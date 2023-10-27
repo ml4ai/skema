@@ -1,0 +1,887 @@
+{
+    "nodes": [
+        {
+            "body": [
+                {
+                    "alias": "np",
+                    "all": false,
+                    "name": "numpy",
+                    "node_type": "ModelImport",
+                    "source_refs": [
+                        {
+                            "col_end": 18,
+                            "col_start": 0,
+                            "node_type": "SourceRef",
+                            "row_end": 1,
+                            "row_start": 1,
+                            "source_file_name": "two_stage_hierarchical"
+                        }
+                    ],
+                    "symbol": null
+                },
+                {
+                    "body": [
+                        {
+                            "left": {
+                                "default_value": null,
+                                "node_type": "Var",
+                                "source_refs": [
+                                    {
+                                        "col_end": 5,
+                                        "col_start": 4,
+                                        "node_type": "SourceRef",
+                                        "row_end": 11,
+                                        "row_start": 11,
+                                        "source_file_name": "two_stage_hierarchical"
+                                    }
+                                ],
+                                "type": "float",
+                                "val": {
+                                    "id": 4,
+                                    "name": "x",
+                                    "node_type": "Name",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 5,
+                                            "col_start": 4,
+                                            "node_type": "SourceRef",
+                                            "row_end": 11,
+                                            "row_start": 11,
+                                            "source_file_name": "two_stage_hierarchical"
+                                        }
+                                    ]
+                                }
+                            },
+                            "node_type": "Assignment",
+                            "right": {
+                                "interpreter": "Python",
+                                "node_type": "Operator",
+                                "op": "ast.Lt",
+                                "operands": [
+                                    {
+                                        "arguments": [
+                                            {
+                                                "id": 2,
+                                                "name": "pool_size",
+                                                "node_type": "Name",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 32,
+                                                        "col_start": 23,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 11,
+                                                        "row_start": 11,
+                                                        "source_file_name": "two_stage_hierarchical"
+                                                    }
+                                                ]
+                                            }
+                                        ],
+                                        "func": {
+                                            "attr": {
+                                                "id": 8,
+                                                "name": "rand",
+                                                "node_type": "Name",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 22,
+                                                        "col_start": 8,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 11,
+                                                        "row_start": 11,
+                                                        "source_file_name": "two_stage_hierarchical"
+                                                    }
+                                                ]
+                                            },
+                                            "node_type": "Attribute",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 22,
+                                                    "col_start": 8,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 11,
+                                                    "row_start": 11,
+                                                    "source_file_name": "two_stage_hierarchical"
+                                                }
+                                            ],
+                                            "value": {
+                                                "attr": {
+                                                    "id": 7,
+                                                    "name": "random",
+                                                    "node_type": "Name",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 17,
+                                                            "col_start": 8,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 11,
+                                                            "row_start": 11,
+                                                            "source_file_name": "two_stage_hierarchical"
+                                                        }
+                                                    ]
+                                                },
+                                                "node_type": "Attribute",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 17,
+                                                        "col_start": 8,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 11,
+                                                        "row_start": 11,
+                                                        "source_file_name": "two_stage_hierarchical"
+                                                    }
+                                                ],
+                                                "value": {
+                                                    "id": -1,
+                                                    "name": "numpy",
+                                                    "node_type": "Name",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 10,
+                                                            "col_start": 8,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 11,
+                                                            "row_start": 11,
+                                                            "source_file_name": "two_stage_hierarchical"
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        },
+                                        "node_type": "Call",
+                                        "source_language": null,
+                                        "source_language_version": null,
+                                        "source_refs": [
+                                            {
+                                                "col_end": 33,
+                                                "col_start": 8,
+                                                "node_type": "SourceRef",
+                                                "row_end": 11,
+                                                "row_start": 11,
+                                                "source_file_name": "two_stage_hierarchical"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "id": 3,
+                                        "name": "prevalence",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 46,
+                                                "col_start": 36,
+                                                "node_type": "SourceRef",
+                                                "row_end": 11,
+                                                "row_start": 11,
+                                                "source_file_name": "two_stage_hierarchical"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "source_language": "Python",
+                                "source_refs": [
+                                    {
+                                        "col_end": 46,
+                                        "col_start": 8,
+                                        "node_type": "SourceRef",
+                                        "row_end": 11,
+                                        "row_start": 11,
+                                        "source_file_name": "two_stage_hierarchical"
+                                    }
+                                ],
+                                "version": "3.8.18"
+                            },
+                            "source_refs": [
+                                {
+                                    "col_end": 46,
+                                    "col_start": 4,
+                                    "node_type": "SourceRef",
+                                    "row_end": 11,
+                                    "row_start": 11,
+                                    "source_file_name": "two_stage_hierarchical"
+                                }
+                            ]
+                        },
+                        {
+                            "left": {
+                                "default_value": null,
+                                "node_type": "Var",
+                                "source_refs": [
+                                    {
+                                        "col_end": 11,
+                                        "col_start": 4,
+                                        "node_type": "SourceRef",
+                                        "row_end": 13,
+                                        "row_start": 13,
+                                        "source_file_name": "two_stage_hierarchical"
+                                    }
+                                ],
+                                "type": "float",
+                                "val": {
+                                    "id": 5,
+                                    "name": "n_tests",
+                                    "node_type": "Name",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 11,
+                                            "col_start": 4,
+                                            "node_type": "SourceRef",
+                                            "row_end": 13,
+                                            "row_start": 13,
+                                            "source_file_name": "two_stage_hierarchical"
+                                        }
+                                    ]
+                                }
+                            },
+                            "node_type": "Assignment",
+                            "right": {
+                                "node_type": "LiteralValue",
+                                "source_code_data_type": [
+                                    "Python",
+                                    "3.8",
+                                    "<class 'int'>"
+                                ],
+                                "source_refs": [
+                                    {
+                                        "col_end": 15,
+                                        "col_start": 14,
+                                        "node_type": "SourceRef",
+                                        "row_end": 13,
+                                        "row_start": 13,
+                                        "source_file_name": "two_stage_hierarchical"
+                                    }
+                                ],
+                                "value": 1,
+                                "value_type": "Integer"
+                            },
+                            "source_refs": [
+                                {
+                                    "col_end": 15,
+                                    "col_start": 4,
+                                    "node_type": "SourceRef",
+                                    "row_end": 13,
+                                    "row_start": 13,
+                                    "source_file_name": "two_stage_hierarchical"
+                                }
+                            ]
+                        },
+                        {
+                            "left": {
+                                "default_value": null,
+                                "node_type": "Var",
+                                "source_refs": [
+                                    {
+                                        "col_end": 12,
+                                        "col_start": 4,
+                                        "node_type": "SourceRef",
+                                        "row_end": 14,
+                                        "row_start": 14,
+                                        "source_file_name": "two_stage_hierarchical"
+                                    }
+                                ],
+                                "type": "float",
+                                "val": {
+                                    "id": 6,
+                                    "name": "positive",
+                                    "node_type": "Name",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 12,
+                                            "col_start": 4,
+                                            "node_type": "SourceRef",
+                                            "row_end": 14,
+                                            "row_start": 14,
+                                            "source_file_name": "two_stage_hierarchical"
+                                        }
+                                    ]
+                                }
+                            },
+                            "node_type": "Assignment",
+                            "right": {
+                                "arguments": [],
+                                "func": {
+                                    "attr": {
+                                        "id": 11,
+                                        "name": "max",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 33,
+                                                "col_start": 15,
+                                                "node_type": "SourceRef",
+                                                "row_end": 14,
+                                                "row_start": 14,
+                                                "source_file_name": "two_stage_hierarchical"
+                                            }
+                                        ]
+                                    },
+                                    "node_type": "Attribute",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 33,
+                                            "col_start": 15,
+                                            "node_type": "SourceRef",
+                                            "row_end": 14,
+                                            "row_start": 14,
+                                            "source_file_name": "two_stage_hierarchical"
+                                        }
+                                    ],
+                                    "value": {
+                                        "arguments": [
+                                            {
+                                                "id": 4,
+                                                "name": "x",
+                                                "node_type": "Name",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 16,
+                                                        "col_start": 15,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 14,
+                                                        "row_start": 14,
+                                                        "source_file_name": "two_stage_hierarchical"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "arguments": [
+                                                    {
+                                                        "node_type": "LiteralValue",
+                                                        "source_code_data_type": [
+                                                            "Python",
+                                                            "3.8",
+                                                            "<class 'int'>"
+                                                        ],
+                                                        "source_refs": [
+                                                            {
+                                                                "col_end": 18,
+                                                                "col_start": 17,
+                                                                "node_type": "SourceRef",
+                                                                "row_end": 14,
+                                                                "row_start": 14,
+                                                                "source_file_name": "two_stage_hierarchical"
+                                                            }
+                                                        ],
+                                                        "value": 1,
+                                                        "value_type": "Integer"
+                                                    },
+                                                    {
+                                                        "id": 2,
+                                                        "name": "pool_size",
+                                                        "node_type": "Name",
+                                                        "source_refs": [
+                                                            {
+                                                                "col_end": 28,
+                                                                "col_start": 19,
+                                                                "node_type": "SourceRef",
+                                                                "row_end": 14,
+                                                                "row_start": 14,
+                                                                "source_file_name": "two_stage_hierarchical"
+                                                            }
+                                                        ]
+                                                    },
+                                                    {
+                                                        "node_type": "LiteralValue",
+                                                        "source_code_data_type": [
+                                                            "Python",
+                                                            "3.8",
+                                                            "Float"
+                                                        ],
+                                                        "source_refs": [
+                                                            {
+                                                                "col_end": 29,
+                                                                "col_start": 15,
+                                                                "node_type": "SourceRef",
+                                                                "row_end": 14,
+                                                                "row_start": 14,
+                                                                "source_file_name": "two_stage_hierarchical"
+                                                            }
+                                                        ],
+                                                        "value": 1,
+                                                        "value_type": "Integer"
+                                                    }
+                                                ],
+                                                "func": {
+                                                    "id": 9,
+                                                    "name": "slice",
+                                                    "node_type": "Name",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 29,
+                                                            "col_start": 15,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 14,
+                                                            "row_start": 14,
+                                                            "source_file_name": "two_stage_hierarchical"
+                                                        }
+                                                    ]
+                                                },
+                                                "node_type": "Call",
+                                                "source_language": null,
+                                                "source_language_version": null,
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 29,
+                                                        "col_start": 15,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 14,
+                                                        "row_start": 14,
+                                                        "source_file_name": "two_stage_hierarchical"
+                                                    }
+                                                ]
+                                            }
+                                        ],
+                                        "func": {
+                                            "id": 10,
+                                            "name": "_get",
+                                            "node_type": "Name",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 29,
+                                                    "col_start": 15,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 14,
+                                                    "row_start": 14,
+                                                    "source_file_name": "two_stage_hierarchical"
+                                                }
+                                            ]
+                                        },
+                                        "node_type": "Call",
+                                        "source_language": null,
+                                        "source_language_version": null,
+                                        "source_refs": [
+                                            {
+                                                "col_end": 29,
+                                                "col_start": 15,
+                                                "node_type": "SourceRef",
+                                                "row_end": 14,
+                                                "row_start": 14,
+                                                "source_file_name": "two_stage_hierarchical"
+                                            }
+                                        ]
+                                    }
+                                },
+                                "node_type": "Call",
+                                "source_language": null,
+                                "source_language_version": null,
+                                "source_refs": [
+                                    {
+                                        "col_end": 35,
+                                        "col_start": 15,
+                                        "node_type": "SourceRef",
+                                        "row_end": 14,
+                                        "row_start": 14,
+                                        "source_file_name": "two_stage_hierarchical"
+                                    }
+                                ]
+                            },
+                            "source_refs": [
+                                {
+                                    "col_end": 35,
+                                    "col_start": 4,
+                                    "node_type": "SourceRef",
+                                    "row_end": 14,
+                                    "row_start": 14,
+                                    "source_file_name": "two_stage_hierarchical"
+                                }
+                            ]
+                        },
+                        {
+                            "body": [
+                                {
+                                    "left": {
+                                        "default_value": null,
+                                        "node_type": "Var",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 15,
+                                                "col_start": 8,
+                                                "node_type": "SourceRef",
+                                                "row_end": 16,
+                                                "row_start": 16,
+                                                "source_file_name": "two_stage_hierarchical"
+                                            }
+                                        ],
+                                        "type": "float",
+                                        "val": {
+                                            "id": 5,
+                                            "name": "n_tests",
+                                            "node_type": "Name",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 15,
+                                                    "col_start": 8,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 16,
+                                                    "row_start": 16,
+                                                    "source_file_name": "two_stage_hierarchical"
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "node_type": "Assignment",
+                                    "right": {
+                                        "interpreter": "Python",
+                                        "node_type": "Operator",
+                                        "op": "ast.Add",
+                                        "operands": [
+                                            {
+                                                "id": 5,
+                                                "name": "n_tests",
+                                                "node_type": "Name",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 28,
+                                                        "col_start": 8,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 16,
+                                                        "row_start": 16,
+                                                        "source_file_name": "two_stage_hierarchical"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "id": 2,
+                                                "name": "pool_size",
+                                                "node_type": "Name",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 28,
+                                                        "col_start": 19,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 16,
+                                                        "row_start": 16,
+                                                        "source_file_name": "two_stage_hierarchical"
+                                                    }
+                                                ]
+                                            }
+                                        ],
+                                        "source_language": "Python",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 28,
+                                                "col_start": 8,
+                                                "node_type": "SourceRef",
+                                                "row_end": 16,
+                                                "row_start": 16,
+                                                "source_file_name": "two_stage_hierarchical"
+                                            }
+                                        ],
+                                        "version": "3.8.18"
+                                    },
+                                    "source_refs": [
+                                        {
+                                            "col_end": 28,
+                                            "col_start": 8,
+                                            "node_type": "SourceRef",
+                                            "row_end": 16,
+                                            "row_start": 16,
+                                            "source_file_name": "two_stage_hierarchical"
+                                        }
+                                    ]
+                                }
+                            ],
+                            "expr": {
+                                "interpreter": "Python",
+                                "node_type": "Operator",
+                                "op": "ast.Eq",
+                                "operands": [
+                                    {
+                                        "arguments": [
+                                            {
+                                                "id": 6,
+                                                "name": "positive",
+                                                "node_type": "Name",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 15,
+                                                        "col_start": 7,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 15,
+                                                        "row_start": 15,
+                                                        "source_file_name": "two_stage_hierarchical"
+                                                    }
+                                                ]
+                                            }
+                                        ],
+                                        "func": {
+                                            "id": 12,
+                                            "name": "bool",
+                                            "node_type": "Name",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 28,
+                                                    "col_start": 4,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 16,
+                                                    "row_start": 15,
+                                                    "source_file_name": "two_stage_hierarchical"
+                                                }
+                                            ]
+                                        },
+                                        "node_type": "Call",
+                                        "source_language": null,
+                                        "source_language_version": null,
+                                        "source_refs": [
+                                            {
+                                                "col_end": 28,
+                                                "col_start": 4,
+                                                "node_type": "SourceRef",
+                                                "row_end": 16,
+                                                "row_start": 15,
+                                                "source_file_name": "two_stage_hierarchical"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "node_type": "LiteralValue",
+                                        "source_code_data_type": [
+                                            "Python",
+                                            "3.8",
+                                            "<class 'bool'>"
+                                        ],
+                                        "source_refs": [
+                                            {
+                                                "col_end": 28,
+                                                "col_start": 4,
+                                                "node_type": "SourceRef",
+                                                "row_end": 16,
+                                                "row_start": 15,
+                                                "source_file_name": "two_stage_hierarchical"
+                                            }
+                                        ],
+                                        "value": "True",
+                                        "value_type": "Boolean"
+                                    }
+                                ],
+                                "source_language": "Python",
+                                "source_refs": [
+                                    {
+                                        "col_end": 28,
+                                        "col_start": 4,
+                                        "node_type": "SourceRef",
+                                        "row_end": 16,
+                                        "row_start": 15,
+                                        "source_file_name": "two_stage_hierarchical"
+                                    }
+                                ],
+                                "version": "3.8.18"
+                            },
+                            "node_type": "ModelIf",
+                            "orelse": [],
+                            "source_refs": [
+                                {
+                                    "col_end": 28,
+                                    "col_start": 4,
+                                    "node_type": "SourceRef",
+                                    "row_end": 16,
+                                    "row_start": 15,
+                                    "source_file_name": "two_stage_hierarchical"
+                                }
+                            ]
+                        },
+                        {
+                            "node_type": "ModelReturn",
+                            "source_refs": [
+                                {
+                                    "col_end": 30,
+                                    "col_start": 4,
+                                    "node_type": "SourceRef",
+                                    "row_end": 17,
+                                    "row_start": 17,
+                                    "source_file_name": "two_stage_hierarchical"
+                                }
+                            ],
+                            "value": {
+                                "interpreter": "Python",
+                                "node_type": "Operator",
+                                "op": "ast.Div",
+                                "operands": [
+                                    {
+                                        "id": 5,
+                                        "name": "n_tests",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 18,
+                                                "col_start": 11,
+                                                "node_type": "SourceRef",
+                                                "row_end": 17,
+                                                "row_start": 17,
+                                                "source_file_name": "two_stage_hierarchical"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "id": 2,
+                                        "name": "pool_size",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 30,
+                                                "col_start": 21,
+                                                "node_type": "SourceRef",
+                                                "row_end": 17,
+                                                "row_start": 17,
+                                                "source_file_name": "two_stage_hierarchical"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "source_language": "Python",
+                                "source_refs": [
+                                    {
+                                        "col_end": 30,
+                                        "col_start": 11,
+                                        "node_type": "SourceRef",
+                                        "row_end": 17,
+                                        "row_start": 17,
+                                        "source_file_name": "two_stage_hierarchical"
+                                    }
+                                ],
+                                "version": "3.8.18"
+                            }
+                        }
+                    ],
+                    "func_args": [
+                        {
+                            "default_value": {
+                                "node_type": "LiteralValue",
+                                "source_code_data_type": [
+                                    "Python",
+                                    "3.8",
+                                    "<class 'int'>"
+                                ],
+                                "source_refs": [
+                                    {
+                                        "col_end": 29,
+                                        "col_start": 27,
+                                        "node_type": "SourceRef",
+                                        "row_end": 3,
+                                        "row_start": 3,
+                                        "source_file_name": "two_stage_hierarchical"
+                                    }
+                                ],
+                                "value": 32,
+                                "value_type": "Integer"
+                            },
+                            "node_type": "Var",
+                            "source_refs": [
+                                {
+                                    "col_end": 24,
+                                    "col_start": 15,
+                                    "node_type": "SourceRef",
+                                    "row_end": 3,
+                                    "row_start": 3,
+                                    "source_file_name": "two_stage_hierarchical"
+                                }
+                            ],
+                            "type": "float",
+                            "val": {
+                                "id": 2,
+                                "name": "pool_size",
+                                "node_type": "Name",
+                                "source_refs": [
+                                    {
+                                        "col_end": 24,
+                                        "col_start": 15,
+                                        "node_type": "SourceRef",
+                                        "row_end": 3,
+                                        "row_start": 3,
+                                        "source_file_name": "two_stage_hierarchical"
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "default_value": {
+                                "node_type": "LiteralValue",
+                                "source_code_data_type": [
+                                    "Python",
+                                    "3.8",
+                                    "<class 'float'>"
+                                ],
+                                "source_refs": [
+                                    {
+                                        "col_end": 49,
+                                        "col_start": 44,
+                                        "node_type": "SourceRef",
+                                        "row_end": 3,
+                                        "row_start": 3,
+                                        "source_file_name": "two_stage_hierarchical"
+                                    }
+                                ],
+                                "value": 0.001,
+                                "value_type": "AbstractFloat"
+                            },
+                            "node_type": "Var",
+                            "source_refs": [
+                                {
+                                    "col_end": 41,
+                                    "col_start": 31,
+                                    "node_type": "SourceRef",
+                                    "row_end": 3,
+                                    "row_start": 3,
+                                    "source_file_name": "two_stage_hierarchical"
+                                }
+                            ],
+                            "type": "float",
+                            "val": {
+                                "id": 3,
+                                "name": "prevalence",
+                                "node_type": "Name",
+                                "source_refs": [
+                                    {
+                                        "col_end": 41,
+                                        "col_start": 31,
+                                        "node_type": "SourceRef",
+                                        "row_end": 3,
+                                        "row_start": 3,
+                                        "source_file_name": "two_stage_hierarchical"
+                                    }
+                                ]
+                            }
+                        }
+                    ],
+                    "name": {
+                        "id": 1,
+                        "name": "sim_2stage",
+                        "node_type": "Name",
+                        "source_refs": [
+                            {
+                                "col_end": 30,
+                                "col_start": 0,
+                                "node_type": "SourceRef",
+                                "row_end": 17,
+                                "row_start": 3,
+                                "source_file_name": "two_stage_hierarchical"
+                            }
+                        ]
+                    },
+                    "node_type": "FunctionDef",
+                    "source_refs": [
+                        {
+                            "col_end": 30,
+                            "col_start": 0,
+                            "node_type": "SourceRef",
+                            "row_end": 17,
+                            "row_start": 3,
+                            "source_file_name": "two_stage_hierarchical"
+                        }
+                    ]
+                }
+            ],
+            "name": "two_stage_hierarchical",
+            "node_type": "Module",
+            "source_refs": [
+                {
+                    "col_end": null,
+                    "col_start": null,
+                    "node_type": "SourceRef",
+                    "row_end": 17,
+                    "row_start": 1,
+                    "source_file_name": "two_stage_hierarchical.py"
+                }
+            ]
+        }
+    ]
+}

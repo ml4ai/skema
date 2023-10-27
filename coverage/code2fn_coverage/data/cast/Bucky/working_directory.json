@@ -1,0 +1,405 @@
+{
+    "nodes": [
+        {
+            "body": [
+                {
+                    "alias": null,
+                    "all": false,
+                    "name": "contextlib",
+                    "node_type": "ModelImport",
+                    "source_refs": [
+                        {
+                            "col_end": 17,
+                            "col_start": 0,
+                            "node_type": "SourceRef",
+                            "row_end": 2,
+                            "row_start": 2,
+                            "source_file_name": "working_directory"
+                        }
+                    ],
+                    "symbol": null
+                },
+                {
+                    "alias": null,
+                    "all": false,
+                    "name": "os",
+                    "node_type": "ModelImport",
+                    "source_refs": [
+                        {
+                            "col_end": 9,
+                            "col_start": 0,
+                            "node_type": "SourceRef",
+                            "row_end": 3,
+                            "row_start": 3,
+                            "source_file_name": "working_directory"
+                        }
+                    ],
+                    "symbol": null
+                },
+                {
+                    "alias": null,
+                    "all": false,
+                    "name": "pathlib",
+                    "node_type": "ModelImport",
+                    "source_refs": [
+                        {
+                            "col_end": 24,
+                            "col_start": 0,
+                            "node_type": "SourceRef",
+                            "row_end": 4,
+                            "row_start": 4,
+                            "source_file_name": "working_directory"
+                        }
+                    ],
+                    "symbol": "Path"
+                },
+                {
+                    "body": [
+                        {
+                            "left": {
+                                "default_value": null,
+                                "node_type": "Var",
+                                "source_refs": [
+                                    {
+                                        "col_end": 12,
+                                        "col_start": 4,
+                                        "node_type": "SourceRef",
+                                        "row_end": 12,
+                                        "row_start": 12,
+                                        "source_file_name": "working_directory"
+                                    }
+                                ],
+                                "type": "float",
+                                "val": {
+                                    "id": 4,
+                                    "name": "prev_cwd",
+                                    "node_type": "Name",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 12,
+                                            "col_start": 4,
+                                            "node_type": "SourceRef",
+                                            "row_end": 12,
+                                            "row_start": 12,
+                                            "source_file_name": "working_directory"
+                                        }
+                                    ]
+                                }
+                            },
+                            "node_type": "Assignment",
+                            "right": {
+                                "arguments": [],
+                                "func": {
+                                    "attr": {
+                                        "id": 6,
+                                        "name": "cwd",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 23,
+                                                "col_start": 15,
+                                                "node_type": "SourceRef",
+                                                "row_end": 12,
+                                                "row_start": 12,
+                                                "source_file_name": "working_directory"
+                                            }
+                                        ]
+                                    },
+                                    "node_type": "Attribute",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 23,
+                                            "col_start": 15,
+                                            "node_type": "SourceRef",
+                                            "row_end": 12,
+                                            "row_start": 12,
+                                            "source_file_name": "working_directory"
+                                        }
+                                    ],
+                                    "value": {
+                                        "id": 5,
+                                        "name": "Path",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 19,
+                                                "col_start": 15,
+                                                "node_type": "SourceRef",
+                                                "row_end": 12,
+                                                "row_start": 12,
+                                                "source_file_name": "working_directory"
+                                            }
+                                        ]
+                                    }
+                                },
+                                "node_type": "Call",
+                                "source_language": null,
+                                "source_language_version": null,
+                                "source_refs": [
+                                    {
+                                        "col_end": 25,
+                                        "col_start": 15,
+                                        "node_type": "SourceRef",
+                                        "row_end": 12,
+                                        "row_start": 12,
+                                        "source_file_name": "working_directory"
+                                    }
+                                ]
+                            },
+                            "source_refs": [
+                                {
+                                    "col_end": 25,
+                                    "col_start": 4,
+                                    "node_type": "SourceRef",
+                                    "row_end": 12,
+                                    "row_start": 12,
+                                    "source_file_name": "working_directory"
+                                }
+                            ]
+                        },
+                        {
+                            "arguments": [
+                                {
+                                    "id": 3,
+                                    "name": "path",
+                                    "node_type": "Name",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 17,
+                                            "col_start": 13,
+                                            "node_type": "SourceRef",
+                                            "row_end": 13,
+                                            "row_start": 13,
+                                            "source_file_name": "working_directory"
+                                        }
+                                    ]
+                                }
+                            ],
+                            "func": {
+                                "attr": {
+                                    "id": 8,
+                                    "name": "chdir",
+                                    "node_type": "Name",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 12,
+                                            "col_start": 4,
+                                            "node_type": "SourceRef",
+                                            "row_end": 13,
+                                            "row_start": 13,
+                                            "source_file_name": "working_directory"
+                                        }
+                                    ]
+                                },
+                                "node_type": "Attribute",
+                                "source_refs": [
+                                    {
+                                        "col_end": 12,
+                                        "col_start": 4,
+                                        "node_type": "SourceRef",
+                                        "row_end": 13,
+                                        "row_start": 13,
+                                        "source_file_name": "working_directory"
+                                    }
+                                ],
+                                "value": {
+                                    "id": 7,
+                                    "name": "os",
+                                    "node_type": "Name",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 6,
+                                            "col_start": 4,
+                                            "node_type": "SourceRef",
+                                            "row_end": 13,
+                                            "row_start": 13,
+                                            "source_file_name": "working_directory"
+                                        }
+                                    ]
+                                }
+                            },
+                            "node_type": "Call",
+                            "source_language": null,
+                            "source_language_version": null,
+                            "source_refs": [
+                                {
+                                    "col_end": 18,
+                                    "col_start": 4,
+                                    "node_type": "SourceRef",
+                                    "row_end": 13,
+                                    "row_start": 13,
+                                    "source_file_name": "working_directory"
+                                }
+                            ]
+                        },
+                        {
+                            "node_type": "LiteralValue",
+                            "source_code_data_type": [
+                                "Python",
+                                "3.8",
+                                "List"
+                            ],
+                            "source_refs": [
+                                {
+                                    "col_end": 13,
+                                    "col_start": 8,
+                                    "node_type": "SourceRef",
+                                    "row_end": 15,
+                                    "row_start": 15,
+                                    "source_file_name": "working_directory"
+                                }
+                            ],
+                            "value": "NotImplemented",
+                            "value_type": "List"
+                        },
+                        {
+                            "arguments": [
+                                {
+                                    "id": 4,
+                                    "name": "prev_cwd",
+                                    "node_type": "Name",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 25,
+                                            "col_start": 17,
+                                            "node_type": "SourceRef",
+                                            "row_end": 17,
+                                            "row_start": 17,
+                                            "source_file_name": "working_directory"
+                                        }
+                                    ]
+                                }
+                            ],
+                            "func": {
+                                "attr": {
+                                    "id": 8,
+                                    "name": "chdir",
+                                    "node_type": "Name",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 16,
+                                            "col_start": 8,
+                                            "node_type": "SourceRef",
+                                            "row_end": 17,
+                                            "row_start": 17,
+                                            "source_file_name": "working_directory"
+                                        }
+                                    ]
+                                },
+                                "node_type": "Attribute",
+                                "source_refs": [
+                                    {
+                                        "col_end": 16,
+                                        "col_start": 8,
+                                        "node_type": "SourceRef",
+                                        "row_end": 17,
+                                        "row_start": 17,
+                                        "source_file_name": "working_directory"
+                                    }
+                                ],
+                                "value": {
+                                    "id": 7,
+                                    "name": "os",
+                                    "node_type": "Name",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 10,
+                                            "col_start": 8,
+                                            "node_type": "SourceRef",
+                                            "row_end": 17,
+                                            "row_start": 17,
+                                            "source_file_name": "working_directory"
+                                        }
+                                    ]
+                                }
+                            },
+                            "node_type": "Call",
+                            "source_language": null,
+                            "source_language_version": null,
+                            "source_refs": [
+                                {
+                                    "col_end": 26,
+                                    "col_start": 8,
+                                    "node_type": "SourceRef",
+                                    "row_end": 17,
+                                    "row_start": 17,
+                                    "source_file_name": "working_directory"
+                                }
+                            ]
+                        }
+                    ],
+                    "func_args": [
+                        {
+                            "default_value": null,
+                            "node_type": "Var",
+                            "source_refs": [
+                                {
+                                    "col_end": 26,
+                                    "col_start": 22,
+                                    "node_type": "SourceRef",
+                                    "row_end": 10,
+                                    "row_start": 10,
+                                    "source_file_name": "working_directory"
+                                }
+                            ],
+                            "type": "float",
+                            "val": {
+                                "id": 3,
+                                "name": "path",
+                                "node_type": "Name",
+                                "source_refs": [
+                                    {
+                                        "col_end": 26,
+                                        "col_start": 22,
+                                        "node_type": "SourceRef",
+                                        "row_end": 10,
+                                        "row_start": 10,
+                                        "source_file_name": "working_directory"
+                                    }
+                                ]
+                            }
+                        }
+                    ],
+                    "name": {
+                        "id": 2,
+                        "name": "working_directory",
+                        "node_type": "Name",
+                        "source_refs": [
+                            {
+                                "col_end": 26,
+                                "col_start": 0,
+                                "node_type": "SourceRef",
+                                "row_end": 17,
+                                "row_start": 10,
+                                "source_file_name": "working_directory"
+                            }
+                        ]
+                    },
+                    "node_type": "FunctionDef",
+                    "source_refs": [
+                        {
+                            "col_end": 26,
+                            "col_start": 0,
+                            "node_type": "SourceRef",
+                            "row_end": 17,
+                            "row_start": 10,
+                            "source_file_name": "working_directory"
+                        }
+                    ]
+                }
+            ],
+            "name": "working_directory",
+            "node_type": "Module",
+            "source_refs": [
+                {
+                    "col_end": null,
+                    "col_start": null,
+                    "node_type": "SourceRef",
+                    "row_end": 17,
+                    "row_start": 1,
+                    "source_file_name": "working_directory.py"
+                }
+            ]
+        }
+    ]
+}

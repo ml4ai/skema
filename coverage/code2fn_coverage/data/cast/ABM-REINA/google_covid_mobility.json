@@ -1,0 +1,1946 @@
+{
+    "nodes": [
+        {
+            "body": [
+                {
+                    "alias": null,
+                    "all": false,
+                    "name": "os",
+                    "node_type": "ModelImport",
+                    "source_refs": [
+                        {
+                            "col_end": 9,
+                            "col_start": 0,
+                            "node_type": "SourceRef",
+                            "row_end": 1,
+                            "row_start": 1,
+                            "source_file_name": "google_covid_mobility"
+                        }
+                    ],
+                    "symbol": null
+                },
+                {
+                    "alias": null,
+                    "all": false,
+                    "name": "datetime",
+                    "node_type": "ModelImport",
+                    "source_refs": [
+                        {
+                            "col_end": 29,
+                            "col_start": 0,
+                            "node_type": "SourceRef",
+                            "row_end": 2,
+                            "row_start": 2,
+                            "source_file_name": "google_covid_mobility"
+                        }
+                    ],
+                    "symbol": "datetime"
+                },
+                {
+                    "alias": null,
+                    "all": false,
+                    "name": "requests",
+                    "node_type": "ModelImport",
+                    "source_refs": [
+                        {
+                            "col_end": 15,
+                            "col_start": 0,
+                            "node_type": "SourceRef",
+                            "row_end": 4,
+                            "row_start": 4,
+                            "source_file_name": "google_covid_mobility"
+                        }
+                    ],
+                    "symbol": null
+                },
+                {
+                    "alias": null,
+                    "all": false,
+                    "name": "dateutil.parser",
+                    "node_type": "ModelImport",
+                    "source_refs": [
+                        {
+                            "col_end": 45,
+                            "col_start": 0,
+                            "node_type": "SourceRef",
+                            "row_end": 5,
+                            "row_start": 5,
+                            "source_file_name": "google_covid_mobility"
+                        }
+                    ],
+                    "symbol": "parse"
+                },
+                {
+                    "alias": null,
+                    "all": false,
+                    "name": "dateutil.tz",
+                    "node_type": "ModelImport",
+                    "source_refs": [
+                        {
+                            "col_end": 31,
+                            "col_start": 0,
+                            "node_type": "SourceRef",
+                            "row_end": 6,
+                            "row_start": 6,
+                            "source_file_name": "google_covid_mobility"
+                        }
+                    ],
+                    "symbol": "tzlocal"
+                },
+                {
+                    "alias": null,
+                    "all": false,
+                    "name": "utils.data",
+                    "node_type": "ModelImport",
+                    "source_refs": [
+                        {
+                            "col_end": 39,
+                            "col_start": 0,
+                            "node_type": "SourceRef",
+                            "row_end": 8,
+                            "row_start": 8,
+                            "source_file_name": "google_covid_mobility"
+                        }
+                    ],
+                    "symbol": "get_dataset_path"
+                },
+                {
+                    "left": {
+                        "default_value": null,
+                        "node_type": "Var",
+                        "source_refs": [
+                            {
+                                "col_end": 3,
+                                "col_start": 0,
+                                "node_type": "SourceRef",
+                                "row_end": 11,
+                                "row_start": 11,
+                                "source_file_name": "google_covid_mobility"
+                            }
+                        ],
+                        "type": "float",
+                        "val": {
+                            "id": 0,
+                            "name": "URL",
+                            "node_type": "Name",
+                            "source_refs": [
+                                {
+                                    "col_end": 3,
+                                    "col_start": 0,
+                                    "node_type": "SourceRef",
+                                    "row_end": 11,
+                                    "row_start": 11,
+                                    "source_file_name": "google_covid_mobility"
+                                }
+                            ]
+                        }
+                    },
+                    "node_type": "Assignment",
+                    "right": {
+                        "node_type": "LiteralValue",
+                        "source_code_data_type": [
+                            "Python",
+                            "3.8",
+                            "<class 'str'>"
+                        ],
+                        "source_refs": [
+                            {
+                                "col_end": 80,
+                                "col_start": 6,
+                                "node_type": "SourceRef",
+                                "row_end": 11,
+                                "row_start": 11,
+                                "source_file_name": "google_covid_mobility"
+                            }
+                        ],
+                        "value": "https://www.gstatic.com/covid19/mobility/Region_Mobility_Report_CSVs.zip",
+                        "value_type": "List"
+                    },
+                    "source_refs": [
+                        {
+                            "col_end": 80,
+                            "col_start": 0,
+                            "node_type": "SourceRef",
+                            "row_end": 11,
+                            "row_start": 11,
+                            "source_file_name": "google_covid_mobility"
+                        }
+                    ]
+                },
+                {
+                    "left": {
+                        "default_value": null,
+                        "node_type": "Var",
+                        "source_refs": [
+                            {
+                                "col_end": 16,
+                                "col_start": 0,
+                                "node_type": "SourceRef",
+                                "row_end": 13,
+                                "row_start": 13,
+                                "source_file_name": "google_covid_mobility"
+                            }
+                        ],
+                        "type": "float",
+                        "val": {
+                            "id": 1,
+                            "name": "DATASET_ZIP_NAME",
+                            "node_type": "Name",
+                            "source_refs": [
+                                {
+                                    "col_end": 16,
+                                    "col_start": 0,
+                                    "node_type": "SourceRef",
+                                    "row_end": 13,
+                                    "row_start": 13,
+                                    "source_file_name": "google_covid_mobility"
+                                }
+                            ]
+                        }
+                    },
+                    "node_type": "Assignment",
+                    "right": {
+                        "node_type": "LiteralValue",
+                        "source_code_data_type": [
+                            "Python",
+                            "3.8",
+                            "<class 'str'>"
+                        ],
+                        "source_refs": [
+                            {
+                                "col_end": 59,
+                                "col_start": 19,
+                                "node_type": "SourceRef",
+                                "row_end": 13,
+                                "row_start": 13,
+                                "source_file_name": "google_covid_mobility"
+                            }
+                        ],
+                        "value": "Google_Region_Mobility_Report_CSVs.zip",
+                        "value_type": "List"
+                    },
+                    "source_refs": [
+                        {
+                            "col_end": 59,
+                            "col_start": 0,
+                            "node_type": "SourceRef",
+                            "row_end": 13,
+                            "row_start": 13,
+                            "source_file_name": "google_covid_mobility"
+                        }
+                    ]
+                },
+                {
+                    "body": [
+                        {
+                            "left": {
+                                "default_value": null,
+                                "node_type": "Var",
+                                "source_refs": [
+                                    {
+                                        "col_end": 8,
+                                        "col_start": 4,
+                                        "node_type": "SourceRef",
+                                        "row_end": 17,
+                                        "row_start": 17,
+                                        "source_file_name": "google_covid_mobility"
+                                    }
+                                ],
+                                "type": "float",
+                                "val": {
+                                    "id": 9,
+                                    "name": "resp",
+                                    "node_type": "Name",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 8,
+                                            "col_start": 4,
+                                            "node_type": "SourceRef",
+                                            "row_end": 17,
+                                            "row_start": 17,
+                                            "source_file_name": "google_covid_mobility"
+                                        }
+                                    ]
+                                }
+                            },
+                            "node_type": "Assignment",
+                            "right": {
+                                "arguments": [
+                                    {
+                                        "id": 0,
+                                        "name": "URL",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 28,
+                                                "col_start": 25,
+                                                "node_type": "SourceRef",
+                                                "row_end": 17,
+                                                "row_start": 17,
+                                                "source_file_name": "google_covid_mobility"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "func": {
+                                    "attr": {
+                                        "id": 11,
+                                        "name": "head",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 24,
+                                                "col_start": 11,
+                                                "node_type": "SourceRef",
+                                                "row_end": 17,
+                                                "row_start": 17,
+                                                "source_file_name": "google_covid_mobility"
+                                            }
+                                        ]
+                                    },
+                                    "node_type": "Attribute",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 24,
+                                            "col_start": 11,
+                                            "node_type": "SourceRef",
+                                            "row_end": 17,
+                                            "row_start": 17,
+                                            "source_file_name": "google_covid_mobility"
+                                        }
+                                    ],
+                                    "value": {
+                                        "id": 10,
+                                        "name": "requests",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 19,
+                                                "col_start": 11,
+                                                "node_type": "SourceRef",
+                                                "row_end": 17,
+                                                "row_start": 17,
+                                                "source_file_name": "google_covid_mobility"
+                                            }
+                                        ]
+                                    }
+                                },
+                                "node_type": "Call",
+                                "source_language": null,
+                                "source_language_version": null,
+                                "source_refs": [
+                                    {
+                                        "col_end": 29,
+                                        "col_start": 11,
+                                        "node_type": "SourceRef",
+                                        "row_end": 17,
+                                        "row_start": 17,
+                                        "source_file_name": "google_covid_mobility"
+                                    }
+                                ]
+                            },
+                            "source_refs": [
+                                {
+                                    "col_end": 29,
+                                    "col_start": 4,
+                                    "node_type": "SourceRef",
+                                    "row_end": 17,
+                                    "row_start": 17,
+                                    "source_file_name": "google_covid_mobility"
+                                }
+                            ]
+                        },
+                        {
+                            "arguments": [],
+                            "func": {
+                                "attr": {
+                                    "id": 12,
+                                    "name": "raise_for_status",
+                                    "node_type": "Name",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 25,
+                                            "col_start": 4,
+                                            "node_type": "SourceRef",
+                                            "row_end": 18,
+                                            "row_start": 18,
+                                            "source_file_name": "google_covid_mobility"
+                                        }
+                                    ]
+                                },
+                                "node_type": "Attribute",
+                                "source_refs": [
+                                    {
+                                        "col_end": 25,
+                                        "col_start": 4,
+                                        "node_type": "SourceRef",
+                                        "row_end": 18,
+                                        "row_start": 18,
+                                        "source_file_name": "google_covid_mobility"
+                                    }
+                                ],
+                                "value": {
+                                    "id": 9,
+                                    "name": "resp",
+                                    "node_type": "Name",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 8,
+                                            "col_start": 4,
+                                            "node_type": "SourceRef",
+                                            "row_end": 18,
+                                            "row_start": 18,
+                                            "source_file_name": "google_covid_mobility"
+                                        }
+                                    ]
+                                }
+                            },
+                            "node_type": "Call",
+                            "source_language": null,
+                            "source_language_version": null,
+                            "source_refs": [
+                                {
+                                    "col_end": 27,
+                                    "col_start": 4,
+                                    "node_type": "SourceRef",
+                                    "row_end": 18,
+                                    "row_start": 18,
+                                    "source_file_name": "google_covid_mobility"
+                                }
+                            ]
+                        },
+                        {
+                            "left": {
+                                "default_value": null,
+                                "node_type": "Var",
+                                "source_refs": [
+                                    {
+                                        "col_end": 6,
+                                        "col_start": 4,
+                                        "node_type": "SourceRef",
+                                        "row_end": 19,
+                                        "row_start": 19,
+                                        "source_file_name": "google_covid_mobility"
+                                    }
+                                ],
+                                "type": "float",
+                                "val": {
+                                    "id": 6,
+                                    "name": "lm",
+                                    "node_type": "Name",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 6,
+                                            "col_start": 4,
+                                            "node_type": "SourceRef",
+                                            "row_end": 19,
+                                            "row_start": 19,
+                                            "source_file_name": "google_covid_mobility"
+                                        }
+                                    ]
+                                }
+                            },
+                            "node_type": "Assignment",
+                            "right": {
+                                "arguments": [
+                                    {
+                                        "attr": {
+                                            "id": 14,
+                                            "name": "headers",
+                                            "node_type": "Name",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 21,
+                                                    "col_start": 9,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 19,
+                                                    "row_start": 19,
+                                                    "source_file_name": "google_covid_mobility"
+                                                }
+                                            ]
+                                        },
+                                        "node_type": "Attribute",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 21,
+                                                "col_start": 9,
+                                                "node_type": "SourceRef",
+                                                "row_end": 19,
+                                                "row_start": 19,
+                                                "source_file_name": "google_covid_mobility"
+                                            }
+                                        ],
+                                        "value": {
+                                            "id": 9,
+                                            "name": "resp",
+                                            "node_type": "Name",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 13,
+                                                    "col_start": 9,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 19,
+                                                    "row_start": 19,
+                                                    "source_file_name": "google_covid_mobility"
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "node_type": "LiteralValue",
+                                        "source_code_data_type": [
+                                            "Python",
+                                            "3.8",
+                                            "<class 'str'>"
+                                        ],
+                                        "source_refs": [
+                                            {
+                                                "col_end": 37,
+                                                "col_start": 22,
+                                                "node_type": "SourceRef",
+                                                "row_end": 19,
+                                                "row_start": 19,
+                                                "source_file_name": "google_covid_mobility"
+                                            }
+                                        ],
+                                        "value": "last-modified",
+                                        "value_type": "List"
+                                    }
+                                ],
+                                "func": {
+                                    "id": 13,
+                                    "name": "_get",
+                                    "node_type": "Name",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 38,
+                                            "col_start": 4,
+                                            "node_type": "SourceRef",
+                                            "row_end": 19,
+                                            "row_start": 19,
+                                            "source_file_name": "google_covid_mobility"
+                                        }
+                                    ]
+                                },
+                                "node_type": "Call",
+                                "source_language": null,
+                                "source_language_version": null,
+                                "source_refs": [
+                                    {
+                                        "col_end": 38,
+                                        "col_start": 4,
+                                        "node_type": "SourceRef",
+                                        "row_end": 19,
+                                        "row_start": 19,
+                                        "source_file_name": "google_covid_mobility"
+                                    }
+                                ]
+                            },
+                            "source_refs": [
+                                {
+                                    "col_end": 38,
+                                    "col_start": 4,
+                                    "node_type": "SourceRef",
+                                    "row_end": 19,
+                                    "row_start": 19,
+                                    "source_file_name": "google_covid_mobility"
+                                }
+                            ]
+                        },
+                        {
+                            "left": {
+                                "default_value": null,
+                                "node_type": "Var",
+                                "source_refs": [
+                                    {
+                                        "col_end": 6,
+                                        "col_start": 4,
+                                        "node_type": "SourceRef",
+                                        "row_end": 20,
+                                        "row_start": 20,
+                                        "source_file_name": "google_covid_mobility"
+                                    }
+                                ],
+                                "type": "float",
+                                "val": {
+                                    "id": 7,
+                                    "name": "dt",
+                                    "node_type": "Name",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 6,
+                                            "col_start": 4,
+                                            "node_type": "SourceRef",
+                                            "row_end": 20,
+                                            "row_start": 20,
+                                            "source_file_name": "google_covid_mobility"
+                                        }
+                                    ]
+                                }
+                            },
+                            "node_type": "Assignment",
+                            "right": {
+                                "arguments": [
+                                    {
+                                        "id": 6,
+                                        "name": "lm",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 20,
+                                                "col_start": 18,
+                                                "node_type": "SourceRef",
+                                                "row_end": 20,
+                                                "row_start": 20,
+                                                "source_file_name": "google_covid_mobility"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "func": {
+                                    "id": 15,
+                                    "name": "parse_dt",
+                                    "node_type": "Name",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 21,
+                                            "col_start": 9,
+                                            "node_type": "SourceRef",
+                                            "row_end": 20,
+                                            "row_start": 20,
+                                            "source_file_name": "google_covid_mobility"
+                                        }
+                                    ]
+                                },
+                                "node_type": "Call",
+                                "source_language": null,
+                                "source_language_version": null,
+                                "source_refs": [
+                                    {
+                                        "col_end": 21,
+                                        "col_start": 9,
+                                        "node_type": "SourceRef",
+                                        "row_end": 20,
+                                        "row_start": 20,
+                                        "source_file_name": "google_covid_mobility"
+                                    }
+                                ]
+                            },
+                            "source_refs": [
+                                {
+                                    "col_end": 21,
+                                    "col_start": 4,
+                                    "node_type": "SourceRef",
+                                    "row_end": 20,
+                                    "row_start": 20,
+                                    "source_file_name": "google_covid_mobility"
+                                }
+                            ]
+                        },
+                        {
+                            "left": {
+                                "default_value": null,
+                                "node_type": "Var",
+                                "source_refs": [
+                                    {
+                                        "col_end": 10,
+                                        "col_start": 4,
+                                        "node_type": "SourceRef",
+                                        "row_end": 21,
+                                        "row_start": 21,
+                                        "source_file_name": "google_covid_mobility"
+                                    }
+                                ],
+                                "type": "float",
+                                "val": {
+                                    "id": 8,
+                                    "name": "zip_fn",
+                                    "node_type": "Name",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 10,
+                                            "col_start": 4,
+                                            "node_type": "SourceRef",
+                                            "row_end": 21,
+                                            "row_start": 21,
+                                            "source_file_name": "google_covid_mobility"
+                                        }
+                                    ]
+                                }
+                            },
+                            "node_type": "Assignment",
+                            "right": {
+                                "arguments": [
+                                    {
+                                        "arguments": [],
+                                        "func": {
+                                            "id": 16,
+                                            "name": "get_dataset_path",
+                                            "node_type": "Name",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 44,
+                                                    "col_start": 26,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 21,
+                                                    "row_start": 21,
+                                                    "source_file_name": "google_covid_mobility"
+                                                }
+                                            ]
+                                        },
+                                        "node_type": "Call",
+                                        "source_language": null,
+                                        "source_language_version": null,
+                                        "source_refs": [
+                                            {
+                                                "col_end": 44,
+                                                "col_start": 26,
+                                                "node_type": "SourceRef",
+                                                "row_end": 21,
+                                                "row_start": 21,
+                                                "source_file_name": "google_covid_mobility"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "id": 1,
+                                        "name": "DATASET_ZIP_NAME",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 62,
+                                                "col_start": 46,
+                                                "node_type": "SourceRef",
+                                                "row_end": 21,
+                                                "row_start": 21,
+                                                "source_file_name": "google_covid_mobility"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "func": {
+                                    "attr": {
+                                        "id": 19,
+                                        "name": "join",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 25,
+                                                "col_start": 13,
+                                                "node_type": "SourceRef",
+                                                "row_end": 21,
+                                                "row_start": 21,
+                                                "source_file_name": "google_covid_mobility"
+                                            }
+                                        ]
+                                    },
+                                    "node_type": "Attribute",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 25,
+                                            "col_start": 13,
+                                            "node_type": "SourceRef",
+                                            "row_end": 21,
+                                            "row_start": 21,
+                                            "source_file_name": "google_covid_mobility"
+                                        }
+                                    ],
+                                    "value": {
+                                        "attr": {
+                                            "id": 18,
+                                            "name": "path",
+                                            "node_type": "Name",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 20,
+                                                    "col_start": 13,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 21,
+                                                    "row_start": 21,
+                                                    "source_file_name": "google_covid_mobility"
+                                                }
+                                            ]
+                                        },
+                                        "node_type": "Attribute",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 20,
+                                                "col_start": 13,
+                                                "node_type": "SourceRef",
+                                                "row_end": 21,
+                                                "row_start": 21,
+                                                "source_file_name": "google_covid_mobility"
+                                            }
+                                        ],
+                                        "value": {
+                                            "id": 17,
+                                            "name": "os",
+                                            "node_type": "Name",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 15,
+                                                    "col_start": 13,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 21,
+                                                    "row_start": 21,
+                                                    "source_file_name": "google_covid_mobility"
+                                                }
+                                            ]
+                                        }
+                                    }
+                                },
+                                "node_type": "Call",
+                                "source_language": null,
+                                "source_language_version": null,
+                                "source_refs": [
+                                    {
+                                        "col_end": 63,
+                                        "col_start": 13,
+                                        "node_type": "SourceRef",
+                                        "row_end": 21,
+                                        "row_start": 21,
+                                        "source_file_name": "google_covid_mobility"
+                                    }
+                                ]
+                            },
+                            "source_refs": [
+                                {
+                                    "col_end": 63,
+                                    "col_start": 4,
+                                    "node_type": "SourceRef",
+                                    "row_end": 21,
+                                    "row_start": 21,
+                                    "source_file_name": "google_covid_mobility"
+                                }
+                            ]
+                        },
+                        {
+                            "left": {
+                                "default_value": null,
+                                "node_type": "Var",
+                                "source_refs": [
+                                    {
+                                        "col_end": 14,
+                                        "col_start": 8,
+                                        "node_type": "SourceRef",
+                                        "row_end": 23,
+                                        "row_start": 23,
+                                        "source_file_name": "google_covid_mobility"
+                                    }
+                                ],
+                                "type": "float",
+                                "val": {
+                                    "id": 20,
+                                    "name": "zip_dt",
+                                    "node_type": "Name",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 14,
+                                            "col_start": 8,
+                                            "node_type": "SourceRef",
+                                            "row_end": 23,
+                                            "row_start": 23,
+                                            "source_file_name": "google_covid_mobility"
+                                        }
+                                    ]
+                                }
+                            },
+                            "node_type": "Assignment",
+                            "right": {
+                                "arguments": [
+                                    {
+                                        "arguments": [
+                                            {
+                                                "id": 8,
+                                                "name": "zip_fn",
+                                                "node_type": "Name",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 63,
+                                                        "col_start": 57,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 23,
+                                                        "row_start": 23,
+                                                        "source_file_name": "google_covid_mobility"
+                                                    }
+                                                ]
+                                            }
+                                        ],
+                                        "func": {
+                                            "attr": {
+                                                "id": 21,
+                                                "name": "getmtime",
+                                                "node_type": "Name",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 56,
+                                                        "col_start": 40,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 23,
+                                                        "row_start": 23,
+                                                        "source_file_name": "google_covid_mobility"
+                                                    }
+                                                ]
+                                            },
+                                            "node_type": "Attribute",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 56,
+                                                    "col_start": 40,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 23,
+                                                    "row_start": 23,
+                                                    "source_file_name": "google_covid_mobility"
+                                                }
+                                            ],
+                                            "value": {
+                                                "attr": {
+                                                    "id": 18,
+                                                    "name": "path",
+                                                    "node_type": "Name",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 47,
+                                                            "col_start": 40,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 23,
+                                                            "row_start": 23,
+                                                            "source_file_name": "google_covid_mobility"
+                                                        }
+                                                    ]
+                                                },
+                                                "node_type": "Attribute",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 47,
+                                                        "col_start": 40,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 23,
+                                                        "row_start": 23,
+                                                        "source_file_name": "google_covid_mobility"
+                                                    }
+                                                ],
+                                                "value": {
+                                                    "id": 17,
+                                                    "name": "os",
+                                                    "node_type": "Name",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 42,
+                                                            "col_start": 40,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 23,
+                                                            "row_start": 23,
+                                                            "source_file_name": "google_covid_mobility"
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        },
+                                        "node_type": "Call",
+                                        "source_language": null,
+                                        "source_language_version": null,
+                                        "source_refs": [
+                                            {
+                                                "col_end": 64,
+                                                "col_start": 40,
+                                                "node_type": "SourceRef",
+                                                "row_end": 23,
+                                                "row_start": 23,
+                                                "source_file_name": "google_covid_mobility"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "arguments": [],
+                                        "func": {
+                                            "id": 22,
+                                            "name": "tzlocal",
+                                            "node_type": "Name",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 75,
+                                                    "col_start": 66,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 23,
+                                                    "row_start": 23,
+                                                    "source_file_name": "google_covid_mobility"
+                                                }
+                                            ]
+                                        },
+                                        "node_type": "Call",
+                                        "source_language": null,
+                                        "source_language_version": null,
+                                        "source_refs": [
+                                            {
+                                                "col_end": 75,
+                                                "col_start": 66,
+                                                "node_type": "SourceRef",
+                                                "row_end": 23,
+                                                "row_start": 23,
+                                                "source_file_name": "google_covid_mobility"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "func": {
+                                    "attr": {
+                                        "id": 24,
+                                        "name": "fromtimestamp",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 39,
+                                                "col_start": 17,
+                                                "node_type": "SourceRef",
+                                                "row_end": 23,
+                                                "row_start": 23,
+                                                "source_file_name": "google_covid_mobility"
+                                            }
+                                        ]
+                                    },
+                                    "node_type": "Attribute",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 39,
+                                            "col_start": 17,
+                                            "node_type": "SourceRef",
+                                            "row_end": 23,
+                                            "row_start": 23,
+                                            "source_file_name": "google_covid_mobility"
+                                        }
+                                    ],
+                                    "value": {
+                                        "id": 23,
+                                        "name": "datetime",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 25,
+                                                "col_start": 17,
+                                                "node_type": "SourceRef",
+                                                "row_end": 23,
+                                                "row_start": 23,
+                                                "source_file_name": "google_covid_mobility"
+                                            }
+                                        ]
+                                    }
+                                },
+                                "node_type": "Call",
+                                "source_language": null,
+                                "source_language_version": null,
+                                "source_refs": [
+                                    {
+                                        "col_end": 76,
+                                        "col_start": 17,
+                                        "node_type": "SourceRef",
+                                        "row_end": 23,
+                                        "row_start": 23,
+                                        "source_file_name": "google_covid_mobility"
+                                    }
+                                ]
+                            },
+                            "source_refs": [
+                                {
+                                    "col_end": 76,
+                                    "col_start": 8,
+                                    "node_type": "SourceRef",
+                                    "row_end": 23,
+                                    "row_start": 23,
+                                    "source_file_name": "google_covid_mobility"
+                                }
+                            ]
+                        },
+                        {
+                            "body": [
+                                {
+                                    "node_type": "ModelReturn",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 21,
+                                            "col_start": 8,
+                                            "node_type": "SourceRef",
+                                            "row_end": 27,
+                                            "row_start": 27,
+                                            "source_file_name": "google_covid_mobility"
+                                        }
+                                    ],
+                                    "value": {
+                                        "id": 8,
+                                        "name": "zip_fn",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 21,
+                                                "col_start": 15,
+                                                "node_type": "SourceRef",
+                                                "row_end": 27,
+                                                "row_start": 27,
+                                                "source_file_name": "google_covid_mobility"
+                                            }
+                                        ]
+                                    }
+                                }
+                            ],
+                            "expr": {
+                                "body": [
+                                    {
+                                        "interpreter": "Python",
+                                        "node_type": "Operator",
+                                        "op": "ast.LtE",
+                                        "operands": [
+                                            {
+                                                "id": 7,
+                                                "name": "dt",
+                                                "node_type": "Name",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 32,
+                                                        "col_start": 30,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 26,
+                                                        "row_start": 26,
+                                                        "source_file_name": "google_covid_mobility"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "id": 20,
+                                                "name": "zip_dt",
+                                                "node_type": "Name",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 42,
+                                                        "col_start": 36,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 26,
+                                                        "row_start": 26,
+                                                        "source_file_name": "google_covid_mobility"
+                                                    }
+                                                ]
+                                            }
+                                        ],
+                                        "source_language": "Python",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 42,
+                                                "col_start": 30,
+                                                "node_type": "SourceRef",
+                                                "row_end": 26,
+                                                "row_start": 26,
+                                                "source_file_name": "google_covid_mobility"
+                                            }
+                                        ],
+                                        "version": "3.8.18"
+                                    }
+                                ],
+                                "expr": {
+                                    "interpreter": "Python",
+                                    "node_type": "Operator",
+                                    "op": "<_ast.IsNot object at 0x7f17cd18bdc0>",
+                                    "operands": [
+                                        {
+                                            "id": 20,
+                                            "name": "zip_dt",
+                                            "node_type": "Name",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 13,
+                                                    "col_start": 7,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 26,
+                                                    "row_start": 26,
+                                                    "source_file_name": "google_covid_mobility"
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "node_type": "LiteralValue",
+                                            "source_code_data_type": [
+                                                "Python",
+                                                "3.8",
+                                                "<class 'NoneType'>"
+                                            ],
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 25,
+                                                    "col_start": 21,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 26,
+                                                    "row_start": 26,
+                                                    "source_file_name": "google_covid_mobility"
+                                                }
+                                            ],
+                                            "value": null,
+                                            "value_type": null
+                                        }
+                                    ],
+                                    "source_language": "Python",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 25,
+                                            "col_start": 7,
+                                            "node_type": "SourceRef",
+                                            "row_end": 26,
+                                            "row_start": 26,
+                                            "source_file_name": "google_covid_mobility"
+                                        }
+                                    ],
+                                    "version": "3.8.18"
+                                },
+                                "node_type": "ModelIf",
+                                "orelse": [
+                                    {
+                                        "node_type": "LiteralValue",
+                                        "source_code_data_type": [
+                                            "Python",
+                                            "3.8",
+                                            "<class 'bool'>"
+                                        ],
+                                        "source_refs": [
+                                            {
+                                                "col_end": 42,
+                                                "col_start": 7,
+                                                "node_type": "SourceRef",
+                                                "row_end": 26,
+                                                "row_start": 26,
+                                                "source_file_name": "google_covid_mobility"
+                                            }
+                                        ],
+                                        "value": "False",
+                                        "value_type": "Boolean"
+                                    }
+                                ],
+                                "source_refs": [
+                                    {
+                                        "col_end": 42,
+                                        "col_start": 7,
+                                        "node_type": "SourceRef",
+                                        "row_end": 26,
+                                        "row_start": 26,
+                                        "source_file_name": "google_covid_mobility"
+                                    }
+                                ]
+                            },
+                            "node_type": "ModelIf",
+                            "orelse": [],
+                            "source_refs": [
+                                {
+                                    "col_end": 21,
+                                    "col_start": 4,
+                                    "node_type": "SourceRef",
+                                    "row_end": 27,
+                                    "row_start": 26,
+                                    "source_file_name": "google_covid_mobility"
+                                }
+                            ]
+                        },
+                        {
+                            "arguments": [
+                                {
+                                    "interpreter": "Python",
+                                    "node_type": "Operator",
+                                    "op": "ast.Mod",
+                                    "operands": [
+                                        {
+                                            "node_type": "LiteralValue",
+                                            "source_code_data_type": [
+                                                "Python",
+                                                "3.8",
+                                                "<class 'str'>"
+                                            ],
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 39,
+                                                    "col_start": 10,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 28,
+                                                    "row_start": 28,
+                                                    "source_file_name": "google_covid_mobility"
+                                                }
+                                            ],
+                                            "value": "Downloading updated ZIP: %s",
+                                            "value_type": "List"
+                                        },
+                                        {
+                                            "id": 1,
+                                            "name": "DATASET_ZIP_NAME",
+                                            "node_type": "Name",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 58,
+                                                    "col_start": 42,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 28,
+                                                    "row_start": 28,
+                                                    "source_file_name": "google_covid_mobility"
+                                                }
+                                            ]
+                                        }
+                                    ],
+                                    "source_language": "Python",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 58,
+                                            "col_start": 10,
+                                            "node_type": "SourceRef",
+                                            "row_end": 28,
+                                            "row_start": 28,
+                                            "source_file_name": "google_covid_mobility"
+                                        }
+                                    ],
+                                    "version": "3.8.18"
+                                }
+                            ],
+                            "func": {
+                                "id": 25,
+                                "name": "print",
+                                "node_type": "Name",
+                                "source_refs": [
+                                    {
+                                        "col_end": 59,
+                                        "col_start": 4,
+                                        "node_type": "SourceRef",
+                                        "row_end": 28,
+                                        "row_start": 28,
+                                        "source_file_name": "google_covid_mobility"
+                                    }
+                                ]
+                            },
+                            "node_type": "Call",
+                            "source_language": null,
+                            "source_language_version": null,
+                            "source_refs": [
+                                {
+                                    "col_end": 59,
+                                    "col_start": 4,
+                                    "node_type": "SourceRef",
+                                    "row_end": 28,
+                                    "row_start": 28,
+                                    "source_file_name": "google_covid_mobility"
+                                }
+                            ]
+                        },
+                        {
+                            "left": {
+                                "default_value": null,
+                                "node_type": "Var",
+                                "source_refs": [
+                                    {
+                                        "col_end": 8,
+                                        "col_start": 4,
+                                        "node_type": "SourceRef",
+                                        "row_end": 29,
+                                        "row_start": 29,
+                                        "source_file_name": "google_covid_mobility"
+                                    }
+                                ],
+                                "type": "float",
+                                "val": {
+                                    "id": 9,
+                                    "name": "resp",
+                                    "node_type": "Name",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 8,
+                                            "col_start": 4,
+                                            "node_type": "SourceRef",
+                                            "row_end": 29,
+                                            "row_start": 29,
+                                            "source_file_name": "google_covid_mobility"
+                                        }
+                                    ]
+                                }
+                            },
+                            "node_type": "Assignment",
+                            "right": {
+                                "arguments": [
+                                    {
+                                        "id": 0,
+                                        "name": "URL",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 27,
+                                                "col_start": 24,
+                                                "node_type": "SourceRef",
+                                                "row_end": 29,
+                                                "row_start": 29,
+                                                "source_file_name": "google_covid_mobility"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "func": {
+                                    "attr": {
+                                        "id": 26,
+                                        "name": "get",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 23,
+                                                "col_start": 11,
+                                                "node_type": "SourceRef",
+                                                "row_end": 29,
+                                                "row_start": 29,
+                                                "source_file_name": "google_covid_mobility"
+                                            }
+                                        ]
+                                    },
+                                    "node_type": "Attribute",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 23,
+                                            "col_start": 11,
+                                            "node_type": "SourceRef",
+                                            "row_end": 29,
+                                            "row_start": 29,
+                                            "source_file_name": "google_covid_mobility"
+                                        }
+                                    ],
+                                    "value": {
+                                        "id": 10,
+                                        "name": "requests",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 19,
+                                                "col_start": 11,
+                                                "node_type": "SourceRef",
+                                                "row_end": 29,
+                                                "row_start": 29,
+                                                "source_file_name": "google_covid_mobility"
+                                            }
+                                        ]
+                                    }
+                                },
+                                "node_type": "Call",
+                                "source_language": null,
+                                "source_language_version": null,
+                                "source_refs": [
+                                    {
+                                        "col_end": 28,
+                                        "col_start": 11,
+                                        "node_type": "SourceRef",
+                                        "row_end": 29,
+                                        "row_start": 29,
+                                        "source_file_name": "google_covid_mobility"
+                                    }
+                                ]
+                            },
+                            "source_refs": [
+                                {
+                                    "col_end": 28,
+                                    "col_start": 4,
+                                    "node_type": "SourceRef",
+                                    "row_end": 29,
+                                    "row_start": 29,
+                                    "source_file_name": "google_covid_mobility"
+                                }
+                            ]
+                        },
+                        {
+                            "arguments": [],
+                            "func": {
+                                "attr": {
+                                    "id": 12,
+                                    "name": "raise_for_status",
+                                    "node_type": "Name",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 25,
+                                            "col_start": 4,
+                                            "node_type": "SourceRef",
+                                            "row_end": 30,
+                                            "row_start": 30,
+                                            "source_file_name": "google_covid_mobility"
+                                        }
+                                    ]
+                                },
+                                "node_type": "Attribute",
+                                "source_refs": [
+                                    {
+                                        "col_end": 25,
+                                        "col_start": 4,
+                                        "node_type": "SourceRef",
+                                        "row_end": 30,
+                                        "row_start": 30,
+                                        "source_file_name": "google_covid_mobility"
+                                    }
+                                ],
+                                "value": {
+                                    "id": 9,
+                                    "name": "resp",
+                                    "node_type": "Name",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 8,
+                                            "col_start": 4,
+                                            "node_type": "SourceRef",
+                                            "row_end": 30,
+                                            "row_start": 30,
+                                            "source_file_name": "google_covid_mobility"
+                                        }
+                                    ]
+                                }
+                            },
+                            "node_type": "Call",
+                            "source_language": null,
+                            "source_language_version": null,
+                            "source_refs": [
+                                {
+                                    "col_end": 27,
+                                    "col_start": 4,
+                                    "node_type": "SourceRef",
+                                    "row_end": 30,
+                                    "row_start": 30,
+                                    "source_file_name": "google_covid_mobility"
+                                }
+                            ]
+                        },
+                        {
+                            "left": {
+                                "default_value": null,
+                                "node_type": "Var",
+                                "source_refs": [
+                                    {
+                                        "col_end": 35,
+                                        "col_start": 31,
+                                        "node_type": "SourceRef",
+                                        "row_end": 31,
+                                        "row_start": 31,
+                                        "source_file_name": "google_covid_mobility"
+                                    }
+                                ],
+                                "type": "float",
+                                "val": {
+                                    "id": 27,
+                                    "name": "zipf",
+                                    "node_type": "Name",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 35,
+                                            "col_start": 31,
+                                            "node_type": "SourceRef",
+                                            "row_end": 31,
+                                            "row_start": 31,
+                                            "source_file_name": "google_covid_mobility"
+                                        }
+                                    ]
+                                }
+                            },
+                            "node_type": "Assignment",
+                            "right": {
+                                "arguments": [
+                                    {
+                                        "id": 8,
+                                        "name": "zip_fn",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 20,
+                                                "col_start": 14,
+                                                "node_type": "SourceRef",
+                                                "row_end": 31,
+                                                "row_start": 31,
+                                                "source_file_name": "google_covid_mobility"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "node_type": "LiteralValue",
+                                        "source_code_data_type": [
+                                            "Python",
+                                            "3.8",
+                                            "<class 'str'>"
+                                        ],
+                                        "source_refs": [
+                                            {
+                                                "col_end": 26,
+                                                "col_start": 22,
+                                                "node_type": "SourceRef",
+                                                "row_end": 31,
+                                                "row_start": 31,
+                                                "source_file_name": "google_covid_mobility"
+                                            }
+                                        ],
+                                        "value": "wb",
+                                        "value_type": "List"
+                                    }
+                                ],
+                                "func": {
+                                    "id": 28,
+                                    "name": "open",
+                                    "node_type": "Name",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 27,
+                                            "col_start": 9,
+                                            "node_type": "SourceRef",
+                                            "row_end": 31,
+                                            "row_start": 31,
+                                            "source_file_name": "google_covid_mobility"
+                                        }
+                                    ]
+                                },
+                                "node_type": "Call",
+                                "source_language": null,
+                                "source_language_version": null,
+                                "source_refs": [
+                                    {
+                                        "col_end": 27,
+                                        "col_start": 9,
+                                        "node_type": "SourceRef",
+                                        "row_end": 31,
+                                        "row_start": 31,
+                                        "source_file_name": "google_covid_mobility"
+                                    }
+                                ]
+                            },
+                            "source_refs": [
+                                {
+                                    "col_end": 20,
+                                    "col_start": 4,
+                                    "node_type": "SourceRef",
+                                    "row_end": 33,
+                                    "row_start": 31,
+                                    "source_file_name": "google_covid_mobility"
+                                }
+                            ]
+                        },
+                        {
+                            "arguments": [
+                                {
+                                    "attr": {
+                                        "id": 29,
+                                        "name": "content",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 31,
+                                                "col_start": 19,
+                                                "node_type": "SourceRef",
+                                                "row_end": 32,
+                                                "row_start": 32,
+                                                "source_file_name": "google_covid_mobility"
+                                            }
+                                        ]
+                                    },
+                                    "node_type": "Attribute",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 31,
+                                            "col_start": 19,
+                                            "node_type": "SourceRef",
+                                            "row_end": 32,
+                                            "row_start": 32,
+                                            "source_file_name": "google_covid_mobility"
+                                        }
+                                    ],
+                                    "value": {
+                                        "id": 9,
+                                        "name": "resp",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 23,
+                                                "col_start": 19,
+                                                "node_type": "SourceRef",
+                                                "row_end": 32,
+                                                "row_start": 32,
+                                                "source_file_name": "google_covid_mobility"
+                                            }
+                                        ]
+                                    }
+                                }
+                            ],
+                            "func": {
+                                "attr": {
+                                    "id": 30,
+                                    "name": "write",
+                                    "node_type": "Name",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 18,
+                                            "col_start": 8,
+                                            "node_type": "SourceRef",
+                                            "row_end": 32,
+                                            "row_start": 32,
+                                            "source_file_name": "google_covid_mobility"
+                                        }
+                                    ]
+                                },
+                                "node_type": "Attribute",
+                                "source_refs": [
+                                    {
+                                        "col_end": 18,
+                                        "col_start": 8,
+                                        "node_type": "SourceRef",
+                                        "row_end": 32,
+                                        "row_start": 32,
+                                        "source_file_name": "google_covid_mobility"
+                                    }
+                                ],
+                                "value": {
+                                    "id": 27,
+                                    "name": "zipf",
+                                    "node_type": "Name",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 12,
+                                            "col_start": 8,
+                                            "node_type": "SourceRef",
+                                            "row_end": 32,
+                                            "row_start": 32,
+                                            "source_file_name": "google_covid_mobility"
+                                        }
+                                    ]
+                                }
+                            },
+                            "node_type": "Call",
+                            "source_language": null,
+                            "source_language_version": null,
+                            "source_refs": [
+                                {
+                                    "col_end": 32,
+                                    "col_start": 8,
+                                    "node_type": "SourceRef",
+                                    "row_end": 32,
+                                    "row_start": 32,
+                                    "source_file_name": "google_covid_mobility"
+                                }
+                            ]
+                        },
+                        {
+                            "arguments": [],
+                            "func": {
+                                "attr": {
+                                    "id": 31,
+                                    "name": "close",
+                                    "node_type": "Name",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 18,
+                                            "col_start": 8,
+                                            "node_type": "SourceRef",
+                                            "row_end": 33,
+                                            "row_start": 33,
+                                            "source_file_name": "google_covid_mobility"
+                                        }
+                                    ]
+                                },
+                                "node_type": "Attribute",
+                                "source_refs": [
+                                    {
+                                        "col_end": 18,
+                                        "col_start": 8,
+                                        "node_type": "SourceRef",
+                                        "row_end": 33,
+                                        "row_start": 33,
+                                        "source_file_name": "google_covid_mobility"
+                                    }
+                                ],
+                                "value": {
+                                    "id": 27,
+                                    "name": "zipf",
+                                    "node_type": "Name",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 12,
+                                            "col_start": 8,
+                                            "node_type": "SourceRef",
+                                            "row_end": 33,
+                                            "row_start": 33,
+                                            "source_file_name": "google_covid_mobility"
+                                        }
+                                    ]
+                                }
+                            },
+                            "node_type": "Call",
+                            "source_language": null,
+                            "source_language_version": null,
+                            "source_refs": [
+                                {
+                                    "col_end": 20,
+                                    "col_start": 8,
+                                    "node_type": "SourceRef",
+                                    "row_end": 33,
+                                    "row_start": 33,
+                                    "source_file_name": "google_covid_mobility"
+                                }
+                            ]
+                        },
+                        {
+                            "node_type": "ModelReturn",
+                            "source_refs": [
+                                {
+                                    "col_end": 17,
+                                    "col_start": 4,
+                                    "node_type": "SourceRef",
+                                    "row_end": 34,
+                                    "row_start": 34,
+                                    "source_file_name": "google_covid_mobility"
+                                }
+                            ],
+                            "value": {
+                                "id": 8,
+                                "name": "zip_fn",
+                                "node_type": "Name",
+                                "source_refs": [
+                                    {
+                                        "col_end": 17,
+                                        "col_start": 11,
+                                        "node_type": "SourceRef",
+                                        "row_end": 34,
+                                        "row_start": 34,
+                                        "source_file_name": "google_covid_mobility"
+                                    }
+                                ]
+                            }
+                        }
+                    ],
+                    "func_args": [],
+                    "name": {
+                        "id": 4,
+                        "name": "download_updated_zip",
+                        "node_type": "Name",
+                        "source_refs": [
+                            {
+                                "col_end": 17,
+                                "col_start": 0,
+                                "node_type": "SourceRef",
+                                "row_end": 34,
+                                "row_start": 16,
+                                "source_file_name": "google_covid_mobility"
+                            }
+                        ]
+                    },
+                    "node_type": "FunctionDef",
+                    "source_refs": [
+                        {
+                            "col_end": 17,
+                            "col_start": 0,
+                            "node_type": "SourceRef",
+                            "row_end": 34,
+                            "row_start": 16,
+                            "source_file_name": "google_covid_mobility"
+                        }
+                    ]
+                },
+                {
+                    "body": [
+                        {
+                            "arguments": [],
+                            "func": {
+                                "id": 4,
+                                "name": "download_updated_zip",
+                                "node_type": "Name",
+                                "source_refs": [
+                                    {
+                                        "col_end": 26,
+                                        "col_start": 4,
+                                        "node_type": "SourceRef",
+                                        "row_end": 38,
+                                        "row_start": 38,
+                                        "source_file_name": "google_covid_mobility"
+                                    }
+                                ]
+                            },
+                            "node_type": "Call",
+                            "source_language": null,
+                            "source_language_version": null,
+                            "source_refs": [
+                                {
+                                    "col_end": 26,
+                                    "col_start": 4,
+                                    "node_type": "SourceRef",
+                                    "row_end": 38,
+                                    "row_start": 38,
+                                    "source_file_name": "google_covid_mobility"
+                                }
+                            ]
+                        }
+                    ],
+                    "expr": {
+                        "interpreter": "Python",
+                        "node_type": "Operator",
+                        "op": "ast.Eq",
+                        "operands": [
+                            {
+                                "id": 32,
+                                "name": "__name__",
+                                "node_type": "Name",
+                                "source_refs": [
+                                    {
+                                        "col_end": 11,
+                                        "col_start": 3,
+                                        "node_type": "SourceRef",
+                                        "row_end": 37,
+                                        "row_start": 37,
+                                        "source_file_name": "google_covid_mobility"
+                                    }
+                                ]
+                            },
+                            {
+                                "node_type": "LiteralValue",
+                                "source_code_data_type": [
+                                    "Python",
+                                    "3.8",
+                                    "<class 'str'>"
+                                ],
+                                "source_refs": [
+                                    {
+                                        "col_end": 25,
+                                        "col_start": 15,
+                                        "node_type": "SourceRef",
+                                        "row_end": 37,
+                                        "row_start": 37,
+                                        "source_file_name": "google_covid_mobility"
+                                    }
+                                ],
+                                "value": "__main__",
+                                "value_type": "List"
+                            }
+                        ],
+                        "source_language": "Python",
+                        "source_refs": [
+                            {
+                                "col_end": 25,
+                                "col_start": 3,
+                                "node_type": "SourceRef",
+                                "row_end": 37,
+                                "row_start": 37,
+                                "source_file_name": "google_covid_mobility"
+                            }
+                        ],
+                        "version": "3.8.18"
+                    },
+                    "node_type": "ModelIf",
+                    "orelse": [],
+                    "source_refs": [
+                        {
+                            "col_end": 26,
+                            "col_start": 0,
+                            "node_type": "SourceRef",
+                            "row_end": 38,
+                            "row_start": 37,
+                            "source_file_name": "google_covid_mobility"
+                        }
+                    ]
+                }
+            ],
+            "name": "google_covid_mobility",
+            "node_type": "Module",
+            "source_refs": [
+                {
+                    "col_end": null,
+                    "col_start": null,
+                    "node_type": "SourceRef",
+                    "row_end": 38,
+                    "row_start": 1,
+                    "source_file_name": "google_covid_mobility.py"
+                }
+            ]
+        }
+    ]
+}

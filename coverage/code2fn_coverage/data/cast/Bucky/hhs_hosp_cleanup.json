@@ -1,0 +1,3259 @@
+{
+    "nodes": [
+        {
+            "body": [
+                {
+                    "alias": null,
+                    "all": false,
+                    "name": "pathlib",
+                    "node_type": "ModelImport",
+                    "source_refs": [
+                        {
+                            "col_end": 24,
+                            "col_start": 0,
+                            "node_type": "SourceRef",
+                            "row_end": 2,
+                            "row_start": 2,
+                            "source_file_name": "hhs_hosp_cleanup"
+                        }
+                    ],
+                    "symbol": "Path"
+                },
+                {
+                    "alias": "pd",
+                    "all": false,
+                    "name": "pandas",
+                    "node_type": "ModelImport",
+                    "source_refs": [
+                        {
+                            "col_end": 19,
+                            "col_start": 0,
+                            "node_type": "SourceRef",
+                            "row_end": 4,
+                            "row_start": 4,
+                            "source_file_name": "hhs_hosp_cleanup"
+                        }
+                    ],
+                    "symbol": null
+                },
+                {
+                    "body": [
+                        {
+                            "left": {
+                                "default_value": null,
+                                "node_type": "Var",
+                                "source_refs": [
+                                    {
+                                        "col_end": 12,
+                                        "col_start": 4,
+                                        "node_type": "SourceRef",
+                                        "row_end": 12,
+                                        "row_start": 12,
+                                        "source_file_name": "hhs_hosp_cleanup"
+                                    }
+                                ],
+                                "type": "float",
+                                "val": {
+                                    "id": 3,
+                                    "name": "base_dir",
+                                    "node_type": "Name",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 12,
+                                            "col_start": 4,
+                                            "node_type": "SourceRef",
+                                            "row_end": 12,
+                                            "row_start": 12,
+                                            "source_file_name": "hhs_hosp_cleanup"
+                                        }
+                                    ]
+                                }
+                            },
+                            "node_type": "Assignment",
+                            "right": {
+                                "arguments": [],
+                                "func": {
+                                    "attr": {
+                                        "id": 18,
+                                        "name": "cwd",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 25,
+                                                "col_start": 15,
+                                                "node_type": "SourceRef",
+                                                "row_end": 12,
+                                                "row_start": 12,
+                                                "source_file_name": "hhs_hosp_cleanup"
+                                            }
+                                        ]
+                                    },
+                                    "node_type": "Attribute",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 25,
+                                            "col_start": 15,
+                                            "node_type": "SourceRef",
+                                            "row_end": 12,
+                                            "row_start": 12,
+                                            "source_file_name": "hhs_hosp_cleanup"
+                                        }
+                                    ],
+                                    "value": {
+                                        "arguments": [],
+                                        "func": {
+                                            "id": 17,
+                                            "name": "Path",
+                                            "node_type": "Name",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 21,
+                                                    "col_start": 15,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 12,
+                                                    "row_start": 12,
+                                                    "source_file_name": "hhs_hosp_cleanup"
+                                                }
+                                            ]
+                                        },
+                                        "node_type": "Call",
+                                        "source_language": null,
+                                        "source_language_version": null,
+                                        "source_refs": [
+                                            {
+                                                "col_end": 21,
+                                                "col_start": 15,
+                                                "node_type": "SourceRef",
+                                                "row_end": 12,
+                                                "row_start": 12,
+                                                "source_file_name": "hhs_hosp_cleanup"
+                                            }
+                                        ]
+                                    }
+                                },
+                                "node_type": "Call",
+                                "source_language": null,
+                                "source_language_version": null,
+                                "source_refs": [
+                                    {
+                                        "col_end": 27,
+                                        "col_start": 15,
+                                        "node_type": "SourceRef",
+                                        "row_end": 12,
+                                        "row_start": 12,
+                                        "source_file_name": "hhs_hosp_cleanup"
+                                    }
+                                ]
+                            },
+                            "source_refs": [
+                                {
+                                    "col_end": 27,
+                                    "col_start": 4,
+                                    "node_type": "SourceRef",
+                                    "row_end": 12,
+                                    "row_start": 12,
+                                    "source_file_name": "hhs_hosp_cleanup"
+                                }
+                            ]
+                        },
+                        {
+                            "left": {
+                                "default_value": null,
+                                "node_type": "Var",
+                                "source_refs": [
+                                    {
+                                        "col_end": 12,
+                                        "col_start": 4,
+                                        "node_type": "SourceRef",
+                                        "row_end": 14,
+                                        "row_start": 14,
+                                        "source_file_name": "hhs_hosp_cleanup"
+                                    }
+                                ],
+                                "type": "float",
+                                "val": {
+                                    "id": 4,
+                                    "name": "hhs_file",
+                                    "node_type": "Name",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 12,
+                                            "col_start": 4,
+                                            "node_type": "SourceRef",
+                                            "row_end": 14,
+                                            "row_start": 14,
+                                            "source_file_name": "hhs_hosp_cleanup"
+                                        }
+                                    ]
+                                }
+                            },
+                            "node_type": "Assignment",
+                            "right": {
+                                "interpreter": "Python",
+                                "node_type": "Operator",
+                                "op": "ast.Div",
+                                "operands": [
+                                    {
+                                        "id": 3,
+                                        "name": "base_dir",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 23,
+                                                "col_start": 15,
+                                                "node_type": "SourceRef",
+                                                "row_end": 14,
+                                                "row_start": 14,
+                                                "source_file_name": "hhs_hosp_cleanup"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "node_type": "LiteralValue",
+                                        "source_code_data_type": [
+                                            "Python",
+                                            "3.8",
+                                            "<class 'str'>"
+                                        ],
+                                        "source_refs": [
+                                            {
+                                                "col_end": 40,
+                                                "col_start": 26,
+                                                "node_type": "SourceRef",
+                                                "row_end": 14,
+                                                "row_start": 14,
+                                                "source_file_name": "hhs_hosp_cleanup"
+                                            }
+                                        ],
+                                        "value": "hhs_hosp.csv",
+                                        "value_type": "List"
+                                    }
+                                ],
+                                "source_language": "Python",
+                                "source_refs": [
+                                    {
+                                        "col_end": 40,
+                                        "col_start": 15,
+                                        "node_type": "SourceRef",
+                                        "row_end": 14,
+                                        "row_start": 14,
+                                        "source_file_name": "hhs_hosp_cleanup"
+                                    }
+                                ],
+                                "version": "3.8.18"
+                            },
+                            "source_refs": [
+                                {
+                                    "col_end": 40,
+                                    "col_start": 4,
+                                    "node_type": "SourceRef",
+                                    "row_end": 14,
+                                    "row_start": 14,
+                                    "source_file_name": "hhs_hosp_cleanup"
+                                }
+                            ]
+                        },
+                        {
+                            "left": {
+                                "default_value": null,
+                                "node_type": "Var",
+                                "source_refs": [
+                                    {
+                                        "col_end": 6,
+                                        "col_start": 4,
+                                        "node_type": "SourceRef",
+                                        "row_end": 16,
+                                        "row_start": 16,
+                                        "source_file_name": "hhs_hosp_cleanup"
+                                    }
+                                ],
+                                "type": "float",
+                                "val": {
+                                    "id": 16,
+                                    "name": "df",
+                                    "node_type": "Name",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 6,
+                                            "col_start": 4,
+                                            "node_type": "SourceRef",
+                                            "row_end": 16,
+                                            "row_start": 16,
+                                            "source_file_name": "hhs_hosp_cleanup"
+                                        }
+                                    ]
+                                }
+                            },
+                            "node_type": "Assignment",
+                            "right": {
+                                "arguments": [
+                                    {
+                                        "id": 4,
+                                        "name": "hhs_file",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 29,
+                                                "col_start": 21,
+                                                "node_type": "SourceRef",
+                                                "row_end": 16,
+                                                "row_start": 16,
+                                                "source_file_name": "hhs_hosp_cleanup"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "func": {
+                                    "attr": {
+                                        "id": 19,
+                                        "name": "read_csv",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 20,
+                                                "col_start": 9,
+                                                "node_type": "SourceRef",
+                                                "row_end": 16,
+                                                "row_start": 16,
+                                                "source_file_name": "hhs_hosp_cleanup"
+                                            }
+                                        ]
+                                    },
+                                    "node_type": "Attribute",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 20,
+                                            "col_start": 9,
+                                            "node_type": "SourceRef",
+                                            "row_end": 16,
+                                            "row_start": 16,
+                                            "source_file_name": "hhs_hosp_cleanup"
+                                        }
+                                    ],
+                                    "value": {
+                                        "id": -1,
+                                        "name": "pandas",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 11,
+                                                "col_start": 9,
+                                                "node_type": "SourceRef",
+                                                "row_end": 16,
+                                                "row_start": 16,
+                                                "source_file_name": "hhs_hosp_cleanup"
+                                            }
+                                        ]
+                                    }
+                                },
+                                "node_type": "Call",
+                                "source_language": null,
+                                "source_language_version": null,
+                                "source_refs": [
+                                    {
+                                        "col_end": 30,
+                                        "col_start": 9,
+                                        "node_type": "SourceRef",
+                                        "row_end": 16,
+                                        "row_start": 16,
+                                        "source_file_name": "hhs_hosp_cleanup"
+                                    }
+                                ]
+                            },
+                            "source_refs": [
+                                {
+                                    "col_end": 30,
+                                    "col_start": 4,
+                                    "node_type": "SourceRef",
+                                    "row_end": 16,
+                                    "row_start": 16,
+                                    "source_file_name": "hhs_hosp_cleanup"
+                                }
+                            ]
+                        },
+                        {
+                            "left": {
+                                "default_value": null,
+                                "node_type": "Var",
+                                "source_refs": [
+                                    {
+                                        "col_end": 18,
+                                        "col_start": 4,
+                                        "node_type": "SourceRef",
+                                        "row_end": 18,
+                                        "row_start": 18,
+                                        "source_file_name": "hhs_hosp_cleanup"
+                                    }
+                                ],
+                                "type": "float",
+                                "val": {
+                                    "id": 6,
+                                    "name": "state_abbr_map",
+                                    "node_type": "Name",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 18,
+                                            "col_start": 4,
+                                            "node_type": "SourceRef",
+                                            "row_end": 18,
+                                            "row_start": 18,
+                                            "source_file_name": "hhs_hosp_cleanup"
+                                        }
+                                    ]
+                                }
+                            },
+                            "node_type": "Assignment",
+                            "right": {
+                                "arguments": [
+                                    {
+                                        "node_type": "LiteralValue",
+                                        "source_code_data_type": [
+                                            "Python",
+                                            "3.8",
+                                            "<class 'str'>"
+                                        ],
+                                        "source_refs": [
+                                            {
+                                                "col_end": 45,
+                                                "col_start": 39,
+                                                "node_type": "SourceRef",
+                                                "row_end": 18,
+                                                "row_start": 18,
+                                                "source_file_name": "hhs_hosp_cleanup"
+                                            }
+                                        ],
+                                        "value": "abbr",
+                                        "value_type": "List"
+                                    },
+                                    {
+                                        "node_type": "LiteralValue",
+                                        "source_code_data_type": [
+                                            "Python",
+                                            "3.8",
+                                            "<class 'str'>"
+                                        ],
+                                        "source_refs": [
+                                            {
+                                                "col_end": 53,
+                                                "col_start": 47,
+                                                "node_type": "SourceRef",
+                                                "row_end": 18,
+                                                "row_start": 18,
+                                                "source_file_name": "hhs_hosp_cleanup"
+                                            }
+                                        ],
+                                        "value": "fips",
+                                        "value_type": "List"
+                                    }
+                                ],
+                                "func": {
+                                    "attr": {
+                                        "id": 22,
+                                        "name": "mapping",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 38,
+                                                "col_start": 21,
+                                                "node_type": "SourceRef",
+                                                "row_end": 18,
+                                                "row_start": 18,
+                                                "source_file_name": "hhs_hosp_cleanup"
+                                            }
+                                        ]
+                                    },
+                                    "node_type": "Attribute",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 38,
+                                            "col_start": 21,
+                                            "node_type": "SourceRef",
+                                            "row_end": 18,
+                                            "row_start": 18,
+                                            "source_file_name": "hhs_hosp_cleanup"
+                                        }
+                                    ],
+                                    "value": {
+                                        "attr": {
+                                            "id": 21,
+                                            "name": "states",
+                                            "node_type": "Name",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 30,
+                                                    "col_start": 21,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 18,
+                                                    "row_start": 18,
+                                                    "source_file_name": "hhs_hosp_cleanup"
+                                                }
+                                            ]
+                                        },
+                                        "node_type": "Attribute",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 30,
+                                                "col_start": 21,
+                                                "node_type": "SourceRef",
+                                                "row_end": 18,
+                                                "row_start": 18,
+                                                "source_file_name": "hhs_hosp_cleanup"
+                                            }
+                                        ],
+                                        "value": {
+                                            "id": 20,
+                                            "name": "us",
+                                            "node_type": "Name",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 23,
+                                                    "col_start": 21,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 18,
+                                                    "row_start": 18,
+                                                    "source_file_name": "hhs_hosp_cleanup"
+                                                }
+                                            ]
+                                        }
+                                    }
+                                },
+                                "node_type": "Call",
+                                "source_language": null,
+                                "source_language_version": null,
+                                "source_refs": [
+                                    {
+                                        "col_end": 54,
+                                        "col_start": 21,
+                                        "node_type": "SourceRef",
+                                        "row_end": 18,
+                                        "row_start": 18,
+                                        "source_file_name": "hhs_hosp_cleanup"
+                                    }
+                                ]
+                            },
+                            "source_refs": [
+                                {
+                                    "col_end": 54,
+                                    "col_start": 4,
+                                    "node_type": "SourceRef",
+                                    "row_end": 18,
+                                    "row_start": 18,
+                                    "source_file_name": "hhs_hosp_cleanup"
+                                }
+                            ]
+                        },
+                        {
+                            "left": {
+                                "default_value": null,
+                                "node_type": "Var",
+                                "source_refs": [
+                                    {
+                                        "col_end": 45,
+                                        "col_start": 4,
+                                        "node_type": "SourceRef",
+                                        "row_end": 20,
+                                        "row_start": 20,
+                                        "source_file_name": "hhs_hosp_cleanup"
+                                    }
+                                ],
+                                "type": "Any",
+                                "val": {
+                                    "id": 16,
+                                    "name": "df",
+                                    "node_type": "Name",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 6,
+                                            "col_start": 4,
+                                            "node_type": "SourceRef",
+                                            "row_end": 20,
+                                            "row_start": 20,
+                                            "source_file_name": "hhs_hosp_cleanup"
+                                        }
+                                    ]
+                                }
+                            },
+                            "node_type": "Assignment",
+                            "right": {
+                                "arguments": [
+                                    {
+                                        "id": 16,
+                                        "name": "df",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 6,
+                                                "col_start": 4,
+                                                "node_type": "SourceRef",
+                                                "row_end": 20,
+                                                "row_start": 20,
+                                                "source_file_name": "hhs_hosp_cleanup"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "node_type": "LiteralValue",
+                                        "source_code_data_type": [
+                                            "Python",
+                                            "3.8",
+                                            "<class 'str'>"
+                                        ],
+                                        "source_refs": [
+                                            {
+                                                "col_end": 13,
+                                                "col_start": 7,
+                                                "node_type": "SourceRef",
+                                                "row_end": 20,
+                                                "row_start": 20,
+                                                "source_file_name": "hhs_hosp_cleanup"
+                                            }
+                                        ],
+                                        "value": "adm1",
+                                        "value_type": "List"
+                                    },
+                                    {
+                                        "arguments": [
+                                            {
+                                                "id": 6,
+                                                "name": "state_abbr_map",
+                                                "node_type": "Name",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 44,
+                                                        "col_start": 30,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 20,
+                                                        "row_start": 20,
+                                                        "source_file_name": "hhs_hosp_cleanup"
+                                                    }
+                                                ]
+                                            }
+                                        ],
+                                        "func": {
+                                            "attr": {
+                                                "id": 24,
+                                                "name": "map",
+                                                "node_type": "Name",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 29,
+                                                        "col_start": 17,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 20,
+                                                        "row_start": 20,
+                                                        "source_file_name": "hhs_hosp_cleanup"
+                                                    }
+                                                ]
+                                            },
+                                            "node_type": "Attribute",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 29,
+                                                    "col_start": 17,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 20,
+                                                    "row_start": 20,
+                                                    "source_file_name": "hhs_hosp_cleanup"
+                                                }
+                                            ],
+                                            "value": {
+                                                "attr": {
+                                                    "id": 23,
+                                                    "name": "state",
+                                                    "node_type": "Name",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 25,
+                                                            "col_start": 17,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 20,
+                                                            "row_start": 20,
+                                                            "source_file_name": "hhs_hosp_cleanup"
+                                                        }
+                                                    ]
+                                                },
+                                                "node_type": "Attribute",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 25,
+                                                        "col_start": 17,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 20,
+                                                        "row_start": 20,
+                                                        "source_file_name": "hhs_hosp_cleanup"
+                                                    }
+                                                ],
+                                                "value": {
+                                                    "id": 16,
+                                                    "name": "df",
+                                                    "node_type": "Name",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 19,
+                                                            "col_start": 17,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 20,
+                                                            "row_start": 20,
+                                                            "source_file_name": "hhs_hosp_cleanup"
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        },
+                                        "node_type": "Call",
+                                        "source_language": null,
+                                        "source_language_version": null,
+                                        "source_refs": [
+                                            {
+                                                "col_end": 45,
+                                                "col_start": 17,
+                                                "node_type": "SourceRef",
+                                                "row_end": 20,
+                                                "row_start": 20,
+                                                "source_file_name": "hhs_hosp_cleanup"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "func": {
+                                    "id": 25,
+                                    "name": "_set",
+                                    "node_type": "Name",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 45,
+                                            "col_start": 4,
+                                            "node_type": "SourceRef",
+                                            "row_end": 20,
+                                            "row_start": 20,
+                                            "source_file_name": "hhs_hosp_cleanup"
+                                        }
+                                    ]
+                                },
+                                "node_type": "Call",
+                                "source_language": null,
+                                "source_language_version": null,
+                                "source_refs": [
+                                    {
+                                        "col_end": 45,
+                                        "col_start": 4,
+                                        "node_type": "SourceRef",
+                                        "row_end": 20,
+                                        "row_start": 20,
+                                        "source_file_name": "hhs_hosp_cleanup"
+                                    }
+                                ]
+                            },
+                            "source_refs": [
+                                {
+                                    "col_end": 45,
+                                    "col_start": 4,
+                                    "node_type": "SourceRef",
+                                    "row_end": 20,
+                                    "row_start": 20,
+                                    "source_file_name": "hhs_hosp_cleanup"
+                                }
+                            ]
+                        },
+                        {
+                            "left": {
+                                "default_value": null,
+                                "node_type": "Var",
+                                "source_refs": [
+                                    {
+                                        "col_end": 43,
+                                        "col_start": 4,
+                                        "node_type": "SourceRef",
+                                        "row_end": 21,
+                                        "row_start": 21,
+                                        "source_file_name": "hhs_hosp_cleanup"
+                                    }
+                                ],
+                                "type": "Any",
+                                "val": {
+                                    "id": 16,
+                                    "name": "df",
+                                    "node_type": "Name",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 6,
+                                            "col_start": 4,
+                                            "node_type": "SourceRef",
+                                            "row_end": 21,
+                                            "row_start": 21,
+                                            "source_file_name": "hhs_hosp_cleanup"
+                                        }
+                                    ]
+                                }
+                            },
+                            "node_type": "Assignment",
+                            "right": {
+                                "arguments": [
+                                    {
+                                        "id": 16,
+                                        "name": "df",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 6,
+                                                "col_start": 4,
+                                                "node_type": "SourceRef",
+                                                "row_end": 21,
+                                                "row_start": 21,
+                                                "source_file_name": "hhs_hosp_cleanup"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "node_type": "LiteralValue",
+                                        "source_code_data_type": [
+                                            "Python",
+                                            "3.8",
+                                            "<class 'str'>"
+                                        ],
+                                        "source_refs": [
+                                            {
+                                                "col_end": 13,
+                                                "col_start": 7,
+                                                "node_type": "SourceRef",
+                                                "row_end": 21,
+                                                "row_start": 21,
+                                                "source_file_name": "hhs_hosp_cleanup"
+                                            }
+                                        ],
+                                        "value": "date",
+                                        "value_type": "List"
+                                    },
+                                    {
+                                        "arguments": [
+                                            {
+                                                "arguments": [
+                                                    {
+                                                        "id": 16,
+                                                        "name": "df",
+                                                        "node_type": "Name",
+                                                        "source_refs": [
+                                                            {
+                                                                "col_end": 34,
+                                                                "col_start": 32,
+                                                                "node_type": "SourceRef",
+                                                                "row_end": 21,
+                                                                "row_start": 21,
+                                                                "source_file_name": "hhs_hosp_cleanup"
+                                                            }
+                                                        ]
+                                                    },
+                                                    {
+                                                        "node_type": "LiteralValue",
+                                                        "source_code_data_type": [
+                                                            "Python",
+                                                            "3.8",
+                                                            "<class 'str'>"
+                                                        ],
+                                                        "source_refs": [
+                                                            {
+                                                                "col_end": 41,
+                                                                "col_start": 35,
+                                                                "node_type": "SourceRef",
+                                                                "row_end": 21,
+                                                                "row_start": 21,
+                                                                "source_file_name": "hhs_hosp_cleanup"
+                                                            }
+                                                        ],
+                                                        "value": "date",
+                                                        "value_type": "List"
+                                                    }
+                                                ],
+                                                "func": {
+                                                    "id": 26,
+                                                    "name": "_get",
+                                                    "node_type": "Name",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 43,
+                                                            "col_start": 17,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 21,
+                                                            "row_start": 21,
+                                                            "source_file_name": "hhs_hosp_cleanup"
+                                                        }
+                                                    ]
+                                                },
+                                                "node_type": "Call",
+                                                "source_language": null,
+                                                "source_language_version": null,
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 43,
+                                                        "col_start": 17,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 21,
+                                                        "row_start": 21,
+                                                        "source_file_name": "hhs_hosp_cleanup"
+                                                    }
+                                                ]
+                                            }
+                                        ],
+                                        "func": {
+                                            "attr": {
+                                                "id": 27,
+                                                "name": "to_datetime",
+                                                "node_type": "Name",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 31,
+                                                        "col_start": 17,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 21,
+                                                        "row_start": 21,
+                                                        "source_file_name": "hhs_hosp_cleanup"
+                                                    }
+                                                ]
+                                            },
+                                            "node_type": "Attribute",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 31,
+                                                    "col_start": 17,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 21,
+                                                    "row_start": 21,
+                                                    "source_file_name": "hhs_hosp_cleanup"
+                                                }
+                                            ],
+                                            "value": {
+                                                "id": -1,
+                                                "name": "pandas",
+                                                "node_type": "Name",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 19,
+                                                        "col_start": 17,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 21,
+                                                        "row_start": 21,
+                                                        "source_file_name": "hhs_hosp_cleanup"
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        "node_type": "Call",
+                                        "source_language": null,
+                                        "source_language_version": null,
+                                        "source_refs": [
+                                            {
+                                                "col_end": 43,
+                                                "col_start": 17,
+                                                "node_type": "SourceRef",
+                                                "row_end": 21,
+                                                "row_start": 21,
+                                                "source_file_name": "hhs_hosp_cleanup"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "func": {
+                                    "id": 25,
+                                    "name": "_set",
+                                    "node_type": "Name",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 43,
+                                            "col_start": 4,
+                                            "node_type": "SourceRef",
+                                            "row_end": 21,
+                                            "row_start": 21,
+                                            "source_file_name": "hhs_hosp_cleanup"
+                                        }
+                                    ]
+                                },
+                                "node_type": "Call",
+                                "source_language": null,
+                                "source_language_version": null,
+                                "source_refs": [
+                                    {
+                                        "col_end": 43,
+                                        "col_start": 4,
+                                        "node_type": "SourceRef",
+                                        "row_end": 21,
+                                        "row_start": 21,
+                                        "source_file_name": "hhs_hosp_cleanup"
+                                    }
+                                ]
+                            },
+                            "source_refs": [
+                                {
+                                    "col_end": 43,
+                                    "col_start": 4,
+                                    "node_type": "SourceRef",
+                                    "row_end": 21,
+                                    "row_start": 21,
+                                    "source_file_name": "hhs_hosp_cleanup"
+                                }
+                            ]
+                        },
+                        {
+                            "left": {
+                                "default_value": null,
+                                "node_type": "Var",
+                                "source_refs": [
+                                    {
+                                        "col_end": 42,
+                                        "col_start": 4,
+                                        "node_type": "SourceRef",
+                                        "row_end": 24,
+                                        "row_start": 24,
+                                        "source_file_name": "hhs_hosp_cleanup"
+                                    }
+                                ],
+                                "type": "Any",
+                                "val": {
+                                    "id": 16,
+                                    "name": "df",
+                                    "node_type": "Name",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 6,
+                                            "col_start": 4,
+                                            "node_type": "SourceRef",
+                                            "row_end": 24,
+                                            "row_start": 24,
+                                            "source_file_name": "hhs_hosp_cleanup"
+                                        }
+                                    ]
+                                }
+                            },
+                            "node_type": "Assignment",
+                            "right": {
+                                "arguments": [
+                                    {
+                                        "id": 16,
+                                        "name": "df",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 6,
+                                                "col_start": 4,
+                                                "node_type": "SourceRef",
+                                                "row_end": 24,
+                                                "row_start": 24,
+                                                "source_file_name": "hhs_hosp_cleanup"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "node_type": "LiteralValue",
+                                        "source_code_data_type": [
+                                            "Python",
+                                            "3.8",
+                                            "<class 'str'>"
+                                        ],
+                                        "source_refs": [
+                                            {
+                                                "col_end": 13,
+                                                "col_start": 7,
+                                                "node_type": "SourceRef",
+                                                "row_end": 24,
+                                                "row_start": 24,
+                                                "source_file_name": "hhs_hosp_cleanup"
+                                            }
+                                        ],
+                                        "value": "adm1",
+                                        "value_type": "List"
+                                    },
+                                    {
+                                        "arguments": [
+                                            {
+                                                "arguments": [
+                                                    {
+                                                        "id": 16,
+                                                        "name": "df",
+                                                        "node_type": "Name",
+                                                        "source_refs": [
+                                                            {
+                                                                "col_end": 33,
+                                                                "col_start": 31,
+                                                                "node_type": "SourceRef",
+                                                                "row_end": 24,
+                                                                "row_start": 24,
+                                                                "source_file_name": "hhs_hosp_cleanup"
+                                                            }
+                                                        ]
+                                                    },
+                                                    {
+                                                        "node_type": "LiteralValue",
+                                                        "source_code_data_type": [
+                                                            "Python",
+                                                            "3.8",
+                                                            "<class 'str'>"
+                                                        ],
+                                                        "source_refs": [
+                                                            {
+                                                                "col_end": 40,
+                                                                "col_start": 34,
+                                                                "node_type": "SourceRef",
+                                                                "row_end": 24,
+                                                                "row_start": 24,
+                                                                "source_file_name": "hhs_hosp_cleanup"
+                                                            }
+                                                        ],
+                                                        "value": "adm1",
+                                                        "value_type": "List"
+                                                    }
+                                                ],
+                                                "func": {
+                                                    "id": 26,
+                                                    "name": "_get",
+                                                    "node_type": "Name",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 42,
+                                                            "col_start": 17,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 24,
+                                                            "row_start": 24,
+                                                            "source_file_name": "hhs_hosp_cleanup"
+                                                        }
+                                                    ]
+                                                },
+                                                "node_type": "Call",
+                                                "source_language": null,
+                                                "source_language_version": null,
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 42,
+                                                        "col_start": 17,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 24,
+                                                        "row_start": 24,
+                                                        "source_file_name": "hhs_hosp_cleanup"
+                                                    }
+                                                ]
+                                            }
+                                        ],
+                                        "func": {
+                                            "attr": {
+                                                "id": 28,
+                                                "name": "to_numeric",
+                                                "node_type": "Name",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 30,
+                                                        "col_start": 17,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 24,
+                                                        "row_start": 24,
+                                                        "source_file_name": "hhs_hosp_cleanup"
+                                                    }
+                                                ]
+                                            },
+                                            "node_type": "Attribute",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 30,
+                                                    "col_start": 17,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 24,
+                                                    "row_start": 24,
+                                                    "source_file_name": "hhs_hosp_cleanup"
+                                                }
+                                            ],
+                                            "value": {
+                                                "id": -1,
+                                                "name": "pandas",
+                                                "node_type": "Name",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 19,
+                                                        "col_start": 17,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 24,
+                                                        "row_start": 24,
+                                                        "source_file_name": "hhs_hosp_cleanup"
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        "node_type": "Call",
+                                        "source_language": null,
+                                        "source_language_version": null,
+                                        "source_refs": [
+                                            {
+                                                "col_end": 42,
+                                                "col_start": 17,
+                                                "node_type": "SourceRef",
+                                                "row_end": 24,
+                                                "row_start": 24,
+                                                "source_file_name": "hhs_hosp_cleanup"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "func": {
+                                    "id": 25,
+                                    "name": "_set",
+                                    "node_type": "Name",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 42,
+                                            "col_start": 4,
+                                            "node_type": "SourceRef",
+                                            "row_end": 24,
+                                            "row_start": 24,
+                                            "source_file_name": "hhs_hosp_cleanup"
+                                        }
+                                    ]
+                                },
+                                "node_type": "Call",
+                                "source_language": null,
+                                "source_language_version": null,
+                                "source_refs": [
+                                    {
+                                        "col_end": 42,
+                                        "col_start": 4,
+                                        "node_type": "SourceRef",
+                                        "row_end": 24,
+                                        "row_start": 24,
+                                        "source_file_name": "hhs_hosp_cleanup"
+                                    }
+                                ]
+                            },
+                            "source_refs": [
+                                {
+                                    "col_end": 42,
+                                    "col_start": 4,
+                                    "node_type": "SourceRef",
+                                    "row_end": 24,
+                                    "row_start": 24,
+                                    "source_file_name": "hhs_hosp_cleanup"
+                                }
+                            ]
+                        },
+                        {
+                            "left": {
+                                "default_value": null,
+                                "node_type": "Var",
+                                "source_refs": [
+                                    {
+                                        "col_end": 6,
+                                        "col_start": 4,
+                                        "node_type": "SourceRef",
+                                        "row_end": 26,
+                                        "row_start": 26,
+                                        "source_file_name": "hhs_hosp_cleanup"
+                                    }
+                                ],
+                                "type": "float",
+                                "val": {
+                                    "id": 16,
+                                    "name": "df",
+                                    "node_type": "Name",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 6,
+                                            "col_start": 4,
+                                            "node_type": "SourceRef",
+                                            "row_end": 26,
+                                            "row_start": 26,
+                                            "source_file_name": "hhs_hosp_cleanup"
+                                        }
+                                    ]
+                                }
+                            },
+                            "node_type": "Assignment",
+                            "right": {
+                                "arguments": [],
+                                "func": {
+                                    "attr": {
+                                        "id": 30,
+                                        "name": "sort_index",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 50,
+                                                "col_start": 9,
+                                                "node_type": "SourceRef",
+                                                "row_end": 26,
+                                                "row_start": 26,
+                                                "source_file_name": "hhs_hosp_cleanup"
+                                            }
+                                        ]
+                                    },
+                                    "node_type": "Attribute",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 50,
+                                            "col_start": 9,
+                                            "node_type": "SourceRef",
+                                            "row_end": 26,
+                                            "row_start": 26,
+                                            "source_file_name": "hhs_hosp_cleanup"
+                                        }
+                                    ],
+                                    "value": {
+                                        "arguments": [
+                                            {
+                                                "node_type": "LiteralValue",
+                                                "source_code_data_type": [
+                                                    "Python",
+                                                    "3.8",
+                                                    "List"
+                                                ],
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 38,
+                                                        "col_start": 22,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 26,
+                                                        "row_start": 26,
+                                                        "source_file_name": "hhs_hosp_cleanup"
+                                                    }
+                                                ],
+                                                "value": [
+                                                    {
+                                                        "node_type": "LiteralValue",
+                                                        "source_code_data_type": [
+                                                            "Python",
+                                                            "3.8",
+                                                            "<class 'str'>"
+                                                        ],
+                                                        "source_refs": [
+                                                            {
+                                                                "col_end": 29,
+                                                                "col_start": 23,
+                                                                "node_type": "SourceRef",
+                                                                "row_end": 26,
+                                                                "row_start": 26,
+                                                                "source_file_name": "hhs_hosp_cleanup"
+                                                            }
+                                                        ],
+                                                        "value": "adm1",
+                                                        "value_type": "List"
+                                                    },
+                                                    {
+                                                        "node_type": "LiteralValue",
+                                                        "source_code_data_type": [
+                                                            "Python",
+                                                            "3.8",
+                                                            "<class 'str'>"
+                                                        ],
+                                                        "source_refs": [
+                                                            {
+                                                                "col_end": 37,
+                                                                "col_start": 31,
+                                                                "node_type": "SourceRef",
+                                                                "row_end": 26,
+                                                                "row_start": 26,
+                                                                "source_file_name": "hhs_hosp_cleanup"
+                                                            }
+                                                        ],
+                                                        "value": "date",
+                                                        "value_type": "List"
+                                                    }
+                                                ],
+                                                "value_type": "List"
+                                            }
+                                        ],
+                                        "func": {
+                                            "attr": {
+                                                "id": 29,
+                                                "name": "set_index",
+                                                "node_type": "Name",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 21,
+                                                        "col_start": 9,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 26,
+                                                        "row_start": 26,
+                                                        "source_file_name": "hhs_hosp_cleanup"
+                                                    }
+                                                ]
+                                            },
+                                            "node_type": "Attribute",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 21,
+                                                    "col_start": 9,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 26,
+                                                    "row_start": 26,
+                                                    "source_file_name": "hhs_hosp_cleanup"
+                                                }
+                                            ],
+                                            "value": {
+                                                "id": 16,
+                                                "name": "df",
+                                                "node_type": "Name",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 11,
+                                                        "col_start": 9,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 26,
+                                                        "row_start": 26,
+                                                        "source_file_name": "hhs_hosp_cleanup"
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        "node_type": "Call",
+                                        "source_language": null,
+                                        "source_language_version": null,
+                                        "source_refs": [
+                                            {
+                                                "col_end": 39,
+                                                "col_start": 9,
+                                                "node_type": "SourceRef",
+                                                "row_end": 26,
+                                                "row_start": 26,
+                                                "source_file_name": "hhs_hosp_cleanup"
+                                            }
+                                        ]
+                                    }
+                                },
+                                "node_type": "Call",
+                                "source_language": null,
+                                "source_language_version": null,
+                                "source_refs": [
+                                    {
+                                        "col_end": 52,
+                                        "col_start": 9,
+                                        "node_type": "SourceRef",
+                                        "row_end": 26,
+                                        "row_start": 26,
+                                        "source_file_name": "hhs_hosp_cleanup"
+                                    }
+                                ]
+                            },
+                            "source_refs": [
+                                {
+                                    "col_end": 52,
+                                    "col_start": 4,
+                                    "node_type": "SourceRef",
+                                    "row_end": 26,
+                                    "row_start": 26,
+                                    "source_file_name": "hhs_hosp_cleanup"
+                                }
+                            ]
+                        },
+                        {
+                            "left": {
+                                "default_value": null,
+                                "node_type": "Var",
+                                "source_refs": [
+                                    {
+                                        "col_end": 13,
+                                        "col_start": 4,
+                                        "node_type": "SourceRef",
+                                        "row_end": 28,
+                                        "row_start": 28,
+                                        "source_file_name": "hhs_hosp_cleanup"
+                                    }
+                                ],
+                                "type": "float",
+                                "val": {
+                                    "id": 11,
+                                    "name": "inc_hosps",
+                                    "node_type": "Name",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 13,
+                                            "col_start": 4,
+                                            "node_type": "SourceRef",
+                                            "row_end": 28,
+                                            "row_start": 28,
+                                            "source_file_name": "hhs_hosp_cleanup"
+                                        }
+                                    ]
+                                }
+                            },
+                            "node_type": "Assignment",
+                            "right": {
+                                "interpreter": "Python",
+                                "node_type": "Operator",
+                                "op": "ast.Add",
+                                "operands": [
+                                    {
+                                        "attr": {
+                                            "id": 31,
+                                            "name": "previous_day_admission_adult_covid_confirmed",
+                                            "node_type": "Name",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 63,
+                                                    "col_start": 16,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 28,
+                                                    "row_start": 28,
+                                                    "source_file_name": "hhs_hosp_cleanup"
+                                                }
+                                            ]
+                                        },
+                                        "node_type": "Attribute",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 63,
+                                                "col_start": 16,
+                                                "node_type": "SourceRef",
+                                                "row_end": 28,
+                                                "row_start": 28,
+                                                "source_file_name": "hhs_hosp_cleanup"
+                                            }
+                                        ],
+                                        "value": {
+                                            "id": 16,
+                                            "name": "df",
+                                            "node_type": "Name",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 18,
+                                                    "col_start": 16,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 28,
+                                                    "row_start": 28,
+                                                    "source_file_name": "hhs_hosp_cleanup"
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "attr": {
+                                            "id": 32,
+                                            "name": "previous_day_admission_pediatric_covid_confirmed",
+                                            "node_type": "Name",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 117,
+                                                    "col_start": 66,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 28,
+                                                    "row_start": 28,
+                                                    "source_file_name": "hhs_hosp_cleanup"
+                                                }
+                                            ]
+                                        },
+                                        "node_type": "Attribute",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 117,
+                                                "col_start": 66,
+                                                "node_type": "SourceRef",
+                                                "row_end": 28,
+                                                "row_start": 28,
+                                                "source_file_name": "hhs_hosp_cleanup"
+                                            }
+                                        ],
+                                        "value": {
+                                            "id": 16,
+                                            "name": "df",
+                                            "node_type": "Name",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 68,
+                                                    "col_start": 66,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 28,
+                                                    "row_start": 28,
+                                                    "source_file_name": "hhs_hosp_cleanup"
+                                                }
+                                            ]
+                                        }
+                                    }
+                                ],
+                                "source_language": "Python",
+                                "source_refs": [
+                                    {
+                                        "col_end": 117,
+                                        "col_start": 16,
+                                        "node_type": "SourceRef",
+                                        "row_end": 28,
+                                        "row_start": 28,
+                                        "source_file_name": "hhs_hosp_cleanup"
+                                    }
+                                ],
+                                "version": "3.8.18"
+                            },
+                            "source_refs": [
+                                {
+                                    "col_end": 117,
+                                    "col_start": 4,
+                                    "node_type": "SourceRef",
+                                    "row_end": 28,
+                                    "row_start": 28,
+                                    "source_file_name": "hhs_hosp_cleanup"
+                                }
+                            ]
+                        },
+                        {
+                            "left": {
+                                "default_value": null,
+                                "node_type": "Var",
+                                "source_refs": [
+                                    {
+                                        "col_end": 17,
+                                        "col_start": 4,
+                                        "node_type": "SourceRef",
+                                        "row_end": 30,
+                                        "row_start": 30,
+                                        "source_file_name": "hhs_hosp_cleanup"
+                                    }
+                                ],
+                                "type": "float",
+                                "val": {
+                                    "id": 12,
+                                    "name": "current_hosps",
+                                    "node_type": "Name",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 17,
+                                            "col_start": 4,
+                                            "node_type": "SourceRef",
+                                            "row_end": 30,
+                                            "row_start": 30,
+                                            "source_file_name": "hhs_hosp_cleanup"
+                                        }
+                                    ]
+                                }
+                            },
+                            "node_type": "Assignment",
+                            "right": {
+                                "interpreter": "Python",
+                                "node_type": "Operator",
+                                "op": "ast.Add",
+                                "operands": [
+                                    {
+                                        "attr": {
+                                            "id": 33,
+                                            "name": "total_adult_patients_hospitalized_confirmed_covid",
+                                            "node_type": "Name",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 60,
+                                                    "col_start": 8,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 31,
+                                                    "row_start": 31,
+                                                    "source_file_name": "hhs_hosp_cleanup"
+                                                }
+                                            ]
+                                        },
+                                        "node_type": "Attribute",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 60,
+                                                "col_start": 8,
+                                                "node_type": "SourceRef",
+                                                "row_end": 31,
+                                                "row_start": 31,
+                                                "source_file_name": "hhs_hosp_cleanup"
+                                            }
+                                        ],
+                                        "value": {
+                                            "id": 16,
+                                            "name": "df",
+                                            "node_type": "Name",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 10,
+                                                    "col_start": 8,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 31,
+                                                    "row_start": 31,
+                                                    "source_file_name": "hhs_hosp_cleanup"
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "attr": {
+                                            "id": 34,
+                                            "name": "total_pediatric_patients_hospitalized_confirmed_covid",
+                                            "node_type": "Name",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 119,
+                                                    "col_start": 63,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 31,
+                                                    "row_start": 31,
+                                                    "source_file_name": "hhs_hosp_cleanup"
+                                                }
+                                            ]
+                                        },
+                                        "node_type": "Attribute",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 119,
+                                                "col_start": 63,
+                                                "node_type": "SourceRef",
+                                                "row_end": 31,
+                                                "row_start": 31,
+                                                "source_file_name": "hhs_hosp_cleanup"
+                                            }
+                                        ],
+                                        "value": {
+                                            "id": 16,
+                                            "name": "df",
+                                            "node_type": "Name",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 65,
+                                                    "col_start": 63,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 31,
+                                                    "row_start": 31,
+                                                    "source_file_name": "hhs_hosp_cleanup"
+                                                }
+                                            ]
+                                        }
+                                    }
+                                ],
+                                "source_language": "Python",
+                                "source_refs": [
+                                    {
+                                        "col_end": 119,
+                                        "col_start": 8,
+                                        "node_type": "SourceRef",
+                                        "row_end": 31,
+                                        "row_start": 31,
+                                        "source_file_name": "hhs_hosp_cleanup"
+                                    }
+                                ],
+                                "version": "3.8.18"
+                            },
+                            "source_refs": [
+                                {
+                                    "col_end": 5,
+                                    "col_start": 4,
+                                    "node_type": "SourceRef",
+                                    "row_end": 32,
+                                    "row_start": 30,
+                                    "source_file_name": "hhs_hosp_cleanup"
+                                }
+                            ]
+                        },
+                        {
+                            "left": {
+                                "default_value": null,
+                                "node_type": "Var",
+                                "source_refs": [
+                                    {
+                                        "col_end": 6,
+                                        "col_start": 4,
+                                        "node_type": "SourceRef",
+                                        "row_end": 34,
+                                        "row_start": 34,
+                                        "source_file_name": "hhs_hosp_cleanup"
+                                    }
+                                ],
+                                "type": "float",
+                                "val": {
+                                    "id": 16,
+                                    "name": "df",
+                                    "node_type": "Name",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 6,
+                                            "col_start": 4,
+                                            "node_type": "SourceRef",
+                                            "row_end": 34,
+                                            "row_start": 34,
+                                            "source_file_name": "hhs_hosp_cleanup"
+                                        }
+                                    ]
+                                }
+                            },
+                            "node_type": "Assignment",
+                            "right": {
+                                "arguments": [
+                                    {
+                                        "node_type": "LiteralValue",
+                                        "source_code_data_type": [
+                                            "Python",
+                                            "3.8",
+                                            "<class 'dict'>"
+                                        ],
+                                        "source_refs": [
+                                            {
+                                                "col_end": 102,
+                                                "col_start": 19,
+                                                "node_type": "SourceRef",
+                                                "row_end": 34,
+                                                "row_start": 34,
+                                                "source_file_name": "hhs_hosp_cleanup"
+                                            }
+                                        ],
+                                        "value": "[('incident_hospitalizations', {'id': 11,\n 'name': 'inc_hosps',\n 'source_refs': [{'col_end': 58,\n                  'col_start': 49,\n                  'row_end': 34,\n                  'row_start': 34,\n                  'source_file_name': 'hhs_hosp_cleanup'}]}), ('current_hospitalizations', {'id': 12,\n 'name': 'current_hosps',\n 'source_refs': [{'col_end': 101,\n                  'col_start': 88,\n                  'row_end': 34,\n                  'row_start': 34,\n                  'source_file_name': 'hhs_hosp_cleanup'}]})]",
+                                        "value_type": "Map"
+                                    },
+                                    {
+                                        "left": {
+                                            "default_value": null,
+                                            "node_type": "Var",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 111,
+                                                    "col_start": 9,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 34,
+                                                    "row_start": 34,
+                                                    "source_file_name": "hhs_hosp_cleanup"
+                                                }
+                                            ],
+                                            "type": "float",
+                                            "val": {
+                                                "id": 100,
+                                                "name": "axis",
+                                                "node_type": "Name",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 111,
+                                                        "col_start": 9,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 34,
+                                                        "row_start": 34,
+                                                        "source_file_name": "hhs_hosp_cleanup"
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        "node_type": "Assignment",
+                                        "right": {
+                                            "node_type": "LiteralValue",
+                                            "source_code_data_type": [
+                                                "Python",
+                                                "3.8",
+                                                "<class 'int'>"
+                                            ],
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 110,
+                                                    "col_start": 109,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 34,
+                                                    "row_start": 34,
+                                                    "source_file_name": "hhs_hosp_cleanup"
+                                                }
+                                            ],
+                                            "value": 1,
+                                            "value_type": "Integer"
+                                        },
+                                        "source_refs": [
+                                            {
+                                                "col_end": 111,
+                                                "col_start": 9,
+                                                "node_type": "SourceRef",
+                                                "row_end": 34,
+                                                "row_start": 34,
+                                                "source_file_name": "hhs_hosp_cleanup"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "func": {
+                                    "attr": {
+                                        "id": 35,
+                                        "name": "concat",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 18,
+                                                "col_start": 9,
+                                                "node_type": "SourceRef",
+                                                "row_end": 34,
+                                                "row_start": 34,
+                                                "source_file_name": "hhs_hosp_cleanup"
+                                            }
+                                        ]
+                                    },
+                                    "node_type": "Attribute",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 18,
+                                            "col_start": 9,
+                                            "node_type": "SourceRef",
+                                            "row_end": 34,
+                                            "row_start": 34,
+                                            "source_file_name": "hhs_hosp_cleanup"
+                                        }
+                                    ],
+                                    "value": {
+                                        "id": -1,
+                                        "name": "pandas",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 11,
+                                                "col_start": 9,
+                                                "node_type": "SourceRef",
+                                                "row_end": 34,
+                                                "row_start": 34,
+                                                "source_file_name": "hhs_hosp_cleanup"
+                                            }
+                                        ]
+                                    }
+                                },
+                                "node_type": "Call",
+                                "source_language": null,
+                                "source_language_version": null,
+                                "source_refs": [
+                                    {
+                                        "col_end": 111,
+                                        "col_start": 9,
+                                        "node_type": "SourceRef",
+                                        "row_end": 34,
+                                        "row_start": 34,
+                                        "source_file_name": "hhs_hosp_cleanup"
+                                    }
+                                ]
+                            },
+                            "source_refs": [
+                                {
+                                    "col_end": 111,
+                                    "col_start": 4,
+                                    "node_type": "SourceRef",
+                                    "row_end": 34,
+                                    "row_start": 34,
+                                    "source_file_name": "hhs_hosp_cleanup"
+                                }
+                            ]
+                        },
+                        {
+                            "body": [
+                                {
+                                    "arguments": [
+                                        {
+                                            "node_type": "LiteralValue",
+                                            "source_code_data_type": [
+                                                "Python",
+                                                "3.8",
+                                                "List"
+                                            ],
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 60,
+                                                    "col_start": 8,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 38,
+                                                    "row_start": 38,
+                                                    "source_file_name": "hhs_hosp_cleanup"
+                                                }
+                                            ],
+                                            "value": "RuntimeError",
+                                            "value_type": "List"
+                                        }
+                                    ],
+                                    "func": {
+                                        "id": 38,
+                                        "name": "raise",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 60,
+                                                "col_start": 8,
+                                                "node_type": "SourceRef",
+                                                "row_end": 38,
+                                                "row_start": 38,
+                                                "source_file_name": "hhs_hosp_cleanup"
+                                            }
+                                        ]
+                                    },
+                                    "node_type": "Call",
+                                    "source_language": null,
+                                    "source_language_version": null,
+                                    "source_refs": [
+                                        {
+                                            "col_end": 60,
+                                            "col_start": 8,
+                                            "node_type": "SourceRef",
+                                            "row_end": 38,
+                                            "row_start": 38,
+                                            "source_file_name": "hhs_hosp_cleanup"
+                                        }
+                                    ]
+                                }
+                            ],
+                            "expr": {
+                                "interpreter": "Python",
+                                "node_type": "Operator",
+                                "op": "ast.In",
+                                "operands": [
+                                    {
+                                        "node_type": "LiteralValue",
+                                        "source_code_data_type": [
+                                            "Python",
+                                            "3.8",
+                                            "<class 'int'>"
+                                        ],
+                                        "source_refs": [
+                                            {
+                                                "col_end": 9,
+                                                "col_start": 7,
+                                                "node_type": "SourceRef",
+                                                "row_end": 37,
+                                                "row_start": 37,
+                                                "source_file_name": "hhs_hosp_cleanup"
+                                            }
+                                        ],
+                                        "value": 66,
+                                        "value_type": "Integer"
+                                    },
+                                    {
+                                        "arguments": [
+                                            {
+                                                "node_type": "LiteralValue",
+                                                "source_code_data_type": [
+                                                    "Python",
+                                                    "3.8",
+                                                    "<class 'str'>"
+                                                ],
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 35,
+                                                        "col_start": 29,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 37,
+                                                        "row_start": 37,
+                                                        "source_file_name": "hhs_hosp_cleanup"
+                                                    }
+                                                ],
+                                                "value": "adm1",
+                                                "value_type": "List"
+                                            }
+                                        ],
+                                        "func": {
+                                            "attr": {
+                                                "id": 37,
+                                                "name": "unique",
+                                                "node_type": "Name",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 28,
+                                                        "col_start": 13,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 37,
+                                                        "row_start": 37,
+                                                        "source_file_name": "hhs_hosp_cleanup"
+                                                    }
+                                                ]
+                                            },
+                                            "node_type": "Attribute",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 28,
+                                                    "col_start": 13,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 37,
+                                                    "row_start": 37,
+                                                    "source_file_name": "hhs_hosp_cleanup"
+                                                }
+                                            ],
+                                            "value": {
+                                                "attr": {
+                                                    "id": 36,
+                                                    "name": "index",
+                                                    "node_type": "Name",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 21,
+                                                            "col_start": 13,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 37,
+                                                            "row_start": 37,
+                                                            "source_file_name": "hhs_hosp_cleanup"
+                                                        }
+                                                    ]
+                                                },
+                                                "node_type": "Attribute",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 21,
+                                                        "col_start": 13,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 37,
+                                                        "row_start": 37,
+                                                        "source_file_name": "hhs_hosp_cleanup"
+                                                    }
+                                                ],
+                                                "value": {
+                                                    "id": 16,
+                                                    "name": "df",
+                                                    "node_type": "Name",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 15,
+                                                            "col_start": 13,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 37,
+                                                            "row_start": 37,
+                                                            "source_file_name": "hhs_hosp_cleanup"
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        },
+                                        "node_type": "Call",
+                                        "source_language": null,
+                                        "source_language_version": null,
+                                        "source_refs": [
+                                            {
+                                                "col_end": 36,
+                                                "col_start": 13,
+                                                "node_type": "SourceRef",
+                                                "row_end": 37,
+                                                "row_start": 37,
+                                                "source_file_name": "hhs_hosp_cleanup"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "source_language": "Python",
+                                "source_refs": [
+                                    {
+                                        "col_end": 36,
+                                        "col_start": 7,
+                                        "node_type": "SourceRef",
+                                        "row_end": 37,
+                                        "row_start": 37,
+                                        "source_file_name": "hhs_hosp_cleanup"
+                                    }
+                                ],
+                                "version": "3.8.18"
+                            },
+                            "node_type": "ModelIf",
+                            "orelse": [],
+                            "source_refs": [
+                                {
+                                    "col_end": 60,
+                                    "col_start": 4,
+                                    "node_type": "SourceRef",
+                                    "row_end": 38,
+                                    "row_start": 37,
+                                    "source_file_name": "hhs_hosp_cleanup"
+                                }
+                            ]
+                        },
+                        {
+                            "body": [
+                                {
+                                    "arguments": [
+                                        {
+                                            "node_type": "LiteralValue",
+                                            "source_code_data_type": [
+                                                "Python",
+                                                "3.8",
+                                                "List"
+                                            ],
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 60,
+                                                    "col_start": 8,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 40,
+                                                    "row_start": 40,
+                                                    "source_file_name": "hhs_hosp_cleanup"
+                                                }
+                                            ],
+                                            "value": "RuntimeError",
+                                            "value_type": "List"
+                                        }
+                                    ],
+                                    "func": {
+                                        "id": 38,
+                                        "name": "raise",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 60,
+                                                "col_start": 8,
+                                                "node_type": "SourceRef",
+                                                "row_end": 40,
+                                                "row_start": 40,
+                                                "source_file_name": "hhs_hosp_cleanup"
+                                            }
+                                        ]
+                                    },
+                                    "node_type": "Call",
+                                    "source_language": null,
+                                    "source_language_version": null,
+                                    "source_refs": [
+                                        {
+                                            "col_end": 60,
+                                            "col_start": 8,
+                                            "node_type": "SourceRef",
+                                            "row_end": 40,
+                                            "row_start": 40,
+                                            "source_file_name": "hhs_hosp_cleanup"
+                                        }
+                                    ]
+                                }
+                            ],
+                            "expr": {
+                                "interpreter": "Python",
+                                "node_type": "Operator",
+                                "op": "ast.In",
+                                "operands": [
+                                    {
+                                        "node_type": "LiteralValue",
+                                        "source_code_data_type": [
+                                            "Python",
+                                            "3.8",
+                                            "<class 'int'>"
+                                        ],
+                                        "source_refs": [
+                                            {
+                                                "col_end": 9,
+                                                "col_start": 7,
+                                                "node_type": "SourceRef",
+                                                "row_end": 39,
+                                                "row_start": 39,
+                                                "source_file_name": "hhs_hosp_cleanup"
+                                            }
+                                        ],
+                                        "value": 69,
+                                        "value_type": "Integer"
+                                    },
+                                    {
+                                        "arguments": [
+                                            {
+                                                "node_type": "LiteralValue",
+                                                "source_code_data_type": [
+                                                    "Python",
+                                                    "3.8",
+                                                    "<class 'str'>"
+                                                ],
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 35,
+                                                        "col_start": 29,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 39,
+                                                        "row_start": 39,
+                                                        "source_file_name": "hhs_hosp_cleanup"
+                                                    }
+                                                ],
+                                                "value": "adm1",
+                                                "value_type": "List"
+                                            }
+                                        ],
+                                        "func": {
+                                            "attr": {
+                                                "id": 37,
+                                                "name": "unique",
+                                                "node_type": "Name",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 28,
+                                                        "col_start": 13,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 39,
+                                                        "row_start": 39,
+                                                        "source_file_name": "hhs_hosp_cleanup"
+                                                    }
+                                                ]
+                                            },
+                                            "node_type": "Attribute",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 28,
+                                                    "col_start": 13,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 39,
+                                                    "row_start": 39,
+                                                    "source_file_name": "hhs_hosp_cleanup"
+                                                }
+                                            ],
+                                            "value": {
+                                                "attr": {
+                                                    "id": 36,
+                                                    "name": "index",
+                                                    "node_type": "Name",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 21,
+                                                            "col_start": 13,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 39,
+                                                            "row_start": 39,
+                                                            "source_file_name": "hhs_hosp_cleanup"
+                                                        }
+                                                    ]
+                                                },
+                                                "node_type": "Attribute",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 21,
+                                                        "col_start": 13,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 39,
+                                                        "row_start": 39,
+                                                        "source_file_name": "hhs_hosp_cleanup"
+                                                    }
+                                                ],
+                                                "value": {
+                                                    "id": 16,
+                                                    "name": "df",
+                                                    "node_type": "Name",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 15,
+                                                            "col_start": 13,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 39,
+                                                            "row_start": 39,
+                                                            "source_file_name": "hhs_hosp_cleanup"
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        },
+                                        "node_type": "Call",
+                                        "source_language": null,
+                                        "source_language_version": null,
+                                        "source_refs": [
+                                            {
+                                                "col_end": 36,
+                                                "col_start": 13,
+                                                "node_type": "SourceRef",
+                                                "row_end": 39,
+                                                "row_start": 39,
+                                                "source_file_name": "hhs_hosp_cleanup"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "source_language": "Python",
+                                "source_refs": [
+                                    {
+                                        "col_end": 36,
+                                        "col_start": 7,
+                                        "node_type": "SourceRef",
+                                        "row_end": 39,
+                                        "row_start": 39,
+                                        "source_file_name": "hhs_hosp_cleanup"
+                                    }
+                                ],
+                                "version": "3.8.18"
+                            },
+                            "node_type": "ModelIf",
+                            "orelse": [],
+                            "source_refs": [
+                                {
+                                    "col_end": 60,
+                                    "col_start": 4,
+                                    "node_type": "SourceRef",
+                                    "row_end": 40,
+                                    "row_start": 39,
+                                    "source_file_name": "hhs_hosp_cleanup"
+                                }
+                            ]
+                        },
+                        {
+                            "left": {
+                                "default_value": null,
+                                "node_type": "Var",
+                                "source_refs": [
+                                    {
+                                        "col_end": 18,
+                                        "col_start": 4,
+                                        "node_type": "SourceRef",
+                                        "row_end": 41,
+                                        "row_start": 41,
+                                        "source_file_name": "hhs_hosp_cleanup"
+                                    }
+                                ],
+                                "type": "float",
+                                "val": {
+                                    "id": 14,
+                                    "name": "empty_row_inds",
+                                    "node_type": "Name",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 18,
+                                            "col_start": 4,
+                                            "node_type": "SourceRef",
+                                            "row_end": 41,
+                                            "row_start": 41,
+                                            "source_file_name": "hhs_hosp_cleanup"
+                                        }
+                                    ]
+                                }
+                            },
+                            "node_type": "Assignment",
+                            "right": {
+                                "arguments": [
+                                    {
+                                        "node_type": "LiteralValue",
+                                        "source_code_data_type": [
+                                            "Python",
+                                            "3.8",
+                                            "List"
+                                        ],
+                                        "source_refs": [
+                                            {
+                                                "col_end": 83,
+                                                "col_start": 48,
+                                                "node_type": "SourceRef",
+                                                "row_end": 41,
+                                                "row_start": 41,
+                                                "source_file_name": "hhs_hosp_cleanup"
+                                            }
+                                        ],
+                                        "value": [
+                                            {
+                                                "node_type": "LiteralValue",
+                                                "source_code_data_type": [
+                                                    "Python",
+                                                    "3.8",
+                                                    "List"
+                                                ],
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 57,
+                                                        "col_start": 49,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 41,
+                                                        "row_start": 41,
+                                                        "source_file_name": "hhs_hosp_cleanup"
+                                                    }
+                                                ],
+                                                "value": [
+                                                    {
+                                                        "node_type": "LiteralValue",
+                                                        "source_code_data_type": [
+                                                            "Python",
+                                                            "3.8",
+                                                            "<class 'int'>"
+                                                        ],
+                                                        "source_refs": [
+                                                            {
+                                                                "col_end": 52,
+                                                                "col_start": 50,
+                                                                "node_type": "SourceRef",
+                                                                "row_end": 41,
+                                                                "row_start": 41,
+                                                                "source_file_name": "hhs_hosp_cleanup"
+                                                            }
+                                                        ],
+                                                        "value": 66,
+                                                        "value_type": "Integer"
+                                                    },
+                                                    {
+                                                        "node_type": "LiteralValue",
+                                                        "source_code_data_type": [
+                                                            "Python",
+                                                            "3.8",
+                                                            "<class 'int'>"
+                                                        ],
+                                                        "source_refs": [
+                                                            {
+                                                                "col_end": 56,
+                                                                "col_start": 54,
+                                                                "node_type": "SourceRef",
+                                                                "row_end": 41,
+                                                                "row_start": 41,
+                                                                "source_file_name": "hhs_hosp_cleanup"
+                                                            }
+                                                        ],
+                                                        "value": 69,
+                                                        "value_type": "Integer"
+                                                    }
+                                                ],
+                                                "value_type": "List"
+                                            },
+                                            {
+                                                "arguments": [
+                                                    {
+                                                        "node_type": "LiteralValue",
+                                                        "source_code_data_type": [
+                                                            "Python",
+                                                            "3.8",
+                                                            "<class 'str'>"
+                                                        ],
+                                                        "source_refs": [
+                                                            {
+                                                                "col_end": 81,
+                                                                "col_start": 75,
+                                                                "node_type": "SourceRef",
+                                                                "row_end": 41,
+                                                                "row_start": 41,
+                                                                "source_file_name": "hhs_hosp_cleanup"
+                                                            }
+                                                        ],
+                                                        "value": "date",
+                                                        "value_type": "List"
+                                                    }
+                                                ],
+                                                "func": {
+                                                    "attr": {
+                                                        "id": 37,
+                                                        "name": "unique",
+                                                        "node_type": "Name",
+                                                        "source_refs": [
+                                                            {
+                                                                "col_end": 74,
+                                                                "col_start": 59,
+                                                                "node_type": "SourceRef",
+                                                                "row_end": 41,
+                                                                "row_start": 41,
+                                                                "source_file_name": "hhs_hosp_cleanup"
+                                                            }
+                                                        ]
+                                                    },
+                                                    "node_type": "Attribute",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 74,
+                                                            "col_start": 59,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 41,
+                                                            "row_start": 41,
+                                                            "source_file_name": "hhs_hosp_cleanup"
+                                                        }
+                                                    ],
+                                                    "value": {
+                                                        "attr": {
+                                                            "id": 36,
+                                                            "name": "index",
+                                                            "node_type": "Name",
+                                                            "source_refs": [
+                                                                {
+                                                                    "col_end": 67,
+                                                                    "col_start": 59,
+                                                                    "node_type": "SourceRef",
+                                                                    "row_end": 41,
+                                                                    "row_start": 41,
+                                                                    "source_file_name": "hhs_hosp_cleanup"
+                                                                }
+                                                            ]
+                                                        },
+                                                        "node_type": "Attribute",
+                                                        "source_refs": [
+                                                            {
+                                                                "col_end": 67,
+                                                                "col_start": 59,
+                                                                "node_type": "SourceRef",
+                                                                "row_end": 41,
+                                                                "row_start": 41,
+                                                                "source_file_name": "hhs_hosp_cleanup"
+                                                            }
+                                                        ],
+                                                        "value": {
+                                                            "id": 16,
+                                                            "name": "df",
+                                                            "node_type": "Name",
+                                                            "source_refs": [
+                                                                {
+                                                                    "col_end": 61,
+                                                                    "col_start": 59,
+                                                                    "node_type": "SourceRef",
+                                                                    "row_end": 41,
+                                                                    "row_start": 41,
+                                                                    "source_file_name": "hhs_hosp_cleanup"
+                                                                }
+                                                            ]
+                                                        }
+                                                    }
+                                                },
+                                                "node_type": "Call",
+                                                "source_language": null,
+                                                "source_language_version": null,
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 82,
+                                                        "col_start": 59,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 41,
+                                                        "row_start": 41,
+                                                        "source_file_name": "hhs_hosp_cleanup"
+                                                    }
+                                                ]
+                                            }
+                                        ],
+                                        "value_type": "List"
+                                    }
+                                ],
+                                "func": {
+                                    "attr": {
+                                        "id": 40,
+                                        "name": "from_product",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 47,
+                                                "col_start": 21,
+                                                "node_type": "SourceRef",
+                                                "row_end": 41,
+                                                "row_start": 41,
+                                                "source_file_name": "hhs_hosp_cleanup"
+                                            }
+                                        ]
+                                    },
+                                    "node_type": "Attribute",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 47,
+                                            "col_start": 21,
+                                            "node_type": "SourceRef",
+                                            "row_end": 41,
+                                            "row_start": 41,
+                                            "source_file_name": "hhs_hosp_cleanup"
+                                        }
+                                    ],
+                                    "value": {
+                                        "attr": {
+                                            "id": 39,
+                                            "name": "MultiIndex",
+                                            "node_type": "Name",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 34,
+                                                    "col_start": 21,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 41,
+                                                    "row_start": 41,
+                                                    "source_file_name": "hhs_hosp_cleanup"
+                                                }
+                                            ]
+                                        },
+                                        "node_type": "Attribute",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 34,
+                                                "col_start": 21,
+                                                "node_type": "SourceRef",
+                                                "row_end": 41,
+                                                "row_start": 41,
+                                                "source_file_name": "hhs_hosp_cleanup"
+                                            }
+                                        ],
+                                        "value": {
+                                            "id": -1,
+                                            "name": "pandas",
+                                            "node_type": "Name",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 23,
+                                                    "col_start": 21,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 41,
+                                                    "row_start": 41,
+                                                    "source_file_name": "hhs_hosp_cleanup"
+                                                }
+                                            ]
+                                        }
+                                    }
+                                },
+                                "node_type": "Call",
+                                "source_language": null,
+                                "source_language_version": null,
+                                "source_refs": [
+                                    {
+                                        "col_end": 84,
+                                        "col_start": 21,
+                                        "node_type": "SourceRef",
+                                        "row_end": 41,
+                                        "row_start": 41,
+                                        "source_file_name": "hhs_hosp_cleanup"
+                                    }
+                                ]
+                            },
+                            "source_refs": [
+                                {
+                                    "col_end": 84,
+                                    "col_start": 4,
+                                    "node_type": "SourceRef",
+                                    "row_end": 41,
+                                    "row_start": 41,
+                                    "source_file_name": "hhs_hosp_cleanup"
+                                }
+                            ]
+                        },
+                        {
+                            "left": {
+                                "default_value": null,
+                                "node_type": "Var",
+                                "source_refs": [
+                                    {
+                                        "col_end": 6,
+                                        "col_start": 4,
+                                        "node_type": "SourceRef",
+                                        "row_end": 42,
+                                        "row_start": 42,
+                                        "source_file_name": "hhs_hosp_cleanup"
+                                    }
+                                ],
+                                "type": "float",
+                                "val": {
+                                    "id": 16,
+                                    "name": "df",
+                                    "node_type": "Name",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 6,
+                                            "col_start": 4,
+                                            "node_type": "SourceRef",
+                                            "row_end": 42,
+                                            "row_start": 42,
+                                            "source_file_name": "hhs_hosp_cleanup"
+                                        }
+                                    ]
+                                }
+                            },
+                            "node_type": "Assignment",
+                            "right": {
+                                "arguments": [],
+                                "func": {
+                                    "attr": {
+                                        "id": 30,
+                                        "name": "sort_index",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 63,
+                                                "col_start": 9,
+                                                "node_type": "SourceRef",
+                                                "row_end": 42,
+                                                "row_start": 42,
+                                                "source_file_name": "hhs_hosp_cleanup"
+                                            }
+                                        ]
+                                    },
+                                    "node_type": "Attribute",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 63,
+                                            "col_start": 9,
+                                            "node_type": "SourceRef",
+                                            "row_end": 42,
+                                            "row_start": 42,
+                                            "source_file_name": "hhs_hosp_cleanup"
+                                        }
+                                    ],
+                                    "value": {
+                                        "arguments": [
+                                            {
+                                                "arguments": [
+                                                    {
+                                                        "id": 14,
+                                                        "name": "empty_row_inds",
+                                                        "node_type": "Name",
+                                                        "source_refs": [
+                                                            {
+                                                                "col_end": 50,
+                                                                "col_start": 36,
+                                                                "node_type": "SourceRef",
+                                                                "row_end": 42,
+                                                                "row_start": 42,
+                                                                "source_file_name": "hhs_hosp_cleanup"
+                                                            }
+                                                        ]
+                                                    }
+                                                ],
+                                                "func": {
+                                                    "attr": {
+                                                        "id": 41,
+                                                        "name": "append",
+                                                        "node_type": "Name",
+                                                        "source_refs": [
+                                                            {
+                                                                "col_end": 35,
+                                                                "col_start": 20,
+                                                                "node_type": "SourceRef",
+                                                                "row_end": 42,
+                                                                "row_start": 42,
+                                                                "source_file_name": "hhs_hosp_cleanup"
+                                                            }
+                                                        ]
+                                                    },
+                                                    "node_type": "Attribute",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 35,
+                                                            "col_start": 20,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 42,
+                                                            "row_start": 42,
+                                                            "source_file_name": "hhs_hosp_cleanup"
+                                                        }
+                                                    ],
+                                                    "value": {
+                                                        "attr": {
+                                                            "id": 36,
+                                                            "name": "index",
+                                                            "node_type": "Name",
+                                                            "source_refs": [
+                                                                {
+                                                                    "col_end": 28,
+                                                                    "col_start": 20,
+                                                                    "node_type": "SourceRef",
+                                                                    "row_end": 42,
+                                                                    "row_start": 42,
+                                                                    "source_file_name": "hhs_hosp_cleanup"
+                                                                }
+                                                            ]
+                                                        },
+                                                        "node_type": "Attribute",
+                                                        "source_refs": [
+                                                            {
+                                                                "col_end": 28,
+                                                                "col_start": 20,
+                                                                "node_type": "SourceRef",
+                                                                "row_end": 42,
+                                                                "row_start": 42,
+                                                                "source_file_name": "hhs_hosp_cleanup"
+                                                            }
+                                                        ],
+                                                        "value": {
+                                                            "id": 16,
+                                                            "name": "df",
+                                                            "node_type": "Name",
+                                                            "source_refs": [
+                                                                {
+                                                                    "col_end": 22,
+                                                                    "col_start": 20,
+                                                                    "node_type": "SourceRef",
+                                                                    "row_end": 42,
+                                                                    "row_start": 42,
+                                                                    "source_file_name": "hhs_hosp_cleanup"
+                                                                }
+                                                            ]
+                                                        }
+                                                    }
+                                                },
+                                                "node_type": "Call",
+                                                "source_language": null,
+                                                "source_language_version": null,
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 51,
+                                                        "col_start": 20,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 42,
+                                                        "row_start": 42,
+                                                        "source_file_name": "hhs_hosp_cleanup"
+                                                    }
+                                                ]
+                                            }
+                                        ],
+                                        "func": {
+                                            "attr": {
+                                                "id": 42,
+                                                "name": "reindex",
+                                                "node_type": "Name",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 19,
+                                                        "col_start": 9,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 42,
+                                                        "row_start": 42,
+                                                        "source_file_name": "hhs_hosp_cleanup"
+                                                    }
+                                                ]
+                                            },
+                                            "node_type": "Attribute",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 19,
+                                                    "col_start": 9,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 42,
+                                                    "row_start": 42,
+                                                    "source_file_name": "hhs_hosp_cleanup"
+                                                }
+                                            ],
+                                            "value": {
+                                                "id": 16,
+                                                "name": "df",
+                                                "node_type": "Name",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 11,
+                                                        "col_start": 9,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 42,
+                                                        "row_start": 42,
+                                                        "source_file_name": "hhs_hosp_cleanup"
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        "node_type": "Call",
+                                        "source_language": null,
+                                        "source_language_version": null,
+                                        "source_refs": [
+                                            {
+                                                "col_end": 52,
+                                                "col_start": 9,
+                                                "node_type": "SourceRef",
+                                                "row_end": 42,
+                                                "row_start": 42,
+                                                "source_file_name": "hhs_hosp_cleanup"
+                                            }
+                                        ]
+                                    }
+                                },
+                                "node_type": "Call",
+                                "source_language": null,
+                                "source_language_version": null,
+                                "source_refs": [
+                                    {
+                                        "col_end": 65,
+                                        "col_start": 9,
+                                        "node_type": "SourceRef",
+                                        "row_end": 42,
+                                        "row_start": 42,
+                                        "source_file_name": "hhs_hosp_cleanup"
+                                    }
+                                ]
+                            },
+                            "source_refs": [
+                                {
+                                    "col_end": 65,
+                                    "col_start": 4,
+                                    "node_type": "SourceRef",
+                                    "row_end": 42,
+                                    "row_start": 42,
+                                    "source_file_name": "hhs_hosp_cleanup"
+                                }
+                            ]
+                        },
+                        {
+                            "left": {
+                                "default_value": null,
+                                "node_type": "Var",
+                                "source_refs": [
+                                    {
+                                        "col_end": 6,
+                                        "col_start": 4,
+                                        "node_type": "SourceRef",
+                                        "row_end": 44,
+                                        "row_start": 44,
+                                        "source_file_name": "hhs_hosp_cleanup"
+                                    }
+                                ],
+                                "type": "float",
+                                "val": {
+                                    "id": 16,
+                                    "name": "df",
+                                    "node_type": "Name",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 6,
+                                            "col_start": 4,
+                                            "node_type": "SourceRef",
+                                            "row_end": 44,
+                                            "row_start": 44,
+                                            "source_file_name": "hhs_hosp_cleanup"
+                                        }
+                                    ]
+                                }
+                            },
+                            "node_type": "Assignment",
+                            "right": {
+                                "arguments": [
+                                    {
+                                        "node_type": "LiteralValue",
+                                        "source_code_data_type": [
+                                            "Python",
+                                            "3.8",
+                                            "<class 'int'>"
+                                        ],
+                                        "source_refs": [
+                                            {
+                                                "col_end": 20,
+                                                "col_start": 19,
+                                                "node_type": "SourceRef",
+                                                "row_end": 44,
+                                                "row_start": 44,
+                                                "source_file_name": "hhs_hosp_cleanup"
+                                            }
+                                        ],
+                                        "value": 0,
+                                        "value_type": "Integer"
+                                    }
+                                ],
+                                "func": {
+                                    "attr": {
+                                        "id": 43,
+                                        "name": "fillna",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 18,
+                                                "col_start": 9,
+                                                "node_type": "SourceRef",
+                                                "row_end": 44,
+                                                "row_start": 44,
+                                                "source_file_name": "hhs_hosp_cleanup"
+                                            }
+                                        ]
+                                    },
+                                    "node_type": "Attribute",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 18,
+                                            "col_start": 9,
+                                            "node_type": "SourceRef",
+                                            "row_end": 44,
+                                            "row_start": 44,
+                                            "source_file_name": "hhs_hosp_cleanup"
+                                        }
+                                    ],
+                                    "value": {
+                                        "id": 16,
+                                        "name": "df",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 11,
+                                                "col_start": 9,
+                                                "node_type": "SourceRef",
+                                                "row_end": 44,
+                                                "row_start": 44,
+                                                "source_file_name": "hhs_hosp_cleanup"
+                                            }
+                                        ]
+                                    }
+                                },
+                                "node_type": "Call",
+                                "source_language": null,
+                                "source_language_version": null,
+                                "source_refs": [
+                                    {
+                                        "col_end": 21,
+                                        "col_start": 9,
+                                        "node_type": "SourceRef",
+                                        "row_end": 44,
+                                        "row_start": 44,
+                                        "source_file_name": "hhs_hosp_cleanup"
+                                    }
+                                ]
+                            },
+                            "source_refs": [
+                                {
+                                    "col_end": 21,
+                                    "col_start": 4,
+                                    "node_type": "SourceRef",
+                                    "row_end": 44,
+                                    "row_start": 44,
+                                    "source_file_name": "hhs_hosp_cleanup"
+                                }
+                            ]
+                        },
+                        {
+                            "arguments": [
+                                {
+                                    "id": 2,
+                                    "name": "output_file",
+                                    "node_type": "Name",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 25,
+                                            "col_start": 14,
+                                            "node_type": "SourceRef",
+                                            "row_end": 46,
+                                            "row_start": 46,
+                                            "source_file_name": "hhs_hosp_cleanup"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "left": {
+                                        "default_value": null,
+                                        "node_type": "Var",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 38,
+                                                "col_start": 4,
+                                                "node_type": "SourceRef",
+                                                "row_end": 46,
+                                                "row_start": 46,
+                                                "source_file_name": "hhs_hosp_cleanup"
+                                            }
+                                        ],
+                                        "type": "float",
+                                        "val": {
+                                            "id": 100,
+                                            "name": "index",
+                                            "node_type": "Name",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 38,
+                                                    "col_start": 4,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 46,
+                                                    "row_start": 46,
+                                                    "source_file_name": "hhs_hosp_cleanup"
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "node_type": "Assignment",
+                                    "right": {
+                                        "node_type": "LiteralValue",
+                                        "source_code_data_type": [
+                                            "Python",
+                                            "3.8",
+                                            "<class 'bool'>"
+                                        ],
+                                        "source_refs": [
+                                            {
+                                                "col_end": 37,
+                                                "col_start": 33,
+                                                "node_type": "SourceRef",
+                                                "row_end": 46,
+                                                "row_start": 46,
+                                                "source_file_name": "hhs_hosp_cleanup"
+                                            }
+                                        ],
+                                        "value": "True",
+                                        "value_type": "Boolean"
+                                    },
+                                    "source_refs": [
+                                        {
+                                            "col_end": 38,
+                                            "col_start": 4,
+                                            "node_type": "SourceRef",
+                                            "row_end": 46,
+                                            "row_start": 46,
+                                            "source_file_name": "hhs_hosp_cleanup"
+                                        }
+                                    ]
+                                }
+                            ],
+                            "func": {
+                                "attr": {
+                                    "id": 44,
+                                    "name": "to_csv",
+                                    "node_type": "Name",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 13,
+                                            "col_start": 4,
+                                            "node_type": "SourceRef",
+                                            "row_end": 46,
+                                            "row_start": 46,
+                                            "source_file_name": "hhs_hosp_cleanup"
+                                        }
+                                    ]
+                                },
+                                "node_type": "Attribute",
+                                "source_refs": [
+                                    {
+                                        "col_end": 13,
+                                        "col_start": 4,
+                                        "node_type": "SourceRef",
+                                        "row_end": 46,
+                                        "row_start": 46,
+                                        "source_file_name": "hhs_hosp_cleanup"
+                                    }
+                                ],
+                                "value": {
+                                    "id": 16,
+                                    "name": "df",
+                                    "node_type": "Name",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 6,
+                                            "col_start": 4,
+                                            "node_type": "SourceRef",
+                                            "row_end": 46,
+                                            "row_start": 46,
+                                            "source_file_name": "hhs_hosp_cleanup"
+                                        }
+                                    ]
+                                }
+                            },
+                            "node_type": "Call",
+                            "source_language": null,
+                            "source_language_version": null,
+                            "source_refs": [
+                                {
+                                    "col_end": 38,
+                                    "col_start": 4,
+                                    "node_type": "SourceRef",
+                                    "row_end": 46,
+                                    "row_start": 46,
+                                    "source_file_name": "hhs_hosp_cleanup"
+                                }
+                            ]
+                        }
+                    ],
+                    "func_args": [
+                        {
+                            "default_value": null,
+                            "node_type": "Var",
+                            "source_refs": [
+                                {
+                                    "col_end": 25,
+                                    "col_start": 14,
+                                    "node_type": "SourceRef",
+                                    "row_end": 10,
+                                    "row_start": 10,
+                                    "source_file_name": "hhs_hosp_cleanup"
+                                }
+                            ],
+                            "type": "float",
+                            "val": {
+                                "id": 2,
+                                "name": "output_file",
+                                "node_type": "Name",
+                                "source_refs": [
+                                    {
+                                        "col_end": 25,
+                                        "col_start": 14,
+                                        "node_type": "SourceRef",
+                                        "row_end": 10,
+                                        "row_start": 10,
+                                        "source_file_name": "hhs_hosp_cleanup"
+                                    }
+                                ]
+                            }
+                        }
+                    ],
+                    "name": {
+                        "id": 1,
+                        "name": "transform",
+                        "node_type": "Name",
+                        "source_refs": [
+                            {
+                                "col_end": 38,
+                                "col_start": 0,
+                                "node_type": "SourceRef",
+                                "row_end": 46,
+                                "row_start": 10,
+                                "source_file_name": "hhs_hosp_cleanup"
+                            }
+                        ]
+                    },
+                    "node_type": "FunctionDef",
+                    "source_refs": [
+                        {
+                            "col_end": 38,
+                            "col_start": 0,
+                            "node_type": "SourceRef",
+                            "row_end": 46,
+                            "row_start": 10,
+                            "source_file_name": "hhs_hosp_cleanup"
+                        }
+                    ]
+                }
+            ],
+            "name": "hhs_hosp_cleanup",
+            "node_type": "Module",
+            "source_refs": [
+                {
+                    "col_end": null,
+                    "col_start": null,
+                    "node_type": "SourceRef",
+                    "row_end": 46,
+                    "row_start": 1,
+                    "source_file_name": "hhs_hosp_cleanup.py"
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,2545 @@
+{
+    "nodes": [
+        {
+            "body": [
+                {
+                    "alias": "np",
+                    "all": false,
+                    "name": "numpy",
+                    "node_type": "ModelImport",
+                    "source_refs": [
+                        {
+                            "col_end": 18,
+                            "col_start": 0,
+                            "node_type": "SourceRef",
+                            "row_end": 6,
+                            "row_start": 6,
+                            "source_file_name": "t05_dynamic_triggering"
+                        }
+                    ],
+                    "symbol": null
+                },
+                {
+                    "body": [
+                        {
+                            "body": [
+                                {
+                                    "body": [
+                                        {
+                                            "left": {
+                                                "attr": {
+                                                    "id": 18,
+                                                    "name": "active",
+                                                    "node_type": "Name",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 23,
+                                                            "col_start": 12,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 14,
+                                                            "row_start": 14,
+                                                            "source_file_name": "t05_dynamic_triggering"
+                                                        }
+                                                    ]
+                                                },
+                                                "node_type": "Attribute",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 23,
+                                                        "col_start": 12,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 14,
+                                                        "row_start": 14,
+                                                        "source_file_name": "t05_dynamic_triggering"
+                                                    }
+                                                ],
+                                                "value": {
+                                                    "id": 12,
+                                                    "name": "self",
+                                                    "node_type": "Name",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 16,
+                                                            "col_start": 12,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 14,
+                                                            "row_start": 14,
+                                                            "source_file_name": "t05_dynamic_triggering"
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "node_type": "Assignment",
+                                            "right": {
+                                                "node_type": "LiteralValue",
+                                                "source_code_data_type": [
+                                                    "Python",
+                                                    "3.8",
+                                                    "<class 'bool'>"
+                                                ],
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 30,
+                                                        "col_start": 26,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 14,
+                                                        "row_start": 14,
+                                                        "source_file_name": "t05_dynamic_triggering"
+                                                    }
+                                                ],
+                                                "value": "True",
+                                                "value_type": "Boolean"
+                                            },
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 30,
+                                                    "col_start": 12,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 14,
+                                                    "row_start": 14,
+                                                    "source_file_name": "t05_dynamic_triggering"
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "left": {
+                                                "attr": {
+                                                    "id": 19,
+                                                    "name": "t_on",
+                                                    "node_type": "Name",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 21,
+                                                            "col_start": 12,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 15,
+                                                            "row_start": 15,
+                                                            "source_file_name": "t05_dynamic_triggering"
+                                                        }
+                                                    ]
+                                                },
+                                                "node_type": "Attribute",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 21,
+                                                        "col_start": 12,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 15,
+                                                        "row_start": 15,
+                                                        "source_file_name": "t05_dynamic_triggering"
+                                                    }
+                                                ],
+                                                "value": {
+                                                    "id": 12,
+                                                    "name": "self",
+                                                    "node_type": "Name",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 16,
+                                                            "col_start": 12,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 15,
+                                                            "row_start": 15,
+                                                            "source_file_name": "t05_dynamic_triggering"
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "node_type": "Assignment",
+                                            "right": {
+                                                "attr": {
+                                                    "id": 20,
+                                                    "name": "t",
+                                                    "node_type": "Name",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 29,
+                                                            "col_start": 24,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 15,
+                                                            "row_start": 15,
+                                                            "source_file_name": "t05_dynamic_triggering"
+                                                        }
+                                                    ]
+                                                },
+                                                "node_type": "Attribute",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 29,
+                                                        "col_start": 24,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 15,
+                                                        "row_start": 15,
+                                                        "source_file_name": "t05_dynamic_triggering"
+                                                    }
+                                                ],
+                                                "value": {
+                                                    "id": 13,
+                                                    "name": "sim",
+                                                    "node_type": "Name",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 27,
+                                                            "col_start": 24,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 15,
+                                                            "row_start": 15,
+                                                            "source_file_name": "t05_dynamic_triggering"
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 29,
+                                                    "col_start": 12,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 15,
+                                                    "row_start": 15,
+                                                    "source_file_name": "t05_dynamic_triggering"
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "arguments": [
+                                                {
+                                                    "attr": {
+                                                        "id": 19,
+                                                        "name": "t_on",
+                                                        "node_type": "Name",
+                                                        "source_refs": [
+                                                            {
+                                                                "col_end": 43,
+                                                                "col_start": 34,
+                                                                "node_type": "SourceRef",
+                                                                "row_end": 16,
+                                                                "row_start": 16,
+                                                                "source_file_name": "t05_dynamic_triggering"
+                                                            }
+                                                        ]
+                                                    },
+                                                    "node_type": "Attribute",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 43,
+                                                            "col_start": 34,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 16,
+                                                            "row_start": 16,
+                                                            "source_file_name": "t05_dynamic_triggering"
+                                                        }
+                                                    ],
+                                                    "value": {
+                                                        "id": 12,
+                                                        "name": "self",
+                                                        "node_type": "Name",
+                                                        "source_refs": [
+                                                            {
+                                                                "col_end": 38,
+                                                                "col_start": 34,
+                                                                "node_type": "SourceRef",
+                                                                "row_end": 16,
+                                                                "row_start": 16,
+                                                                "source_file_name": "t05_dynamic_triggering"
+                                                            }
+                                                        ]
+                                                    }
+                                                }
+                                            ],
+                                            "func": {
+                                                "attr": {
+                                                    "id": 22,
+                                                    "name": "append",
+                                                    "node_type": "Name",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 33,
+                                                            "col_start": 12,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 16,
+                                                            "row_start": 16,
+                                                            "source_file_name": "t05_dynamic_triggering"
+                                                        }
+                                                    ]
+                                                },
+                                                "node_type": "Attribute",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 33,
+                                                        "col_start": 12,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 16,
+                                                        "row_start": 16,
+                                                        "source_file_name": "t05_dynamic_triggering"
+                                                    }
+                                                ],
+                                                "value": {
+                                                    "attr": {
+                                                        "id": 21,
+                                                        "name": "plot_days",
+                                                        "node_type": "Name",
+                                                        "source_refs": [
+                                                            {
+                                                                "col_end": 26,
+                                                                "col_start": 12,
+                                                                "node_type": "SourceRef",
+                                                                "row_end": 16,
+                                                                "row_start": 16,
+                                                                "source_file_name": "t05_dynamic_triggering"
+                                                            }
+                                                        ]
+                                                    },
+                                                    "node_type": "Attribute",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 26,
+                                                            "col_start": 12,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 16,
+                                                            "row_start": 16,
+                                                            "source_file_name": "t05_dynamic_triggering"
+                                                        }
+                                                    ],
+                                                    "value": {
+                                                        "id": 12,
+                                                        "name": "self",
+                                                        "node_type": "Name",
+                                                        "source_refs": [
+                                                            {
+                                                                "col_end": 16,
+                                                                "col_start": 12,
+                                                                "node_type": "SourceRef",
+                                                                "row_end": 16,
+                                                                "row_start": 16,
+                                                                "source_file_name": "t05_dynamic_triggering"
+                                                            }
+                                                        ]
+                                                    }
+                                                }
+                                            },
+                                            "node_type": "Call",
+                                            "source_language": null,
+                                            "source_language_version": null,
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 44,
+                                                    "col_start": 12,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 16,
+                                                    "row_start": 16,
+                                                    "source_file_name": "t05_dynamic_triggering"
+                                                }
+                                            ]
+                                        }
+                                    ],
+                                    "expr": {
+                                        "interpreter": "Python",
+                                        "node_type": "Operator",
+                                        "op": "ast.Not",
+                                        "operands": [
+                                            {
+                                                "attr": {
+                                                    "id": 18,
+                                                    "name": "active",
+                                                    "node_type": "Name",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 26,
+                                                            "col_start": 15,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 13,
+                                                            "row_start": 13,
+                                                            "source_file_name": "t05_dynamic_triggering"
+                                                        }
+                                                    ]
+                                                },
+                                                "node_type": "Attribute",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 26,
+                                                        "col_start": 15,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 13,
+                                                        "row_start": 13,
+                                                        "source_file_name": "t05_dynamic_triggering"
+                                                    }
+                                                ],
+                                                "value": {
+                                                    "id": 12,
+                                                    "name": "self",
+                                                    "node_type": "Name",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 19,
+                                                            "col_start": 15,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 13,
+                                                            "row_start": 13,
+                                                            "source_file_name": "t05_dynamic_triggering"
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        ],
+                                        "source_language": "Python",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 26,
+                                                "col_start": 11,
+                                                "node_type": "SourceRef",
+                                                "row_end": 13,
+                                                "row_start": 13,
+                                                "source_file_name": "t05_dynamic_triggering"
+                                            }
+                                        ],
+                                        "version": "3.8.18"
+                                    },
+                                    "node_type": "ModelIf",
+                                    "orelse": [],
+                                    "source_refs": [
+                                        {
+                                            "col_end": 44,
+                                            "col_start": 8,
+                                            "node_type": "SourceRef",
+                                            "row_end": 16,
+                                            "row_start": 13,
+                                            "source_file_name": "t05_dynamic_triggering"
+                                        }
+                                    ]
+                                }
+                            ],
+                            "expr": {
+                                "interpreter": "Python",
+                                "node_type": "Operator",
+                                "op": "ast.Gt",
+                                "operands": [
+                                    {
+                                        "arguments": [],
+                                        "func": {
+                                            "attr": {
+                                                "id": 17,
+                                                "name": "sum",
+                                                "node_type": "Name",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 32,
+                                                        "col_start": 7,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 12,
+                                                        "row_start": 12,
+                                                        "source_file_name": "t05_dynamic_triggering"
+                                                    }
+                                                ]
+                                            },
+                                            "node_type": "Attribute",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 32,
+                                                    "col_start": 7,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 12,
+                                                    "row_start": 12,
+                                                    "source_file_name": "t05_dynamic_triggering"
+                                                }
+                                            ],
+                                            "value": {
+                                                "attr": {
+                                                    "id": 16,
+                                                    "name": "infectious",
+                                                    "node_type": "Name",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 28,
+                                                            "col_start": 7,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 12,
+                                                            "row_start": 12,
+                                                            "source_file_name": "t05_dynamic_triggering"
+                                                        }
+                                                    ]
+                                                },
+                                                "node_type": "Attribute",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 28,
+                                                        "col_start": 7,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 12,
+                                                        "row_start": 12,
+                                                        "source_file_name": "t05_dynamic_triggering"
+                                                    }
+                                                ],
+                                                "value": {
+                                                    "attr": {
+                                                        "id": 15,
+                                                        "name": "people",
+                                                        "node_type": "Name",
+                                                        "source_refs": [
+                                                            {
+                                                                "col_end": 17,
+                                                                "col_start": 7,
+                                                                "node_type": "SourceRef",
+                                                                "row_end": 12,
+                                                                "row_start": 12,
+                                                                "source_file_name": "t05_dynamic_triggering"
+                                                            }
+                                                        ]
+                                                    },
+                                                    "node_type": "Attribute",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 17,
+                                                            "col_start": 7,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 12,
+                                                            "row_start": 12,
+                                                            "source_file_name": "t05_dynamic_triggering"
+                                                        }
+                                                    ],
+                                                    "value": {
+                                                        "id": 13,
+                                                        "name": "sim",
+                                                        "node_type": "Name",
+                                                        "source_refs": [
+                                                            {
+                                                                "col_end": 10,
+                                                                "col_start": 7,
+                                                                "node_type": "SourceRef",
+                                                                "row_end": 12,
+                                                                "row_start": 12,
+                                                                "source_file_name": "t05_dynamic_triggering"
+                                                            }
+                                                        ]
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        "node_type": "Call",
+                                        "source_language": null,
+                                        "source_language_version": null,
+                                        "source_refs": [
+                                            {
+                                                "col_end": 34,
+                                                "col_start": 7,
+                                                "node_type": "SourceRef",
+                                                "row_end": 12,
+                                                "row_start": 12,
+                                                "source_file_name": "t05_dynamic_triggering"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "id": 14,
+                                        "name": "thresh",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 43,
+                                                "col_start": 37,
+                                                "node_type": "SourceRef",
+                                                "row_end": 12,
+                                                "row_start": 12,
+                                                "source_file_name": "t05_dynamic_triggering"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "source_language": "Python",
+                                "source_refs": [
+                                    {
+                                        "col_end": 43,
+                                        "col_start": 7,
+                                        "node_type": "SourceRef",
+                                        "row_end": 12,
+                                        "row_start": 12,
+                                        "source_file_name": "t05_dynamic_triggering"
+                                    }
+                                ],
+                                "version": "3.8.18"
+                            },
+                            "node_type": "ModelIf",
+                            "orelse": [
+                                {
+                                    "body": [
+                                        {
+                                            "left": {
+                                                "attr": {
+                                                    "id": 18,
+                                                    "name": "active",
+                                                    "node_type": "Name",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 23,
+                                                            "col_start": 12,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 21,
+                                                            "row_start": 21,
+                                                            "source_file_name": "t05_dynamic_triggering"
+                                                        }
+                                                    ]
+                                                },
+                                                "node_type": "Attribute",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 23,
+                                                        "col_start": 12,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 21,
+                                                        "row_start": 21,
+                                                        "source_file_name": "t05_dynamic_triggering"
+                                                    }
+                                                ],
+                                                "value": {
+                                                    "id": 12,
+                                                    "name": "self",
+                                                    "node_type": "Name",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 16,
+                                                            "col_start": 12,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 21,
+                                                            "row_start": 21,
+                                                            "source_file_name": "t05_dynamic_triggering"
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "node_type": "Assignment",
+                                            "right": {
+                                                "node_type": "LiteralValue",
+                                                "source_code_data_type": [
+                                                    "Python",
+                                                    "3.8",
+                                                    "<class 'bool'>"
+                                                ],
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 31,
+                                                        "col_start": 26,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 21,
+                                                        "row_start": 21,
+                                                        "source_file_name": "t05_dynamic_triggering"
+                                                    }
+                                                ],
+                                                "value": "False",
+                                                "value_type": "Boolean"
+                                            },
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 31,
+                                                    "col_start": 12,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 21,
+                                                    "row_start": 21,
+                                                    "source_file_name": "t05_dynamic_triggering"
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "left": {
+                                                "attr": {
+                                                    "id": 23,
+                                                    "name": "t_off",
+                                                    "node_type": "Name",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 22,
+                                                            "col_start": 12,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 22,
+                                                            "row_start": 22,
+                                                            "source_file_name": "t05_dynamic_triggering"
+                                                        }
+                                                    ]
+                                                },
+                                                "node_type": "Attribute",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 22,
+                                                        "col_start": 12,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 22,
+                                                        "row_start": 22,
+                                                        "source_file_name": "t05_dynamic_triggering"
+                                                    }
+                                                ],
+                                                "value": {
+                                                    "id": 12,
+                                                    "name": "self",
+                                                    "node_type": "Name",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 16,
+                                                            "col_start": 12,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 22,
+                                                            "row_start": 22,
+                                                            "source_file_name": "t05_dynamic_triggering"
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "node_type": "Assignment",
+                                            "right": {
+                                                "attr": {
+                                                    "id": 20,
+                                                    "name": "t",
+                                                    "node_type": "Name",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 30,
+                                                            "col_start": 25,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 22,
+                                                            "row_start": 22,
+                                                            "source_file_name": "t05_dynamic_triggering"
+                                                        }
+                                                    ]
+                                                },
+                                                "node_type": "Attribute",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 30,
+                                                        "col_start": 25,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 22,
+                                                        "row_start": 22,
+                                                        "source_file_name": "t05_dynamic_triggering"
+                                                    }
+                                                ],
+                                                "value": {
+                                                    "id": 13,
+                                                    "name": "sim",
+                                                    "node_type": "Name",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 28,
+                                                            "col_start": 25,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 22,
+                                                            "row_start": 22,
+                                                            "source_file_name": "t05_dynamic_triggering"
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 30,
+                                                    "col_start": 12,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 22,
+                                                    "row_start": 22,
+                                                    "source_file_name": "t05_dynamic_triggering"
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "arguments": [
+                                                {
+                                                    "attr": {
+                                                        "id": 23,
+                                                        "name": "t_off",
+                                                        "node_type": "Name",
+                                                        "source_refs": [
+                                                            {
+                                                                "col_end": 44,
+                                                                "col_start": 34,
+                                                                "node_type": "SourceRef",
+                                                                "row_end": 23,
+                                                                "row_start": 23,
+                                                                "source_file_name": "t05_dynamic_triggering"
+                                                            }
+                                                        ]
+                                                    },
+                                                    "node_type": "Attribute",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 44,
+                                                            "col_start": 34,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 23,
+                                                            "row_start": 23,
+                                                            "source_file_name": "t05_dynamic_triggering"
+                                                        }
+                                                    ],
+                                                    "value": {
+                                                        "id": 12,
+                                                        "name": "self",
+                                                        "node_type": "Name",
+                                                        "source_refs": [
+                                                            {
+                                                                "col_end": 38,
+                                                                "col_start": 34,
+                                                                "node_type": "SourceRef",
+                                                                "row_end": 23,
+                                                                "row_start": 23,
+                                                                "source_file_name": "t05_dynamic_triggering"
+                                                            }
+                                                        ]
+                                                    }
+                                                }
+                                            ],
+                                            "func": {
+                                                "attr": {
+                                                    "id": 22,
+                                                    "name": "append",
+                                                    "node_type": "Name",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 33,
+                                                            "col_start": 12,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 23,
+                                                            "row_start": 23,
+                                                            "source_file_name": "t05_dynamic_triggering"
+                                                        }
+                                                    ]
+                                                },
+                                                "node_type": "Attribute",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 33,
+                                                        "col_start": 12,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 23,
+                                                        "row_start": 23,
+                                                        "source_file_name": "t05_dynamic_triggering"
+                                                    }
+                                                ],
+                                                "value": {
+                                                    "attr": {
+                                                        "id": 21,
+                                                        "name": "plot_days",
+                                                        "node_type": "Name",
+                                                        "source_refs": [
+                                                            {
+                                                                "col_end": 26,
+                                                                "col_start": 12,
+                                                                "node_type": "SourceRef",
+                                                                "row_end": 23,
+                                                                "row_start": 23,
+                                                                "source_file_name": "t05_dynamic_triggering"
+                                                            }
+                                                        ]
+                                                    },
+                                                    "node_type": "Attribute",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 26,
+                                                            "col_start": 12,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 23,
+                                                            "row_start": 23,
+                                                            "source_file_name": "t05_dynamic_triggering"
+                                                        }
+                                                    ],
+                                                    "value": {
+                                                        "id": 12,
+                                                        "name": "self",
+                                                        "node_type": "Name",
+                                                        "source_refs": [
+                                                            {
+                                                                "col_end": 16,
+                                                                "col_start": 12,
+                                                                "node_type": "SourceRef",
+                                                                "row_end": 23,
+                                                                "row_start": 23,
+                                                                "source_file_name": "t05_dynamic_triggering"
+                                                            }
+                                                        ]
+                                                    }
+                                                }
+                                            },
+                                            "node_type": "Call",
+                                            "source_language": null,
+                                            "source_language_version": null,
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 45,
+                                                    "col_start": 12,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 23,
+                                                    "row_start": 23,
+                                                    "source_file_name": "t05_dynamic_triggering"
+                                                }
+                                            ]
+                                        }
+                                    ],
+                                    "expr": {
+                                        "attr": {
+                                            "id": 18,
+                                            "name": "active",
+                                            "node_type": "Name",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 22,
+                                                    "col_start": 11,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 20,
+                                                    "row_start": 20,
+                                                    "source_file_name": "t05_dynamic_triggering"
+                                                }
+                                            ]
+                                        },
+                                        "node_type": "Attribute",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 22,
+                                                "col_start": 11,
+                                                "node_type": "SourceRef",
+                                                "row_end": 20,
+                                                "row_start": 20,
+                                                "source_file_name": "t05_dynamic_triggering"
+                                            }
+                                        ],
+                                        "value": {
+                                            "id": 12,
+                                            "name": "self",
+                                            "node_type": "Name",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 15,
+                                                    "col_start": 11,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 20,
+                                                    "row_start": 20,
+                                                    "source_file_name": "t05_dynamic_triggering"
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "node_type": "ModelIf",
+                                    "orelse": [],
+                                    "source_refs": [
+                                        {
+                                            "col_end": 45,
+                                            "col_start": 8,
+                                            "node_type": "SourceRef",
+                                            "row_end": 23,
+                                            "row_start": 20,
+                                            "source_file_name": "t05_dynamic_triggering"
+                                        }
+                                    ]
+                                }
+                            ],
+                            "source_refs": [
+                                {
+                                    "col_end": 45,
+                                    "col_start": 4,
+                                    "node_type": "SourceRef",
+                                    "row_end": 23,
+                                    "row_start": 12,
+                                    "source_file_name": "t05_dynamic_triggering"
+                                }
+                            ]
+                        },
+                        {
+                            "node_type": "ModelReturn",
+                            "source_refs": [
+                                {
+                                    "col_end": 34,
+                                    "col_start": 4,
+                                    "node_type": "SourceRef",
+                                    "row_end": 25,
+                                    "row_start": 25,
+                                    "source_file_name": "t05_dynamic_triggering"
+                                }
+                            ],
+                            "value": {
+                                "node_type": "LiteralValue",
+                                "source_code_data_type": [
+                                    "Python",
+                                    "3.8",
+                                    "List"
+                                ],
+                                "source_refs": [
+                                    {
+                                        "col_end": 34,
+                                        "col_start": 11,
+                                        "node_type": "SourceRef",
+                                        "row_end": 25,
+                                        "row_start": 25,
+                                        "source_file_name": "t05_dynamic_triggering"
+                                    }
+                                ],
+                                "value": [
+                                    {
+                                        "attr": {
+                                            "id": 19,
+                                            "name": "t_on",
+                                            "node_type": "Name",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 21,
+                                                    "col_start": 12,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 25,
+                                                    "row_start": 25,
+                                                    "source_file_name": "t05_dynamic_triggering"
+                                                }
+                                            ]
+                                        },
+                                        "node_type": "Attribute",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 21,
+                                                "col_start": 12,
+                                                "node_type": "SourceRef",
+                                                "row_end": 25,
+                                                "row_start": 25,
+                                                "source_file_name": "t05_dynamic_triggering"
+                                            }
+                                        ],
+                                        "value": {
+                                            "id": 12,
+                                            "name": "self",
+                                            "node_type": "Name",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 16,
+                                                    "col_start": 12,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 25,
+                                                    "row_start": 25,
+                                                    "source_file_name": "t05_dynamic_triggering"
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "attr": {
+                                            "id": 23,
+                                            "name": "t_off",
+                                            "node_type": "Name",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 33,
+                                                    "col_start": 23,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 25,
+                                                    "row_start": 25,
+                                                    "source_file_name": "t05_dynamic_triggering"
+                                                }
+                                            ]
+                                        },
+                                        "node_type": "Attribute",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 33,
+                                                "col_start": 23,
+                                                "node_type": "SourceRef",
+                                                "row_end": 25,
+                                                "row_start": 25,
+                                                "source_file_name": "t05_dynamic_triggering"
+                                            }
+                                        ],
+                                        "value": {
+                                            "id": 12,
+                                            "name": "self",
+                                            "node_type": "Name",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 27,
+                                                    "col_start": 23,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 25,
+                                                    "row_start": 25,
+                                                    "source_file_name": "t05_dynamic_triggering"
+                                                }
+                                            ]
+                                        }
+                                    }
+                                ],
+                                "value_type": "List"
+                            }
+                        }
+                    ],
+                    "func_args": [
+                        {
+                            "default_value": null,
+                            "node_type": "Var",
+                            "source_refs": [
+                                {
+                                    "col_end": 19,
+                                    "col_start": 15,
+                                    "node_type": "SourceRef",
+                                    "row_end": 8,
+                                    "row_start": 8,
+                                    "source_file_name": "t05_dynamic_triggering"
+                                }
+                            ],
+                            "type": "float",
+                            "val": {
+                                "id": 12,
+                                "name": "self",
+                                "node_type": "Name",
+                                "source_refs": [
+                                    {
+                                        "col_end": 19,
+                                        "col_start": 15,
+                                        "node_type": "SourceRef",
+                                        "row_end": 8,
+                                        "row_start": 8,
+                                        "source_file_name": "t05_dynamic_triggering"
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "default_value": null,
+                            "node_type": "Var",
+                            "source_refs": [
+                                {
+                                    "col_end": 24,
+                                    "col_start": 21,
+                                    "node_type": "SourceRef",
+                                    "row_end": 8,
+                                    "row_start": 8,
+                                    "source_file_name": "t05_dynamic_triggering"
+                                }
+                            ],
+                            "type": "float",
+                            "val": {
+                                "id": 13,
+                                "name": "sim",
+                                "node_type": "Name",
+                                "source_refs": [
+                                    {
+                                        "col_end": 24,
+                                        "col_start": 21,
+                                        "node_type": "SourceRef",
+                                        "row_end": 8,
+                                        "row_start": 8,
+                                        "source_file_name": "t05_dynamic_triggering"
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "default_value": {
+                                "node_type": "LiteralValue",
+                                "source_code_data_type": [
+                                    "Python",
+                                    "3.8",
+                                    "<class 'int'>"
+                                ],
+                                "source_refs": [
+                                    {
+                                        "col_end": 36,
+                                        "col_start": 33,
+                                        "node_type": "SourceRef",
+                                        "row_end": 8,
+                                        "row_start": 8,
+                                        "source_file_name": "t05_dynamic_triggering"
+                                    }
+                                ],
+                                "value": 500,
+                                "value_type": "Integer"
+                            },
+                            "node_type": "Var",
+                            "source_refs": [
+                                {
+                                    "col_end": 32,
+                                    "col_start": 26,
+                                    "node_type": "SourceRef",
+                                    "row_end": 8,
+                                    "row_start": 8,
+                                    "source_file_name": "t05_dynamic_triggering"
+                                }
+                            ],
+                            "type": "float",
+                            "val": {
+                                "id": 14,
+                                "name": "thresh",
+                                "node_type": "Name",
+                                "source_refs": [
+                                    {
+                                        "col_end": 32,
+                                        "col_start": 26,
+                                        "node_type": "SourceRef",
+                                        "row_end": 8,
+                                        "row_start": 8,
+                                        "source_file_name": "t05_dynamic_triggering"
+                                    }
+                                ]
+                            }
+                        }
+                    ],
+                    "name": {
+                        "id": 11,
+                        "name": "inf_thresh",
+                        "node_type": "Name",
+                        "source_refs": [
+                            {
+                                "col_end": 34,
+                                "col_start": 0,
+                                "node_type": "SourceRef",
+                                "row_end": 25,
+                                "row_start": 8,
+                                "source_file_name": "t05_dynamic_triggering"
+                            }
+                        ]
+                    },
+                    "node_type": "FunctionDef",
+                    "source_refs": [
+                        {
+                            "col_end": 34,
+                            "col_start": 0,
+                            "node_type": "SourceRef",
+                            "row_end": 25,
+                            "row_start": 8,
+                            "source_file_name": "t05_dynamic_triggering"
+                        }
+                    ]
+                },
+                {
+                    "left": {
+                        "default_value": null,
+                        "node_type": "Var",
+                        "source_refs": [
+                            {
+                                "col_end": 2,
+                                "col_start": 0,
+                                "node_type": "SourceRef",
+                                "row_end": 28,
+                                "row_start": 28,
+                                "source_file_name": "t05_dynamic_triggering"
+                            }
+                        ],
+                        "type": "float",
+                        "val": {
+                            "id": 0,
+                            "name": "on",
+                            "node_type": "Name",
+                            "source_refs": [
+                                {
+                                    "col_end": 2,
+                                    "col_start": 0,
+                                    "node_type": "SourceRef",
+                                    "row_end": 28,
+                                    "row_start": 28,
+                                    "source_file_name": "t05_dynamic_triggering"
+                                }
+                            ]
+                        }
+                    },
+                    "node_type": "Assignment",
+                    "right": {
+                        "node_type": "LiteralValue",
+                        "source_code_data_type": [
+                            "Python",
+                            "3.8",
+                            "<class 'float'>"
+                        ],
+                        "source_refs": [
+                            {
+                                "col_end": 8,
+                                "col_start": 5,
+                                "node_type": "SourceRef",
+                                "row_end": 28,
+                                "row_start": 28,
+                                "source_file_name": "t05_dynamic_triggering"
+                            }
+                        ],
+                        "value": 0.2,
+                        "value_type": "AbstractFloat"
+                    },
+                    "source_refs": [
+                        {
+                            "col_end": 8,
+                            "col_start": 0,
+                            "node_type": "SourceRef",
+                            "row_end": 28,
+                            "row_start": 28,
+                            "source_file_name": "t05_dynamic_triggering"
+                        }
+                    ]
+                },
+                {
+                    "left": {
+                        "default_value": null,
+                        "node_type": "Var",
+                        "source_refs": [
+                            {
+                                "col_end": 3,
+                                "col_start": 0,
+                                "node_type": "SourceRef",
+                                "row_end": 29,
+                                "row_start": 29,
+                                "source_file_name": "t05_dynamic_triggering"
+                            }
+                        ],
+                        "type": "float",
+                        "val": {
+                            "id": 1,
+                            "name": "off",
+                            "node_type": "Name",
+                            "source_refs": [
+                                {
+                                    "col_end": 3,
+                                    "col_start": 0,
+                                    "node_type": "SourceRef",
+                                    "row_end": 29,
+                                    "row_start": 29,
+                                    "source_file_name": "t05_dynamic_triggering"
+                                }
+                            ]
+                        }
+                    },
+                    "node_type": "Assignment",
+                    "right": {
+                        "node_type": "LiteralValue",
+                        "source_code_data_type": [
+                            "Python",
+                            "3.8",
+                            "<class 'float'>"
+                        ],
+                        "source_refs": [
+                            {
+                                "col_end": 9,
+                                "col_start": 6,
+                                "node_type": "SourceRef",
+                                "row_end": 29,
+                                "row_start": 29,
+                                "source_file_name": "t05_dynamic_triggering"
+                            }
+                        ],
+                        "value": 1.0,
+                        "value_type": "AbstractFloat"
+                    },
+                    "source_refs": [
+                        {
+                            "col_end": 9,
+                            "col_start": 0,
+                            "node_type": "SourceRef",
+                            "row_end": 29,
+                            "row_start": 29,
+                            "source_file_name": "t05_dynamic_triggering"
+                        }
+                    ]
+                },
+                {
+                    "left": {
+                        "default_value": null,
+                        "node_type": "Var",
+                        "source_refs": [
+                            {
+                                "col_end": 7,
+                                "col_start": 0,
+                                "node_type": "SourceRef",
+                                "row_end": 30,
+                                "row_start": 30,
+                                "source_file_name": "t05_dynamic_triggering"
+                            }
+                        ],
+                        "type": "float",
+                        "val": {
+                            "id": 2,
+                            "name": "changes",
+                            "node_type": "Name",
+                            "source_refs": [
+                                {
+                                    "col_end": 7,
+                                    "col_start": 0,
+                                    "node_type": "SourceRef",
+                                    "row_end": 30,
+                                    "row_start": 30,
+                                    "source_file_name": "t05_dynamic_triggering"
+                                }
+                            ]
+                        }
+                    },
+                    "node_type": "Assignment",
+                    "right": {
+                        "node_type": "LiteralValue",
+                        "source_code_data_type": [
+                            "Python",
+                            "3.8",
+                            "List"
+                        ],
+                        "source_refs": [
+                            {
+                                "col_end": 19,
+                                "col_start": 10,
+                                "node_type": "SourceRef",
+                                "row_end": 30,
+                                "row_start": 30,
+                                "source_file_name": "t05_dynamic_triggering"
+                            }
+                        ],
+                        "value": [
+                            {
+                                "id": 0,
+                                "name": "on",
+                                "node_type": "Name",
+                                "source_refs": [
+                                    {
+                                        "col_end": 13,
+                                        "col_start": 11,
+                                        "node_type": "SourceRef",
+                                        "row_end": 30,
+                                        "row_start": 30,
+                                        "source_file_name": "t05_dynamic_triggering"
+                                    }
+                                ]
+                            },
+                            {
+                                "id": 1,
+                                "name": "off",
+                                "node_type": "Name",
+                                "source_refs": [
+                                    {
+                                        "col_end": 18,
+                                        "col_start": 15,
+                                        "node_type": "SourceRef",
+                                        "row_end": 30,
+                                        "row_start": 30,
+                                        "source_file_name": "t05_dynamic_triggering"
+                                    }
+                                ]
+                            }
+                        ],
+                        "value_type": "List"
+                    },
+                    "source_refs": [
+                        {
+                            "col_end": 19,
+                            "col_start": 0,
+                            "node_type": "SourceRef",
+                            "row_end": 30,
+                            "row_start": 30,
+                            "source_file_name": "t05_dynamic_triggering"
+                        }
+                    ]
+                },
+                {
+                    "left": {
+                        "default_value": null,
+                        "node_type": "Var",
+                        "source_refs": [
+                            {
+                                "col_end": 9,
+                                "col_start": 0,
+                                "node_type": "SourceRef",
+                                "row_end": 31,
+                                "row_start": 31,
+                                "source_file_name": "t05_dynamic_triggering"
+                            }
+                        ],
+                        "type": "float",
+                        "val": {
+                            "id": 3,
+                            "name": "plot_args",
+                            "node_type": "Name",
+                            "source_refs": [
+                                {
+                                    "col_end": 9,
+                                    "col_start": 0,
+                                    "node_type": "SourceRef",
+                                    "row_end": 31,
+                                    "row_start": 31,
+                                    "source_file_name": "t05_dynamic_triggering"
+                                }
+                            ]
+                        }
+                    },
+                    "node_type": "Assignment",
+                    "right": {
+                        "arguments": [
+                            {
+                                "left": {
+                                    "default_value": null,
+                                    "node_type": "Var",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 79,
+                                            "col_start": 12,
+                                            "node_type": "SourceRef",
+                                            "row_end": 31,
+                                            "row_start": 31,
+                                            "source_file_name": "t05_dynamic_triggering"
+                                        }
+                                    ],
+                                    "type": "float",
+                                    "val": {
+                                        "id": 100,
+                                        "name": "label",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 79,
+                                                "col_start": 12,
+                                                "node_type": "SourceRef",
+                                                "row_end": 31,
+                                                "row_start": 31,
+                                                "source_file_name": "t05_dynamic_triggering"
+                                            }
+                                        ]
+                                    }
+                                },
+                                "node_type": "Assignment",
+                                "right": {
+                                    "node_type": "LiteralValue",
+                                    "source_code_data_type": [
+                                        "Python",
+                                        "3.8",
+                                        "<class 'str'>"
+                                    ],
+                                    "source_refs": [
+                                        {
+                                            "col_end": 37,
+                                            "col_start": 23,
+                                            "node_type": "SourceRef",
+                                            "row_end": 31,
+                                            "row_start": 31,
+                                            "source_file_name": "t05_dynamic_triggering"
+                                        }
+                                    ],
+                                    "value": "Dynamic beta",
+                                    "value_type": "List"
+                                },
+                                "source_refs": [
+                                    {
+                                        "col_end": 79,
+                                        "col_start": 12,
+                                        "node_type": "SourceRef",
+                                        "row_end": 31,
+                                        "row_start": 31,
+                                        "source_file_name": "t05_dynamic_triggering"
+                                    }
+                                ]
+                            },
+                            {
+                                "left": {
+                                    "default_value": null,
+                                    "node_type": "Var",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 79,
+                                            "col_start": 12,
+                                            "node_type": "SourceRef",
+                                            "row_end": 31,
+                                            "row_start": 31,
+                                            "source_file_name": "t05_dynamic_triggering"
+                                        }
+                                    ],
+                                    "type": "float",
+                                    "val": {
+                                        "id": 100,
+                                        "name": "show_label",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 79,
+                                                "col_start": 12,
+                                                "node_type": "SourceRef",
+                                                "row_end": 31,
+                                                "row_start": 31,
+                                                "source_file_name": "t05_dynamic_triggering"
+                                            }
+                                        ]
+                                    }
+                                },
+                                "node_type": "Assignment",
+                                "right": {
+                                    "node_type": "LiteralValue",
+                                    "source_code_data_type": [
+                                        "Python",
+                                        "3.8",
+                                        "<class 'bool'>"
+                                    ],
+                                    "source_refs": [
+                                        {
+                                            "col_end": 54,
+                                            "col_start": 50,
+                                            "node_type": "SourceRef",
+                                            "row_end": 31,
+                                            "row_start": 31,
+                                            "source_file_name": "t05_dynamic_triggering"
+                                        }
+                                    ],
+                                    "value": "True",
+                                    "value_type": "Boolean"
+                                },
+                                "source_refs": [
+                                    {
+                                        "col_end": 79,
+                                        "col_start": 12,
+                                        "node_type": "SourceRef",
+                                        "row_end": 31,
+                                        "row_start": 31,
+                                        "source_file_name": "t05_dynamic_triggering"
+                                    }
+                                ]
+                            },
+                            {
+                                "left": {
+                                    "default_value": null,
+                                    "node_type": "Var",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 79,
+                                            "col_start": 12,
+                                            "node_type": "SourceRef",
+                                            "row_end": 31,
+                                            "row_start": 31,
+                                            "source_file_name": "t05_dynamic_triggering"
+                                        }
+                                    ],
+                                    "type": "float",
+                                    "val": {
+                                        "id": 100,
+                                        "name": "line_args",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 79,
+                                                "col_start": 12,
+                                                "node_type": "SourceRef",
+                                                "row_end": 31,
+                                                "row_start": 31,
+                                                "source_file_name": "t05_dynamic_triggering"
+                                            }
+                                        ]
+                                    }
+                                },
+                                "node_type": "Assignment",
+                                "right": {
+                                    "node_type": "LiteralValue",
+                                    "source_code_data_type": [
+                                        "Python",
+                                        "3.8",
+                                        "<class 'dict'>"
+                                    ],
+                                    "source_refs": [
+                                        {
+                                            "col_end": 78,
+                                            "col_start": 66,
+                                            "node_type": "SourceRef",
+                                            "row_end": 31,
+                                            "row_start": 31,
+                                            "source_file_name": "t05_dynamic_triggering"
+                                        }
+                                    ],
+                                    "value": "[('c', 'blue')]",
+                                    "value_type": "Map"
+                                },
+                                "source_refs": [
+                                    {
+                                        "col_end": 79,
+                                        "col_start": 12,
+                                        "node_type": "SourceRef",
+                                        "row_end": 31,
+                                        "row_start": 31,
+                                        "source_file_name": "t05_dynamic_triggering"
+                                    }
+                                ]
+                            }
+                        ],
+                        "func": {
+                            "id": 24,
+                            "name": "dict",
+                            "node_type": "Name",
+                            "source_refs": [
+                                {
+                                    "col_end": 79,
+                                    "col_start": 12,
+                                    "node_type": "SourceRef",
+                                    "row_end": 31,
+                                    "row_start": 31,
+                                    "source_file_name": "t05_dynamic_triggering"
+                                }
+                            ]
+                        },
+                        "node_type": "Call",
+                        "source_language": null,
+                        "source_language_version": null,
+                        "source_refs": [
+                            {
+                                "col_end": 79,
+                                "col_start": 12,
+                                "node_type": "SourceRef",
+                                "row_end": 31,
+                                "row_start": 31,
+                                "source_file_name": "t05_dynamic_triggering"
+                            }
+                        ]
+                    },
+                    "source_refs": [
+                        {
+                            "col_end": 79,
+                            "col_start": 0,
+                            "node_type": "SourceRef",
+                            "row_end": 31,
+                            "row_start": 31,
+                            "source_file_name": "t05_dynamic_triggering"
+                        }
+                    ]
+                },
+                {
+                    "left": {
+                        "default_value": null,
+                        "node_type": "Var",
+                        "source_refs": [
+                            {
+                                "col_end": 2,
+                                "col_start": 0,
+                                "node_type": "SourceRef",
+                                "row_end": 32,
+                                "row_start": 32,
+                                "source_file_name": "t05_dynamic_triggering"
+                            }
+                        ],
+                        "type": "float",
+                        "val": {
+                            "id": 8,
+                            "name": "cb",
+                            "node_type": "Name",
+                            "source_refs": [
+                                {
+                                    "col_end": 2,
+                                    "col_start": 0,
+                                    "node_type": "SourceRef",
+                                    "row_end": 32,
+                                    "row_start": 32,
+                                    "source_file_name": "t05_dynamic_triggering"
+                                }
+                            ]
+                        }
+                    },
+                    "node_type": "Assignment",
+                    "right": {
+                        "arguments": [
+                            {
+                                "left": {
+                                    "default_value": null,
+                                    "node_type": "Var",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 66,
+                                            "col_start": 5,
+                                            "node_type": "SourceRef",
+                                            "row_end": 32,
+                                            "row_start": 32,
+                                            "source_file_name": "t05_dynamic_triggering"
+                                        }
+                                    ],
+                                    "type": "float",
+                                    "val": {
+                                        "id": 100,
+                                        "name": "days",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 66,
+                                                "col_start": 5,
+                                                "node_type": "SourceRef",
+                                                "row_end": 32,
+                                                "row_start": 32,
+                                                "source_file_name": "t05_dynamic_triggering"
+                                            }
+                                        ]
+                                    }
+                                },
+                                "node_type": "Assignment",
+                                "right": {
+                                    "id": 25,
+                                    "name": "inf_thresh",
+                                    "node_type": "Name",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 35,
+                                            "col_start": 25,
+                                            "node_type": "SourceRef",
+                                            "row_end": 32,
+                                            "row_start": 32,
+                                            "source_file_name": "t05_dynamic_triggering"
+                                        }
+                                    ]
+                                },
+                                "source_refs": [
+                                    {
+                                        "col_end": 66,
+                                        "col_start": 5,
+                                        "node_type": "SourceRef",
+                                        "row_end": 32,
+                                        "row_start": 32,
+                                        "source_file_name": "t05_dynamic_triggering"
+                                    }
+                                ]
+                            },
+                            {
+                                "left": {
+                                    "default_value": null,
+                                    "node_type": "Var",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 66,
+                                            "col_start": 5,
+                                            "node_type": "SourceRef",
+                                            "row_end": 32,
+                                            "row_start": 32,
+                                            "source_file_name": "t05_dynamic_triggering"
+                                        }
+                                    ],
+                                    "type": "float",
+                                    "val": {
+                                        "id": 100,
+                                        "name": "changes",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 66,
+                                                "col_start": 5,
+                                                "node_type": "SourceRef",
+                                                "row_end": 32,
+                                                "row_start": 32,
+                                                "source_file_name": "t05_dynamic_triggering"
+                                            }
+                                        ]
+                                    }
+                                },
+                                "node_type": "Assignment",
+                                "right": {
+                                    "id": 2,
+                                    "name": "changes",
+                                    "node_type": "Name",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 52,
+                                            "col_start": 45,
+                                            "node_type": "SourceRef",
+                                            "row_end": 32,
+                                            "row_start": 32,
+                                            "source_file_name": "t05_dynamic_triggering"
+                                        }
+                                    ]
+                                },
+                                "source_refs": [
+                                    {
+                                        "col_end": 66,
+                                        "col_start": 5,
+                                        "node_type": "SourceRef",
+                                        "row_end": 32,
+                                        "row_start": 32,
+                                        "source_file_name": "t05_dynamic_triggering"
+                                    }
+                                ]
+                            },
+                            {
+                                "id": -1,
+                                "name": "plot_args",
+                                "node_type": "Name",
+                                "source_refs": [
+                                    {
+                                        "col_end": 66,
+                                        "col_start": 5,
+                                        "node_type": "SourceRef",
+                                        "row_end": 32,
+                                        "row_start": 32,
+                                        "source_file_name": "t05_dynamic_triggering"
+                                    }
+                                ]
+                            }
+                        ],
+                        "func": {
+                            "attr": {
+                                "id": 26,
+                                "name": "change_beta",
+                                "node_type": "Name",
+                                "source_refs": [
+                                    {
+                                        "col_end": 19,
+                                        "col_start": 5,
+                                        "node_type": "SourceRef",
+                                        "row_end": 32,
+                                        "row_start": 32,
+                                        "source_file_name": "t05_dynamic_triggering"
+                                    }
+                                ]
+                            },
+                            "node_type": "Attribute",
+                            "source_refs": [
+                                {
+                                    "col_end": 19,
+                                    "col_start": 5,
+                                    "node_type": "SourceRef",
+                                    "row_end": 32,
+                                    "row_start": 32,
+                                    "source_file_name": "t05_dynamic_triggering"
+                                }
+                            ],
+                            "value": {
+                                "id": -1,
+                                "name": "covasim",
+                                "node_type": "Name",
+                                "source_refs": [
+                                    {
+                                        "col_end": 7,
+                                        "col_start": 5,
+                                        "node_type": "SourceRef",
+                                        "row_end": 32,
+                                        "row_start": 32,
+                                        "source_file_name": "t05_dynamic_triggering"
+                                    }
+                                ]
+                            }
+                        },
+                        "node_type": "Call",
+                        "source_language": null,
+                        "source_language_version": null,
+                        "source_refs": [
+                            {
+                                "col_end": 66,
+                                "col_start": 5,
+                                "node_type": "SourceRef",
+                                "row_end": 32,
+                                "row_start": 32,
+                                "source_file_name": "t05_dynamic_triggering"
+                            }
+                        ]
+                    },
+                    "source_refs": [
+                        {
+                            "col_end": 66,
+                            "col_start": 0,
+                            "node_type": "SourceRef",
+                            "row_end": 32,
+                            "row_start": 32,
+                            "source_file_name": "t05_dynamic_triggering"
+                        }
+                    ]
+                },
+                {
+                    "left": {
+                        "attr": {
+                            "id": 27,
+                            "name": "t_on",
+                            "node_type": "Name",
+                            "source_refs": [
+                                {
+                                    "col_end": 7,
+                                    "col_start": 0,
+                                    "node_type": "SourceRef",
+                                    "row_end": 35,
+                                    "row_start": 35,
+                                    "source_file_name": "t05_dynamic_triggering"
+                                }
+                            ]
+                        },
+                        "node_type": "Attribute",
+                        "source_refs": [
+                            {
+                                "col_end": 7,
+                                "col_start": 0,
+                                "node_type": "SourceRef",
+                                "row_end": 35,
+                                "row_start": 35,
+                                "source_file_name": "t05_dynamic_triggering"
+                            }
+                        ],
+                        "value": {
+                            "id": 8,
+                            "name": "cb",
+                            "node_type": "Name",
+                            "source_refs": [
+                                {
+                                    "col_end": 2,
+                                    "col_start": 0,
+                                    "node_type": "SourceRef",
+                                    "row_end": 35,
+                                    "row_start": 35,
+                                    "source_file_name": "t05_dynamic_triggering"
+                                }
+                            ]
+                        }
+                    },
+                    "node_type": "Assignment",
+                    "right": {
+                        "attr": {
+                            "id": 28,
+                            "name": "nan",
+                            "node_type": "Name",
+                            "source_refs": [
+                                {
+                                    "col_end": 16,
+                                    "col_start": 10,
+                                    "node_type": "SourceRef",
+                                    "row_end": 35,
+                                    "row_start": 35,
+                                    "source_file_name": "t05_dynamic_triggering"
+                                }
+                            ]
+                        },
+                        "node_type": "Attribute",
+                        "source_refs": [
+                            {
+                                "col_end": 16,
+                                "col_start": 10,
+                                "node_type": "SourceRef",
+                                "row_end": 35,
+                                "row_start": 35,
+                                "source_file_name": "t05_dynamic_triggering"
+                            }
+                        ],
+                        "value": {
+                            "id": -1,
+                            "name": "numpy",
+                            "node_type": "Name",
+                            "source_refs": [
+                                {
+                                    "col_end": 12,
+                                    "col_start": 10,
+                                    "node_type": "SourceRef",
+                                    "row_end": 35,
+                                    "row_start": 35,
+                                    "source_file_name": "t05_dynamic_triggering"
+                                }
+                            ]
+                        }
+                    },
+                    "source_refs": [
+                        {
+                            "col_end": 16,
+                            "col_start": 0,
+                            "node_type": "SourceRef",
+                            "row_end": 35,
+                            "row_start": 35,
+                            "source_file_name": "t05_dynamic_triggering"
+                        }
+                    ]
+                },
+                {
+                    "left": {
+                        "attr": {
+                            "id": 29,
+                            "name": "t_off",
+                            "node_type": "Name",
+                            "source_refs": [
+                                {
+                                    "col_end": 8,
+                                    "col_start": 0,
+                                    "node_type": "SourceRef",
+                                    "row_end": 36,
+                                    "row_start": 36,
+                                    "source_file_name": "t05_dynamic_triggering"
+                                }
+                            ]
+                        },
+                        "node_type": "Attribute",
+                        "source_refs": [
+                            {
+                                "col_end": 8,
+                                "col_start": 0,
+                                "node_type": "SourceRef",
+                                "row_end": 36,
+                                "row_start": 36,
+                                "source_file_name": "t05_dynamic_triggering"
+                            }
+                        ],
+                        "value": {
+                            "id": 8,
+                            "name": "cb",
+                            "node_type": "Name",
+                            "source_refs": [
+                                {
+                                    "col_end": 2,
+                                    "col_start": 0,
+                                    "node_type": "SourceRef",
+                                    "row_end": 36,
+                                    "row_start": 36,
+                                    "source_file_name": "t05_dynamic_triggering"
+                                }
+                            ]
+                        }
+                    },
+                    "node_type": "Assignment",
+                    "right": {
+                        "attr": {
+                            "id": 28,
+                            "name": "nan",
+                            "node_type": "Name",
+                            "source_refs": [
+                                {
+                                    "col_end": 17,
+                                    "col_start": 11,
+                                    "node_type": "SourceRef",
+                                    "row_end": 36,
+                                    "row_start": 36,
+                                    "source_file_name": "t05_dynamic_triggering"
+                                }
+                            ]
+                        },
+                        "node_type": "Attribute",
+                        "source_refs": [
+                            {
+                                "col_end": 17,
+                                "col_start": 11,
+                                "node_type": "SourceRef",
+                                "row_end": 36,
+                                "row_start": 36,
+                                "source_file_name": "t05_dynamic_triggering"
+                            }
+                        ],
+                        "value": {
+                            "id": -1,
+                            "name": "numpy",
+                            "node_type": "Name",
+                            "source_refs": [
+                                {
+                                    "col_end": 13,
+                                    "col_start": 11,
+                                    "node_type": "SourceRef",
+                                    "row_end": 36,
+                                    "row_start": 36,
+                                    "source_file_name": "t05_dynamic_triggering"
+                                }
+                            ]
+                        }
+                    },
+                    "source_refs": [
+                        {
+                            "col_end": 17,
+                            "col_start": 0,
+                            "node_type": "SourceRef",
+                            "row_end": 36,
+                            "row_start": 36,
+                            "source_file_name": "t05_dynamic_triggering"
+                        }
+                    ]
+                },
+                {
+                    "left": {
+                        "attr": {
+                            "id": 30,
+                            "name": "active",
+                            "node_type": "Name",
+                            "source_refs": [
+                                {
+                                    "col_end": 9,
+                                    "col_start": 0,
+                                    "node_type": "SourceRef",
+                                    "row_end": 37,
+                                    "row_start": 37,
+                                    "source_file_name": "t05_dynamic_triggering"
+                                }
+                            ]
+                        },
+                        "node_type": "Attribute",
+                        "source_refs": [
+                            {
+                                "col_end": 9,
+                                "col_start": 0,
+                                "node_type": "SourceRef",
+                                "row_end": 37,
+                                "row_start": 37,
+                                "source_file_name": "t05_dynamic_triggering"
+                            }
+                        ],
+                        "value": {
+                            "id": 8,
+                            "name": "cb",
+                            "node_type": "Name",
+                            "source_refs": [
+                                {
+                                    "col_end": 2,
+                                    "col_start": 0,
+                                    "node_type": "SourceRef",
+                                    "row_end": 37,
+                                    "row_start": 37,
+                                    "source_file_name": "t05_dynamic_triggering"
+                                }
+                            ]
+                        }
+                    },
+                    "node_type": "Assignment",
+                    "right": {
+                        "node_type": "LiteralValue",
+                        "source_code_data_type": [
+                            "Python",
+                            "3.8",
+                            "<class 'bool'>"
+                        ],
+                        "source_refs": [
+                            {
+                                "col_end": 17,
+                                "col_start": 12,
+                                "node_type": "SourceRef",
+                                "row_end": 37,
+                                "row_start": 37,
+                                "source_file_name": "t05_dynamic_triggering"
+                            }
+                        ],
+                        "value": "False",
+                        "value_type": "Boolean"
+                    },
+                    "source_refs": [
+                        {
+                            "col_end": 17,
+                            "col_start": 0,
+                            "node_type": "SourceRef",
+                            "row_end": 37,
+                            "row_start": 37,
+                            "source_file_name": "t05_dynamic_triggering"
+                        }
+                    ]
+                },
+                {
+                    "left": {
+                        "attr": {
+                            "id": 31,
+                            "name": "plot_days",
+                            "node_type": "Name",
+                            "source_refs": [
+                                {
+                                    "col_end": 12,
+                                    "col_start": 0,
+                                    "node_type": "SourceRef",
+                                    "row_end": 38,
+                                    "row_start": 38,
+                                    "source_file_name": "t05_dynamic_triggering"
+                                }
+                            ]
+                        },
+                        "node_type": "Attribute",
+                        "source_refs": [
+                            {
+                                "col_end": 12,
+                                "col_start": 0,
+                                "node_type": "SourceRef",
+                                "row_end": 38,
+                                "row_start": 38,
+                                "source_file_name": "t05_dynamic_triggering"
+                            }
+                        ],
+                        "value": {
+                            "id": 8,
+                            "name": "cb",
+                            "node_type": "Name",
+                            "source_refs": [
+                                {
+                                    "col_end": 2,
+                                    "col_start": 0,
+                                    "node_type": "SourceRef",
+                                    "row_end": 38,
+                                    "row_start": 38,
+                                    "source_file_name": "t05_dynamic_triggering"
+                                }
+                            ]
+                        }
+                    },
+                    "node_type": "Assignment",
+                    "right": {
+                        "node_type": "LiteralValue",
+                        "source_code_data_type": [
+                            "Python",
+                            "3.8",
+                            "List"
+                        ],
+                        "source_refs": [
+                            {
+                                "col_end": 17,
+                                "col_start": 15,
+                                "node_type": "SourceRef",
+                                "row_end": 38,
+                                "row_start": 38,
+                                "source_file_name": "t05_dynamic_triggering"
+                            }
+                        ],
+                        "value": [],
+                        "value_type": "List"
+                    },
+                    "source_refs": [
+                        {
+                            "col_end": 17,
+                            "col_start": 0,
+                            "node_type": "SourceRef",
+                            "row_end": 38,
+                            "row_start": 38,
+                            "source_file_name": "t05_dynamic_triggering"
+                        }
+                    ]
+                },
+                {
+                    "left": {
+                        "default_value": null,
+                        "node_type": "Var",
+                        "source_refs": [
+                            {
+                                "col_end": 3,
+                                "col_start": 0,
+                                "node_type": "SourceRef",
+                                "row_end": 41,
+                                "row_start": 41,
+                                "source_file_name": "t05_dynamic_triggering"
+                            }
+                        ],
+                        "type": "float",
+                        "val": {
+                            "id": 9,
+                            "name": "sim",
+                            "node_type": "Name",
+                            "source_refs": [
+                                {
+                                    "col_end": 3,
+                                    "col_start": 0,
+                                    "node_type": "SourceRef",
+                                    "row_end": 41,
+                                    "row_start": 41,
+                                    "source_file_name": "t05_dynamic_triggering"
+                                }
+                            ]
+                        }
+                    },
+                    "node_type": "Assignment",
+                    "right": {
+                        "arguments": [
+                            {
+                                "left": {
+                                    "default_value": null,
+                                    "node_type": "Var",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 30,
+                                            "col_start": 6,
+                                            "node_type": "SourceRef",
+                                            "row_end": 41,
+                                            "row_start": 41,
+                                            "source_file_name": "t05_dynamic_triggering"
+                                        }
+                                    ],
+                                    "type": "float",
+                                    "val": {
+                                        "id": 100,
+                                        "name": "interventions",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 30,
+                                                "col_start": 6,
+                                                "node_type": "SourceRef",
+                                                "row_end": 41,
+                                                "row_start": 41,
+                                                "source_file_name": "t05_dynamic_triggering"
+                                            }
+                                        ]
+                                    }
+                                },
+                                "node_type": "Assignment",
+                                "right": {
+                                    "id": 8,
+                                    "name": "cb",
+                                    "node_type": "Name",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 29,
+                                            "col_start": 27,
+                                            "node_type": "SourceRef",
+                                            "row_end": 41,
+                                            "row_start": 41,
+                                            "source_file_name": "t05_dynamic_triggering"
+                                        }
+                                    ]
+                                },
+                                "source_refs": [
+                                    {
+                                        "col_end": 30,
+                                        "col_start": 6,
+                                        "node_type": "SourceRef",
+                                        "row_end": 41,
+                                        "row_start": 41,
+                                        "source_file_name": "t05_dynamic_triggering"
+                                    }
+                                ]
+                            }
+                        ],
+                        "func": {
+                            "attr": {
+                                "id": 32,
+                                "name": "Sim",
+                                "node_type": "Name",
+                                "source_refs": [
+                                    {
+                                        "col_end": 12,
+                                        "col_start": 6,
+                                        "node_type": "SourceRef",
+                                        "row_end": 41,
+                                        "row_start": 41,
+                                        "source_file_name": "t05_dynamic_triggering"
+                                    }
+                                ]
+                            },
+                            "node_type": "Attribute",
+                            "source_refs": [
+                                {
+                                    "col_end": 12,
+                                    "col_start": 6,
+                                    "node_type": "SourceRef",
+                                    "row_end": 41,
+                                    "row_start": 41,
+                                    "source_file_name": "t05_dynamic_triggering"
+                                }
+                            ],
+                            "value": {
+                                "id": -1,
+                                "name": "covasim",
+                                "node_type": "Name",
+                                "source_refs": [
+                                    {
+                                        "col_end": 8,
+                                        "col_start": 6,
+                                        "node_type": "SourceRef",
+                                        "row_end": 41,
+                                        "row_start": 41,
+                                        "source_file_name": "t05_dynamic_triggering"
+                                    }
+                                ]
+                            }
+                        },
+                        "node_type": "Call",
+                        "source_language": null,
+                        "source_language_version": null,
+                        "source_refs": [
+                            {
+                                "col_end": 30,
+                                "col_start": 6,
+                                "node_type": "SourceRef",
+                                "row_end": 41,
+                                "row_start": 41,
+                                "source_file_name": "t05_dynamic_triggering"
+                            }
+                        ]
+                    },
+                    "source_refs": [
+                        {
+                            "col_end": 30,
+                            "col_start": 0,
+                            "node_type": "SourceRef",
+                            "row_end": 41,
+                            "row_start": 41,
+                            "source_file_name": "t05_dynamic_triggering"
+                        }
+                    ]
+                },
+                {
+                    "arguments": [],
+                    "func": {
+                        "attr": {
+                            "id": 34,
+                            "name": "plot",
+                            "node_type": "Name",
+                            "source_refs": [
+                                {
+                                    "col_end": 14,
+                                    "col_start": 0,
+                                    "node_type": "SourceRef",
+                                    "row_end": 42,
+                                    "row_start": 42,
+                                    "source_file_name": "t05_dynamic_triggering"
+                                }
+                            ]
+                        },
+                        "node_type": "Attribute",
+                        "source_refs": [
+                            {
+                                "col_end": 14,
+                                "col_start": 0,
+                                "node_type": "SourceRef",
+                                "row_end": 42,
+                                "row_start": 42,
+                                "source_file_name": "t05_dynamic_triggering"
+                            }
+                        ],
+                        "value": {
+                            "arguments": [],
+                            "func": {
+                                "attr": {
+                                    "id": 33,
+                                    "name": "run",
+                                    "node_type": "Name",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 7,
+                                            "col_start": 0,
+                                            "node_type": "SourceRef",
+                                            "row_end": 42,
+                                            "row_start": 42,
+                                            "source_file_name": "t05_dynamic_triggering"
+                                        }
+                                    ]
+                                },
+                                "node_type": "Attribute",
+                                "source_refs": [
+                                    {
+                                        "col_end": 7,
+                                        "col_start": 0,
+                                        "node_type": "SourceRef",
+                                        "row_end": 42,
+                                        "row_start": 42,
+                                        "source_file_name": "t05_dynamic_triggering"
+                                    }
+                                ],
+                                "value": {
+                                    "id": 9,
+                                    "name": "sim",
+                                    "node_type": "Name",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 3,
+                                            "col_start": 0,
+                                            "node_type": "SourceRef",
+                                            "row_end": 42,
+                                            "row_start": 42,
+                                            "source_file_name": "t05_dynamic_triggering"
+                                        }
+                                    ]
+                                }
+                            },
+                            "node_type": "Call",
+                            "source_language": null,
+                            "source_language_version": null,
+                            "source_refs": [
+                                {
+                                    "col_end": 9,
+                                    "col_start": 0,
+                                    "node_type": "SourceRef",
+                                    "row_end": 42,
+                                    "row_start": 42,
+                                    "source_file_name": "t05_dynamic_triggering"
+                                }
+                            ]
+                        }
+                    },
+                    "node_type": "Call",
+                    "source_language": null,
+                    "source_language_version": null,
+                    "source_refs": [
+                        {
+                            "col_end": 16,
+                            "col_start": 0,
+                            "node_type": "SourceRef",
+                            "row_end": 42,
+                            "row_start": 42,
+                            "source_file_name": "t05_dynamic_triggering"
+                        }
+                    ]
+                }
+            ],
+            "name": "t05_dynamic_triggering",
+            "node_type": "Module",
+            "source_refs": [
+                {
+                    "col_end": null,
+                    "col_start": null,
+                    "node_type": "SourceRef",
+                    "row_end": 42,
+                    "row_start": 1,
+                    "source_file_name": "t05_dynamic_triggering.py"
+                }
+            ]
+        }
+    ]
+}

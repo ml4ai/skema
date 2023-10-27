@@ -1,0 +1,566 @@
+{
+    "schema": "FN",
+    "schema_version": "0.1.8",
+    "name": "multisim_tests",
+    "modules": [
+        {
+            "schema": "FN",
+            "schema_version": "0.1.8",
+            "name": "multisim_tests",
+            "fn": {
+                "b": [{"function_type":"MODULE","gromet_type":"GrometBoxFunction","name":"module","metadata":3}],
+                "bf": [
+                    {"function_type":"IMPORTED_METHOD","body":21,"import_type":"OTHER","source_language":"Python","source_language_version":"3.8","gromet_type":"GrometBoxFunction","name":"module.Sim_1","metadata":35},
+                    {"function_type":"IMPORTED_METHOD","body":22,"import_type":"OTHER","source_language":"Python","source_language_version":"3.8","gromet_type":"GrometBoxFunction","name":"module.MultiSim_0","metadata":36},
+                    {"function_type":"EXPRESSION","body":23,"gromet_type":"GrometBoxFunction","metadata":38},
+                    {"function_type":"IMPORTED_METHOD","body":24,"import_type":"OTHER","source_language":"Python","source_language_version":"3.8","gromet_type":"GrometBoxFunction","name":"module.run_0","metadata":39},
+                    {"function_type":"IMPORTED_METHOD","body":25,"import_type":"OTHER","source_language":"Python","source_language_version":"3.8","gromet_type":"GrometBoxFunction","name":"module.combine_0","metadata":40},
+                    {"function_type":"IMPORTED_METHOD","body":26,"import_type":"OTHER","source_language":"Python","source_language_version":"3.8","gromet_type":"GrometBoxFunction","name":"module.plot_0","metadata":41},
+                    {"function_type":"IMPORTED_METHOD","body":27,"import_type":"OTHER","source_language":"Python","source_language_version":"3.8","gromet_type":"GrometBoxFunction","name":"module.Sim_2","metadata":42},
+                    {"function_type":"IMPORTED_METHOD","body":28,"import_type":"OTHER","source_language":"Python","source_language_version":"3.8","gromet_type":"GrometBoxFunction","name":"module.MultiSim_1","metadata":43},
+                    {"function_type":"EXPRESSION","body":29,"gromet_type":"GrometBoxFunction","metadata":45},
+                    {"function_type":"EXPRESSION","body":30,"gromet_type":"GrometBoxFunction","metadata":47},
+                    {"function_type":"IMPORTED_METHOD","body":31,"import_type":"OTHER","source_language":"Python","source_language_version":"3.8","gromet_type":"GrometBoxFunction","name":"module.run_1","metadata":48},
+                    {"function_type":"IMPORTED_METHOD","body":32,"import_type":"OTHER","source_language":"Python","source_language_version":"3.8","gromet_type":"GrometBoxFunction","name":"module.reduce_0","metadata":49},
+                    {"function_type":"IMPORTED_METHOD","body":33,"import_type":"OTHER","source_language":"Python","source_language_version":"3.8","gromet_type":"GrometBoxFunction","name":"module.plot_1","metadata":50},
+                    {"function_type":"EXPRESSION","body":34,"gromet_type":"GrometBoxFunction","metadata":52},
+                    {"function_type":"IMPORTED_METHOD","body":1,"import_type":"OTHER","source_language":"Python","source_language_version":"3.8","gromet_type":"GrometBoxFunction","name":"%comprehension_list_0_id0","metadata":53},
+                    {"function_type":"IMPORTED_METHOD","body":7,"import_type":"OTHER","source_language":"Python","source_language_version":"3.8","gromet_type":"GrometBoxFunction","name":"%comprehension_list_1_id0","metadata":54},
+                    {"function_type":"IMPORTED_METHOD","body":14,"import_type":"OTHER","source_language":"Python","source_language_version":"3.8","gromet_type":"GrometBoxFunction","name":"%comprehension_list_2_id0","metadata":55},
+                    {"function_type":"IMPORTED_METHOD","body":39,"import_type":"OTHER","source_language":"Python","source_language_version":"3.8","gromet_type":"GrometBoxFunction","name":"module.MultiSim_2","metadata":60},
+                    {"function_type":"IMPORTED_METHOD","body":40,"import_type":"OTHER","source_language":"Python","source_language_version":"3.8","gromet_type":"GrometBoxFunction","name":"module.plot_2","metadata":61}
+                ],
+                "pif": [{"id":1,"box":2,"gromet_type":"GrometPort"},{"id":2,"box":2,"gromet_type":"GrometPort"},{"id":1,"box":8,"gromet_type":"GrometPort"},{"id":2,"box":8,"gromet_type":"GrometPort"},{"id":3,"box":8,"gromet_type":"GrometPort"},{"id":1,"box":18,"gromet_type":"GrometPort"}],
+                "pof": [{"id":1,"box":1,"gromet_type":"GrometPort"},{"id":2,"name":"sim","box":1,"gromet_type":"GrometPort"},{"id":1,"name":"n_runs","box":3,"gromet_type":"GrometPort"},{"id":1,"box":2,"gromet_type":"GrometPort"},{"id":2,"name":"msim1","box":3,"gromet_type":"GrometPort"},{"id":1,"box":7,"gromet_type":"GrometPort"},{"id":2,"name":"sim","box":7,"gromet_type":"GrometPort"},{"id":1,"name":"n_runs","box":9,"gromet_type":"GrometPort"},{"id":1,"name":"noise","box":10,"gromet_type":"GrometPort"},{"id":1,"box":8,"gromet_type":"GrometPort"},{"id":2,"name":"msim2","box":10,"gromet_type":"GrometPort"},{"id":1,"name":"n_sims","box":14,"gromet_type":"GrometPort"},{"id":1,"name":"betas","box":15,"gromet_type":"GrometPort"},{"id":1,"name":"labels","box":16,"gromet_type":"GrometPort"},{"id":1,"name":"sims","box":17,"gromet_type":"GrometPort"},{"id":1,"box":18,"gromet_type":"GrometPort"},{"id":2,"name":"msim3","box":18,"gromet_type":"GrometPort"}],
+                "wfl": [{"src":1,"tgt":15,"gromet_type":"GrometWire"},{"src":3,"tgt":7,"gromet_type":"GrometWire"}],
+                "wff": [{"src":2,"tgt":5,"gromet_type":"GrometWire"},{"src":2,"tgt":7,"gromet_type":"GrometWire"},{"src":5,"tgt":11,"gromet_type":"GrometWire"},{"src":6,"tgt":1,"gromet_type":"GrometWire"},{"src":6,"tgt":17,"gromet_type":"GrometWire"}],
+                "bl": [{"pre":35,"condition":36,"body":37,"gromet_type":"GrometBoxLoop"}],
+                "pil": [{"id":1,"name":"sims","box":1,"gromet_type":"GrometPort"},{"id":2,"name":"generated_iter_8","box":1,"gromet_type":"GrometPort"},{"id":3,"name":"sim","box":1,"gromet_type":"GrometPort"},{"id":4,"name":"sc_9","box":1,"gromet_type":"GrometPort"}],
+                "pol": [{"id":1,"name":"sims","box":1,"gromet_type":"GrometPort"},{"id":2,"name":"generated_iter_8","box":1,"gromet_type":"GrometPort"},{"id":3,"name":"sim","box":1,"gromet_type":"GrometPort"},{"id":4,"name":"sc_9","box":1,"gromet_type":"GrometPort"}],
+                "wlf": [{"src":6,"tgt":1,"gromet_type":"GrometWire"}],
+                "gromet_type": "GrometFN"
+            },
+            "fn_array": [
+                {
+                    "b": [{"function_type":"FUNCTION","gromet_type":"GrometBoxFunction","name":"%comprehension_list_0_id0","metadata":4}],
+                    "opo": [{"id":1,"box":1,"gromet_type":"GrometPort"}],
+                    "bf": [{"function_type":"EXPRESSION","body":2,"gromet_type":"GrometBoxFunction","metadata":6}],
+                    "pof": [{"id":1,"name":"list__temp_","box":1,"gromet_type":"GrometPort"}],
+                    "wfl": [{"src":5,"tgt":1,"gromet_type":"GrometWire"}],
+                    "bl": [{"pre":3,"condition":4,"body":5,"gromet_type":"GrometBoxLoop"}],
+                    "pil": [{"id":1,"name":"n_sims","box":1,"gromet_type":"GrometPort"},{"id":2,"name":"generated_iter_0","box":1,"gromet_type":"GrometPort"},{"id":3,"name":"i","box":1,"gromet_type":"GrometPort"},{"id":4,"name":"sc_1","box":1,"gromet_type":"GrometPort"},{"id":5,"name":"list__temp_","box":1,"gromet_type":"GrometPort"}],
+                    "pol": [{"id":1,"name":"n_sims","box":1,"gromet_type":"GrometPort"},{"id":2,"name":"generated_iter_0","box":1,"gromet_type":"GrometPort"},{"id":3,"name":"i","box":1,"gromet_type":"GrometPort"},{"id":4,"name":"sc_1","box":1,"gromet_type":"GrometPort"},{"id":5,"name":"list__temp_","box":1,"gromet_type":"GrometPort"}],
+                    "wlopo": [{"src":1,"tgt":5,"gromet_type":"GrometWire"}],
+                    "gromet_type": "GrometFN"
+                },
+                {
+                    "b": [{"function_type":"EXPRESSION","gromet_type":"GrometBoxFunction"}],
+                    "opo": [{"id":1,"box":1,"gromet_type":"GrometPort"}],
+                    "bf": [{"function_type":"LITERAL","value":{"value_type":"List","value":[],"gromet_type":"LiteralValue"},"gromet_type":"GrometBoxFunction","metadata":5}],
+                    "pof": [{"id":1,"box":1,"gromet_type":"GrometPort"}],
+                    "wfopo": [{"src":1,"tgt":1,"gromet_type":"GrometWire"}],
+                    "gromet_type": "GrometFN"
+                },
+                {
+                    "b": [{"function_type":"FUNCTION","gromet_type":"GrometBoxFunction"}],
+                    "opi": [{"id":1,"name":"n_sims","box":3,"gromet_type":"GrometPort"},{"id":2,"name":"generated_iter_0","box":3,"gromet_type":"GrometPort"},{"id":3,"name":"i","box":3,"gromet_type":"GrometPort"},{"id":4,"name":"sc_1","box":3,"gromet_type":"GrometPort"},{"id":5,"name":"list__temp_","box":3,"gromet_type":"GrometPort"}],
+                    "opo": [{"id":1,"name":"n_sims","box":3,"gromet_type":"GrometPort"},{"id":2,"name":"generated_iter_0","box":3,"gromet_type":"GrometPort"},{"id":3,"name":"i","box":3,"gromet_type":"GrometPort"},{"id":4,"name":"sc_1","box":3,"gromet_type":"GrometPort"},{"id":5,"name":"list__temp_","box":3,"gromet_type":"GrometPort"}],
+                    "wopio": [{"src":1,"tgt":1,"gromet_type":"GrometWire"},{"src":5,"tgt":5,"gromet_type":"GrometWire"}],
+                    "bf": [{"function_type":"LANGUAGE_PRIMITIVE","gromet_type":"GrometBoxFunction","name":"iter"},{"function_type":"LANGUAGE_PRIMITIVE","gromet_type":"GrometBoxFunction","name":"next"}],
+                    "pof": [{"id":1,"name":"generated_iter_0","box":1,"gromet_type":"GrometPort"},{"id":1,"name":"i","box":2,"gromet_type":"GrometPort"},{"id":2,"name":"generated_iter_0","box":2,"gromet_type":"GrometPort"},{"id":3,"name":"sc_1","box":2,"gromet_type":"GrometPort"}],
+                    "wfopo": [{"src":3,"tgt":2,"gromet_type":"GrometWire"},{"src":2,"tgt":3,"gromet_type":"GrometWire"},{"src":4,"tgt":4,"gromet_type":"GrometWire"}],
+                    "gromet_type": "GrometFN"
+                },
+                {
+                    "b": [{"function_type":"PREDICATE","gromet_type":"GrometBoxFunction"}],
+                    "opi": [{"id":1,"name":"n_sims","box":1,"gromet_type":"GrometPort"},{"id":2,"name":"generated_iter_0","box":1,"gromet_type":"GrometPort"},{"id":3,"name":"i","box":1,"gromet_type":"GrometPort"},{"id":4,"name":"sc_1","box":1,"gromet_type":"GrometPort"},{"id":5,"name":"list__temp_","box":1,"gromet_type":"GrometPort"}],
+                    "opo": [{"id":1,"name":"n_sims","box":1,"gromet_type":"GrometPort"},{"id":2,"name":"generated_iter_0","box":1,"gromet_type":"GrometPort"},{"id":3,"name":"i","box":1,"gromet_type":"GrometPort"},{"id":4,"name":"sc_1","box":1,"gromet_type":"GrometPort"},{"id":5,"name":"list__temp_","box":1,"gromet_type":"GrometPort"},{"id":6,"box":1,"gromet_type":"GrometPort"}],
+                    "wopio": [{"src":1,"tgt":1,"gromet_type":"GrometWire"},{"src":2,"tgt":2,"gromet_type":"GrometWire"},{"src":3,"tgt":3,"gromet_type":"GrometWire"},{"src":4,"tgt":4,"gromet_type":"GrometWire"},{"src":5,"tgt":5,"gromet_type":"GrometWire"}],
+                    "bf": [{"function_type":"LITERAL","value":{"value_type":"Boolean","value":false,"gromet_type":"LiteralValue"},"gromet_type":"GrometBoxFunction","metadata":7},{"function_type":"LANGUAGE_PRIMITIVE","gromet_type":"GrometBoxFunction","name":"ast.Eq","metadata":8}],
+                    "pif": [{"id":1,"box":2,"gromet_type":"GrometPort"},{"id":2,"box":2,"gromet_type":"GrometPort"}],
+                    "pof": [{"id":1,"box":1,"gromet_type":"GrometPort"},{"id":1,"box":2,"gromet_type":"GrometPort"}],
+                    "wfopi": [{"src":1,"tgt":4,"gromet_type":"GrometWire"}],
+                    "wff": [{"src":2,"tgt":1,"gromet_type":"GrometWire"}],
+                    "wfopo": [{"src":6,"tgt":2,"gromet_type":"GrometWire"}],
+                    "gromet_type": "GrometFN"
+                },
+                {
+                    "b": [{"function_type":"FUNCTION","gromet_type":"GrometBoxFunction","metadata":9}],
+                    "opi": [{"id":1,"name":"n_sims","box":1,"gromet_type":"GrometPort"},{"id":2,"name":"generated_iter_0","box":1,"gromet_type":"GrometPort"},{"id":3,"name":"i","box":1,"gromet_type":"GrometPort"},{"id":4,"name":"sc_1","box":1,"gromet_type":"GrometPort"},{"id":5,"name":"list__temp_","box":1,"gromet_type":"GrometPort"}],
+                    "opo": [{"id":1,"name":"n_sims","box":1,"gromet_type":"GrometPort"},{"id":2,"name":"generated_iter_0","box":1,"gromet_type":"GrometPort"},{"id":3,"name":"i","box":1,"gromet_type":"GrometPort"},{"id":4,"name":"sc_1","box":1,"gromet_type":"GrometPort"},{"id":5,"name":"list__temp_","box":1,"gromet_type":"GrometPort"}],
+                    "wopio": [{"src":1,"tgt":1,"gromet_type":"GrometWire"},{"src":5,"tgt":5,"gromet_type":"GrometWire"}],
+                    "bf": [{"function_type":"IMPORTED_METHOD","body":6,"import_type":"OTHER","source_language":"Python","source_language_version":"3.8","gromet_type":"GrometBoxFunction","name":"module.%comprehension_list_0_id0.loop0.loop-body.append_0","metadata":10},{"function_type":"LITERAL","value":{"value_type":"AbstractFloat","value":0.015,"gromet_type":"LiteralValue"},"gromet_type":"GrometBoxFunction","metadata":11},{"function_type":"LITERAL","value":{"value_type":"Integer","value":1,"gromet_type":"LiteralValue"},"gromet_type":"GrometBoxFunction","metadata":12},{"function_type":"LITERAL","value":{"value_type":"AbstractFloat","value":0.02,"gromet_type":"LiteralValue"},"gromet_type":"GrometBoxFunction","metadata":13},{"function_type":"LANGUAGE_PRIMITIVE","gromet_type":"GrometBoxFunction","name":"ast.Mult","metadata":14},{"function_type":"LANGUAGE_PRIMITIVE","gromet_type":"GrometBoxFunction","name":"ast.Add","metadata":15},{"function_type":"LANGUAGE_PRIMITIVE","gromet_type":"GrometBoxFunction","name":"ast.Mult","metadata":16},{"function_type":"LANGUAGE_PRIMITIVE","gromet_type":"GrometBoxFunction","name":"next"}],
+                    "pif": [{"id":1,"box":5,"gromet_type":"GrometPort"},{"id":2,"box":5,"gromet_type":"GrometPort"},{"id":1,"box":6,"gromet_type":"GrometPort"},{"id":2,"box":6,"gromet_type":"GrometPort"},{"id":1,"box":7,"gromet_type":"GrometPort"},{"id":2,"box":7,"gromet_type":"GrometPort"},{"id":1,"box":1,"gromet_type":"GrometPort"}],
+                    "pof": [{"id":1,"box":2,"gromet_type":"GrometPort"},{"id":1,"box":3,"gromet_type":"GrometPort"},{"id":1,"box":4,"gromet_type":"GrometPort"},{"id":1,"box":5,"gromet_type":"GrometPort"},{"id":1,"box":6,"gromet_type":"GrometPort"},{"id":1,"box":7,"gromet_type":"GrometPort"},{"id":1,"name":"i","box":8,"gromet_type":"GrometPort"},{"id":2,"name":"generated_iter_0","box":8,"gromet_type":"GrometPort"},{"id":3,"name":"sc_1","box":8,"gromet_type":"GrometPort"}],
+                    "wfopi": [{"src":2,"tgt":3,"gromet_type":"GrometWire"}],
+                    "wff": [{"src":1,"tgt":3,"gromet_type":"GrometWire"},{"src":3,"tgt":2,"gromet_type":"GrometWire"},{"src":4,"tgt":4,"gromet_type":"GrometWire"},{"src":5,"tgt":1,"gromet_type":"GrometWire"},{"src":6,"tgt":5,"gromet_type":"GrometWire"},{"src":7,"tgt":6,"gromet_type":"GrometWire"}],
+                    "wfopo": [{"src":2,"tgt":7,"gromet_type":"GrometWire"},{"src":3,"tgt":6,"gromet_type":"GrometWire"},{"src":4,"tgt":8,"gromet_type":"GrometWire"}],
+                    "gromet_type": "GrometFN"
+                },
+                {
+                    "b": [{"function_type":"FUNCTION","gromet_type":"GrometBoxFunction","name":"append"}],
+                    "gromet_type": "GrometFN"
+                },
+                {
+                    "b": [{"function_type":"FUNCTION","gromet_type":"GrometBoxFunction","name":"%comprehension_list_1_id0","metadata":17}],
+                    "opo": [{"id":1,"box":1,"gromet_type":"GrometPort"}],
+                    "bf": [{"function_type":"EXPRESSION","body":8,"gromet_type":"GrometBoxFunction","metadata":19}],
+                    "pof": [{"id":1,"name":"list__temp_","box":1,"gromet_type":"GrometPort"}],
+                    "wfl": [{"src":5,"tgt":1,"gromet_type":"GrometWire"}],
+                    "bl": [{"pre":9,"condition":10,"body":11,"gromet_type":"GrometBoxLoop"}],
+                    "pil": [{"id":1,"name":"betas","box":1,"gromet_type":"GrometPort"},{"id":2,"name":"generated_iter_2","box":1,"gromet_type":"GrometPort"},{"id":3,"name":"beta","box":1,"gromet_type":"GrometPort"},{"id":4,"name":"sc_3","box":1,"gromet_type":"GrometPort"},{"id":5,"name":"list__temp_","box":1,"gromet_type":"GrometPort"}],
+                    "pol": [{"id":1,"name":"betas","box":1,"gromet_type":"GrometPort"},{"id":2,"name":"generated_iter_2","box":1,"gromet_type":"GrometPort"},{"id":3,"name":"beta","box":1,"gromet_type":"GrometPort"},{"id":4,"name":"sc_3","box":1,"gromet_type":"GrometPort"},{"id":5,"name":"list__temp_","box":1,"gromet_type":"GrometPort"}],
+                    "wlopo": [{"src":1,"tgt":5,"gromet_type":"GrometWire"}],
+                    "gromet_type": "GrometFN"
+                },
+                {
+                    "b": [{"function_type":"EXPRESSION","gromet_type":"GrometBoxFunction"}],
+                    "opo": [{"id":1,"box":1,"gromet_type":"GrometPort"}],
+                    "bf": [{"function_type":"LITERAL","value":{"value_type":"List","value":[],"gromet_type":"LiteralValue"},"gromet_type":"GrometBoxFunction","metadata":18}],
+                    "pof": [{"id":1,"box":1,"gromet_type":"GrometPort"}],
+                    "wfopo": [{"src":1,"tgt":1,"gromet_type":"GrometWire"}],
+                    "gromet_type": "GrometFN"
+                },
+                {
+                    "b": [{"function_type":"FUNCTION","gromet_type":"GrometBoxFunction"}],
+                    "opi": [{"id":1,"name":"betas","box":9,"gromet_type":"GrometPort"},{"id":2,"name":"generated_iter_2","box":9,"gromet_type":"GrometPort"},{"id":3,"name":"beta","box":9,"gromet_type":"GrometPort"},{"id":4,"name":"sc_3","box":9,"gromet_type":"GrometPort"},{"id":5,"name":"list__temp_","box":9,"gromet_type":"GrometPort"}],
+                    "opo": [{"id":1,"name":"betas","box":9,"gromet_type":"GrometPort"},{"id":2,"name":"generated_iter_2","box":9,"gromet_type":"GrometPort"},{"id":3,"name":"beta","box":9,"gromet_type":"GrometPort"},{"id":4,"name":"sc_3","box":9,"gromet_type":"GrometPort"},{"id":5,"name":"list__temp_","box":9,"gromet_type":"GrometPort"}],
+                    "wopio": [{"src":1,"tgt":1,"gromet_type":"GrometWire"},{"src":5,"tgt":5,"gromet_type":"GrometWire"}],
+                    "bf": [{"function_type":"LANGUAGE_PRIMITIVE","gromet_type":"GrometBoxFunction","name":"iter"},{"function_type":"LANGUAGE_PRIMITIVE","gromet_type":"GrometBoxFunction","name":"next"}],
+                    "pif": [{"id":1,"box":1,"gromet_type":"GrometPort"}],
+                    "pof": [{"id":1,"name":"generated_iter_2","box":1,"gromet_type":"GrometPort"},{"id":1,"name":"beta","box":2,"gromet_type":"GrometPort"},{"id":2,"name":"generated_iter_2","box":2,"gromet_type":"GrometPort"},{"id":3,"name":"sc_3","box":2,"gromet_type":"GrometPort"}],
+                    "wfopi": [{"src":1,"tgt":1,"gromet_type":"GrometWire"}],
+                    "wfopo": [{"src":3,"tgt":2,"gromet_type":"GrometWire"},{"src":2,"tgt":3,"gromet_type":"GrometWire"},{"src":4,"tgt":4,"gromet_type":"GrometWire"}],
+                    "gromet_type": "GrometFN"
+                },
+                {
+                    "b": [{"function_type":"PREDICATE","gromet_type":"GrometBoxFunction"}],
+                    "opi": [{"id":1,"name":"betas","box":1,"gromet_type":"GrometPort"},{"id":2,"name":"generated_iter_2","box":1,"gromet_type":"GrometPort"},{"id":3,"name":"beta","box":1,"gromet_type":"GrometPort"},{"id":4,"name":"sc_3","box":1,"gromet_type":"GrometPort"},{"id":5,"name":"list__temp_","box":1,"gromet_type":"GrometPort"}],
+                    "opo": [{"id":1,"name":"betas","box":1,"gromet_type":"GrometPort"},{"id":2,"name":"generated_iter_2","box":1,"gromet_type":"GrometPort"},{"id":3,"name":"beta","box":1,"gromet_type":"GrometPort"},{"id":4,"name":"sc_3","box":1,"gromet_type":"GrometPort"},{"id":5,"name":"list__temp_","box":1,"gromet_type":"GrometPort"},{"id":6,"box":1,"gromet_type":"GrometPort"}],
+                    "wopio": [{"src":1,"tgt":1,"gromet_type":"GrometWire"},{"src":2,"tgt":2,"gromet_type":"GrometWire"},{"src":3,"tgt":3,"gromet_type":"GrometWire"},{"src":4,"tgt":4,"gromet_type":"GrometWire"},{"src":5,"tgt":5,"gromet_type":"GrometWire"}],
+                    "bf": [{"function_type":"LITERAL","value":{"value_type":"Boolean","value":false,"gromet_type":"LiteralValue"},"gromet_type":"GrometBoxFunction","metadata":20},{"function_type":"LANGUAGE_PRIMITIVE","gromet_type":"GrometBoxFunction","name":"ast.Eq","metadata":21}],
+                    "pif": [{"id":1,"box":2,"gromet_type":"GrometPort"},{"id":2,"box":2,"gromet_type":"GrometPort"}],
+                    "pof": [{"id":1,"box":1,"gromet_type":"GrometPort"},{"id":1,"box":2,"gromet_type":"GrometPort"}],
+                    "wfopi": [{"src":1,"tgt":4,"gromet_type":"GrometWire"}],
+                    "wff": [{"src":2,"tgt":1,"gromet_type":"GrometWire"}],
+                    "wfopo": [{"src":6,"tgt":2,"gromet_type":"GrometWire"}],
+                    "gromet_type": "GrometFN"
+                },
+                {
+                    "b": [{"function_type":"FUNCTION","gromet_type":"GrometBoxFunction","metadata":22}],
+                    "opi": [{"id":1,"name":"betas","box":1,"gromet_type":"GrometPort"},{"id":2,"name":"generated_iter_2","box":1,"gromet_type":"GrometPort"},{"id":3,"name":"beta","box":1,"gromet_type":"GrometPort"},{"id":4,"name":"sc_3","box":1,"gromet_type":"GrometPort"},{"id":5,"name":"list__temp_","box":1,"gromet_type":"GrometPort"}],
+                    "opo": [{"id":1,"name":"betas","box":1,"gromet_type":"GrometPort"},{"id":2,"name":"generated_iter_2","box":1,"gromet_type":"GrometPort"},{"id":3,"name":"beta","box":1,"gromet_type":"GrometPort"},{"id":4,"name":"sc_3","box":1,"gromet_type":"GrometPort"},{"id":5,"name":"list__temp_","box":1,"gromet_type":"GrometPort"}],
+                    "wopio": [{"src":1,"tgt":1,"gromet_type":"GrometWire"},{"src":5,"tgt":5,"gromet_type":"GrometWire"}],
+                    "bf": [{"function_type":"IMPORTED_METHOD","body":12,"import_type":"OTHER","source_language":"Python","source_language_version":"3.8","gromet_type":"GrometBoxFunction","name":"module.%comprehension_list_1_id0.loop0.loop-body.append_1","metadata":23},{"function_type":"IMPORTED_METHOD","body":13,"import_type":"OTHER","source_language":"Python","source_language_version":"3.8","gromet_type":"GrometBoxFunction","name":"Concatenate_id15","metadata":24},{"function_type":"LITERAL","value":{"value_type":"List","value":"beta=","gromet_type":"LiteralValue"},"gromet_type":"GrometBoxFunction","metadata":25},{"function_type":"LITERAL","value":{"value_type":"List","value":[{"name":"beta","id":23,"source_refs":[{"source_file_name":"multisim_tests","col_start":18,"col_end":22,"row_start":18,"row_end":18}]}],"gromet_type":"LiteralValue"},"gromet_type":"GrometBoxFunction","metadata":26},{"function_type":"LANGUAGE_PRIMITIVE","gromet_type":"GrometBoxFunction","name":"next"}],
+                    "pif": [{"id":1,"box":2,"gromet_type":"GrometPort"},{"id":2,"box":2,"gromet_type":"GrometPort"},{"id":1,"box":1,"gromet_type":"GrometPort"}],
+                    "pof": [{"id":1,"box":3,"gromet_type":"GrometPort"},{"id":1,"box":4,"gromet_type":"GrometPort"},{"id":1,"box":2,"gromet_type":"GrometPort"},{"id":1,"name":"beta","box":5,"gromet_type":"GrometPort"},{"id":2,"name":"generated_iter_2","box":5,"gromet_type":"GrometPort"},{"id":3,"name":"sc_3","box":5,"gromet_type":"GrometPort"}],
+                    "wff": [{"src":1,"tgt":1,"gromet_type":"GrometWire"},{"src":2,"tgt":2,"gromet_type":"GrometWire"},{"src":3,"tgt":3,"gromet_type":"GrometWire"}],
+                    "wfopo": [{"src":2,"tgt":4,"gromet_type":"GrometWire"},{"src":3,"tgt":3,"gromet_type":"GrometWire"},{"src":4,"tgt":5,"gromet_type":"GrometWire"}],
+                    "gromet_type": "GrometFN"
+                },
+                {
+                    "b": [{"function_type":"FUNCTION","gromet_type":"GrometBoxFunction","name":"append"}],
+                    "gromet_type": "GrometFN"
+                },
+                {
+                    "b": [{"function_type":"FUNCTION","gromet_type":"GrometBoxFunction","name":"Concatenate"}],
+                    "gromet_type": "GrometFN"
+                },
+                {
+                    "b": [{"function_type":"FUNCTION","gromet_type":"GrometBoxFunction","name":"%comprehension_list_2_id0","metadata":27}],
+                    "opo": [{"id":1,"box":1,"gromet_type":"GrometPort"}],
+                    "bf": [{"function_type":"EXPRESSION","body":15,"gromet_type":"GrometBoxFunction","metadata":29}],
+                    "pof": [{"id":1,"name":"list__temp_","box":1,"gromet_type":"GrometPort"}],
+                    "wfl": [{"src":5,"tgt":1,"gromet_type":"GrometWire"}],
+                    "bl": [{"pre":16,"condition":17,"body":18,"gromet_type":"GrometBoxLoop"}],
+                    "pil": [{"id":1,"name":"n_sims","box":1,"gromet_type":"GrometPort"},{"id":2,"name":"generated_iter_6","box":1,"gromet_type":"GrometPort"},{"id":3,"name":"i","box":1,"gromet_type":"GrometPort"},{"id":4,"name":"sc_7","box":1,"gromet_type":"GrometPort"},{"id":5,"name":"list__temp_","box":1,"gromet_type":"GrometPort"},{"id":6,"name":"covasim","box":1,"gromet_type":"GrometPort"},{"id":7,"name":"betas","box":1,"gromet_type":"GrometPort"},{"id":8,"name":"label","box":1,"gromet_type":"GrometPort"},{"id":9,"name":"labels","box":1,"gromet_type":"GrometPort"}],
+                    "pol": [{"id":1,"name":"n_sims","box":1,"gromet_type":"GrometPort"},{"id":2,"name":"generated_iter_6","box":1,"gromet_type":"GrometPort"},{"id":3,"name":"i","box":1,"gromet_type":"GrometPort"},{"id":4,"name":"sc_7","box":1,"gromet_type":"GrometPort"},{"id":5,"name":"list__temp_","box":1,"gromet_type":"GrometPort"},{"id":6,"name":"covasim","box":1,"gromet_type":"GrometPort"},{"id":7,"name":"betas","box":1,"gromet_type":"GrometPort"},{"id":8,"name":"label","box":1,"gromet_type":"GrometPort"},{"id":9,"name":"labels","box":1,"gromet_type":"GrometPort"}],
+                    "wlopo": [{"src":1,"tgt":5,"gromet_type":"GrometWire"}],
+                    "gromet_type": "GrometFN"
+                },
+                {
+                    "b": [{"function_type":"EXPRESSION","gromet_type":"GrometBoxFunction"}],
+                    "opo": [{"id":1,"box":1,"gromet_type":"GrometPort"}],
+                    "bf": [{"function_type":"LITERAL","value":{"value_type":"List","value":[],"gromet_type":"LiteralValue"},"gromet_type":"GrometBoxFunction","metadata":28}],
+                    "pof": [{"id":1,"box":1,"gromet_type":"GrometPort"}],
+                    "wfopo": [{"src":1,"tgt":1,"gromet_type":"GrometWire"}],
+                    "gromet_type": "GrometFN"
+                },
+                {
+                    "b": [{"function_type":"FUNCTION","gromet_type":"GrometBoxFunction"}],
+                    "opi": [{"id":1,"name":"n_sims","box":16,"gromet_type":"GrometPort"},{"id":2,"name":"generated_iter_6","box":16,"gromet_type":"GrometPort"},{"id":3,"name":"i","box":16,"gromet_type":"GrometPort"},{"id":4,"name":"sc_7","box":16,"gromet_type":"GrometPort"},{"id":5,"name":"list__temp_","box":16,"gromet_type":"GrometPort"},{"id":6,"name":"covasim","box":16,"gromet_type":"GrometPort"},{"id":7,"name":"betas","box":16,"gromet_type":"GrometPort"},{"id":8,"name":"label","box":16,"gromet_type":"GrometPort"},{"id":9,"name":"labels","box":16,"gromet_type":"GrometPort"}],
+                    "opo": [{"id":1,"name":"n_sims","box":16,"gromet_type":"GrometPort"},{"id":2,"name":"generated_iter_6","box":16,"gromet_type":"GrometPort"},{"id":3,"name":"i","box":16,"gromet_type":"GrometPort"},{"id":4,"name":"sc_7","box":16,"gromet_type":"GrometPort"},{"id":5,"name":"list__temp_","box":16,"gromet_type":"GrometPort"},{"id":6,"name":"covasim","box":16,"gromet_type":"GrometPort"},{"id":7,"name":"betas","box":16,"gromet_type":"GrometPort"},{"id":8,"name":"label","box":16,"gromet_type":"GrometPort"},{"id":9,"name":"labels","box":16,"gromet_type":"GrometPort"}],
+                    "wopio": [{"src":1,"tgt":1,"gromet_type":"GrometWire"},{"src":5,"tgt":5,"gromet_type":"GrometWire"},{"src":6,"tgt":6,"gromet_type":"GrometWire"},{"src":7,"tgt":7,"gromet_type":"GrometWire"},{"src":8,"tgt":8,"gromet_type":"GrometWire"},{"src":9,"tgt":9,"gromet_type":"GrometWire"}],
+                    "bf": [{"function_type":"LANGUAGE_PRIMITIVE","gromet_type":"GrometBoxFunction","name":"iter"},{"function_type":"LANGUAGE_PRIMITIVE","gromet_type":"GrometBoxFunction","name":"next"}],
+                    "pof": [{"id":1,"name":"generated_iter_6","box":1,"gromet_type":"GrometPort"},{"id":1,"name":"i","box":2,"gromet_type":"GrometPort"},{"id":2,"name":"generated_iter_6","box":2,"gromet_type":"GrometPort"},{"id":3,"name":"sc_7","box":2,"gromet_type":"GrometPort"}],
+                    "wfopo": [{"src":3,"tgt":2,"gromet_type":"GrometWire"},{"src":2,"tgt":3,"gromet_type":"GrometWire"},{"src":4,"tgt":4,"gromet_type":"GrometWire"}],
+                    "gromet_type": "GrometFN"
+                },
+                {
+                    "b": [{"function_type":"PREDICATE","gromet_type":"GrometBoxFunction"}],
+                    "opi": [{"id":1,"name":"n_sims","box":1,"gromet_type":"GrometPort"},{"id":2,"name":"generated_iter_6","box":1,"gromet_type":"GrometPort"},{"id":3,"name":"i","box":1,"gromet_type":"GrometPort"},{"id":4,"name":"sc_7","box":1,"gromet_type":"GrometPort"},{"id":5,"name":"list__temp_","box":1,"gromet_type":"GrometPort"},{"id":6,"name":"covasim","box":1,"gromet_type":"GrometPort"},{"id":7,"name":"betas","box":1,"gromet_type":"GrometPort"},{"id":8,"name":"label","box":1,"gromet_type":"GrometPort"},{"id":9,"name":"labels","box":1,"gromet_type":"GrometPort"}],
+                    "opo": [{"id":1,"name":"n_sims","box":1,"gromet_type":"GrometPort"},{"id":2,"name":"generated_iter_6","box":1,"gromet_type":"GrometPort"},{"id":3,"name":"i","box":1,"gromet_type":"GrometPort"},{"id":4,"name":"sc_7","box":1,"gromet_type":"GrometPort"},{"id":5,"name":"list__temp_","box":1,"gromet_type":"GrometPort"},{"id":6,"name":"covasim","box":1,"gromet_type":"GrometPort"},{"id":7,"name":"betas","box":1,"gromet_type":"GrometPort"},{"id":8,"name":"label","box":1,"gromet_type":"GrometPort"},{"id":9,"name":"labels","box":1,"gromet_type":"GrometPort"},{"id":10,"box":1,"gromet_type":"GrometPort"}],
+                    "wopio": [{"src":1,"tgt":1,"gromet_type":"GrometWire"},{"src":2,"tgt":2,"gromet_type":"GrometWire"},{"src":3,"tgt":3,"gromet_type":"GrometWire"},{"src":4,"tgt":4,"gromet_type":"GrometWire"},{"src":5,"tgt":5,"gromet_type":"GrometWire"},{"src":6,"tgt":6,"gromet_type":"GrometWire"},{"src":7,"tgt":7,"gromet_type":"GrometWire"},{"src":8,"tgt":8,"gromet_type":"GrometWire"},{"src":9,"tgt":9,"gromet_type":"GrometWire"}],
+                    "bf": [{"function_type":"LITERAL","value":{"value_type":"Boolean","value":false,"gromet_type":"LiteralValue"},"gromet_type":"GrometBoxFunction","metadata":30},{"function_type":"LANGUAGE_PRIMITIVE","gromet_type":"GrometBoxFunction","name":"ast.Eq","metadata":31}],
+                    "pif": [{"id":1,"box":2,"gromet_type":"GrometPort"},{"id":2,"box":2,"gromet_type":"GrometPort"}],
+                    "pof": [{"id":1,"box":1,"gromet_type":"GrometPort"},{"id":1,"box":2,"gromet_type":"GrometPort"}],
+                    "wfopi": [{"src":1,"tgt":4,"gromet_type":"GrometWire"}],
+                    "wff": [{"src":2,"tgt":1,"gromet_type":"GrometWire"}],
+                    "wfopo": [{"src":10,"tgt":2,"gromet_type":"GrometWire"}],
+                    "gromet_type": "GrometFN"
+                },
+                {
+                    "b": [{"function_type":"FUNCTION","gromet_type":"GrometBoxFunction","metadata":32}],
+                    "opi": [{"id":1,"name":"n_sims","box":1,"gromet_type":"GrometPort"},{"id":2,"name":"generated_iter_6","box":1,"gromet_type":"GrometPort"},{"id":3,"name":"i","box":1,"gromet_type":"GrometPort"},{"id":4,"name":"sc_7","box":1,"gromet_type":"GrometPort"},{"id":5,"name":"list__temp_","box":1,"gromet_type":"GrometPort"},{"id":6,"name":"covasim","box":1,"gromet_type":"GrometPort"},{"id":7,"name":"betas","box":1,"gromet_type":"GrometPort"},{"id":8,"name":"label","box":1,"gromet_type":"GrometPort"},{"id":9,"name":"labels","box":1,"gromet_type":"GrometPort"}],
+                    "opo": [{"id":1,"name":"n_sims","box":1,"gromet_type":"GrometPort"},{"id":2,"name":"generated_iter_6","box":1,"gromet_type":"GrometPort"},{"id":3,"name":"i","box":1,"gromet_type":"GrometPort"},{"id":4,"name":"sc_7","box":1,"gromet_type":"GrometPort"},{"id":5,"name":"list__temp_","box":1,"gromet_type":"GrometPort"},{"id":6,"name":"covasim","box":1,"gromet_type":"GrometPort"},{"id":7,"name":"betas","box":1,"gromet_type":"GrometPort"},{"id":8,"name":"label","box":1,"gromet_type":"GrometPort"},{"id":9,"name":"labels","box":1,"gromet_type":"GrometPort"}],
+                    "wopio": [{"src":1,"tgt":1,"gromet_type":"GrometWire"},{"src":5,"tgt":5,"gromet_type":"GrometWire"},{"src":6,"tgt":6,"gromet_type":"GrometWire"},{"src":7,"tgt":7,"gromet_type":"GrometWire"},{"src":8,"tgt":8,"gromet_type":"GrometWire"},{"src":9,"tgt":9,"gromet_type":"GrometWire"}],
+                    "bf": [{"function_type":"IMPORTED_METHOD","body":19,"import_type":"OTHER","source_language":"Python","source_language_version":"3.8","gromet_type":"GrometBoxFunction","name":"module.%comprehension_list_2_id0.loop0.loop-body.append_2","metadata":33},{"function_type":"IMPORTED_METHOD","import_type":"OTHER","source_language":"Python","source_language_version":"3.8","gromet_type":"GrometBoxFunction","name":"covasim.Sim"},{"function_type":"IMPORTED_METHOD","body":20,"import_type":"OTHER","source_language":"Python","source_language_version":"3.8","gromet_type":"GrometBoxFunction","name":"module.%comprehension_list_2_id0.loop0.loop-body.Sim_0","metadata":34},{"function_type":"LANGUAGE_PRIMITIVE","gromet_type":"GrometBoxFunction","name":"_get"},{"function_type":"LANGUAGE_PRIMITIVE","gromet_type":"GrometBoxFunction","name":"_get"},{"function_type":"LANGUAGE_PRIMITIVE","gromet_type":"GrometBoxFunction","name":"next"}],
+                    "pif": [{"id":1,"box":4,"gromet_type":"GrometPort"},{"id":2,"box":4,"gromet_type":"GrometPort"},{"id":1,"box":3,"gromet_type":"GrometPort"},{"id":1,"box":5,"gromet_type":"GrometPort"},{"id":2,"box":5,"gromet_type":"GrometPort"},{"id":2,"box":3,"gromet_type":"GrometPort"},{"id":1,"box":1,"gromet_type":"GrometPort"}],
+                    "pof": [{"id":1,"box":2,"gromet_type":"GrometPort"},{"id":1,"name":"beta","box":4,"gromet_type":"GrometPort"},{"id":1,"name":"label","box":5,"gromet_type":"GrometPort"},{"id":1,"box":3,"gromet_type":"GrometPort"},{"id":1,"name":"i","box":6,"gromet_type":"GrometPort"},{"id":2,"name":"generated_iter_6","box":6,"gromet_type":"GrometPort"},{"id":3,"name":"sc_7","box":6,"gromet_type":"GrometPort"}],
+                    "wfopi": [{"src":1,"tgt":7,"gromet_type":"GrometWire"},{"src":2,"tgt":3,"gromet_type":"GrometWire"},{"src":4,"tgt":9,"gromet_type":"GrometWire"},{"src":5,"tgt":3,"gromet_type":"GrometWire"}],
+                    "wff": [{"src":7,"tgt":4,"gromet_type":"GrometWire"}],
+                    "wfopo": [{"src":2,"tgt":5,"gromet_type":"GrometWire"},{"src":3,"tgt":4,"gromet_type":"GrometWire"},{"src":4,"tgt":6,"gromet_type":"GrometWire"}],
+                    "gromet_type": "GrometFN"
+                },
+                {
+                    "b": [{"function_type":"FUNCTION","gromet_type":"GrometBoxFunction","name":"append"}],
+                    "gromet_type": "GrometFN"
+                },
+                {
+                    "b": [{"function_type":"FUNCTION","gromet_type":"GrometBoxFunction","name":"Sim"}],
+                    "gromet_type": "GrometFN"
+                },
+                {
+                    "b": [{"function_type":"FUNCTION","gromet_type":"GrometBoxFunction","name":"Sim"}],
+                    "gromet_type": "GrometFN"
+                },
+                {
+                    "b": [{"function_type":"FUNCTION","gromet_type":"GrometBoxFunction","name":"MultiSim"}],
+                    "gromet_type": "GrometFN"
+                },
+                {
+                    "b": [{"function_type":"EXPRESSION","gromet_type":"GrometBoxFunction"}],
+                    "opo": [{"id":1,"box":1,"gromet_type":"GrometPort"}],
+                    "bf": [{"function_type":"LITERAL","value":{"value_type":"Integer","value":5,"gromet_type":"LiteralValue"},"gromet_type":"GrometBoxFunction","metadata":37}],
+                    "pof": [{"id":1,"box":1,"gromet_type":"GrometPort"}],
+                    "wfopo": [{"src":1,"tgt":1,"gromet_type":"GrometWire"}],
+                    "gromet_type": "GrometFN"
+                },
+                {
+                    "b": [{"function_type":"FUNCTION","gromet_type":"GrometBoxFunction","name":"run"}],
+                    "gromet_type": "GrometFN"
+                },
+                {
+                    "b": [{"function_type":"FUNCTION","gromet_type":"GrometBoxFunction","name":"combine"}],
+                    "gromet_type": "GrometFN"
+                },
+                {
+                    "b": [{"function_type":"FUNCTION","gromet_type":"GrometBoxFunction","name":"plot"}],
+                    "gromet_type": "GrometFN"
+                },
+                {
+                    "b": [{"function_type":"FUNCTION","gromet_type":"GrometBoxFunction","name":"Sim"}],
+                    "gromet_type": "GrometFN"
+                },
+                {
+                    "b": [{"function_type":"FUNCTION","gromet_type":"GrometBoxFunction","name":"MultiSim"}],
+                    "gromet_type": "GrometFN"
+                },
+                {
+                    "b": [{"function_type":"EXPRESSION","gromet_type":"GrometBoxFunction"}],
+                    "opo": [{"id":1,"box":1,"gromet_type":"GrometPort"}],
+                    "bf": [{"function_type":"LITERAL","value":{"value_type":"Integer","value":11,"gromet_type":"LiteralValue"},"gromet_type":"GrometBoxFunction","metadata":44}],
+                    "pof": [{"id":1,"box":1,"gromet_type":"GrometPort"}],
+                    "wfopo": [{"src":1,"tgt":1,"gromet_type":"GrometWire"}],
+                    "gromet_type": "GrometFN"
+                },
+                {
+                    "b": [{"function_type":"EXPRESSION","gromet_type":"GrometBoxFunction"}],
+                    "opo": [{"id":1,"box":1,"gromet_type":"GrometPort"}],
+                    "bf": [{"function_type":"LITERAL","value":{"value_type":"AbstractFloat","value":0.1,"gromet_type":"LiteralValue"},"gromet_type":"GrometBoxFunction","metadata":46}],
+                    "pof": [{"id":1,"box":1,"gromet_type":"GrometPort"}],
+                    "wfopo": [{"src":1,"tgt":1,"gromet_type":"GrometWire"}],
+                    "gromet_type": "GrometFN"
+                },
+                {
+                    "b": [{"function_type":"FUNCTION","gromet_type":"GrometBoxFunction","name":"run"}],
+                    "gromet_type": "GrometFN"
+                },
+                {
+                    "b": [{"function_type":"FUNCTION","gromet_type":"GrometBoxFunction","name":"reduce"}],
+                    "gromet_type": "GrometFN"
+                },
+                {
+                    "b": [{"function_type":"FUNCTION","gromet_type":"GrometBoxFunction","name":"plot"}],
+                    "gromet_type": "GrometFN"
+                },
+                {
+                    "b": [{"function_type":"EXPRESSION","gromet_type":"GrometBoxFunction"}],
+                    "opo": [{"id":1,"box":1,"gromet_type":"GrometPort"}],
+                    "bf": [{"function_type":"LITERAL","value":{"value_type":"Integer","value":5,"gromet_type":"LiteralValue"},"gromet_type":"GrometBoxFunction","metadata":51}],
+                    "pof": [{"id":1,"box":1,"gromet_type":"GrometPort"}],
+                    "wfopo": [{"src":1,"tgt":1,"gromet_type":"GrometWire"}],
+                    "gromet_type": "GrometFN"
+                },
+                {
+                    "b": [{"function_type":"FUNCTION","gromet_type":"GrometBoxFunction"}],
+                    "opi": [{"id":1,"name":"sims","box":35,"gromet_type":"GrometPort"},{"id":2,"name":"generated_iter_8","box":35,"gromet_type":"GrometPort"},{"id":3,"name":"sim","box":35,"gromet_type":"GrometPort"},{"id":4,"name":"sc_9","box":35,"gromet_type":"GrometPort"}],
+                    "opo": [{"id":1,"name":"sims","box":35,"gromet_type":"GrometPort"},{"id":2,"name":"generated_iter_8","box":35,"gromet_type":"GrometPort"},{"id":3,"name":"sim","box":35,"gromet_type":"GrometPort"},{"id":4,"name":"sc_9","box":35,"gromet_type":"GrometPort"}],
+                    "wopio": [{"src":1,"tgt":1,"gromet_type":"GrometWire"}],
+                    "bf": [{"function_type":"LANGUAGE_PRIMITIVE","gromet_type":"GrometBoxFunction","name":"iter"},{"function_type":"LANGUAGE_PRIMITIVE","gromet_type":"GrometBoxFunction","name":"next"}],
+                    "pif": [{"id":1,"box":1,"gromet_type":"GrometPort"}],
+                    "pof": [{"id":1,"name":"generated_iter_8","box":1,"gromet_type":"GrometPort"},{"id":1,"name":"sim","box":2,"gromet_type":"GrometPort"},{"id":2,"name":"generated_iter_8","box":2,"gromet_type":"GrometPort"},{"id":3,"name":"sc_9","box":2,"gromet_type":"GrometPort"}],
+                    "wfopi": [{"src":1,"tgt":1,"gromet_type":"GrometWire"}],
+                    "wfopo": [{"src":3,"tgt":2,"gromet_type":"GrometWire"},{"src":2,"tgt":3,"gromet_type":"GrometWire"},{"src":4,"tgt":4,"gromet_type":"GrometWire"}],
+                    "gromet_type": "GrometFN"
+                },
+                {
+                    "b": [{"function_type":"PREDICATE","gromet_type":"GrometBoxFunction"}],
+                    "opi": [{"id":1,"name":"sims","box":1,"gromet_type":"GrometPort"},{"id":2,"name":"generated_iter_8","box":1,"gromet_type":"GrometPort"},{"id":3,"name":"sim","box":1,"gromet_type":"GrometPort"},{"id":4,"name":"sc_9","box":1,"gromet_type":"GrometPort"}],
+                    "opo": [{"id":1,"name":"sims","box":1,"gromet_type":"GrometPort"},{"id":2,"name":"generated_iter_8","box":1,"gromet_type":"GrometPort"},{"id":3,"name":"sim","box":1,"gromet_type":"GrometPort"},{"id":4,"name":"sc_9","box":1,"gromet_type":"GrometPort"},{"id":5,"box":1,"gromet_type":"GrometPort"}],
+                    "wopio": [{"src":1,"tgt":1,"gromet_type":"GrometWire"},{"src":2,"tgt":2,"gromet_type":"GrometWire"},{"src":3,"tgt":3,"gromet_type":"GrometWire"},{"src":4,"tgt":4,"gromet_type":"GrometWire"}],
+                    "bf": [{"function_type":"LITERAL","value":{"value_type":"Boolean","value":false,"gromet_type":"LiteralValue"},"gromet_type":"GrometBoxFunction","metadata":56},{"function_type":"LANGUAGE_PRIMITIVE","gromet_type":"GrometBoxFunction","name":"ast.Eq","metadata":57}],
+                    "pif": [{"id":1,"box":2,"gromet_type":"GrometPort"},{"id":2,"box":2,"gromet_type":"GrometPort"}],
+                    "pof": [{"id":1,"box":1,"gromet_type":"GrometPort"},{"id":1,"box":2,"gromet_type":"GrometPort"}],
+                    "wfopi": [{"src":1,"tgt":4,"gromet_type":"GrometWire"}],
+                    "wff": [{"src":2,"tgt":1,"gromet_type":"GrometWire"}],
+                    "wfopo": [{"src":5,"tgt":2,"gromet_type":"GrometWire"}],
+                    "gromet_type": "GrometFN"
+                },
+                {
+                    "b": [{"function_type":"FUNCTION","gromet_type":"GrometBoxFunction","metadata":58}],
+                    "opi": [{"id":1,"name":"sims","box":1,"gromet_type":"GrometPort"},{"id":2,"name":"generated_iter_8","box":1,"gromet_type":"GrometPort"},{"id":3,"name":"sim","box":1,"gromet_type":"GrometPort"},{"id":4,"name":"sc_9","box":1,"gromet_type":"GrometPort"}],
+                    "opo": [{"id":1,"name":"sims","box":1,"gromet_type":"GrometPort"},{"id":2,"name":"generated_iter_8","box":1,"gromet_type":"GrometPort"},{"id":3,"name":"sim","box":1,"gromet_type":"GrometPort"},{"id":4,"name":"sc_9","box":1,"gromet_type":"GrometPort"}],
+                    "wopio": [{"src":1,"tgt":1,"gromet_type":"GrometWire"}],
+                    "bf": [{"function_type":"IMPORTED_METHOD","body":38,"import_type":"OTHER","source_language":"Python","source_language_version":"3.8","gromet_type":"GrometBoxFunction","name":"module.loop0.loop-body.run_2","metadata":59},{"function_type":"LANGUAGE_PRIMITIVE","gromet_type":"GrometBoxFunction","name":"next"}],
+                    "pof": [{"id":1,"name":"sim","box":2,"gromet_type":"GrometPort"},{"id":2,"name":"generated_iter_8","box":2,"gromet_type":"GrometPort"},{"id":3,"name":"sc_9","box":2,"gromet_type":"GrometPort"}],
+                    "wfopo": [{"src":2,"tgt":1,"gromet_type":"GrometWire"},{"src":3,"tgt":0,"gromet_type":"GrometWire"},{"src":4,"tgt":2,"gromet_type":"GrometWire"}],
+                    "gromet_type": "GrometFN"
+                },
+                {
+                    "b": [{"function_type":"FUNCTION","gromet_type":"GrometBoxFunction","name":"run"}],
+                    "gromet_type": "GrometFN"
+                },
+                {
+                    "b": [{"function_type":"FUNCTION","gromet_type":"GrometBoxFunction","name":"MultiSim"}],
+                    "gromet_type": "GrometFN"
+                },
+                {
+                    "b": [{"function_type":"FUNCTION","gromet_type":"GrometBoxFunction","name":"plot"}],
+                    "gromet_type": "GrometFN"
+                }
+            ],
+            "metadata_collection": [
+                [
+
+                ],
+                [
+                    {"gromet_type":"SourceCodeCollection","name":"","global_reference_id":"","files":[{"gromet_type":"CodeFileReference","uid":"a18c2d89-f054-4993-5ab5-fcb44618f22b","name":"multisim_tests.py","path":""}],"is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2023-10-27 18:24:01.044715"}},
+                    {"gromet_type":"GrometCreation","gromet_version":"0.1.8","is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2023-10-27 18:24:01.044682"}}
+                ],
+                [
+                    {"gromet_type":"SourceCodeReference","code_file_reference_uid":"a18c2d89-f054-4993-5ab5-fcb44618f22b","line_begin":1,"line_end":23,"is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2023-10-27 18:24:01.044741"}}
+                ],
+                [
+                    {"gromet_type":"SourceCodeReference","code_file_reference_uid":"a18c2d89-f054-4993-5ab5-fcb44618f22b","line_begin":17,"line_end":17,"col_begin":8,"col_end":49,"is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2023-10-27 18:24:01.044821"}}
+                ],
+                [
+                    {"gromet_type":"source_code_data_type","source_language":"Python","source_language_version":"3.8","data_type":"List","is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2023-10-27 18:24:01.044884"}},
+                    {"gromet_type":"SourceCodeReference","code_file_reference_uid":"a18c2d89-f054-4993-5ab5-fcb44618f22b","line_begin":17,"line_end":17,"col_begin":8,"col_end":49,"is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2023-10-27 18:24:01.044875"}}
+                ],
+                [
+                    {"gromet_type":"SourceCodeReference","code_file_reference_uid":"a18c2d89-f054-4993-5ab5-fcb44618f22b","line_begin":17,"line_end":17,"col_begin":8,"col_end":49,"is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2023-10-27 18:24:01.044849"}}
+                ],
+                [
+                    {"gromet_type":"source_code_data_type","source_language":"Python","source_language_version":"3.8","data_type":"boolean","is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2023-10-27 18:24:01.051928"}},
+                    {"gromet_type":"SourceCodeReference","code_file_reference_uid":"a18c2d89-f054-4993-5ab5-fcb44618f22b","line_begin":17,"line_end":17,"col_begin":8,"col_end":49,"is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2023-10-27 18:24:01.051919"}}
+                ],
+                [
+                    {"gromet_type":"SourceCodeReference","code_file_reference_uid":"a18c2d89-f054-4993-5ab5-fcb44618f22b","line_begin":17,"line_end":17,"col_begin":8,"col_end":49,"is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2023-10-27 18:24:01.051958"}}
+                ],
+                [
+                    {"gromet_type":"SourceCodeReference","code_file_reference_uid":"a18c2d89-f054-4993-5ab5-fcb44618f22b","line_begin":17,"line_end":17,"col_begin":8,"col_end":49,"is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2023-10-27 18:24:01.052017"}}
+                ],
+                [
+                    {"gromet_type":"SourceCodeReference","code_file_reference_uid":"a18c2d89-f054-4993-5ab5-fcb44618f22b","line_begin":17,"line_end":17,"col_begin":8,"col_end":49,"is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2023-10-27 18:24:01.058462"}}
+                ],
+                [
+                    {"gromet_type":"source_code_data_type","source_language":"Python","source_language_version":"3.8","data_type":"<class 'float'>","is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2023-10-27 18:24:01.058594"}},
+                    {"gromet_type":"SourceCodeReference","code_file_reference_uid":"a18c2d89-f054-4993-5ab5-fcb44618f22b","line_begin":17,"line_end":17,"col_begin":9,"col_end":14,"is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2023-10-27 18:24:01.058583"}}
+                ],
+                [
+                    {"gromet_type":"source_code_data_type","source_language":"Python","source_language_version":"3.8","data_type":"<class 'int'>","is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2023-10-27 18:24:01.058644"}},
+                    {"gromet_type":"SourceCodeReference","code_file_reference_uid":"a18c2d89-f054-4993-5ab5-fcb44618f22b","line_begin":17,"line_end":17,"col_begin":16,"col_end":17,"is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2023-10-27 18:24:01.058635"}}
+                ],
+                [
+                    {"gromet_type":"source_code_data_type","source_language":"Python","source_language_version":"3.8","data_type":"<class 'float'>","is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2023-10-27 18:24:01.058685"}},
+                    {"gromet_type":"SourceCodeReference","code_file_reference_uid":"a18c2d89-f054-4993-5ab5-fcb44618f22b","line_begin":17,"line_end":17,"col_begin":18,"col_end":22,"is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2023-10-27 18:24:01.058676"}}
+                ],
+                [
+                    {"gromet_type":"SourceCodeReference","code_file_reference_uid":"a18c2d89-f054-4993-5ab5-fcb44618f22b","line_begin":17,"line_end":17,"col_begin":18,"col_end":24,"is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2023-10-27 18:24:01.058713"}}
+                ],
+                [
+                    {"gromet_type":"SourceCodeReference","code_file_reference_uid":"a18c2d89-f054-4993-5ab5-fcb44618f22b","line_begin":17,"line_end":17,"col_begin":16,"col_end":24,"is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2023-10-27 18:24:01.058756"}}
+                ],
+                [
+                    {"gromet_type":"SourceCodeReference","code_file_reference_uid":"a18c2d89-f054-4993-5ab5-fcb44618f22b","line_begin":17,"line_end":17,"col_begin":9,"col_end":25,"is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2023-10-27 18:24:01.058791"}}
+                ],
+                [
+                    {"gromet_type":"SourceCodeReference","code_file_reference_uid":"a18c2d89-f054-4993-5ab5-fcb44618f22b","line_begin":18,"line_end":18,"col_begin":9,"col_end":43,"is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2023-10-27 18:24:01.059121"}}
+                ],
+                [
+                    {"gromet_type":"source_code_data_type","source_language":"Python","source_language_version":"3.8","data_type":"List","is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2023-10-27 18:24:01.059176"}},
+                    {"gromet_type":"SourceCodeReference","code_file_reference_uid":"a18c2d89-f054-4993-5ab5-fcb44618f22b","line_begin":18,"line_end":18,"col_begin":9,"col_end":43,"is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2023-10-27 18:24:01.059169"}}
+                ],
+                [
+                    {"gromet_type":"SourceCodeReference","code_file_reference_uid":"a18c2d89-f054-4993-5ab5-fcb44618f22b","line_begin":18,"line_end":18,"col_begin":9,"col_end":43,"is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2023-10-27 18:24:01.059146"}}
+                ],
+                [
+                    {"gromet_type":"source_code_data_type","source_language":"Python","source_language_version":"3.8","data_type":"boolean","is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2023-10-27 18:24:01.066773"}},
+                    {"gromet_type":"SourceCodeReference","code_file_reference_uid":"a18c2d89-f054-4993-5ab5-fcb44618f22b","line_begin":18,"line_end":18,"col_begin":9,"col_end":43,"is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2023-10-27 18:24:01.066765"}}
+                ],
+                [
+                    {"gromet_type":"SourceCodeReference","code_file_reference_uid":"a18c2d89-f054-4993-5ab5-fcb44618f22b","line_begin":18,"line_end":18,"col_begin":9,"col_end":43,"is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2023-10-27 18:24:01.066800"}}
+                ],
+                [
+                    {"gromet_type":"SourceCodeReference","code_file_reference_uid":"a18c2d89-f054-4993-5ab5-fcb44618f22b","line_begin":18,"line_end":18,"col_begin":9,"col_end":43,"is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2023-10-27 18:24:01.066854"}}
+                ],
+                [
+                    {"gromet_type":"SourceCodeReference","code_file_reference_uid":"a18c2d89-f054-4993-5ab5-fcb44618f22b","line_begin":18,"line_end":18,"col_begin":9,"col_end":43,"is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2023-10-27 18:24:01.073126"}}
+                ],
+                [
+                    {"gromet_type":"SourceCodeReference","code_file_reference_uid":"a18c2d89-f054-4993-5ab5-fcb44618f22b","line_begin":18,"line_end":18,"col_begin":10,"col_end":24,"is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2023-10-27 18:24:01.073238"}}
+                ],
+                [
+                    {"gromet_type":"source_code_data_type","source_language":"Python","source_language_version":"3.8","data_type":"<class 'str'>","is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2023-10-27 18:24:01.073307"}},
+                    {"gromet_type":"SourceCodeReference","code_file_reference_uid":"a18c2d89-f054-4993-5ab5-fcb44618f22b","line_begin":18,"line_end":18,"col_begin":10,"col_end":24,"is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2023-10-27 18:24:01.073298"}}
+                ],
+                [
+                    {"gromet_type":"source_code_data_type","source_language":"Python","source_language_version":"3.8","data_type":"<class 'str'>","is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2023-10-27 18:24:01.073356"}},
+                    {"gromet_type":"SourceCodeReference","code_file_reference_uid":"a18c2d89-f054-4993-5ab5-fcb44618f22b","line_begin":18,"line_end":18,"col_begin":10,"col_end":24,"is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2023-10-27 18:24:01.073347"}}
+                ],
+                [
+                    {"gromet_type":"SourceCodeReference","code_file_reference_uid":"a18c2d89-f054-4993-5ab5-fcb44618f22b","line_begin":19,"line_end":19,"col_begin":7,"col_end":70,"is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2023-10-27 18:24:01.073668"}}
+                ],
+                [
+                    {"gromet_type":"source_code_data_type","source_language":"Python","source_language_version":"3.8","data_type":"List","is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2023-10-27 18:24:01.073721"}},
+                    {"gromet_type":"SourceCodeReference","code_file_reference_uid":"a18c2d89-f054-4993-5ab5-fcb44618f22b","line_begin":19,"line_end":19,"col_begin":7,"col_end":70,"is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2023-10-27 18:24:01.073713"}}
+                ],
+                [
+                    {"gromet_type":"SourceCodeReference","code_file_reference_uid":"a18c2d89-f054-4993-5ab5-fcb44618f22b","line_begin":19,"line_end":19,"col_begin":7,"col_end":70,"is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2023-10-27 18:24:01.073691"}}
+                ],
+                [
+                    {"gromet_type":"source_code_data_type","source_language":"Python","source_language_version":"3.8","data_type":"boolean","is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2023-10-27 18:24:01.078165"}},
+                    {"gromet_type":"SourceCodeReference","code_file_reference_uid":"a18c2d89-f054-4993-5ab5-fcb44618f22b","line_begin":19,"line_end":19,"col_begin":7,"col_end":70,"is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2023-10-27 18:24:01.078155"}}
+                ],
+                [
+                    {"gromet_type":"SourceCodeReference","code_file_reference_uid":"a18c2d89-f054-4993-5ab5-fcb44618f22b","line_begin":19,"line_end":19,"col_begin":7,"col_end":70,"is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2023-10-27 18:24:01.078192"}}
+                ],
+                [
+                    {"gromet_type":"SourceCodeReference","code_file_reference_uid":"a18c2d89-f054-4993-5ab5-fcb44618f22b","line_begin":19,"line_end":19,"col_begin":7,"col_end":70,"is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2023-10-27 18:24:01.078247"}}
+                ],
+                [
+                    {"gromet_type":"SourceCodeReference","code_file_reference_uid":"a18c2d89-f054-4993-5ab5-fcb44618f22b","line_begin":19,"line_end":19,"col_begin":7,"col_end":70,"is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2023-10-27 18:24:01.082350"}}
+                ],
+                [
+                    {"gromet_type":"SourceCodeReference","code_file_reference_uid":"a18c2d89-f054-4993-5ab5-fcb44618f22b","line_begin":19,"line_end":19,"col_begin":8,"col_end":46,"is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2023-10-27 18:24:01.082454"}}
+                ],
+                [
+                    {"gromet_type":"SourceCodeReference","code_file_reference_uid":"a18c2d89-f054-4993-5ab5-fcb44618f22b","line_begin":3,"line_end":3,"col_begin":6,"col_end":14,"is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2023-10-27 18:24:01.083000"}}
+                ],
+                [
+                    {"gromet_type":"SourceCodeReference","code_file_reference_uid":"a18c2d89-f054-4993-5ab5-fcb44618f22b","line_begin":4,"line_end":4,"col_begin":8,"col_end":34,"is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2023-10-27 18:24:01.083090"}}
+                ],
+                [
+                    {"gromet_type":"source_code_data_type","source_language":"Python","source_language_version":"3.8","data_type":"<class 'int'>","is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2023-10-27 18:24:01.083204"}},
+                    {"gromet_type":"SourceCodeReference","code_file_reference_uid":"a18c2d89-f054-4993-5ab5-fcb44618f22b","line_begin":4,"line_end":4,"col_begin":32,"col_end":33,"is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2023-10-27 18:24:01.083195"}}
+                ],
+                [
+                    {"gromet_type":"SourceCodeReference","code_file_reference_uid":"a18c2d89-f054-4993-5ab5-fcb44618f22b","line_begin":4,"line_end":4,"col_begin":8,"col_end":34,"is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2023-10-27 18:24:01.083172"}}
+                ],
+                [
+                    {"gromet_type":"SourceCodeReference","code_file_reference_uid":"a18c2d89-f054-4993-5ab5-fcb44618f22b","line_begin":5,"line_end":5,"col_begin":0,"col_end":11,"is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2023-10-27 18:24:01.083279"}}
+                ],
+                [
+                    {"gromet_type":"SourceCodeReference","code_file_reference_uid":"a18c2d89-f054-4993-5ab5-fcb44618f22b","line_begin":6,"line_end":6,"col_begin":0,"col_end":15,"is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2023-10-27 18:24:01.083350"}}
+                ],
+                [
+                    {"gromet_type":"SourceCodeReference","code_file_reference_uid":"a18c2d89-f054-4993-5ab5-fcb44618f22b","line_begin":7,"line_end":7,"col_begin":0,"col_end":12,"is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2023-10-27 18:24:01.083419"}}
+                ],
+                [
+                    {"gromet_type":"SourceCodeReference","code_file_reference_uid":"a18c2d89-f054-4993-5ab5-fcb44618f22b","line_begin":9,"line_end":9,"col_begin":6,"col_end":14,"is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2023-10-27 18:24:01.083509"}}
+                ],
+                [
+                    {"gromet_type":"SourceCodeReference","code_file_reference_uid":"a18c2d89-f054-4993-5ab5-fcb44618f22b","line_begin":10,"line_end":10,"col_begin":8,"col_end":46,"is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2023-10-27 18:24:01.083602"}}
+                ],
+                [
+                    {"gromet_type":"source_code_data_type","source_language":"Python","source_language_version":"3.8","data_type":"<class 'int'>","is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2023-10-27 18:24:01.083712"}},
+                    {"gromet_type":"SourceCodeReference","code_file_reference_uid":"a18c2d89-f054-4993-5ab5-fcb44618f22b","line_begin":10,"line_end":10,"col_begin":32,"col_end":34,"is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2023-10-27 18:24:01.083704"}}
+                ],
+                [
+                    {"gromet_type":"SourceCodeReference","code_file_reference_uid":"a18c2d89-f054-4993-5ab5-fcb44618f22b","line_begin":10,"line_end":10,"col_begin":8,"col_end":46,"is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2023-10-27 18:24:01.083683"}}
+                ],
+                [
+                    {"gromet_type":"source_code_data_type","source_language":"Python","source_language_version":"3.8","data_type":"<class 'float'>","is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2023-10-27 18:24:01.083796"}},
+                    {"gromet_type":"SourceCodeReference","code_file_reference_uid":"a18c2d89-f054-4993-5ab5-fcb44618f22b","line_begin":10,"line_end":10,"col_begin":42,"col_end":45,"is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2023-10-27 18:24:01.083789"}}
+                ],
+                [
+                    {"gromet_type":"SourceCodeReference","code_file_reference_uid":"a18c2d89-f054-4993-5ab5-fcb44618f22b","line_begin":10,"line_end":10,"col_begin":8,"col_end":46,"is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2023-10-27 18:24:01.083766"}}
+                ],
+                [
+                    {"gromet_type":"SourceCodeReference","code_file_reference_uid":"a18c2d89-f054-4993-5ab5-fcb44618f22b","line_begin":11,"line_end":11,"col_begin":0,"col_end":11,"is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2023-10-27 18:24:01.083866"}}
+                ],
+                [
+                    {"gromet_type":"SourceCodeReference","code_file_reference_uid":"a18c2d89-f054-4993-5ab5-fcb44618f22b","line_begin":12,"line_end":12,"col_begin":0,"col_end":14,"is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2023-10-27 18:24:01.083941"}}
+                ],
+                [
+                    {"gromet_type":"SourceCodeReference","code_file_reference_uid":"a18c2d89-f054-4993-5ab5-fcb44618f22b","line_begin":13,"line_end":13,"col_begin":0,"col_end":12,"is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2023-10-27 18:24:01.084014"}}
+                ],
+                [
+                    {"gromet_type":"source_code_data_type","source_language":"Python","source_language_version":"3.8","data_type":"<class 'int'>","is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2023-10-27 18:24:01.084118"}},
+                    {"gromet_type":"SourceCodeReference","code_file_reference_uid":"a18c2d89-f054-4993-5ab5-fcb44618f22b","line_begin":16,"line_end":16,"col_begin":9,"col_end":10,"is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2023-10-27 18:24:01.084110"}}
+                ],
+                [
+                    {"gromet_type":"SourceCodeReference","code_file_reference_uid":"a18c2d89-f054-4993-5ab5-fcb44618f22b","line_begin":16,"line_end":16,"col_begin":0,"col_end":10,"is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2023-10-27 18:24:01.084088"}}
+                ],
+                [
+                    {"gromet_type":"SourceCodeReference","code_file_reference_uid":"a18c2d89-f054-4993-5ab5-fcb44618f22b","line_begin":17,"line_end":17,"col_begin":8,"col_end":49,"is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2023-10-27 18:24:01.084229"}}
+                ],
+                [
+                    {"gromet_type":"SourceCodeReference","code_file_reference_uid":"a18c2d89-f054-4993-5ab5-fcb44618f22b","line_begin":18,"line_end":18,"col_begin":9,"col_end":43,"is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2023-10-27 18:24:01.084302"}}
+                ],
+                [
+                    {"gromet_type":"SourceCodeReference","code_file_reference_uid":"a18c2d89-f054-4993-5ab5-fcb44618f22b","line_begin":19,"line_end":19,"col_begin":7,"col_end":70,"is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2023-10-27 18:24:01.084372"}}
+                ],
+                [
+                    {"gromet_type":"source_code_data_type","source_language":"Python","source_language_version":"3.8","data_type":"boolean","is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2023-10-27 18:24:01.084783"}},
+                    {"gromet_type":"SourceCodeReference","code_file_reference_uid":"a18c2d89-f054-4993-5ab5-fcb44618f22b","line_begin":20,"line_end":21,"col_begin":0,"col_end":13,"is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2023-10-27 18:24:01.084775"}}
+                ],
+                [
+                    {"gromet_type":"SourceCodeReference","code_file_reference_uid":"a18c2d89-f054-4993-5ab5-fcb44618f22b","line_begin":20,"line_end":21,"col_begin":0,"col_end":13,"is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2023-10-27 18:24:01.084807"}}
+                ],
+                [
+                    {"gromet_type":"SourceCodeReference","code_file_reference_uid":"a18c2d89-f054-4993-5ab5-fcb44618f22b","line_begin":21,"line_end":21,"col_begin":4,"col_end":13,"is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2023-10-27 18:24:01.084859"}}
+                ],
+                [
+                    {"gromet_type":"SourceCodeReference","code_file_reference_uid":"a18c2d89-f054-4993-5ab5-fcb44618f22b","line_begin":21,"line_end":21,"col_begin":4,"col_end":13,"is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2023-10-27 18:24:01.084943"}}
+                ],
+                [
+                    {"gromet_type":"SourceCodeReference","code_file_reference_uid":"a18c2d89-f054-4993-5ab5-fcb44618f22b","line_begin":22,"line_end":22,"col_begin":8,"col_end":25,"is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2023-10-27 18:24:01.085161"}}
+                ],
+                [
+                    {"gromet_type":"SourceCodeReference","code_file_reference_uid":"a18c2d89-f054-4993-5ab5-fcb44618f22b","line_begin":23,"line_end":23,"col_begin":0,"col_end":12,"is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2023-10-27 18:24:01.085283"}}
+                ]
+            ],
+            "gromet_type": "GrometFNModule",
+            "metadata": 2
+        }
+    ],
+    "module_index": [
+        "archive.multisim_tests"
+    ],
+    "executables": [
+
+    ],
+    "gromet_type": "GrometFNModuleCollection"
+}

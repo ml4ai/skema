@@ -1,0 +1,1423 @@
+{
+    "nodes": [
+        {
+            "body": [
+                {
+                    "alias": "pl",
+                    "all": false,
+                    "name": "pylab",
+                    "node_type": "ModelImport",
+                    "source_refs": [
+                        {
+                            "col_end": 18,
+                            "col_start": 0,
+                            "node_type": "SourceRef",
+                            "row_end": 7,
+                            "row_start": 7,
+                            "source_file_name": "test_examples"
+                        }
+                    ],
+                    "symbol": null
+                },
+                {
+                    "alias": null,
+                    "all": false,
+                    "name": "pathlib",
+                    "node_type": "ModelImport",
+                    "source_refs": [
+                        {
+                            "col_end": 24,
+                            "col_start": 0,
+                            "node_type": "SourceRef",
+                            "row_end": 9,
+                            "row_start": 9,
+                            "source_file_name": "test_examples"
+                        }
+                    ],
+                    "symbol": "Path"
+                },
+                {
+                    "alias": "iu",
+                    "all": false,
+                    "name": "importlib.util",
+                    "node_type": "ModelImport",
+                    "source_refs": [
+                        {
+                            "col_end": 27,
+                            "col_start": 0,
+                            "node_type": "SourceRef",
+                            "row_end": 10,
+                            "row_start": 10,
+                            "source_file_name": "test_examples"
+                        }
+                    ],
+                    "symbol": null
+                },
+                {
+                    "arguments": [
+                        {
+                            "node_type": "LiteralValue",
+                            "source_code_data_type": [
+                                "Python",
+                                "3.8",
+                                "<class 'str'>"
+                            ],
+                            "source_refs": [
+                                {
+                                    "col_end": 23,
+                                    "col_start": 18,
+                                    "node_type": "SourceRef",
+                                    "row_end": 12,
+                                    "row_start": 12,
+                                    "source_file_name": "test_examples"
+                                }
+                            ],
+                            "value": "agg",
+                            "value_type": "List"
+                        }
+                    ],
+                    "func": {
+                        "attr": {
+                            "id": 3,
+                            "name": "switch_backend",
+                            "node_type": "Name",
+                            "source_refs": [
+                                {
+                                    "col_end": 17,
+                                    "col_start": 0,
+                                    "node_type": "SourceRef",
+                                    "row_end": 12,
+                                    "row_start": 12,
+                                    "source_file_name": "test_examples"
+                                }
+                            ]
+                        },
+                        "node_type": "Attribute",
+                        "source_refs": [
+                            {
+                                "col_end": 17,
+                                "col_start": 0,
+                                "node_type": "SourceRef",
+                                "row_end": 12,
+                                "row_start": 12,
+                                "source_file_name": "test_examples"
+                            }
+                        ],
+                        "value": {
+                            "id": -1,
+                            "name": "pylab",
+                            "node_type": "Name",
+                            "source_refs": [
+                                {
+                                    "col_end": 2,
+                                    "col_start": 0,
+                                    "node_type": "SourceRef",
+                                    "row_end": 12,
+                                    "row_start": 12,
+                                    "source_file_name": "test_examples"
+                                }
+                            ]
+                        }
+                    },
+                    "node_type": "Call",
+                    "source_language": null,
+                    "source_language_version": null,
+                    "source_refs": [
+                        {
+                            "col_end": 24,
+                            "col_start": 0,
+                            "node_type": "SourceRef",
+                            "row_end": 12,
+                            "row_start": 12,
+                            "source_file_name": "test_examples"
+                        }
+                    ]
+                },
+                {
+                    "left": {
+                        "default_value": null,
+                        "node_type": "Var",
+                        "source_refs": [
+                            {
+                                "col_end": 12,
+                                "col_start": 0,
+                                "node_type": "SourceRef",
+                                "row_end": 13,
+                                "row_start": 13,
+                                "source_file_name": "test_examples"
+                            }
+                        ],
+                        "type": "float",
+                        "val": {
+                            "id": 0,
+                            "name": "examples_dir",
+                            "node_type": "Name",
+                            "source_refs": [
+                                {
+                                    "col_end": 12,
+                                    "col_start": 0,
+                                    "node_type": "SourceRef",
+                                    "row_end": 13,
+                                    "row_start": 13,
+                                    "source_file_name": "test_examples"
+                                }
+                            ]
+                        }
+                    },
+                    "node_type": "Assignment",
+                    "right": {
+                        "arguments": [
+                            {
+                                "arguments": [
+                                    {
+                                        "id": 4,
+                                        "name": "__file__",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 39,
+                                                "col_start": 31,
+                                                "node_type": "SourceRef",
+                                                "row_end": 13,
+                                                "row_start": 13,
+                                                "source_file_name": "test_examples"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "func": {
+                                    "attr": {
+                                        "id": 5,
+                                        "name": "thisdir",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 30,
+                                                "col_start": 20,
+                                                "node_type": "SourceRef",
+                                                "row_end": 13,
+                                                "row_start": 13,
+                                                "source_file_name": "test_examples"
+                                            }
+                                        ]
+                                    },
+                                    "node_type": "Attribute",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 30,
+                                            "col_start": 20,
+                                            "node_type": "SourceRef",
+                                            "row_end": 13,
+                                            "row_start": 13,
+                                            "source_file_name": "test_examples"
+                                        }
+                                    ],
+                                    "value": {
+                                        "id": -1,
+                                        "name": "sciris",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 22,
+                                                "col_start": 20,
+                                                "node_type": "SourceRef",
+                                                "row_end": 13,
+                                                "row_start": 13,
+                                                "source_file_name": "test_examples"
+                                            }
+                                        ]
+                                    }
+                                },
+                                "node_type": "Call",
+                                "source_language": null,
+                                "source_language_version": null,
+                                "source_refs": [
+                                    {
+                                        "col_end": 40,
+                                        "col_start": 20,
+                                        "node_type": "SourceRef",
+                                        "row_end": 13,
+                                        "row_start": 13,
+                                        "source_file_name": "test_examples"
+                                    }
+                                ]
+                            }
+                        ],
+                        "func": {
+                            "id": 6,
+                            "name": "Path",
+                            "node_type": "Name",
+                            "source_refs": [
+                                {
+                                    "col_end": 41,
+                                    "col_start": 15,
+                                    "node_type": "SourceRef",
+                                    "row_end": 13,
+                                    "row_start": 13,
+                                    "source_file_name": "test_examples"
+                                }
+                            ]
+                        },
+                        "node_type": "Call",
+                        "source_language": null,
+                        "source_language_version": null,
+                        "source_refs": [
+                            {
+                                "col_end": 41,
+                                "col_start": 15,
+                                "node_type": "SourceRef",
+                                "row_end": 13,
+                                "row_start": 13,
+                                "source_file_name": "test_examples"
+                            }
+                        ]
+                    },
+                    "source_refs": [
+                        {
+                            "col_end": 41,
+                            "col_start": 0,
+                            "node_type": "SourceRef",
+                            "row_end": 13,
+                            "row_start": 13,
+                            "source_file_name": "test_examples"
+                        }
+                    ]
+                },
+                {
+                    "body": [
+                        {
+                            "left": {
+                                "default_value": null,
+                                "node_type": "Var",
+                                "source_refs": [
+                                    {
+                                        "col_end": 8,
+                                        "col_start": 4,
+                                        "node_type": "SourceRef",
+                                        "row_end": 22,
+                                        "row_start": 22,
+                                        "source_file_name": "test_examples"
+                                    }
+                                ],
+                                "type": "float",
+                                "val": {
+                                    "id": 9,
+                                    "name": "spec",
+                                    "node_type": "Name",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 8,
+                                            "col_start": 4,
+                                            "node_type": "SourceRef",
+                                            "row_end": 22,
+                                            "row_start": 22,
+                                            "source_file_name": "test_examples"
+                                        }
+                                    ]
+                                }
+                            },
+                            "node_type": "Assignment",
+                            "right": {
+                                "arguments": [
+                                    {
+                                        "node_type": "LiteralValue",
+                                        "source_code_data_type": [
+                                            "Python",
+                                            "3.8",
+                                            "<class 'str'>"
+                                        ],
+                                        "source_refs": [
+                                            {
+                                                "col_end": 48,
+                                                "col_start": 38,
+                                                "node_type": "SourceRef",
+                                                "row_end": 22,
+                                                "row_start": 22,
+                                                "source_file_name": "test_examples"
+                                            }
+                                        ],
+                                        "value": "__main__",
+                                        "value_type": "List"
+                                    },
+                                    {
+                                        "arguments": [
+                                            {
+                                                "id": 8,
+                                                "name": "name",
+                                                "node_type": "Name",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 76,
+                                                        "col_start": 72,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 22,
+                                                        "row_start": 22,
+                                                        "source_file_name": "test_examples"
+                                                    }
+                                                ]
+                                            }
+                                        ],
+                                        "func": {
+                                            "attr": {
+                                                "id": 11,
+                                                "name": "joinpath",
+                                                "node_type": "Name",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 71,
+                                                        "col_start": 50,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 22,
+                                                        "row_start": 22,
+                                                        "source_file_name": "test_examples"
+                                                    }
+                                                ]
+                                            },
+                                            "node_type": "Attribute",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 71,
+                                                    "col_start": 50,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 22,
+                                                    "row_start": 22,
+                                                    "source_file_name": "test_examples"
+                                                }
+                                            ],
+                                            "value": {
+                                                "id": 0,
+                                                "name": "examples_dir",
+                                                "node_type": "Name",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 62,
+                                                        "col_start": 50,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 22,
+                                                        "row_start": 22,
+                                                        "source_file_name": "test_examples"
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        "node_type": "Call",
+                                        "source_language": null,
+                                        "source_language_version": null,
+                                        "source_refs": [
+                                            {
+                                                "col_end": 77,
+                                                "col_start": 50,
+                                                "node_type": "SourceRef",
+                                                "row_end": 22,
+                                                "row_start": 22,
+                                                "source_file_name": "test_examples"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "func": {
+                                    "attr": {
+                                        "id": 12,
+                                        "name": "spec_from_file_location",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 37,
+                                                "col_start": 11,
+                                                "node_type": "SourceRef",
+                                                "row_end": 22,
+                                                "row_start": 22,
+                                                "source_file_name": "test_examples"
+                                            }
+                                        ]
+                                    },
+                                    "node_type": "Attribute",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 37,
+                                            "col_start": 11,
+                                            "node_type": "SourceRef",
+                                            "row_end": 22,
+                                            "row_start": 22,
+                                            "source_file_name": "test_examples"
+                                        }
+                                    ],
+                                    "value": {
+                                        "id": -1,
+                                        "name": "importlib.util",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 13,
+                                                "col_start": 11,
+                                                "node_type": "SourceRef",
+                                                "row_end": 22,
+                                                "row_start": 22,
+                                                "source_file_name": "test_examples"
+                                            }
+                                        ]
+                                    }
+                                },
+                                "node_type": "Call",
+                                "source_language": null,
+                                "source_language_version": null,
+                                "source_refs": [
+                                    {
+                                        "col_end": 78,
+                                        "col_start": 11,
+                                        "node_type": "SourceRef",
+                                        "row_end": 22,
+                                        "row_start": 22,
+                                        "source_file_name": "test_examples"
+                                    }
+                                ]
+                            },
+                            "source_refs": [
+                                {
+                                    "col_end": 78,
+                                    "col_start": 4,
+                                    "node_type": "SourceRef",
+                                    "row_end": 22,
+                                    "row_start": 22,
+                                    "source_file_name": "test_examples"
+                                }
+                            ]
+                        },
+                        {
+                            "left": {
+                                "default_value": null,
+                                "node_type": "Var",
+                                "source_refs": [
+                                    {
+                                        "col_end": 10,
+                                        "col_start": 4,
+                                        "node_type": "SourceRef",
+                                        "row_end": 23,
+                                        "row_start": 23,
+                                        "source_file_name": "test_examples"
+                                    }
+                                ],
+                                "type": "float",
+                                "val": {
+                                    "id": 10,
+                                    "name": "module",
+                                    "node_type": "Name",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 10,
+                                            "col_start": 4,
+                                            "node_type": "SourceRef",
+                                            "row_end": 23,
+                                            "row_start": 23,
+                                            "source_file_name": "test_examples"
+                                        }
+                                    ]
+                                }
+                            },
+                            "node_type": "Assignment",
+                            "right": {
+                                "arguments": [
+                                    {
+                                        "id": 9,
+                                        "name": "spec",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 37,
+                                                "col_start": 33,
+                                                "node_type": "SourceRef",
+                                                "row_end": 23,
+                                                "row_start": 23,
+                                                "source_file_name": "test_examples"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "func": {
+                                    "attr": {
+                                        "id": 13,
+                                        "name": "module_from_spec",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 32,
+                                                "col_start": 13,
+                                                "node_type": "SourceRef",
+                                                "row_end": 23,
+                                                "row_start": 23,
+                                                "source_file_name": "test_examples"
+                                            }
+                                        ]
+                                    },
+                                    "node_type": "Attribute",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 32,
+                                            "col_start": 13,
+                                            "node_type": "SourceRef",
+                                            "row_end": 23,
+                                            "row_start": 23,
+                                            "source_file_name": "test_examples"
+                                        }
+                                    ],
+                                    "value": {
+                                        "id": -1,
+                                        "name": "importlib.util",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 15,
+                                                "col_start": 13,
+                                                "node_type": "SourceRef",
+                                                "row_end": 23,
+                                                "row_start": 23,
+                                                "source_file_name": "test_examples"
+                                            }
+                                        ]
+                                    }
+                                },
+                                "node_type": "Call",
+                                "source_language": null,
+                                "source_language_version": null,
+                                "source_refs": [
+                                    {
+                                        "col_end": 38,
+                                        "col_start": 13,
+                                        "node_type": "SourceRef",
+                                        "row_end": 23,
+                                        "row_start": 23,
+                                        "source_file_name": "test_examples"
+                                    }
+                                ]
+                            },
+                            "source_refs": [
+                                {
+                                    "col_end": 38,
+                                    "col_start": 4,
+                                    "node_type": "SourceRef",
+                                    "row_end": 23,
+                                    "row_start": 23,
+                                    "source_file_name": "test_examples"
+                                }
+                            ]
+                        },
+                        {
+                            "arguments": [
+                                {
+                                    "id": 10,
+                                    "name": "module",
+                                    "node_type": "Name",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 34,
+                                            "col_start": 28,
+                                            "node_type": "SourceRef",
+                                            "row_end": 24,
+                                            "row_start": 24,
+                                            "source_file_name": "test_examples"
+                                        }
+                                    ]
+                                }
+                            ],
+                            "func": {
+                                "attr": {
+                                    "id": 15,
+                                    "name": "exec_module",
+                                    "node_type": "Name",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 27,
+                                            "col_start": 4,
+                                            "node_type": "SourceRef",
+                                            "row_end": 24,
+                                            "row_start": 24,
+                                            "source_file_name": "test_examples"
+                                        }
+                                    ]
+                                },
+                                "node_type": "Attribute",
+                                "source_refs": [
+                                    {
+                                        "col_end": 27,
+                                        "col_start": 4,
+                                        "node_type": "SourceRef",
+                                        "row_end": 24,
+                                        "row_start": 24,
+                                        "source_file_name": "test_examples"
+                                    }
+                                ],
+                                "value": {
+                                    "attr": {
+                                        "id": 14,
+                                        "name": "loader",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 15,
+                                                "col_start": 4,
+                                                "node_type": "SourceRef",
+                                                "row_end": 24,
+                                                "row_start": 24,
+                                                "source_file_name": "test_examples"
+                                            }
+                                        ]
+                                    },
+                                    "node_type": "Attribute",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 15,
+                                            "col_start": 4,
+                                            "node_type": "SourceRef",
+                                            "row_end": 24,
+                                            "row_start": 24,
+                                            "source_file_name": "test_examples"
+                                        }
+                                    ],
+                                    "value": {
+                                        "id": 9,
+                                        "name": "spec",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 8,
+                                                "col_start": 4,
+                                                "node_type": "SourceRef",
+                                                "row_end": 24,
+                                                "row_start": 24,
+                                                "source_file_name": "test_examples"
+                                            }
+                                        ]
+                                    }
+                                }
+                            },
+                            "node_type": "Call",
+                            "source_language": null,
+                            "source_language_version": null,
+                            "source_refs": [
+                                {
+                                    "col_end": 35,
+                                    "col_start": 4,
+                                    "node_type": "SourceRef",
+                                    "row_end": 24,
+                                    "row_start": 24,
+                                    "source_file_name": "test_examples"
+                                }
+                            ]
+                        }
+                    ],
+                    "func_args": [
+                        {
+                            "default_value": null,
+                            "node_type": "Var",
+                            "source_refs": [
+                                {
+                                    "col_end": 20,
+                                    "col_start": 16,
+                                    "node_type": "SourceRef",
+                                    "row_end": 15,
+                                    "row_start": 15,
+                                    "source_file_name": "test_examples"
+                                }
+                            ],
+                            "type": "float",
+                            "val": {
+                                "id": 8,
+                                "name": "name",
+                                "node_type": "Name",
+                                "source_refs": [
+                                    {
+                                        "col_end": 20,
+                                        "col_start": 16,
+                                        "node_type": "SourceRef",
+                                        "row_end": 15,
+                                        "row_start": 15,
+                                        "source_file_name": "test_examples"
+                                    }
+                                ]
+                            }
+                        }
+                    ],
+                    "name": {
+                        "id": 7,
+                        "name": "run_example",
+                        "node_type": "Name",
+                        "source_refs": [
+                            {
+                                "col_end": 35,
+                                "col_start": 0,
+                                "node_type": "SourceRef",
+                                "row_end": 24,
+                                "row_start": 15,
+                                "source_file_name": "test_examples"
+                            }
+                        ]
+                    },
+                    "node_type": "FunctionDef",
+                    "source_refs": [
+                        {
+                            "col_end": 35,
+                            "col_start": 0,
+                            "node_type": "SourceRef",
+                            "row_end": 24,
+                            "row_start": 15,
+                            "source_file_name": "test_examples"
+                        }
+                    ]
+                },
+                {
+                    "body": [
+                        {
+                            "arguments": [
+                                {
+                                    "node_type": "LiteralValue",
+                                    "source_code_data_type": [
+                                        "Python",
+                                        "3.8",
+                                        "<class 'str'>"
+                                    ],
+                                    "source_refs": [
+                                        {
+                                            "col_end": 34,
+                                            "col_start": 16,
+                                            "node_type": "SourceRef",
+                                            "row_end": 28,
+                                            "row_start": 28,
+                                            "source_file_name": "test_examples"
+                                        }
+                                    ],
+                                    "value": "run_scenarios.py",
+                                    "value_type": "List"
+                                }
+                            ],
+                            "func": {
+                                "id": 7,
+                                "name": "run_example",
+                                "node_type": "Name",
+                                "source_refs": [
+                                    {
+                                        "col_end": 35,
+                                        "col_start": 4,
+                                        "node_type": "SourceRef",
+                                        "row_end": 28,
+                                        "row_start": 28,
+                                        "source_file_name": "test_examples"
+                                    }
+                                ]
+                            },
+                            "node_type": "Call",
+                            "source_language": null,
+                            "source_language_version": null,
+                            "source_refs": [
+                                {
+                                    "col_end": 35,
+                                    "col_start": 4,
+                                    "node_type": "SourceRef",
+                                    "row_end": 28,
+                                    "row_start": 28,
+                                    "source_file_name": "test_examples"
+                                }
+                            ]
+                        }
+                    ],
+                    "func_args": [],
+                    "name": {
+                        "id": 16,
+                        "name": "test_run_scenarios",
+                        "node_type": "Name",
+                        "source_refs": [
+                            {
+                                "col_end": 35,
+                                "col_start": 0,
+                                "node_type": "SourceRef",
+                                "row_end": 28,
+                                "row_start": 27,
+                                "source_file_name": "test_examples"
+                            }
+                        ]
+                    },
+                    "node_type": "FunctionDef",
+                    "source_refs": [
+                        {
+                            "col_end": 35,
+                            "col_start": 0,
+                            "node_type": "SourceRef",
+                            "row_end": 28,
+                            "row_start": 27,
+                            "source_file_name": "test_examples"
+                        }
+                    ]
+                },
+                {
+                    "body": [
+                        {
+                            "arguments": [
+                                {
+                                    "node_type": "LiteralValue",
+                                    "source_code_data_type": [
+                                        "Python",
+                                        "3.8",
+                                        "<class 'str'>"
+                                    ],
+                                    "source_refs": [
+                                        {
+                                            "col_end": 28,
+                                            "col_start": 16,
+                                            "node_type": "SourceRef",
+                                            "row_end": 31,
+                                            "row_start": 31,
+                                            "source_file_name": "test_examples"
+                                        }
+                                    ],
+                                    "value": "run_sim.py",
+                                    "value_type": "List"
+                                }
+                            ],
+                            "func": {
+                                "id": 7,
+                                "name": "run_example",
+                                "node_type": "Name",
+                                "source_refs": [
+                                    {
+                                        "col_end": 29,
+                                        "col_start": 4,
+                                        "node_type": "SourceRef",
+                                        "row_end": 31,
+                                        "row_start": 31,
+                                        "source_file_name": "test_examples"
+                                    }
+                                ]
+                            },
+                            "node_type": "Call",
+                            "source_language": null,
+                            "source_language_version": null,
+                            "source_refs": [
+                                {
+                                    "col_end": 29,
+                                    "col_start": 4,
+                                    "node_type": "SourceRef",
+                                    "row_end": 31,
+                                    "row_start": 31,
+                                    "source_file_name": "test_examples"
+                                }
+                            ]
+                        }
+                    ],
+                    "func_args": [],
+                    "name": {
+                        "id": 17,
+                        "name": "test_run_sim",
+                        "node_type": "Name",
+                        "source_refs": [
+                            {
+                                "col_end": 29,
+                                "col_start": 0,
+                                "node_type": "SourceRef",
+                                "row_end": 31,
+                                "row_start": 30,
+                                "source_file_name": "test_examples"
+                            }
+                        ]
+                    },
+                    "node_type": "FunctionDef",
+                    "source_refs": [
+                        {
+                            "col_end": 29,
+                            "col_start": 0,
+                            "node_type": "SourceRef",
+                            "row_end": 31,
+                            "row_start": 30,
+                            "source_file_name": "test_examples"
+                        }
+                    ]
+                },
+                {
+                    "body": [
+                        {
+                            "arguments": [
+                                {
+                                    "node_type": "LiteralValue",
+                                    "source_code_data_type": [
+                                        "Python",
+                                        "3.8",
+                                        "<class 'str'>"
+                                    ],
+                                    "source_refs": [
+                                        {
+                                            "col_end": 27,
+                                            "col_start": 16,
+                                            "node_type": "SourceRef",
+                                            "row_end": 34,
+                                            "row_start": 34,
+                                            "source_file_name": "test_examples"
+                                        }
+                                    ],
+                                    "value": "simple.py",
+                                    "value_type": "List"
+                                }
+                            ],
+                            "func": {
+                                "id": 7,
+                                "name": "run_example",
+                                "node_type": "Name",
+                                "source_refs": [
+                                    {
+                                        "col_end": 28,
+                                        "col_start": 4,
+                                        "node_type": "SourceRef",
+                                        "row_end": 34,
+                                        "row_start": 34,
+                                        "source_file_name": "test_examples"
+                                    }
+                                ]
+                            },
+                            "node_type": "Call",
+                            "source_language": null,
+                            "source_language_version": null,
+                            "source_refs": [
+                                {
+                                    "col_end": 28,
+                                    "col_start": 4,
+                                    "node_type": "SourceRef",
+                                    "row_end": 34,
+                                    "row_start": 34,
+                                    "source_file_name": "test_examples"
+                                }
+                            ]
+                        }
+                    ],
+                    "func_args": [],
+                    "name": {
+                        "id": 18,
+                        "name": "test_simple",
+                        "node_type": "Name",
+                        "source_refs": [
+                            {
+                                "col_end": 28,
+                                "col_start": 0,
+                                "node_type": "SourceRef",
+                                "row_end": 34,
+                                "row_start": 33,
+                                "source_file_name": "test_examples"
+                            }
+                        ]
+                    },
+                    "node_type": "FunctionDef",
+                    "source_refs": [
+                        {
+                            "col_end": 28,
+                            "col_start": 0,
+                            "node_type": "SourceRef",
+                            "row_end": 34,
+                            "row_start": 33,
+                            "source_file_name": "test_examples"
+                        }
+                    ]
+                },
+                {
+                    "body": [
+                        {
+                            "left": {
+                                "default_value": null,
+                                "node_type": "Var",
+                                "source_refs": [
+                                    {
+                                        "col_end": 5,
+                                        "col_start": 4,
+                                        "node_type": "SourceRef",
+                                        "row_end": 40,
+                                        "row_start": 40,
+                                        "source_file_name": "test_examples"
+                                    }
+                                ],
+                                "type": "float",
+                                "val": {
+                                    "id": 20,
+                                    "name": "T",
+                                    "node_type": "Name",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 5,
+                                            "col_start": 4,
+                                            "node_type": "SourceRef",
+                                            "row_end": 40,
+                                            "row_start": 40,
+                                            "source_file_name": "test_examples"
+                                        }
+                                    ]
+                                }
+                            },
+                            "node_type": "Assignment",
+                            "right": {
+                                "arguments": [],
+                                "func": {
+                                    "attr": {
+                                        "id": 21,
+                                        "name": "tic",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 14,
+                                                "col_start": 8,
+                                                "node_type": "SourceRef",
+                                                "row_end": 40,
+                                                "row_start": 40,
+                                                "source_file_name": "test_examples"
+                                            }
+                                        ]
+                                    },
+                                    "node_type": "Attribute",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 14,
+                                            "col_start": 8,
+                                            "node_type": "SourceRef",
+                                            "row_end": 40,
+                                            "row_start": 40,
+                                            "source_file_name": "test_examples"
+                                        }
+                                    ],
+                                    "value": {
+                                        "id": -1,
+                                        "name": "sciris",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 10,
+                                                "col_start": 8,
+                                                "node_type": "SourceRef",
+                                                "row_end": 40,
+                                                "row_start": 40,
+                                                "source_file_name": "test_examples"
+                                            }
+                                        ]
+                                    }
+                                },
+                                "node_type": "Call",
+                                "source_language": null,
+                                "source_language_version": null,
+                                "source_refs": [
+                                    {
+                                        "col_end": 16,
+                                        "col_start": 8,
+                                        "node_type": "SourceRef",
+                                        "row_end": 40,
+                                        "row_start": 40,
+                                        "source_file_name": "test_examples"
+                                    }
+                                ]
+                            },
+                            "source_refs": [
+                                {
+                                    "col_end": 16,
+                                    "col_start": 4,
+                                    "node_type": "SourceRef",
+                                    "row_end": 40,
+                                    "row_start": 40,
+                                    "source_file_name": "test_examples"
+                                }
+                            ]
+                        },
+                        {
+                            "arguments": [],
+                            "func": {
+                                "id": 16,
+                                "name": "test_run_scenarios",
+                                "node_type": "Name",
+                                "source_refs": [
+                                    {
+                                        "col_end": 24,
+                                        "col_start": 4,
+                                        "node_type": "SourceRef",
+                                        "row_end": 42,
+                                        "row_start": 42,
+                                        "source_file_name": "test_examples"
+                                    }
+                                ]
+                            },
+                            "node_type": "Call",
+                            "source_language": null,
+                            "source_language_version": null,
+                            "source_refs": [
+                                {
+                                    "col_end": 24,
+                                    "col_start": 4,
+                                    "node_type": "SourceRef",
+                                    "row_end": 42,
+                                    "row_start": 42,
+                                    "source_file_name": "test_examples"
+                                }
+                            ]
+                        },
+                        {
+                            "arguments": [],
+                            "func": {
+                                "id": 17,
+                                "name": "test_run_sim",
+                                "node_type": "Name",
+                                "source_refs": [
+                                    {
+                                        "col_end": 18,
+                                        "col_start": 4,
+                                        "node_type": "SourceRef",
+                                        "row_end": 43,
+                                        "row_start": 43,
+                                        "source_file_name": "test_examples"
+                                    }
+                                ]
+                            },
+                            "node_type": "Call",
+                            "source_language": null,
+                            "source_language_version": null,
+                            "source_refs": [
+                                {
+                                    "col_end": 18,
+                                    "col_start": 4,
+                                    "node_type": "SourceRef",
+                                    "row_end": 43,
+                                    "row_start": 43,
+                                    "source_file_name": "test_examples"
+                                }
+                            ]
+                        },
+                        {
+                            "arguments": [],
+                            "func": {
+                                "id": 18,
+                                "name": "test_simple",
+                                "node_type": "Name",
+                                "source_refs": [
+                                    {
+                                        "col_end": 17,
+                                        "col_start": 4,
+                                        "node_type": "SourceRef",
+                                        "row_end": 44,
+                                        "row_start": 44,
+                                        "source_file_name": "test_examples"
+                                    }
+                                ]
+                            },
+                            "node_type": "Call",
+                            "source_language": null,
+                            "source_language_version": null,
+                            "source_refs": [
+                                {
+                                    "col_end": 17,
+                                    "col_start": 4,
+                                    "node_type": "SourceRef",
+                                    "row_end": 44,
+                                    "row_start": 44,
+                                    "source_file_name": "test_examples"
+                                }
+                            ]
+                        },
+                        {
+                            "arguments": [
+                                {
+                                    "id": 20,
+                                    "name": "T",
+                                    "node_type": "Name",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 12,
+                                            "col_start": 11,
+                                            "node_type": "SourceRef",
+                                            "row_end": 46,
+                                            "row_start": 46,
+                                            "source_file_name": "test_examples"
+                                        }
+                                    ]
+                                }
+                            ],
+                            "func": {
+                                "attr": {
+                                    "id": 22,
+                                    "name": "toc",
+                                    "node_type": "Name",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 10,
+                                            "col_start": 4,
+                                            "node_type": "SourceRef",
+                                            "row_end": 46,
+                                            "row_start": 46,
+                                            "source_file_name": "test_examples"
+                                        }
+                                    ]
+                                },
+                                "node_type": "Attribute",
+                                "source_refs": [
+                                    {
+                                        "col_end": 10,
+                                        "col_start": 4,
+                                        "node_type": "SourceRef",
+                                        "row_end": 46,
+                                        "row_start": 46,
+                                        "source_file_name": "test_examples"
+                                    }
+                                ],
+                                "value": {
+                                    "id": -1,
+                                    "name": "sciris",
+                                    "node_type": "Name",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 6,
+                                            "col_start": 4,
+                                            "node_type": "SourceRef",
+                                            "row_end": 46,
+                                            "row_start": 46,
+                                            "source_file_name": "test_examples"
+                                        }
+                                    ]
+                                }
+                            },
+                            "node_type": "Call",
+                            "source_language": null,
+                            "source_language_version": null,
+                            "source_refs": [
+                                {
+                                    "col_end": 13,
+                                    "col_start": 4,
+                                    "node_type": "SourceRef",
+                                    "row_end": 46,
+                                    "row_start": 46,
+                                    "source_file_name": "test_examples"
+                                }
+                            ]
+                        },
+                        {
+                            "arguments": [
+                                {
+                                    "node_type": "LiteralValue",
+                                    "source_code_data_type": [
+                                        "Python",
+                                        "3.8",
+                                        "<class 'str'>"
+                                    ],
+                                    "source_refs": [
+                                        {
+                                            "col_end": 17,
+                                            "col_start": 10,
+                                            "node_type": "SourceRef",
+                                            "row_end": 47,
+                                            "row_start": 47,
+                                            "source_file_name": "test_examples"
+                                        }
+                                    ],
+                                    "value": "Done.",
+                                    "value_type": "List"
+                                }
+                            ],
+                            "func": {
+                                "id": 23,
+                                "name": "print",
+                                "node_type": "Name",
+                                "source_refs": [
+                                    {
+                                        "col_end": 18,
+                                        "col_start": 4,
+                                        "node_type": "SourceRef",
+                                        "row_end": 47,
+                                        "row_start": 47,
+                                        "source_file_name": "test_examples"
+                                    }
+                                ]
+                            },
+                            "node_type": "Call",
+                            "source_language": null,
+                            "source_language_version": null,
+                            "source_refs": [
+                                {
+                                    "col_end": 18,
+                                    "col_start": 4,
+                                    "node_type": "SourceRef",
+                                    "row_end": 47,
+                                    "row_start": 47,
+                                    "source_file_name": "test_examples"
+                                }
+                            ]
+                        }
+                    ],
+                    "expr": {
+                        "interpreter": "Python",
+                        "node_type": "Operator",
+                        "op": "ast.Eq",
+                        "operands": [
+                            {
+                                "id": 19,
+                                "name": "__name__",
+                                "node_type": "Name",
+                                "source_refs": [
+                                    {
+                                        "col_end": 11,
+                                        "col_start": 3,
+                                        "node_type": "SourceRef",
+                                        "row_end": 38,
+                                        "row_start": 38,
+                                        "source_file_name": "test_examples"
+                                    }
+                                ]
+                            },
+                            {
+                                "node_type": "LiteralValue",
+                                "source_code_data_type": [
+                                    "Python",
+                                    "3.8",
+                                    "<class 'str'>"
+                                ],
+                                "source_refs": [
+                                    {
+                                        "col_end": 25,
+                                        "col_start": 15,
+                                        "node_type": "SourceRef",
+                                        "row_end": 38,
+                                        "row_start": 38,
+                                        "source_file_name": "test_examples"
+                                    }
+                                ],
+                                "value": "__main__",
+                                "value_type": "List"
+                            }
+                        ],
+                        "source_language": "Python",
+                        "source_refs": [
+                            {
+                                "col_end": 25,
+                                "col_start": 3,
+                                "node_type": "SourceRef",
+                                "row_end": 38,
+                                "row_start": 38,
+                                "source_file_name": "test_examples"
+                            }
+                        ],
+                        "version": "3.8.18"
+                    },
+                    "node_type": "ModelIf",
+                    "orelse": [],
+                    "source_refs": [
+                        {
+                            "col_end": 18,
+                            "col_start": 0,
+                            "node_type": "SourceRef",
+                            "row_end": 47,
+                            "row_start": 38,
+                            "source_file_name": "test_examples"
+                        }
+                    ]
+                }
+            ],
+            "name": "test_examples",
+            "node_type": "Module",
+            "source_refs": [
+                {
+                    "col_end": null,
+                    "col_start": null,
+                    "node_type": "SourceRef",
+                    "row_end": 47,
+                    "row_start": 1,
+                    "source_file_name": "test_examples.py"
+                }
+            ]
+        }
+    ]
+}

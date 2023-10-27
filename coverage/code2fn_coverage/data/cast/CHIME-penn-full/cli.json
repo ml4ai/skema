@@ -1,0 +1,1784 @@
+{
+    "nodes": [
+        {
+            "body": [
+                {
+                    "alias": null,
+                    "all": false,
+                    "name": "os",
+                    "node_type": "ModelImport",
+                    "source_refs": [
+                        {
+                            "col_end": 9,
+                            "col_start": 0,
+                            "node_type": "SourceRef",
+                            "row_end": 3,
+                            "row_start": 3,
+                            "source_file_name": "cli"
+                        }
+                    ],
+                    "symbol": null
+                },
+                {
+                    "alias": null,
+                    "all": false,
+                    "name": "sys",
+                    "node_type": "ModelImport",
+                    "source_refs": [
+                        {
+                            "col_end": 10,
+                            "col_start": 0,
+                            "node_type": "SourceRef",
+                            "row_end": 4,
+                            "row_start": 4,
+                            "source_file_name": "cli"
+                        }
+                    ],
+                    "symbol": null
+                },
+                {
+                    "alias": null,
+                    "all": false,
+                    "name": "model.parameters",
+                    "node_type": "ModelImport",
+                    "source_refs": [
+                        {
+                            "col_end": 40,
+                            "col_start": 0,
+                            "node_type": "SourceRef",
+                            "row_end": 6,
+                            "row_start": 6,
+                            "source_file_name": "cli"
+                        }
+                    ],
+                    "symbol": "Parameters"
+                },
+                {
+                    "alias": null,
+                    "all": false,
+                    "name": "model.sir",
+                    "node_type": "ModelImport",
+                    "source_refs": [
+                        {
+                            "col_end": 26,
+                            "col_start": 0,
+                            "node_type": "SourceRef",
+                            "row_end": 7,
+                            "row_start": 7,
+                            "source_file_name": "cli"
+                        }
+                    ],
+                    "symbol": "Sir"
+                },
+                {
+                    "body": [
+                        {
+                            "left": {
+                                "default_value": null,
+                                "node_type": "Var",
+                                "source_refs": [
+                                    {
+                                        "col_end": 5,
+                                        "col_start": 4,
+                                        "node_type": "SourceRef",
+                                        "row_end": 12,
+                                        "row_start": 12,
+                                        "source_file_name": "cli"
+                                    }
+                                ],
+                                "type": "float",
+                                "val": {
+                                    "id": 4,
+                                    "name": "p",
+                                    "node_type": "Name",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 5,
+                                            "col_start": 4,
+                                            "node_type": "SourceRef",
+                                            "row_end": 12,
+                                            "row_start": 12,
+                                            "source_file_name": "cli"
+                                        }
+                                    ]
+                                }
+                            },
+                            "node_type": "Assignment",
+                            "right": {
+                                "arguments": [
+                                    {
+                                        "attr": {
+                                            "id": 7,
+                                            "name": "environ",
+                                            "node_type": "Name",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 36,
+                                                    "col_start": 26,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 12,
+                                                    "row_start": 12,
+                                                    "source_file_name": "cli"
+                                                }
+                                            ]
+                                        },
+                                        "node_type": "Attribute",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 36,
+                                                "col_start": 26,
+                                                "node_type": "SourceRef",
+                                                "row_end": 12,
+                                                "row_start": 12,
+                                                "source_file_name": "cli"
+                                            }
+                                        ],
+                                        "value": {
+                                            "id": 6,
+                                            "name": "os",
+                                            "node_type": "Name",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 28,
+                                                    "col_start": 26,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 12,
+                                                    "row_start": 12,
+                                                    "source_file_name": "cli"
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "arguments": [
+                                            {
+                                                "id": 3,
+                                                "name": "argv",
+                                                "node_type": "Name",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 42,
+                                                        "col_start": 38,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 12,
+                                                        "row_start": 12,
+                                                        "source_file_name": "cli"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "node_type": "LiteralValue",
+                                                "source_code_data_type": [
+                                                    "Python",
+                                                    "3.8",
+                                                    "List"
+                                                ],
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": -1,
+                                                        "col_start": -1,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": -1,
+                                                        "row_start": -1,
+                                                        "source_file_name": "cli"
+                                                    }
+                                                ],
+                                                "value": "NotImplemented",
+                                                "value_type": "List"
+                                            }
+                                        ],
+                                        "func": {
+                                            "id": 8,
+                                            "name": "_get",
+                                            "node_type": "Name",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 47,
+                                                    "col_start": 8,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 12,
+                                                    "row_start": 12,
+                                                    "source_file_name": "cli"
+                                                }
+                                            ]
+                                        },
+                                        "node_type": "Call",
+                                        "source_language": null,
+                                        "source_language_version": null,
+                                        "source_refs": [
+                                            {
+                                                "col_end": 47,
+                                                "col_start": 8,
+                                                "node_type": "SourceRef",
+                                                "row_end": 12,
+                                                "row_start": 12,
+                                                "source_file_name": "cli"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "func": {
+                                    "attr": {
+                                        "id": 10,
+                                        "name": "create",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 25,
+                                                "col_start": 8,
+                                                "node_type": "SourceRef",
+                                                "row_end": 12,
+                                                "row_start": 12,
+                                                "source_file_name": "cli"
+                                            }
+                                        ]
+                                    },
+                                    "node_type": "Attribute",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 25,
+                                            "col_start": 8,
+                                            "node_type": "SourceRef",
+                                            "row_end": 12,
+                                            "row_start": 12,
+                                            "source_file_name": "cli"
+                                        }
+                                    ],
+                                    "value": {
+                                        "id": 9,
+                                        "name": "Parameters",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 18,
+                                                "col_start": 8,
+                                                "node_type": "SourceRef",
+                                                "row_end": 12,
+                                                "row_start": 12,
+                                                "source_file_name": "cli"
+                                            }
+                                        ]
+                                    }
+                                },
+                                "node_type": "Call",
+                                "source_language": null,
+                                "source_language_version": null,
+                                "source_refs": [
+                                    {
+                                        "col_end": 47,
+                                        "col_start": 8,
+                                        "node_type": "SourceRef",
+                                        "row_end": 12,
+                                        "row_start": 12,
+                                        "source_file_name": "cli"
+                                    }
+                                ]
+                            },
+                            "source_refs": [
+                                {
+                                    "col_end": 47,
+                                    "col_start": 4,
+                                    "node_type": "SourceRef",
+                                    "row_end": 12,
+                                    "row_start": 12,
+                                    "source_file_name": "cli"
+                                }
+                            ]
+                        },
+                        {
+                            "left": {
+                                "default_value": null,
+                                "node_type": "Var",
+                                "source_refs": [
+                                    {
+                                        "col_end": 5,
+                                        "col_start": 4,
+                                        "node_type": "SourceRef",
+                                        "row_end": 13,
+                                        "row_start": 13,
+                                        "source_file_name": "cli"
+                                    }
+                                ],
+                                "type": "float",
+                                "val": {
+                                    "id": 5,
+                                    "name": "m",
+                                    "node_type": "Name",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 5,
+                                            "col_start": 4,
+                                            "node_type": "SourceRef",
+                                            "row_end": 13,
+                                            "row_start": 13,
+                                            "source_file_name": "cli"
+                                        }
+                                    ]
+                                }
+                            },
+                            "node_type": "Assignment",
+                            "right": {
+                                "arguments": [
+                                    {
+                                        "id": 4,
+                                        "name": "p",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 13,
+                                                "col_start": 12,
+                                                "node_type": "SourceRef",
+                                                "row_end": 13,
+                                                "row_start": 13,
+                                                "source_file_name": "cli"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "func": {
+                                    "id": 11,
+                                    "name": "Sir",
+                                    "node_type": "Name",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 14,
+                                            "col_start": 8,
+                                            "node_type": "SourceRef",
+                                            "row_end": 13,
+                                            "row_start": 13,
+                                            "source_file_name": "cli"
+                                        }
+                                    ]
+                                },
+                                "node_type": "Call",
+                                "source_language": null,
+                                "source_language_version": null,
+                                "source_refs": [
+                                    {
+                                        "col_end": 14,
+                                        "col_start": 8,
+                                        "node_type": "SourceRef",
+                                        "row_end": 13,
+                                        "row_start": 13,
+                                        "source_file_name": "cli"
+                                    }
+                                ]
+                            },
+                            "source_refs": [
+                                {
+                                    "col_end": 14,
+                                    "col_start": 4,
+                                    "node_type": "SourceRef",
+                                    "row_end": 13,
+                                    "row_start": 13,
+                                    "source_file_name": "cli"
+                                }
+                            ]
+                        },
+                        {
+                            "body": [
+                                {
+                                    "arguments": [
+                                        {
+                                            "arguments": [
+                                                {
+                                                    "node_type": "LiteralValue",
+                                                    "source_code_data_type": [
+                                                        "Python",
+                                                        "3.8",
+                                                        "<class 'str'>"
+                                                    ],
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 48,
+                                                            "col_start": 18,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 21,
+                                                            "row_start": 21,
+                                                            "source_file_name": "cli"
+                                                        }
+                                                    ],
+                                                    "value": [
+                                                        {
+                                                            "attr": {
+                                                                "id": 18,
+                                                                "name": "current_date",
+                                                                "node_type": "Name",
+                                                                "source_refs": [
+                                                                    {
+                                                                        "col_end": 35,
+                                                                        "col_start": 21,
+                                                                        "node_type": "SourceRef",
+                                                                        "row_end": 21,
+                                                                        "row_start": 21,
+                                                                        "source_file_name": "cli"
+                                                                    }
+                                                                ]
+                                                            },
+                                                            "node_type": "Attribute",
+                                                            "source_refs": [
+                                                                {
+                                                                    "col_end": 35,
+                                                                    "col_start": 21,
+                                                                    "node_type": "SourceRef",
+                                                                    "row_end": 21,
+                                                                    "row_start": 21,
+                                                                    "source_file_name": "cli"
+                                                                }
+                                                            ],
+                                                            "value": {
+                                                                "id": 4,
+                                                                "name": "p",
+                                                                "node_type": "Name",
+                                                                "source_refs": [
+                                                                    {
+                                                                        "col_end": 22,
+                                                                        "col_start": 21,
+                                                                        "node_type": "SourceRef",
+                                                                        "row_end": 21,
+                                                                        "row_start": 21,
+                                                                        "source_file_name": "cli"
+                                                                    }
+                                                                ]
+                                                            }
+                                                        }
+                                                    ],
+                                                    "value_type": "List"
+                                                },
+                                                {
+                                                    "node_type": "LiteralValue",
+                                                    "source_code_data_type": [
+                                                        "Python",
+                                                        "3.8",
+                                                        "<class 'str'>"
+                                                    ],
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 48,
+                                                            "col_start": 18,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 21,
+                                                            "row_start": 21,
+                                                            "source_file_name": "cli"
+                                                        }
+                                                    ],
+                                                    "value": "_",
+                                                    "value_type": "List"
+                                                },
+                                                {
+                                                    "node_type": "LiteralValue",
+                                                    "source_code_data_type": [
+                                                        "Python",
+                                                        "3.8",
+                                                        "<class 'str'>"
+                                                    ],
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 48,
+                                                            "col_start": 18,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 21,
+                                                            "row_start": 21,
+                                                            "source_file_name": "cli"
+                                                        }
+                                                    ],
+                                                    "value": [
+                                                        {
+                                                            "id": 13,
+                                                            "name": "name",
+                                                            "node_type": "Name",
+                                                            "source_refs": [
+                                                                {
+                                                                    "col_end": 42,
+                                                                    "col_start": 38,
+                                                                    "node_type": "SourceRef",
+                                                                    "row_end": 21,
+                                                                    "row_start": 21,
+                                                                    "source_file_name": "cli"
+                                                                }
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "value_type": "List"
+                                                },
+                                                {
+                                                    "node_type": "LiteralValue",
+                                                    "source_code_data_type": [
+                                                        "Python",
+                                                        "3.8",
+                                                        "<class 'str'>"
+                                                    ],
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 48,
+                                                            "col_start": 18,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 21,
+                                                            "row_start": 21,
+                                                            "source_file_name": "cli"
+                                                        }
+                                                    ],
+                                                    "value": ".csv",
+                                                    "value_type": "List"
+                                                }
+                                            ],
+                                            "func": {
+                                                "id": 19,
+                                                "name": "Concatenate",
+                                                "node_type": "Name",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 48,
+                                                        "col_start": 18,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 21,
+                                                        "row_start": 21,
+                                                        "source_file_name": "cli"
+                                                    }
+                                                ]
+                                            },
+                                            "node_type": "Call",
+                                            "source_language": null,
+                                            "source_language_version": null,
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 48,
+                                                    "col_start": 18,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 21,
+                                                    "row_start": 21,
+                                                    "source_file_name": "cli"
+                                                }
+                                            ]
+                                        }
+                                    ],
+                                    "func": {
+                                        "attr": {
+                                            "id": 20,
+                                            "name": "to_csv",
+                                            "node_type": "Name",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 17,
+                                                    "col_start": 8,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 21,
+                                                    "row_start": 21,
+                                                    "source_file_name": "cli"
+                                                }
+                                            ]
+                                        },
+                                        "node_type": "Attribute",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 17,
+                                                "col_start": 8,
+                                                "node_type": "SourceRef",
+                                                "row_end": 21,
+                                                "row_start": 21,
+                                                "source_file_name": "cli"
+                                            }
+                                        ],
+                                        "value": {
+                                            "id": 12,
+                                            "name": "df",
+                                            "node_type": "Name",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 10,
+                                                    "col_start": 8,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 21,
+                                                    "row_start": 21,
+                                                    "source_file_name": "cli"
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "node_type": "Call",
+                                    "source_language": null,
+                                    "source_language_version": null,
+                                    "source_refs": [
+                                        {
+                                            "col_end": 49,
+                                            "col_start": 8,
+                                            "node_type": "SourceRef",
+                                            "row_end": 21,
+                                            "row_start": 21,
+                                            "source_file_name": "cli"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "left": {
+                                        "node_type": "LiteralValue",
+                                        "source_code_data_type": [
+                                            "Python",
+                                            "3.8",
+                                            "Tuple"
+                                        ],
+                                        "source_refs": [
+                                            {
+                                                "col_end": 49,
+                                                "col_start": 4,
+                                                "node_type": "SourceRef",
+                                                "row_end": 21,
+                                                "row_start": 15,
+                                                "source_file_name": "cli"
+                                            }
+                                        ],
+                                        "value": [
+                                            {
+                                                "node_type": "LiteralValue",
+                                                "source_code_data_type": [
+                                                    "Python",
+                                                    "3.8",
+                                                    "Tuple"
+                                                ],
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 16,
+                                                        "col_start": 8,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 15,
+                                                        "row_start": 15,
+                                                        "source_file_name": "cli"
+                                                    }
+                                                ],
+                                                "value": [
+                                                    {
+                                                        "default_value": null,
+                                                        "node_type": "Var",
+                                                        "source_refs": [
+                                                            {
+                                                                "col_end": 10,
+                                                                "col_start": 8,
+                                                                "node_type": "SourceRef",
+                                                                "row_end": 15,
+                                                                "row_start": 15,
+                                                                "source_file_name": "cli"
+                                                            }
+                                                        ],
+                                                        "type": "float",
+                                                        "val": {
+                                                            "id": 12,
+                                                            "name": "df",
+                                                            "node_type": "Name",
+                                                            "source_refs": [
+                                                                {
+                                                                    "col_end": 10,
+                                                                    "col_start": 8,
+                                                                    "node_type": "SourceRef",
+                                                                    "row_end": 15,
+                                                                    "row_start": 15,
+                                                                    "source_file_name": "cli"
+                                                                }
+                                                            ]
+                                                        }
+                                                    },
+                                                    {
+                                                        "default_value": null,
+                                                        "node_type": "Var",
+                                                        "source_refs": [
+                                                            {
+                                                                "col_end": 16,
+                                                                "col_start": 12,
+                                                                "node_type": "SourceRef",
+                                                                "row_end": 15,
+                                                                "row_start": 15,
+                                                                "source_file_name": "cli"
+                                                            }
+                                                        ],
+                                                        "type": "float",
+                                                        "val": {
+                                                            "id": 13,
+                                                            "name": "name",
+                                                            "node_type": "Name",
+                                                            "source_refs": [
+                                                                {
+                                                                    "col_end": 16,
+                                                                    "col_start": 12,
+                                                                    "node_type": "SourceRef",
+                                                                    "row_end": 15,
+                                                                    "row_start": 15,
+                                                                    "source_file_name": "cli"
+                                                                }
+                                                            ]
+                                                        }
+                                                    }
+                                                ],
+                                                "value_type": "Tuple"
+                                            },
+                                            {
+                                                "default_value": null,
+                                                "node_type": "Var",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 49,
+                                                        "col_start": 4,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 21,
+                                                        "row_start": 15,
+                                                        "source_file_name": "cli"
+                                                    }
+                                                ],
+                                                "type": "iterator",
+                                                "val": {
+                                                    "id": 21,
+                                                    "name": "generated_iter_0",
+                                                    "node_type": "Name",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 49,
+                                                            "col_start": 4,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 21,
+                                                            "row_start": 15,
+                                                            "source_file_name": "cli"
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            {
+                                                "default_value": null,
+                                                "node_type": "Var",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 49,
+                                                        "col_start": 4,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 21,
+                                                        "row_start": 15,
+                                                        "source_file_name": "cli"
+                                                    }
+                                                ],
+                                                "type": "boolean",
+                                                "val": {
+                                                    "id": 24,
+                                                    "name": "sc_1",
+                                                    "node_type": "Name",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 49,
+                                                            "col_start": 4,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 21,
+                                                            "row_start": 15,
+                                                            "source_file_name": "cli"
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        ],
+                                        "value_type": "Tuple"
+                                    },
+                                    "node_type": "Assignment",
+                                    "right": {
+                                        "arguments": [
+                                            {
+                                                "default_value": null,
+                                                "node_type": "Var",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 49,
+                                                        "col_start": 4,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 21,
+                                                        "row_start": 15,
+                                                        "source_file_name": "cli"
+                                                    }
+                                                ],
+                                                "type": "iterator",
+                                                "val": {
+                                                    "id": 21,
+                                                    "name": "generated_iter_0",
+                                                    "node_type": "Name",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 49,
+                                                            "col_start": 4,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 21,
+                                                            "row_start": 15,
+                                                            "source_file_name": "cli"
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        ],
+                                        "func": {
+                                            "id": 23,
+                                            "name": "next",
+                                            "node_type": "Name",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 49,
+                                                    "col_start": 4,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 21,
+                                                    "row_start": 15,
+                                                    "source_file_name": "cli"
+                                                }
+                                            ]
+                                        },
+                                        "node_type": "Call",
+                                        "source_language": null,
+                                        "source_language_version": null,
+                                        "source_refs": [
+                                            {
+                                                "col_end": 49,
+                                                "col_start": 4,
+                                                "node_type": "SourceRef",
+                                                "row_end": 21,
+                                                "row_start": 15,
+                                                "source_file_name": "cli"
+                                            }
+                                        ]
+                                    },
+                                    "source_refs": [
+                                        {
+                                            "col_end": 49,
+                                            "col_start": 4,
+                                            "node_type": "SourceRef",
+                                            "row_end": 21,
+                                            "row_start": 15,
+                                            "source_file_name": "cli"
+                                        }
+                                    ]
+                                }
+                            ],
+                            "expr": {
+                                "interpreter": "Python",
+                                "node_type": "Operator",
+                                "op": "ast.Eq",
+                                "operands": [
+                                    {
+                                        "default_value": null,
+                                        "node_type": "Var",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 49,
+                                                "col_start": 4,
+                                                "node_type": "SourceRef",
+                                                "row_end": 21,
+                                                "row_start": 15,
+                                                "source_file_name": "cli"
+                                            }
+                                        ],
+                                        "type": "boolean",
+                                        "val": {
+                                            "id": 24,
+                                            "name": "sc_1",
+                                            "node_type": "Name",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 49,
+                                                    "col_start": 4,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 21,
+                                                    "row_start": 15,
+                                                    "source_file_name": "cli"
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "node_type": "LiteralValue",
+                                        "source_code_data_type": [
+                                            "Python",
+                                            "3.8",
+                                            "boolean"
+                                        ],
+                                        "source_refs": [
+                                            {
+                                                "col_end": 49,
+                                                "col_start": 4,
+                                                "node_type": "SourceRef",
+                                                "row_end": 21,
+                                                "row_start": 15,
+                                                "source_file_name": "cli"
+                                            }
+                                        ],
+                                        "value": false,
+                                        "value_type": "Boolean"
+                                    }
+                                ],
+                                "source_language": "Python",
+                                "source_refs": [
+                                    {
+                                        "col_end": 49,
+                                        "col_start": 4,
+                                        "node_type": "SourceRef",
+                                        "row_end": 21,
+                                        "row_start": 15,
+                                        "source_file_name": "cli"
+                                    }
+                                ],
+                                "version": "3.8.18"
+                            },
+                            "node_type": "Loop",
+                            "post": [],
+                            "pre": [
+                                {
+                                    "left": {
+                                        "default_value": null,
+                                        "node_type": "Var",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 49,
+                                                "col_start": 4,
+                                                "node_type": "SourceRef",
+                                                "row_end": 21,
+                                                "row_start": 15,
+                                                "source_file_name": "cli"
+                                            }
+                                        ],
+                                        "type": "iterator",
+                                        "val": {
+                                            "id": 21,
+                                            "name": "generated_iter_0",
+                                            "node_type": "Name",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 49,
+                                                    "col_start": 4,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 21,
+                                                    "row_start": 15,
+                                                    "source_file_name": "cli"
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "node_type": "Assignment",
+                                    "right": {
+                                        "arguments": [
+                                            {
+                                                "node_type": "LiteralValue",
+                                                "source_code_data_type": [
+                                                    "Python",
+                                                    "3.8",
+                                                    "Tuple"
+                                                ],
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 5,
+                                                        "col_start": 20,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 20,
+                                                        "row_start": 15,
+                                                        "source_file_name": "cli"
+                                                    }
+                                                ],
+                                                "value": [
+                                                    {
+                                                        "node_type": "LiteralValue",
+                                                        "source_code_data_type": [
+                                                            "Python",
+                                                            "3.8",
+                                                            "Tuple"
+                                                        ],
+                                                        "source_refs": [
+                                                            {
+                                                                "col_end": 47,
+                                                                "col_start": 8,
+                                                                "node_type": "SourceRef",
+                                                                "row_end": 16,
+                                                                "row_start": 16,
+                                                                "source_file_name": "cli"
+                                                            }
+                                                        ],
+                                                        "value": [
+                                                            {
+                                                                "attr": {
+                                                                    "id": 14,
+                                                                    "name": "sim_sir_w_date_df",
+                                                                    "node_type": "Name",
+                                                                    "source_refs": [
+                                                                        {
+                                                                            "col_end": 28,
+                                                                            "col_start": 9,
+                                                                            "node_type": "SourceRef",
+                                                                            "row_end": 16,
+                                                                            "row_start": 16,
+                                                                            "source_file_name": "cli"
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                "node_type": "Attribute",
+                                                                "source_refs": [
+                                                                    {
+                                                                        "col_end": 28,
+                                                                        "col_start": 9,
+                                                                        "node_type": "SourceRef",
+                                                                        "row_end": 16,
+                                                                        "row_start": 16,
+                                                                        "source_file_name": "cli"
+                                                                    }
+                                                                ],
+                                                                "value": {
+                                                                    "id": 5,
+                                                                    "name": "m",
+                                                                    "node_type": "Name",
+                                                                    "source_refs": [
+                                                                        {
+                                                                            "col_end": 10,
+                                                                            "col_start": 9,
+                                                                            "node_type": "SourceRef",
+                                                                            "row_end": 16,
+                                                                            "row_start": 16,
+                                                                            "source_file_name": "cli"
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            },
+                                                            {
+                                                                "node_type": "LiteralValue",
+                                                                "source_code_data_type": [
+                                                                    "Python",
+                                                                    "3.8",
+                                                                    "<class 'str'>"
+                                                                ],
+                                                                "source_refs": [
+                                                                    {
+                                                                        "col_end": 46,
+                                                                        "col_start": 30,
+                                                                        "node_type": "SourceRef",
+                                                                        "row_end": 16,
+                                                                        "row_start": 16,
+                                                                        "source_file_name": "cli"
+                                                                    }
+                                                                ],
+                                                                "value": "sim_sir_w_date",
+                                                                "value_type": "List"
+                                                            }
+                                                        ],
+                                                        "value_type": "Tuple"
+                                                    },
+                                                    {
+                                                        "node_type": "LiteralValue",
+                                                        "source_code_data_type": [
+                                                            "Python",
+                                                            "3.8",
+                                                            "Tuple"
+                                                        ],
+                                                        "source_refs": [
+                                                            {
+                                                                "col_end": 41,
+                                                                "col_start": 8,
+                                                                "node_type": "SourceRef",
+                                                                "row_end": 17,
+                                                                "row_start": 17,
+                                                                "source_file_name": "cli"
+                                                            }
+                                                        ],
+                                                        "value": [
+                                                            {
+                                                                "attr": {
+                                                                    "id": 15,
+                                                                    "name": "admits_df",
+                                                                    "node_type": "Name",
+                                                                    "source_refs": [
+                                                                        {
+                                                                            "col_end": 20,
+                                                                            "col_start": 9,
+                                                                            "node_type": "SourceRef",
+                                                                            "row_end": 17,
+                                                                            "row_start": 17,
+                                                                            "source_file_name": "cli"
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                "node_type": "Attribute",
+                                                                "source_refs": [
+                                                                    {
+                                                                        "col_end": 20,
+                                                                        "col_start": 9,
+                                                                        "node_type": "SourceRef",
+                                                                        "row_end": 17,
+                                                                        "row_start": 17,
+                                                                        "source_file_name": "cli"
+                                                                    }
+                                                                ],
+                                                                "value": {
+                                                                    "id": 5,
+                                                                    "name": "m",
+                                                                    "node_type": "Name",
+                                                                    "source_refs": [
+                                                                        {
+                                                                            "col_end": 10,
+                                                                            "col_start": 9,
+                                                                            "node_type": "SourceRef",
+                                                                            "row_end": 17,
+                                                                            "row_start": 17,
+                                                                            "source_file_name": "cli"
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            },
+                                                            {
+                                                                "node_type": "LiteralValue",
+                                                                "source_code_data_type": [
+                                                                    "Python",
+                                                                    "3.8",
+                                                                    "<class 'str'>"
+                                                                ],
+                                                                "source_refs": [
+                                                                    {
+                                                                        "col_end": 40,
+                                                                        "col_start": 22,
+                                                                        "node_type": "SourceRef",
+                                                                        "row_end": 17,
+                                                                        "row_start": 17,
+                                                                        "source_file_name": "cli"
+                                                                    }
+                                                                ],
+                                                                "value": "projected_admits",
+                                                                "value_type": "List"
+                                                            }
+                                                        ],
+                                                        "value_type": "Tuple"
+                                                    },
+                                                    {
+                                                        "node_type": "LiteralValue",
+                                                        "source_code_data_type": [
+                                                            "Python",
+                                                            "3.8",
+                                                            "Tuple"
+                                                        ],
+                                                        "source_refs": [
+                                                            {
+                                                                "col_end": 41,
+                                                                "col_start": 8,
+                                                                "node_type": "SourceRef",
+                                                                "row_end": 18,
+                                                                "row_start": 18,
+                                                                "source_file_name": "cli"
+                                                            }
+                                                        ],
+                                                        "value": [
+                                                            {
+                                                                "attr": {
+                                                                    "id": 16,
+                                                                    "name": "census_df",
+                                                                    "node_type": "Name",
+                                                                    "source_refs": [
+                                                                        {
+                                                                            "col_end": 20,
+                                                                            "col_start": 9,
+                                                                            "node_type": "SourceRef",
+                                                                            "row_end": 18,
+                                                                            "row_start": 18,
+                                                                            "source_file_name": "cli"
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                "node_type": "Attribute",
+                                                                "source_refs": [
+                                                                    {
+                                                                        "col_end": 20,
+                                                                        "col_start": 9,
+                                                                        "node_type": "SourceRef",
+                                                                        "row_end": 18,
+                                                                        "row_start": 18,
+                                                                        "source_file_name": "cli"
+                                                                    }
+                                                                ],
+                                                                "value": {
+                                                                    "id": 5,
+                                                                    "name": "m",
+                                                                    "node_type": "Name",
+                                                                    "source_refs": [
+                                                                        {
+                                                                            "col_end": 10,
+                                                                            "col_start": 9,
+                                                                            "node_type": "SourceRef",
+                                                                            "row_end": 18,
+                                                                            "row_start": 18,
+                                                                            "source_file_name": "cli"
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            },
+                                                            {
+                                                                "node_type": "LiteralValue",
+                                                                "source_code_data_type": [
+                                                                    "Python",
+                                                                    "3.8",
+                                                                    "<class 'str'>"
+                                                                ],
+                                                                "source_refs": [
+                                                                    {
+                                                                        "col_end": 40,
+                                                                        "col_start": 22,
+                                                                        "node_type": "SourceRef",
+                                                                        "row_end": 18,
+                                                                        "row_start": 18,
+                                                                        "source_file_name": "cli"
+                                                                    }
+                                                                ],
+                                                                "value": "projected_census",
+                                                                "value_type": "List"
+                                                            }
+                                                        ],
+                                                        "value_type": "Tuple"
+                                                    },
+                                                    {
+                                                        "node_type": "LiteralValue",
+                                                        "source_code_data_type": [
+                                                            "Python",
+                                                            "3.8",
+                                                            "Tuple"
+                                                        ],
+                                                        "source_refs": [
+                                                            {
+                                                                "col_end": 30,
+                                                                "col_start": 8,
+                                                                "node_type": "SourceRef",
+                                                                "row_end": 19,
+                                                                "row_start": 19,
+                                                                "source_file_name": "cli"
+                                                            }
+                                                        ],
+                                                        "value": [
+                                                            {
+                                                                "attr": {
+                                                                    "id": 17,
+                                                                    "name": "ppe_df",
+                                                                    "node_type": "Name",
+                                                                    "source_refs": [
+                                                                        {
+                                                                            "col_end": 17,
+                                                                            "col_start": 9,
+                                                                            "node_type": "SourceRef",
+                                                                            "row_end": 19,
+                                                                            "row_start": 19,
+                                                                            "source_file_name": "cli"
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                "node_type": "Attribute",
+                                                                "source_refs": [
+                                                                    {
+                                                                        "col_end": 17,
+                                                                        "col_start": 9,
+                                                                        "node_type": "SourceRef",
+                                                                        "row_end": 19,
+                                                                        "row_start": 19,
+                                                                        "source_file_name": "cli"
+                                                                    }
+                                                                ],
+                                                                "value": {
+                                                                    "id": 5,
+                                                                    "name": "m",
+                                                                    "node_type": "Name",
+                                                                    "source_refs": [
+                                                                        {
+                                                                            "col_end": 10,
+                                                                            "col_start": 9,
+                                                                            "node_type": "SourceRef",
+                                                                            "row_end": 19,
+                                                                            "row_start": 19,
+                                                                            "source_file_name": "cli"
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            },
+                                                            {
+                                                                "node_type": "LiteralValue",
+                                                                "source_code_data_type": [
+                                                                    "Python",
+                                                                    "3.8",
+                                                                    "<class 'str'>"
+                                                                ],
+                                                                "source_refs": [
+                                                                    {
+                                                                        "col_end": 29,
+                                                                        "col_start": 19,
+                                                                        "node_type": "SourceRef",
+                                                                        "row_end": 19,
+                                                                        "row_start": 19,
+                                                                        "source_file_name": "cli"
+                                                                    }
+                                                                ],
+                                                                "value": "ppe_data",
+                                                                "value_type": "List"
+                                                            }
+                                                        ],
+                                                        "value_type": "Tuple"
+                                                    }
+                                                ],
+                                                "value_type": "Tuple"
+                                            }
+                                        ],
+                                        "func": {
+                                            "id": 22,
+                                            "name": "iter",
+                                            "node_type": "Name",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 49,
+                                                    "col_start": 4,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 21,
+                                                    "row_start": 15,
+                                                    "source_file_name": "cli"
+                                                }
+                                            ]
+                                        },
+                                        "node_type": "Call",
+                                        "source_language": null,
+                                        "source_language_version": null,
+                                        "source_refs": [
+                                            {
+                                                "col_end": 49,
+                                                "col_start": 4,
+                                                "node_type": "SourceRef",
+                                                "row_end": 21,
+                                                "row_start": 15,
+                                                "source_file_name": "cli"
+                                            }
+                                        ]
+                                    },
+                                    "source_refs": [
+                                        {
+                                            "col_end": 49,
+                                            "col_start": 4,
+                                            "node_type": "SourceRef",
+                                            "row_end": 21,
+                                            "row_start": 15,
+                                            "source_file_name": "cli"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "left": {
+                                        "node_type": "LiteralValue",
+                                        "source_code_data_type": [
+                                            "Python",
+                                            "3.8",
+                                            "Tuple"
+                                        ],
+                                        "source_refs": [
+                                            {
+                                                "col_end": 49,
+                                                "col_start": 4,
+                                                "node_type": "SourceRef",
+                                                "row_end": 21,
+                                                "row_start": 15,
+                                                "source_file_name": "cli"
+                                            }
+                                        ],
+                                        "value": [
+                                            {
+                                                "node_type": "LiteralValue",
+                                                "source_code_data_type": [
+                                                    "Python",
+                                                    "3.8",
+                                                    "Tuple"
+                                                ],
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 16,
+                                                        "col_start": 8,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 15,
+                                                        "row_start": 15,
+                                                        "source_file_name": "cli"
+                                                    }
+                                                ],
+                                                "value": [
+                                                    {
+                                                        "default_value": null,
+                                                        "node_type": "Var",
+                                                        "source_refs": [
+                                                            {
+                                                                "col_end": 10,
+                                                                "col_start": 8,
+                                                                "node_type": "SourceRef",
+                                                                "row_end": 15,
+                                                                "row_start": 15,
+                                                                "source_file_name": "cli"
+                                                            }
+                                                        ],
+                                                        "type": "float",
+                                                        "val": {
+                                                            "id": 12,
+                                                            "name": "df",
+                                                            "node_type": "Name",
+                                                            "source_refs": [
+                                                                {
+                                                                    "col_end": 10,
+                                                                    "col_start": 8,
+                                                                    "node_type": "SourceRef",
+                                                                    "row_end": 15,
+                                                                    "row_start": 15,
+                                                                    "source_file_name": "cli"
+                                                                }
+                                                            ]
+                                                        }
+                                                    },
+                                                    {
+                                                        "default_value": null,
+                                                        "node_type": "Var",
+                                                        "source_refs": [
+                                                            {
+                                                                "col_end": 16,
+                                                                "col_start": 12,
+                                                                "node_type": "SourceRef",
+                                                                "row_end": 15,
+                                                                "row_start": 15,
+                                                                "source_file_name": "cli"
+                                                            }
+                                                        ],
+                                                        "type": "float",
+                                                        "val": {
+                                                            "id": 13,
+                                                            "name": "name",
+                                                            "node_type": "Name",
+                                                            "source_refs": [
+                                                                {
+                                                                    "col_end": 16,
+                                                                    "col_start": 12,
+                                                                    "node_type": "SourceRef",
+                                                                    "row_end": 15,
+                                                                    "row_start": 15,
+                                                                    "source_file_name": "cli"
+                                                                }
+                                                            ]
+                                                        }
+                                                    }
+                                                ],
+                                                "value_type": "Tuple"
+                                            },
+                                            {
+                                                "default_value": null,
+                                                "node_type": "Var",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 49,
+                                                        "col_start": 4,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 21,
+                                                        "row_start": 15,
+                                                        "source_file_name": "cli"
+                                                    }
+                                                ],
+                                                "type": "iterator",
+                                                "val": {
+                                                    "id": 21,
+                                                    "name": "generated_iter_0",
+                                                    "node_type": "Name",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 49,
+                                                            "col_start": 4,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 21,
+                                                            "row_start": 15,
+                                                            "source_file_name": "cli"
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            {
+                                                "default_value": null,
+                                                "node_type": "Var",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 49,
+                                                        "col_start": 4,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 21,
+                                                        "row_start": 15,
+                                                        "source_file_name": "cli"
+                                                    }
+                                                ],
+                                                "type": "boolean",
+                                                "val": {
+                                                    "id": 24,
+                                                    "name": "sc_1",
+                                                    "node_type": "Name",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 49,
+                                                            "col_start": 4,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 21,
+                                                            "row_start": 15,
+                                                            "source_file_name": "cli"
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        ],
+                                        "value_type": "Tuple"
+                                    },
+                                    "node_type": "Assignment",
+                                    "right": {
+                                        "arguments": [
+                                            {
+                                                "default_value": null,
+                                                "node_type": "Var",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 49,
+                                                        "col_start": 4,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 21,
+                                                        "row_start": 15,
+                                                        "source_file_name": "cli"
+                                                    }
+                                                ],
+                                                "type": "iterator",
+                                                "val": {
+                                                    "id": 21,
+                                                    "name": "generated_iter_0",
+                                                    "node_type": "Name",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 49,
+                                                            "col_start": 4,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 21,
+                                                            "row_start": 15,
+                                                            "source_file_name": "cli"
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        ],
+                                        "func": {
+                                            "id": 23,
+                                            "name": "next",
+                                            "node_type": "Name",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 49,
+                                                    "col_start": 4,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 21,
+                                                    "row_start": 15,
+                                                    "source_file_name": "cli"
+                                                }
+                                            ]
+                                        },
+                                        "node_type": "Call",
+                                        "source_language": null,
+                                        "source_language_version": null,
+                                        "source_refs": [
+                                            {
+                                                "col_end": 49,
+                                                "col_start": 4,
+                                                "node_type": "SourceRef",
+                                                "row_end": 21,
+                                                "row_start": 15,
+                                                "source_file_name": "cli"
+                                            }
+                                        ]
+                                    },
+                                    "source_refs": [
+                                        {
+                                            "col_end": 49,
+                                            "col_start": 4,
+                                            "node_type": "SourceRef",
+                                            "row_end": 21,
+                                            "row_start": 15,
+                                            "source_file_name": "cli"
+                                        }
+                                    ]
+                                }
+                            ],
+                            "source_refs": [
+                                {
+                                    "col_end": 49,
+                                    "col_start": 4,
+                                    "node_type": "SourceRef",
+                                    "row_end": 21,
+                                    "row_start": 15,
+                                    "source_file_name": "cli"
+                                }
+                            ]
+                        }
+                    ],
+                    "func_args": [
+                        {
+                            "default_value": null,
+                            "node_type": "Var",
+                            "source_refs": [
+                                {
+                                    "col_end": 12,
+                                    "col_start": 8,
+                                    "node_type": "SourceRef",
+                                    "row_end": 10,
+                                    "row_start": 10,
+                                    "source_file_name": "cli"
+                                }
+                            ],
+                            "type": "float",
+                            "val": {
+                                "id": 3,
+                                "name": "argv",
+                                "node_type": "Name",
+                                "source_refs": [
+                                    {
+                                        "col_end": 12,
+                                        "col_start": 8,
+                                        "node_type": "SourceRef",
+                                        "row_end": 10,
+                                        "row_start": 10,
+                                        "source_file_name": "cli"
+                                    }
+                                ]
+                            }
+                        }
+                    ],
+                    "name": {
+                        "id": 2,
+                        "name": "run",
+                        "node_type": "Name",
+                        "source_refs": [
+                            {
+                                "col_end": 49,
+                                "col_start": 0,
+                                "node_type": "SourceRef",
+                                "row_end": 21,
+                                "row_start": 10,
+                                "source_file_name": "cli"
+                            }
+                        ]
+                    },
+                    "node_type": "FunctionDef",
+                    "source_refs": [
+                        {
+                            "col_end": 49,
+                            "col_start": 0,
+                            "node_type": "SourceRef",
+                            "row_end": 21,
+                            "row_start": 10,
+                            "source_file_name": "cli"
+                        }
+                    ]
+                },
+                {
+                    "body": [
+                        {
+                            "arguments": [
+                                {
+                                    "attr": {
+                                        "id": 3,
+                                        "name": "argv",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 16,
+                                                "col_start": 8,
+                                                "node_type": "SourceRef",
+                                                "row_end": 26,
+                                                "row_start": 26,
+                                                "source_file_name": "cli"
+                                            }
+                                        ]
+                                    },
+                                    "node_type": "Attribute",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 16,
+                                            "col_start": 8,
+                                            "node_type": "SourceRef",
+                                            "row_end": 26,
+                                            "row_start": 26,
+                                            "source_file_name": "cli"
+                                        }
+                                    ],
+                                    "value": {
+                                        "id": 26,
+                                        "name": "sys",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 11,
+                                                "col_start": 8,
+                                                "node_type": "SourceRef",
+                                                "row_end": 26,
+                                                "row_start": 26,
+                                                "source_file_name": "cli"
+                                            }
+                                        ]
+                                    }
+                                }
+                            ],
+                            "func": {
+                                "id": 2,
+                                "name": "run",
+                                "node_type": "Name",
+                                "source_refs": [
+                                    {
+                                        "col_end": 17,
+                                        "col_start": 4,
+                                        "node_type": "SourceRef",
+                                        "row_end": 26,
+                                        "row_start": 26,
+                                        "source_file_name": "cli"
+                                    }
+                                ]
+                            },
+                            "node_type": "Call",
+                            "source_language": null,
+                            "source_language_version": null,
+                            "source_refs": [
+                                {
+                                    "col_end": 17,
+                                    "col_start": 4,
+                                    "node_type": "SourceRef",
+                                    "row_end": 26,
+                                    "row_start": 26,
+                                    "source_file_name": "cli"
+                                }
+                            ]
+                        }
+                    ],
+                    "func_args": [],
+                    "name": {
+                        "id": 25,
+                        "name": "main",
+                        "node_type": "Name",
+                        "source_refs": [
+                            {
+                                "col_end": 17,
+                                "col_start": 0,
+                                "node_type": "SourceRef",
+                                "row_end": 26,
+                                "row_start": 24,
+                                "source_file_name": "cli"
+                            }
+                        ]
+                    },
+                    "node_type": "FunctionDef",
+                    "source_refs": [
+                        {
+                            "col_end": 17,
+                            "col_start": 0,
+                            "node_type": "SourceRef",
+                            "row_end": 26,
+                            "row_start": 24,
+                            "source_file_name": "cli"
+                        }
+                    ]
+                }
+            ],
+            "name": "cli",
+            "node_type": "Module",
+            "source_refs": [
+                {
+                    "col_end": null,
+                    "col_start": null,
+                    "node_type": "SourceRef",
+                    "row_end": 26,
+                    "row_start": 1,
+                    "source_file_name": "cli.py"
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,750 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.10.0" />
+<title>skema.program_analysis.model_coverage_report.model_coverage_report API documentation</title>
+<meta name="description" content="" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS_CHTML" integrity="sha256-kZafAc6mZvK3W3v1pHOcUix30OHQN6pU/NO2oFkqZVw=" crossorigin></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>skema.program_analysis.model_coverage_report.model_coverage_report</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">import argparse
+import os
+import traceback  # Debugs
+import requests
+import yaml
+from enum import Enum
+from typing import List, Dict, Tuple, Callable
+from zipfile import ZipFile
+from io import BytesIO
+from tempfile import TemporaryDirectory
+from pathlib import Path
+
+from func_timeout import func_timeout, FunctionTimedOut
+from tree_sitter import Language, Parser, Tree
+
+from skema.program_analysis.CAST2FN.cast import CAST
+from skema.program_analysis.run_ann_cast_pipeline import ann_cast_pipeline
+from skema.program_analysis.model_coverage_report.html_builder import HTML_Instance
+from skema.program_analysis.multi_file_ingester import process_file_system
+from skema.program_analysis.single_file_ingester import process_file
+from skema.program_analysis.snippet_ingester import process_snippet
+from skema.program_analysis.tree_sitter_parsers.build_parsers import (
+    INSTALLED_LANGUAGES_FILEPATH,
+    LANGUAGES_YAML_FILEPATH,
+)
+from skema.program_analysis.python2cast import python_to_cast
+from skema.program_analysis.fortran2cast import fortran_to_cast
+from skema.program_analysis.matlab2cast import matlab_to_cast
+from skema.program_analysis.tree_sitter_parsers.util import extension_to_language
+from skema.utils.fold import del_nulls, dictionary_to_gromet_json
+
+THIS_PATH = Path(__file__).parent.resolve()
+MODEL_YAML_PATH = Path(__file__).parent / &#34;models.yaml&#34;
+MODEL_YAML = yaml.safe_load(MODEL_YAML_PATH.read_text())
+
+class Status(Enum):
+    &#34;&#34;&#34;Status enum for the status of executing a step in the code2fn pipeline&#34;&#34;&#34;
+
+    VALID = &#34;Valid&#34;
+    TIMEOUT = &#34;Timeout&#34;
+    EXCEPTION = &#34;Exception&#34;
+
+    @staticmethod
+    def all_valid(status_list: List) -&gt; bool:
+        &#34;&#34;&#34;Check if all status in a List are Status.VALID&#34;&#34;&#34;
+        return all([status == Status.VALID for status in status_list])
+
+    @staticmethod
+    def get_overall_status(status_list: List) -&gt; str:
+        &#34;&#34;&#34;Return the final pipeline status given a List of status for each step in the pipeline&#34;&#34;&#34;
+        return (
+            Status.TIMEOUT
+            if Status.TIMEOUT in status_list
+            else Status.EXCEPTION
+            if Status.EXCEPTION in status_list
+            else Status.VALID
+        )
+
+
+def generate_data_product(
+    output_path: Path, data_product_function: Callable, args=(), kwargs=None
+) -&gt; str:
+    &#34;&#34;&#34;Wrapper function for generating data products, returns the status of processing.&#34;&#34;&#34;
+    os.chdir(THIS_PATH)
+    try:
+        output = func_timeout(10, data_product_function, args=args, kwargs=kwargs)
+        if output == &#34;&#34;:
+            raise Exception(&#34;Data product is empty&#34;)
+        output_path.write_text(output)
+        return Status.VALID
+    except FunctionTimedOut:
+        # There is a possibility that the processing function fails after changing the working directory.
+        # So we should change it back after each itteraton.
+        os.chdir(THIS_PATH)
+        output_path.write_text(&#34;Processing exceeded timeout (10s)&#34;)
+        return Status.TIMEOUT
+    except (Exception, SystemExit) as e:
+        os.chdir(THIS_PATH)
+        output_path.write_text(traceback.format_exc())
+        return Status.EXCEPTION
+
+
+def generate_parse_tree(source: str, language_name: str) -&gt; str:
+    &#34;&#34;&#34;Generator function for Tree-Sitter parse tree&#34;&#34;&#34;
+    # Determine the tree-sitter parser we need to use based on file extension
+    parser = Parser()
+    parser.set_language(Language(INSTALLED_LANGUAGES_FILEPATH, language_name))
+    tree = parser.parse(bytes(source, encoding=&#34;utf-8&#34;))
+
+    return tree.root_node.sexp()
+
+
+def generate_cast(source_path: str, language_name: str) -&gt; str:
+    &#34;&#34;&#34;Generator function for CAST&#34;&#34;&#34;
+    if language_name == &#34;python&#34;:
+        cast = python_to_cast(source_path, cast_obj=True)
+    elif language_name == &#34;fortran&#34;:
+        cast = fortran_to_cast(source_path, cast_obj=True)
+    elif language_name == &#34;matlab&#34;:
+        cast = matlab_to_cast(source_path, cast_obj=True)
+
+    # Currently, the CAST frontends can either return a single CAST object, or a List of CAST objects.
+    if isinstance(cast, List):
+        return &#34;\n&#34;.join([cast_obj.to_json_str() for cast_obj in cast])
+    else:
+        return cast.to_json_str()
+
+
+def generate_gromet(source_path: str) -&gt; str:
+    &#34;&#34;&#34;Generator function for Gromet&#34;&#34;&#34;
+    gromet_collection = process_file(source_path)
+    return dictionary_to_gromet_json(del_nulls(gromet_collection.to_dict()))
+
+
+def generate_full_gromet(system_name: str, root_path: str, system_filepaths: str):
+    &#34;&#34;&#34;Generator function for Gromet for full system ingest&#34;&#34;&#34;
+    gromet_collection = process_file_system(system_name, root_path, system_filepaths)
+    return dictionary_to_gromet_json(del_nulls(gromet_collection.to_dict()))
+
+
+def process_single_model(html: HTML_Instance, output_dir: str, model_name: str):
+    &#34;&#34;&#34;Generate an HTML report for a single model&#34;&#34;&#34;
+    html.add_model(model_name)
+
+    if model_name in MODEL_YAML:
+        model_url = MODEL_YAML[model_name][&#34;zip_archive&#34;]
+        response = requests.get(model_url)
+    else:
+        pass
+
+    zip = ZipFile(BytesIO(response.content))
+    with TemporaryDirectory() as temp:
+        file_status_list = []
+        supported_lines = 0
+        total_lines = 0
+        for file in zip.filelist:
+            source = str(zip.open(file).read(), encoding=&#34;utf-8&#34;)
+            temp_path = Path(temp) / file.filename
+            temp_path.parent.mkdir(parents=True, exist_ok=True)
+            temp_path.write_text(source)
+            filename = Path(file.filename).stem
+
+            # Determine the language name by cross referencing the file extension in languages.yaml
+            file_extension = Path(file.filename).suffix
+            language_name = extension_to_language(file_extension)
+
+            # Step 1: Generate Tree-Sitter parse tree
+            # NOTE: This currently produces the parse-tree BEFORE preprocessing. Once we have a generalized preprocessor, we can improve this.
+            parse_tree_path = (
+                Path(output_dir)
+                / &#34;data&#34;
+                / &#34;tree-sitter&#34;
+                / model_name
+                / f&#34;{filename}.txt&#34;
+            )
+            parse_tree_path.parent.mkdir(parents=True, exist_ok=True)
+            parse_tree_relative_path = str(parse_tree_path.relative_to(output_dir))
+            parse_tree_status = generate_data_product(
+                parse_tree_path, generate_parse_tree, (source, language_name), None
+            )
+
+            # Step 2: Generate CAST
+            # NOTE: Currently we don&#39;t have a system to pass a parse tree to the CAST frontends, so some processing will be repeated.
+            cast_path = (
+                Path(output_dir) / &#34;data&#34; / &#34;cast&#34; / model_name / f&#34;{filename}.json&#34;
+            )
+            cast_path.parent.mkdir(parents=True, exist_ok=True)
+            cast_relative_path = str(cast_path.relative_to(output_dir))
+            cast_status = generate_data_product(
+                cast_path,
+                generate_cast,
+                args=(str(temp_path), language_name),
+                kwargs=None,
+            )
+
+            # Step 3: Generate Gromet
+            # NOTE: The CAST-&gt;Gromet function currently only accepts a single CAST object. So we are not currently passing the CAST from the previous step.
+            gromet_path = (
+                Path(output_dir) / &#34;data&#34; / &#34;gromet&#34; / model_name / f&#34;{filename}.json&#34;
+            )
+            gromet_path.parent.mkdir(parents=True, exist_ok=True)
+            gromet_relative_path = str(gromet_path.relative_to(output_dir))
+            gromet_status = generate_data_product(
+                gromet_path, generate_gromet, args=(str(temp_path),), kwargs=None
+            )
+
+            # Check the status of each pipeline step
+            final_status = Status.get_overall_status(
+                [parse_tree_status, cast_status, gromet_status]
+            )
+            file_status_list.append(final_status)
+
+            if final_status == Status.VALID:
+                can_ingest = True
+                supported_lines += len(source.splitlines())
+            else:
+                can_ingest = False
+            total_lines += len(source.splitlines())
+
+            html.add_file_basic(
+                model_name,
+                file.filename,
+                len(source.splitlines()),
+                can_ingest,
+                parse_tree_relative_path,
+                cast_relative_path,
+                gromet_relative_path,
+            )
+
+        # If all files are valid in a system, attempt to ingest full system into single GrometFNModuleCollection
+        if not Status.all_valid(file_status_list):
+            html.add_model_header_data(
+                model_name, supported_lines, total_lines, False, None
+            )
+        else:
+            system_filepaths = Path(temp) / &#34;system_filepaths.txt&#34;
+            system_filepaths.write_text(
+                &#34;\n&#34;.join([file.filename for file in zip.filelist])
+            )
+            full_gromet_path = (
+                Path(output_dir)
+                / &#34;data&#34;
+                / &#34;full_gromet&#34;
+                / model_name
+                / f&#34;{model_name}.json&#34;
+            )
+            full_gromet_path.parent.mkdir(parents=True, exist_ok=True)
+            full_gromet_relative_path = str(full_gromet_path.relative_to(output_dir))
+            full_gromet_status = generate_data_product(
+                full_gromet_path,
+                generate_full_gromet,
+                args=(model_name, str(Path(temp)), str(system_filepaths)),
+                kwargs=None,
+            )
+            html.add_model_header_data(
+                model_name,
+                supported_lines,
+                total_lines,
+                True,
+                full_gromet_relative_path,
+            )
+
+
+def process_all_models(html: HTML_Instance, output_dir: str):
+    &#34;&#34;&#34;Generate an HTML report for all models in models.yaml&#34;&#34;&#34;
+    for model_name in MODEL_YAML:
+        process_single_model(html, output_dir, model_name)
+
+
+def main():
+    parser = argparse.ArgumentParser(description=&#34;Process models.&#34;)
+    parser.add_argument(&#34;output_dir&#34;, help=&#34;Path to the output directory&#34;)
+    subparsers = parser.add_subparsers(dest=&#34;mode&#34;)
+
+    # Subparser for the &#34;all&#34; mode
+    all_parser = subparsers.add_parser(&#34;all&#34;)
+
+    # Subparser for the &#34;single&#34; mode
+    single_parser = subparsers.add_parser(&#34;single&#34;)
+    single_parser.add_argument(&#34;model_name&#34;, help=&#34;Name of the model to be processed&#34;)
+
+    args = parser.parse_args()
+
+    # output_dir has to be resolved ahead of time due to how the cwd is changed in the Gromet pipeline
+    output_dir = str(Path(args.output_dir).resolve()) 
+
+    html = HTML_Instance()
+    if args.mode == &#34;all&#34;:
+        process_all_models(html, output_dir)
+    elif args.mode == &#34;single&#34;:
+        process_single_model(html, output_dir, args.model_name)
+
+    output_path = Path(output_dir) / &#34;report.html&#34;
+    output_path.write_text(html.soup.prettify())
+
+
+if __name__ == &#34;__main__&#34;:
+    main()</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="skema.program_analysis.model_coverage_report.model_coverage_report.generate_cast"><code class="name flex">
+<span>def <span class="ident">generate_cast</span></span>(<span>source_path: str, language_name: str) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Generator function for CAST</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def generate_cast(source_path: str, language_name: str) -&gt; str:
+    &#34;&#34;&#34;Generator function for CAST&#34;&#34;&#34;
+    if language_name == &#34;python&#34;:
+        cast = python_to_cast(source_path, cast_obj=True)
+    elif language_name == &#34;fortran&#34;:
+        cast = fortran_to_cast(source_path, cast_obj=True)
+    elif language_name == &#34;matlab&#34;:
+        cast = matlab_to_cast(source_path, cast_obj=True)
+
+    # Currently, the CAST frontends can either return a single CAST object, or a List of CAST objects.
+    if isinstance(cast, List):
+        return &#34;\n&#34;.join([cast_obj.to_json_str() for cast_obj in cast])
+    else:
+        return cast.to_json_str()</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.model_coverage_report.model_coverage_report.generate_data_product"><code class="name flex">
+<span>def <span class="ident">generate_data_product</span></span>(<span>output_path: pathlib.Path, data_product_function: Callable, args=(), kwargs=None) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Wrapper function for generating data products, returns the status of processing.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def generate_data_product(
+    output_path: Path, data_product_function: Callable, args=(), kwargs=None
+) -&gt; str:
+    &#34;&#34;&#34;Wrapper function for generating data products, returns the status of processing.&#34;&#34;&#34;
+    os.chdir(THIS_PATH)
+    try:
+        output = func_timeout(10, data_product_function, args=args, kwargs=kwargs)
+        if output == &#34;&#34;:
+            raise Exception(&#34;Data product is empty&#34;)
+        output_path.write_text(output)
+        return Status.VALID
+    except FunctionTimedOut:
+        # There is a possibility that the processing function fails after changing the working directory.
+        # So we should change it back after each itteraton.
+        os.chdir(THIS_PATH)
+        output_path.write_text(&#34;Processing exceeded timeout (10s)&#34;)
+        return Status.TIMEOUT
+    except (Exception, SystemExit) as e:
+        os.chdir(THIS_PATH)
+        output_path.write_text(traceback.format_exc())
+        return Status.EXCEPTION</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.model_coverage_report.model_coverage_report.generate_full_gromet"><code class="name flex">
+<span>def <span class="ident">generate_full_gromet</span></span>(<span>system_name: str, root_path: str, system_filepaths: str)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Generator function for Gromet for full system ingest</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def generate_full_gromet(system_name: str, root_path: str, system_filepaths: str):
+    &#34;&#34;&#34;Generator function for Gromet for full system ingest&#34;&#34;&#34;
+    gromet_collection = process_file_system(system_name, root_path, system_filepaths)
+    return dictionary_to_gromet_json(del_nulls(gromet_collection.to_dict()))</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.model_coverage_report.model_coverage_report.generate_gromet"><code class="name flex">
+<span>def <span class="ident">generate_gromet</span></span>(<span>source_path: str) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Generator function for Gromet</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def generate_gromet(source_path: str) -&gt; str:
+    &#34;&#34;&#34;Generator function for Gromet&#34;&#34;&#34;
+    gromet_collection = process_file(source_path)
+    return dictionary_to_gromet_json(del_nulls(gromet_collection.to_dict()))</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.model_coverage_report.model_coverage_report.generate_parse_tree"><code class="name flex">
+<span>def <span class="ident">generate_parse_tree</span></span>(<span>source: str, language_name: str) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Generator function for Tree-Sitter parse tree</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def generate_parse_tree(source: str, language_name: str) -&gt; str:
+    &#34;&#34;&#34;Generator function for Tree-Sitter parse tree&#34;&#34;&#34;
+    # Determine the tree-sitter parser we need to use based on file extension
+    parser = Parser()
+    parser.set_language(Language(INSTALLED_LANGUAGES_FILEPATH, language_name))
+    tree = parser.parse(bytes(source, encoding=&#34;utf-8&#34;))
+
+    return tree.root_node.sexp()</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.model_coverage_report.model_coverage_report.main"><code class="name flex">
+<span>def <span class="ident">main</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def main():
+    parser = argparse.ArgumentParser(description=&#34;Process models.&#34;)
+    parser.add_argument(&#34;output_dir&#34;, help=&#34;Path to the output directory&#34;)
+    subparsers = parser.add_subparsers(dest=&#34;mode&#34;)
+
+    # Subparser for the &#34;all&#34; mode
+    all_parser = subparsers.add_parser(&#34;all&#34;)
+
+    # Subparser for the &#34;single&#34; mode
+    single_parser = subparsers.add_parser(&#34;single&#34;)
+    single_parser.add_argument(&#34;model_name&#34;, help=&#34;Name of the model to be processed&#34;)
+
+    args = parser.parse_args()
+
+    # output_dir has to be resolved ahead of time due to how the cwd is changed in the Gromet pipeline
+    output_dir = str(Path(args.output_dir).resolve()) 
+
+    html = HTML_Instance()
+    if args.mode == &#34;all&#34;:
+        process_all_models(html, output_dir)
+    elif args.mode == &#34;single&#34;:
+        process_single_model(html, output_dir, args.model_name)
+
+    output_path = Path(output_dir) / &#34;report.html&#34;
+    output_path.write_text(html.soup.prettify())</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.model_coverage_report.model_coverage_report.process_all_models"><code class="name flex">
+<span>def <span class="ident">process_all_models</span></span>(<span>html: <a title="skema.program_analysis.model_coverage_report.html_builder.HTML_Instance" href="html_builder.html#skema.program_analysis.model_coverage_report.html_builder.HTML_Instance">HTML_Instance</a>, output_dir: str)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Generate an HTML report for all models in models.yaml</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def process_all_models(html: HTML_Instance, output_dir: str):
+    &#34;&#34;&#34;Generate an HTML report for all models in models.yaml&#34;&#34;&#34;
+    for model_name in MODEL_YAML:
+        process_single_model(html, output_dir, model_name)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.model_coverage_report.model_coverage_report.process_single_model"><code class="name flex">
+<span>def <span class="ident">process_single_model</span></span>(<span>html: <a title="skema.program_analysis.model_coverage_report.html_builder.HTML_Instance" href="html_builder.html#skema.program_analysis.model_coverage_report.html_builder.HTML_Instance">HTML_Instance</a>, output_dir: str, model_name: str)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Generate an HTML report for a single model</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def process_single_model(html: HTML_Instance, output_dir: str, model_name: str):
+    &#34;&#34;&#34;Generate an HTML report for a single model&#34;&#34;&#34;
+    html.add_model(model_name)
+
+    if model_name in MODEL_YAML:
+        model_url = MODEL_YAML[model_name][&#34;zip_archive&#34;]
+        response = requests.get(model_url)
+    else:
+        pass
+
+    zip = ZipFile(BytesIO(response.content))
+    with TemporaryDirectory() as temp:
+        file_status_list = []
+        supported_lines = 0
+        total_lines = 0
+        for file in zip.filelist:
+            source = str(zip.open(file).read(), encoding=&#34;utf-8&#34;)
+            temp_path = Path(temp) / file.filename
+            temp_path.parent.mkdir(parents=True, exist_ok=True)
+            temp_path.write_text(source)
+            filename = Path(file.filename).stem
+
+            # Determine the language name by cross referencing the file extension in languages.yaml
+            file_extension = Path(file.filename).suffix
+            language_name = extension_to_language(file_extension)
+
+            # Step 1: Generate Tree-Sitter parse tree
+            # NOTE: This currently produces the parse-tree BEFORE preprocessing. Once we have a generalized preprocessor, we can improve this.
+            parse_tree_path = (
+                Path(output_dir)
+                / &#34;data&#34;
+                / &#34;tree-sitter&#34;
+                / model_name
+                / f&#34;{filename}.txt&#34;
+            )
+            parse_tree_path.parent.mkdir(parents=True, exist_ok=True)
+            parse_tree_relative_path = str(parse_tree_path.relative_to(output_dir))
+            parse_tree_status = generate_data_product(
+                parse_tree_path, generate_parse_tree, (source, language_name), None
+            )
+
+            # Step 2: Generate CAST
+            # NOTE: Currently we don&#39;t have a system to pass a parse tree to the CAST frontends, so some processing will be repeated.
+            cast_path = (
+                Path(output_dir) / &#34;data&#34; / &#34;cast&#34; / model_name / f&#34;{filename}.json&#34;
+            )
+            cast_path.parent.mkdir(parents=True, exist_ok=True)
+            cast_relative_path = str(cast_path.relative_to(output_dir))
+            cast_status = generate_data_product(
+                cast_path,
+                generate_cast,
+                args=(str(temp_path), language_name),
+                kwargs=None,
+            )
+
+            # Step 3: Generate Gromet
+            # NOTE: The CAST-&gt;Gromet function currently only accepts a single CAST object. So we are not currently passing the CAST from the previous step.
+            gromet_path = (
+                Path(output_dir) / &#34;data&#34; / &#34;gromet&#34; / model_name / f&#34;{filename}.json&#34;
+            )
+            gromet_path.parent.mkdir(parents=True, exist_ok=True)
+            gromet_relative_path = str(gromet_path.relative_to(output_dir))
+            gromet_status = generate_data_product(
+                gromet_path, generate_gromet, args=(str(temp_path),), kwargs=None
+            )
+
+            # Check the status of each pipeline step
+            final_status = Status.get_overall_status(
+                [parse_tree_status, cast_status, gromet_status]
+            )
+            file_status_list.append(final_status)
+
+            if final_status == Status.VALID:
+                can_ingest = True
+                supported_lines += len(source.splitlines())
+            else:
+                can_ingest = False
+            total_lines += len(source.splitlines())
+
+            html.add_file_basic(
+                model_name,
+                file.filename,
+                len(source.splitlines()),
+                can_ingest,
+                parse_tree_relative_path,
+                cast_relative_path,
+                gromet_relative_path,
+            )
+
+        # If all files are valid in a system, attempt to ingest full system into single GrometFNModuleCollection
+        if not Status.all_valid(file_status_list):
+            html.add_model_header_data(
+                model_name, supported_lines, total_lines, False, None
+            )
+        else:
+            system_filepaths = Path(temp) / &#34;system_filepaths.txt&#34;
+            system_filepaths.write_text(
+                &#34;\n&#34;.join([file.filename for file in zip.filelist])
+            )
+            full_gromet_path = (
+                Path(output_dir)
+                / &#34;data&#34;
+                / &#34;full_gromet&#34;
+                / model_name
+                / f&#34;{model_name}.json&#34;
+            )
+            full_gromet_path.parent.mkdir(parents=True, exist_ok=True)
+            full_gromet_relative_path = str(full_gromet_path.relative_to(output_dir))
+            full_gromet_status = generate_data_product(
+                full_gromet_path,
+                generate_full_gromet,
+                args=(model_name, str(Path(temp)), str(system_filepaths)),
+                kwargs=None,
+            )
+            html.add_model_header_data(
+                model_name,
+                supported_lines,
+                total_lines,
+                True,
+                full_gromet_relative_path,
+            )</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="skema.program_analysis.model_coverage_report.model_coverage_report.Status"><code class="flex name class">
+<span>class <span class="ident">Status</span></span>
+<span>(</span><span>value, names=None, *, module=None, qualname=None, type=None, start=1)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Status enum for the status of executing a step in the code2fn pipeline</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Status(Enum):
+    &#34;&#34;&#34;Status enum for the status of executing a step in the code2fn pipeline&#34;&#34;&#34;
+
+    VALID = &#34;Valid&#34;
+    TIMEOUT = &#34;Timeout&#34;
+    EXCEPTION = &#34;Exception&#34;
+
+    @staticmethod
+    def all_valid(status_list: List) -&gt; bool:
+        &#34;&#34;&#34;Check if all status in a List are Status.VALID&#34;&#34;&#34;
+        return all([status == Status.VALID for status in status_list])
+
+    @staticmethod
+    def get_overall_status(status_list: List) -&gt; str:
+        &#34;&#34;&#34;Return the final pipeline status given a List of status for each step in the pipeline&#34;&#34;&#34;
+        return (
+            Status.TIMEOUT
+            if Status.TIMEOUT in status_list
+            else Status.EXCEPTION
+            if Status.EXCEPTION in status_list
+            else Status.VALID
+        )</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="skema.program_analysis.model_coverage_report.model_coverage_report.Status.EXCEPTION"><code class="name">var <span class="ident">EXCEPTION</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.program_analysis.model_coverage_report.model_coverage_report.Status.TIMEOUT"><code class="name">var <span class="ident">TIMEOUT</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.program_analysis.model_coverage_report.model_coverage_report.Status.VALID"><code class="name">var <span class="ident">VALID</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Static methods</h3>
+<dl>
+<dt id="skema.program_analysis.model_coverage_report.model_coverage_report.Status.all_valid"><code class="name flex">
+<span>def <span class="ident">all_valid</span></span>(<span>status_list: List[~T]) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Check if all status in a List are Status.VALID</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@staticmethod
+def all_valid(status_list: List) -&gt; bool:
+    &#34;&#34;&#34;Check if all status in a List are Status.VALID&#34;&#34;&#34;
+    return all([status == Status.VALID for status in status_list])</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.model_coverage_report.model_coverage_report.Status.get_overall_status"><code class="name flex">
+<span>def <span class="ident">get_overall_status</span></span>(<span>status_list: List[~T]) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Return the final pipeline status given a List of status for each step in the pipeline</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@staticmethod
+def get_overall_status(status_list: List) -&gt; str:
+    &#34;&#34;&#34;Return the final pipeline status given a List of status for each step in the pipeline&#34;&#34;&#34;
+    return (
+        Status.TIMEOUT
+        if Status.TIMEOUT in status_list
+        else Status.EXCEPTION
+        if Status.EXCEPTION in status_list
+        else Status.VALID
+    )</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="skema.program_analysis.model_coverage_report" href="index.html">skema.program_analysis.model_coverage_report</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="skema.program_analysis.model_coverage_report.model_coverage_report.generate_cast" href="#skema.program_analysis.model_coverage_report.model_coverage_report.generate_cast">generate_cast</a></code></li>
+<li><code><a title="skema.program_analysis.model_coverage_report.model_coverage_report.generate_data_product" href="#skema.program_analysis.model_coverage_report.model_coverage_report.generate_data_product">generate_data_product</a></code></li>
+<li><code><a title="skema.program_analysis.model_coverage_report.model_coverage_report.generate_full_gromet" href="#skema.program_analysis.model_coverage_report.model_coverage_report.generate_full_gromet">generate_full_gromet</a></code></li>
+<li><code><a title="skema.program_analysis.model_coverage_report.model_coverage_report.generate_gromet" href="#skema.program_analysis.model_coverage_report.model_coverage_report.generate_gromet">generate_gromet</a></code></li>
+<li><code><a title="skema.program_analysis.model_coverage_report.model_coverage_report.generate_parse_tree" href="#skema.program_analysis.model_coverage_report.model_coverage_report.generate_parse_tree">generate_parse_tree</a></code></li>
+<li><code><a title="skema.program_analysis.model_coverage_report.model_coverage_report.main" href="#skema.program_analysis.model_coverage_report.model_coverage_report.main">main</a></code></li>
+<li><code><a title="skema.program_analysis.model_coverage_report.model_coverage_report.process_all_models" href="#skema.program_analysis.model_coverage_report.model_coverage_report.process_all_models">process_all_models</a></code></li>
+<li><code><a title="skema.program_analysis.model_coverage_report.model_coverage_report.process_single_model" href="#skema.program_analysis.model_coverage_report.model_coverage_report.process_single_model">process_single_model</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="skema.program_analysis.model_coverage_report.model_coverage_report.Status" href="#skema.program_analysis.model_coverage_report.model_coverage_report.Status">Status</a></code></h4>
+<ul class="">
+<li><code><a title="skema.program_analysis.model_coverage_report.model_coverage_report.Status.EXCEPTION" href="#skema.program_analysis.model_coverage_report.model_coverage_report.Status.EXCEPTION">EXCEPTION</a></code></li>
+<li><code><a title="skema.program_analysis.model_coverage_report.model_coverage_report.Status.TIMEOUT" href="#skema.program_analysis.model_coverage_report.model_coverage_report.Status.TIMEOUT">TIMEOUT</a></code></li>
+<li><code><a title="skema.program_analysis.model_coverage_report.model_coverage_report.Status.VALID" href="#skema.program_analysis.model_coverage_report.model_coverage_report.Status.VALID">VALID</a></code></li>
+<li><code><a title="skema.program_analysis.model_coverage_report.model_coverage_report.Status.all_valid" href="#skema.program_analysis.model_coverage_report.model_coverage_report.Status.all_valid">all_valid</a></code></li>
+<li><code><a title="skema.program_analysis.model_coverage_report.model_coverage_report.Status.get_overall_status" href="#skema.program_analysis.model_coverage_report.model_coverage_report.Status.get_overall_status">get_overall_status</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
+</footer>
+</body>
+</html>

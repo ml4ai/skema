@@ -1,0 +1,21 @@
+Traceback (most recent call last):
+  File "skema/program_analysis/model_coverage_report/model_coverage_report.py", line 66, in generate_data_product
+    output = func_timeout(10, data_product_function, args=args, kwargs=kwargs)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/func_timeout/dafunc.py", line 108, in func_timeout
+    raise_exception(exception)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/func_timeout/py3_raise.py", line 7, in raise_exception
+    raise exception[0] from None
+  File "skema/program_analysis/model_coverage_report/model_coverage_report.py", line 111, in generate_gromet
+    gromet_collection = process_file(source_path)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/single_file_ingester.py", line 26, in process_file
+    gromet_collection = process_file_system(
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/multi_file_ingester.py", line 62, in process_file_system
+    cast = python_to_cast(full_file, cast_obj=True)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/python2cast.py", line 112, in python_to_cast
+    contents = ast.parse(file_contents)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/ast.py", line 47, in parse
+    return compile(source, filename, mode, flags,
+  File "<unknown>", line 320
+    elif self.compiler == 'pgi':
+                               ^
+TabError: inconsistent use of tabs and spaces in indentation

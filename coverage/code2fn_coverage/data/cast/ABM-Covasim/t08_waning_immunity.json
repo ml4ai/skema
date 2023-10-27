@@ -1,0 +1,1534 @@
+{
+    "nodes": [
+        {
+            "body": [
+                {
+                    "alias": "np",
+                    "all": false,
+                    "name": "numpy",
+                    "node_type": "ModelImport",
+                    "source_refs": [
+                        {
+                            "col_end": 18,
+                            "col_start": 0,
+                            "node_type": "SourceRef",
+                            "row_end": 5,
+                            "row_start": 5,
+                            "source_file_name": "t08_waning_immunity"
+                        }
+                    ],
+                    "symbol": null
+                },
+                {
+                    "alias": "pl",
+                    "all": false,
+                    "name": "pylab",
+                    "node_type": "ModelImport",
+                    "source_refs": [
+                        {
+                            "col_end": 18,
+                            "col_start": 0,
+                            "node_type": "SourceRef",
+                            "row_end": 7,
+                            "row_start": 7,
+                            "source_file_name": "t08_waning_immunity"
+                        }
+                    ],
+                    "symbol": null
+                },
+                {
+                    "left": {
+                        "default_value": null,
+                        "node_type": "Var",
+                        "source_refs": [
+                            {
+                                "col_end": 12,
+                                "col_start": 0,
+                                "node_type": "SourceRef",
+                                "row_end": 10,
+                                "row_start": 10,
+                                "source_file_name": "t08_waning_immunity"
+                            }
+                        ],
+                        "type": "float",
+                        "val": {
+                            "id": 0,
+                            "name": "sim_nowaning",
+                            "node_type": "Name",
+                            "source_refs": [
+                                {
+                                    "col_end": 12,
+                                    "col_start": 0,
+                                    "node_type": "SourceRef",
+                                    "row_end": 10,
+                                    "row_start": 10,
+                                    "source_file_name": "t08_waning_immunity"
+                                }
+                            ]
+                        }
+                    },
+                    "node_type": "Assignment",
+                    "right": {
+                        "arguments": [
+                            {
+                                "left": {
+                                    "default_value": null,
+                                    "node_type": "Var",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 79,
+                                            "col_start": 15,
+                                            "node_type": "SourceRef",
+                                            "row_end": 10,
+                                            "row_start": 10,
+                                            "source_file_name": "t08_waning_immunity"
+                                        }
+                                    ],
+                                    "type": "float",
+                                    "val": {
+                                        "id": 100,
+                                        "name": "n_days",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 79,
+                                                "col_start": 15,
+                                                "node_type": "SourceRef",
+                                                "row_end": 10,
+                                                "row_start": 10,
+                                                "source_file_name": "t08_waning_immunity"
+                                            }
+                                        ]
+                                    }
+                                },
+                                "node_type": "Assignment",
+                                "right": {
+                                    "node_type": "LiteralValue",
+                                    "source_code_data_type": [
+                                        "Python",
+                                        "3.8",
+                                        "<class 'int'>"
+                                    ],
+                                    "source_refs": [
+                                        {
+                                            "col_end": 32,
+                                            "col_start": 29,
+                                            "node_type": "SourceRef",
+                                            "row_end": 10,
+                                            "row_start": 10,
+                                            "source_file_name": "t08_waning_immunity"
+                                        }
+                                    ],
+                                    "value": 120,
+                                    "value_type": "Integer"
+                                },
+                                "source_refs": [
+                                    {
+                                        "col_end": 79,
+                                        "col_start": 15,
+                                        "node_type": "SourceRef",
+                                        "row_end": 10,
+                                        "row_start": 10,
+                                        "source_file_name": "t08_waning_immunity"
+                                    }
+                                ]
+                            },
+                            {
+                                "left": {
+                                    "default_value": null,
+                                    "node_type": "Var",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 79,
+                                            "col_start": 15,
+                                            "node_type": "SourceRef",
+                                            "row_end": 10,
+                                            "row_start": 10,
+                                            "source_file_name": "t08_waning_immunity"
+                                        }
+                                    ],
+                                    "type": "float",
+                                    "val": {
+                                        "id": 100,
+                                        "name": "use_waning",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 79,
+                                                "col_start": 15,
+                                                "node_type": "SourceRef",
+                                                "row_end": 10,
+                                                "row_start": 10,
+                                                "source_file_name": "t08_waning_immunity"
+                                            }
+                                        ]
+                                    }
+                                },
+                                "node_type": "Assignment",
+                                "right": {
+                                    "node_type": "LiteralValue",
+                                    "source_code_data_type": [
+                                        "Python",
+                                        "3.8",
+                                        "<class 'bool'>"
+                                    ],
+                                    "source_refs": [
+                                        {
+                                            "col_end": 50,
+                                            "col_start": 45,
+                                            "node_type": "SourceRef",
+                                            "row_end": 10,
+                                            "row_start": 10,
+                                            "source_file_name": "t08_waning_immunity"
+                                        }
+                                    ],
+                                    "value": "False",
+                                    "value_type": "Boolean"
+                                },
+                                "source_refs": [
+                                    {
+                                        "col_end": 79,
+                                        "col_start": 15,
+                                        "node_type": "SourceRef",
+                                        "row_end": 10,
+                                        "row_start": 10,
+                                        "source_file_name": "t08_waning_immunity"
+                                    }
+                                ]
+                            },
+                            {
+                                "left": {
+                                    "default_value": null,
+                                    "node_type": "Var",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 79,
+                                            "col_start": 15,
+                                            "node_type": "SourceRef",
+                                            "row_end": 10,
+                                            "row_start": 10,
+                                            "source_file_name": "t08_waning_immunity"
+                                        }
+                                    ],
+                                    "type": "float",
+                                    "val": {
+                                        "id": 100,
+                                        "name": "label",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 79,
+                                                "col_start": 15,
+                                                "node_type": "SourceRef",
+                                                "row_end": 10,
+                                                "row_start": 10,
+                                                "source_file_name": "t08_waning_immunity"
+                                            }
+                                        ]
+                                    }
+                                },
+                                "node_type": "Assignment",
+                                "right": {
+                                    "node_type": "LiteralValue",
+                                    "source_code_data_type": [
+                                        "Python",
+                                        "3.8",
+                                        "<class 'str'>"
+                                    ],
+                                    "source_refs": [
+                                        {
+                                            "col_end": 78,
+                                            "col_start": 58,
+                                            "node_type": "SourceRef",
+                                            "row_end": 10,
+                                            "row_start": 10,
+                                            "source_file_name": "t08_waning_immunity"
+                                        }
+                                    ],
+                                    "value": "No waning immunity",
+                                    "value_type": "List"
+                                },
+                                "source_refs": [
+                                    {
+                                        "col_end": 79,
+                                        "col_start": 15,
+                                        "node_type": "SourceRef",
+                                        "row_end": 10,
+                                        "row_start": 10,
+                                        "source_file_name": "t08_waning_immunity"
+                                    }
+                                ]
+                            }
+                        ],
+                        "func": {
+                            "attr": {
+                                "id": 5,
+                                "name": "Sim",
+                                "node_type": "Name",
+                                "source_refs": [
+                                    {
+                                        "col_end": 21,
+                                        "col_start": 15,
+                                        "node_type": "SourceRef",
+                                        "row_end": 10,
+                                        "row_start": 10,
+                                        "source_file_name": "t08_waning_immunity"
+                                    }
+                                ]
+                            },
+                            "node_type": "Attribute",
+                            "source_refs": [
+                                {
+                                    "col_end": 21,
+                                    "col_start": 15,
+                                    "node_type": "SourceRef",
+                                    "row_end": 10,
+                                    "row_start": 10,
+                                    "source_file_name": "t08_waning_immunity"
+                                }
+                            ],
+                            "value": {
+                                "id": -1,
+                                "name": "covasim",
+                                "node_type": "Name",
+                                "source_refs": [
+                                    {
+                                        "col_end": 17,
+                                        "col_start": 15,
+                                        "node_type": "SourceRef",
+                                        "row_end": 10,
+                                        "row_start": 10,
+                                        "source_file_name": "t08_waning_immunity"
+                                    }
+                                ]
+                            }
+                        },
+                        "node_type": "Call",
+                        "source_language": null,
+                        "source_language_version": null,
+                        "source_refs": [
+                            {
+                                "col_end": 79,
+                                "col_start": 15,
+                                "node_type": "SourceRef",
+                                "row_end": 10,
+                                "row_start": 10,
+                                "source_file_name": "t08_waning_immunity"
+                            }
+                        ]
+                    },
+                    "source_refs": [
+                        {
+                            "col_end": 79,
+                            "col_start": 0,
+                            "node_type": "SourceRef",
+                            "row_end": 10,
+                            "row_start": 10,
+                            "source_file_name": "t08_waning_immunity"
+                        }
+                    ]
+                },
+                {
+                    "left": {
+                        "default_value": null,
+                        "node_type": "Var",
+                        "source_refs": [
+                            {
+                                "col_end": 10,
+                                "col_start": 0,
+                                "node_type": "SourceRef",
+                                "row_end": 11,
+                                "row_start": 11,
+                                "source_file_name": "t08_waning_immunity"
+                            }
+                        ],
+                        "type": "float",
+                        "val": {
+                            "id": 1,
+                            "name": "sim_waning",
+                            "node_type": "Name",
+                            "source_refs": [
+                                {
+                                    "col_end": 10,
+                                    "col_start": 0,
+                                    "node_type": "SourceRef",
+                                    "row_end": 11,
+                                    "row_start": 11,
+                                    "source_file_name": "t08_waning_immunity"
+                                }
+                            ]
+                        }
+                    },
+                    "node_type": "Assignment",
+                    "right": {
+                        "arguments": [
+                            {
+                                "left": {
+                                    "default_value": null,
+                                    "node_type": "Var",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 58,
+                                            "col_start": 15,
+                                            "node_type": "SourceRef",
+                                            "row_end": 11,
+                                            "row_start": 11,
+                                            "source_file_name": "t08_waning_immunity"
+                                        }
+                                    ],
+                                    "type": "float",
+                                    "val": {
+                                        "id": 100,
+                                        "name": "n_days",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 58,
+                                                "col_start": 15,
+                                                "node_type": "SourceRef",
+                                                "row_end": 11,
+                                                "row_start": 11,
+                                                "source_file_name": "t08_waning_immunity"
+                                            }
+                                        ]
+                                    }
+                                },
+                                "node_type": "Assignment",
+                                "right": {
+                                    "node_type": "LiteralValue",
+                                    "source_code_data_type": [
+                                        "Python",
+                                        "3.8",
+                                        "<class 'int'>"
+                                    ],
+                                    "source_refs": [
+                                        {
+                                            "col_end": 32,
+                                            "col_start": 29,
+                                            "node_type": "SourceRef",
+                                            "row_end": 11,
+                                            "row_start": 11,
+                                            "source_file_name": "t08_waning_immunity"
+                                        }
+                                    ],
+                                    "value": 120,
+                                    "value_type": "Integer"
+                                },
+                                "source_refs": [
+                                    {
+                                        "col_end": 58,
+                                        "col_start": 15,
+                                        "node_type": "SourceRef",
+                                        "row_end": 11,
+                                        "row_start": 11,
+                                        "source_file_name": "t08_waning_immunity"
+                                    }
+                                ]
+                            },
+                            {
+                                "left": {
+                                    "default_value": null,
+                                    "node_type": "Var",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 58,
+                                            "col_start": 15,
+                                            "node_type": "SourceRef",
+                                            "row_end": 11,
+                                            "row_start": 11,
+                                            "source_file_name": "t08_waning_immunity"
+                                        }
+                                    ],
+                                    "type": "float",
+                                    "val": {
+                                        "id": 100,
+                                        "name": "label",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 58,
+                                                "col_start": 15,
+                                                "node_type": "SourceRef",
+                                                "row_end": 11,
+                                                "row_start": 11,
+                                                "source_file_name": "t08_waning_immunity"
+                                            }
+                                        ]
+                                    }
+                                },
+                                "node_type": "Assignment",
+                                "right": {
+                                    "node_type": "LiteralValue",
+                                    "source_code_data_type": [
+                                        "Python",
+                                        "3.8",
+                                        "<class 'str'>"
+                                    ],
+                                    "source_refs": [
+                                        {
+                                            "col_end": 57,
+                                            "col_start": 40,
+                                            "node_type": "SourceRef",
+                                            "row_end": 11,
+                                            "row_start": 11,
+                                            "source_file_name": "t08_waning_immunity"
+                                        }
+                                    ],
+                                    "value": "Waning immunity",
+                                    "value_type": "List"
+                                },
+                                "source_refs": [
+                                    {
+                                        "col_end": 58,
+                                        "col_start": 15,
+                                        "node_type": "SourceRef",
+                                        "row_end": 11,
+                                        "row_start": 11,
+                                        "source_file_name": "t08_waning_immunity"
+                                    }
+                                ]
+                            }
+                        ],
+                        "func": {
+                            "attr": {
+                                "id": 5,
+                                "name": "Sim",
+                                "node_type": "Name",
+                                "source_refs": [
+                                    {
+                                        "col_end": 21,
+                                        "col_start": 15,
+                                        "node_type": "SourceRef",
+                                        "row_end": 11,
+                                        "row_start": 11,
+                                        "source_file_name": "t08_waning_immunity"
+                                    }
+                                ]
+                            },
+                            "node_type": "Attribute",
+                            "source_refs": [
+                                {
+                                    "col_end": 21,
+                                    "col_start": 15,
+                                    "node_type": "SourceRef",
+                                    "row_end": 11,
+                                    "row_start": 11,
+                                    "source_file_name": "t08_waning_immunity"
+                                }
+                            ],
+                            "value": {
+                                "id": -1,
+                                "name": "covasim",
+                                "node_type": "Name",
+                                "source_refs": [
+                                    {
+                                        "col_end": 17,
+                                        "col_start": 15,
+                                        "node_type": "SourceRef",
+                                        "row_end": 11,
+                                        "row_start": 11,
+                                        "source_file_name": "t08_waning_immunity"
+                                    }
+                                ]
+                            }
+                        },
+                        "node_type": "Call",
+                        "source_language": null,
+                        "source_language_version": null,
+                        "source_refs": [
+                            {
+                                "col_end": 58,
+                                "col_start": 15,
+                                "node_type": "SourceRef",
+                                "row_end": 11,
+                                "row_start": 11,
+                                "source_file_name": "t08_waning_immunity"
+                            }
+                        ]
+                    },
+                    "source_refs": [
+                        {
+                            "col_end": 58,
+                            "col_start": 0,
+                            "node_type": "SourceRef",
+                            "row_end": 11,
+                            "row_start": 11,
+                            "source_file_name": "t08_waning_immunity"
+                        }
+                    ]
+                },
+                {
+                    "left": {
+                        "default_value": null,
+                        "node_type": "Var",
+                        "source_refs": [
+                            {
+                                "col_end": 16,
+                                "col_start": 0,
+                                "node_type": "SourceRef",
+                                "row_end": 14,
+                                "row_start": 14,
+                                "source_file_name": "t08_waning_immunity"
+                            }
+                        ],
+                        "type": "float",
+                        "val": {
+                            "id": 2,
+                            "name": "sim_fasterwaning",
+                            "node_type": "Name",
+                            "source_refs": [
+                                {
+                                    "col_end": 16,
+                                    "col_start": 0,
+                                    "node_type": "SourceRef",
+                                    "row_end": 14,
+                                    "row_start": 14,
+                                    "source_file_name": "t08_waning_immunity"
+                                }
+                            ]
+                        }
+                    },
+                    "node_type": "Assignment",
+                    "right": {
+                        "arguments": [
+                            {
+                                "left": {
+                                    "default_value": null,
+                                    "node_type": "Var",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 1,
+                                            "col_start": 19,
+                                            "node_type": "SourceRef",
+                                            "row_end": 18,
+                                            "row_start": 14,
+                                            "source_file_name": "t08_waning_immunity"
+                                        }
+                                    ],
+                                    "type": "float",
+                                    "val": {
+                                        "id": 100,
+                                        "name": "label",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 1,
+                                                "col_start": 19,
+                                                "node_type": "SourceRef",
+                                                "row_end": 18,
+                                                "row_start": 14,
+                                                "source_file_name": "t08_waning_immunity"
+                                            }
+                                        ]
+                                    }
+                                },
+                                "node_type": "Assignment",
+                                "right": {
+                                    "node_type": "LiteralValue",
+                                    "source_code_data_type": [
+                                        "Python",
+                                        "3.8",
+                                        "<class 'str'>"
+                                    ],
+                                    "source_refs": [
+                                        {
+                                            "col_end": 34,
+                                            "col_start": 10,
+                                            "node_type": "SourceRef",
+                                            "row_end": 15,
+                                            "row_start": 15,
+                                            "source_file_name": "t08_waning_immunity"
+                                        }
+                                    ],
+                                    "value": "Faster waning immunity",
+                                    "value_type": "List"
+                                },
+                                "source_refs": [
+                                    {
+                                        "col_end": 1,
+                                        "col_start": 19,
+                                        "node_type": "SourceRef",
+                                        "row_end": 18,
+                                        "row_start": 14,
+                                        "source_file_name": "t08_waning_immunity"
+                                    }
+                                ]
+                            },
+                            {
+                                "left": {
+                                    "default_value": null,
+                                    "node_type": "Var",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 1,
+                                            "col_start": 19,
+                                            "node_type": "SourceRef",
+                                            "row_end": 18,
+                                            "row_start": 14,
+                                            "source_file_name": "t08_waning_immunity"
+                                        }
+                                    ],
+                                    "type": "float",
+                                    "val": {
+                                        "id": 100,
+                                        "name": "n_days",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 1,
+                                                "col_start": 19,
+                                                "node_type": "SourceRef",
+                                                "row_end": 18,
+                                                "row_start": 14,
+                                                "source_file_name": "t08_waning_immunity"
+                                            }
+                                        ]
+                                    }
+                                },
+                                "node_type": "Assignment",
+                                "right": {
+                                    "node_type": "LiteralValue",
+                                    "source_code_data_type": [
+                                        "Python",
+                                        "3.8",
+                                        "<class 'int'>"
+                                    ],
+                                    "source_refs": [
+                                        {
+                                            "col_end": 14,
+                                            "col_start": 11,
+                                            "node_type": "SourceRef",
+                                            "row_end": 16,
+                                            "row_start": 16,
+                                            "source_file_name": "t08_waning_immunity"
+                                        }
+                                    ],
+                                    "value": 120,
+                                    "value_type": "Integer"
+                                },
+                                "source_refs": [
+                                    {
+                                        "col_end": 1,
+                                        "col_start": 19,
+                                        "node_type": "SourceRef",
+                                        "row_end": 18,
+                                        "row_start": 14,
+                                        "source_file_name": "t08_waning_immunity"
+                                    }
+                                ]
+                            },
+                            {
+                                "left": {
+                                    "default_value": null,
+                                    "node_type": "Var",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 1,
+                                            "col_start": 19,
+                                            "node_type": "SourceRef",
+                                            "row_end": 18,
+                                            "row_start": 14,
+                                            "source_file_name": "t08_waning_immunity"
+                                        }
+                                    ],
+                                    "type": "float",
+                                    "val": {
+                                        "id": 100,
+                                        "name": "nab_decay",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 1,
+                                                "col_start": 19,
+                                                "node_type": "SourceRef",
+                                                "row_end": 18,
+                                                "row_start": 14,
+                                                "source_file_name": "t08_waning_immunity"
+                                            }
+                                        ]
+                                    }
+                                },
+                                "node_type": "Assignment",
+                                "right": {
+                                    "arguments": [
+                                        {
+                                            "left": {
+                                                "default_value": null,
+                                                "node_type": "Var",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 128,
+                                                        "col_start": 14,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 17,
+                                                        "row_start": 17,
+                                                        "source_file_name": "t08_waning_immunity"
+                                                    }
+                                                ],
+                                                "type": "float",
+                                                "val": {
+                                                    "id": 100,
+                                                    "name": "form",
+                                                    "node_type": "Name",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 128,
+                                                            "col_start": 14,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 17,
+                                                            "row_start": 17,
+                                                            "source_file_name": "t08_waning_immunity"
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "node_type": "Assignment",
+                                            "right": {
+                                                "node_type": "LiteralValue",
+                                                "source_code_data_type": [
+                                                    "Python",
+                                                    "3.8",
+                                                    "<class 'str'>"
+                                                ],
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 42,
+                                                        "col_start": 24,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 17,
+                                                        "row_start": 17,
+                                                        "source_file_name": "t08_waning_immunity"
+                                                    }
+                                                ],
+                                                "value": "nab_growth_decay",
+                                                "value_type": "List"
+                                            },
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 128,
+                                                    "col_start": 14,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 17,
+                                                    "row_start": 17,
+                                                    "source_file_name": "t08_waning_immunity"
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "left": {
+                                                "default_value": null,
+                                                "node_type": "Var",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 128,
+                                                        "col_start": 14,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 17,
+                                                        "row_start": 17,
+                                                        "source_file_name": "t08_waning_immunity"
+                                                    }
+                                                ],
+                                                "type": "float",
+                                                "val": {
+                                                    "id": 100,
+                                                    "name": "growth_time",
+                                                    "node_type": "Name",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 128,
+                                                            "col_start": 14,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 17,
+                                                            "row_start": 17,
+                                                            "source_file_name": "t08_waning_immunity"
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "node_type": "Assignment",
+                                            "right": {
+                                                "node_type": "LiteralValue",
+                                                "source_code_data_type": [
+                                                    "Python",
+                                                    "3.8",
+                                                    "<class 'int'>"
+                                                ],
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 58,
+                                                        "col_start": 56,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 17,
+                                                        "row_start": 17,
+                                                        "source_file_name": "t08_waning_immunity"
+                                                    }
+                                                ],
+                                                "value": 21,
+                                                "value_type": "Integer"
+                                            },
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 128,
+                                                    "col_start": 14,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 17,
+                                                    "row_start": 17,
+                                                    "source_file_name": "t08_waning_immunity"
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "left": {
+                                                "default_value": null,
+                                                "node_type": "Var",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 128,
+                                                        "col_start": 14,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 17,
+                                                        "row_start": 17,
+                                                        "source_file_name": "t08_waning_immunity"
+                                                    }
+                                                ],
+                                                "type": "float",
+                                                "val": {
+                                                    "id": 100,
+                                                    "name": "decay_rate1",
+                                                    "node_type": "Name",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 128,
+                                                            "col_start": 14,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 17,
+                                                            "row_start": 17,
+                                                            "source_file_name": "t08_waning_immunity"
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "node_type": "Assignment",
+                                            "right": {
+                                                "node_type": "LiteralValue",
+                                                "source_code_data_type": [
+                                                    "Python",
+                                                    "3.8",
+                                                    "<class 'float'>"
+                                                ],
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 76,
+                                                        "col_start": 72,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 17,
+                                                        "row_start": 17,
+                                                        "source_file_name": "t08_waning_immunity"
+                                                    }
+                                                ],
+                                                "value": 0.07,
+                                                "value_type": "AbstractFloat"
+                                            },
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 128,
+                                                    "col_start": 14,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 17,
+                                                    "row_start": 17,
+                                                    "source_file_name": "t08_waning_immunity"
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "left": {
+                                                "default_value": null,
+                                                "node_type": "Var",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 128,
+                                                        "col_start": 14,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 17,
+                                                        "row_start": 17,
+                                                        "source_file_name": "t08_waning_immunity"
+                                                    }
+                                                ],
+                                                "type": "float",
+                                                "val": {
+                                                    "id": 100,
+                                                    "name": "decay_time1",
+                                                    "node_type": "Name",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 128,
+                                                            "col_start": 14,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 17,
+                                                            "row_start": 17,
+                                                            "source_file_name": "t08_waning_immunity"
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "node_type": "Assignment",
+                                            "right": {
+                                                "node_type": "LiteralValue",
+                                                "source_code_data_type": [
+                                                    "Python",
+                                                    "3.8",
+                                                    "<class 'int'>"
+                                                ],
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 92,
+                                                        "col_start": 90,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 17,
+                                                        "row_start": 17,
+                                                        "source_file_name": "t08_waning_immunity"
+                                                    }
+                                                ],
+                                                "value": 47,
+                                                "value_type": "Integer"
+                                            },
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 128,
+                                                    "col_start": 14,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 17,
+                                                    "row_start": 17,
+                                                    "source_file_name": "t08_waning_immunity"
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "left": {
+                                                "default_value": null,
+                                                "node_type": "Var",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 128,
+                                                        "col_start": 14,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 17,
+                                                        "row_start": 17,
+                                                        "source_file_name": "t08_waning_immunity"
+                                                    }
+                                                ],
+                                                "type": "float",
+                                                "val": {
+                                                    "id": 100,
+                                                    "name": "decay_rate2",
+                                                    "node_type": "Name",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 128,
+                                                            "col_start": 14,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 17,
+                                                            "row_start": 17,
+                                                            "source_file_name": "t08_waning_immunity"
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "node_type": "Assignment",
+                                            "right": {
+                                                "node_type": "LiteralValue",
+                                                "source_code_data_type": [
+                                                    "Python",
+                                                    "3.8",
+                                                    "<class 'float'>"
+                                                ],
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 110,
+                                                        "col_start": 106,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 17,
+                                                        "row_start": 17,
+                                                        "source_file_name": "t08_waning_immunity"
+                                                    }
+                                                ],
+                                                "value": 0.02,
+                                                "value_type": "AbstractFloat"
+                                            },
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 128,
+                                                    "col_start": 14,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 17,
+                                                    "row_start": 17,
+                                                    "source_file_name": "t08_waning_immunity"
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "left": {
+                                                "default_value": null,
+                                                "node_type": "Var",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 128,
+                                                        "col_start": 14,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 17,
+                                                        "row_start": 17,
+                                                        "source_file_name": "t08_waning_immunity"
+                                                    }
+                                                ],
+                                                "type": "float",
+                                                "val": {
+                                                    "id": 100,
+                                                    "name": "decay_time2",
+                                                    "node_type": "Name",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 128,
+                                                            "col_start": 14,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 17,
+                                                            "row_start": 17,
+                                                            "source_file_name": "t08_waning_immunity"
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "node_type": "Assignment",
+                                            "right": {
+                                                "node_type": "LiteralValue",
+                                                "source_code_data_type": [
+                                                    "Python",
+                                                    "3.8",
+                                                    "<class 'int'>"
+                                                ],
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 127,
+                                                        "col_start": 124,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 17,
+                                                        "row_start": 17,
+                                                        "source_file_name": "t08_waning_immunity"
+                                                    }
+                                                ],
+                                                "value": 106,
+                                                "value_type": "Integer"
+                                            },
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 128,
+                                                    "col_start": 14,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 17,
+                                                    "row_start": 17,
+                                                    "source_file_name": "t08_waning_immunity"
+                                                }
+                                            ]
+                                        }
+                                    ],
+                                    "func": {
+                                        "id": 6,
+                                        "name": "dict",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 128,
+                                                "col_start": 14,
+                                                "node_type": "SourceRef",
+                                                "row_end": 17,
+                                                "row_start": 17,
+                                                "source_file_name": "t08_waning_immunity"
+                                            }
+                                        ]
+                                    },
+                                    "node_type": "Call",
+                                    "source_language": null,
+                                    "source_language_version": null,
+                                    "source_refs": [
+                                        {
+                                            "col_end": 128,
+                                            "col_start": 14,
+                                            "node_type": "SourceRef",
+                                            "row_end": 17,
+                                            "row_start": 17,
+                                            "source_file_name": "t08_waning_immunity"
+                                        }
+                                    ]
+                                },
+                                "source_refs": [
+                                    {
+                                        "col_end": 1,
+                                        "col_start": 19,
+                                        "node_type": "SourceRef",
+                                        "row_end": 18,
+                                        "row_start": 14,
+                                        "source_file_name": "t08_waning_immunity"
+                                    }
+                                ]
+                            }
+                        ],
+                        "func": {
+                            "attr": {
+                                "id": 5,
+                                "name": "Sim",
+                                "node_type": "Name",
+                                "source_refs": [
+                                    {
+                                        "col_end": 25,
+                                        "col_start": 19,
+                                        "node_type": "SourceRef",
+                                        "row_end": 14,
+                                        "row_start": 14,
+                                        "source_file_name": "t08_waning_immunity"
+                                    }
+                                ]
+                            },
+                            "node_type": "Attribute",
+                            "source_refs": [
+                                {
+                                    "col_end": 25,
+                                    "col_start": 19,
+                                    "node_type": "SourceRef",
+                                    "row_end": 14,
+                                    "row_start": 14,
+                                    "source_file_name": "t08_waning_immunity"
+                                }
+                            ],
+                            "value": {
+                                "id": -1,
+                                "name": "covasim",
+                                "node_type": "Name",
+                                "source_refs": [
+                                    {
+                                        "col_end": 21,
+                                        "col_start": 19,
+                                        "node_type": "SourceRef",
+                                        "row_end": 14,
+                                        "row_start": 14,
+                                        "source_file_name": "t08_waning_immunity"
+                                    }
+                                ]
+                            }
+                        },
+                        "node_type": "Call",
+                        "source_language": null,
+                        "source_language_version": null,
+                        "source_refs": [
+                            {
+                                "col_end": 1,
+                                "col_start": 19,
+                                "node_type": "SourceRef",
+                                "row_end": 18,
+                                "row_start": 14,
+                                "source_file_name": "t08_waning_immunity"
+                            }
+                        ]
+                    },
+                    "source_refs": [
+                        {
+                            "col_end": 1,
+                            "col_start": 0,
+                            "node_type": "SourceRef",
+                            "row_end": 18,
+                            "row_start": 14,
+                            "source_file_name": "t08_waning_immunity"
+                        }
+                    ]
+                },
+                {
+                    "body": [
+                        {
+                            "left": {
+                                "default_value": null,
+                                "node_type": "Var",
+                                "source_refs": [
+                                    {
+                                        "col_end": 8,
+                                        "col_start": 4,
+                                        "node_type": "SourceRef",
+                                        "row_end": 21,
+                                        "row_start": 21,
+                                        "source_file_name": "t08_waning_immunity"
+                                    }
+                                ],
+                                "type": "float",
+                                "val": {
+                                    "id": 8,
+                                    "name": "msim",
+                                    "node_type": "Name",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 8,
+                                            "col_start": 4,
+                                            "node_type": "SourceRef",
+                                            "row_end": 21,
+                                            "row_start": 21,
+                                            "source_file_name": "t08_waning_immunity"
+                                        }
+                                    ]
+                                }
+                            },
+                            "node_type": "Assignment",
+                            "right": {
+                                "arguments": [
+                                    {
+                                        "id": 0,
+                                        "name": "sim_nowaning",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 35,
+                                                "col_start": 23,
+                                                "node_type": "SourceRef",
+                                                "row_end": 21,
+                                                "row_start": 21,
+                                                "source_file_name": "t08_waning_immunity"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "id": 1,
+                                        "name": "sim_waning",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 47,
+                                                "col_start": 37,
+                                                "node_type": "SourceRef",
+                                                "row_end": 21,
+                                                "row_start": 21,
+                                                "source_file_name": "t08_waning_immunity"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "id": 2,
+                                        "name": "sim_fasterwaning",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 65,
+                                                "col_start": 49,
+                                                "node_type": "SourceRef",
+                                                "row_end": 21,
+                                                "row_start": 21,
+                                                "source_file_name": "t08_waning_immunity"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "func": {
+                                    "attr": {
+                                        "id": 9,
+                                        "name": "parallel",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 22,
+                                                "col_start": 11,
+                                                "node_type": "SourceRef",
+                                                "row_end": 21,
+                                                "row_start": 21,
+                                                "source_file_name": "t08_waning_immunity"
+                                            }
+                                        ]
+                                    },
+                                    "node_type": "Attribute",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 22,
+                                            "col_start": 11,
+                                            "node_type": "SourceRef",
+                                            "row_end": 21,
+                                            "row_start": 21,
+                                            "source_file_name": "t08_waning_immunity"
+                                        }
+                                    ],
+                                    "value": {
+                                        "id": -1,
+                                        "name": "covasim",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 13,
+                                                "col_start": 11,
+                                                "node_type": "SourceRef",
+                                                "row_end": 21,
+                                                "row_start": 21,
+                                                "source_file_name": "t08_waning_immunity"
+                                            }
+                                        ]
+                                    }
+                                },
+                                "node_type": "Call",
+                                "source_language": null,
+                                "source_language_version": null,
+                                "source_refs": [
+                                    {
+                                        "col_end": 66,
+                                        "col_start": 11,
+                                        "node_type": "SourceRef",
+                                        "row_end": 21,
+                                        "row_start": 21,
+                                        "source_file_name": "t08_waning_immunity"
+                                    }
+                                ]
+                            },
+                            "source_refs": [
+                                {
+                                    "col_end": 66,
+                                    "col_start": 4,
+                                    "node_type": "SourceRef",
+                                    "row_end": 21,
+                                    "row_start": 21,
+                                    "source_file_name": "t08_waning_immunity"
+                                }
+                            ]
+                        },
+                        {
+                            "arguments": [],
+                            "func": {
+                                "attr": {
+                                    "id": 10,
+                                    "name": "plot",
+                                    "node_type": "Name",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 13,
+                                            "col_start": 4,
+                                            "node_type": "SourceRef",
+                                            "row_end": 22,
+                                            "row_start": 22,
+                                            "source_file_name": "t08_waning_immunity"
+                                        }
+                                    ]
+                                },
+                                "node_type": "Attribute",
+                                "source_refs": [
+                                    {
+                                        "col_end": 13,
+                                        "col_start": 4,
+                                        "node_type": "SourceRef",
+                                        "row_end": 22,
+                                        "row_start": 22,
+                                        "source_file_name": "t08_waning_immunity"
+                                    }
+                                ],
+                                "value": {
+                                    "id": 8,
+                                    "name": "msim",
+                                    "node_type": "Name",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 8,
+                                            "col_start": 4,
+                                            "node_type": "SourceRef",
+                                            "row_end": 22,
+                                            "row_start": 22,
+                                            "source_file_name": "t08_waning_immunity"
+                                        }
+                                    ]
+                                }
+                            },
+                            "node_type": "Call",
+                            "source_language": null,
+                            "source_language_version": null,
+                            "source_refs": [
+                                {
+                                    "col_end": 15,
+                                    "col_start": 4,
+                                    "node_type": "SourceRef",
+                                    "row_end": 22,
+                                    "row_start": 22,
+                                    "source_file_name": "t08_waning_immunity"
+                                }
+                            ]
+                        }
+                    ],
+                    "expr": {
+                        "interpreter": "Python",
+                        "node_type": "Operator",
+                        "op": "ast.Eq",
+                        "operands": [
+                            {
+                                "id": 7,
+                                "name": "__name__",
+                                "node_type": "Name",
+                                "source_refs": [
+                                    {
+                                        "col_end": 11,
+                                        "col_start": 3,
+                                        "node_type": "SourceRef",
+                                        "row_end": 20,
+                                        "row_start": 20,
+                                        "source_file_name": "t08_waning_immunity"
+                                    }
+                                ]
+                            },
+                            {
+                                "node_type": "LiteralValue",
+                                "source_code_data_type": [
+                                    "Python",
+                                    "3.8",
+                                    "<class 'str'>"
+                                ],
+                                "source_refs": [
+                                    {
+                                        "col_end": 25,
+                                        "col_start": 15,
+                                        "node_type": "SourceRef",
+                                        "row_end": 20,
+                                        "row_start": 20,
+                                        "source_file_name": "t08_waning_immunity"
+                                    }
+                                ],
+                                "value": "__main__",
+                                "value_type": "List"
+                            }
+                        ],
+                        "source_language": "Python",
+                        "source_refs": [
+                            {
+                                "col_end": 25,
+                                "col_start": 3,
+                                "node_type": "SourceRef",
+                                "row_end": 20,
+                                "row_start": 20,
+                                "source_file_name": "t08_waning_immunity"
+                            }
+                        ],
+                        "version": "3.8.18"
+                    },
+                    "node_type": "ModelIf",
+                    "orelse": [],
+                    "source_refs": [
+                        {
+                            "col_end": 15,
+                            "col_start": 0,
+                            "node_type": "SourceRef",
+                            "row_end": 22,
+                            "row_start": 20,
+                            "source_file_name": "t08_waning_immunity"
+                        }
+                    ]
+                }
+            ],
+            "name": "t08_waning_immunity",
+            "node_type": "Module",
+            "source_refs": [
+                {
+                    "col_end": null,
+                    "col_start": null,
+                    "node_type": "SourceRef",
+                    "row_end": 22,
+                    "row_start": 1,
+                    "source_file_name": "t08_waning_immunity.py"
+                }
+            ]
+        }
+    ]
+}
