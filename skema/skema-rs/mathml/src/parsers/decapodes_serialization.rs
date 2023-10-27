@@ -375,7 +375,7 @@ fn test_serialize1() {
 }
 
 #[test]
-fn test_serialize_APlusBT() {
+fn test_serialize_aplus_bt() {
     let input = "
     <math>
         <mrow><mi>OLR</mi></mrow>
