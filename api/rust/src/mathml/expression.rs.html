@@ -2717,13 +2717,6 @@
 <a href="#2717" id="2717">2717</a>
 <a href="#2718" id="2718">2718</a>
 <a href="#2719" id="2719">2719</a>
-<a href="#2720" id="2720">2720</a>
-<a href="#2721" id="2721">2721</a>
-<a href="#2722" id="2722">2722</a>
-<a href="#2723" id="2723">2723</a>
-<a href="#2724" id="2724">2724</a>
-<a href="#2725" id="2725">2725</a>
-<a href="#2726" id="2726">2726</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
     ast::{
         operator::Operator,
@@ -2748,7 +2741,8 @@
     Operator(Operator),
 }
 
-<span class="attr">#[derive(Debug, PartialEq, Clone)]
+<span class="doccomment">/// Intermediate data structure to support the generation of graphs of mathematical expressions
+</span><span class="attr">#[derive(Debug, Default, PartialEq, Clone)]
 </span><span class="kw">pub struct </span>Expression {
     <span class="kw">pub </span>ops: Vec&lt;Operator&gt;,
     <span class="kw">pub </span>args: Vec&lt;Expr&gt;,
@@ -2763,14 +2757,6 @@
         args: Vec&lt;Expr&gt;,
         name: String,
     },
-}
-
-<span class="doccomment">/// Intermediate data structure to support the generation of graphs of mathematical expressions
-</span><span class="attr">#[derive(Debug, Default, PartialEq, Clone)]
-</span><span class="kw">pub struct </span>PreExp {
-    <span class="kw">pub </span>ops: Vec&lt;Operator&gt;,
-    <span class="kw">pub </span>args: Vec&lt;Expr&gt;,
-    <span class="kw">pub </span>name: String,
 }
 
 <span class="doccomment">/// Check if the fraction is a derivative expressed in Leibniz notation. If yes, mutate it to
@@ -2794,15 +2780,15 @@
 
 <span class="doccomment">/// Identify if there is an implicit multiplication operator, and if so, add an
 /// explicit multiplication operator.
-</span><span class="kw">fn </span>insert_explicit_multiplication_operator(pre: <span class="kw-2">&amp;mut </span>PreExp) {
+</span><span class="kw">fn </span>insert_explicit_multiplication_operator(pre: <span class="kw-2">&amp;mut </span>Expression) {
     <span class="kw">if </span>pre.args.len() &gt;= pre.ops.len() {
         pre.ops.push(Operator::Multiply);
     }
 }
 
 <span class="kw">impl </span>MathExpression {
-    <span class="doccomment">/// Convert a MathExpression struct to a PreExp struct.
-    </span><span class="kw">pub fn </span>to_expr(<span class="self">self</span>, pre: <span class="kw-2">&amp;mut </span>PreExp) {
+    <span class="doccomment">/// Convert a MathExpression struct to a Expression struct.
+    </span><span class="kw">pub fn </span>to_expr(<span class="self">self</span>, pre: <span class="kw-2">&amp;mut </span>Expression) {
         <span class="kw">match </span><span class="self">self </span>{
             MathExpression::Mi(Mi(x)) =&gt; {
                 <span class="comment">// Process unary minus operation.
@@ -2841,7 +2827,7 @@
             }
             MathExpression::Mrow(Mrow(xs)) =&gt; {
                 insert_explicit_multiplication_operator(pre);
-                <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = PreExp::default();
+                <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = Expression::default();
                 pre_exp.ops.push(Operator::Other(<span class="string">&quot;&quot;</span>.to_string()));
                 <span class="kw">for </span>x <span class="kw">in </span>xs {
                     x.to_expr(<span class="kw-2">&amp;mut </span>pre_exp);
@@ -2854,7 +2840,7 @@
             }
             Msubsup(xs1, xs2, xs3) =&gt; {
                 insert_explicit_multiplication_operator(pre);
-                <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = PreExp::default();
+                <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = Expression::default();
                 pre_exp.ops.push(Operator::Other(<span class="string">&quot;&quot;</span>.to_string()));
                 pre_exp.ops.push(Operator::Other(<span class="string">&quot;_&quot;</span>.to_string()));
                 xs1.to_expr(<span class="kw-2">&amp;mut </span>pre_exp);
@@ -2869,7 +2855,7 @@
             }
             Msqrt(xs) =&gt; {
                 insert_explicit_multiplication_operator(pre);
-                <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = PreExp::default();
+                <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = Expression::default();
                 pre_exp.ops.push(Operator::Sqrt);
                 xs.to_expr(<span class="kw-2">&amp;mut </span>pre_exp);
                 pre.args.push(Expr::Expression {
@@ -2880,7 +2866,7 @@
             }
             Mfrac(<span class="kw-2">mut </span>xs1, <span class="kw-2">mut </span>xs2) =&gt; {
                 insert_explicit_multiplication_operator(pre);
-                <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = PreExp::default();
+                <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = Expression::default();
                 <span class="kw">if </span>is_derivative(<span class="kw-2">&amp;mut </span>xs1, <span class="kw-2">&amp;mut </span>xs2) {
                     pre_exp.ops.push(Operator::Other(<span class="string">&quot;derivative&quot;</span>.to_string()));
                 } <span class="kw">else </span>{
@@ -2897,7 +2883,7 @@
             }
             Msup(xs1, xs2) =&gt; {
                 insert_explicit_multiplication_operator(pre);
-                <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = PreExp::default();
+                <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = Expression::default();
                 pre_exp.ops.push(Operator::Other(<span class="string">&quot;&quot;</span>.to_string()));
                 xs1.to_expr(<span class="kw-2">&amp;mut </span>pre_exp);
                 pre_exp.ops.push(Operator::Other(<span class="string">&quot;^&quot;</span>.to_string()));
@@ -2910,7 +2896,7 @@
             }
             Mover(xs1, xs2) =&gt; {
                 insert_explicit_multiplication_operator(pre);
-                <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = PreExp::default();
+                <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = Expression::default();
                 pre_exp.ops.push(Operator::Other(<span class="string">&quot;&quot;</span>.to_string()));
                 xs1.to_expr(<span class="kw-2">&amp;mut </span>pre_exp);
                 xs2.to_expr(<span class="kw-2">&amp;mut </span>pre_exp);
@@ -2928,7 +2914,7 @@
     }
 
     <span class="kw">pub fn </span>to_graph(<span class="self">self</span>) -&gt; MathExpressionGraph&lt;<span class="lifetime">&#39;static</span>&gt; {
-        <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = PreExp {
+        <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = Expression {
             ops: Vec::&lt;Operator&gt;::new(),
             args: Vec::&lt;Expr&gt;::new(),
             name: <span class="string">&quot;root&quot;</span>.to_string(),
@@ -3740,7 +3726,7 @@
     <span class="bool-val">false
 </span>}
 
-<span class="kw">impl </span>PreExp {
+<span class="kw">impl </span>Expression {
     <span class="kw">pub fn </span>group_expr(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
         <span class="kw">for </span>arg <span class="kw">in </span><span class="kw-2">&amp;mut </span><span class="self">self</span>.args {
             <span class="kw">if let </span>Expr::Expression { .. } = arg {
@@ -3912,7 +3898,7 @@
         <span class="kw">let </span>loc = pre_string[<span class="kw-2">*</span>ul..].find(<span class="string">&#39;&lt;&#39;</span>).map(|i| i + ul);
         <span class="kw">match </span>loc {
             <span class="prelude-val">None </span>=&gt; {}
-            <span class="prelude-val">Some</span>(x) =&gt; pre_string.insert(x, <span class="string">&#39;;&#39;</span>),
+            <span class="prelude-val">Some</span>(x) =&gt; {}
         }
     }
     pre_string = html_escape::decode_html_entities(<span class="kw-2">&amp;</span>pre_string).to_string();
@@ -3941,7 +3927,7 @@
         Mo(Operator::Add),
         MathExpression::Mi(Mi(<span class="string">&quot;b&quot;</span>.to_string())),
     ]));
-    <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = PreExp {
+    <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = Expression {
         ops: Vec::&lt;Operator&gt;::new(),
         args: Vec::&lt;Expr&gt;::new(),
         name: <span class="string">&quot;&quot;</span>.to_string(),
@@ -3970,7 +3956,7 @@
             MathExpression::Mi(Mi(<span class="string">&quot;d&quot;</span>.to_string())),
         ])),
     ]));
-    <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = PreExp {
+    <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = Expression {
         ops: Vec::&lt;Operator&gt;::new(),
         args: Vec::&lt;Expr&gt;::new(),
         name: <span class="string">&quot;&quot;</span>.to_string(),
@@ -4008,7 +3994,7 @@
         Mo(Operator::Add),
         MathExpression::Mi(Mi(<span class="string">&quot;b&quot;</span>.to_string())),
     ]))));
-    <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = PreExp {
+    <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = Expression {
         ops: Vec::&lt;Operator&gt;::new(),
         args: Vec::&lt;Expr&gt;::new(),
         name: <span class="string">&quot;&quot;</span>.to_string(),
@@ -4043,7 +4029,7 @@
         ]))),
         Box::from(MathExpression::Mi(Mi(<span class="string">&quot;c&quot;</span>.to_string()))),
     );
-    <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = PreExp {
+    <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = Expression {
         ops: Vec::&lt;Operator&gt;::new(),
         args: Vec::&lt;Expr&gt;::new(),
         name: <span class="string">&quot;&quot;</span>.to_string(),
@@ -4084,7 +4070,7 @@
         Mo(Operator::Multiply),
         MathExpression::Mi(Mi(<span class="string">&quot;c&quot;</span>.to_string())),
     ]));
-    <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = PreExp {
+    <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = Expression {
         ops: Vec::&lt;Operator&gt;::new(),
         args: Vec::&lt;Expr&gt;::new(),
         name: <span class="string">&quot;&quot;</span>.to_string(),
@@ -4131,7 +4117,7 @@
         Mo(Operator::Subtract),
         MathExpression::Mi(Mi(<span class="string">&quot;h&quot;</span>.to_string())),
     ]));
-    <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = PreExp {
+    <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = Expression {
         ops: Vec::&lt;Operator&gt;::new(),
         args: Vec::&lt;Expr&gt;::new(),
         name: <span class="string">&quot;&quot;</span>.to_string(),
@@ -4183,7 +4169,7 @@
         Mo(Operator::Multiply),
         MathExpression::Mi(Mi(<span class="string">&quot;c&quot;</span>.to_string())),
     ]));
-    <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = PreExp {
+    <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = Expression {
         ops: Vec::&lt;Operator&gt;::new(),
         args: Vec::&lt;Expr&gt;::new(),
         name: <span class="string">&quot;root&quot;</span>.to_string(),
@@ -4233,7 +4219,7 @@
         Mo(Operator::Subtract),
         MathExpression::Mi(Mi(<span class="string">&quot;h&quot;</span>.to_string())),
     ]));
-    <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = PreExp {
+    <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = Expression {
         ops: Vec::&lt;Operator&gt;::new(),
         args: Vec::&lt;Expr&gt;::new(),
         name: <span class="string">&quot;&quot;</span>.to_string(),
@@ -4293,7 +4279,7 @@
             MathExpression::Mi(Mi(<span class="string">&quot;d&quot;</span>.to_string())),
         ])),
     ]));
-    <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = PreExp {
+    <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = Expression {
         ops: Vec::&lt;Operator&gt;::new(),
         args: Vec::&lt;Expr&gt;::new(),
         name: <span class="string">&quot;root&quot;</span>.to_string(),
@@ -4346,7 +4332,7 @@
             MathExpression::Mi(Mi(<span class="string">&quot;a&quot;</span>.to_string())),
         ])),
     ]));
-    <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = PreExp {
+    <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = Expression {
         ops: Vec::&lt;Operator&gt;::new(),
         args: Vec::&lt;Expr&gt;::new(),
         name: <span class="string">&quot;root&quot;</span>.to_string(),
@@ -4372,7 +4358,7 @@
         ])),
     ]))));
 
-    <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = PreExp {
+    <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = Expression {
         ops: Vec::&lt;Operator&gt;::new(),
         args: Vec::&lt;Expr&gt;::new(),
         name: <span class="string">&quot;root&quot;</span>.to_string(),
@@ -4403,7 +4389,7 @@
         Mo(Operator::Subtract),
         MathExpression::Mi(Mi(<span class="string">&quot;h&quot;</span>.to_string())),
     ]));
-    <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = PreExp {
+    <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = Expression {
         ops: Vec::&lt;Operator&gt;::new(),
         args: Vec::&lt;Expr&gt;::new(),
         name: <span class="string">&quot;&quot;</span>.to_string(),
@@ -4434,7 +4420,7 @@
         Mo(Operator::Subtract),
         MathExpression::Mi(Mi(<span class="string">&quot;b&quot;</span>.to_string())),
     ]));
-    <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = PreExp {
+    <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = Expression {
         ops: Vec::&lt;Operator&gt;::new(),
         args: Vec::&lt;Expr&gt;::new(),
         name: <span class="string">&quot;&quot;</span>.to_string(),
@@ -4461,7 +4447,7 @@
             MathExpression::Mi(Mi(<span class="string">&quot;b&quot;</span>.to_string())),
         ])),
     ]));
-    <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = PreExp {
+    <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = Expression {
         ops: Vec::&lt;Operator&gt;::new(),
         args: Vec::&lt;Expr&gt;::new(),
         name: <span class="string">&quot;&quot;</span>.to_string(),
@@ -4488,7 +4474,7 @@
             MathExpression::Mi(Mi(<span class="string">&quot;b&quot;</span>.to_string())),
         ])))),
     ]));
-    <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = PreExp {
+    <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = Expression {
         ops: Vec::&lt;Operator&gt;::new(),
         args: Vec::&lt;Expr&gt;::new(),
         name: <span class="string">&quot;&quot;</span>.to_string(),
@@ -4605,7 +4591,7 @@
         ]))),
         Box::from(MathExpression::Mi(Mi(<span class="string">&quot;c&quot;</span>.to_string()))),
     );
-    <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = PreExp {
+    <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = Expression {
         ops: Vec::&lt;Operator&gt;::new(),
         args: Vec::&lt;Expr&gt;::new(),
         name: <span class="string">&quot;&quot;</span>.to_string(),
@@ -4804,7 +4790,7 @@
             MathExpression::Mi(Mi(<span class="string">&quot;c&quot;</span>.to_string())),
         ])),
     ]));
-    <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = PreExp {
+    <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = Expression {
         ops: Vec::&lt;Operator&gt;::new(),
         args: Vec::&lt;Expr&gt;::new(),
         name: <span class="string">&quot;root&quot;</span>.to_string(),
@@ -4858,7 +4844,7 @@
             MathExpression::Mi(Mi(<span class="string">&quot;d&quot;</span>.to_string())),
         ])),
     ]));
-    <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = PreExp {
+    <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = Expression {
         ops: Vec::&lt;Operator&gt;::new(),
         args: Vec::&lt;Expr&gt;::new(),
         name: <span class="string">&quot;root&quot;</span>.to_string(),
@@ -4912,7 +4898,7 @@
             MathExpression::Mi(Mi(<span class="string">&quot;c&quot;</span>.to_string())),
         ])),
     ]));
-    <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = PreExp {
+    <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = Expression {
         ops: Vec::&lt;Operator&gt;::new(),
         args: Vec::&lt;Expr&gt;::new(),
         name: <span class="string">&quot;root&quot;</span>.to_string(),
@@ -4948,7 +4934,7 @@
         Mo(Operator::Subtract),
         MathExpression::Mi(Mi(<span class="string">&quot;c&quot;</span>.to_string())),
     ]));
-    <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = PreExp {
+    <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = Expression {
         ops: Vec::&lt;Operator&gt;::new(),
         args: Vec::&lt;Expr&gt;::new(),
         name: <span class="string">&quot;root&quot;</span>.to_string(),
@@ -4990,7 +4976,7 @@
         Mo(Operator::Add),
         MathExpression::Mi(Mi(<span class="string">&quot;e&quot;</span>.to_string())),
     ]));
-    <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = PreExp {
+    <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = Expression {
         ops: Vec::&lt;Operator&gt;::new(),
         args: Vec::&lt;Expr&gt;::new(),
         name: <span class="string">&quot;root&quot;</span>.to_string(),
@@ -5034,7 +5020,7 @@
             MathExpression::Mi(Mi(<span class="string">&quot;d&quot;</span>.to_string())),
         ])),
     ]));
-    <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = PreExp {
+    <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = Expression {
         ops: Vec::&lt;Operator&gt;::new(),
         args: Vec::&lt;Expr&gt;::new(),
         name: <span class="string">&quot;root&quot;</span>.to_string(),
@@ -5076,7 +5062,7 @@
             MathExpression::Mi(Mi(<span class="string">&quot;d&quot;</span>.to_string())),
         ])),
     ]));
-    <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = PreExp {
+    <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = Expression {
         ops: Vec::&lt;Operator&gt;::new(),
         args: Vec::&lt;Expr&gt;::new(),
         name: <span class="string">&quot;root&quot;</span>.to_string(),
@@ -5120,7 +5106,7 @@
             MathExpression::Mi(Mi(<span class="string">&quot;e&quot;</span>.to_string())),
         ])),
     ]));
-    <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = PreExp {
+    <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = Expression {
         ops: Vec::&lt;Operator&gt;::new(),
         args: Vec::&lt;Expr&gt;::new(),
         name: <span class="string">&quot;root&quot;</span>.to_string(),
@@ -5202,7 +5188,7 @@
             MathExpression::Mi(Mi(<span class="string">&quot;d&quot;</span>.to_string())),
         ])),
     ]));
-    <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = PreExp {
+    <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = Expression {
         ops: Vec::&lt;Operator&gt;::new(),
         args: Vec::&lt;Expr&gt;::new(),
         name: <span class="string">&quot;root&quot;</span>.to_string(),
@@ -5300,7 +5286,7 @@
         Mo(Operator::Add),
         MathExpression::Mi(Mi(<span class="string">&quot;l&quot;</span>.to_string())),
     ]));
-    <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = PreExp {
+    <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = Expression {
         ops: Vec::&lt;Operator&gt;::new(),
         args: Vec::&lt;Expr&gt;::new(),
         name: <span class="string">&quot;root&quot;</span>.to_string(),

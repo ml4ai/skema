@@ -50,7 +50,9 @@ def ping():
 
 
 @app.put(&#34;/align-eqns&#34;, summary=&#34;Align two MathML equations&#34;)
-async def align_eqns(file1: str, file2: str) -&gt; ISA_Result:
+async def align_eqns(
+    file1: str, file2: str, mention_json1: str = &#34;&#34;, mention_json2: str = &#34;&#34;
+) -&gt; ISA_Result:
     &#34;&#34;&#34;
     Endpoint for align two MathML equations.
     &#34;&#34;&#34;
@@ -63,7 +65,7 @@ async def align_eqns(file1: str, file2: str) -&gt; ISA_Result:
         aligned_indices2,
         union_graph,
         perfectly_matched_indices1,
-    ) = align_mathml_eqs(file1, file2)
+    ) = align_mathml_eqs(file1, file2, mention_json1, mention_json2)
     ir = ISA_Result()
     ir.matching_ratio = matching_ratio
     ir.union_graph = union_graph.to_string()
@@ -78,7 +80,7 @@ async def align_eqns(file1: str, file2: str) -&gt; ISA_Result:
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
 <dt id="skema.isa.isa_service.align_eqns"><code class="name flex">
-<span>async def <span class="ident">align_eqns</span></span>(<span>file1: str, file2: str) ‑> <a title="skema.isa.isa_service.ISA_Result" href="#skema.isa.isa_service.ISA_Result">ISA_Result</a></span>
+<span>async def <span class="ident">align_eqns</span></span>(<span>file1: str, file2: str, mention_json1: str = '', mention_json2: str = '') ‑> <a title="skema.isa.isa_service.ISA_Result" href="#skema.isa.isa_service.ISA_Result">ISA_Result</a></span>
 </code></dt>
 <dd>
 <div class="desc"><p>Endpoint for align two MathML equations.</p></div>
@@ -87,7 +89,9 @@ async def align_eqns(file1: str, file2: str) -&gt; ISA_Result:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">@app.put(&#34;/align-eqns&#34;, summary=&#34;Align two MathML equations&#34;)
-async def align_eqns(file1: str, file2: str) -&gt; ISA_Result:
+async def align_eqns(
+    file1: str, file2: str, mention_json1: str = &#34;&#34;, mention_json2: str = &#34;&#34;
+) -&gt; ISA_Result:
     &#34;&#34;&#34;
     Endpoint for align two MathML equations.
     &#34;&#34;&#34;
@@ -100,7 +104,7 @@ async def align_eqns(file1: str, file2: str) -&gt; ISA_Result:
         aligned_indices2,
         union_graph,
         perfectly_matched_indices1,
-    ) = align_mathml_eqs(file1, file2)
+    ) = align_mathml_eqs(file1, file2, mention_json1, mention_json2)
     ir = ISA_Result()
     ir.matching_ratio = matching_ratio
     ir.union_graph = union_graph.to_string()
