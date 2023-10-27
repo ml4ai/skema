@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Model Coverage Tracker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .model-container {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin: 10px;
+        }
+        .table-container {
+            display: none;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <h1>Code Model Coverage Tracker</h1>
+    <label for="viewSelect">View:</label>
+    <select id="viewSelect">
+        <option value="basic">Basic</option>
+        <option value="intermediate">Intermediate</option>
+        <option value="advanced">Advanced</option>
+    </select>
+    
+    <!-- Add more model containers and tables as needed -->
+
+    <script>
+        const viewSelect = document.getElementById('viewSelect');
+        const modelContainers = document.querySelectorAll('.model-container');
+
+        viewSelect.addEventListener('change', (e) => {
+            const selectedValue = e.target.value;
+            updateView(selectedValue);
+        });
+
+        function updateView(view) {
+            modelContainers.forEach((container) => {
+                const tableContainers = container.querySelectorAll('.table-container');
+                tableContainers.forEach((tableContainer) => {
+                    tableContainer.style.display = 'none';
+                });
+            });
+
+            modelContainers.forEach((container) => {
+                const tableContainer = container.querySelector(`#${container.id}-${view}`);
+                if (tableContainer) {
+                    tableContainer.style.display = 'block';
+                }
+            });
+        }
+    </script>
+</body>
+</html>

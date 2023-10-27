@@ -66,6 +66,7 @@ pub enum MathExpression {
     //GroupTuple(Vec<MathExpression>),
     Ci(Ci),
     Differential(Differential),
+    AbsoluteSup(Box<MathExpression>, Box<MathExpression>),
     //Differential(Box<MathExpression>, Box<MathExpression>),
     #[default]
     None,
@@ -97,8 +98,12 @@ impl fmt::Display for MathExpression {
                 Ok(())
             }
             MathExpression::Differential(Differential { diff, func }) => {
-                write!(f, "{diff}");
+                write!(f, "{diff}")?;
                 write!(f, "{func}")
+            }
+            MathExpression::AbsoluteSup(base, superscript) => {
+                write!(f, "{:?}", base)?;
+                write!(f, "{superscript:?}")
             }
             expression => write!(f, "{expression:?}"),
         }
