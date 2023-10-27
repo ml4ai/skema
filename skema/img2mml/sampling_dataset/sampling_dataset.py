@@ -1,13 +1,14 @@
-import os
 import json
+import multiprocessing as mp
+import os
 import random
+import re
 import shutil
 import subprocess
-from threading import Timer
 from shutil import copyfile as CP
-import multiprocessing as mp
+from threading import Timer
+
 import requests
-import re
 
 # read config file and define paths
 config_path = "sampling_dataset/sampling_config.json"
@@ -29,7 +30,9 @@ root = config["src_path"]
 random.seed(config["seed"])
 
 # fields we want papers from
-fields = set(config["fields"])
+fields = (
+    set(config["fields"]) if "fields" in config and len(config["fields"]) > 0 else None
+)
 
 # create destination files and directory
 if not os.path.exists("training_data"):
@@ -76,46 +79,57 @@ lock = mp.Lock()
 
 
 def get_paths(yr, yr_path, month):
-    temp_files = list()
+    temp_files = []
 
-    month_path = os.path.join(yr_path, month)
-    mml_path = os.path.join(month_path, "mathjax_mml")
-    folders = os.listdir(mml_path)
-    for folder in folders:
-        folder_path = os.path.join(mml_path, folder)
-        for tyf in os.listdir(folder_path):
-            type_of_eqn = "large" if tyf == "large_mml" else "small"
-            for eqn in os.listdir(os.path.join(folder_path, tyf)):
-                eqn_num = eqn.split(".")[0]
-                mml_eqn_path = f"{yr}_{month}_{folder}_{type_of_eqn}_{eqn_num}"
+    month_path = os.path.join(yr_path, month, "latex_equations")
 
-                temp_files.append(mml_eqn_path)
+    for paper in os.listdir(month_path):
+        for eqn_type in ["large_eqns", "small_eqns"]:
+            type_of_eqn = "large" if eqn_type == "large_eqns" else "small"
+            eqn_folder = os.path.join(month_path, paper, eqn_type)
 
+            temp_files.extend(
+                [
+                    f"{yr}_{month}_{paper}_{type_of_eqn}_{eqn.split('.')[0]}"
+                    for eqn in os.listdir(eqn_folder)
+                ]
+            )
+    print(temp_files[0:10])
+    exit(1)
     return temp_files
+
 
 def has_intersection(a: set, b: set):
     return bool(a & b)
+
 
 def filter_paths_by_field(paths: list, fields: set):
     arxvid_id_list = []
     for path in paths:
         arxiv_id = path.split("_")[2]
         arxvid_id_list.append(arxiv_id)
-    
+
     script_dir = os.path.dirname(__file__)
-    with open(os.path.join(script_dir, "paper_data", "arxiv_paper_categories.json"), "r") as f:
-        category_dict =  json.load(f)
+    with open(
+        os.path.join(script_dir, "paper_data", "arxiv_paper_categories.json"), "r"
+    ) as f:
+        category_dict = json.load(f)
 
     filtered_paths = []
     for path in paths:
         arxiv_id = path.split("_")[2]
         if arxiv_id in category_dict:
-            paper_fields = {category.split(".")[0].lower() for category in category_dict[arxiv_id]}
+            paper_fields = {
+                category.split(".")[0].lower() for category in category_dict[arxiv_id]
+            }
             if has_intersection(paper_fields, fields):
                 filtered_paths.append(path)
-    print(f"Filtered paths to include only papers in the following fields: {','.join(fields)}")
+    print(
+        f"Filtered paths to include only papers in the following fields: {','.join(fields)}"
+    )
     print(f"{len(paths)} total paths -> {len(filtered_paths)} total paths")
     return filtered_paths
+
 
 def divide_all_paths_into_chunks(all_paths):
     global chunk_size
@@ -130,22 +144,24 @@ def copy_image(img_src, img_dst):
     except:
         return False
 
+
 def areAligned(mml, latex):
     # checking if mml and latex represents same image
-    begin = mml.find('alttext=') + len("alttext=") + 2
-    end = mml.find('>') - 2
+    begin = mml.find("alttext=") + len("alttext=") + 2
+    end = mml.find(">") - 2
     _mml = mml[begin:end].strip()
     _mml = _mml.replace("\\\\", "\\")
     _latex = latex.strip()
 
     flag = False
-    if _mml.replace(" ", "") != _latex.replace(" ",""):
+    if _mml.replace(" ", "") != _latex.replace(" ", ""):
         if abs(len(_mml.split()) - len(_latex.split())) <= 10:
             flag = True
     else:
         flag = True
 
     return flag
+
 
 def prepare_dataset(args):
     i, ap = args
@@ -162,15 +178,11 @@ def prepare_dataset(args):
     # latex = open(latex_path).readlines()[0]
 
     # if areAligned(mml, latex):
-    open(f"{os.getcwd()}/sampling_dataset/temp_folder/smr_{i}.txt", "w").write(
-        mml
-    )
+    open(f"{os.getcwd()}/sampling_dataset/temp_folder/smr_{i}.txt", "w").write(mml)
 
     cwd = os.getcwd()
     cmd = ["python", f"{cwd}/sampling_dataset/simp.py", str(i)]
-    output = subprocess.Popen(
-        cmd, stderr=subprocess.PIPE, stdout=subprocess.PIPE
-    )
+    output = subprocess.Popen(cmd, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
     my_timer = Timer(5, kill, [output])
 
     try:
@@ -189,12 +201,11 @@ def prepare_dataset(args):
     # else:
     #     pass
 
+
 def get_bin(af):
     try:
         i, ap = af
-        simp_mml = open(
-            f"{os.getcwd()}/sampling_dataset/temp_folder/sm_{i}.txt"
-        )
+        simp_mml = open(f"{os.getcwd()}/sampling_dataset/temp_folder/sm_{i}.txt")
         simp_mml = simp_mml.readlines()[0]
         length_mml = len(simp_mml.split())
 
@@ -238,35 +249,27 @@ def main():
 
     """
 
-    all_paths = list()
+    all_paths = []
 
-    ######## step 1: get all MathML paths ########
-    print("collecting all the MathML paths...")
+    ######## step 1: get all LaTeX paths ########
+    print("collecting all the LaTeX paths...")
 
     if config["sample_entire_year"]:
-        years = config["years"].split(",")
+        years = [yr.strip() for yr in config["years"].split(",")]
+
         for yr in years:
-            yr = yr.strip()
             yr_path = os.path.join(root, yr)
-
-            for m in range(1, 13, 1):
-                month = yr[2:] + f"{m:02}"  # yr=2018, month=1801,..
-                temp_paths = get_paths(yr, yr_path, month)
-                for p in temp_paths:
-                    all_paths.append(p)
-
+            for month in [f"{yr[2:]}{m:02}" for m in range(1, 13)]:
+                all_paths.extend(get_paths(yr, yr_path, month))
     elif config["sample_from_months"]:
-        months = config["months"].split(",")
+        months = [month.strip() for month in config["months"].split(",")]
+
         for month in months:
-            month = month.strip()
-            yr = f"20{month[0:2]}"
+            yr = f"20{month[:2]}"
             yr_path = os.path.join(root, yr)
-            temp_paths = get_paths(yr, yr_path, month)
-            for p in temp_paths:
-                all_paths.append(p)
-    
-    
-    all_paths = filter_paths_by_field(all_paths, fields)
+            all_paths.extend(get_paths(yr, yr_path, month))
+
+    all_paths = filter_paths_by_field(all_paths, fields) if fields else all_paths
 
     ######## step 2: shuffle it twice ########
     print("shuffling all the paths to create randomness...")
@@ -287,31 +290,28 @@ def main():
 
     print("diving all_paths into batches of 10K to work efficiently...")
     reject_count = 0
-    for bidx, batch_paths in enumerate(
-        list(divide_all_paths_into_chunks(all_paths))
-    ):
+    for bidx, batch_paths in enumerate(list(divide_all_paths_into_chunks(all_paths))):
         if count <= total_eqns:
             print("running batch: ", bidx)
             print("current status: ", counter_dist_dict)
 
-            all_files = list()
-            for i, ap in enumerate(batch_paths):
-                all_files.append([i, ap])
+            all_files = [[i, ap] for i, ap in enumerate(batch_paths)]
+            print(all_files[0:10])
+            exit(1)
 
             with mp.Pool(config["num_cpus"]) as pool:
                 pool.map(prepare_dataset, all_files)
 
             with mp.Pool(config["num_cpus"]) as pool:
                 results = [
-                    pool.apply_async(get_bin, args=(i,)).get()
-                    for i in all_files
+                    pool.apply_async(get_bin, args=(i,)).get() for i in all_files
                 ]
             pool.close()
 
             for r in results:
                 if r is not None:
-                    tgt_bin, ap = r          
-                    if  counter_dist_dict[tgt_bin] <= dist_dict[tgt_bin]:
+                    tgt_bin, ap = r
+                    if counter_dist_dict[tgt_bin] <= dist_dict[tgt_bin]:
                         counter_dist_dict[tgt_bin] += 1
                         final_paths.append(ap)
                         count += 1
@@ -350,9 +350,7 @@ def main():
                 root,
                 f"{yr}/{month}/latex_images/{folder}/{type_of_eqn}_eqns/{eqn_num}.png",
             )
-            img_dst = os.path.join(
-                os.path.join(data_path, "images"), f"{c_idx}.png"
-            )
+            img_dst = os.path.join(os.path.join(data_path, "images"), f"{c_idx}.png")
             CP(img_src, img_dst)
 
             # wrting path
