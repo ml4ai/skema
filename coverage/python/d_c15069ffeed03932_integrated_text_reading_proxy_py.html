@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Coverage for skema/rest/integrated_text_reading_proxy.py: 43%</title>
+    <title>Coverage for skema/rest/integrated_text_reading_proxy.py: 41%</title>
     <link rel="icon" sizes="32x32" href="favicon_32.png">
     <link rel="stylesheet" href="style.css" type="text/css">
     <script type="text/javascript" src="coverage_html.js" defer></script>
@@ -12,7 +12,7 @@
     <div class="content">
         <h1>
             <span class="text">Coverage for </span><b>skema/rest/integrated_text_reading_proxy.py</b>:
-            <span class="pc_cov">43%</span>
+            <span class="pc_cov">41%</span>
         </h1>
         <aside id="help_panel_wrapper">
             <input id="help_panel_state" type="checkbox">
@@ -54,9 +54,9 @@
             </div>
         </aside>
         <h2>
-            <span class="text">253 statements &nbsp;</span>
-            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">108<span class="text"> run</span></button>
-            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">145<span class="text"> missing</span></button>
+            <span class="text">268 statements &nbsp;</span>
+            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">110<span class="text"> run</span></button>
+            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">158<span class="text"> missing</span></button>
             <button type="button" class="exc show_exc button_toggle_exc" value="exc" data-shortcut="x" title="Toggle lines excluded">0<span class="text"> excluded</span></button>
         </h2>
         <p class="text">
@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="d_c15069ffeed03932_metal_proxy_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.3.2">coverage.py v7.3.2</a>,
-            created at 2023-10-27 18:21 +0000
+            created at 2023-10-27 19:50 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"/>
@@ -759,8 +759,45 @@
     <p class="mis show_mis"><span class="n"><a id="t677" href="#t677">677</a></span><span class="t">    <span class="key">return</span> <span class="nam">compute_text_reading_evaluation</span><span class="op">(</span><span class="nam">gt_data</span><span class="op">,</span> <span class="nam">extractions</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t678" href="#t678">678</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t679" href="#t679">679</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t680" href="#t680">680</a></span><span class="t"><span class="nam">app</span> <span class="op">=</span> <span class="nam">FastAPI</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t681" href="#t681">681</a></span><span class="t"><span class="nam">app</span><span class="op">.</span><span class="nam">include_router</span><span class="op">(</span><span class="nam">router</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t680" href="#t680">680</a></span><span class="t"><span class="op">@</span><span class="nam">router</span><span class="op">.</span><span class="nam">post</span><span class="op">(</span><span class="str">"/eval"</span><span class="op">,</span> <span class="nam">response_model</span><span class="op">=</span><span class="nam">TextReadingEvaluationResults</span><span class="op">,</span> <span class="nam">status_code</span><span class="op">=</span><span class="num">200</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t681" href="#t681">681</a></span><span class="t"><span class="key">def</span> <span class="nam">quantitative_eval</span><span class="op">(</span><span class="nam">extractions_file</span><span class="op">:</span> <span class="nam">UploadFile</span><span class="op">,</span> <span class="nam">gt_annotations</span><span class="op">:</span> <span class="nam">UploadFile</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t682" href="#t682">682</a></span><span class="t">    <span class="str">"""</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t683" href="#t683">683</a></span><span class="t"><span class="str">    # Gets performance metrics of a set of text extractions againts a ground truth annotations file.</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t684" href="#t684">684</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t685" href="#t685">685</a></span><span class="t"><span class="str">    ## Example:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t686" href="#t686">686</a></span><span class="t"><span class="str">    ```python</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t687" href="#t687">687</a></span><span class="t"><span class="str">    files = {</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t688" href="#t688">688</a></span><span class="t"><span class="str">        "extractions_file": ("paper_variable_extractions.json", open("paper_variable_extractions.json", 'rb')),</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t689" href="#t689">689</a></span><span class="t"><span class="str">        "gt_annotations": ("paper_gt_annotations.json", open("paper_gt_annotations.json", 'rb')),</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t690" href="#t690">690</a></span><span class="t"><span class="str">    }</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t691" href="#t691">691</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t692" href="#t692">692</a></span><span class="t"><span class="str">    response = requests.post(f"{endpoint}/text-reading/eval", files=files)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t693" href="#t693">693</a></span><span class="t"><span class="str">    ```</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t694" href="#t694">694</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t695" href="#t695">695</a></span><span class="t"><span class="str">    """</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t696" href="#t696">696</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t697" href="#t697">697</a></span><span class="t">    <span class="nam">gt_data</span> <span class="op">=</span> <span class="nam">json</span><span class="op">.</span><span class="nam">load</span><span class="op">(</span><span class="nam">gt_annotations</span><span class="op">.</span><span class="nam">file</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t698" href="#t698">698</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t699" href="#t699">699</a></span><span class="t">    <span class="com"># Support both Attribute Collections serialized and within the envelop of this rest API</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t700" href="#t700">700</a></span><span class="t">    <span class="nam">extractions_json</span> <span class="op">=</span> <span class="nam">json</span><span class="op">.</span><span class="nam">load</span><span class="op">(</span><span class="nam">extractions_file</span><span class="op">.</span><span class="nam">file</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t701" href="#t701">701</a></span><span class="t">    <span class="key">try</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t702" href="#t702">702</a></span><span class="t">        <span class="nam">extractions</span> <span class="op">=</span> <span class="nam">AttributeCollection</span><span class="op">.</span><span class="nam">from_json</span><span class="op">(</span><span class="nam">extractions_json</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t703" href="#t703">703</a></span><span class="t">    <span class="key">except</span> <span class="nam">KeyError</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t704" href="#t704">704</a></span><span class="t">        <span class="nam">extractions_file</span><span class="op">.</span><span class="nam">file</span><span class="op">.</span><span class="nam">seek</span><span class="op">(</span><span class="num">0</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t705" href="#t705">705</a></span><span class="t">        <span class="nam">service_output</span> <span class="op">=</span> <span class="nam">json</span><span class="op">.</span><span class="nam">load</span><span class="op">(</span><span class="nam">extractions_file</span><span class="op">.</span><span class="nam">file</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t706" href="#t706">706</a></span><span class="t">        <span class="nam">collections</span> <span class="op">=</span> <span class="nam">list</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t707" href="#t707">707</a></span><span class="t">        <span class="key">for</span> <span class="nam">collection</span> <span class="key">in</span> <span class="nam">service_output</span><span class="op">[</span><span class="str">'outputs'</span><span class="op">]</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t708" href="#t708">708</a></span><span class="t">            <span class="nam">collection</span> <span class="op">=</span> <span class="nam">AttributeCollection</span><span class="op">.</span><span class="nam">from_json</span><span class="op">(</span><span class="nam">collection</span><span class="op">[</span><span class="str">'data'</span><span class="op">]</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t709" href="#t709">709</a></span><span class="t">            <span class="nam">collections</span><span class="op">.</span><span class="nam">append</span><span class="op">(</span><span class="nam">collection</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t710" href="#t710">710</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t711" href="#t711">711</a></span><span class="t">        <span class="nam">extractions</span> <span class="op">=</span> <span class="nam">AttributeCollection</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t712" href="#t712">712</a></span><span class="t">            <span class="nam">attributes</span><span class="op">=</span><span class="nam">list</span><span class="op">(</span><span class="nam">it</span><span class="op">.</span><span class="nam">chain</span><span class="op">.</span><span class="nam">from_iterable</span><span class="op">(</span><span class="nam">c</span><span class="op">.</span><span class="nam">attributes</span> <span class="key">for</span> <span class="nam">c</span> <span class="key">in</span> <span class="nam">collections</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t713" href="#t713">713</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t714" href="#t714">714</a></span><span class="t">    <span class="key">return</span> <span class="nam">compute_text_reading_evaluation</span><span class="op">(</span><span class="nam">gt_data</span><span class="op">,</span> <span class="nam">extractions</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t715" href="#t715">715</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t716" href="#t716">716</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t717" href="#t717">717</a></span><span class="t"><span class="nam">app</span> <span class="op">=</span> <span class="nam">FastAPI</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t718" href="#t718">718</a></span><span class="t"><span class="nam">app</span><span class="op">.</span><span class="nam">include_router</span><span class="op">(</span><span class="nam">router</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
 </main>
 <footer>
     <div class="content">
@@ -770,7 +807,7 @@
             <a id="nextFileLink" class="nav" href="d_c15069ffeed03932_metal_proxy_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.3.2">coverage.py v7.3.2</a>,
-            created at 2023-10-27 18:21 +0000
+            created at 2023-10-27 19:50 +0000
         </p>
     </div>
 </footer>

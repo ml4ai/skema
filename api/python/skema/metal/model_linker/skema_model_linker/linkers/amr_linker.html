@@ -32,6 +32,7 @@ from abc import ABC
 from collections import defaultdict
 from typing import Iterable, Dict, List, Any, Tuple, Optional, Union
 
+import pandas as pd
 import torch
 from askem_extractions.data_model import Attribute, AnchoredEntity, AttributeCollection, AttributeType
 from sentence_transformers import SentenceTransformer, util
@@ -97,6 +98,45 @@ class Linker(ABC):
 
 class AMRLinker(Linker, ABC):
 
+    def link_model_to_manual_annotations(self, data: Dict[str, Any], candidates: List[Dict[str, Any]]) -&gt; pd.DataFrame:
+        &#34;&#34;&#34;
+            Similarly to linking a model to text extractions. This will link it to ground truth extractions
+            Used mostly for debugging
+        &#34;&#34;&#34;
+
+        # Make a copy of the amr to avoid mutating the original model
+        data = {**data}
+
+        # Filter out the targets from the annotations
+        targets = defaultdict(list)
+        for candidate in candidates:
+            if candidate[&#39;type&#39;] == &#34;Highlight&#34; and candidate[&#39;color&#39;] == &#34;#f9cd59&#34;: # This color is an anchored extraction
+                key = candidate[&#34;text&#34;]
+                targets[key].append(candidate)
+
+
+        walker = self._build_walker(data)
+
+        to_link = list(walker.walk())
+        sources = self._generate_linking_sources(to_link)
+
+        pairs = self._align_texts(list(sources.keys()), list(targets.keys()), threshold=self._threshold)
+
+        linked_targets = list()
+        for s_key, t_key in pairs:
+            source = sources[s_key]
+            target = targets[t_key]
+
+            # Get the AMR ID of the source and add it to the target extractions
+            for t in target:
+                t[&#39;amr_element_id&#39;] = source[&#39;id&#39;]
+                linked_targets.append(t)
+
+        # Serialize the attribute collection to json, after alignment
+        data[&#34;metadata&#34;] = linked_targets
+
+        return data
+
     def link_model_to_text_extractions(self, data: Dict[str, Any], extractions: AttributeCollection) -&gt; Dict[str, Any]:
 
         # Make a copy of the amr to avoid mutating the original model
@@ -149,6 +189,45 @@ inheritance.</p></div>
 </summary>
 <pre><code class="python">class AMRLinker(Linker, ABC):
 
+    def link_model_to_manual_annotations(self, data: Dict[str, Any], candidates: List[Dict[str, Any]]) -&gt; pd.DataFrame:
+        &#34;&#34;&#34;
+            Similarly to linking a model to text extractions. This will link it to ground truth extractions
+            Used mostly for debugging
+        &#34;&#34;&#34;
+
+        # Make a copy of the amr to avoid mutating the original model
+        data = {**data}
+
+        # Filter out the targets from the annotations
+        targets = defaultdict(list)
+        for candidate in candidates:
+            if candidate[&#39;type&#39;] == &#34;Highlight&#34; and candidate[&#39;color&#39;] == &#34;#f9cd59&#34;: # This color is an anchored extraction
+                key = candidate[&#34;text&#34;]
+                targets[key].append(candidate)
+
+
+        walker = self._build_walker(data)
+
+        to_link = list(walker.walk())
+        sources = self._generate_linking_sources(to_link)
+
+        pairs = self._align_texts(list(sources.keys()), list(targets.keys()), threshold=self._threshold)
+
+        linked_targets = list()
+        for s_key, t_key in pairs:
+            source = sources[s_key]
+            target = targets[t_key]
+
+            # Get the AMR ID of the source and add it to the target extractions
+            for t in target:
+                t[&#39;amr_element_id&#39;] = source[&#39;id&#39;]
+                linked_targets.append(t)
+
+        # Serialize the attribute collection to json, after alignment
+        data[&#34;metadata&#34;] = linked_targets
+
+        return data
+
     def link_model_to_text_extractions(self, data: Dict[str, Any], extractions: AttributeCollection) -&gt; Dict[str, Any]:
 
         # Make a copy of the amr to avoid mutating the original model
@@ -190,6 +269,56 @@ inheritance.</p></div>
 </ul>
 <h3>Methods</h3>
 <dl>
+<dt id="skema.metal.model_linker.skema_model_linker.linkers.amr_linker.AMRLinker.link_model_to_manual_annotations"><code class="name flex">
+<span>def <span class="ident">link_model_to_manual_annotations</span></span>(<span>self, data: Dict[str, Any], candidates: List[Dict[str, Any]]) ‑> pandas.core.frame.DataFrame</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Similarly to linking a model to text extractions. This will link it to ground truth extractions
+Used mostly for debugging</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def link_model_to_manual_annotations(self, data: Dict[str, Any], candidates: List[Dict[str, Any]]) -&gt; pd.DataFrame:
+    &#34;&#34;&#34;
+        Similarly to linking a model to text extractions. This will link it to ground truth extractions
+        Used mostly for debugging
+    &#34;&#34;&#34;
+
+    # Make a copy of the amr to avoid mutating the original model
+    data = {**data}
+
+    # Filter out the targets from the annotations
+    targets = defaultdict(list)
+    for candidate in candidates:
+        if candidate[&#39;type&#39;] == &#34;Highlight&#34; and candidate[&#39;color&#39;] == &#34;#f9cd59&#34;: # This color is an anchored extraction
+            key = candidate[&#34;text&#34;]
+            targets[key].append(candidate)
+
+
+    walker = self._build_walker(data)
+
+    to_link = list(walker.walk())
+    sources = self._generate_linking_sources(to_link)
+
+    pairs = self._align_texts(list(sources.keys()), list(targets.keys()), threshold=self._threshold)
+
+    linked_targets = list()
+    for s_key, t_key in pairs:
+        source = sources[s_key]
+        target = targets[t_key]
+
+        # Get the AMR ID of the source and add it to the target extractions
+        for t in target:
+            t[&#39;amr_element_id&#39;] = source[&#39;id&#39;]
+            linked_targets.append(t)
+
+    # Serialize the attribute collection to json, after alignment
+    data[&#34;metadata&#34;] = linked_targets
+
+    return data</code></pre>
+</details>
+</dd>
 <dt id="skema.metal.model_linker.skema_model_linker.linkers.amr_linker.AMRLinker.link_model_to_text_extractions"><code class="name flex">
 <span>def <span class="ident">link_model_to_text_extractions</span></span>(<span>self, data: Dict[str, Any], extractions: askem_extractions.data_model.attribute.AttributeCollection) ‑> Dict[str, Any]</span>
 </code></dt>
@@ -343,6 +472,7 @@ Dict[str, Any]:
 <li>
 <h4><code><a title="skema.metal.model_linker.skema_model_linker.linkers.amr_linker.AMRLinker" href="#skema.metal.model_linker.skema_model_linker.linkers.amr_linker.AMRLinker">AMRLinker</a></code></h4>
 <ul class="">
+<li><code><a title="skema.metal.model_linker.skema_model_linker.linkers.amr_linker.AMRLinker.link_model_to_manual_annotations" href="#skema.metal.model_linker.skema_model_linker.linkers.amr_linker.AMRLinker.link_model_to_manual_annotations">link_model_to_manual_annotations</a></code></li>
 <li><code><a title="skema.metal.model_linker.skema_model_linker.linkers.amr_linker.AMRLinker.link_model_to_text_extractions" href="#skema.metal.model_linker.skema_model_linker.linkers.amr_linker.AMRLinker.link_model_to_text_extractions">link_model_to_text_extractions</a></code></li>
 </ul>
 </li>

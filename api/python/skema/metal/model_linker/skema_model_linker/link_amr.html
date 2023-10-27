@@ -55,6 +55,7 @@ def link_amr(
         amr_path: str,  # Path of the AMR model
         attribute_collection: str,  # Path to the attribute collection
         amr_type: str,  # AMR model type. I.e. &#34;petrinet&#34; or &#34;regnet&#34;
+        eval_mode: bool = False, # True when the extractions are manual annotations
         output_path: Optional[str] = None,  # Output file path
         clean_xml_codepoints: Optional[bool] = False, # Replaces html codepoints with the unicode character
         similarity_model: str = &#34;sentence-transformers/all-MiniLM-L6-v2&#34;,  # Transformer model to compute similarities
@@ -75,22 +76,30 @@ def link_amr(
         if clean_xml_codepoints:
             amr = replace_xml_codepoints(amr)
 
-    # Handle extractions from the SKEMA service or directly from the library
-    try:
-        extractions = AttributeCollection.from_json(attribute_collection)
-    except KeyError:
-        with open(attribute_collection) as f:
-            service_output = json.load(f)
-            collections = list()
-            for collection in service_output[&#39;outputs&#39;]:
-                collection = AttributeCollection.from_json(collection[&#39;data&#39;])
-                collections.append(collection)
 
-            extractions = AttributeCollection(attributes=list(it.chain.from_iterable(c.attributes for c in collections)))
 
     linker = Linker(model_name=similarity_model, device=device, sim_threshold=similarity_threshold)
 
-    linked_model = linker.link_model_to_text_extractions(amr, extractions)
+    if not eval_mode:
+        # Handle extractions from the SKEMA service or directly from the library
+        try:
+            extractions = AttributeCollection.from_json(attribute_collection)
+        except KeyError:
+            with open(attribute_collection) as f:
+                service_output = json.load(f)
+                collections = list()
+                for collection in service_output[&#39;outputs&#39;]:
+                    collection = AttributeCollection.from_json(collection[&#39;data&#39;])
+                    collections.append(collection)
+
+                extractions = AttributeCollection(
+                    attributes=list(it.chain.from_iterable(c.attributes for c in collections)))
+        linked_model = linker.link_model_to_text_extractions(amr, extractions)
+    else:
+        with open(attribute_collection) as f:
+            annotations = json.load(f)
+        annotations = replace_xml_codepoints(annotations)
+        linked_model = linker.link_model_to_manual_annotations(amr, annotations)
 
     if not output_path:
         input_amr_name = str(Path(amr_path).name)
@@ -117,7 +126,7 @@ if __name__ == &#34;__main__&#34;:
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
 <dt id="skema.metal.model_linker.skema_model_linker.link_amr.link_amr"><code class="name flex">
-<span>def <span class="ident">link_amr</span></span>(<span>amr_path: str, attribute_collection: str, amr_type: str, output_path: Optional[str] = None, clean_xml_codepoints: Optional[bool] = False, similarity_model: str = 'sentence-transformers/all-MiniLM-L6-v2', similarity_threshold: float = 0.7, device: Optional[str] = None)</span>
+<span>def <span class="ident">link_amr</span></span>(<span>amr_path: str, attribute_collection: str, amr_type: str, eval_mode: bool = False, output_path: Optional[str] = None, clean_xml_codepoints: Optional[bool] = False, similarity_model: str = 'sentence-transformers/all-MiniLM-L6-v2', similarity_threshold: float = 0.7, device: Optional[str] = None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Links and AMR model to an attribute collections from ASKEM text reading pipelines</p></div>
@@ -129,6 +138,7 @@ if __name__ == &#34;__main__&#34;:
         amr_path: str,  # Path of the AMR model
         attribute_collection: str,  # Path to the attribute collection
         amr_type: str,  # AMR model type. I.e. &#34;petrinet&#34; or &#34;regnet&#34;
+        eval_mode: bool = False, # True when the extractions are manual annotations
         output_path: Optional[str] = None,  # Output file path
         clean_xml_codepoints: Optional[bool] = False, # Replaces html codepoints with the unicode character
         similarity_model: str = &#34;sentence-transformers/all-MiniLM-L6-v2&#34;,  # Transformer model to compute similarities
@@ -149,22 +159,30 @@ if __name__ == &#34;__main__&#34;:
         if clean_xml_codepoints:
             amr = replace_xml_codepoints(amr)
 
-    # Handle extractions from the SKEMA service or directly from the library
-    try:
-        extractions = AttributeCollection.from_json(attribute_collection)
-    except KeyError:
-        with open(attribute_collection) as f:
-            service_output = json.load(f)
-            collections = list()
-            for collection in service_output[&#39;outputs&#39;]:
-                collection = AttributeCollection.from_json(collection[&#39;data&#39;])
-                collections.append(collection)
 
-            extractions = AttributeCollection(attributes=list(it.chain.from_iterable(c.attributes for c in collections)))
 
     linker = Linker(model_name=similarity_model, device=device, sim_threshold=similarity_threshold)
 
-    linked_model = linker.link_model_to_text_extractions(amr, extractions)
+    if not eval_mode:
+        # Handle extractions from the SKEMA service or directly from the library
+        try:
+            extractions = AttributeCollection.from_json(attribute_collection)
+        except KeyError:
+            with open(attribute_collection) as f:
+                service_output = json.load(f)
+                collections = list()
+                for collection in service_output[&#39;outputs&#39;]:
+                    collection = AttributeCollection.from_json(collection[&#39;data&#39;])
+                    collections.append(collection)
+
+                extractions = AttributeCollection(
+                    attributes=list(it.chain.from_iterable(c.attributes for c in collections)))
+        linked_model = linker.link_model_to_text_extractions(amr, extractions)
+    else:
+        with open(attribute_collection) as f:
+            annotations = json.load(f)
+        annotations = replace_xml_codepoints(annotations)
+        linked_model = linker.link_model_to_manual_annotations(amr, annotations)
 
     if not output_path:
         input_amr_name = str(Path(amr_path).name)
