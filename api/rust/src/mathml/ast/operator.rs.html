@@ -87,6 +87,10 @@
 <a href="#87" id="87">87</a>
 <a href="#88" id="88">88</a>
 <a href="#89" id="89">89</a>
+<a href="#90" id="90">90</a>
+<a href="#91" id="91">91</a>
+<a href="#92" id="92">92</a>
+<a href="#93" id="93">93</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::ast::Ci;
 <span class="kw">use </span>derive_new::new;
 <span class="kw">use </span>std::fmt;
@@ -116,6 +120,8 @@
     Comma,
     Grad,
     Dot,
+    Div,
+    Abs,
     Derivative(Derivative),
     Sin,
     Cos,
@@ -153,7 +159,7 @@
                 var_index,
                 bound_var,
             }) =&gt; {
-                <span class="macro">write!</span>(f, <span class="string">&quot;D({order}, {var_index}, {bound_var})&quot;</span>)
+                <span class="macro">write!</span>(f, <span class="string">&quot;D({order}, {bound_var})&quot;</span>)
             }
             Operator::Exp =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;exp&quot;</span>),
             Operator::Power =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;^&quot;</span>),
@@ -173,6 +179,8 @@
             Operator::Mean =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Mean&quot;</span>),
             Operator::Grad =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Grad&quot;</span>),
             Operator::Dot =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Dot&quot;</span>),
+            Operator::Div =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Div&quot;</span>),
+            Operator::Abs =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Abs&quot;</span>),
         }
     }
 }

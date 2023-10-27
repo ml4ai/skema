@@ -80,7 +80,7 @@ var srcIndex = JSON.parse('{\
 "lock_api":["",[],["lib.rs","mutex.rs","remutex.rs","rwlock.rs"]],\
 "log":["",[],["__private_api.rs","lib.rs","macros.rs"]],\
 "maplit":["",[],["lib.rs"]],\
-"mathml":["",[["ast",[],["operator.rs"]],["parsers",[],["first_order_ode.rs","generic_mathml.rs","interpreted_mathml.rs","math_expression_tree.rs"]],["petri_net",[],["recognizers.rs"]]],["acset.rs","ast.rs","expression.rs","graph.rs","lib.rs","mml2pn.rs","normalization.rs","parsers.rs","petri_net.rs"]],\
+"mathml":["",[["ast",[],["operator.rs"]],["parsers",[],["decapodes_serialization.rs","first_order_ode.rs","generic_mathml.rs","interpreted_mathml.rs","math_expression_tree.rs"]],["petri_net",[],["recognizers.rs"]]],["acset.rs","ast.rs","expression.rs","graph.rs","lib.rs","mml2pn.rs","normalization.rs","parsers.rs","petri_net.rs"]],\
 "memchr":["",[["arch",[["all",[["packedpair",[],["default_rank.rs","mod.rs"]]],["memchr.rs","mod.rs","rabinkarp.rs","shiftor.rs","twoway.rs"]],["generic",[],["memchr.rs","mod.rs","packedpair.rs"]],["x86_64",[["avx2",[],["memchr.rs","mod.rs","packedpair.rs"]],["sse2",[],["memchr.rs","mod.rs","packedpair.rs"]]],["memchr.rs","mod.rs"]]],["mod.rs"]],["memmem",[],["mod.rs","searcher.rs"]]],["cow.rs","ext.rs","lib.rs","macros.rs","memchr.rs","vector.rs"]],\
 "mime":["",[],["lib.rs","parse.rs"]],\
 "mime_guess":["",[],["impl_bin_search.rs","lib.rs"]],\

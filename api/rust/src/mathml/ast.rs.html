@@ -117,6 +117,11 @@
 <a href="#117" id="117">117</a>
 <a href="#118" id="118">118</a>
 <a href="#119" id="119">119</a>
+<a href="#120" id="120">120</a>
+<a href="#121" id="121">121</a>
+<a href="#122" id="122">122</a>
+<a href="#123" id="123">123</a>
+<a href="#124" id="124">124</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>derive_new::new;
 <span class="kw">use </span>std::fmt;
 
@@ -185,6 +190,7 @@
     <span class="comment">//GroupTuple(Vec&lt;MathExpression&gt;),
     </span>Ci(Ci),
     Differential(Differential),
+    AbsoluteSup(Box&lt;MathExpression&gt;, Box&lt;MathExpression&gt;),
     <span class="comment">//Differential(Box&lt;MathExpression&gt;, Box&lt;MathExpression&gt;),
     </span><span class="attr">#[default]
     </span><span class="prelude-val">None</span>,
@@ -216,8 +222,12 @@
                 <span class="prelude-val">Ok</span>(())
             }
             MathExpression::Differential(Differential { diff, func }) =&gt; {
-                <span class="macro">write!</span>(f, <span class="string">&quot;{diff}&quot;</span>);
+                <span class="macro">write!</span>(f, <span class="string">&quot;{diff}&quot;</span>)<span class="question-mark">?</span>;
                 <span class="macro">write!</span>(f, <span class="string">&quot;{func}&quot;</span>)
+            }
+            MathExpression::AbsoluteSup(base, superscript) =&gt; {
+                <span class="macro">write!</span>(f, <span class="string">&quot;{:?}&quot;</span>, base)<span class="question-mark">?</span>;
+                <span class="macro">write!</span>(f, <span class="string">&quot;{superscript:?}&quot;</span>)
             }
             expression =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{expression:?}&quot;</span>),
         }
