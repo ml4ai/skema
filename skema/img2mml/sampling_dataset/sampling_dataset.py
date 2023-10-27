@@ -86,8 +86,8 @@ def get_paths(yr, yr_path, month):
     month_path = os.path.join(yr_path, month, "latex_equations")
 
     for paper in os.listdir(month_path):
-        for type_of_eqn in ("large_eqns", "small_eqns"):
-            eqn_folder = os.path.join(month_path, paper, type_of_eqn)
+        for type_of_eqn in ("large", "small"):
+            eqn_folder = os.path.join(month_path, paper, f"{type_of_eqn}_eqns")
 
             temp_files.extend(
                 [
@@ -170,7 +170,7 @@ def prepare_dataset(args):
     yr, month, folder, type_of_eqn, eqn_num = ap.split("_")
     latex_path = os.path.join(
         root,
-        f"{yr}/{month}/latex_equations/{folder}/{type_of_eqn}_mml/{eqn_num}.txt",
+        f"{yr}/{month}/latex_equations/{folder}/{type_of_eqn}_eqns/{eqn_num}.txt",
     )
     with open(latex_path, "r") as f:
         # read first line
