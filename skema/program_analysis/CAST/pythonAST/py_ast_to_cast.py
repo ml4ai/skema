@@ -1544,8 +1544,8 @@ class PyASTToCAST:
                             prev_scope_id_dict[unique_name] = self.global_identifier_dict[
                                 unique_name
                             ]
-                        source_code_data_type = None
-                        func_name_arg = LiteralValue(StructureType.LIST, node.func.id, None, ref)
+                        source_code_data_type = ["Python","3.8","List"]
+                        func_name_arg = LiteralValue(StructureType.LIST, node.func.id, source_code_data_type, ref)
 
                         return [
                             Call(
@@ -1554,7 +1554,7 @@ class PyASTToCAST:
                                     id=curr_scope_id_dict[unique_name] if unique_name in curr_scope_id_dict else prev_scope_id_dict[unique_name], # NOTE: do this everywhere?
                                     source_refs=ref,
                                 ),
-                                arguments=args,
+                                arguments=[func_name_arg]+args,
                                 source_refs=ref,
                             )
                         ]
