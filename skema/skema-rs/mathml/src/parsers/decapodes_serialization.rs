@@ -218,13 +218,22 @@ pub fn to_decapodes_serialization(
                 tables.variables.push(temp_variable.clone());
                 table_counts.variable_count += 1;
                 let tgt_idx = table_counts.variable_count;
-                let projection = ProjectionOperator {
-                    proj1: to_decapodes_serialization(&rest[0], tables, table_counts),
-                    proj2: to_decapodes_serialization(&rest[1], tables, table_counts),
-                    res: tgt_idx,
-                    op2: "-".to_string(),
-                };
-                tables.projection_operators.push(projection.clone());
+                if rest.len() == 1 {
+                    let unary = UnaryOperator {
+                        src: to_decapodes_serialization(&rest[0], tables, table_counts),
+                        tgt: tgt_idx,
+                        op1: "-".to_string(),
+                    };
+                    tables.unary_operators.push(unary.clone());
+                } else {
+                    let projection = ProjectionOperator {
+                        proj1: to_decapodes_serialization(&rest[0], tables, table_counts),
+                        proj2: to_decapodes_serialization(&rest[1], tables, table_counts),
+                        res: tgt_idx,
+                        op2: "-".to_string(),
+                    };
+                    tables.projection_operators.push(projection.clone());
+                }
                 tgt_idx
             }
             Operator::Multiply => {
