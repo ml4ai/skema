@@ -106,9 +106,7 @@ def has_intersection(a: set, b: set):
 
 def filter_paths_by_field(paths: list, fields: set):
     start_time = time.perf_counter()
-    print(
-       f"Filtering paths by fields: {",".join(fields)}"
-    )
+    print(f"Filtering paths by fields: {','.join(fields)}")
     arxvid_id_list = []
     for path in paths:
         arxiv_id = path.split("_")[2]
@@ -299,7 +297,7 @@ def main():
 
             with mp.Pool(config["num_cpus"]) as pool:
                 pool.map(prepare_dataset, all_files)
-            
+
             exit(1)
 
             with mp.Pool(config["num_cpus"]) as pool:
