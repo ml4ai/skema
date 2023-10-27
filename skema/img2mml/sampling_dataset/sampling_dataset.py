@@ -79,8 +79,8 @@ lock = mp.Lock()
 
 
 def get_paths(yr, yr_path, month):
+    print(f"collecting paths for {yr}/{month}...")
     temp_files = []
-
     month_path = os.path.join(yr_path, month, "latex_equations")
 
     for paper in os.listdir(month_path):
@@ -94,8 +94,7 @@ def get_paths(yr, yr_path, month):
                     for eqn in os.listdir(eqn_folder)
                 ]
             )
-    print(temp_files[0:10])
-    exit(1)
+
     return temp_files
 
 
@@ -296,8 +295,6 @@ def main():
             print("current status: ", counter_dist_dict)
 
             all_files = [[i, ap] for i, ap in enumerate(batch_paths)]
-            print(all_files[0:10])
-            exit(1)
 
             with mp.Pool(config["num_cpus"]) as pool:
                 pool.map(prepare_dataset, all_files)
