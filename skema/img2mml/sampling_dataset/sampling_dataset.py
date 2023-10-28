@@ -203,9 +203,9 @@ def prepare_dataset(args):
 def get_bin(af):
     try:
         i, ap = af
-        latex = open(f"{os.getcwd()}/sampling_dataset/temp_folder/eqn_set_{i}.txt")
-        latex = latex.readlines()[0]
-        latex_length = len(latex.split())
+        with open(f"{os.getcwd()}/sampling_dataset/temp_folder/eqn_set_{i}.txt") as f:
+            latex = f.readline().rstrip("\n")
+            latex_length = len(latex.split())
 
         # finding the bin
         temp_dict = {}
