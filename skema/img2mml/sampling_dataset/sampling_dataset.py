@@ -176,15 +176,15 @@ def prepare_dataset(args):
         # read first line
         latex = f.readline().rstrip("\n")
 
-    temp_file_path = f"{os.getcwd()}/sampling_dataset/temp_folder/sm_{i}.txt"
+    temp_file_path = f"{os.getcwd()}/sampling_dataset/temp_folder/eqn_set_{i}.txt"
     with open(temp_file_path, "w") as f:
         f.write(latex)
-    return True
 
+    # run preprocess_latex.py
     cwd = os.getcwd()
-    cmd = ["python", f"{cwd}/sampling_dataset/simp.py", str(i)]
+    cmd = ["python", f"{cwd}/sampling_dataset/preprocess_latex.py", temp_file_path]
     process = subprocess.Popen(cmd, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
-    my_timer = Timer(5, kill, [process])
+    my_timer = Timer(10, kill, [process])
 
     try:
         my_timer.start()
@@ -298,6 +298,7 @@ def main():
             with mp.Pool(config["num_cpus"]) as pool:
                 pool.map(prepare_dataset, all_files)
 
+            print("Check the files")
             exit(1)
 
             with mp.Pool(config["num_cpus"]) as pool:
