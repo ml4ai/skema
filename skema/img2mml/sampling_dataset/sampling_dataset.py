@@ -203,15 +203,15 @@ def prepare_dataset(args):
 def get_bin(af):
     try:
         i, ap = af
-        simp_mml = open(f"{os.getcwd()}/sampling_dataset/temp_folder/sm_{i}.txt")
-        simp_mml = simp_mml.readlines()[0]
-        length_mml = len(simp_mml.split())
+        latex = open(f"{os.getcwd()}/sampling_dataset/temp_folder/eqn_set_{i}.txt")
+        latex = latex.readlines()[0]
+        latex_length = len(latex.split())
 
         # finding the bin
         temp_dict = {}
         for i in range(50, 400, 50):
-            if length_mml / i < 1:
-                temp_dict[i] = length_mml / i
+            if latex_length / i < 1:
+                temp_dict[i] = latex_length / i
 
         # get the bin
         if len(temp_dict) >= 1:
@@ -295,18 +295,17 @@ def main():
 
             all_files = [[i, ap] for i, ap in enumerate(batch_paths)]
 
+            print("Preparing dataset...")
             with mp.Pool(config["num_cpus"]) as pool:
                 pool.map(prepare_dataset, all_files)
 
-            print("Check the files")
-            exit(1)
-
+            print("Getting bins...")
             with mp.Pool(config["num_cpus"]) as pool:
                 results = [
                     pool.apply_async(get_bin, args=(i,)).get() for i in all_files
                 ]
-            pool.close()
 
+            print("Collecting final paths...")
             for r in results:
                 if r is not None:
                     tgt_bin, ap = r
