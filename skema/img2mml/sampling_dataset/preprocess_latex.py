@@ -11,7 +11,9 @@ os.chdir(latex_preprocessing_dir)
 
 input_file_path = sys.argv[1]
 input_file_path = os.path.join(script_dir, input_file_path)
-temp_file_path = f"{input_file_path}.preprocesed.tmp"
+temp_file_path = (
+    f"{input_file_path}.preprocesed.tmp" if len(sys.argv) < 3 else sys.argv[2]
+)
 
 
 def preprocess_latex():
@@ -59,5 +61,6 @@ if __name__ == "__main__":
         exit(1)
     else:
         preprocess_latex()
-        # rename output file to input file
-        os.rename(temp_file_path, input_file_path)
+        # rename output file to input file if no output file is specified
+        if len(sys.argv) < 3:
+            os.rename(temp_file_path, input_file_path)
