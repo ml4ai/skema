@@ -5,11 +5,12 @@ conda deactivate
 conda activate image2mathml_venv
 
 python3 create_dataset.py
+cp training_data/sample_data/original_latex.lst sampling_dataset/temp.lst
+python3 sampling_dataset/preprocess_latex.py temp.lst temp.norm.lst
+cp sampling_dataset/temp.norm.lst training_data/sample_data/latex.norm.lst
+rm -rf sampling_dataset/*.lst
 
-python3 sampling_dataset/preprocess_latex.py training_data/sample_data/original_latex.lst training_data/sample_data/latex.norm.lst
-
-# zip everyting intraining_data/sample_data to data.tar.gz
-cd training_data/sample_data/
+cd training_data/
 tar -czvf data.tar.gz sample_data
 mv data.tar.gz ../
 cd ../

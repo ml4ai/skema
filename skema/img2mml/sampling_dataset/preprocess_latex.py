@@ -14,6 +14,9 @@ input_file_path = os.path.join(script_dir, input_file_path)
 temp_file_path = (
     f"{input_file_path}.preprocesed.tmp" if len(sys.argv) < 3 else sys.argv[2]
 )
+temp_file_path = os.path.join(script_dir, temp_file_path)
+
+print(input_file_path, temp_file_path)
 
 
 def preprocess_latex():

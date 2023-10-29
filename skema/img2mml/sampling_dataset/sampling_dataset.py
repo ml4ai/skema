@@ -176,8 +176,8 @@ def prepare_dataset(args):
         latex = f.readlines()
         latex = (
             " ".join([l.replace("\n", "") for l in latex])
-            if len(latex) > 1
-            else latex[0]
+            if len(latex) >= 1
+            else ""
         )
 
     temp_file_path = f"{os.getcwd()}/sampling_dataset/temp_folder/eqn_set_{i}.txt"
