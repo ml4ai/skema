@@ -173,8 +173,12 @@ def prepare_dataset(args):
         f"{yr}/{month}/latex_equations/{folder}/{type_of_eqn}_eqns/{eqn_num}.txt",
     )
     with open(latex_path, "r") as f:
-        # read first line
-        latex = f.readline().rstrip("\n")
+        latex = f.readlines()
+        latex = (
+            " ".join([l.replace("\n", "") for l in latex])
+            if len(latex) > 1
+            else latex[0]
+        )
 
     temp_file_path = f"{os.getcwd()}/sampling_dataset/temp_folder/eqn_set_{i}.txt"
     with open(temp_file_path, "w") as f:
@@ -360,7 +364,8 @@ def main():
                 f"{yr}/{month}/mathjax_mml/{folder}/{type_of_eqn}_mml/{eqn_num}.xml",
             )
 
-            mml = open(mml_path).readlines()[0]
+            with open(mml_path, "r") as f:
+                mml = f.readline()
 
             if "\n" not in mml:
                 mml = mml + "\n"
@@ -371,7 +376,10 @@ def main():
                 root,
                 f"{yr}/{month}/latex_equations/{folder}/{type_of_eqn}_eqns/{eqn_num}.txt",
             )
-            latex_arr = open(latex_path).readlines()
+
+            with open(latex_path, "r") as f:
+                latex_arr = f.readlines()
+
             if len(latex_arr) > 1:
                 latex = " "
                 for l in latex_arr:
