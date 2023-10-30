@@ -229,8 +229,9 @@ def get_bin(af):
 
         return (tgt_bin, ap)
 
-    except:
-        pass
+    except Exception as e:
+        print(str(e))
+        print("Error in get_bin for ", ap)
 
 
 # Function to kill process if TimeoutError occurs
