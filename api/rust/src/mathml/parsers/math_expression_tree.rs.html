@@ -1079,6 +1079,22 @@
 <a href="#1079" id="1079">1079</a>
 <a href="#1080" id="1080">1080</a>
 <a href="#1081" id="1081">1081</a>
+<a href="#1082" id="1082">1082</a>
+<a href="#1083" id="1083">1083</a>
+<a href="#1084" id="1084">1084</a>
+<a href="#1085" id="1085">1085</a>
+<a href="#1086" id="1086">1086</a>
+<a href="#1087" id="1087">1087</a>
+<a href="#1088" id="1088">1088</a>
+<a href="#1089" id="1089">1089</a>
+<a href="#1090" id="1090">1090</a>
+<a href="#1091" id="1091">1091</a>
+<a href="#1092" id="1092">1092</a>
+<a href="#1093" id="1093">1093</a>
+<a href="#1094" id="1094">1094</a>
+<a href="#1095" id="1095">1095</a>
+<a href="#1096" id="1096">1096</a>
+<a href="#1097" id="1097">1097</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Pratt parsing module to construct S-expressions from presentation MathML.
 //! This is based on the nice tutorial at https://matklad.github.io/2020/04/13/simple-but-powerful-pratt-parsing.html
 
@@ -1303,11 +1319,12 @@
                         tokens.push(MathExpression::Mo(Operator::Rparen));
                     }
                 } <span class="kw">else </span>{
-                    tokens.push(MathExpression::Mo(Operator::Lparen));
-                    base.flatten(tokens);
+                    <span class="comment">//tokens.push(MathExpression::Mo(Operator::Lparen));
+                    </span>base.flatten(tokens);
                     tokens.push(MathExpression::Mo(Operator::Power));
                     tokens.push(MathExpression::Mo(Operator::Lparen));
                     superscript.flatten(tokens);
+                    tokens.push(MathExpression::Mo(Operator::Rparen));
                 }
             }
             MathExpression::AbsoluteSup(base, superscript) =&gt; {
@@ -1465,6 +1482,7 @@
             <span class="kw">if let </span>Token::Op(Operator::Lparen) = token {
                 <span class="kw">if let </span>Token::Op(Operator::Rparen) = <span class="kw-2">**</span>next_token {
                     new_tokens.push(Token::Op(Operator::Multiply).clone());
+                } <span class="kw">else </span>{
                 }
             }
         }
@@ -2159,5 +2177,19 @@
     <span class="kw">let </span>exp = input.parse::&lt;MathExpressionTree&gt;().unwrap();
     <span class="kw">let </span>s_exp = exp.to_string();
     <span class="macro">assert_eq!</span>(s_exp, <span class="string">&quot;(* (* (* S (+ n 4)) (- i 3)) (^ H (- m 2)))&quot;</span>);
+}
+
+<span class="attr">#[test]
+</span><span class="kw">fn </span>test_mi_multiply() {
+    <span class="kw">let </span>input = <span class="string">&quot;
+    &lt;math&gt;
+        &lt;mi&gt;A&lt;/mi&gt;
+        &lt;msup&gt;&lt;mi&gt;ρ&lt;/mi&gt;&lt;mi&gt;n&lt;/mi&gt;&lt;/msup&gt;
+        &lt;msup&gt;&lt;mi&gt;g&lt;/mi&gt;&lt;mi&gt;n&lt;/mi&gt;&lt;/msup&gt;
+    &lt;/math&gt;
+    &quot;</span>;
+    <span class="kw">let </span>exp = input.parse::&lt;MathExpressionTree&gt;().unwrap();
+    <span class="kw">let </span>s_exp = exp.to_string();
+    <span class="macro">println!</span>(<span class="string">&quot;s_exp={:?}&quot;</span>, s_exp);
 }
 </code></pre></div></section></main></body></html>

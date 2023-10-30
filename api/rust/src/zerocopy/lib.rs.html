@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/zerocopy-0.7.18/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-cb6f1f67f1bcd037.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="zerocopy" data-themes="" data-resource-suffix="" data-rustdoc-version="1.73.0 (cc66ad468 2023-10-03)" data-channel="1.73.0" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-1596385f77d47ef2.css" data-theme-dark-css="dark-0a43001d3fc2282c.css" data-theme-ayu-css="ayu-fd19013d6ce078bf.css" ><script src="../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-1596385f77d47ef2.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-0a43001d3fc2282c.css"><link rel="stylesheet" href="../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../zerocopy/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/zerocopy-0.7.20/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-cb6f1f67f1bcd037.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="zerocopy" data-themes="" data-resource-suffix="" data-rustdoc-version="1.73.0 (cc66ad468 2023-10-03)" data-channel="1.73.0" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-1596385f77d47ef2.css" data-theme-dark-css="dark-0a43001d3fc2282c.css" data-theme-ayu-css="ayu-fd19013d6ce078bf.css" ><script src="../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-1596385f77d47ef2.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-0a43001d3fc2282c.css"><link rel="stylesheet" href="../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../zerocopy/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -5425,6 +5425,13 @@
 <a href="#5425" id="5425">5425</a>
 <a href="#5426" id="5426">5426</a>
 <a href="#5427" id="5427">5427</a>
+<a href="#5428" id="5428">5428</a>
+<a href="#5429" id="5429">5429</a>
+<a href="#5430" id="5430">5430</a>
+<a href="#5431" id="5431">5431</a>
+<a href="#5432" id="5432">5432</a>
+<a href="#5433" id="5433">5433</a>
+<a href="#5434" id="5434">5434</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018 The Fuchsia Authors
 //
 // Licensed under the 2-Clause BSD License &lt;LICENSE-BSD or
@@ -5648,7 +5655,7 @@
 #![cfg_attr(feature = <span class="string">&quot;simd-nightly&quot;</span>, feature(stdsimd))]
 #![cfg_attr(
     __INTERNAL_USE_ONLY_NIGHLTY_FEATURES_IN_TESTS,
-    feature(layout_for_ptr, pointer_byte_offsets, strict_provenance)
+    feature(layout_for_ptr, strict_provenance)
 )]
 #[macro_use]
 </span><span class="kw">mod </span>macros;
@@ -6648,7 +6655,7 @@
     <span class="doccomment">/// Interprets the prefix of the given `bytes` as a `&amp;Self` without copying.
     ///
     /// `ref_from_prefix` returns a reference to the first `size_of::&lt;Self&gt;()`
-    /// bytes of `bytes`. If `bytes.len() != size_of::&lt;T&gt;()` or `bytes` is not
+    /// bytes of `bytes`. If `bytes.len() &lt; size_of::&lt;T&gt;()` or `bytes` is not
     /// aligned to `align_of::&lt;T&gt;()`, this returns `None`.
     ///
     /// To also access the prefix bytes, use [`Ref::new_from_prefix`]. Then,
@@ -6664,7 +6671,7 @@
     <span class="doccomment">/// Interprets the suffix of the given `bytes` as a `&amp;Self` without copying.
     ///
     /// `ref_from_suffix` returns a reference to the last `size_of::&lt;Self&gt;()`
-    /// bytes of `bytes`. If `bytes.len() != size_of::&lt;T&gt;()` or the suffix of
+    /// bytes of `bytes`. If `bytes.len() &lt; size_of::&lt;T&gt;()` or the suffix of
     /// `bytes` is not aligned to `align_of::&lt;T&gt;()`, this returns `None`.
     ///
     /// To also access the suffix bytes, use [`Ref::new_from_suffix`]. Then,
@@ -6692,7 +6699,7 @@
     <span class="doccomment">/// Interprets the prefix of the given `bytes` as a `&amp;mut Self` without copying.
     ///
     /// `mut_from_prefix` returns a reference to the first `size_of::&lt;Self&gt;()`
-    /// bytes of `bytes`. If `bytes.len() != size_of::&lt;T&gt;()` or `bytes` is not
+    /// bytes of `bytes`. If `bytes.len() &lt; size_of::&lt;T&gt;()` or `bytes` is not
     /// aligned to `align_of::&lt;T&gt;()`, this returns `None`.
     ///
     /// To also access the prefix bytes, use [`Ref::new_from_prefix`]. Then,
@@ -6708,7 +6715,7 @@
     <span class="doccomment">/// Interprets the suffix of the given `bytes` as a `&amp;mut Self` without copying.
     ///
     /// `mut_from_suffix` returns a reference to the last `size_of::&lt;Self&gt;()`
-    /// bytes of `bytes`. If `bytes.len() != size_of::&lt;T&gt;()` or the suffix of
+    /// bytes of `bytes`. If `bytes.len() &lt; size_of::&lt;T&gt;()` or the suffix of
     /// `bytes` is not aligned to `align_of::&lt;T&gt;()`, this returns `None`.
     ///
     /// To also access the suffix bytes, use [`Ref::new_from_suffix`]. Then,
@@ -7357,9 +7364,9 @@
                             // target/feature combinations don&#39;t emit any impls
                             // and thus don&#39;t use this macro.
     </span><span class="macro">macro_rules! </span>simd_arch_mod {
-        (<span class="macro-nonterminal">$arch</span>:ident, $(<span class="macro-nonterminal">$typ</span>:ident),<span class="kw-2">*</span>) =&gt; {
-            <span class="kw">mod </span><span class="macro-nonterminal">$arch </span>{
-                <span class="kw">use </span>core::arch::<span class="macro-nonterminal">$arch</span>::{$(<span class="macro-nonterminal">$typ</span>),<span class="kw-2">*</span>};
+        (<span class="macro-nonterminal">$arch</span>:ident, <span class="macro-nonterminal">$</span><span class="kw">mod</span>:<span class="macro-nonterminal">ident</span>, $(<span class="macro-nonterminal">$typ</span>:ident),<span class="kw-2">*</span>) =&gt; {
+            <span class="kw">mod </span><span class="macro-nonterminal">$</span><span class="kw">mod </span>{
+                <span class="kw">use </span><span class="macro-nonterminal">core::arch</span>::<span class="macro-nonterminal">$arch</span>::{$(<span class="macro-nonterminal">$typ</span>),<span class="kw-2">*</span>};
 
                 <span class="kw">use crate</span>::<span class="kw-2">*</span>;
                 <span class="macro">impl_known_layout!</span>($(<span class="macro-nonterminal">$typ</span>),<span class="kw-2">*</span>);
@@ -7373,13 +7380,18 @@
     }
 
     <span class="attr">#[cfg(target_arch = <span class="string">&quot;x86&quot;</span>)]
-    </span><span class="macro">simd_arch_mod!</span>(x86, __m128, __m128d, __m128i, __m256, __m256d, __m256i);
+    </span><span class="macro">simd_arch_mod!</span>(x86, x86, __m128, __m128d, __m128i, __m256, __m256d, __m256i);
+    <span class="attr">#[cfg(all(feature = <span class="string">&quot;simd-nightly&quot;</span>, target_arch = <span class="string">&quot;x86&quot;</span>))]
+    </span><span class="macro">simd_arch_mod!</span>(x86, x86_nightly, __m512bh, __m512, __m512d, __m512i);
     <span class="attr">#[cfg(target_arch = <span class="string">&quot;x86_64&quot;</span>)]
-    </span><span class="macro">simd_arch_mod!</span>(x86_64, __m128, __m128d, __m128i, __m256, __m256d, __m256i);
+    </span><span class="macro">simd_arch_mod!</span>(x86_64, x86_64, __m128, __m128d, __m128i, __m256, __m256d, __m256i);
+    <span class="attr">#[cfg(all(feature = <span class="string">&quot;simd-nightly&quot;</span>, target_arch = <span class="string">&quot;x86_64&quot;</span>))]
+    </span><span class="macro">simd_arch_mod!</span>(x86_64, x86_64_nightly, __m512bh, __m512, __m512d, __m512i);
     <span class="attr">#[cfg(target_arch = <span class="string">&quot;wasm32&quot;</span>)]
-    </span><span class="macro">simd_arch_mod!</span>(wasm32, v128);
+    </span><span class="macro">simd_arch_mod!</span>(wasm32, wasm32, v128);
     <span class="attr">#[cfg(all(feature = <span class="string">&quot;simd-nightly&quot;</span>, target_arch = <span class="string">&quot;powerpc&quot;</span>))]
     </span><span class="macro">simd_arch_mod!</span>(
+        powerpc,
         powerpc,
         vector_bool_long,
         vector_double,
@@ -7389,6 +7401,7 @@
     <span class="attr">#[cfg(all(feature = <span class="string">&quot;simd-nightly&quot;</span>, target_arch = <span class="string">&quot;powerpc64&quot;</span>))]
     </span><span class="macro">simd_arch_mod!</span>(
         powerpc64,
+        powerpc64,
         vector_bool_long,
         vector_double,
         vector_signed_long,
@@ -7397,7 +7410,7 @@
     <span class="attr">#[cfg(target_arch = <span class="string">&quot;aarch64&quot;</span>)]
     #[rustfmt::skip]
     </span><span class="macro">simd_arch_mod!</span>(
-        aarch64, float32x2_t, float32x4_t, float64x1_t, float64x2_t, int8x8_t, int8x8x2_t,
+        aarch64, aarch64, float32x2_t, float32x4_t, float64x1_t, float64x2_t, int8x8_t, int8x8x2_t,
         int8x8x3_t, int8x8x4_t, int8x16_t, int8x16x2_t, int8x16x3_t, int8x16x4_t, int16x4_t,
         int16x8_t, int32x2_t, int32x4_t, int64x1_t, int64x2_t, poly8x8_t, poly8x8x2_t, poly8x8x3_t,
         poly8x8x4_t, poly8x16_t, poly8x16x2_t, poly8x16x3_t, poly8x16x4_t, poly16x4_t, poly16x8_t,
@@ -7407,7 +7420,7 @@
     );
     <span class="attr">#[cfg(all(feature = <span class="string">&quot;simd-nightly&quot;</span>, target_arch = <span class="string">&quot;arm&quot;</span>))]
     #[rustfmt::skip]
-    </span><span class="macro">simd_arch_mod!</span>(arm, int8x4_t, uint8x4_t);
+    </span><span class="macro">simd_arch_mod!</span>(arm, arm, int8x4_t, uint8x4_t);
 }
 
 <span class="doccomment">/// Safely transmutes a value of one type to a value of another type of the same
@@ -7434,11 +7447,15 @@
             <span class="comment">// This branch, though never taken, ensures that the type of `e` is
             // `AsBytes` and that the type of this macro invocation expression
             // is `FromBytes`.
-            </span><span class="kw">const fn </span>transmute&lt;T: <span class="macro-nonterminal">$crate::AsBytes</span>, U: <span class="macro-nonterminal">$crate::FromBytes</span>&gt;(_t: T) -&gt; U {
-                <span class="kw">loop </span>{}
-            }
-            transmute(e)
-        } <span class="kw">else </span>{
+
+            </span><span class="kw">struct </span>AssertIsAsBytes&lt;T: <span class="macro-nonterminal">$crate::AsBytes</span>&gt;(T);
+            <span class="kw">let _ </span>= AssertIsAsBytes(e);
+
+            <span class="kw">struct </span>AssertIsFromBytes&lt;U: <span class="macro-nonterminal">$crate::FromBytes</span>&gt;(U);
+            <span class="attr">#[allow(unused, unreachable_code)]
+            </span><span class="kw">let </span>u = AssertIsFromBytes(<span class="kw">loop </span>{});
+            u.<span class="number">0
+        </span>} <span class="kw">else </span>{
             <span class="comment">// SAFETY: `core::mem::transmute` ensures that the type of `e` and
             // the type of this macro invocation expression have the same size.
             // We know this transmute is safe thanks to the `AsBytes` and
@@ -7507,11 +7524,9 @@
         // because there&#39;s no way, in a generic context, to enforce that two
         // types have the same size or alignment.
 
-        // Reborrow so that mutable references are supported too.
-        //
-        // In the rest of the comments, we refer only to `&amp;T` since this
-        // reborrow ensures that `e` is an immutable reference.
-        </span><span class="kw">let </span>e = <span class="kw-2">&amp;*</span><span class="macro-nonterminal">$e</span>;
+        // Ensure that the source type is a reference or a mutable reference
+        // (note that mutable references are implicitly reborrowed here).
+        </span><span class="kw">let </span>e: <span class="kw-2">&amp;</span><span class="kw">_ </span>= <span class="macro-nonterminal">$e</span>;
 
         <span class="attr">#[allow(unused, clippy::diverging_sub_expression)]
         </span><span class="kw">if </span><span class="bool-val">false </span>{
@@ -7519,11 +7534,15 @@
             // `&amp;T` where `T: &#39;t + Sized + AsBytes`, that the type of this macro
             // expression is `&amp;U` where `U: &#39;u + Sized + FromBytes`, and that
             // `&#39;t` outlives `&#39;u`.
-            </span><span class="kw">const fn </span>transmute&lt;<span class="lifetime">&#39;u</span>, <span class="lifetime">&#39;t</span>: <span class="lifetime">&#39;u</span>, T: <span class="lifetime">&#39;t </span>+ Sized + <span class="macro-nonterminal">$crate::AsBytes</span>, U: <span class="lifetime">&#39;u </span>+ Sized + <span class="macro-nonterminal">$crate::FromBytes</span>&gt;(_t: <span class="kw-2">&amp;</span><span class="lifetime">&#39;t </span>T) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;u </span>U {
-                <span class="kw">loop </span>{}
-            }
-            transmute(e)
-        } <span class="kw">else if </span><span class="bool-val">false </span>{
+
+            </span><span class="kw">struct </span>AssertIsAsBytes&lt;<span class="lifetime">&#39;a</span>, T: ::core::marker::Sized + <span class="macro-nonterminal">$crate::AsBytes</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T);
+            <span class="kw">let _ </span>= AssertIsAsBytes(e);
+
+            <span class="kw">struct </span>AssertIsFromBytes&lt;<span class="lifetime">&#39;a</span>, U: ::core::marker::Sized + <span class="macro-nonterminal">$crate::FromBytes</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>U);
+            <span class="attr">#[allow(unused, unreachable_code)]
+            </span><span class="kw">let </span>u = AssertIsFromBytes(<span class="kw">loop </span>{});
+            u.<span class="number">0
+        </span>} <span class="kw">else if </span><span class="bool-val">false </span>{
             <span class="comment">// This branch, though never taken, ensures that `size_of::&lt;T&gt;() ==
             // size_of::&lt;U&gt;()` and that that `align_of::&lt;T&gt;() &gt;=
             // align_of::&lt;U&gt;()`.
@@ -7542,32 +7561,14 @@
 
             <span class="kw-2">&amp;</span>u
         } <span class="kw">else </span>{
-            <span class="comment">// SAFETY:
-            // - We know that the input and output types are both `Sized` (ie,
-            //   thin) references thanks to the trait bounds on `transmute`
-            //   above, and thanks to the fact that transmute takes and returns
-            //   references.
-            // - We know that it is sound to view the target type of the input
-            //   reference (`T`) as the target type of the output reference
-            //   (`U`) because `T: AsBytes` and `U: FromBytes` (guaranteed by
-            //   trait bounds on `transmute`) and because `size_of::&lt;T&gt;() ==
-            //   size_of::&lt;U&gt;()` (guaranteed by the `assert_size_eq` above).
-            // - We know that alignment is not increased thanks to the
-            //   `assert_align_gt_eq` above.
-            //
-            // We use this reexport of `core::mem::transmute` because we know it
-            // will always be available for crates which are using the 2015
-            // edition of Rust. By contrast, if we were to use
-            // `std::mem::transmute`, this macro would not work for such crates
-            // in `no_std` contexts, and if we were to use
-            // `core::mem::transmute`, this macro would not work in `std`
-            // contexts in which `core` was not manually imported. This is not a
-            // problem for 2018 edition crates.
-            </span><span class="kw">unsafe </span>{
-                <span class="comment">// Clippy: It&#39;s okay to transmute a type to itself.
-                </span><span class="attr">#[allow(clippy::useless_transmute)]
-                </span><span class="macro-nonterminal">$crate::macro_util::core_reexport::mem::transmute</span>(e)
-            }
+            <span class="comment">// SAFETY: For source type `Src` and destination type `Dst`:
+            // - We know that `Src: AsBytes` and `Dst: FromBytes` thanks to the
+            //   uses of `AssertIsAsBytes` and `AssertIsFromBytes` above.
+            // - We know that `size_of::&lt;Src&gt;() == size_of::&lt;Dst&gt;()` thanks to
+            //   the use of `assert_size_eq!` above.
+            // - We know that `align_of::&lt;Src&gt;() &gt;= align_of::&lt;Dst&gt;()` thanks to
+            //   the use of `assert_align_gt_eq!` above.
+            </span><span class="kw">unsafe </span>{ <span class="macro-nonterminal">$crate::macro_util::transmute_ref</span>(e) }
         }
     }}
 }
@@ -7618,22 +7619,41 @@
         // because there&#39;s no way, in a generic context, to enforce that two
         // types have the same size or alignment.
 
-        </span><span class="kw">let </span>e = <span class="macro-nonterminal">$e</span>;
+        // Ensure that the source type is a mutable reference.
+        </span><span class="kw">let </span>e: <span class="kw-2">&amp;mut </span><span class="kw">_ </span>= <span class="macro-nonterminal">$e</span>;
 
         <span class="attr">#[allow(unused, clippy::diverging_sub_expression)]
         </span><span class="kw">if </span><span class="bool-val">false </span>{
             <span class="comment">// This branch, though never taken, ensures that the type of `e` is
-            // `&amp;mut T` where `T: &#39;t + Sized + AsBytes + FromBytes`, that the
+            // `&amp;mut T` where `T: &#39;t + Sized + FromBytes + AsBytes`, that the
             // type of this macro expression is `&amp;mut U` where `U: &#39;u + Sized +
-            // AsBytes + FromBytes`.
-            </span><span class="kw">fn </span>transmute&lt;<span class="lifetime">&#39;t</span>, T, U&gt;(_t: <span class="kw-2">&amp;</span><span class="lifetime">&#39;t </span><span class="kw-2">mut </span>T) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;t </span><span class="kw-2">mut </span>U
-            <span class="kw">where
-                </span>T: <span class="lifetime">&#39;t </span>+ Sized + <span class="macro-nonterminal">$crate::AsBytes </span>+ <span class="macro-nonterminal">$crate::FromBytes</span>,
-                U: <span class="lifetime">&#39;t </span>+ Sized + <span class="macro-nonterminal">$crate::AsBytes </span>+ <span class="macro-nonterminal">$crate::FromBytes</span>,
-            {
-                <span class="kw">loop </span>{}
+            // FromBytes + AsBytes`.
+
+            // We use immutable references here rather than mutable so that, if
+            // this macro is used in a const context (in which, as of this
+            // writing, mutable references are banned), the error message
+            // appears to originate in the user&#39;s code rather than in the
+            // internals of this macro.
+            </span><span class="kw">struct </span>AssertSrcIsFromBytes&lt;<span class="lifetime">&#39;a</span>, T: ::core::marker::Sized + <span class="macro-nonterminal">$crate::FromBytes</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T);
+            <span class="kw">struct </span>AssertSrcIsAsBytes&lt;<span class="lifetime">&#39;a</span>, T: ::core::marker::Sized + <span class="macro-nonterminal">$crate::AsBytes</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T);
+            <span class="kw">struct </span>AssertDstIsFromBytes&lt;<span class="lifetime">&#39;a</span>, T: ::core::marker::Sized + <span class="macro-nonterminal">$crate::FromBytes</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T);
+            <span class="kw">struct </span>AssertDstIsAsBytes&lt;<span class="lifetime">&#39;a</span>, T: ::core::marker::Sized + <span class="macro-nonterminal">$crate::AsBytes</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T);
+
+            <span class="kw">if </span><span class="bool-val">true </span>{
+                <span class="kw">let _ </span>= AssertSrcIsFromBytes(<span class="kw-2">&amp;*</span>e);
+            } <span class="kw">else </span>{
+                <span class="kw">let _ </span>= AssertSrcIsAsBytes(<span class="kw-2">&amp;*</span>e);
             }
-            transmute(e)
+
+            <span class="kw">if </span><span class="bool-val">true </span>{
+                <span class="attr">#[allow(unused, unreachable_code)]
+                </span><span class="kw">let </span>u = AssertDstIsFromBytes(<span class="kw">loop </span>{});
+                <span class="kw-2">&amp;mut *</span>u.<span class="number">0
+            </span>} <span class="kw">else </span>{
+                <span class="attr">#[allow(unused, unreachable_code)]
+                </span><span class="kw">let </span>u = AssertDstIsAsBytes(<span class="kw">loop </span>{});
+                <span class="kw-2">&amp;mut *</span>u.<span class="number">0
+            </span>}
         } <span class="kw">else if </span><span class="bool-val">false </span>{
             <span class="comment">// This branch, though never taken, ensures that `size_of::&lt;T&gt;() ==
             // size_of::&lt;U&gt;()` and that that `align_of::&lt;T&gt;() &gt;=
@@ -7653,33 +7673,16 @@
 
             <span class="kw-2">&amp;mut </span>u
         } <span class="kw">else </span>{
-            <span class="comment">// SAFETY:
-            // - We know that the input and output types are both `Sized` (ie,
-            //   thin) references thanks to the trait bounds on `transmute`
-            //   above, and thanks to the fact that transmute takes and returns
-            //   references.
-            // - We know that it is sound to view the target type of the input
-            //   reference (`T`) as the target type of the output reference
-            //   (`U`) and visa versa because `T: AsBytes + FromBytes` and `U:
-            //   AsBytes + FromBytes` (guaranteed by trait bounds on
-            //   `transmute`) and because `size_of::&lt;T&gt;() == size_of::&lt;U&gt;()`
-            //   (guaranteed by the `assert_size_eq` above).
-            // - We know that alignment is not increased thanks to the
-            //   `assert_align_gt_eq` above.
-            //
-            // We use this reexport of `core::mem::transmute` because we know it
-            // will always be available for crates which are using the 2015
-            // edition of Rust. By contrast, if we were to use
-            // `std::mem::transmute`, this macro would not work for such crates
-            // in `no_std` contexts, and if we were to use
-            // `core::mem::transmute`, this macro would not work in `std`
-            // contexts in which `core` was not manually imported. This is not a
-            // problem for 2018 edition crates.
-            </span><span class="kw">unsafe </span>{
-                <span class="comment">// Clippy: It&#39;s okay to transmute a type to itself.
-                </span><span class="attr">#[allow(clippy::useless_transmute)]
-                </span><span class="macro-nonterminal">$crate::macro_util::core_reexport::mem::transmute</span>(e)
-            }
+            <span class="comment">// SAFETY: For source type `Src` and destination type `Dst`:
+            // - We know that `Src: FromBytes + AsBytes` and `Dst: FromBytes +
+            //   AsBytes` thanks to the uses of `AssertSrcIsFromBytes`,
+            //   `AssertSrcIsAsBytes`, `AssertDstIsFromBytes`, and
+            //   `AssertDstIsAsBytes` above.
+            // - We know that `size_of::&lt;Src&gt;() == size_of::&lt;Dst&gt;()` thanks to
+            //   the use of `assert_size_eq!` above.
+            // - We know that `align_of::&lt;Src&gt;() &gt;= align_of::&lt;Dst&gt;()` thanks to
+            //   the use of `assert_align_gt_eq!` above.
+            </span><span class="kw">unsafe </span>{ <span class="macro-nonterminal">$crate::macro_util::transmute_mut</span>(e) }
         }
     }}
 }
@@ -8906,6 +8909,8 @@
 
     <span class="attr">#[cfg(test)]
     </span><span class="kw">mod </span>tests {
+        <span class="kw">use </span>core::convert::TryFrom <span class="kw">as _</span>;
+
         <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
         <span class="attr">#[test]
@@ -9081,7 +9086,7 @@
 </span><span class="kw">mod </span>tests {
     <span class="attr">#![allow(clippy::unreadable_literal)]
 
-    </span><span class="kw">use </span>core::ops::Deref;
+    </span><span class="kw">use </span>core::{convert::TryInto <span class="kw">as _</span>, ops::Deref};
 
     <span class="kw">use </span>static_assertions::assert_impl_all;
 
@@ -9851,7 +9856,8 @@
                 <span class="macro">panic!</span>(<span class="string">&quot;PanicOnDrop::drop&quot;</span>);
             }
         }
-        <span class="kw">let _</span>: () = <span class="macro">transmute!</span>(PanicOnDrop(()));
+        <span class="attr">#[allow(clippy::let_unit_value)]
+        </span><span class="kw">let _</span>: () = <span class="macro">transmute!</span>(PanicOnDrop(()));
 
         <span class="comment">// Test that `transmute!` is legal in a const context.
         </span><span class="kw">const </span>ARRAY_OF_U8S: [u8; <span class="number">8</span>] = [<span class="number">0u8</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>];
@@ -10338,7 +10344,9 @@
         );
         <span class="kw">let </span>suffix = AU64::mut_from(<span class="kw-2">&amp;mut </span>buf.t[<span class="number">8</span>..]).unwrap();
         suffix.<span class="number">0 </span>= <span class="number">0x0101010101010101</span>;
-        <span class="macro">assert_eq!</span>(&lt;[u8; <span class="number">9</span>]&gt;::ref_from_suffix(<span class="kw-2">&amp;</span>buf.t[..]).unwrap(), <span class="kw-2">&amp;</span>[<span class="number">7u8</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>]);
+        <span class="comment">// The `[u8:9]` is a non-half size of the full buffer, which would catch
+        // `from_prefix` having the same implementation as `from_suffix` (issues #506, #511).
+        </span><span class="macro">assert_eq!</span>(&lt;[u8; <span class="number">9</span>]&gt;::ref_from_suffix(<span class="kw-2">&amp;</span>buf.t[..]).unwrap(), <span class="kw-2">&amp;</span>[<span class="number">7u8</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>]);
         <span class="kw">let </span>suffix = AU64::mut_from_suffix(<span class="kw-2">&amp;mut </span>buf.t[<span class="number">1</span>..]).unwrap();
         suffix.<span class="number">0 </span>= <span class="number">0x0202020202020202</span>;
         &lt;[u8; <span class="number">10</span>]&gt;::mut_from_suffix(<span class="kw-2">&amp;mut </span>buf.t[..]).unwrap()[<span class="number">0</span>] = <span class="number">42</span>;
@@ -10812,8 +10820,14 @@
             <span class="attr">#[cfg(target_arch = <span class="string">&quot;x86&quot;</span>)]
             </span><span class="macro">test_simd_arch_mod!</span>(x86, __m128, __m128d, __m128i, __m256, __m256d, __m256i);
 
+            <span class="attr">#[cfg(all(feature = <span class="string">&quot;simd-nightly&quot;</span>, target_arch = <span class="string">&quot;x86&quot;</span>))]
+            </span><span class="macro">test_simd_arch_mod!</span>(x86, __m512bh, __m512, __m512d, __m512i);
+
             <span class="attr">#[cfg(target_arch = <span class="string">&quot;x86_64&quot;</span>)]
             </span><span class="macro">test_simd_arch_mod!</span>(x86_64, __m128, __m128d, __m128i, __m256, __m256d, __m256i);
+
+            <span class="attr">#[cfg(all(feature = <span class="string">&quot;simd-nightly&quot;</span>, target_arch = <span class="string">&quot;x86_64&quot;</span>))]
+            </span><span class="macro">test_simd_arch_mod!</span>(x86_64, __m512bh, __m512, __m512d, __m512i);
 
             <span class="attr">#[cfg(target_arch = <span class="string">&quot;wasm32&quot;</span>)]
             </span><span class="macro">test_simd_arch_mod!</span>(wasm32, v128);
