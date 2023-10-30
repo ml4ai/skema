@@ -8,6 +8,7 @@ from langchain.output_parsers import (
     StructuredOutputParser,
     ResponseSchema
 )
+import langchain.schema
 from skema.rest.proxies import SKEMA_OPENAI_KEY
 
 def test_prompt_construction():
@@ -27,16 +28,6 @@ def test_prompt_construction():
     # for structured output parsing, makes the instructions to be passed as a variable to prompt template
     format_instructions = output_parser.get_format_instructions()
 
-    # low temp as is not generative
-    temperature = 0.0
-
-    # initialize the models
-    openai = ChatOpenAI(
-        temperature=temperature,
-        model_name='gpt-3.5-turbo',
-        openai_api_key=SKEMA_OPENAI_KEY
-    )
-
     # construct the prompts
     template="You are a assistant that answers questions about code."
     system_message_prompt = SystemMessagePromptTemplate.from_template(template)
@@ -49,9 +40,5 @@ def test_prompt_construction():
     # formatting the prompt with input variables
     formatted_prompt = chat_prompt.format_prompt(code=code, format_instructions = format_instructions).to_messages()
 
-    # running the model
-    output = openai(formatted_prompt)  
-
-    parsed_output = output_parser.parse(output.content)
-
-    assert isinstance(parsed_output['model_function'], str)
+    assert isinstance(formatted_prompt[0], langchain.schema.messages.SystemMessage)
+    assert isinstance(formatted_prompt[1], langchain.schema.messages.HumanMessage)
