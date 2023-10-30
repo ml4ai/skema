@@ -7,7 +7,9 @@ from bs4 import BeautifulSoup, Comment
 from skema.rest.schema import TextReadingEvaluationResults, AMRLinkingEvaluationResults
 
 
-def fn_preprocessor(fn_data):
+def fn_preprocessor(function_network: Dict[str, Any]):
+
+    fn_data = function_network.copy()
 
     logs = []
 
