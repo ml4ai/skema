@@ -175,9 +175,7 @@ def prepare_dataset(args):
     with open(latex_path, "r") as f:
         latex = f.readlines()
         latex = (
-            " ".join([l.replace("\n", "") for l in latex])
-            if len(latex) >= 1
-            else ""
+            " ".join([l.replace("\n", "") for l in latex]) if len(latex) >= 1 else ""
         )
 
     temp_file_path = f"{os.getcwd()}/sampling_dataset/temp_folder/eqn_set_{i}.txt"
@@ -208,7 +206,12 @@ def get_bin(af):
     try:
         i, ap = af
         with open(f"{os.getcwd()}/sampling_dataset/temp_folder/eqn_set_{i}.txt") as f:
-            latex = f.readline().rstrip("\n")
+            latex = f.readlines()
+            latex = (
+                " ".join([l.replace("\n", "") for l in latex])
+                if len(latex) >= 1
+                else ""
+            )
             latex_length = len(latex.split())
 
         # finding the bin
@@ -379,13 +382,11 @@ def main():
 
             with open(latex_path, "r") as f:
                 latex_arr = f.readlines()
-
-            if len(latex_arr) > 1:
-                latex = " "
-                for l in latex_arr:
-                    latex = latex + l.replace("\n", "")
-            else:
-                latex = latex_arr[0]
+                latex = (
+                    " ".join([l.replace("\n", "") for l in latex_arr])
+                    if len(latex_arr) >= 1
+                    else ""
+                )
 
             if "\n" not in latex:
                 latex = latex + "\n"
