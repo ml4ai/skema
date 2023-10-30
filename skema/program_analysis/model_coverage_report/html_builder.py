@@ -44,7 +44,7 @@ class HTML_Instance:
             "div", id=f"{model_name}-basic", class_="table-container"
         )
 
-        new_model_table_basic = self.soup.new_tag("table", _class="searchable sortable")
+        new_model_table_basic = self.soup.new_tag("table", id=f"table-{model_name}", **{"class":"searchable sortable data-table"})
         new_model_thead = self.soup.new_tag("thead")
 
         new_model_table_header_basic = self.soup.new_tag("tr")
@@ -60,10 +60,9 @@ class HTML_Instance:
         
         # Append the elements to each other
         new_model_container.extend([new_model_heading, new_model_table_container_basic])
-        new_model_thead.append(new_model_table_basic)
-        new_model_table_container_basic.append(new_model_thead)
-        new_model_table_basic.append(new_model_table_header_basic)
-
+        new_model_table_container_basic.append(new_model_table_basic)
+        new_model_table_basic.append(new_model_thead)
+        new_model_thead.append(new_model_table_header_basic)
 
         # Append to outer body
         self.soup.body.append(new_model_container)
@@ -102,6 +101,13 @@ class HTML_Instance:
             ]
         )
         model_table.append(model_header)
+
+    def add_data_table_script(self):
+        script_tag = self.soup.new_tag("script")
+        script_tag.append("""$(document).ready(function () {
+            $('.data-table').DataTable();
+        });""")
+        self.soup.body.append(script_tag)
 
     def add_file_basic(
         self,
