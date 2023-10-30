@@ -40,5 +40,12 @@ def test_prompt_construction():
     # formatting the prompt with input variables
     formatted_prompt = chat_prompt.format_prompt(code=code, format_instructions = format_instructions).to_messages()
 
+    # mockes the output from the model
+    output_mock = langchain.schema.messages.AIMessage(content='```json\n{\n\t"model_function": "sir"\n}\n```',additional_kwargs={}, example=False )
+
+    parsed_output = output_parser.parse(output_mock.content)
+
+    assert isinstance(parsed_output['model_fuction'], str)
     assert isinstance(formatted_prompt[0], langchain.schema.messages.SystemMessage)
     assert isinstance(formatted_prompt[1], langchain.schema.messages.HumanMessage)
+
