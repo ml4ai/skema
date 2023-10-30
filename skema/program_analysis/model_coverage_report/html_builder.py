@@ -10,6 +10,27 @@ class HTML_Instance:
     def __init__(self):
         self.soup = BeautifulSoup(HTML_BASE)
 
+    def add_table_header_field(self, table_header_tag, field_name: str):
+        """Adds a new field to a table header"""
+        field_tag = self.soup.new_tag("th")
+        field_tag.string = field_name
+
+        table_header_tag.append(field_tag)
+
+    def add_table_data_field(self, table_row_tag, field_data: str, anchored=False, anchor_text=None):
+        """Adds a new field to a table row"""
+        field_tag = self.soup.new_tag("td")
+
+        if anchored:
+            anchor_tag = self.soup.new_tag("a")
+            anchor_tag["href"] = field_data
+            anchor_tag.string = anchor_text
+            field_tag.append(anchor_tag)
+        else:
+            field_tag.string = field_data
+
+        table_row_tag.append(field_tag)
+
     def add_model(self, model_name: str):
         """Adds a new model to the HTML source"""
         # Create the new model HTML structure
@@ -22,35 +43,27 @@ class HTML_Instance:
         new_model_table_container_basic = self.soup.new_tag(
             "div", id=f"{model_name}-basic", class_="table-container"
         )
-        new_model_table_basic = self.soup.new_tag("table")
-        new_model_table_header_basic = self.soup.new_tag("tr")
-        new_model_table_header_basic_th1 = self.soup.new_tag("th")
-        new_model_table_header_basic_th1.string = "File Name"
-        new_model_table_header_basic_th2 = self.soup.new_tag("th")
-        new_model_table_header_basic_th2.string = "Num Lines"
-        new_model_table_header_basic_th3 = self.soup.new_tag("th")
-        new_model_table_header_basic_th3.string = "Can Ingest"
-        new_model_table_header_basic_th4 = self.soup.new_tag("th")
-        new_model_table_header_basic_th4.string = "Tree-Sitter Parse Tree"
-        new_model_table_header_basic_th5 = self.soup.new_tag("th")
-        new_model_table_header_basic_th5.string = "CAST"
-        new_model_table_header_basic_th6 = self.soup.new_tag("th")
-        new_model_table_header_basic_th6.string = "Gromet"
 
+        new_model_table_basic = self.soup.new_tag("table", _class="searchable sortable")
+        new_model_thead = self.soup.new_tag("thead")
+
+        new_model_table_header_basic = self.soup.new_tag("tr")
+        self.add_table_header_field(new_model_table_header_basic, "File Name")
+        self.add_table_header_field(new_model_table_header_basic, "Num Lines")
+        self.add_table_header_field(new_model_table_header_basic, "Can Ingest")
+        self.add_table_header_field(new_model_table_header_basic, "Tree-Sitter Parse Tree")
+        self.add_table_header_field(new_model_table_header_basic, "CAST")
+        self.add_table_header_field(new_model_table_header_basic, "Gromet")
+        self.add_table_header_field(new_model_table_header_basic, "Gromet Errors")
+        self.add_table_header_field(new_model_table_header_basic, "Gromet Report")
+        self.add_table_header_field(new_model_table_header_basic, "Preprocessed Gromet")
+        
         # Append the elements to each other
         new_model_container.extend([new_model_heading, new_model_table_container_basic])
-        new_model_table_container_basic.append(new_model_table_basic)
+        new_model_thead.append(new_model_table_basic)
+        new_model_table_container_basic.append(new_model_thead)
         new_model_table_basic.append(new_model_table_header_basic)
-        new_model_table_header_basic.extend(
-            [
-                new_model_table_header_basic_th1,
-                new_model_table_header_basic_th2,
-                new_model_table_header_basic_th3,
-                new_model_table_header_basic_th4,
-                new_model_table_header_basic_th5,
-                new_model_table_header_basic_th6,
-            ]
-        )
+
 
         # Append to outer body
         self.soup.body.append(new_model_container)
@@ -99,50 +112,25 @@ class HTML_Instance:
         parse_tree_path: Path,
         cast_path: Path,
         gromet_path: Path,
+        gromet_errors: int = 0,
+        gromet_report_path: Path = Path(""),
+        preprocessed_gromet_path: Path = Path("")
     ):
         """Add a file entry to a model table"""
         model_table = self.soup.select_one(f"#{model}-basic table")
-
         new_row = self.soup.new_tag("tr")
 
-        file_name_cell = self.soup.new_tag("td")
-        file_name_cell.string = file_name
-
-        num_lines_cell = self.soup.new_tag("td")
-        num_lines_cell.string = str(num_lines)
-
-        valid_cell = self.soup.new_tag("td")
-        valid_cell.string = "✓" if can_ingest else "✗"
-
-        parse_tree_cell = self.soup.new_tag("td")
-        parse_tree_a = self.soup.new_tag("a")
-        parse_tree_a["href"] = str(parse_tree_path)
-        parse_tree_a.string = "Open Parse Tree"
-        parse_tree_cell.append(parse_tree_a)
-
-        cast_cell = self.soup.new_tag("td")
-        cast_a = self.soup.new_tag("a")
-        cast_a["href"] = str(cast_path)
-        cast_a.string = "Open CAST"
-        cast_cell.append(cast_a)
-
-        gromet_cell = self.soup.new_tag("td")
-        gromet_a = self.soup.new_tag("a")
-        gromet_a["href"] = str(gromet_path)
-        gromet_a.string = "Open Gromet"
-        gromet_cell.append(gromet_a)
-
-        new_row.extend(
-            [
-                file_name_cell,
-                num_lines_cell,
-                valid_cell,
-                parse_tree_cell,
-                cast_cell,
-                gromet_cell,
-            ]
-        )
-
+        # Add row data fields
+        self.add_table_data_field(new_row, file_name)
+        self.add_table_data_field(new_row, str(num_lines))
+        self.add_table_data_field(new_row, "✓" if can_ingest else "✗")
+        self.add_table_data_field(new_row, str(parse_tree_path), anchored=True, anchor_text="Open Parse Tree")
+        self.add_table_data_field(new_row, str(cast_path), anchored=True, anchor_text="Open CAST")
+        self.add_table_data_field(new_row, str(gromet_path), anchored=True, anchor_text="Open Gromet")
+        self.add_table_data_field(new_row, str(gromet_errors))
+        self.add_table_data_field(new_row, str(gromet_report_path), anchored=True, anchor_text="Open Gromet Report")
+        self.add_table_data_field(new_row, str(preprocessed_gromet_path), anchored=True, anchor_text="Open Preprocessed Gromet")
+        
         model_table.append(new_row)
 
     def write_html(self):

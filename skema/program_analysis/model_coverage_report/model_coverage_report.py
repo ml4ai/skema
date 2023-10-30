@@ -3,8 +3,9 @@ import os
 import traceback  # Debugs
 import requests
 import yaml
+import json
 from enum import Enum
-from typing import List, Dict, Tuple, Callable
+from typing import List, Dict, Tuple, Callable, Any
 from zipfile import ZipFile
 from io import BytesIO
 from tempfile import TemporaryDirectory
@@ -27,6 +28,7 @@ from skema.program_analysis.python2cast import python_to_cast
 from skema.program_analysis.fortran2cast import fortran_to_cast
 from skema.program_analysis.matlab2cast import matlab_to_cast
 from skema.program_analysis.tree_sitter_parsers.util import extension_to_language
+from skema.rest.utils import fn_preprocessor
 from skema.utils.fold import del_nulls, dictionary_to_gromet_json
 
 THIS_PATH = Path(__file__).parent.resolve()
@@ -59,7 +61,7 @@ class Status(Enum):
 
 def generate_data_product(
     output_path: Path, data_product_function: Callable, args=(), kwargs=None
-) -> str:
+) -> Tuple[str, Any]:
     """Wrapper function for generating data products, returns the status of processing."""
     os.chdir(THIS_PATH)
     try:
@@ -117,6 +119,15 @@ def generate_full_gromet(system_name: str, root_path: str, system_filepaths: str
     gromet_collection = process_file_system(system_name, root_path, system_filepaths)
     return dictionary_to_gromet_json(del_nulls(gromet_collection.to_dict()))
 
+def generate_gromet_preprocess_fn(gromet_collection: Dict) -> str:
+    """Generator function for Gromet preprocessed fn"""
+    gromet_collection = fn_preprocessor(gromet_collection)[0]
+    return dictionary_to_gromet_json(del_nulls(gromet_collection))
+
+def generate_gromet_preprocess_logs(gromet_collection: Dict) -> str:
+    """Generator function for Gromet preprocessing logs"""
+    logs = fn_preprocessor(gromet_collection)[1]
+    return "\n".join(logs)
 
 def process_single_model(html: HTML_Instance, output_dir: str, model_name: str):
     """Generate an HTML report for a single model"""
@@ -184,6 +195,30 @@ def process_single_model(html: HTML_Instance, output_dir: str, model_name: str):
                 gromet_path, generate_gromet, args=(str(temp_path),), kwargs=None
             )
 
+            # Step 4: Preprocess Gromet 
+            try:
+                gromet_collection = json.loads(gromet_path.read_text())
+            except:
+                gromet_collection = {}
+                
+            gromet_report_path = (
+                Path(output_dir) / "data" / "gromet_report" / model_name / f"{filename}.json"
+            )
+            gromet_report_path.parent.mkdir(parents=True, exist_ok=True)
+            gromet_report_relative_path = str(gromet_report_path.relative_to(output_dir))
+            gromet_preprocess_path = (
+                Path(output_dir) / "data" / "gromet_preprocess" / model_name / f"{filename}.json"
+            )
+            gromet_preprocess_path.parent.mkdir(parents=True, exist_ok=True)
+            gromet_preprocess_relative_path = str(gromet_preprocess_path.relative_to(output_dir))
+            generate_data_product(
+                gromet_report_path, generate_gromet_preprocess_logs, args=(gromet_collection,), kwargs=None 
+            )
+            generate_data_product(
+                gromet_preprocess_path, generate_gromet_preprocess_fn, args=(gromet_collection,), kwargs=None 
+            )
+        
+
             # Check the status of each pipeline step
             final_status = Status.get_overall_status(
                 [parse_tree_status, cast_status, gromet_status]
@@ -205,6 +240,9 @@ def process_single_model(html: HTML_Instance, output_dir: str, model_name: str):
                 parse_tree_relative_path,
                 cast_relative_path,
                 gromet_relative_path,
+                0 if "Traceback" in gromet_report_path.read_text() else len(gromet_report_path.read_text().splitlines()),
+                gromet_report_relative_path,
+                gromet_preprocess_relative_path
             )
 
         # If all files are valid in a system, attempt to ingest full system into single GrometFNModuleCollection
@@ -248,6 +286,7 @@ def process_all_models(html: HTML_Instance, output_dir: str):
 
 
 def main():
+
     parser = argparse.ArgumentParser(description="Process models.")
     parser.add_argument("output_dir", help="Path to the output directory")
     subparsers = parser.add_subparsers(dest="mode")
