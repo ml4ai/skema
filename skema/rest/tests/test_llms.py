@@ -45,7 +45,7 @@ def test_prompt_construction():
 
     parsed_output = output_parser.parse(output_mock.content)
 
-    assert isinstance(parsed_output['model_fuction'], str)
+    assert isinstance(parsed_output['model_function'], str)
     assert isinstance(formatted_prompt[0], langchain.schema.messages.SystemMessage)
     assert isinstance(formatted_prompt[1], langchain.schema.messages.HumanMessage)
 
