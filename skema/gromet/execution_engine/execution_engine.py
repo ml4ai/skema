@@ -2,7 +2,8 @@ import yaml
 import argparse
 import asyncio
 import subprocess
-
+import json
+import asyncio
 from ast import literal_eval
 from pathlib import Path
 from typing import Any, List, Dict
@@ -14,7 +15,7 @@ from skema.program_analysis.CAST.pythonAST.builtin_map import retrieve_operator
 from skema.program_analysis.single_file_ingester import process_file
 from skema.gromet.execution_engine.execute import execute_primitive
 
-# TODO: Broken import: from skema.rest.workflows import code_snippets_to_pn_amr
+from skema.rest.workflows import code_snippets_to_pn_amr
 from skema.skema_py.server import System
 from skema.gromet.execution_engine.query_runner import QueryRunner
 from skema.gromet.execution_engine.symbol_table import SymbolTable
@@ -48,6 +49,34 @@ class ExecutionEngine:
         # Upload source to Memgraph instance
         self.upload_source()
 
+        amr_path = Path(__file__).parent / "amr.json"
+        self.amr = json.loads(amr_path.read_text())
+
+    def generate_amr(self, source_path: str):
+        """Generate AMR for the source file"""
+        # Generate system from code
+        system = System(
+            files=[Path(source_path).name],
+            blobs=[Path(source_path).read_text()]
+        )
+
+        amr = asyncio.run(code_snippets_to_pn_amr(system))
+        print(amr.body)
+        exit()
+
+    def enrich_amr(self):
+        """Enrich the AMR for a source file with initial parameter values"""
+        # For each parameter, see if we have a matching value
+        parameters = self.amr["semantics"]["ode"]["parameters"]
+        for index,parameter in enumerate(parameters):
+            value = self.symbol_table.get_symbol(parameter["name"])
+            if value:
+                parameters[index]["value"] = value["history"][0].item()
+            else:
+                print(f"WARNING: Could not extract value for parameter {parameter['name']}")
+
+        return self.amr
+    
     def upload_source(self):
         """Ingest source file and upload Gromet to Memgraph"""
 
@@ -55,7 +84,7 @@ class ExecutionEngine:
         # Instead, we want to store it alongside the source so that we can upload it to Memgraph.
         gromet_collection = process_file(self.source_path)
         gromet_name = f"{self.filename}--Gromet-FN-auto.json"
-        gromet_path = Path(self.source_path).parent / gromet_name
+        gromet_path = Path(self.source_path).resolve().parent / gromet_name
         gromet_path.write_text(
             dictionary_to_gromet_json(del_nulls(gromet_collection.to_dict()))
         )
@@ -241,7 +270,9 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     engine = ExecutionEngine(args.host, args.port, args.source_path)
+    
     print(engine.parameter_extraction())
+    print(engine.enrich_amr())
 
     """ TODO: New arguments to add with function execution support
     group = parser.add_mutually_exclusive_group(required=True)
