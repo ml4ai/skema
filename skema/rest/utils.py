@@ -8,19 +8,18 @@ from bs4 import BeautifulSoup, Comment
 from skema.rest.schema import TextReadingEvaluationResults, AMRLinkingEvaluationResults
 
 
-def fn_preprocessor(function_net_path):
-    with open(function_net_path,'r') as fn_file:
-        fn_data = json.load(fn_file)
-        fn_file.close()
+def fn_preprocessor(fn_data):
 
     logs = []
 
-    # we will currently preprocess based on 2 different common bugs
-    # 1) wire tgt's being -1 -> which we will delete these wires
-    # 2) metadata being inline for bf entries instead of an index into the metadata_collection -> which we will replace with an index of 2
-    # 3) missing function_type field on a bf entry -> will replace with function_type: "OTHER"
-    # 4) If there is not a body field to a function -> replace "FUNCTION" with "ABSTRACT and set "name":"unknown"
-    # 5) NOT DONE YET: In the future we will preprocess about function calls being arguments, in order to simplify extracting the dataflow 
+    '''
+    We will currently preprocess based on 2 different common bugs
+    1) wire tgt's being -1 -> which we will delete these wires
+    2) metadata being inline for bf entries instead of an index into the metadata_collection -> which we will replace with an index of 2
+    3) missing function_type field on a bf entry -> will replace with function_type: "OTHER"
+    4) If there is not a body field to a function -> replace "FUNCTION" with "ABSTRACT and set "name":"unknown"
+    5) NOT DONE YET: In the future we will preprocess about function calls being arguments, in order to simplify extracting the dataflow 
+    '''
 
     # first we check the top bf level of wires and inline metadata: 
     keys_to_check = ['bf', 'wff', 'wfopi', 'wfopo', 'wopio']
