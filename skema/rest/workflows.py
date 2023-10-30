@@ -116,6 +116,7 @@ async def equations_to_amr(data: schema.MmlToAMR):
 @router.post("/code/snippets-to-pn-amr", summary="Code snippets → PetriNet AMR")
 async def code_snippets_to_pn_amr(system: code2fn.System):
     gromet = await code2fn.fn_given_filepaths(system)
+    gromet, logs = utils.fn_preprocessor(gromet)
     res = requests.put(f"{SKEMA_RS_ADDESS}/models/PN", json=gromet)
     if res.status_code != 200:
         return JSONResponse(
@@ -153,6 +154,7 @@ async def code_snippets_to_rn_amr(system: code2fn.System):
 )
 async def repo_to_pn_amr(zip_file: UploadFile = File()):
     gromet = await code2fn.fn_given_filepaths_zip(zip_file)
+    gromet, logs = utils.fn_preprocessor(gromet)
     res = requests.put(f"{SKEMA_RS_ADDESS}/models/PN", json=gromet)
     if res.status_code != 200:
         return JSONResponse(

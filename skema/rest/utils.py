@@ -1,7 +1,6 @@
 from collections import defaultdict
 from typing import Any, Dict
 import itertools as it
-import json
 from askem_extractions.data_model import AttributeCollection, AttributeType, Mention
 from bs4 import BeautifulSoup, Comment
 
@@ -33,7 +32,7 @@ def fn_preprocessor(fn_data):
                             entry['metadata'] = 2
                             logs.append(f"Inline metadata on {i+1}'th entry in top level bf")
                     except:
-                        None
+                        continue
                     try: 
                         temp = entry['function_type']
                     except:
@@ -47,7 +46,7 @@ def fn_preprocessor(fn_data):
                         entry['name'] = "Unknown"
                         logs.append(f"Missing Function body on {i+1}'th entry in top level bf")    
             except:
-                None
+                continue
         else:
             try: 
                 for (i, entry) in enumerate(fn_data['modules'][0]['fn'][key]):
@@ -55,7 +54,7 @@ def fn_preprocessor(fn_data):
                         del fn_data['modules'][0]['fn'][key][i]
                         logs.append(f"The {i+1}'th {key} wire in the top level bf is targeting -1")
             except:
-                None
+                continue
 
     # now we iterate through the fn_array and do the same thing
     for (j,fn_ent) in enumerate(fn_data['modules'][0]['fn_array']):
@@ -69,7 +68,7 @@ def fn_preprocessor(fn_data):
                                 entry['metadata'] = 2
                                 logs.append(f"Inline metadata on {i+1}'th bf in the {j+1}'th fn_array")
                         except:
-                            None
+                            continue
                         try: 
                             temp = entry['function_type']
                         except:
@@ -83,7 +82,7 @@ def fn_preprocessor(fn_data):
                             entry['name'] = "Unknown"
                             logs.append(f"Missing Function body on {i+1}'th bf in the {j+1}'th fn_array")  
                 except:
-                    None
+                    continue
             else:
                 try: 
                     for (i, entry) in enumerate(fn_ent[key]):
@@ -91,7 +90,7 @@ def fn_preprocessor(fn_data):
                             del fn_ent[key][i]
                             logs.append(f"The {i+1}'th {key} wire in the {j+1}'th fn_array is targeting -1")
                 except:
-                    None
+                    continue
 
     return fn_data, logs
 
