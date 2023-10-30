@@ -328,7 +328,6 @@ class ToGrometPass:
         elif name in var_environment["args"]:
             args_env = var_environment["args"]
             entry = args_env[name]
-            print(entry)
             gromet_fn.wfopi = insert_gromet_object(
                 gromet_fn.wfopi,
                 GrometWire(src=len(gromet_fn.pif), tgt=entry[2]),
@@ -2170,6 +2169,8 @@ class ToGrometPass:
         # cases where it's used
         # - Function call: function call returns its index which can be used for pof generation
         opd_one_ret_val = self.visit(node.operands[0], parent_gromet_fn, node)
+        print(node.op)
+        print(parent_gromet_fn.pof)
 
         # Collect where the location of the left pof is
         # If the left node is an AnnCastName then it
@@ -2188,6 +2189,7 @@ class ToGrometPass:
         # - Function call: function call returns its index which can be used for pof generation
         opd_two_ret_val = self.visit(node.operands[1], parent_gromet_fn, node)
 
+        print(parent_gromet_fn.pof)
         # Collect where the location of the right pof is
         # If the right node is an AnnCastName then it
         # automatically doesn't have a pof
@@ -2568,9 +2570,8 @@ class ToGrometPass:
             # is not inlined or part of an assignment we don't visit the
             # arguments as that's already been handled by the primitive handler
             # if not is_primitive(func_name, "CAST") or (from_assignment or is_inline(func_name)):
-            print(func_name)
             for arg in node.arguments:
-                print(type(arg))
+                # print(type(arg))
                 self.visit(arg, parent_gromet_fn, node)
 
                 parent_gromet_fn.pif = insert_gromet_object(
@@ -2648,7 +2649,6 @@ class ToGrometPass:
                             parent_gromet_fn.wff,
                             GrometWire(src=pif_idx, tgt=pof_idx),
                         )
-                        print(arg.name)
                 elif isinstance(arg, AnnCastAssignment):
                     parent_gromet_fn.wff = insert_gromet_object(
                         parent_gromet_fn.wff,
