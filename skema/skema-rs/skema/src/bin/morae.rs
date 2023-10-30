@@ -6,7 +6,12 @@ pub use mathml::mml2pn::{ACSet, Term};
 // new imports
 use mathml::acset::{PetriNet, RegNet};
 use mathml::parsers::first_order_ode::get_FirstOrderODE_vec_from_file;
+use mathml::parsers::math_expression_tree::MathExpressionTree;
+use mathml::parsers::decapodes_serialization::{to_wiring_diagram, to_decapodes_json, WiringDiagram};
 use skema::model_extraction::{module_id2mathml_MET_ast, subgraph2_core_dyn_ast};
+use std::io::{BufRead, BufReader};
+use std::fs::File;
+
 
 #[derive(Parser, Debug)]
 struct Cli {
@@ -38,12 +43,28 @@ fn main() {
 
         let host = "localhost";
 
-        let math_content = module_id2mathml_MET_ast(module_id, host);
+        //let math_content = module_id2mathml_MET_ast(module_id, host);
 
         let input_src = "../../data/mml2pn_inputs/testing_eqns/sidarthe_mml.txt";
 
         // This does get a panic with a message, so need to figure out how to forward it
         //let _mathml_ast = get_mathml_asts_from_file(input_src.clone());
+
+        let f = File::open(input_src.clone()).unwrap();
+        let lines = BufReader::new(f).lines();
+        let mut deca_vec = Vec::<MathExpressionTree>::new();
+        let mut wiring_vec = Vec::<WiringDiagram>::new();
+
+        for line in lines.flatten() {
+            let mut deca = line
+                .parse::<MathExpressionTree>()
+                .unwrap_or_else(|_| panic!("Unable to parse line {}!", line));
+            deca_vec.push(deca.clone());
+            wiring_vec.push(to_wiring_diagram(&deca))
+        }
+
+        println!("{:?}", deca_vec);
+        println!("{:?}", wiring_vec);
 
         let odes = get_FirstOrderODE_vec_from_file(input_src.clone());
 
@@ -54,7 +75,7 @@ fn main() {
             "\nAMR from mathml: {}\n",
             serde_json::to_string(&PetriNet::from(odes)).unwrap()
         );
-        println!("\nAMR from code: {:?}", PetriNet::from(math_content));
+        //println!("\nAMR from code: {:?}", PetriNet::from(math_content));
     }
     // This is the graph id for the top level function for the core dynamics for our test case.
     else if new_args.arg == *"manual" {
