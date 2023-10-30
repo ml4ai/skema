@@ -441,6 +441,24 @@ pub fn absolute_with_msup(input: Span) -> IResult<MathExpression> {
     Ok((s, sup))
 }
 
+/*
+///Parenthesis with Msup value
+pub fn paren_as_msup(input: Span) -> IResult<MathExpression> {
+    let (s, sup) = ws(map(
+        ws(delimited(
+            tag("<mo>(</mo>"),
+            tuple((
+                math_expression,
+                preceded(tag("<msup><mo>)</mo>"), math_expression),
+            )),
+            tag("</msup>"),
+        )),
+        |(x, y)| MathExpression::Msup(Box::new(x), Box::new(y)),
+    ))(input)?;
+    Ok((s, sup))
+}
+*/
+
 /// Parser for math expressions. This varies from the one in the generic_mathml module, since it
 /// assumes that expressions such as S(t) are actually univariate functions.
 pub fn math_expression(input: Span) -> IResult<MathExpression> {
@@ -550,9 +568,10 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
         ),
         //map(gradient, MathExpression::Mo),
         map(absolute, MathExpression::Mrow),
+        //paren_as_msup,
         map(operator, MathExpression::Mo),
         mn,
-        superscript,
+        //superscript,
         msup,
         over_term,
         msub,

@@ -59,17 +59,13 @@ pub fn first_order_ode(input: Span) -> IResult<FirstOrderODE> {
         first_order_derivative_leibniz_notation,
         newtonian_derivative,
     ))(s)?;
-    //let ci = binding.content;
-    //let parenthesized = ci.func_of.clone();
     let mut parenthesized: Vec<Ci> = Vec::new();
     if let Some(ref ci_vec) = ci.func_of {
-        //for bvar in ci_vec.clone().iter() {
         if let Some(bounds) = Some(ci_vec.clone()) {
             for bvar in bounds {
                 parenthesized.push(bvar);
             }
         }
-        //}
     }
 
     let bvar = derivative.bound_var;
@@ -111,8 +107,8 @@ pub fn first_order_ode(input: Span) -> IResult<FirstOrderODE> {
                 })
             },
         ),
-        map(operator, MathExpression::Mo),
         math_expression,
+        map(operator, MathExpression::Mo),
     )))(s)?;
     let (s, _) = etag!("math")(s)?;
 
