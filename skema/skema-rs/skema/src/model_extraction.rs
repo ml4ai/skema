@@ -67,20 +67,42 @@ pub fn get_line_span(
 
 #[allow(non_snake_case)]
 pub fn module_id2mathml_MET_ast(module_id: i64, host: &str) -> Vec<FirstOrderODE> {
+    let mut core_dynamics_ast = Vec::<FirstOrderODE>::new();
+    let mut _metadata_map_ast = HashMap::new();
     let graph = subgraph2petgraph(module_id, host); // makes petgraph of graph
 
     let core_id = find_pn_dynamics(module_id, host); // gives back list of function nodes that might contain the dynamics
     //let _line_span = get_line_span(core_id[0], graph); // get's the line span of function id
 
     //println!("\n{:?}", line_span);
+    if core_id.len() == 0 {
+        let deriv = Ci {
+            r#type: Some(Function),
+            content: Box::new(MathExpression::Mi(Mi("temp".to_string()))),
+            func_of: None,
+        };
+        let operate = Operator::Subtract;
+        let rhs_arg = MathExpressionTree::Atom(MathExpression::Mi(Mi("temp".to_string())));
+        let rhs = MathExpressionTree::Cons(operate, [rhs_arg].to_vec());
+        let fo_eq = FirstOrderODE {
+            lhs_var: deriv.clone(),
+            func_of: [deriv.clone()].to_vec(), // just place holders for construction
+            with_respect_to: deriv.clone(),    // just place holders for construction
+            rhs: rhs,
+        };
+        core_dynamics_ast.push(fo_eq);
+    } else {
+        (core_dynamics_ast, _metadata_map_ast) =
+        subgrapg2_core_dyn_MET_ast(core_id[0], host).unwrap();
+    }
 
     //println!("function_core_id: {:?}", core_id[0].clone());
     //println!("module_id: {:?}\n", module_id.clone());
     // 4.5 now to check if of those expressions, if they are arithmetric in nature
 
     // 5. pass id to subgrapg2_core_dyn to get core dynamics
-    let (core_dynamics_ast, _metadata_map_ast) =
-        subgrapg2_core_dyn_MET_ast(core_id[0], host).unwrap();
+    //let (core_dynamics_ast, _metadata_map_ast) =
+        //subgrapg2_core_dyn_MET_ast(core_id[0], host).unwrap();
 
     core_dynamics_ast
 }
