@@ -13,15 +13,22 @@ from io import BytesIO
 from zipfile import ZipFile
 import requests
 from pathlib import Path
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+from typing import List, Optional
 from skema.rest.proxies import SKEMA_OPENAI_KEY
 
 router = APIRouter()
 
-class LineSpan(BaseModel):
-    line_begin: int
-    line_end: int
+class Dynamics(BaseModel):
+    """
+    Dynamics Data Model for capturing dynamics within a CodeFile.
+    """
 
+    name: Optional[str] = Field(description="Name of the dynamics section.")
+    description: Optional[str] = Field(description="Description of the dynamics.")
+    block: List[str] = Field(
+        description="A list containing strings indicating the line numbers in the file that contain the dynamics, e.g., ['L205-L213', 'L225-L230']."
+    )
 
 @router.post(
     "/linespan-given-filepaths-zip",
@@ -49,6 +56,7 @@ async def get_lines_of_model(zip_file: UploadFile = File()) -> LineSpan:
     """
     files=[]
     blobs=[]
+    block=[]
     with ZipFile(BytesIO(zip_file.file.read()), "r") as zip:
         for file in zip.namelist():
             file_obj = Path(file)
@@ -129,7 +137,9 @@ async def get_lines_of_model(zip_file: UploadFile = File()) -> LineSpan:
         line_begin = 0
         line_end = 0
 
-    output = LineSpan(line_begin=line_begin,line_end=line_end)
+    block.append(f"L{line_begin}-L{line_end}")
+
+    output = Dynamics(name=None, description=None, block=block)
     return output
 
 
