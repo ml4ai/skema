@@ -29,6 +29,6 @@ async def healthcheck() -> int:
     return requests.get(f"{SKEMA_RS_ADDESS}/ping").status_code
 
 
-@router.get("/mathml/decapodes", summary="Gets Decapodes from a list of MathML strings")
+@router.post("/mathml/decapodes", summary="Gets Decapodes from a list of MathML strings")
 async def get_decapodes(mathml: List[str]) -> Dict[Text, Any]:
-    return requests.get(f"{SKEMA_RS_ADDESS}/mathml/decapodes", json=mathml).json()
+    return requests.put(f"{SKEMA_RS_ADDESS}/mathml/decapodes", json=mathml).json()
