@@ -90,6 +90,15 @@ def eqn_image_exists(path: str):
     return os.path.exists(img_path)
 
 
+def eqn_mml_exists(path: str):
+    yr, month, folder, type_of_eqn, eqn_num = path.split("_")
+    mml_path = os.path.join(
+        root,
+        f"{yr}/{month}/mathjax_mml/{folder}/{type_of_eqn}_mml/{eqn_num}.xml",
+    )
+    return os.path.exists(mml_path)
+
+
 def get_paths(yr, yr_path, month):
     start_time = time.perf_counter()
     temp_files = []
@@ -116,6 +125,22 @@ def get_paths(yr, yr_path, month):
 
 def has_intersection(a: set, b: set):
     return bool(a & b)
+
+
+def filter_by_mml_existence(paths: list):
+    start_time = time.perf_counter()
+    filtered_paths = []
+    print("Filtering paths by mml existence. This may take a while...")
+    with mp.Pool(config["num_cpus"]) as pool:
+        results = pool.map(eqn_mml_exists, paths)
+        for idx, result in tqdm(enumerate(results), total=len(results)):
+            if result:
+                filtered_paths.append(paths[idx])
+
+    end_time = time.perf_counter()
+    print(f"Trimmed {len(paths)} paths to {len(filtered_paths)} paths")
+    print(f"Finished filtering paths in {end_time - start_time} seconds")
+    return filtered_paths
 
 
 def filter_by_image_existence(paths: list):
@@ -271,6 +296,7 @@ def main():
     ######## step 1: get all LaTeX paths ########
     print("collecting all the LaTeX paths...")
 
+    # collect all the paths in all_paths list according to the config
     if config["sample_entire_year"]:
         years = [yr.strip() for yr in config["years"].split(",")]
 
@@ -286,8 +312,11 @@ def main():
             yr_path = os.path.join(root, yr)
             all_paths.extend(get_paths(yr, yr_path, month))
 
+    # filter paths by fields if fields are provided in config
     all_paths = filter_paths_by_field(all_paths, fields) if fields else all_paths
+    # filter paths by image existence and mml existence
     all_paths = filter_by_image_existence(all_paths)
+    all_paths = filter_by_mml_existence(all_paths)
 
     ######## step 2: shuffle it twice ########
     print("Shuffling all the paths to create randomness...")
@@ -316,12 +345,14 @@ def main():
             print("running batch: ", bidx)
             print("current status: ", counter_dist_dict)
 
+            # preparing dataset for multiprocessing
             all_files = [[i, ap] for i, ap in enumerate(batch_paths)]
 
             print("Preparing dataset...")
             with mp.Pool(config["num_cpus"]) as pool:
                 pool.map(prepare_dataset, all_files)
 
+            # getting bins for each equation's latex token length
             print("Getting bins...")
             with mp.Pool(config["num_cpus"]) as pool:
                 results = [
@@ -358,7 +389,7 @@ def main():
     random.shuffle(final_paths)
     random.shuffle(final_paths)
 
-    print("writing the final dataset files and copying images...")
+    print("Writing the final dataset files and copying images...")
 
     reject = 0
     c_idx = 0
