@@ -51,6 +51,7 @@ class ExecutionEngine:
         # Upload source to Memgraph instance
         self.upload_source()
 
+    ''' NOTE: Currently we are assuming the amr will be provided seperatly
     def generate_amr(self, source_path: str):
         """Generate AMR for the source file"""
         # Generate system from code
@@ -62,13 +63,14 @@ class ExecutionEngine:
         amr = asyncio.run(code_snippets_to_pn_amr(system))
         print(amr.body)
         exit()
+    '''
 
     def enrich_amr(self, amr: Dict) -> Dict:
         """Enrich the AMR for a source file with initial parameter values"""
-        
+
         parameters = amr["semantics"]["ode"]["parameters"]
         # For each parameter, see if we have a matching value
-        for index,parameter in enumerate(parameters):
+        for index, parameter in enumerate(parameters):
             value = self.symbol_table.get_symbol(parameter["name"])
             if value:
                 try:
@@ -76,10 +78,12 @@ class ExecutionEngine:
                 except:
                     continue
             else:
-                print(f"WARNING: Could not extract value for parameter {parameter['name']}")
+                print(
+                    f"WARNING: Could not extract value for parameter {parameter['name']}"
+                )
 
         return amr
-    
+
     def upload_source(self):
         """Ingest source file and upload Gromet to Memgraph"""
 
@@ -89,9 +93,7 @@ class ExecutionEngine:
         gromet_collection = fn_preprocessor(gromet_collection.to_dict())[0]
         gromet_name = f"{self.filename}--Gromet-FN-auto.json"
         gromet_path = Path(self.source_path).resolve().parent / gromet_name
-        gromet_path.write_text(
-            dictionary_to_gromet_json(del_nulls(gromet_collection))
-        )
+        gromet_path.write_text(dictionary_to_gromet_json(del_nulls(gromet_collection)))
 
         # The Memgraph database state should be reset before running any queries.
         # Unexpected nodes/edges can cause issues with execution.
@@ -147,7 +149,7 @@ class ExecutionEngine:
             print(f"Visitor for node {node} failed to execute.")
             print(e)
             print(traceback.format_exc())
-        
+
     def visit_module(self, node):
         """Visitor for top-level module"""
         node_id = str(node._id)
@@ -177,7 +179,11 @@ class ExecutionEngine:
             right_hand_side, key=lambda node: index[list(node._labels)[0]]
         )
         value = self.visit(right_hand_side[0])
-        if isinstance(value, str):
+
+        if ExecutionEngine.is_node_type(right_hand_side[0], "Opi"):
+            pass
+
+        if "Opi" in right_hand_side[0]._labels:
             value = self.symbol_table.get_symbol(value)["current_value"]
 
         if not self.symbol_table.get_symbol(symbol):
@@ -205,6 +211,14 @@ class ExecutionEngine:
             )
 
         return node.name
+
+    def _visit_opo_value(self, node):
+        """Visit the :Opo and return the value rather than the name"""
+        return self.symbol_table.get_symbol(node.name)
+
+    def _visit_opi_value(self, node):
+        """Visit the :Opi and return the value rather than the name"""
+        return self.symbol_table.get_symbol(node.name)
 
     def visit_literal(self, node):
         def create_dummy_node(value: Dict):
@@ -239,7 +253,7 @@ class ExecutionEngine:
             return torch.tensor(value == "True", dtype=torch.bool)
         elif value_type == "List":
             if isinstance(value, str):
-                return value
+                return None
             list = literal_eval(value)
             return [self.visit(create_dummy_node(element)) for element in list]
         elif value_type == "Map":
@@ -250,6 +264,17 @@ class ExecutionEngine:
     def visit_primitive(self, node):
         """Visitor for :Primitive node type"""
         node_id = node._id
+
+        """      
+        input_nodes = [input for input in self.query_runner("primitive_operands", id=node_id)]
+        inputs = []
+        for input in input_nodes:
+            if ExecutionEngine.is_node_type(input, "Opi"):
+                value = self._visit_opi_value(input)
+            else:
+                value = self.visit(input)
+            inputs.append(value)
+        """
 
         # Some inputs may be symbol names, so we need to access the current value from the symbol map
         inputs = [
@@ -262,9 +287,14 @@ class ExecutionEngine:
             else input
             for input in inputs
         ]
-        
+
         primative = retrieve_operator(node.name)
         return execute(primative, inputs)
+
+    @staticmethod
+    def is_node_type(node, node_type: str):
+        """Helper function for checking if a node matches a given type"""
+        return node_type in node._labels
 
 
 if __name__ == "__main__":
@@ -282,10 +312,10 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     engine = ExecutionEngine(args.host, args.port, args.source_path)
-    
+
     print(engine.parameter_extraction())
-    #output_path = Path("amr_enriched.json")
-    #output_path.write_text(json.dumps(engine.enrich_amr(json.loads(Path(Path(__file__).parent, "amr.json").read_text()))))
+    # output_path = Path("amr_enriched.json")
+    # output_path.write_text(json.dumps(engine.enrich_amr(json.loads(Path(Path(__file__).parent, "amr.json").read_text()))))
 
     """ TODO: New arguments to add with function execution support
     group = parser.add_mutually_exclusive_group(required=True)
