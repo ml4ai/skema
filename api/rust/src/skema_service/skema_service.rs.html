@@ -154,6 +154,10 @@
 <a href="#154" id="154">154</a>
 <a href="#155" id="155">155</a>
 <a href="#156" id="156">156</a>
+<a href="#157" id="157">157</a>
+<a href="#158" id="158">158</a>
+<a href="#159" id="159">159</a>
+<a href="#160" id="160">160</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>actix_web::{get, http::header::ContentType, web::Data, App, HttpResponse, HttpServer};
 <span class="kw">use </span>clap::Parser;
 <span class="kw">use </span>skema::config::Config;
@@ -219,6 +223,7 @@
             skema::services::mathml::get_content_mathml,
             skema::services::mathml::get_regnet,
             skema::services::mathml::get_amr,
+            skema::services::mathml::get_decapodes,
             gromet::get_model_ids,
             gromet::post_model,
             gromet::delete_model,
@@ -234,6 +239,8 @@
         ),
         components(
             schemas(
+                mathml::parsers::decapodes_serialization::DecapodesCollection,
+                mathml::parsers::decapodes_serialization::WiringDiagram,
                 mathml::acset::AMRmathml,
                 mathml::acset::RegNet,
                 mathml::acset::ModelRegNet,
@@ -299,6 +306,7 @@
             .service(skema::services::mathml::get_acset)
             .service(skema::services::mathml::get_regnet)
             .service(skema::services::mathml::get_amr)
+            .service(skema::services::mathml::get_decapodes)
             .service(gromet::get_model_RN)
             .service(gromet::model2PN)
             .service(gromet::model2RN)

@@ -94,6 +94,30 @@
 <a href="#94" id="94">94</a>
 <a href="#95" id="95">95</a>
 <a href="#96" id="96">96</a>
+<a href="#97" id="97">97</a>
+<a href="#98" id="98">98</a>
+<a href="#99" id="99">99</a>
+<a href="#100" id="100">100</a>
+<a href="#101" id="101">101</a>
+<a href="#102" id="102">102</a>
+<a href="#103" id="103">103</a>
+<a href="#104" id="104">104</a>
+<a href="#105" id="105">105</a>
+<a href="#106" id="106">106</a>
+<a href="#107" id="107">107</a>
+<a href="#108" id="108">108</a>
+<a href="#109" id="109">109</a>
+<a href="#110" id="110">110</a>
+<a href="#111" id="111">111</a>
+<a href="#112" id="112">112</a>
+<a href="#113" id="113">113</a>
+<a href="#114" id="114">114</a>
+<a href="#115" id="115">115</a>
+<a href="#116" id="116">116</a>
+<a href="#117" id="117">117</a>
+<a href="#118" id="118">118</a>
+<a href="#119" id="119">119</a>
+<a href="#120" id="120">120</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>clap::Parser;
 
 <span class="kw">use </span>mathml::mml2pn::get_mathml_asts_from_file;
@@ -102,7 +126,12 @@
 <span class="comment">// new imports
 </span><span class="kw">use </span>mathml::acset::{PetriNet, RegNet};
 <span class="kw">use </span>mathml::parsers::first_order_ode::get_FirstOrderODE_vec_from_file;
+<span class="kw">use </span>mathml::parsers::math_expression_tree::MathExpressionTree;
+<span class="kw">use </span>mathml::parsers::decapodes_serialization::{to_wiring_diagram, WiringDiagram, DecapodesCollection};
 <span class="kw">use </span>skema::model_extraction::{module_id2mathml_MET_ast, subgraph2_core_dyn_ast};
+<span class="kw">use </span>std::io::{BufRead, BufReader};
+<span class="kw">use </span>std::fs::File;
+
 
 <span class="attr">#[derive(Parser, Debug)]
 </span><span class="kw">struct </span>Cli {
@@ -134,14 +163,33 @@
 
         <span class="kw">let </span>host = <span class="string">&quot;localhost&quot;</span>;
 
-        <span class="kw">let </span>math_content = module_id2mathml_MET_ast(module_id, host);
+        <span class="comment">//let math_content = module_id2mathml_MET_ast(module_id, host);
 
-        <span class="kw">let </span>input_src = <span class="string">&quot;../../data/mml2pn_inputs/testing_eqns/sidarthe_mml.txt&quot;</span>;
+        </span><span class="kw">let </span>input_src = <span class="string">&quot;../../data/mml2pn_inputs/testing_eqns/sidarthe_mml.txt&quot;</span>;
 
         <span class="comment">// This does get a panic with a message, so need to figure out how to forward it
         //let _mathml_ast = get_mathml_asts_from_file(input_src.clone());
 
-        </span><span class="kw">let </span>odes = get_FirstOrderODE_vec_from_file(input_src.clone());
+        </span><span class="kw">let </span>f = File::open(input_src.clone()).unwrap();
+        <span class="kw">let </span>lines = BufReader::new(f).lines();
+        <span class="kw">let </span><span class="kw-2">mut </span>deca_vec = Vec::&lt;MathExpressionTree&gt;::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>wiring_vec = Vec::&lt;WiringDiagram&gt;::new();
+
+        <span class="kw">for </span>line <span class="kw">in </span>lines.flatten() {
+            <span class="kw">let </span><span class="kw-2">mut </span>deca = line
+                .parse::&lt;MathExpressionTree&gt;()
+                .unwrap_or_else(|<span class="kw">_</span>| <span class="macro">panic!</span>(<span class="string">&quot;Unable to parse line {}!&quot;</span>, line));
+            wiring_vec.push(to_wiring_diagram(<span class="kw-2">&amp;</span>deca))
+        }
+
+        <span class="kw">let </span>decapodescollection = DecapodesCollection {
+            decapodes: wiring_vec.clone()
+        };
+
+        <span class="macro">println!</span>(<span class="string">&quot;{:?}&quot;</span>, wiring_vec.clone());
+        <span class="macro">println!</span>(<span class="string">&quot;decapode collection: {:?}&quot;</span>, decapodescollection.clone());
+
+        <span class="kw">let </span>odes = get_FirstOrderODE_vec_from_file(input_src.clone());
 
         <span class="comment">//println!(&quot;\nmath_content: {:?}&quot;, math_content);
         //println!(&quot;\nmathml_ast: {:?}&quot;, odes);
@@ -150,8 +198,8 @@
             <span class="string">&quot;\nAMR from mathml: {}\n&quot;</span>,
             serde_json::to_string(<span class="kw-2">&amp;</span>PetriNet::from(odes)).unwrap()
         );
-        <span class="macro">println!</span>(<span class="string">&quot;\nAMR from code: {:?}&quot;</span>, PetriNet::from(math_content));
-    }
+        <span class="comment">//println!(&quot;\nAMR from code: {:?}&quot;, PetriNet::from(math_content));
+    </span>}
     <span class="comment">// This is the graph id for the top level function for the core dynamics for our test case.
     </span><span class="kw">else if </span>new_args.arg == <span class="kw-2">*</span><span class="string">&quot;manual&quot; </span>{
         <span class="comment">// still need to grab the module id

@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["to_decapodes_json","to_decapodes_serialization","to_wiring_diagram"],"struct":["ProjectionOperator","Sum","Summation","TableCounts","Tables","UnaryOperator","Variable","WiringDiagram"]};
+window.SIDEBAR_ITEMS = {"fn":["to_decapodes_json","to_decapodes_serialization","to_wiring_diagram"],"struct":["DecapodesCollection","ProjectionOperator","Sum","Summation","TableCounts","Tables","UnaryOperator","Variable","WiringDiagram"]};

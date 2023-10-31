@@ -470,15 +470,20 @@
 <a href="#470" id="470">470</a>
 <a href="#471" id="471">471</a>
 <a href="#472" id="472">472</a>
+<a href="#473" id="473">473</a>
+<a href="#474" id="474">474</a>
+<a href="#475" id="475">475</a>
+<a href="#476" id="476">476</a>
+<a href="#477" id="477">477</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::ast::{
     operator::{Derivative, Operator},
     MathExpression,
 };
 <span class="kw">use </span><span class="kw">crate</span>::parsers::math_expression_tree::MathExpressionTree;
-
+<span class="kw">use </span>utoipa::ToSchema;
 <span class="kw">use </span>serde::{Deserialize, Serialize};
 
-<span class="attr">#[derive(Debug, Clone, Serialize, Deserialize)]
+<span class="attr">#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
 </span><span class="kw">enum </span>Type {
     Form0,
     Form1,
@@ -487,20 +492,20 @@
     Literal,
 }
 
-<span class="attr">#[derive(Debug, Clone, Serialize, Deserialize)]
+<span class="attr">#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
 </span><span class="kw">pub struct </span>Variable {
     r#type: Type,
     <span class="kw">pub </span>name: String,
 }
 
-<span class="attr">#[derive(Debug, Clone, Serialize, Deserialize)]
+<span class="attr">#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
 </span><span class="kw">pub struct </span>UnaryOperator {
     <span class="kw">pub </span>src: usize,
     <span class="kw">pub </span>tgt: usize,
     <span class="kw">pub </span>op1: String,
 }
 
-<span class="attr">#[derive(Debug, Clone, Serialize, Deserialize)]
+<span class="attr">#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
 </span><span class="kw">pub struct </span>ProjectionOperator {
     <span class="kw">pub </span>proj1: usize,
     <span class="kw">pub </span>proj2: usize,
@@ -508,18 +513,18 @@
     <span class="kw">pub </span>op2: String,
 }
 
-<span class="attr">#[derive(Debug, Clone, Serialize, Deserialize)]
+<span class="attr">#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
 </span><span class="kw">pub struct </span>Sum {
     <span class="kw">pub </span>sum: usize,
 }
 
-<span class="attr">#[derive(Debug, Clone, Serialize, Deserialize)]
+<span class="attr">#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
 </span><span class="kw">pub struct </span>Summation {
     <span class="kw">pub </span>summand: usize,
     <span class="kw">pub </span>summation: usize,
 }
 
-<span class="attr">#[derive(Debug, Clone, Serialize, Deserialize)]
+<span class="attr">#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
 </span><span class="kw">pub struct </span>TableCounts {
     <span class="kw">pub </span>variable_count: usize,
     <span class="kw">pub </span>operation_count: usize,
@@ -527,7 +532,7 @@
     <span class="kw">pub </span>multi_count: usize,
 }
 
-<span class="attr">#[derive(Debug, Clone, Serialize, Deserialize)]
+<span class="attr">#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
 </span><span class="kw">pub struct </span>Tables {
     <span class="kw">pub </span>variables: Vec&lt;Variable&gt;,
     <span class="kw">pub </span>projection_operators: Vec&lt;ProjectionOperator&gt;,
@@ -536,13 +541,18 @@
     <span class="kw">pub </span>summand_op: Vec&lt;Summation&gt;,
 }
 
-<span class="attr">#[derive(Debug, Clone, Serialize, Deserialize)]
+<span class="attr">#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
 </span><span class="kw">pub struct </span>WiringDiagram {
     <span class="kw">pub </span>Var: Vec&lt;Variable&gt;,
     <span class="kw">pub </span>Op1: Vec&lt;UnaryOperator&gt;,
     <span class="kw">pub </span>Op2: Vec&lt;ProjectionOperator&gt;,
     <span class="kw">pub </span>Σ: Vec&lt;Sum&gt;,
     <span class="kw">pub </span>Summand: Vec&lt;Summation&gt;,
+}
+
+<span class="attr">#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
+</span><span class="kw">pub struct </span>DecapodesCollection {
+    <span class="kw">pub </span>decapodes: Vec&lt;WiringDiagram&gt;
 }
 
 <span class="kw">pub fn </span>to_decapodes_serialization(
