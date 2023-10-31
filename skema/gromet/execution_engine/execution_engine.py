@@ -314,9 +314,6 @@ if __name__ == "__main__":
     engine = ExecutionEngine(args.host, args.port, args.source_path)
 
     print(engine.parameter_extraction())
-    # output_path = Path("amr_enriched.json")
-    # output_path.write_text(json.dumps(engine.enrich_amr(json.loads(Path(Path(__file__).parent, "amr.json").read_text()))))
-
     """ TODO: New arguments to add with function execution support
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument("--main", action="store_true", help="Extract parameters from the main module")

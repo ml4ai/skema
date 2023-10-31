@@ -16,8 +16,34 @@ class EnrichmentReqest(BaseModel):
     source: str = Field(),
     filename: str = Field()
 
-@router.post("/amr-enrichment", summary="Ping endpoint to test health of service")
+@router.post("/amr-enrichment", summary="Given an amr and source code, return an enriched amr with parameter values filled in.")
 def amr_enrichment(request: EnrichmentReqest):
+    """
+    Endpoint for enriching amr with parameter values.
+    ### Python example
+
+    ```
+    import requests
+
+    request = {
+        "amr": {
+            "semantics": {
+                "ode":{
+                    "parameters":[
+                        {"name": "a"},
+                        {"name": "b"},
+                        {"name": "c"}
+                    ]
+                }
+            }
+        },
+        "source": "a=1\\nb=a+1\\nc=b-a",
+        "filename": "source.py"
+    }
+
+    response=client.post("/execution_engine/amr-enrichment", json=request)
+    enriched_amr = response.json()
+    """
     with TemporaryDirectory() as temp:
         source_path = Path(temp) / request.filename
         source_path.write_text(request.source)
@@ -26,7 +52,6 @@ def amr_enrichment(request: EnrichmentReqest):
         engine.execute(module=True)
         
         return engine.enrich_amr(request.amr)
-
 
 app = FastAPI()
 app.include_router(
