@@ -1,12 +1,100 @@
 from collections import defaultdict
 from typing import Any, Dict
 import itertools as it
-
 from askem_extractions.data_model import AttributeCollection, AttributeType, Mention
 from bs4 import BeautifulSoup, Comment
 
 from skema.rest.schema import TextReadingEvaluationResults, AMRLinkingEvaluationResults
 
+
+def fn_preprocessor(function_network: Dict[str, Any]):
+
+    fn_data = function_network.copy()
+
+    logs = []
+
+    '''
+    We will currently preprocess based on 2 different common bugs
+    1) wire tgt's being -1 -> which we will delete these wires
+    2) metadata being inline for bf entries instead of an index into the metadata_collection -> which we will replace with an index of 2
+    3) missing function_type field on a bf entry -> will replace with function_type: "OTHER"
+    4) If there is not a body field to a function -> replace "FUNCTION" with "ABSTRACT and set "name":"unknown"
+    5) NOT DONE YET: In the future we will preprocess about function calls being arguments, in order to simplify extracting the dataflow 
+    '''
+
+    # first we check the top bf level of wires and inline metadata: 
+    keys_to_check = ['bf', 'wff', 'wfopi', 'wfopo', 'wopio']
+    for key in keys_to_check:
+        if key == 'bf':
+            try:
+                for (i, entry) in enumerate(fn_data['modules'][0]['fn'][key]):
+                    try: 
+                        metadata_obj = entry['metadata']
+                        if not isinstance(metadata_obj, int):
+                            entry['metadata'] = 2
+                            logs.append(f"Inline metadata on {i+1}'th entry in top level bf")
+                    except:
+                        continue
+                    try: 
+                        temp = entry['function_type']
+                    except:
+                        entry['function_type'] = "IMPORTED"
+                        logs.append(f"Missing function_type on {i+1}'th entry in top level bf")
+                    try: 
+                        if entry['function_type'] == "FUNCTION":
+                            temp = entry['body']
+                    except:
+                        entry['function_type'] = "ABSTRACT"
+                        entry['name'] = "Unknown"
+                        logs.append(f"Missing Function body on {i+1}'th entry in top level bf")    
+            except:
+                continue
+        else:
+            try: 
+                for (i, entry) in enumerate(fn_data['modules'][0]['fn'][key]):
+                    if entry['tgt'] == -1:
+                        del fn_data['modules'][0]['fn'][key][i]
+                        logs.append(f"The {i+1}'th {key} wire in the top level bf is targeting -1")
+            except:
+                continue
+
+    # now we iterate through the fn_array and do the same thing
+    for (j,fn_ent) in enumerate(fn_data['modules'][0]['fn_array']):
+        for key in keys_to_check:
+            if key == 'bf':
+                try:
+                    for (i, entry) in enumerate(fn_ent[key]):
+                        try: 
+                            metadata_obj = entry['metadata']
+                            if not isinstance(metadata_obj, int):
+                                entry['metadata'] = 2
+                                logs.append(f"Inline metadata on {i+1}'th bf in the {j+1}'th fn_array")
+                        except:
+                            continue
+                        try: 
+                            temp = entry['function_type']
+                        except:
+                            entry['function_type'] = "IMPORTED"
+                            logs.append(f"Missing function_type on {i+1}'th bf in the {j+1}'th fn_array")
+                        try: 
+                            if entry['function_type'] == "FUNCTION":
+                                temp = entry['body']
+                        except:
+                            entry['function_type'] = "ABSTRACT"
+                            entry['name'] = "Unknown"
+                            logs.append(f"Missing Function body on {i+1}'th bf in the {j+1}'th fn_array")  
+                except:
+                    continue
+            else:
+                try: 
+                    for (i, entry) in enumerate(fn_ent[key]):
+                        if entry['tgt'] == -1:
+                            del fn_ent[key][i]
+                            logs.append(f"The {i+1}'th {key} wire in the {j+1}'th fn_array is targeting -1")
+                except:
+                    continue
+
+    return fn_data, logs
 
 def clean_mml(mml: str) -> str:
     """Cleans/sterilizes pMML for AMR generation service"""
