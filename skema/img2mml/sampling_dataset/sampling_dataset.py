@@ -121,13 +121,12 @@ def has_intersection(a: set, b: set):
 def filter_by_image_existence(paths: list):
     start_time = time.perf_counter()
     filtered_paths = []
-    with tqdm(total=len(paths), desc="Filtering paths by image existence") as pbar:
-        with mp.Pool(config["num_cpus"]) as pool:
-            results = pool.map(eqn_image_exists, paths, chunksize=1)
-            pbar.update(len(results))
-            for idx, result in tqdm(enumerate(results), total=len(results)):
-                if result:
-                    filtered_paths.append(paths[idx])
+    print("Filtering paths by image existence. This may take a while...")
+    with mp.Pool(config["num_cpus"]) as pool:
+        results = pool.map(eqn_image_exists, paths)
+        for idx, result in tqdm(enumerate(results), total=len(results)):
+            if result:
+                filtered_paths.append(paths[idx])
 
     end_time = time.perf_counter()
     print(f"Trimmed {len(paths)} paths to {len(filtered_paths)} paths")
