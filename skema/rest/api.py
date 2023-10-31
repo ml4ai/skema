@@ -7,6 +7,7 @@ from skema.rest import (
     integrated_text_reading_proxy,
     morae_proxy,
     metal_proxy,
+    llm_proxy,
 )
 from skema.img2mml import eqn2mml
 from skema.skema_py import server as code2fn
@@ -108,6 +109,12 @@ app.include_router(
     morae_proxy.router,
     prefix="/morae",
     tags=["morae", "skema-rs"],
+)
+
+app.include_router(
+    llm_proxy.router,
+    prefix="/morae",
+    tags=["morae"],
 )
 
 app.include_router(
