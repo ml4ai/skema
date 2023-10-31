@@ -17,7 +17,7 @@ def fn_preprocessor(function_network: Dict[str, Any]):
     We will currently preprocess based on 2 different common bugs
     1) wire tgt's being -1 -> which we will delete these wires
     2) metadata being inline for bf entries instead of an index into the metadata_collection -> which we will replace with an index of 2
-    3) missing function_type field on a bf entry -> will replace with function_type: "OTHER"
+    3) missing function_type field on a bf entry -> will replace with function_type: "IMPORTED"
     4) If there is not a body field to a function -> replace "FUNCTION" with "ABSTRACT and set "name":"unknown"
     5) NOT DONE YET: In the future we will preprocess about function calls being arguments, in order to simplify extracting the dataflow 
     '''

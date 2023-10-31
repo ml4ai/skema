@@ -856,7 +856,6 @@ fn create_function_net(gromet: &ModuleCollection, mut start: u32) -> Vec<String>
         c_args.att_box = gromet.modules[0].r#fn.clone(); // incase over written
         match boxf.function_type {
             FunctionType::Primitive => {
-                c_args.att_idx = boxf.contents.unwrap() as usize;
                 create_att_primitive(
                     gromet,     // gromet for metadata
                     &mut nodes, // nodes
@@ -1265,6 +1264,15 @@ fn create_function_net(gromet: &ModuleCollection, mut start: u32) -> Vec<String>
     let init_edges = edges.len();
     edges.sort();
     edges.dedup();
+    let edges_clone = edges.clone();
+    // also dedup if edge prop is different
+    for (i, edge) in edges_clone.iter().enumerate().rev() {
+        if i != 0 {
+            if edge.src == edges_clone[i-1].src && edge.tgt == edges_clone[i-1].tgt {
+                edges.remove(i);
+            }
+        }
+    }
     let fin_edges = edges.len();
     if init_edges != fin_edges {
         println!("Duplicated Edges Removed, check for bugs");
