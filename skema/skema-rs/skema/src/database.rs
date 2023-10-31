@@ -1165,6 +1165,32 @@ fn create_function_net(gromet: &ModuleCollection, mut start: u32) -> Vec<String>
                     );
                 }
             }
+            FunctionType::Imported => {
+                create_import(gromet, &mut nodes, &mut edges, &mut meta_nodes, &mut start, c_args.clone());
+                start += 1;
+                // now to implement wiring
+                import_wiring(
+                    &gromet.clone(),
+                    &mut nodes,
+                    &mut edges,
+                    c_args.att_idx,
+                    c_args.bf_counter,
+                    c_args.parent_node.clone(),
+                );
+            }
+            FunctionType::ImportedMethod => {
+                // basically seems like these are just functions to me. 
+                c_args.att_idx = boxf.contents.unwrap() as usize;
+                c_args.att_box = gromet.modules[0].attributes[c_args.att_idx - 1].clone();
+                create_function(
+                    gromet,     // gromet for metadata
+                    &mut nodes, // nodes
+                    &mut edges,
+                    &mut meta_nodes,
+                    &mut start,
+                    c_args.clone(),
+                );
+            }
             _ => {}
         }
         start += 1;
@@ -1312,7 +1338,10 @@ pub fn create_import(
     c_args: ConstructorArgs,
 ) {
     let eboxf = gromet.modules[0].clone();
-    let sboxf = gromet.modules[0].attributes[c_args.att_idx - 1].clone();
+    let mut sboxf = gromet.modules[0].r#fn.clone(); 
+    if c_args.att_idx != 0 {
+        sboxf = gromet.modules[0].attributes[c_args.att_idx - 1].clone();
+    }
     //let mboxf = eboxf.r#fn.bf.unwrap()[c_args.bf_counter - 1].clone();
 
     let mut pof: Vec<u32> = vec![];
@@ -1569,6 +1598,19 @@ pub fn create_function(
                                 meta_nodes,
                                 start,
                                 new_c_args.clone(),
+                            );
+                        }
+                        FunctionType::Imported => {
+                            create_import(gromet, nodes, edges, meta_nodes, start, c_args.clone());
+                            *start += 1;
+                            // now to implement wiring
+                            import_wiring(
+                                &gromet.clone(),
+                                nodes,
+                                edges,
+                                c_args.att_idx,
+                                c_args.bf_counter,
+                                c_args.parent_node.clone(),
                             );
                         }
                         _ => {
@@ -3870,34 +3912,36 @@ pub fn create_att_predicate(
     let mut new_c_args = c_args.clone();
     let mut box_counter: usize = 1;
     new_c_args.att_box = att_box.clone();
-    for sub_att_box in att_box.bf.as_ref().unwrap().iter() {
-        new_c_args.box_counter = box_counter;
-        new_c_args.cur_box = sub_att_box.clone();
-        match sub_att_box.function_type {
-            FunctionType::Literal => {
-                create_att_literal(
-                    gromet, // gromet for metadata
-                    nodes,  // nodes
-                    edges,
-                    meta_nodes,
-                    start,
-                    new_c_args.clone(),
-                );
+    if att_box.bf.as_ref().is_some() {
+        for sub_att_box in att_box.bf.as_ref().unwrap().iter() {
+            new_c_args.box_counter = box_counter;
+            new_c_args.cur_box = sub_att_box.clone();
+            match sub_att_box.function_type {
+                FunctionType::Literal => {
+                    create_att_literal(
+                        gromet, // gromet for metadata
+                        nodes,  // nodes
+                        edges,
+                        meta_nodes,
+                        start,
+                        new_c_args.clone(),
+                    );
+                }
+                FunctionType::Primitive => {
+                    create_att_primitive(
+                        gromet, // gromet for metadata
+                        nodes,  // nodes
+                        edges,
+                        meta_nodes,
+                        start,
+                        new_c_args.clone(),
+                    );
+                }
+                _ => {}
             }
-            FunctionType::Primitive => {
-                create_att_primitive(
-                    gromet, // gromet for metadata
-                    nodes,  // nodes
-                    edges,
-                    meta_nodes,
-                    start,
-                    new_c_args.clone(),
-                );
-            }
-            _ => {}
+            box_counter += 1;
+            *start += 1;
         }
-        box_counter += 1;
-        *start += 1;
     }
     // Now we perform the internal wiring of this branch
     internal_wiring(
