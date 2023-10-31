@@ -470,3 +470,49 @@ fn test_serialize_halfar_dome_3_2() {
     let json = to_decapodes_json(wiring_diagram);
     assert_eq!(json, "{\"Var\":[{\"type\":\"infer\",\"name\":\"mult_1\"},{\"type\":\"infer\",\"name\":\"mult_2\"},{\"type\":\"infer\",\"name\":\"•1\"},{\"type\":\"Literal\",\"name\":\"2\"},{\"type\":\"infer\",\"name\":\"sum_1\"},{\"type\":\"infer\",\"name\":\"n\"},{\"type\":\"infer\",\"name\":\"A\"},{\"type\":\"infer\",\"name\":\"•2\"},{\"type\":\"infer\",\"name\":\"mult_3\"},{\"type\":\"infer\",\"name\":\"ρ\"},{\"type\":\"infer\",\"name\":\"g\"},{\"type\":\"infer\",\"name\":\"Γ\"}],\"Op1\":[],\"Op2\":[{\"proj1\":4,\"proj2\":5,\"res\":3,\"op2\":\"/\"},{\"proj1\":3,\"proj2\":7,\"res\":2,\"op2\":\"*\"},{\"proj1\":10,\"proj2\":11,\"res\":9,\"op2\":\"*\"},{\"proj1\":9,\"proj2\":6,\"res\":8,\"op2\":\"^\"},{\"proj1\":2,\"proj2\":8,\"res\":1,\"op2\":\"*\"}],\"Σ\":[{\"sum\":5}],\"Summand\":[{\"summand\":6,\"summation\":1},{\"summand\":4,\"summation\":1}]}");
 }
+
+#[test]
+fn test_serialize_from_image_3_1() {
+    let input = "
+    <math>
+        <mfrac><mrow><mi>∂</mi><mi>H</mi></mrow><mrow><mi>∂</mi><mi>t</mi></mrow></mfrac>
+        <mo>=</mo>
+        <mo>∇</mo>
+        <mo>⋅</mo>
+        <mo>(</mo>
+        <mi>Γ</mi>
+        <msup><mi>H</mi><mrow><mi>n</mi><mo>+</mo><mn>2</mn></mrow></msup>
+        <mo>|</mo><mrow><mo>∇</mo><mi>H</mi></mrow>
+        <msup><mo>|</mo>
+        <mrow><mi>n</mi><mo>−</mo><mn>1</mn></mrow></msup>
+        <mo>∇</mo><mi>H</mi>
+        <mo>)</mo>
+    </math>
+    ";
+    let expression = input.parse::<MathExpressionTree>().unwrap();
+    let wiring_diagram = to_wiring_diagram(&expression);
+    let json = to_decapodes_json(wiring_diagram);
+    assert_eq!(json,"{\"Var\":[{\"type\":\"infer\",\"name\":\"•1\"},{\"type\":\"infer\",\"name\":\"mult_1\"},{\"type\":\"infer\",\"name\":\"mult_2\"},{\"type\":\"infer\",\"name\":\"mult_3\"},{\"type\":\"infer\",\"name\":\"Γ\"},{\"type\":\"infer\",\"name\":\"•2\"},{\"type\":\"infer\",\"name\":\"H\"},{\"type\":\"infer\",\"name\":\"sum_1\"},{\"type\":\"infer\",\"name\":\"n\"},{\"type\":\"Literal\",\"name\":\"2\"},{\"type\":\"infer\",\"name\":\"•3\"},{\"type\":\"infer\",\"name\":\"•4\"},{\"type\":\"infer\",\"name\":\"•5\"},{\"type\":\"infer\",\"name\":\"•6\"},{\"type\":\"Literal\",\"name\":\"1\"},{\"type\":\"infer\",\"name\":\"•7\"},{\"type\":\"infer\",\"name\":\"•8\"}],\"Op1\":[{\"src\":7,\"tgt\":13,\"op1\":\"Grad\"},{\"src\":13,\"tgt\":12,\"op1\":\"Abs\"},{\"src\":7,\"tgt\":16,\"op1\":\"Grad\"},{\"src\":2,\"tgt\":1,\"op1\":\"Div\"},{\"src\":7,\"tgt\":17,\"op1\":\"D(1,t)\"}],\"Op2\":[{\"proj1\":7,\"proj2\":8,\"res\":6,\"op2\":\"^\"},{\"proj1\":5,\"proj2\":6,\"res\":4,\"op2\":\"*\"},{\"proj1\":9,\"proj2\":15,\"res\":14,\"op2\":\"-\"},{\"proj1\":12,\"proj2\":14,\"res\":11,\"op2\":\"^\"},{\"proj1\":4,\"proj2\":11,\"res\":3,\"op2\":\"*\"},{\"proj1\":3,\"proj2\":16,\"res\":2,\"op2\":\"*\"}],\"Σ\":[{\"sum\":8}],\"Summand\":[{\"summand\":9,\"summation\":1},{\"summand\":10,\"summation\":1}]}");
+}
+
+#[test]
+fn test_serialize_from_image_3_2() {
+    let input = "
+    <math>
+        <mi>Γ</mi>
+        <mo>=</mo>
+        <mfrac><mn>2</mn><mrow><mi>n</mi><mo>+</mo><mn>2</mn></mrow></mfrac>
+        <mi>A</mi>
+        <mo>(</mo>
+        <mi>ρ</mi>
+        <mi>g</mi>
+        <msup><mo>)</mo>
+        <mi>n</mi></msup>
+    </math>
+    ";
+    let expression = input.parse::<MathExpressionTree>().unwrap();
+    let s_exp = expression.to_string();
+    let wiring_diagram = to_wiring_diagram(&expression);
+    let json = to_decapodes_json(wiring_diagram);
+    assert_eq!(json, "{\"Var\":[{\"type\":\"infer\",\"name\":\"mult_1\"},{\"type\":\"infer\",\"name\":\"mult_2\"},{\"type\":\"infer\",\"name\":\"•1\"},{\"type\":\"Literal\",\"name\":\"2\"},{\"type\":\"infer\",\"name\":\"sum_1\"},{\"type\":\"infer\",\"name\":\"n\"},{\"type\":\"infer\",\"name\":\"A\"},{\"type\":\"infer\",\"name\":\"•2\"},{\"type\":\"infer\",\"name\":\"mult_3\"},{\"type\":\"infer\",\"name\":\"ρ\"},{\"type\":\"infer\",\"name\":\"g\"},{\"type\":\"infer\",\"name\":\"Γ\"}],\"Op1\":[],\"Op2\":[{\"proj1\":4,\"proj2\":5,\"res\":3,\"op2\":\"/\"},{\"proj1\":3,\"proj2\":7,\"res\":2,\"op2\":\"*\"},{\"proj1\":10,\"proj2\":11,\"res\":9,\"op2\":\"*\"},{\"proj1\":9,\"proj2\":6,\"res\":8,\"op2\":\"^\"},{\"proj1\":2,\"proj2\":8,\"res\":1,\"op2\":\"*\"}],\"Σ\":[{\"sum\":5}],\"Summand\":[{\"summand\":6,\"summation\":1},{\"summand\":4,\"summation\":1}]}");
+}
