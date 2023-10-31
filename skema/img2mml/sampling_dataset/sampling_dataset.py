@@ -122,11 +122,18 @@ def has_intersection(a: set, b: set):
 
 
 def filter_by_image_existence(paths: list):
+    start_time = time.perf_counter()
+    filtered_paths = []
     for path in tqdm(
         paths, desc="Filtering paths by image existence", total=len(paths)
     ):
-        print(path.split("_"))
-    exit(1)
+        yr, month, paper, type_of_eqn, eqn_num = path.split("_")
+        if eqn_image_exists(yr, month, paper, type_of_eqn, eqn_num):
+            filtered_paths.append(path)
+    end_time = time.perf_counter()
+    print(f"Trimmed {len(paths)} paths to {len(filtered_paths)} paths")
+    print(f"Finished filtering paths in {end_time - start_time} seconds")
+    return filtered_paths
 
 
 def filter_paths_by_field(paths: list, fields: set):
