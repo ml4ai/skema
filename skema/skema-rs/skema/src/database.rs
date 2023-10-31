@@ -793,6 +793,15 @@ fn create_function_net_lib(gromet: &ModuleCollection, mut start: u32) -> Vec<Str
     let init_edges = edges.len();
     edges.sort();
     edges.dedup();
+    let edges_clone = edges.clone();
+    // also dedup if edge prop is different
+    for (i, edge) in edges_clone.iter().enumerate().rev() {
+        if i != 0 {
+            if edge.src == edges_clone[i-1].src && edge.tgt == edges_clone[i-1].tgt {
+                edges.remove(i);
+            }
+        }
+    }
     let fin_edges = edges.len();
     if init_edges != fin_edges {
         println!("Duplicated Edges Removed, check for bugs");
