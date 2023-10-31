@@ -79,6 +79,14 @@ count = 0
 lock = mp.Lock()
 
 
+def eqn_image_exists(yr, month, folder, type_of_eqn, eqn_num):
+    img_path = os.path.join(
+        root,
+        f"{yr}/{month}/latex_images/{folder}/{type_of_eqn}_eqns/{eqn_num}.png",
+    )
+    return os.path.exists(img_path)
+
+
 def get_paths(yr, yr_path, month):
     print(f"Collecting paths for {yr}/{month}...")
     start_time = time.perf_counter()
@@ -93,6 +101,9 @@ def get_paths(yr, yr_path, month):
                 [
                     f"{yr}_{month}_{paper}_{type_of_eqn}_{eqn.split('.')[0]}"
                     for eqn in os.listdir(eqn_folder)
+                    if eqn_image_exists(
+                        yr, month, paper, type_of_eqn, eqn.split(".")[0]
+                    )
                 ]
             )
     end_time = time.perf_counter()
@@ -240,7 +251,7 @@ def kill(process):
 
 
 def main():
-    global count, total_eqns, final_paths
+    global count, total_eqns, final_paths, fields
     global lock, counter_dist_dict, dist_dict, chunk_size
 
     """
