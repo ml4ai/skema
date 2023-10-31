@@ -12,9 +12,28 @@ PORT = 7687
 router = APIRouter()
 
 class EnrichmentReqest(BaseModel):
-    amr: Dict = Field(),
-    source: str = Field(),
-    filename: str = Field()
+    amr: Dict = Field(
+        description="The amr to enrich with parameter values",
+        examples=[{
+            "semantics": {
+                "ode":{
+                    "parameters":[
+                        {"name": "a"},
+                        {"name": "b"},
+                        {"name": "c"}
+                    ]
+                }
+            }
+        }]
+    ),
+    source: str = Field(
+        description="The raw source code to extract parameter values from",
+        examples=["a=1\nb=a+1\nc=b-a"]
+    ),
+    filename: str = Field(
+        description="The filename of the file passed in the 'source' field",
+        examples=["source.py"]
+    )
 
 @router.post("/amr-enrichment", summary="Given an amr and source code, return an enriched amr with parameter values filled in.")
 def amr_enrichment(request: EnrichmentReqest):
