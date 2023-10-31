@@ -121,6 +121,14 @@ def has_intersection(a: set, b: set):
     return bool(a & b)
 
 
+def filter_by_image_existence(paths: list):
+    for path in tqdm(
+        paths, desc="Filtering paths by image existence", total=len(paths)
+    ):
+        print(path.split("_"))
+    exit(1)
+
+
 def filter_paths_by_field(paths: list, fields: set):
     start_time = time.perf_counter()
     print(f"Filtering paths by fields: {','.join(fields)}")
@@ -274,6 +282,7 @@ def main():
             all_paths.extend(get_paths(yr, yr_path, month))
 
     all_paths = filter_paths_by_field(all_paths, fields) if fields else all_paths
+    all_paths = filter_by_image_existence(all_paths)
 
     ######## step 2: shuffle it twice ########
     print("Shuffling all the paths to create randomness...")
