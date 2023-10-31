@@ -2,14 +2,13 @@ import json
 import multiprocessing as mp
 import os
 import random
-import re
 import shutil
 import subprocess
 import time
 from shutil import copyfile as CP
 from threading import Timer
 
-import requests
+from tqdm import tqdm
 
 # read config file and define paths
 config_path = "sampling_dataset/sampling_config.json"
@@ -63,7 +62,10 @@ counter_dist_dict = dict()
 total_eqns = 0
 
 # initialize the dist_dict
-for i in range(0, 350, 50):
+for i in tqdm(
+    range(0, 350, 50),
+    desc="Initializing distribution dict...",
+):
     begin = str(i)
     end = str(i + 50)
     key = f"{begin}-{end}"
@@ -93,7 +95,11 @@ def get_paths(yr, yr_path, month):
     temp_files = []
     month_path = os.path.join(yr_path, month, "latex_equations")
 
-    for paper in os.listdir(month_path):
+    for paper in tqdm(
+        os.listdir(month_path),
+        desc=f"Collecting paths for {yr}/{month}",
+        total=len(os.listdir(month_path)),
+    ):
         for type_of_eqn in ("large", "small"):
             eqn_folder = os.path.join(month_path, paper, f"{type_of_eqn}_eqns")
 
@@ -119,7 +125,7 @@ def filter_paths_by_field(paths: list, fields: set):
     start_time = time.perf_counter()
     print(f"Filtering paths by fields: {','.join(fields)}")
     arxvid_id_list = []
-    for path in paths:
+    for path in tqdm(paths, desc="Collecting arxiv ids from paths", total=len(paths)):
         arxiv_id = path.split("_")[2]
         arxvid_id_list.append(arxiv_id)
 
@@ -130,7 +136,7 @@ def filter_paths_by_field(paths: list, fields: set):
         category_dict = json.load(f)
 
     filtered_paths = []
-    for path in paths:
+    for path in tqdm(paths, desc="Filtering paths by fields", total=len(paths)):
         arxiv_id = path.split("_")[2]
         if arxiv_id in category_dict:
             paper_fields = {
@@ -156,24 +162,6 @@ def copy_image(img_src, img_dst):
         return True
     except:
         return False
-
-
-def areAligned(mml, latex):
-    # checking if mml and latex represents same image
-    begin = mml.find("alttext=") + len("alttext=") + 2
-    end = mml.find(">") - 2
-    _mml = mml[begin:end].strip()
-    _mml = _mml.replace("\\\\", "\\")
-    _latex = latex.strip()
-
-    flag = False
-    if _mml.replace(" ", "") != _latex.replace(" ", ""):
-        if abs(len(_mml.split()) - len(_latex.split())) <= 10:
-            flag = True
-    else:
-        flag = True
-
-    return flag
 
 
 def prepare_dataset(args):
@@ -241,8 +229,7 @@ def get_bin(af):
         return (tgt_bin, ap)
 
     except Exception as e:
-        print(str(e))
-        print("Error in get_bin for ", ap)
+        print(f"Error in {ap}:", e)
 
 
 # Function to kill process if TimeoutError occurs
@@ -307,7 +294,10 @@ def main():
 
     print("diving all_paths into batches of 10K to work efficiently...")
     reject_count = 0
-    for bidx, batch_paths in enumerate(list(divide_all_paths_into_chunks(all_paths))):
+    batches = list(divide_all_paths_into_chunks(all_paths))
+    for bidx, batch_paths in tqdm(
+        enumerate(batches), desc="Batches", total=len(batches)
+    ):
         if count <= total_eqns:
             print("running batch: ", bidx)
             print("current status: ", counter_dist_dict)
@@ -358,7 +348,9 @@ def main():
 
     reject = 0
     c_idx = 0
-    for fpidx, fp in enumerate(final_paths):
+    for _, fp in tqdm(
+        enumerate(final_paths), desc="Writing files...", total=len(final_paths)
+    ):
         try:
             yr, month, folder, type_of_eqn, eqn_num = fp.split("_")
 
@@ -406,9 +398,10 @@ def main():
 
             c_idx += 1
 
-        except:
+        except Exception as e:
             reject += 1
-            pass
+            print("Rejected: with error: ", e)
 
-    print("final distribution: ", counter_dist_dict)
-    print("total equations: ", c_idx)
+    print("Final distribution: ", counter_dist_dict)
+    print("Total equations: ", c_idx)
+    print("Total rejected: ", reject)
