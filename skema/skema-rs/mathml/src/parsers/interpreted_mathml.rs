@@ -11,8 +11,8 @@ use crate::{
     },
     parsers::generic_mathml::{
         add, attribute, comma, dot, elem_many0, equals, etag, grad, lparen, mean, mi, mn, msqrt,
-        msub, msubsup, msup, multiply, rparen, stag, subtract, tag_parser, ws, xml_declaration,
-        IResult, ParseError, Span,
+        msub, msubsup, multiply, rparen, stag, subtract, tag_parser, ws, xml_declaration, IResult,
+        ParseError, Span,
     },
 };
 
@@ -441,12 +441,29 @@ pub fn absolute_with_msup(input: Span) -> IResult<MathExpression> {
     Ok((s, sup))
 }
 
+///Parenthesis with Msup value
+pub fn paren_as_msup(input: Span) -> IResult<MathExpression> {
+    let (s, sup) = ws(map(
+        ws(delimited(
+            tag("<mo>(</mo>"),
+            tuple((
+                map(many0(math_expression), |z| Mrow(z)),
+                preceded(tag("<msup><mo>)</mo>"), math_expression),
+            )),
+            tag("</msup>"),
+        )),
+        |(x, y)| MathExpression::Msup(Box::new(MathExpression::Mrow(x)), Box::new(y)),
+    ))(input)?;
+    Ok((s, sup))
+}
+
 /// Parser for math expressions. This varies from the one in the generic_mathml module, since it
 /// assumes that expressions such as S(t) are actually univariate functions.
 pub fn math_expression(input: Span) -> IResult<MathExpression> {
     ws(alt((
         map(div, MathExpression::Mo),
         absolute_with_msup,
+        paren_as_msup,
         map(
             first_order_derivative_leibniz_notation,
             |(
@@ -553,7 +570,6 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
         map(operator, MathExpression::Mo),
         mn,
         superscript,
-        msup,
         over_term,
         msub,
         msqrt,

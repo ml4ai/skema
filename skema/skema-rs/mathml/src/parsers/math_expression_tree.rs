@@ -222,11 +222,12 @@ impl MathExpression {
                         tokens.push(MathExpression::Mo(Operator::Rparen));
                     }
                 } else {
-                    tokens.push(MathExpression::Mo(Operator::Lparen));
+                    //tokens.push(MathExpression::Mo(Operator::Lparen));
                     base.flatten(tokens);
                     tokens.push(MathExpression::Mo(Operator::Power));
                     tokens.push(MathExpression::Mo(Operator::Lparen));
                     superscript.flatten(tokens);
+                    tokens.push(MathExpression::Mo(Operator::Rparen));
                 }
             }
             MathExpression::AbsoluteSup(base, superscript) => {
@@ -384,6 +385,7 @@ fn insert_multiple_between_paren(lexer: &mut Lexer) {
             if let Token::Op(Operator::Lparen) = token {
                 if let Token::Op(Operator::Rparen) = **next_token {
                     new_tokens.push(Token::Op(Operator::Multiply).clone());
+                } else {
                 }
             }
         }
@@ -1078,4 +1080,18 @@ fn test_combination() {
     let exp = input.parse::<MathExpressionTree>().unwrap();
     let s_exp = exp.to_string();
     assert_eq!(s_exp, "(* (* (* S (+ n 4)) (- i 3)) (^ H (- m 2)))");
+}
+
+#[test]
+fn test_mi_multiply() {
+    let input = "
+    <math>
+        <mi>A</mi>
+        <msup><mi>ρ</mi><mi>n</mi></msup>
+        <msup><mi>g</mi><mi>n</mi></msup>
+    </math>
+    ";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    let s_exp = exp.to_string();
+    println!("s_exp={:?}", s_exp);
 }
