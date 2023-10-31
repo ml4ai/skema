@@ -90,7 +90,6 @@ def eqn_image_exists(yr, month, folder, type_of_eqn, eqn_num):
 
 
 def get_paths(yr, yr_path, month):
-    print(f"Collecting paths for {yr}/{month}...")
     start_time = time.perf_counter()
     temp_files = []
     month_path = os.path.join(yr_path, month, "latex_equations")
@@ -121,15 +120,28 @@ def has_intersection(a: set, b: set):
 def filter_by_image_existence(paths: list):
     start_time = time.perf_counter()
     filtered_paths = []
-    for path in tqdm(
-        paths, desc="Filtering paths by image existence", total=len(paths)
-    ):
-        yr, month, paper, type_of_eqn, eqn_num = path.split("_")
-        if eqn_image_exists(yr, month, paper, type_of_eqn, eqn_num):
-            filtered_paths.append(path)
+    batches = [paths[i : i + chunk_size] for i in range(0, len(paths), chunk_size)]
+    for batch in tqdm(batches, desc="Filtering paths by image existence"):
+        with mp.Pool(config["num_cpus"]) as pool:
+            results = pool.starmap(
+                eqn_image_exists,
+                [
+                    (
+                        path.split("_")[0],
+                        path.split("_")[1],
+                        path.split("_")[2],
+                        path.split("_")[3],
+                        path.split("_")[4],
+                    )
+                    for path in batch
+                ],
+            )
+        filtered_paths.extend(results)
     end_time = time.perf_counter()
     print(f"Trimmed {len(paths)} paths to {len(filtered_paths)} paths")
     print(f"Finished filtering paths in {end_time - start_time} seconds")
+    print(filtered_paths)
+    exit(1)
     return filtered_paths
 
 
