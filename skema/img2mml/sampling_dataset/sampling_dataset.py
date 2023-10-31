@@ -107,9 +107,6 @@ def get_paths(yr, yr_path, month):
                 [
                     f"{yr}_{month}_{paper}_{type_of_eqn}_{eqn.split('.')[0]}"
                     for eqn in os.listdir(eqn_folder)
-                    if eqn_image_exists(
-                        yr, month, paper, type_of_eqn, eqn.split(".")[0]
-                    )
                 ]
             )
     end_time = time.perf_counter()
