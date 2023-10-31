@@ -81,7 +81,8 @@ count = 0
 lock = mp.Lock()
 
 
-def eqn_image_exists(yr, month, folder, type_of_eqn, eqn_num):
+def eqn_image_exists(path: str):
+    yr, month, folder, type_of_eqn, eqn_num = path.split("_")
     img_path = os.path.join(
         root,
         f"{yr}/{month}/latex_images/{folder}/{type_of_eqn}_eqns/{eqn_num}.png",
@@ -120,23 +121,14 @@ def has_intersection(a: set, b: set):
 def filter_by_image_existence(paths: list):
     start_time = time.perf_counter()
     filtered_paths = []
-    batches = [paths[i : i + chunk_size] for i in range(0, len(paths), chunk_size)]
-    for batch in tqdm(batches, desc="Filtering paths by image existence"):
+    with tqdm(total=len(paths)) as pbar:
         with mp.Pool(config["num_cpus"]) as pool:
-            results = pool.starmap(
-                eqn_image_exists,
-                [
-                    (
-                        path.split("_")[0],
-                        path.split("_")[1],
-                        path.split("_")[2],
-                        path.split("_")[3],
-                        path.split("_")[4],
-                    )
-                    for path in batch
-                ],
-            )
-        filtered_paths.extend(results)
+            results = pool.map(eqn_image_exists, paths, chunksize=chunk_size)
+            pbar.update(len(results))
+            for idx, result in tqdm(enumerate(results), total=len(results)):
+                if result:
+                    filtered_paths.append(paths[idx])
+
     end_time = time.perf_counter()
     print(f"Trimmed {len(paths)} paths to {len(filtered_paths)} paths")
     print(f"Finished filtering paths in {end_time - start_time} seconds")
