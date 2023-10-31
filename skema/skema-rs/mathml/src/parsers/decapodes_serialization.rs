@@ -3,10 +3,10 @@ use crate::ast::{
     MathExpression,
 };
 use crate::parsers::math_expression_tree::MathExpressionTree;
-
+use utoipa::ToSchema;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
 enum Type {
     Form0,
     Form1,
@@ -15,20 +15,20 @@ enum Type {
     Literal,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
 pub struct Variable {
     r#type: Type,
     pub name: String,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
 pub struct UnaryOperator {
     pub src: usize,
     pub tgt: usize,
     pub op1: String,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
 pub struct ProjectionOperator {
     pub proj1: usize,
     pub proj2: usize,
@@ -36,18 +36,18 @@ pub struct ProjectionOperator {
     pub op2: String,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
 pub struct Sum {
     pub sum: usize,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
 pub struct Summation {
     pub summand: usize,
     pub summation: usize,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
 pub struct TableCounts {
     pub variable_count: usize,
     pub operation_count: usize,
@@ -55,7 +55,7 @@ pub struct TableCounts {
     pub multi_count: usize,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
 pub struct Tables {
     pub variables: Vec<Variable>,
     pub projection_operators: Vec<ProjectionOperator>,
@@ -64,13 +64,18 @@ pub struct Tables {
     pub summand_op: Vec<Summation>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
 pub struct WiringDiagram {
     pub Var: Vec<Variable>,
     pub Op1: Vec<UnaryOperator>,
     pub Op2: Vec<ProjectionOperator>,
     pub Σ: Vec<Sum>,
     pub Summand: Vec<Summation>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
+pub struct DecapodesCollection {
+    pub decapodes: Vec<WiringDiagram>
 }
 
 pub fn to_decapodes_serialization(

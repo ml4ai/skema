@@ -1,11 +1,99 @@
 from collections import defaultdict
 from typing import Any, Dict
 import itertools as it
-
 from askem_extractions.data_model import AttributeCollection, AttributeType, Mention
 from bs4 import BeautifulSoup, Comment
 
 from skema.rest.schema import TextReadingEvaluationResults, AMRLinkingEvaluationResults
+
+
+def fn_preprocessor(function_network: Dict[str, Any]):
+    fn_data = function_network.copy()
+
+    logs = []
+
+    '''
+    We will currently preprocess based on 2 different common bugs
+    1) wire tgt's being -1 -> which we will delete these wires
+    2) metadata being inline for bf entries instead of an index into the metadata_collection -> which we will replace with an index of 2
+    3) missing function_type field on a bf entry -> will replace with function_type: "IMPORTED"
+    4) If there is not a body field to a function -> replace "FUNCTION" with "ABSTRACT and set "name":"unknown"
+    5) NOT DONE YET: In the future we will preprocess about function calls being arguments, in order to simplify extracting the dataflow 
+    '''
+
+    # first we check the top bf level of wires and inline metadata: 
+    keys_to_check = ['bf', 'wff', 'wfopi', 'wfopo', 'wopio']
+    for key in keys_to_check:
+        if key == 'bf':
+            try:
+                for (i, entry) in enumerate(fn_data['modules'][0]['fn'][key]):
+                    try:
+                        metadata_obj = entry['metadata']
+                        if not isinstance(metadata_obj, int):
+                            entry['metadata'] = 2
+                            logs.append(f"Inline metadata on {i + 1}'th entry in top level bf")
+                    except:
+                        continue
+                    try:
+                        temp = entry['function_type']
+                    except:
+                        entry['function_type'] = "IMPORTED"
+                        logs.append(f"Missing function_type on {i + 1}'th entry in top level bf")
+                    try:
+                        if entry['function_type'] == "FUNCTION":
+                            temp = entry['body']
+                    except:
+                        entry['function_type'] = "ABSTRACT"
+                        entry['name'] = "Unknown"
+                        logs.append(f"Missing Function body on {i + 1}'th entry in top level bf")
+            except:
+                continue
+        else:
+            try:
+                for (i, entry) in enumerate(fn_data['modules'][0]['fn'][key]):
+                    if entry['tgt'] == -1:
+                        del fn_data['modules'][0]['fn'][key][i]
+                        logs.append(f"The {i + 1}'th {key} wire in the top level bf is targeting -1")
+            except:
+                continue
+
+    # now we iterate through the fn_array and do the same thing
+    for (j, fn_ent) in enumerate(fn_data['modules'][0]['fn_array']):
+        for key in keys_to_check:
+            if key == 'bf':
+                try:
+                    for (i, entry) in enumerate(fn_ent[key]):
+                        try:
+                            metadata_obj = entry['metadata']
+                            if not isinstance(metadata_obj, int):
+                                entry['metadata'] = 2
+                                logs.append(f"Inline metadata on {i + 1}'th bf in the {j + 1}'th fn_array")
+                        except:
+                            continue
+                        try:
+                            temp = entry['function_type']
+                        except:
+                            entry['function_type'] = "IMPORTED"
+                            logs.append(f"Missing function_type on {i + 1}'th bf in the {j + 1}'th fn_array")
+                        try:
+                            if entry['function_type'] == "FUNCTION":
+                                temp = entry['body']
+                        except:
+                            entry['function_type'] = "ABSTRACT"
+                            entry['name'] = "Unknown"
+                            logs.append(f"Missing Function body on {i + 1}'th bf in the {j + 1}'th fn_array")
+                except:
+                    continue
+            else:
+                try:
+                    for (i, entry) in enumerate(fn_ent[key]):
+                        if entry['tgt'] == -1:
+                            del fn_ent[key][i]
+                            logs.append(f"The {i + 1}'th {key} wire in the {j + 1}'th fn_array is targeting -1")
+                except:
+                    continue
+
+    return fn_data, logs
 
 
 def clean_mml(mml: str) -> str:
@@ -47,12 +135,12 @@ def compute_text_reading_evaluation(gt_data: list, attributes: AttributeCollecti
     # Get the extraction annotations from the ground truth data
     annotations_by_page = defaultdict(list)
     for a in gt_data:
-        if a["type"] == "Highlight" and a["color"] == "#f9cd59":
+        if a["type"] == "Highlight" and a["color"] in {"#f9cd59", "#ffd100", "#0000ff"}:
             page = a["page"]
             annotations_by_page[page].append(a)
 
     # Count the matches
-    num_matches = 0
+    tp, tn, fp, fn = 0, 0, 0, 0
     for e in extractions:
         for m in e.mentions:
             if m.extraction_source is not None:
@@ -60,16 +148,25 @@ def compute_text_reading_evaluation(gt_data: list, attributes: AttributeCollecti
                 if te.page is not None:
                     e_page = te.page
                     page_annotations = annotations_by_page[e_page]
+                    matched = False
                     for a in page_annotations:
                         if extraction_matches_annotation(m, a):
-                            num_matches += 1
+                            matched = True
+                            tp += 1
                             break
+                    if not matched:
+                        fp += 1
 
+
+    recall = tp / len(gt_data)
+    precision = tp / (tp + fp + 0.00000000001)
     return TextReadingEvaluationResults(
         num_manual_annotations=len(gt_data),
         yield_=len(extractions),
-        correct_extractions=num_matches,
-        precision=num_matches / len(gt_data)
+        correct_extractions=tp,
+        recall=recall,
+        precision=precision,
+        f1=(2 * precision * recall) / (precision + recall + .0000000001)
     )
 
 
@@ -125,8 +222,8 @@ greek_alphabet = {
     'ω': 'omega'
 }
 
-def compute_amr_linking_evaluation(linked_amr, gt_linked_amr) -> AMRLinkingEvaluationResults:
 
+def compute_amr_linking_evaluation(linked_amr, gt_linked_amr) -> AMRLinkingEvaluationResults:
     # Find the amr elements with metadata in the GT
     gt_amr_ids = {m['amr_element_id'] for m in gt_linked_amr['metadata'] if m['amr_element_id'] is not None}
 
@@ -206,7 +303,7 @@ def compute_amr_linking_evaluation(linked_amr, gt_linked_amr) -> AMRLinkingEvalu
     precision = tp / ((tp + fp) + 0.000000001)
     recall = tp / ((tp + fn) + 0.000000001)
 
-    f1 = (2*precision*recall) / ((precision + recall)  + 0.000000001)
+    f1 = (2 * precision * recall) / ((precision + recall) + 0.000000001)
 
     return AMRLinkingEvaluationResults(
         num_gt_elems_with_metadata=len(gt_amr_ids),
