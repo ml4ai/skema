@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Coverage for skema/rest/workflows.py: 0%</title>
+    <title>Coverage for skema/rest/workflows.py: 42%</title>
     <link rel="icon" sizes="32x32" href="favicon_32.png">
     <link rel="stylesheet" href="style.css" type="text/css">
     <script type="text/javascript" src="coverage_html.js" defer></script>
@@ -12,7 +12,7 @@
     <div class="content">
         <h1>
             <span class="text">Coverage for </span><b>skema/rest/workflows.py</b>:
-            <span class="pc_cov">0%</span>
+            <span class="pc_cov">42%</span>
         </h1>
         <aside id="help_panel_wrapper">
             <input id="help_panel_state" type="checkbox">
@@ -55,8 +55,8 @@
         </aside>
         <h2>
             <span class="text">50 statements &nbsp;</span>
-            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">0<span class="text"> run</span></button>
-            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">50<span class="text"> missing</span></button>
+            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">21<span class="text"> run</span></button>
+            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">29<span class="text"> missing</span></button>
             <button type="button" class="exc show_exc button_toggle_exc" value="exc" data-shortcut="x" title="Toggle lines excluded">0<span class="text"> excluded</span></button>
         </h2>
         <p class="text">
@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="d_7f155e5a1b03c261___init___py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.3.2">coverage.py v7.3.2</a>,
-            created at 2023-10-31 22:43 +0000
+            created at 2023-10-31 23:34 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"/>
@@ -81,30 +81,30 @@
 </header>
 <main id="source">
     <p class="pln"><span class="n"><a id="t1" href="#t1">1</a></span><span class="t"><span class="com"># -*- coding: utf-8 -*-</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t2" href="#t2">2</a></span><span class="t"><span class="str">"""</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t2" href="#t2">2</a></span><span class="t"><span class="str">"""</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t3" href="#t3">3</a></span><span class="t"><span class="str">End-to-end skema workflows</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t4" href="#t4">4</a></span><span class="t"><span class="str">"""</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t5" href="#t5">5</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t6" href="#t6">6</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t7" href="#t7">7</a></span><span class="t"><span class="key">from</span> <span class="nam">typing</span> <span class="key">import</span> <span class="nam">List</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t7" href="#t7">7</a></span><span class="t"><span class="key">from</span> <span class="nam">typing</span> <span class="key">import</span> <span class="nam">List</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t8" href="#t8">8</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t9" href="#t9">9</a></span><span class="t"><span class="key">import</span> <span class="nam">requests</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t10" href="#t10">10</a></span><span class="t"><span class="key">from</span> <span class="nam">fastapi</span> <span class="key">import</span> <span class="nam">APIRouter</span><span class="op">,</span> <span class="nam">File</span><span class="op">,</span> <span class="nam">UploadFile</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t11" href="#t11">11</a></span><span class="t"><span class="key">from</span> <span class="nam">starlette</span><span class="op">.</span><span class="nam">responses</span> <span class="key">import</span> <span class="nam">JSONResponse</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t9" href="#t9">9</a></span><span class="t"><span class="key">import</span> <span class="nam">requests</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t10" href="#t10">10</a></span><span class="t"><span class="key">from</span> <span class="nam">fastapi</span> <span class="key">import</span> <span class="nam">APIRouter</span><span class="op">,</span> <span class="nam">File</span><span class="op">,</span> <span class="nam">UploadFile</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t11" href="#t11">11</a></span><span class="t"><span class="key">from</span> <span class="nam">starlette</span><span class="op">.</span><span class="nam">responses</span> <span class="key">import</span> <span class="nam">JSONResponse</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t12" href="#t12">12</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t13" href="#t13">13</a></span><span class="t"><span class="key">from</span> <span class="nam">skema</span><span class="op">.</span><span class="nam">img2mml</span> <span class="key">import</span> <span class="nam">eqn2mml</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t14" href="#t14">14</a></span><span class="t"><span class="key">from</span> <span class="nam">skema</span><span class="op">.</span><span class="nam">rest</span> <span class="key">import</span> <span class="nam">schema</span><span class="op">,</span> <span class="nam">utils</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t15" href="#t15">15</a></span><span class="t"><span class="key">from</span> <span class="nam">skema</span><span class="op">.</span><span class="nam">rest</span><span class="op">.</span><span class="nam">proxies</span> <span class="key">import</span> <span class="nam">SKEMA_RS_ADDESS</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t16" href="#t16">16</a></span><span class="t"><span class="key">from</span> <span class="nam">skema</span><span class="op">.</span><span class="nam">skema_py</span> <span class="key">import</span> <span class="nam">server</span> <span class="key">as</span> <span class="nam">code2fn</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t13" href="#t13">13</a></span><span class="t"><span class="key">from</span> <span class="nam">skema</span><span class="op">.</span><span class="nam">img2mml</span> <span class="key">import</span> <span class="nam">eqn2mml</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t14" href="#t14">14</a></span><span class="t"><span class="key">from</span> <span class="nam">skema</span><span class="op">.</span><span class="nam">rest</span> <span class="key">import</span> <span class="nam">schema</span><span class="op">,</span> <span class="nam">utils</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t15" href="#t15">15</a></span><span class="t"><span class="key">from</span> <span class="nam">skema</span><span class="op">.</span><span class="nam">rest</span><span class="op">.</span><span class="nam">proxies</span> <span class="key">import</span> <span class="nam">SKEMA_RS_ADDESS</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t16" href="#t16">16</a></span><span class="t"><span class="key">from</span> <span class="nam">skema</span><span class="op">.</span><span class="nam">skema_py</span> <span class="key">import</span> <span class="nam">server</span> <span class="key">as</span> <span class="nam">code2fn</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t17" href="#t17">17</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t18" href="#t18">18</a></span><span class="t"><span class="nam">router</span> <span class="op">=</span> <span class="nam">APIRouter</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t18" href="#t18">18</a></span><span class="t"><span class="nam">router</span> <span class="op">=</span> <span class="nam">APIRouter</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t19" href="#t19">19</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t20" href="#t20">20</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t21" href="#t21">21</a></span><span class="t"><span class="com"># equation images -> mml -> amr</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t22" href="#t22">22</a></span><span class="t"><span class="op">@</span><span class="nam">router</span><span class="op">.</span><span class="nam">post</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t22" href="#t22">22</a></span><span class="t"><span class="op">@</span><span class="nam">router</span><span class="op">.</span><span class="nam">post</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t23" href="#t23">23</a></span><span class="t">    <span class="str">"/images/base64/equations-to-amr"</span><span class="op">,</span> <span class="nam">summary</span><span class="op">=</span><span class="str">"Equations (base64 images) &#8594; MML &#8594; AMR"</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t24" href="#t24">24</a></span><span class="t"><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t25" href="#t25">25</a></span><span class="t"><span class="key">async</span> <span class="key">def</span> <span class="nam">equations_to_amr</span><span class="op">(</span><span class="nam">data</span><span class="op">:</span> <span class="nam">schema</span><span class="op">.</span><span class="nam">EquationImagesToAMR</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t25" href="#t25">25</a></span><span class="t"><span class="key">async</span> <span class="key">def</span> <span class="nam">equations_to_amr</span><span class="op">(</span><span class="nam">data</span><span class="op">:</span> <span class="nam">schema</span><span class="op">.</span><span class="nam">EquationImagesToAMR</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t26" href="#t26">26</a></span><span class="t">    <span class="str">"""</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t27" href="#t27">27</a></span><span class="t"><span class="str">    Converts images of equations to AMR.</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t28" href="#t28">28</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
@@ -145,8 +145,8 @@
     <p class="pln"><span class="n"><a id="t63" href="#t63">63</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t64" href="#t64">64</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t65" href="#t65">65</a></span><span class="t"><span class="com"># tex equations -> pmml -> amr</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t66" href="#t66">66</a></span><span class="t"><span class="op">@</span><span class="nam">router</span><span class="op">.</span><span class="nam">post</span><span class="op">(</span><span class="str">"/latex/equations-to-amr"</span><span class="op">,</span> <span class="nam">summary</span><span class="op">=</span><span class="str">"Equations (LaTeX) &#8594; pMML &#8594; AMR"</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t67" href="#t67">67</a></span><span class="t"><span class="key">async</span> <span class="key">def</span> <span class="nam">equations_to_amr</span><span class="op">(</span><span class="nam">data</span><span class="op">:</span> <span class="nam">schema</span><span class="op">.</span><span class="nam">EquationLatexToAMR</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t66" href="#t66">66</a></span><span class="t"><span class="op">@</span><span class="nam">router</span><span class="op">.</span><span class="nam">post</span><span class="op">(</span><span class="str">"/latex/equations-to-amr"</span><span class="op">,</span> <span class="nam">summary</span><span class="op">=</span><span class="str">"Equations (LaTeX) &#8594; pMML &#8594; AMR"</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t67" href="#t67">67</a></span><span class="t"><span class="key">async</span> <span class="key">def</span> <span class="nam">equations_to_amr</span><span class="op">(</span><span class="nam">data</span><span class="op">:</span> <span class="nam">schema</span><span class="op">.</span><span class="nam">EquationLatexToAMR</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t68" href="#t68">68</a></span><span class="t">    <span class="str">"""</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t69" href="#t69">69</a></span><span class="t"><span class="str">    Converts equations (in LaTeX) to AMR.</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t70" href="#t70">70</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
@@ -179,8 +179,8 @@
     <p class="pln"><span class="n"><a id="t97" href="#t97">97</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t98" href="#t98">98</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t99" href="#t99">99</a></span><span class="t"><span class="com"># pmml -> amr</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t100" href="#t100">100</a></span><span class="t"><span class="op">@</span><span class="nam">router</span><span class="op">.</span><span class="nam">post</span><span class="op">(</span><span class="str">"/pmml/equations-to-amr"</span><span class="op">,</span> <span class="nam">summary</span><span class="op">=</span><span class="str">"Equations pMML &#8594; AMR"</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t101" href="#t101">101</a></span><span class="t"><span class="key">async</span> <span class="key">def</span> <span class="nam">equations_to_amr</span><span class="op">(</span><span class="nam">data</span><span class="op">:</span> <span class="nam">schema</span><span class="op">.</span><span class="nam">MmlToAMR</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t100" href="#t100">100</a></span><span class="t"><span class="op">@</span><span class="nam">router</span><span class="op">.</span><span class="nam">post</span><span class="op">(</span><span class="str">"/pmml/equations-to-amr"</span><span class="op">,</span> <span class="nam">summary</span><span class="op">=</span><span class="str">"Equations pMML &#8594; AMR"</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t101" href="#t101">101</a></span><span class="t"><span class="key">async</span> <span class="key">def</span> <span class="nam">equations_to_amr</span><span class="op">(</span><span class="nam">data</span><span class="op">:</span> <span class="nam">schema</span><span class="op">.</span><span class="nam">MmlToAMR</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t102" href="#t102">102</a></span><span class="t">    <span class="nam">payload</span> <span class="op">=</span> <span class="op">{</span><span class="str">"mathml"</span><span class="op">:</span> <span class="nam">data</span><span class="op">.</span><span class="nam">equations</span><span class="op">,</span> <span class="str">"model"</span><span class="op">:</span> <span class="nam">data</span><span class="op">.</span><span class="nam">model</span><span class="op">}</span>&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t103" href="#t103">103</a></span><span class="t">    <span class="nam">res</span> <span class="op">=</span> <span class="nam">requests</span><span class="op">.</span><span class="nam">put</span><span class="op">(</span><span class="str">f"{SKEMA_RS_ADDESS}/mathml/amr"</span><span class="op">,</span> <span class="nam">json</span><span class="op">=</span><span class="nam">payload</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t104" href="#t104">104</a></span><span class="t">    <span class="key">if</span> <span class="nam">res</span><span class="op">.</span><span class="nam">status_code</span> <span class="op">!=</span> <span class="num">200</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
@@ -195,8 +195,8 @@
     <p class="pln"><span class="n"><a id="t113" href="#t113">113</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t114" href="#t114">114</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t115" href="#t115">115</a></span><span class="t"><span class="com"># code snippets -> fn -> petrinet amr</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t116" href="#t116">116</a></span><span class="t"><span class="op">@</span><span class="nam">router</span><span class="op">.</span><span class="nam">post</span><span class="op">(</span><span class="str">"/code/snippets-to-pn-amr"</span><span class="op">,</span> <span class="nam">summary</span><span class="op">=</span><span class="str">"Code snippets &#8594; PetriNet AMR"</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t117" href="#t117">117</a></span><span class="t"><span class="key">async</span> <span class="key">def</span> <span class="nam">code_snippets_to_pn_amr</span><span class="op">(</span><span class="nam">system</span><span class="op">:</span> <span class="nam">code2fn</span><span class="op">.</span><span class="nam">System</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t116" href="#t116">116</a></span><span class="t"><span class="op">@</span><span class="nam">router</span><span class="op">.</span><span class="nam">post</span><span class="op">(</span><span class="str">"/code/snippets-to-pn-amr"</span><span class="op">,</span> <span class="nam">summary</span><span class="op">=</span><span class="str">"Code snippets &#8594; PetriNet AMR"</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t117" href="#t117">117</a></span><span class="t"><span class="key">async</span> <span class="key">def</span> <span class="nam">code_snippets_to_pn_amr</span><span class="op">(</span><span class="nam">system</span><span class="op">:</span> <span class="nam">code2fn</span><span class="op">.</span><span class="nam">System</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t118" href="#t118">118</a></span><span class="t">    <span class="nam">gromet</span> <span class="op">=</span> <span class="key">await</span> <span class="nam">code2fn</span><span class="op">.</span><span class="nam">fn_given_filepaths</span><span class="op">(</span><span class="nam">system</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t119" href="#t119">119</a></span><span class="t">    <span class="nam">gromet</span><span class="op">,</span> <span class="nam">logs</span> <span class="op">=</span> <span class="nam">utils</span><span class="op">.</span><span class="nam">fn_preprocessor</span><span class="op">(</span><span class="nam">gromet</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t120" href="#t120">120</a></span><span class="t">    <span class="nam">res</span> <span class="op">=</span> <span class="nam">requests</span><span class="op">.</span><span class="nam">put</span><span class="op">(</span><span class="str">f"{SKEMA_RS_ADDESS}/models/PN"</span><span class="op">,</span> <span class="nam">json</span><span class="op">=</span><span class="nam">gromet</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
@@ -231,10 +231,10 @@
     <p class="pln"><span class="n"><a id="t149" href="#t149">149</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t150" href="#t150">150</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t151" href="#t151">151</a></span><span class="t"><span class="com"># zip archive -> fn -> petrinet amr</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t152" href="#t152">152</a></span><span class="t"><span class="op">@</span><span class="nam">router</span><span class="op">.</span><span class="nam">post</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t152" href="#t152">152</a></span><span class="t"><span class="op">@</span><span class="nam">router</span><span class="op">.</span><span class="nam">post</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t153" href="#t153">153</a></span><span class="t">    <span class="str">"/code/codebase-to-pn-amr"</span><span class="op">,</span> <span class="nam">summary</span><span class="op">=</span><span class="str">"Code repo (zip archive) &#8594; PetriNet AMR"</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t154" href="#t154">154</a></span><span class="t"><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t155" href="#t155">155</a></span><span class="t"><span class="key">async</span> <span class="key">def</span> <span class="nam">repo_to_pn_amr</span><span class="op">(</span><span class="nam">zip_file</span><span class="op">:</span> <span class="nam">UploadFile</span> <span class="op">=</span> <span class="nam">File</span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t155" href="#t155">155</a></span><span class="t"><span class="key">async</span> <span class="key">def</span> <span class="nam">repo_to_pn_amr</span><span class="op">(</span><span class="nam">zip_file</span><span class="op">:</span> <span class="nam">UploadFile</span> <span class="op">=</span> <span class="nam">File</span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t156" href="#t156">156</a></span><span class="t">    <span class="nam">gromet</span> <span class="op">=</span> <span class="key">await</span> <span class="nam">code2fn</span><span class="op">.</span><span class="nam">fn_given_filepaths_zip</span><span class="op">(</span><span class="nam">zip_file</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t157" href="#t157">157</a></span><span class="t">    <span class="nam">gromet</span><span class="op">,</span> <span class="nam">logs</span> <span class="op">=</span> <span class="nam">utils</span><span class="op">.</span><span class="nam">fn_preprocessor</span><span class="op">(</span><span class="nam">gromet</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t158" href="#t158">158</a></span><span class="t">    <span class="nam">res</span> <span class="op">=</span> <span class="nam">requests</span><span class="op">.</span><span class="nam">put</span><span class="op">(</span><span class="str">f"{SKEMA_RS_ADDESS}/models/PN"</span><span class="op">,</span> <span class="nam">json</span><span class="op">=</span><span class="nam">gromet</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
@@ -249,7 +249,7 @@
     <p class="mis show_mis"><span class="n"><a id="t167" href="#t167">167</a></span><span class="t">    <span class="key">return</span> <span class="nam">res</span><span class="op">.</span><span class="nam">json</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t168" href="#t168">168</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t169" href="#t169">169</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t170" href="#t170">170</a></span><span class="t"><span class="str">""" TODO: The regnet endpoints are currently outdated</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t170" href="#t170">170</a></span><span class="t"><span class="str">""" TODO: The regnet endpoints are currently outdated</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t171" href="#t171">171</a></span><span class="t"><span class="str"># zip archive -> fn -> regnet amr</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t172" href="#t172">172</a></span><span class="t"><span class="str">@router.post("/code/codebase-to-rn-amr", summary="Code repo (zip archive) &#8594; RegNet AMR")</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t173" href="#t173">173</a></span><span class="t"><span class="str">async def repo_to_rn_amr(zip_file: UploadFile = File()):</span>&nbsp;</span><span class="r"></span></p>
@@ -274,7 +274,7 @@
             <a id="nextFileLink" class="nav" href="d_7f155e5a1b03c261___init___py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.3.2">coverage.py v7.3.2</a>,
-            created at 2023-10-31 22:43 +0000
+            created at 2023-10-31 23:34 +0000
         </p>
     </div>
 </footer>
