@@ -132,8 +132,7 @@ def filter_by_image_existence(paths: list):
     end_time = time.perf_counter()
     print(f"Trimmed {len(paths)} paths to {len(filtered_paths)} paths")
     print(f"Finished filtering paths in {end_time - start_time} seconds")
-    print(filtered_paths)
-    exit(1)
+    print(filtered_paths[0:5])
     return filtered_paths
 
 
