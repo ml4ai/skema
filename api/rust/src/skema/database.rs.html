@@ -5391,6 +5391,67 @@
 <a href="#5391" id="5391">5391</a>
 <a href="#5392" id="5392">5392</a>
 <a href="#5393" id="5393">5393</a>
+<a href="#5394" id="5394">5394</a>
+<a href="#5395" id="5395">5395</a>
+<a href="#5396" id="5396">5396</a>
+<a href="#5397" id="5397">5397</a>
+<a href="#5398" id="5398">5398</a>
+<a href="#5399" id="5399">5399</a>
+<a href="#5400" id="5400">5400</a>
+<a href="#5401" id="5401">5401</a>
+<a href="#5402" id="5402">5402</a>
+<a href="#5403" id="5403">5403</a>
+<a href="#5404" id="5404">5404</a>
+<a href="#5405" id="5405">5405</a>
+<a href="#5406" id="5406">5406</a>
+<a href="#5407" id="5407">5407</a>
+<a href="#5408" id="5408">5408</a>
+<a href="#5409" id="5409">5409</a>
+<a href="#5410" id="5410">5410</a>
+<a href="#5411" id="5411">5411</a>
+<a href="#5412" id="5412">5412</a>
+<a href="#5413" id="5413">5413</a>
+<a href="#5414" id="5414">5414</a>
+<a href="#5415" id="5415">5415</a>
+<a href="#5416" id="5416">5416</a>
+<a href="#5417" id="5417">5417</a>
+<a href="#5418" id="5418">5418</a>
+<a href="#5419" id="5419">5419</a>
+<a href="#5420" id="5420">5420</a>
+<a href="#5421" id="5421">5421</a>
+<a href="#5422" id="5422">5422</a>
+<a href="#5423" id="5423">5423</a>
+<a href="#5424" id="5424">5424</a>
+<a href="#5425" id="5425">5425</a>
+<a href="#5426" id="5426">5426</a>
+<a href="#5427" id="5427">5427</a>
+<a href="#5428" id="5428">5428</a>
+<a href="#5429" id="5429">5429</a>
+<a href="#5430" id="5430">5430</a>
+<a href="#5431" id="5431">5431</a>
+<a href="#5432" id="5432">5432</a>
+<a href="#5433" id="5433">5433</a>
+<a href="#5434" id="5434">5434</a>
+<a href="#5435" id="5435">5435</a>
+<a href="#5436" id="5436">5436</a>
+<a href="#5437" id="5437">5437</a>
+<a href="#5438" id="5438">5438</a>
+<a href="#5439" id="5439">5439</a>
+<a href="#5440" id="5440">5440</a>
+<a href="#5441" id="5441">5441</a>
+<a href="#5442" id="5442">5442</a>
+<a href="#5443" id="5443">5443</a>
+<a href="#5444" id="5444">5444</a>
+<a href="#5445" id="5445">5445</a>
+<a href="#5446" id="5446">5446</a>
+<a href="#5447" id="5447">5447</a>
+<a href="#5448" id="5448">5448</a>
+<a href="#5449" id="5449">5449</a>
+<a href="#5450" id="5450">5450</a>
+<a href="#5451" id="5451">5451</a>
+<a href="#5452" id="5452">5452</a>
+<a href="#5453" id="5453">5453</a>
+<a href="#5454" id="5454">5454</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Interface to the graph database we are using for persisting GroMEt objects and performing
 //! queries on them. We currently use MemgraphDB, an in-memory graph database.
 
@@ -6186,6 +6247,15 @@ There being a second function call of the same function which contains an expres
     </span><span class="kw">let </span>init_edges = edges.len();
     edges.sort();
     edges.dedup();
+    <span class="kw">let </span>edges_clone = edges.clone();
+    <span class="comment">// also dedup if edge prop is different
+    </span><span class="kw">for </span>(i, edge) <span class="kw">in </span>edges_clone.iter().enumerate().rev() {
+        <span class="kw">if </span>i != <span class="number">0 </span>{
+            <span class="kw">if </span>edge.src == edges_clone[i-<span class="number">1</span>].src &amp;&amp; edge.tgt == edges_clone[i-<span class="number">1</span>].tgt {
+                edges.remove(i);
+            }
+        }
+    }
     <span class="kw">let </span>fin_edges = edges.len();
     <span class="kw">if </span>init_edges != fin_edges {
         <span class="macro">println!</span>(<span class="string">&quot;Duplicated Edges Removed, check for bugs&quot;</span>);
@@ -6249,7 +6319,6 @@ There being a second function call of the same function which contains an expres
         </span>c_args.att_box = gromet.modules[<span class="number">0</span>].r#fn.clone(); <span class="comment">// incase over written
         </span><span class="kw">match </span>boxf.function_type {
             FunctionType::Primitive =&gt; {
-                c_args.att_idx = boxf.contents.unwrap() <span class="kw">as </span>usize;
                 create_att_primitive(
                     gromet,     <span class="comment">// gromet for metadata
                     </span><span class="kw-2">&amp;mut </span>nodes, <span class="comment">// nodes
@@ -6550,6 +6619,32 @@ There being a second function call of the same function which contains an expres
                     );
                 }
             }
+            FunctionType::Imported =&gt; {
+                create_import(gromet, <span class="kw-2">&amp;mut </span>nodes, <span class="kw-2">&amp;mut </span>edges, <span class="kw-2">&amp;mut </span>meta_nodes, <span class="kw-2">&amp;mut </span>start, c_args.clone());
+                start += <span class="number">1</span>;
+                <span class="comment">// now to implement wiring
+                </span>import_wiring(
+                    <span class="kw-2">&amp;</span>gromet.clone(),
+                    <span class="kw-2">&amp;mut </span>nodes,
+                    <span class="kw-2">&amp;mut </span>edges,
+                    c_args.att_idx,
+                    c_args.bf_counter,
+                    c_args.parent_node.clone(),
+                );
+            }
+            FunctionType::ImportedMethod =&gt; {
+                <span class="comment">// basically seems like these are just functions to me. 
+                </span>c_args.att_idx = boxf.contents.unwrap() <span class="kw">as </span>usize;
+                c_args.att_box = gromet.modules[<span class="number">0</span>].attributes[c_args.att_idx - <span class="number">1</span>].clone();
+                create_function(
+                    gromet,     <span class="comment">// gromet for metadata
+                    </span><span class="kw-2">&amp;mut </span>nodes, <span class="comment">// nodes
+                    </span><span class="kw-2">&amp;mut </span>edges,
+                    <span class="kw-2">&amp;mut </span>meta_nodes,
+                    <span class="kw-2">&amp;mut </span>start,
+                    c_args.clone(),
+                );
+            }
             <span class="kw">_ </span>=&gt; {}
         }
         start += <span class="number">1</span>;
@@ -6658,6 +6753,15 @@ There being a second function call of the same function which contains an expres
     </span><span class="kw">let </span>init_edges = edges.len();
     edges.sort();
     edges.dedup();
+    <span class="kw">let </span>edges_clone = edges.clone();
+    <span class="comment">// also dedup if edge prop is different
+    </span><span class="kw">for </span>(i, edge) <span class="kw">in </span>edges_clone.iter().enumerate().rev() {
+        <span class="kw">if </span>i != <span class="number">0 </span>{
+            <span class="kw">if </span>edge.src == edges_clone[i-<span class="number">1</span>].src &amp;&amp; edge.tgt == edges_clone[i-<span class="number">1</span>].tgt {
+                edges.remove(i);
+            }
+        }
+    }
     <span class="kw">let </span>fin_edges = edges.len();
     <span class="kw">if </span>init_edges != fin_edges {
         <span class="macro">println!</span>(<span class="string">&quot;Duplicated Edges Removed, check for bugs&quot;</span>);
@@ -6688,7 +6792,10 @@ There being a second function call of the same function which contains an expres
     </span>c_args: ConstructorArgs,
 ) {
     <span class="kw">let </span>eboxf = gromet.modules[<span class="number">0</span>].clone();
-    <span class="kw">let </span>sboxf = gromet.modules[<span class="number">0</span>].attributes[c_args.att_idx - <span class="number">1</span>].clone();
+    <span class="kw">let </span><span class="kw-2">mut </span>sboxf = gromet.modules[<span class="number">0</span>].r#fn.clone(); 
+    <span class="kw">if </span>c_args.att_idx != <span class="number">0 </span>{
+        sboxf = gromet.modules[<span class="number">0</span>].attributes[c_args.att_idx - <span class="number">1</span>].clone();
+    }
     <span class="comment">//let mboxf = eboxf.r#fn.bf.unwrap()[c_args.bf_counter - 1].clone();
 
     </span><span class="kw">let </span><span class="kw-2">mut </span>pof: Vec&lt;u32&gt; = <span class="macro">vec!</span>[];
@@ -6945,6 +7052,19 @@ There being a second function call of the same function which contains an expres
                                 meta_nodes,
                                 start,
                                 new_c_args.clone(),
+                            );
+                        }
+                        FunctionType::Imported =&gt; {
+                            create_import(gromet, nodes, edges, meta_nodes, start, c_args.clone());
+                            <span class="kw-2">*</span>start += <span class="number">1</span>;
+                            <span class="comment">// now to implement wiring
+                            </span>import_wiring(
+                                <span class="kw-2">&amp;</span>gromet.clone(),
+                                nodes,
+                                edges,
+                                c_args.att_idx,
+                                c_args.bf_counter,
+                                c_args.parent_node.clone(),
                             );
                         }
                         <span class="kw">_ </span>=&gt; {
@@ -9246,34 +9366,36 @@ There being a second function call of the same function which contains an expres
     </span><span class="kw">let </span><span class="kw-2">mut </span>new_c_args = c_args.clone();
     <span class="kw">let </span><span class="kw-2">mut </span>box_counter: usize = <span class="number">1</span>;
     new_c_args.att_box = att_box.clone();
-    <span class="kw">for </span>sub_att_box <span class="kw">in </span>att_box.bf.as_ref().unwrap().iter() {
-        new_c_args.box_counter = box_counter;
-        new_c_args.cur_box = sub_att_box.clone();
-        <span class="kw">match </span>sub_att_box.function_type {
-            FunctionType::Literal =&gt; {
-                create_att_literal(
-                    gromet, <span class="comment">// gromet for metadata
-                    </span>nodes,  <span class="comment">// nodes
-                    </span>edges,
-                    meta_nodes,
-                    start,
-                    new_c_args.clone(),
-                );
+    <span class="kw">if </span>att_box.bf.as_ref().is_some() {
+        <span class="kw">for </span>sub_att_box <span class="kw">in </span>att_box.bf.as_ref().unwrap().iter() {
+            new_c_args.box_counter = box_counter;
+            new_c_args.cur_box = sub_att_box.clone();
+            <span class="kw">match </span>sub_att_box.function_type {
+                FunctionType::Literal =&gt; {
+                    create_att_literal(
+                        gromet, <span class="comment">// gromet for metadata
+                        </span>nodes,  <span class="comment">// nodes
+                        </span>edges,
+                        meta_nodes,
+                        start,
+                        new_c_args.clone(),
+                    );
+                }
+                FunctionType::Primitive =&gt; {
+                    create_att_primitive(
+                        gromet, <span class="comment">// gromet for metadata
+                        </span>nodes,  <span class="comment">// nodes
+                        </span>edges,
+                        meta_nodes,
+                        start,
+                        new_c_args.clone(),
+                    );
+                }
+                <span class="kw">_ </span>=&gt; {}
             }
-            FunctionType::Primitive =&gt; {
-                create_att_primitive(
-                    gromet, <span class="comment">// gromet for metadata
-                    </span>nodes,  <span class="comment">// nodes
-                    </span>edges,
-                    meta_nodes,
-                    start,
-                    new_c_args.clone(),
-                );
-            }
-            <span class="kw">_ </span>=&gt; {}
+            box_counter += <span class="number">1</span>;
+            <span class="kw-2">*</span>start += <span class="number">1</span>;
         }
-        box_counter += <span class="number">1</span>;
-        <span class="kw-2">*</span>start += <span class="number">1</span>;
     }
     <span class="comment">// Now we perform the internal wiring of this branch
     </span>internal_wiring(

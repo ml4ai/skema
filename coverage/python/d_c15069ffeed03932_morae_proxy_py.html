@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="d_c15069ffeed03932_proxies_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.3.2">coverage.py v7.3.2</a>,
-            created at 2023-10-31 19:16 +0000
+            created at 2023-10-31 20:23 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"/>
@@ -111,9 +111,9 @@
     <p class="mis show_mis"><span class="n"><a id="t29" href="#t29">29</a></span><span class="t">    <span class="key">return</span> <span class="nam">requests</span><span class="op">.</span><span class="nam">get</span><span class="op">(</span><span class="str">f"{SKEMA_RS_ADDESS}/ping"</span><span class="op">)</span><span class="op">.</span><span class="nam">status_code</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t30" href="#t30">30</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t31" href="#t31">31</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t32" href="#t32">32</a></span><span class="t"><span class="op">@</span><span class="nam">router</span><span class="op">.</span><span class="nam">get</span><span class="op">(</span><span class="str">"/mathml/decapodes"</span><span class="op">,</span> <span class="nam">summary</span><span class="op">=</span><span class="str">"Gets Decapodes from a list of MathML strings"</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t32" href="#t32">32</a></span><span class="t"><span class="op">@</span><span class="nam">router</span><span class="op">.</span><span class="nam">post</span><span class="op">(</span><span class="str">"/mathml/decapodes"</span><span class="op">,</span> <span class="nam">summary</span><span class="op">=</span><span class="str">"Gets Decapodes from a list of MathML strings"</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t33" href="#t33">33</a></span><span class="t"><span class="key">async</span> <span class="key">def</span> <span class="nam">get_decapodes</span><span class="op">(</span><span class="nam">mathml</span><span class="op">:</span> <span class="nam">List</span><span class="op">[</span><span class="nam">str</span><span class="op">]</span><span class="op">)</span> <span class="op">-></span> <span class="nam">Dict</span><span class="op">[</span><span class="nam">Text</span><span class="op">,</span> <span class="nam">Any</span><span class="op">]</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t34" href="#t34">34</a></span><span class="t">    <span class="key">return</span> <span class="nam">requests</span><span class="op">.</span><span class="nam">get</span><span class="op">(</span><span class="str">f"{SKEMA_RS_ADDESS}/mathml/decapodes"</span><span class="op">,</span> <span class="nam">json</span><span class="op">=</span><span class="nam">mathml</span><span class="op">)</span><span class="op">.</span><span class="nam">json</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t34" href="#t34">34</a></span><span class="t">    <span class="key">return</span> <span class="nam">requests</span><span class="op">.</span><span class="nam">put</span><span class="op">(</span><span class="str">f"{SKEMA_RS_ADDESS}/mathml/decapodes"</span><span class="op">,</span> <span class="nam">json</span><span class="op">=</span><span class="nam">mathml</span><span class="op">)</span><span class="op">.</span><span class="nam">json</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
 </main>
 <footer>
     <div class="content">
@@ -123,7 +123,7 @@
             <a id="nextFileLink" class="nav" href="d_c15069ffeed03932_proxies_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.3.2">coverage.py v7.3.2</a>,
-            created at 2023-10-31 19:16 +0000
+            created at 2023-10-31 20:23 +0000
         </p>
     </div>
 </footer>
