@@ -119,7 +119,7 @@ def get_paths(yr, yr_path, month):
                 ]
             )
     end_time = time.perf_counter()
-    print(f"Finished collecting paths in {end_time - start_time} seconds")
+    print(f"Finished collecting paths in {(end_time - start_time):2f} seconds")
     return temp_files
 
 
