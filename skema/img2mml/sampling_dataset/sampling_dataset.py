@@ -219,7 +219,8 @@ def filter_paths_by_field(paths: List[str], fields: Set[str]) -> List[str]:
 
     script_dir = os.path.dirname(__file__)
     with open(
-        os.path.join(script_dir, "paper_data", "arxiv_paper_categories.json"), "r"
+        os.path.join(script_dir, "paper_data", "arxiv_2015-2018_paper_categories.json"),
+        "r",
     ) as f:
         category_dict = json.load(f)
 
