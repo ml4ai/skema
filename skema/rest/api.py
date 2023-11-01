@@ -11,6 +11,7 @@ from skema.rest import (
 )
 from skema.img2mml import eqn2mml
 from skema.skema_py import server as code2fn
+from skema.gromet.execution_engine import server as execution_engine
 from skema.program_analysis.comment_extractor import server as comment_service
 
 VERSION: str = os.environ.get("APP_VERSION", "????")
@@ -105,6 +106,11 @@ app.include_router(
     tags=["code2fn"],
 )
 
+app.include_router(
+    execution_engine.router,
+    prefix="/execution_engine",
+    tags=["execution_engine"],
+)
 app.include_router(
     morae_proxy.router,
     prefix="/morae",
