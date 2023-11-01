@@ -6,6 +6,8 @@ from typing import Dict, List
 
 import requests
 
+batch_size = 500
+
 
 def get_paper_categories(arxiv_ids: List[str]) -> Dict[str, List[str]]:
     """
@@ -18,7 +20,7 @@ def get_paper_categories(arxiv_ids: List[str]) -> Dict[str, List[str]]:
         Dict[str, List[str]]: A dictionary mapping arXiv IDs to a list of categories. The categories are strings. If an ID is not found, it will not be included in the dictionary.
     """
     base_url = "http://export.arxiv.org/api/query?id_list="
-    url = base_url + ",".join(arxiv_ids)
+    url = base_url + ",".join(arxiv_ids) + f"&max_results={batch_size}"
 
     try:
         response = requests.get(url)
@@ -84,18 +86,22 @@ def save_arxiv_categories(file_path: str, data: Dict[str, List[str]]):
     with open(file_path, "w") as f:
         json.dump(data, f, indent=4)
 
+    print(f"Saved {len(data.keys())} papers' categories to {file_path}")
+
 
 def main():
     start_time = time.perf_counter()
     script_dir = os.path.dirname(__file__)
 
-    arxiv_ids_file = os.path.join(script_dir, "paper_data/arxiv_paper_ids.json")
+    arxiv_ids_file = os.path.join(
+        script_dir, "paper_data/arxiv_2015-2018_paper_ids.json"
+    )
     final_categories_file = os.path.join(
-        script_dir, "paper_data/arxiv_paper_categories.json"
+        script_dir, "paper_data/arxiv_2015-2018_paper_categories.json"
     )
 
     arxiv_ids = load_json(arxiv_ids_file)
-    arxiv_ids = list(set(arxiv_ids))
+    arxiv_ids.sort()
 
     try:
         final_categories = load_json(final_categories_file)
@@ -103,8 +109,7 @@ def main():
         final_categories = {}
         print("No existing categories file found. Starting from scratch.")
 
-    batch_size = 10  # This is the maximum number of IDs that can be queried at once.
-
+    batches_processed = 0
     for i, start_idx in enumerate(range(0, len(arxiv_ids), batch_size)):
         print(f"Processing batch {i + 1} of {len(arxiv_ids) // batch_size + 1}")
         ids = arxiv_ids[start_idx : start_idx + batch_size]
@@ -118,27 +123,28 @@ def main():
         categories = {}
         try:
             categories = get_paper_categories(ids)
-        except:
+        except requests.exceptions.RequestException as e:
             print(
-                "Error getting categories. If this is a timeout error, you may need to wait a few minutes and try again."
+                "Error getting categories. Saving current results and will retry in 60 minutes."
             )
-            retry = (
-                input(
-                    "Enter 'y' to wait 15 minutes and retry, or 'n' to skip this batch. If you choose to skip, you can always rerun the script later and it will pick up where it left off."
-                ).lower()[0]
-                == "y"
-            )
-            if retry:
-                time.sleep(900)
+            save_arxiv_categories(final_categories_file, final_categories)
+            try:
+                time.sleep(3600)
                 categories = get_paper_categories(ids)
-            else:
-                continue
+            except requests.exceptions.RequestException as e:
+                print(
+                    "Retry Failed. Exiting script. PLease restart it later to pick up where it left off."
+                )
+                exit(1)
         final_categories.update(categories)
+        batches_processed += 1
 
-        if i > 0 and i % 10 == 0:
-            # Sleep for 5 seconds every 10 requests
-            print("Sleeping for 5 seconds...")
-            time.sleep(5)
+        if batches_processed > 0 and batches_processed % 10 == 0:
+            print(f"Number of papers processed: {len(final_categories)}. Saving...")
+            save_arxiv_categories(final_categories_file, final_categories)
+
+            print("Sleeping for 5 seconds to avoid rate limiting.")
+            time.sleep(3)
 
     print(f"Number of papers processed: {len(final_categories)}")
 
@@ -146,7 +152,6 @@ def main():
     save_arxiv_categories(final_categories_file, final_categories)
 
     end_time = time.perf_counter()
-    print("Done! Results saved to arxiv_paper_categories.json")
     print(f"Time elapsed: {end_time - start_time} seconds.")
 
 
