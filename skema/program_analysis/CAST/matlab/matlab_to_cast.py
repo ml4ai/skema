@@ -620,7 +620,6 @@ class MatlabToCast(object):
         """ return a ModelIf with comparison and body nodes. """
         # get ModelIf with body nodes
         mi = self.visit_else_clause(node)
-
         # addd comparison operator
         comp: Operator = get_first_child_by_type(node, "comparison_operator")
         mi.expr = self.visit(comp)
@@ -630,17 +629,15 @@ class MatlabToCast(object):
 
     def visit_else_clause(self, node):
         """ Return a ModelIf with body nodes only. """
-        mi = ModelIf() 
-
         # get the top level body nodes
+        mi = ModelIf()
         block = get_first_child_by_type(node, "block")
-        body_nodes = list()
         for child in block.children:
             body_node = self.visit(child)
             if body_node:
-                body_nodes.append(body_node)
-        if len(body_nodes) > 0:
-            mi.body = body_nodes
+                if not mi.body:
+                    mi.body = list()
+                mi.body.append(body_node)
 
         return mi
 
