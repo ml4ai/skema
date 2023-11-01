@@ -193,9 +193,13 @@ class TextReadingEvaluationResults(BaseModel):
     correct_extractions: int = Field(
         description="Number of extractions matched in the ground-truth annotations"
     ),
+    recall: float = Field(
+        description="How many of the GT annotations we found through extractions"
+    ),
     precision: float = Field(
-        description="Ratio of correct extractions against manual annotations"
-    )
+        description="How many of the extraction are correct according to the GT annotations"
+    ),
+    f1: float
 
 
 class AMRLinkingEvaluationResults(BaseModel):

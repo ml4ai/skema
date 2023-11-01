@@ -47,15 +47,19 @@ def link_amr(amr_type: str,
 
     # Load the extractions, that come out of the TR Proxy endpoint
     raw_extractions = json.load(text_extractions_file.file)
-    text_extractions = [AttributeCollection.from_json(o['data']) for o in raw_extractions['outputs']]
+    if 'outputs' in raw_extractions:
+        text_extractions = [AttributeCollection.from_json(o['data']) for o in raw_extractions['outputs']]
+        # Merge all the attribute collections
+        extractions = AttributeCollection(
+            attributes=list(
+                it.chain.from_iterable(o.attributes for o in text_extractions)
+            )
+        )
+    else:
+        extractions = AttributeCollection.from_json(raw_extractions)
     # text_extractions = TextReadingAnnotationsOutput(**json.load(text_extractions_file.file))
 
-    # Merge all the attribute collections
-    extractions = AttributeCollection(
-        attributes=list(
-            it.chain.from_iterable(o.attributes for o in text_extractions)
-        )
-    )
+
 
     # Link the AMR
     if amr_type == "petrinet":
