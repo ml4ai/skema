@@ -7,7 +7,7 @@ import os
 
 # MORAE etc
 SKEMA_RS_ADDESS = os.environ.get("SKEMA_RS_ADDRESS", "https://skema-rs.askem.lum.ai")
-
+SKEMA_OPENAI_KEY = os.environ.get("SKEMA_OPENAI_KEY", "YOU_FORGOT_TO_SET_SKEMA_OPENAI_KEY")
 
 # MathJAX service
 SKEMA_MATHJAX_PROTOCOL = os.environ.get("SKEMA_MATHJAX_PROTOCOL", "http://")
@@ -24,4 +24,3 @@ MIT_TR_ADDRESS = os.environ.get("MIT_TR_ADDRESS", "http://54.227.237.7")
 SKEMA_TR_ADDRESS = os.environ.get("SKEMA_TR_ADDRESS", "http://hopper.sista.arizona.edu")
 OPENAI_KEY = os.environ.get("OPENAI_KEY", "YOU_FORGOT_TO_SET_OPENAI_KEY")
 COSMOS_ADDRESS = os.environ.get("COSMOS_ADDRESS",  "https://xdd.wisc.edu/cosmos_service")
-

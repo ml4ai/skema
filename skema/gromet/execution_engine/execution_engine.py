@@ -2,7 +2,9 @@ import yaml
 import argparse
 import asyncio
 import subprocess
-
+import json
+import asyncio
+import traceback
 from ast import literal_eval
 from pathlib import Path
 from typing import Any, List, Dict
@@ -14,11 +16,12 @@ from skema.program_analysis.CAST.pythonAST.builtin_map import retrieve_operator
 from skema.program_analysis.single_file_ingester import process_file
 from skema.gromet.execution_engine.execute import execute_primitive
 
-# TODO: Broken import: from skema.rest.workflows import code_snippets_to_pn_amr
+from skema.rest.workflows import code_snippets_to_pn_amr
 from skema.skema_py.server import System
 from skema.gromet.execution_engine.query_runner import QueryRunner
 from skema.gromet.execution_engine.symbol_table import SymbolTable
 from skema.utils.fold import dictionary_to_gromet_json, del_nulls
+from skema.rest.utils import fn_preprocessor
 
 SKEMA_BIN = Path(__file__).resolve().parents[2] / "skema-rs" / "skema" / "src" / "bin"
 
@@ -48,17 +51,49 @@ class ExecutionEngine:
         # Upload source to Memgraph instance
         self.upload_source()
 
+    ''' NOTE: Currently we are assuming the amr will be provided seperatly
+    def generate_amr(self, source_path: str):
+        """Generate AMR for the source file"""
+        # Generate system from code
+        system = System(
+            files=[Path(source_path).name],
+            blobs=[Path(source_path).read_text()]
+        )
+
+        amr = asyncio.run(code_snippets_to_pn_amr(system))
+        print(amr.body)
+        exit()
+    '''
+
+    def enrich_amr(self, amr: Dict) -> Dict:
+        """Enrich the AMR for a source file with initial parameter values"""
+
+        parameters = amr["semantics"]["ode"]["parameters"]
+        # For each parameter, see if we have a matching value
+        for index, parameter in enumerate(parameters):
+            value = self.symbol_table.get_symbol(parameter["name"])
+            if value:
+                try:
+                    parameters[index]["value"] = value["history"][0].item()
+                except:
+                    continue
+            else:
+                print(
+                    f"WARNING: Could not extract value for parameter {parameter['name']}"
+                )
+
+        return amr
+
     def upload_source(self):
         """Ingest source file and upload Gromet to Memgraph"""
 
         # Currently, the Gromet ingester writes the output JSON to the directory where the script is run from.
         # Instead, we want to store it alongside the source so that we can upload it to Memgraph.
         gromet_collection = process_file(self.source_path)
+        gromet_collection = fn_preprocessor(gromet_collection.to_dict())[0]
         gromet_name = f"{self.filename}--Gromet-FN-auto.json"
-        gromet_path = Path(self.source_path).parent / gromet_name
-        gromet_path.write_text(
-            dictionary_to_gromet_json(del_nulls(gromet_collection.to_dict()))
-        )
+        gromet_path = Path(self.source_path).resolve().parent / gromet_name
+        gromet_path.write_text(dictionary_to_gromet_json(del_nulls(gromet_collection)))
 
         # The Memgraph database state should be reset before running any queries.
         # Unexpected nodes/edges can cause issues with execution.
@@ -93,21 +128,27 @@ class ExecutionEngine:
         return self.symbol_table.get_initial_values()
 
     def visit(self, node):
+        """Top-level visitor function"""
         node_types = node._labels
-        if "Module" in node_types:
-            self.visit_module(node)
-        if "Expression" in node_types:
-            self.visit_expression(node)
-        if "Function" in node_types:
-            self.visit_function(node)
-        if "Opo" in node_types:
-            return self.visit_opo(node)
-        if "Opi" in node_types:
-            return self.visit_opi(node)
-        if "Literal" in node_types:
-            return self.visit_literal(node)
-        if "Primitive" in node_types:
-            return self.visit_primitive(node)
+        try:
+            if "Module" in node_types:
+                self.visit_module(node)
+            if "Expression" in node_types:
+                self.visit_expression(node)
+            if "Function" in node_types:
+                self.visit_function(node)
+            if "Opo" in node_types:
+                return self.visit_opo(node)
+            if "Opi" in node_types:
+                return self.visit_opi(node)
+            if "Literal" in node_types:
+                return self.visit_literal(node)
+            if "Primitive" in node_types:
+                return self.visit_primitive(node)
+        except Exception as e:
+            print(f"Visitor for node {node} failed to execute.")
+            print(e)
+            print(traceback.format_exc())
 
     def visit_module(self, node):
         """Visitor for top-level module"""
@@ -132,13 +173,19 @@ class ExecutionEngine:
         # TODO: Does an expression always correspond to an assingment?
         symbol = self.visit(left_hand_side[0])
 
-        # The right hand side can be either a LiteralValue, an Expression, or a Primitive
-        # A Literal
-        index = {"Primitive": 1, "Expression": 1, "Literal": 2}
+        # The right hand side can be either a LiteralValue, an Expression, an Opi, or a Primitive
+        index = {"Primitive": 1, "Expression": 1, "Opi": 1, "Literal": 2}
         right_hand_side = sorted(
             right_hand_side, key=lambda node: index[list(node._labels)[0]]
         )
         value = self.visit(right_hand_side[0])
+
+        if ExecutionEngine.is_node_type(right_hand_side[0], "Opi"):
+            pass
+
+        if "Opi" in right_hand_side[0]._labels:
+            value = self.symbol_table.get_symbol(value)["current_value"]
+
         if not self.symbol_table.get_symbol(symbol):
             self.symbol_table.add_symbol(symbol, value, None)
         else:
@@ -165,6 +212,14 @@ class ExecutionEngine:
 
         return node.name
 
+    def _visit_opo_value(self, node):
+        """Visit the :Opo and return the value rather than the name"""
+        return self.symbol_table.get_symbol(node.name)
+
+    def _visit_opi_value(self, node):
+        """Visit the :Opi and return the value rather than the name"""
+        return self.symbol_table.get_symbol(node.name)
+
     def visit_literal(self, node):
         def create_dummy_node(value: Dict):
             """Create a dummy gqlalchemy node so that we can pass a LiteralValue to a visitor."""
@@ -189,7 +244,7 @@ class ExecutionEngine:
         if value_type == "Integer":
             return torch.tensor(int(value), dtype=torch.int)
         elif value_type == "AbstractFloat":
-            return torch.tensor(float(value), dtype=torch.float)
+            return torch.tensor(float(value), dtype=torch.float64)
         elif value_type == "Complex":
             print(
                 "WARNING: Execution for type Complex not support and will be skipped."
@@ -210,6 +265,17 @@ class ExecutionEngine:
         """Visitor for :Primitive node type"""
         node_id = node._id
 
+        """      
+        input_nodes = [input for input in self.query_runner("primitive_operands", id=node_id)]
+        inputs = []
+        for input in input_nodes:
+            if ExecutionEngine.is_node_type(input, "Opi"):
+                value = self._visit_opi_value(input)
+            else:
+                value = self.visit(input)
+            inputs.append(value)
+        """
+
         # Some inputs may be symbol names, so we need to access the current value from the symbol map
         inputs = [
             self.visit(input)
@@ -224,6 +290,11 @@ class ExecutionEngine:
 
         primative = retrieve_operator(node.name)
         return execute(primative, inputs)
+
+    @staticmethod
+    def is_node_type(node, node_type: str):
+        """Helper function for checking if a node matches a given type"""
+        return node_type in node._labels
 
 
 if __name__ == "__main__":
@@ -241,8 +312,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     engine = ExecutionEngine(args.host, args.port, args.source_path)
-    print(engine.parameter_extraction())
 
+    print(engine.parameter_extraction())
     """ TODO: New arguments to add with function execution support
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument("--main", action="store_true", help="Extract parameters from the main module")
