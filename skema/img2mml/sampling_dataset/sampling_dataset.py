@@ -167,6 +167,11 @@ def filter_paths_by_field(paths: list, fields: set):
         arxiv_id = path.split("_")[2]
         arxvid_id_list.append(arxiv_id)
 
+    with open("arxiv_2016-2018_paper_ids.json", "w") as f:
+        json.dump(arxvid_id_list, f, indent=4)
+
+    exit(0)
+
     script_dir = os.path.dirname(__file__)
     with open(
         os.path.join(script_dir, "paper_data", "arxiv_paper_categories.json"), "r"
@@ -300,17 +305,22 @@ def main():
     if config["sample_entire_year"]:
         years = [yr.strip() for yr in config["years"].split(",")]
 
+        # Prepare batches for multiprocessing
+        batches = []
         for yr in years:
             yr_path = os.path.join(root, yr)
+            cur_year_months = [f"{yr[2:]}{m:02}" for m in range(1, 13)]
+            cur_year_batches = [(yr, yr_path, month) for month in cur_year_months]
+            batches.extend(cur_year_batches)
 
-            with mp.Pool(config["num_cpus"]) as pool:
-                results = [
-                    pool.apply_async(get_paths, args=(yr, yr_path, month))
-                    for month in [f"{yr[2:]}{m:02}" for m in range(1, 13)]
-                ]
+        with mp.Pool(config["num_cpus"]) as pool:
+            results = [
+                pool.apply_async(get_paths, args=(yr, yr_path, month))
+                for yr, yr_path, month in batches
+            ]
 
-                for r in results:
-                    all_paths.extend(r.get())
+            for r in results:
+                all_paths.extend(r.get())
 
     elif config["sample_from_months"]:
         months = [month.strip() for month in config["months"].split(",")]
