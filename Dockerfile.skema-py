@@ -12,11 +12,16 @@ RUN apt-get update &&\
         build-essential \
         graphviz \
         libgraphviz-dev \
-        python3-venv 
+        python3-venv \
+        gnupg \
+        ca-certificates \
+        curl
 
 # Node needed for img2mml
-RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - &&\
-apt-get install -y nodejs=18.17.0-1nodesource1
+RUN NODE_MAJOR=18 && echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" | sudo tee /etc/apt/sources.list.d/nodesource.list
+RUN apt-get update -y && sudo apt-get install -y nodejs -y
+#RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - &&\
+#apt-get install -y nodejs=18.17.0-1nodesource1
 
 # The two commands below are to reduce the size of the Docker image
 RUN apt-get clean &&\
