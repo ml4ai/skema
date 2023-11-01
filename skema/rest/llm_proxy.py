@@ -37,7 +37,7 @@ class Dynamics(BaseModel):
         " get a line span of the dynamics back."
     ),
 )
-async def get_lines_of_model(zip_file: UploadFile = File()) -> LineSpan:
+async def get_lines_of_model(zip_file: UploadFile = File()) -> Dynamics:
     """
     Endpoint for generating a line span containing the dynamics from a zip archive. Currently
     it only expects there to be one python file in the zip. There can be other files, such as a
