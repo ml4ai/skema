@@ -302,15 +302,28 @@ def main():
 
         for yr in years:
             yr_path = os.path.join(root, yr)
-            for month in [f"{yr[2:]}{m:02}" for m in range(1, 13)]:
-                all_paths.extend(get_paths(yr, yr_path, month))
+
+            with mp.Pool(config["num_cpus"]) as pool:
+                results = [
+                    pool.apply_async(get_paths, args=(yr, yr_path, month))
+                    for month in [f"{yr[2:]}{m:02}" for m in range(1, 13)]
+                ]
+
+                for r in results:
+                    all_paths.extend(r.get())
+
     elif config["sample_from_months"]:
         months = [month.strip() for month in config["months"].split(",")]
+        corresponding_years = [f"20{month[:2]}" for month in months]
 
-        for month in months:
-            yr = f"20{month[:2]}"
-            yr_path = os.path.join(root, yr)
-            all_paths.extend(get_paths(yr, yr_path, month))
+        with mp.Pool(config["num_cpus"]) as pool:
+            results = [
+                pool.apply_async(get_paths, args=(yr, os.path.join(root, yr), month))
+                for yr, month in zip(corresponding_years, months)
+            ]
+
+            for r in results:
+                all_paths.extend(r.get())
 
     # filter paths by fields if fields are provided in config
     all_paths = filter_paths_by_field(all_paths, fields) if fields else all_paths
