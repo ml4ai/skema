@@ -35,7 +35,7 @@ class EnrichmentReqest(BaseModel):
         example="source.py"
     )
 
-@router.post("/amr-enrichment", summary="Given an amr and source code, return an enriched amr with parameter values filled in.")
+@router.post("/amr-enrichment", summary="Given an amr and source code, return an enriched amr with parameter values filled in.", response_model=Dict)
 def amr_enrichment(request: EnrichmentReqest):
     """
     Endpoint for enriching amr with parameter values.
