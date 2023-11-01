@@ -585,6 +585,7 @@
 <a href="#585" id="585">585</a>
 <a href="#586" id="586">586</a>
 <a href="#587" id="587">587</a>
+<a href="#588" id="588">588</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! This module contains parsers that perform some amount of preliminary domain-specific
 //! interpretation of presentation MathML (e.g., globbing S(t) to an identifier S of type
 //! &#39;function&#39;). This is in contrast to the `generic_mathml.rs` module that contains parsers that
@@ -1018,12 +1019,13 @@
         ws(delimited(
             tag(<span class="string">&quot;&lt;mo&gt;|&lt;/mo&gt;&quot;</span>),
             tuple((
-                math_expression,
+                <span class="comment">//math_expression,
+                </span>map(many0(math_expression), |z| Mrow(z)),
                 preceded(tag(<span class="string">&quot;&lt;msup&gt;&lt;mo&gt;|&lt;/mo&gt;&quot;</span>), math_expression),
             )),
             tag(<span class="string">&quot;&lt;/msup&gt;&quot;</span>),
         )),
-        |(x, y)| MathExpression::AbsoluteSup(Box::new(x), Box::new(y)),
+        |(x, y)| MathExpression::AbsoluteSup(Box::new(MathExpression::Mrow(x)), Box::new(y)),
     ))(input)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((s, sup))
 }

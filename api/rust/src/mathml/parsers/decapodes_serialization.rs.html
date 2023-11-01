@@ -521,13 +521,14 @@
 <a href="#521" id="521">521</a>
 <a href="#522" id="522">522</a>
 <a href="#523" id="523">523</a>
+<a href="#524" id="524">524</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::ast::{
     operator::{Derivative, Operator},
     MathExpression,
 };
 <span class="kw">use </span><span class="kw">crate</span>::parsers::math_expression_tree::MathExpressionTree;
-<span class="kw">use </span>utoipa::ToSchema;
 <span class="kw">use </span>serde::{Deserialize, Serialize};
+<span class="kw">use </span>utoipa::ToSchema;
 
 <span class="attr">#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
 </span><span class="kw">enum </span>Type {
@@ -598,7 +599,7 @@
 
 <span class="attr">#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
 </span><span class="kw">pub struct </span>DecapodesCollection {
-    <span class="kw">pub </span>decapodes: Vec&lt;WiringDiagram&gt;
+    <span class="kw">pub </span>decapodes: Vec&lt;WiringDiagram&gt;,
 }
 
 <span class="kw">pub fn </span>to_decapodes_serialization(
@@ -994,6 +995,7 @@
     &quot;</span>;
     <span class="kw">let </span>expression = input.parse::&lt;MathExpressionTree&gt;().unwrap();
     <span class="kw">let </span>s_exp = expression.to_string();
+    <span class="macro">println!</span>(<span class="string">&quot;s_exp={:?}&quot;</span>, s_exp);
     <span class="kw">let </span>wiring_diagram = to_wiring_diagram(<span class="kw-2">&amp;</span>expression);
     <span class="kw">let </span>json = to_decapodes_json(wiring_diagram);
     <span class="macro">assert_eq!</span>(json, <span class="string">&quot;{\&quot;Var\&quot;:[{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;mult_1\&quot;},{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;mult_2\&quot;},{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;•1\&quot;},{\&quot;type\&quot;:\&quot;Literal\&quot;,\&quot;name\&quot;:\&quot;2\&quot;},{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;sum_1\&quot;},{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;n\&quot;},{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;A\&quot;},{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;•2\&quot;},{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;mult_3\&quot;},{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;ρ\&quot;},{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;g\&quot;},{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;Γ\&quot;}],\&quot;Op1\&quot;:[],\&quot;Op2\&quot;:[{\&quot;proj1\&quot;:4,\&quot;proj2\&quot;:5,\&quot;res\&quot;:3,\&quot;op2\&quot;:\&quot;/\&quot;},{\&quot;proj1\&quot;:3,\&quot;proj2\&quot;:7,\&quot;res\&quot;:2,\&quot;op2\&quot;:\&quot;*\&quot;},{\&quot;proj1\&quot;:10,\&quot;proj2\&quot;:11,\&quot;res\&quot;:9,\&quot;op2\&quot;:\&quot;*\&quot;},{\&quot;proj1\&quot;:9,\&quot;proj2\&quot;:6,\&quot;res\&quot;:8,\&quot;op2\&quot;:\&quot;^\&quot;},{\&quot;proj1\&quot;:2,\&quot;proj2\&quot;:8,\&quot;res\&quot;:1,\&quot;op2\&quot;:\&quot;*\&quot;}],\&quot;Σ\&quot;:[{\&quot;sum\&quot;:5}],\&quot;Summand\&quot;:[{\&quot;summand\&quot;:6,\&quot;summation\&quot;:1},{\&quot;summand\&quot;:4,\&quot;summation\&quot;:1}]}&quot;</span>);
@@ -1010,7 +1012,7 @@
         &lt;mo&gt;(&lt;/mo&gt;
         &lt;mi&gt;Γ&lt;/mi&gt;
         &lt;msup&gt;&lt;mi&gt;H&lt;/mi&gt;&lt;mrow&gt;&lt;mi&gt;n&lt;/mi&gt;&lt;mo&gt;+&lt;/mo&gt;&lt;mn&gt;2&lt;/mn&gt;&lt;/mrow&gt;&lt;/msup&gt;
-        &lt;mo&gt;|&lt;/mo&gt;&lt;mrow&gt;&lt;mo&gt;∇&lt;/mo&gt;&lt;mi&gt;H&lt;/mi&gt;&lt;/mrow&gt;
+        &lt;mo&gt;|&lt;/mo&gt;&lt;mo&gt;∇&lt;/mo&gt;&lt;mi&gt;H&lt;/mi&gt;
         &lt;msup&gt;&lt;mo&gt;|&lt;/mo&gt;
         &lt;mrow&gt;&lt;mi&gt;n&lt;/mi&gt;&lt;mo&gt;−&lt;/mo&gt;&lt;mn&gt;1&lt;/mn&gt;&lt;/mrow&gt;&lt;/msup&gt;
         &lt;mo&gt;∇&lt;/mo&gt;&lt;mi&gt;H&lt;/mi&gt;
