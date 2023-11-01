@@ -889,7 +889,7 @@
 }
 
 <span class="kw">pub fn </span>grad(input: Span) -&gt; IResult&lt;Operator&gt; {
-    <span class="kw">let </span>(s, op) = value(Operator::Grad, alt((ws(tag(<span class="string">&quot;𝛁&quot;</span>)), ws(tag(<span class="string">&quot;&amp;#x2207;&quot;</span>)))))(input)<span class="question-mark">?</span>;
+    <span class="kw">let </span>(s, op) = value(Operator::Grad, alt((ws(tag(<span class="string">&quot;∇&quot;</span>)), ws(tag(<span class="string">&quot;&amp;#x2207;&quot;</span>)))))(input)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((s, op))
 }
 

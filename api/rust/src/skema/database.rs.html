@@ -5447,11 +5447,6 @@
 <a href="#5447" id="5447">5447</a>
 <a href="#5448" id="5448">5448</a>
 <a href="#5449" id="5449">5449</a>
-<a href="#5450" id="5450">5450</a>
-<a href="#5451" id="5451">5451</a>
-<a href="#5452" id="5452">5452</a>
-<a href="#5453" id="5453">5453</a>
-<a href="#5454" id="5454">5454</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Interface to the graph database we are using for persisting GroMEt objects and performing
 //! queries on them. We currently use MemgraphDB, an in-memory graph database.
 
@@ -7068,7 +7063,10 @@ There being a second function call of the same function which contains an expres
                             );
                         }
                         <span class="kw">_ </span>=&gt; {
-                            <span class="macro">println!</span>(<span class="string">&quot;Missing a box in a function! {:?}&quot;</span>, att_sub_box.function_type.clone());
+                            <span class="macro">println!</span>(
+                                <span class="string">&quot;Missing a box in a function! {:?}&quot;</span>,
+                                att_sub_box.function_type.clone()
+                            );
                         }
                     }
                     box_counter += <span class="number">1</span>;
@@ -7114,8 +7112,8 @@ There being a second function call of the same function which contains an expres
         <span class="kw">for </span>_cond <span class="kw">in </span>att_box.bc.as_ref().unwrap().iter() {
             <span class="comment">// now lets check for and setup any conditionals at this level
             </span>create_conditional(
-                gromet,     <span class="comment">// gromet for metadata
-                </span>nodes, <span class="comment">// nodes
+                gromet, <span class="comment">// gromet for metadata
+                </span>nodes,  <span class="comment">// nodes
                 </span>edges,
                 meta_nodes,
                 start,
@@ -7135,8 +7133,8 @@ There being a second function call of the same function which contains an expres
             {
                 <span class="comment">// if there is not a pre_condition then it is a while loop
                 </span>create_while_loop(
-                    gromet,     <span class="comment">// gromet for metadata
-                    </span>nodes, <span class="comment">// nodes
+                    gromet, <span class="comment">// gromet for metadata
+                    </span>nodes,  <span class="comment">// nodes
                     </span>edges,
                     meta_nodes,
                     start,
@@ -7146,8 +7144,8 @@ There being a second function call of the same function which contains an expres
             } <span class="kw">else </span>{
                 <span class="comment">// if there is pre condition then it is a for loop
                 </span>create_for_loop(
-                    gromet,     <span class="comment">// gromet for metadata
-                    </span>nodes, <span class="comment">// nodes
+                    gromet, <span class="comment">// gromet for metadata
+                    </span>nodes,  <span class="comment">// nodes
                     </span>edges,
                     meta_nodes,
                     start,
@@ -7322,8 +7320,13 @@ There being a second function call of the same function which contains an expres
         .unwrap();
     <span class="kw">let </span><span class="kw-2">mut </span>body_else_box = body_if_box.clone();
     <span class="kw">let </span><span class="kw-2">mut </span>else_exists = <span class="bool-val">false</span>;
-    <span class="kw">if </span>function_net.bc.as_ref().unwrap()[cond_counter <span class="kw">as </span>usize].body_else.is_some() {
-        body_else_box = function_net.bc.as_ref().unwrap()[cond_counter <span class="kw">as </span>usize].body_else.unwrap();
+    <span class="kw">if </span>function_net.bc.as_ref().unwrap()[cond_counter <span class="kw">as </span>usize]
+        .body_else
+        .is_some()
+    {
+        body_else_box = function_net.bc.as_ref().unwrap()[cond_counter <span class="kw">as </span>usize]
+            .body_else
+            .unwrap();
         else_exists = <span class="bool-val">true</span>;
     }
 
@@ -7345,9 +7348,7 @@ There being a second function call of the same function which contains an expres
     <span class="kw-2">*</span>start += <span class="number">1</span>;
 
     <span class="kw">for </span>edge <span class="kw">in </span>edges.iter_mut() {
-        <span class="kw">if </span>edge.src == new_c_args.parent_node.node_id.clone()
-            &amp;&amp; edge.e_type == <span class="kw-2">*</span><span class="string">&quot;Contains&quot;
-        </span>{
+        <span class="kw">if </span>edge.src == new_c_args.parent_node.node_id.clone() &amp;&amp; edge.e_type == <span class="kw-2">*</span><span class="string">&quot;Contains&quot; </span>{
             edge.e_type = <span class="string">&quot;Condition&quot;</span>.to_string();
         }
     }
@@ -7359,9 +7360,7 @@ There being a second function call of the same function which contains an expres
     <span class="kw-2">*</span>start += <span class="number">1</span>;
 
     <span class="kw">for </span>edge <span class="kw">in </span>edges.iter_mut() {
-        <span class="kw">if </span>edge.src == new_c_args.parent_node.node_id.clone()
-            &amp;&amp; edge.e_type == <span class="kw-2">*</span><span class="string">&quot;Contains&quot;
-        </span>{
+        <span class="kw">if </span>edge.src == new_c_args.parent_node.node_id.clone() &amp;&amp; edge.e_type == <span class="kw-2">*</span><span class="string">&quot;Contains&quot; </span>{
             edge.e_type = <span class="string">&quot;if_body&quot;</span>.to_string();
         }
     }
@@ -7373,9 +7372,7 @@ There being a second function call of the same function which contains an expres
     <span class="kw-2">*</span>start += <span class="number">1</span>;
 
     <span class="kw">for </span>edge <span class="kw">in </span>edges.iter_mut() {
-        <span class="kw">if </span>edge.src == new_c_args.parent_node.node_id.clone()
-            &amp;&amp; edge.e_type == <span class="kw-2">*</span><span class="string">&quot;Contains&quot;
-        </span>{
+        <span class="kw">if </span>edge.src == new_c_args.parent_node.node_id.clone() &amp;&amp; edge.e_type == <span class="kw-2">*</span><span class="string">&quot;Contains&quot; </span>{
             edge.e_type = <span class="string">&quot;else_body&quot;</span>.to_string();
         }
     }
@@ -7383,78 +7380,83 @@ There being a second function call of the same function which contains an expres
     <span class="comment">// Now we start to wire these objects together there are two unique wire types and implicit wires that need to be made
     </span><span class="kw">if </span>function_net.wfc.is_some() {
         <span class="kw">for </span>wire <span class="kw">in </span>function_net.wfc.as_ref().unwrap().iter() {
-        <span class="comment">// collect info to identify the opi src node
-        </span><span class="kw">let </span>src_idx = wire.src; <span class="comment">// port index
-        </span><span class="kw">let </span>src_att = att_idx; <span class="comment">// attribute index of submodule (also opi contents value)
-        </span><span class="kw">let </span>src_nbox = bf_counter; <span class="comment">// nbox value of src opi
-        </span><span class="kw">let </span>src_pic_idx = src_idx;
+            <span class="comment">// collect info to identify the opi src node
+            </span><span class="kw">let </span>src_idx = wire.src; <span class="comment">// port index
+            </span><span class="kw">let </span>src_att = att_idx; <span class="comment">// attribute index of submodule (also opi contents value)
+            </span><span class="kw">let </span>src_nbox = bf_counter; <span class="comment">// nbox value of src opi
+            </span><span class="kw">let </span>src_pic_idx = src_idx;
 
-        <span class="kw">let </span>tgt_idx = wire.tgt; <span class="comment">// port index
-        </span><span class="kw">let </span>tgt_pof = function_net.pof.as_ref().unwrap()[(tgt_idx - <span class="number">1</span>) <span class="kw">as </span>usize].clone(); <span class="comment">// tgt port
-        </span><span class="kw">let </span>tgt_opo_idx = tgt_pof.id.unwrap(); <span class="comment">// index of tgt port in opo list in tgt sub module (also opo node out_idx value)
-        </span><span class="kw">let </span>tgt_box = tgt_pof.r#box; <span class="comment">// tgt sub module box number
+            <span class="kw">let </span>tgt_idx = wire.tgt; <span class="comment">// port index
+            </span><span class="kw">let </span>tgt_pof = function_net.pof.as_ref().unwrap()[(tgt_idx - <span class="number">1</span>) <span class="kw">as </span>usize].clone(); <span class="comment">// tgt port
+            </span><span class="kw">let </span>tgt_opo_idx = tgt_pof.id.unwrap(); <span class="comment">// index of tgt port in opo list in tgt sub module (also opo node out_idx value)
+            </span><span class="kw">let </span>tgt_box = tgt_pof.r#box; <span class="comment">// tgt sub module box number
 
-        </span><span class="kw">let </span><span class="kw-2">mut </span>tgt_att = src_att;
-        <span class="kw">if </span>function_net.bf.as_ref().unwrap()[(tgt_box - <span class="number">1</span>) <span class="kw">as </span>usize].contents.is_some() {
-            tgt_att = function_net.bf.as_ref().unwrap()[(tgt_box - <span class="number">1</span>) <span class="kw">as </span>usize].contents.unwrap() <span class="kw">as </span>usize; <span class="comment">// attribute index of submodule (also opo contents value)
-        </span>}
-        <span class="kw">let </span>tgt_nbox = tgt_box; <span class="comment">// nbox value of tgt opo
-                                // collect information to identify the opo src node
+            </span><span class="kw">let </span><span class="kw-2">mut </span>tgt_att = src_att;
+            <span class="kw">if </span>function_net.bf.as_ref().unwrap()[(tgt_box - <span class="number">1</span>) <span class="kw">as </span>usize]
+                .contents
+                .is_some()
+            {
+                tgt_att = function_net.bf.as_ref().unwrap()[(tgt_box - <span class="number">1</span>) <span class="kw">as </span>usize]
+                    .contents
+                    .unwrap() <span class="kw">as </span>usize; <span class="comment">// attribute index of submodule (also opo contents value)
+            </span>}
+            <span class="kw">let </span>tgt_nbox = tgt_box; <span class="comment">// nbox value of tgt opo
+                                    // collect information to identify the opo src node
 
-        // now to construct the wire
-        </span><span class="kw">let </span><span class="kw-2">mut </span>wfc_src_tgt: Vec&lt;String&gt; = <span class="macro">vec!</span>[];
-        <span class="comment">// find the src node
-        </span><span class="kw">for </span>node <span class="kw">in </span>nodes.iter() {
-            <span class="comment">// make sure in correct box
-            </span><span class="kw">if </span>src_nbox == node.nbox {
-                <span class="comment">// make sure only looking in current attribute nodes for srcs and tgts
-                </span><span class="kw">if </span>src_att == node.contents {
-                    <span class="comment">// only opo&#39;s
-                    </span><span class="kw">if </span>node.n_type == <span class="string">&quot;Pic&quot; </span>{
-                        <span class="comment">// iterate through port to check for tgt
-                        </span><span class="kw">for </span>p <span class="kw">in </span>node.in_indx.as_ref().unwrap().iter() {
-                            <span class="comment">// push the src first, being pif
-                            </span><span class="kw">if </span>(src_pic_idx <span class="kw">as </span>u32) == <span class="kw-2">*</span>p {
-                                wfc_src_tgt.push(node.node_id.clone());
+            // now to construct the wire
+            </span><span class="kw">let </span><span class="kw-2">mut </span>wfc_src_tgt: Vec&lt;String&gt; = <span class="macro">vec!</span>[];
+            <span class="comment">// find the src node
+            </span><span class="kw">for </span>node <span class="kw">in </span>nodes.iter() {
+                <span class="comment">// make sure in correct box
+                </span><span class="kw">if </span>src_nbox == node.nbox {
+                    <span class="comment">// make sure only looking in current attribute nodes for srcs and tgts
+                    </span><span class="kw">if </span>src_att == node.contents {
+                        <span class="comment">// only opo&#39;s
+                        </span><span class="kw">if </span>node.n_type == <span class="string">&quot;Pic&quot; </span>{
+                            <span class="comment">// iterate through port to check for tgt
+                            </span><span class="kw">for </span>p <span class="kw">in </span>node.in_indx.as_ref().unwrap().iter() {
+                                <span class="comment">// push the src first, being pif
+                                </span><span class="kw">if </span>(src_pic_idx <span class="kw">as </span>u32) == <span class="kw-2">*</span>p {
+                                    wfc_src_tgt.push(node.node_id.clone());
+                                }
                             }
                         }
                     }
                 }
             }
-        }
-        <span class="kw">for </span>node <span class="kw">in </span>nodes.iter() {
-            <span class="comment">// make sure in correct box
-            </span><span class="kw">if </span>tgt_nbox == node.nbox <span class="kw">as </span>u8 {
-                <span class="comment">// make sure only looking in current attribute nodes for srcs and tgts
-                </span><span class="kw">if </span>tgt_att <span class="kw">as </span>u32 == node.contents <span class="kw">as </span>u32 {
-                    <span class="comment">// only opo&#39;s
-                    </span><span class="kw">if </span>node.n_type == <span class="string">&quot;Opo&quot; </span>{
-                        <span class="comment">// iterate through port to check for tgt
-                        </span><span class="kw">for </span>p <span class="kw">in </span>node.out_idx.as_ref().unwrap().iter() {
-                            <span class="comment">// push the src first, being pif
-                            </span><span class="kw">if </span>(tgt_opo_idx <span class="kw">as </span>u32) == <span class="kw-2">*</span>p {
-                                wfc_src_tgt.push(node.node_id.clone());
+            <span class="kw">for </span>node <span class="kw">in </span>nodes.iter() {
+                <span class="comment">// make sure in correct box
+                </span><span class="kw">if </span>tgt_nbox == node.nbox <span class="kw">as </span>u8 {
+                    <span class="comment">// make sure only looking in current attribute nodes for srcs and tgts
+                    </span><span class="kw">if </span>tgt_att <span class="kw">as </span>u32 == node.contents <span class="kw">as </span>u32 {
+                        <span class="comment">// only opo&#39;s
+                        </span><span class="kw">if </span>node.n_type == <span class="string">&quot;Opo&quot; </span>{
+                            <span class="comment">// iterate through port to check for tgt
+                            </span><span class="kw">for </span>p <span class="kw">in </span>node.out_idx.as_ref().unwrap().iter() {
+                                <span class="comment">// push the src first, being pif
+                                </span><span class="kw">if </span>(tgt_opo_idx <span class="kw">as </span>u32) == <span class="kw-2">*</span>p {
+                                    wfc_src_tgt.push(node.node_id.clone());
+                                }
                             }
                         }
                     }
                 }
             }
-        }
-        <span class="kw">if </span>wfc_src_tgt.len() == <span class="number">2 </span>{
-            <span class="kw">let </span>e8 = Edge {
-                src: wfc_src_tgt[<span class="number">0</span>].clone(),
-                tgt: wfc_src_tgt[<span class="number">1</span>].clone(),
-                e_type: String::from(<span class="string">&quot;Wire&quot;</span>),
-                prop: <span class="prelude-val">None</span>,
-            };
-            edges.push(e8);
-        }
+            <span class="kw">if </span>wfc_src_tgt.len() == <span class="number">2 </span>{
+                <span class="kw">let </span>e8 = Edge {
+                    src: wfc_src_tgt[<span class="number">0</span>].clone(),
+                    tgt: wfc_src_tgt[<span class="number">1</span>].clone(),
+                    e_type: String::from(<span class="string">&quot;Wire&quot;</span>),
+                    prop: <span class="prelude-val">None</span>,
+                };
+                edges.push(e8);
+            }
         }
     }
 
     <span class="comment">// now to make the implicit wires that go from pics -&gt; /opis and /opos -&gt; pocs.
     // every opi in predicate, if and else statements gets mapped to a pic of the same id
-    // to determine the opi we need, att_idx, bf_counter, and id 
+    // to determine the opi we need, att_idx, bf_counter, and id
     // to determine the pic we only need the id
     </span><span class="kw">for </span>opi <span class="kw">in </span>cond_att_box.opi.unwrap().iter() {
         <span class="kw">let </span>src_id = opi.id.unwrap();
@@ -7552,56 +7554,56 @@ There being a second function call of the same function which contains an expres
     }
     <span class="kw">if </span>else_exists {
         <span class="kw">for </span>opi <span class="kw">in </span>else_att_box.opi.unwrap().iter() {
-        <span class="kw">let </span>src_id = opi.id.unwrap();
-        <span class="kw">let </span>tgt_id = src_id;
-        <span class="kw">let </span>tgt_bf_counter = <span class="number">0</span>; <span class="comment">// because of how we have defined it
-        </span><span class="kw">let </span>tgt_att_idx = body_else_box <span class="kw">as </span>usize;
+            <span class="kw">let </span>src_id = opi.id.unwrap();
+            <span class="kw">let </span>tgt_id = src_id;
+            <span class="kw">let </span>tgt_bf_counter = <span class="number">0</span>; <span class="comment">// because of how we have defined it
+            </span><span class="kw">let </span>tgt_att_idx = body_else_box <span class="kw">as </span>usize;
 
-        <span class="kw">let </span><span class="kw-2">mut </span>else_src_tgt: Vec&lt;String&gt; = <span class="macro">vec!</span>[];
+            <span class="kw">let </span><span class="kw-2">mut </span>else_src_tgt: Vec&lt;String&gt; = <span class="macro">vec!</span>[];
 
-        <span class="kw">for </span>node <span class="kw">in </span>nodes.iter() {
-            <span class="kw">if </span>node.n_type == <span class="string">&quot;Pic&quot; </span>{
-                <span class="comment">// iterate through port to check for tgt
-                </span><span class="kw">for </span>p <span class="kw">in </span>node.in_indx.as_ref().unwrap().iter() {
-                    <span class="comment">// push the src first, being pif
-                    </span><span class="kw">if </span>(src_id <span class="kw">as </span>u32) == <span class="kw-2">*</span>p {
-                        else_src_tgt.push(node.node_id.clone());
+            <span class="kw">for </span>node <span class="kw">in </span>nodes.iter() {
+                <span class="kw">if </span>node.n_type == <span class="string">&quot;Pic&quot; </span>{
+                    <span class="comment">// iterate through port to check for tgt
+                    </span><span class="kw">for </span>p <span class="kw">in </span>node.in_indx.as_ref().unwrap().iter() {
+                        <span class="comment">// push the src first, being pif
+                        </span><span class="kw">if </span>(src_id <span class="kw">as </span>u32) == <span class="kw-2">*</span>p {
+                            else_src_tgt.push(node.node_id.clone());
+                        }
                     }
                 }
             }
-        }
-        <span class="kw">for </span>node <span class="kw">in </span>nodes.iter() {
-            <span class="comment">// make sure in correct box
-            </span><span class="kw">if </span>tgt_bf_counter == node.nbox {
-                <span class="comment">// make sure only looking in current attribute nodes for srcs and tgts
-                </span><span class="kw">if </span>tgt_att_idx == node.contents {
-                    <span class="comment">// only opo&#39;s
-                    </span><span class="kw">if </span>node.n_type == <span class="string">&quot;Opi&quot; </span>{
-                        <span class="comment">// iterate through port to check for tgt
-                        </span><span class="kw">for </span>p <span class="kw">in </span>node.in_indx.as_ref().unwrap().iter() {
-                            <span class="comment">// push the src first, being pif
-                            </span><span class="kw">if </span>(tgt_id <span class="kw">as </span>u32) == <span class="kw-2">*</span>p {
-                                else_src_tgt.push(node.node_id.clone());
+            <span class="kw">for </span>node <span class="kw">in </span>nodes.iter() {
+                <span class="comment">// make sure in correct box
+                </span><span class="kw">if </span>tgt_bf_counter == node.nbox {
+                    <span class="comment">// make sure only looking in current attribute nodes for srcs and tgts
+                    </span><span class="kw">if </span>tgt_att_idx == node.contents {
+                        <span class="comment">// only opo&#39;s
+                        </span><span class="kw">if </span>node.n_type == <span class="string">&quot;Opi&quot; </span>{
+                            <span class="comment">// iterate through port to check for tgt
+                            </span><span class="kw">for </span>p <span class="kw">in </span>node.in_indx.as_ref().unwrap().iter() {
+                                <span class="comment">// push the src first, being pif
+                                </span><span class="kw">if </span>(tgt_id <span class="kw">as </span>u32) == <span class="kw-2">*</span>p {
+                                    else_src_tgt.push(node.node_id.clone());
+                                }
                             }
                         }
                     }
                 }
             }
-        }
-        <span class="kw">if </span>else_src_tgt.len() == <span class="number">2 </span>{
-            <span class="kw">let </span>e11 = Edge {
-                src: else_src_tgt[<span class="number">0</span>].clone(),
-                tgt: else_src_tgt[<span class="number">1</span>].clone(),
-                e_type: String::from(<span class="string">&quot;Wire&quot;</span>),
-                prop: <span class="prelude-val">None</span>,
-            };
-            edges.push(e11);
-        }
+            <span class="kw">if </span>else_src_tgt.len() == <span class="number">2 </span>{
+                <span class="kw">let </span>e11 = Edge {
+                    src: else_src_tgt[<span class="number">0</span>].clone(),
+                    tgt: else_src_tgt[<span class="number">1</span>].clone(),
+                    e_type: String::from(<span class="string">&quot;Wire&quot;</span>),
+                    prop: <span class="prelude-val">None</span>,
+                };
+                edges.push(e11);
+            }
         }
     }
 
     <span class="comment">// every opo in if and else statements gets mapped to a poc of the same id, every opo but the last in a predicate
-    // gets mapped to a poc of the same id. 
+    // gets mapped to a poc of the same id.
 
     </span><span class="kw">for </span>opo <span class="kw">in </span>if_att_box.opo.clone().unwrap().iter() {
         <span class="kw">let </span>src_id = opo.id.unwrap();
@@ -7652,51 +7654,51 @@ There being a second function call of the same function which contains an expres
     }
     <span class="kw">if </span>else_exists {
         <span class="kw">for </span>opo <span class="kw">in </span>else_att_box.opo.unwrap().iter() {
-        <span class="kw">let </span>src_id = opo.id.unwrap();
-        <span class="kw">let </span>tgt_id = src_id;
-        <span class="kw">let </span>tgt_bf_counter = <span class="number">0</span>; <span class="comment">// because of how we have defined it
-        </span><span class="kw">let </span>tgt_att_idx = body_else_box <span class="kw">as </span>usize;
+            <span class="kw">let </span>src_id = opo.id.unwrap();
+            <span class="kw">let </span>tgt_id = src_id;
+            <span class="kw">let </span>tgt_bf_counter = <span class="number">0</span>; <span class="comment">// because of how we have defined it
+            </span><span class="kw">let </span>tgt_att_idx = body_else_box <span class="kw">as </span>usize;
 
-        <span class="kw">let </span><span class="kw-2">mut </span>else_src_tgt: Vec&lt;String&gt; = <span class="macro">vec!</span>[];
+            <span class="kw">let </span><span class="kw-2">mut </span>else_src_tgt: Vec&lt;String&gt; = <span class="macro">vec!</span>[];
 
-        <span class="kw">for </span>node <span class="kw">in </span>nodes.iter() {
-            <span class="comment">// make sure in correct box
-            </span><span class="kw">if </span>tgt_bf_counter == node.nbox {
-                <span class="comment">// make sure only looking in current attribute nodes for srcs and tgts
-                </span><span class="kw">if </span>tgt_att_idx == node.contents {
-                    <span class="comment">// only opo&#39;s
-                    </span><span class="kw">if </span>node.n_type == <span class="string">&quot;Opo&quot; </span>{
-                        <span class="comment">// iterate through port to check for tgt
-                        </span><span class="kw">for </span>p <span class="kw">in </span>node.out_idx.as_ref().unwrap().iter() {
-                            <span class="comment">// push the src first, being pif
-                            </span><span class="kw">if </span>(src_id <span class="kw">as </span>u32) == <span class="kw-2">*</span>p {
-                                else_src_tgt.push(node.node_id.clone());
+            <span class="kw">for </span>node <span class="kw">in </span>nodes.iter() {
+                <span class="comment">// make sure in correct box
+                </span><span class="kw">if </span>tgt_bf_counter == node.nbox {
+                    <span class="comment">// make sure only looking in current attribute nodes for srcs and tgts
+                    </span><span class="kw">if </span>tgt_att_idx == node.contents {
+                        <span class="comment">// only opo&#39;s
+                        </span><span class="kw">if </span>node.n_type == <span class="string">&quot;Opo&quot; </span>{
+                            <span class="comment">// iterate through port to check for tgt
+                            </span><span class="kw">for </span>p <span class="kw">in </span>node.out_idx.as_ref().unwrap().iter() {
+                                <span class="comment">// push the src first, being pif
+                                </span><span class="kw">if </span>(src_id <span class="kw">as </span>u32) == <span class="kw-2">*</span>p {
+                                    else_src_tgt.push(node.node_id.clone());
+                                }
                             }
                         }
                     }
                 }
             }
-        }
-        <span class="kw">for </span>node <span class="kw">in </span>nodes.iter() {
-            <span class="kw">if </span>node.n_type == <span class="string">&quot;Poc&quot; </span>{
-                <span class="comment">// iterate through port to check for tgt
-                </span><span class="kw">for </span>p <span class="kw">in </span>node.out_idx.as_ref().unwrap().iter() {
-                    <span class="comment">// push the src first, being pif
-                    </span><span class="kw">if </span>(tgt_id <span class="kw">as </span>u32) == <span class="kw-2">*</span>p {
-                        else_src_tgt.push(node.node_id.clone());
+            <span class="kw">for </span>node <span class="kw">in </span>nodes.iter() {
+                <span class="kw">if </span>node.n_type == <span class="string">&quot;Poc&quot; </span>{
+                    <span class="comment">// iterate through port to check for tgt
+                    </span><span class="kw">for </span>p <span class="kw">in </span>node.out_idx.as_ref().unwrap().iter() {
+                        <span class="comment">// push the src first, being pif
+                        </span><span class="kw">if </span>(tgt_id <span class="kw">as </span>u32) == <span class="kw-2">*</span>p {
+                            else_src_tgt.push(node.node_id.clone());
+                        }
                     }
                 }
             }
-        }
-        <span class="kw">if </span>else_src_tgt.len() == <span class="number">2 </span>{
-            <span class="kw">let </span>e13 = Edge {
-                src: else_src_tgt[<span class="number">0</span>].clone(),
-                tgt: else_src_tgt[<span class="number">1</span>].clone(),
-                e_type: String::from(<span class="string">&quot;Wire&quot;</span>),
-                prop: <span class="prelude-val">None</span>,
-            };
-            edges.push(e13);
-        }
+            <span class="kw">if </span>else_src_tgt.len() == <span class="number">2 </span>{
+                <span class="kw">let </span>e13 = Edge {
+                    src: else_src_tgt[<span class="number">0</span>].clone(),
+                    tgt: else_src_tgt[<span class="number">1</span>].clone(),
+                    e_type: String::from(<span class="string">&quot;Wire&quot;</span>),
+                    prop: <span class="prelude-val">None</span>,
+                };
+                edges.push(e13);
+            }
         }
     }
     <span class="comment">// iterate through everything but last opo
@@ -7750,9 +7752,6 @@ There being a second function call of the same function which contains an expres
             }
         }
     }
-
-    
-
 }
 <span class="kw">pub fn </span>create_for_loop(
     gromet: <span class="kw-2">&amp;</span>ModuleCollection, <span class="comment">// needed still for metadata unfortunately
@@ -7850,9 +7849,7 @@ There being a second function call of the same function which contains an expres
 
     <span class="comment">// now we need to rename the contains edge for the body to body
     </span><span class="kw">for </span>edge <span class="kw">in </span>edges.iter_mut() {
-        <span class="kw">if </span>edge.src == new_c_args.parent_node.node_id.clone()
-            &amp;&amp; edge.e_type == <span class="kw-2">*</span><span class="string">&quot;Contains&quot;
-        </span>{
+        <span class="kw">if </span>edge.src == new_c_args.parent_node.node_id.clone() &amp;&amp; edge.e_type == <span class="kw-2">*</span><span class="string">&quot;Contains&quot; </span>{
             edge.e_type = <span class="string">&quot;Pre&quot;</span>.to_string();
         }
     }
@@ -7871,9 +7868,7 @@ There being a second function call of the same function which contains an expres
     );
     <span class="comment">// we need to rename the contains edge to be a condition edge
     </span><span class="kw">for </span>edge <span class="kw">in </span>edges.iter_mut() {
-        <span class="kw">if </span>edge.src == new_c_args.parent_node.node_id.clone()
-            &amp;&amp; edge.e_type == <span class="kw-2">*</span><span class="string">&quot;Contains&quot;
-        </span>{
+        <span class="kw">if </span>edge.src == new_c_args.parent_node.node_id.clone() &amp;&amp; edge.e_type == <span class="kw-2">*</span><span class="string">&quot;Contains&quot; </span>{
             edge.e_type = <span class="string">&quot;Condition&quot;</span>.to_string();
         }
     }
@@ -7893,9 +7888,7 @@ There being a second function call of the same function which contains an expres
 
     <span class="comment">// now we need to rename the contains edge for the body to body
     </span><span class="kw">for </span>edge <span class="kw">in </span>edges.iter_mut() {
-        <span class="kw">if </span>edge.src == new_c_args.parent_node.node_id.clone()
-            &amp;&amp; edge.e_type == <span class="kw-2">*</span><span class="string">&quot;Contains&quot;
-        </span>{
+        <span class="kw">if </span>edge.src == new_c_args.parent_node.node_id.clone() &amp;&amp; edge.e_type == <span class="kw-2">*</span><span class="string">&quot;Contains&quot; </span>{
             edge.e_type = <span class="string">&quot;Body&quot;</span>.to_string();
         }
     }
@@ -8174,7 +8167,7 @@ There being a second function call of the same function which contains an expres
         }
     }
     <span class="comment">// every opo in if and else statements gets mapped to a poc of the same id, every opo but the last in a predicate
-    // gets mapped to a poc of the same id. 
+    // gets mapped to a poc of the same id.
 
     </span><span class="kw">for </span>opo <span class="kw">in </span>body_att_box.opo.unwrap().iter() {
         <span class="kw">let </span>src_id = opo.id.unwrap();
@@ -8271,7 +8264,7 @@ There being a second function call of the same function which contains an expres
         }
     }
     <span class="comment">// every opo in if and else statements gets mapped to a poc of the same id, every opo but the last in a predicate
-    // gets mapped to a poc of the same id. 
+    // gets mapped to a poc of the same id.
 
     </span><span class="kw">for </span>opo <span class="kw">in </span>pre_att_box.opo.unwrap().iter() {
         <span class="kw">let </span>src_id = opo.id.unwrap();
@@ -8465,9 +8458,7 @@ There being a second function call of the same function which contains an expres
     );
     <span class="comment">// we need to rename the contains edge to be a condition edge
     </span><span class="kw">for </span>edge <span class="kw">in </span>edges.iter_mut() {
-        <span class="kw">if </span>edge.src == new_c_args.parent_node.node_id.clone()
-            &amp;&amp; edge.e_type == <span class="kw-2">*</span><span class="string">&quot;Contains&quot;
-        </span>{
+        <span class="kw">if </span>edge.src == new_c_args.parent_node.node_id.clone() &amp;&amp; edge.e_type == <span class="kw-2">*</span><span class="string">&quot;Contains&quot; </span>{
             edge.e_type = <span class="string">&quot;Condition&quot;</span>.to_string();
         }
     }
@@ -8487,9 +8478,7 @@ There being a second function call of the same function which contains an expres
 
     <span class="comment">// now we need to rename the contains edge for the body to body
     </span><span class="kw">for </span>edge <span class="kw">in </span>edges.iter_mut() {
-        <span class="kw">if </span>edge.src == new_c_args.parent_node.node_id.clone()
-            &amp;&amp; edge.e_type == <span class="kw-2">*</span><span class="string">&quot;Contains&quot;
-        </span>{
+        <span class="kw">if </span>edge.src == new_c_args.parent_node.node_id.clone() &amp;&amp; edge.e_type == <span class="kw-2">*</span><span class="string">&quot;Contains&quot; </span>{
             edge.e_type = <span class="string">&quot;Body&quot;</span>.to_string();
         }
     }
@@ -8768,7 +8757,7 @@ There being a second function call of the same function which contains an expres
         }
     }
     <span class="comment">// every opo in if and else statements gets mapped to a poc of the same id, every opo but the last in a predicate
-    // gets mapped to a poc of the same id. 
+    // gets mapped to a poc of the same id.
 
     </span><span class="kw">for </span>opo <span class="kw">in </span>body_att_box.opo.unwrap().iter() {
         <span class="kw">let </span>src_id = opo.id.unwrap();
@@ -8868,7 +8857,6 @@ There being a second function call of the same function which contains an expres
             }
         }
     }
-
 }
 
 <span class="comment">// This needs to be updated to handle the new node structure and remove the overloaded contents field which will mess with the wiring alot
@@ -9037,7 +9025,9 @@ There being a second function call of the same function which contains an expres
                 <span class="kw">for </span>(i, bf) <span class="kw">in </span>parent_att_box.bf.clone().unwrap().iter().enumerate() {
                     <span class="kw">match </span>bf.function_type {
                         FunctionType::Abstract =&gt; {
-                            <span class="kw">if </span>bf.name.is_some() &amp;&amp; <span class="kw-2">*</span>bf.name.as_ref().unwrap() == String::from(<span class="string">&quot;unpack&quot;</span>) {
+                            <span class="kw">if </span>bf.name.is_some()
+                                &amp;&amp; <span class="kw-2">*</span>bf.name.as_ref().unwrap() == String::from(<span class="string">&quot;unpack&quot;</span>)
+                            {
                                 unpack_box = i + <span class="number">1</span>; <span class="comment">// base 1 in gromet
                             </span>}
                         }
