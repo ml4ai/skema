@@ -18,12 +18,19 @@ CONTROL_CHARACTERS = [
     "*",
     "**",
     "/",
-    "/="
+    "/=",
     ">",
     "<",
     "<=",
     ">=",
     "only",
+    "\.not\.",
+    "\.gt\.",
+    "\.ge\.",
+    "\.lt\.",
+    "\.le\.",
+    "\.eq\.",
+    "\.ne\.",
 ]
 
 class NodeHelper():
@@ -61,6 +68,19 @@ class NodeHelper():
                 identifier += char
 
         return identifier
+
+def remove_comments(node: Node):
+    """Remove comment nodes from tree-sitter parse tree"""
+    # NOTE: tree-sitter Node objects are read-only, so we have to be careful about how we remove comments
+    # The below has been carefully designed to work around this restriction.
+    to_remove = sorted([index for index,child in enumerate(node.children) if child.type == "comment"], reverse=True)
+    for index in to_remove:
+        del node.children[index]
+    
+    for i in range(len(node.children)):
+        node.children[i] = remove_comments(node.children[i])
+
+    return node
 
 def get_first_child_by_type(node: Node, type: str, recurse=False):
     """Takes in a node and a type string as inputs and returns the first child matching that type. Otherwise, return None

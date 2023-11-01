@@ -6,7 +6,12 @@ pub use mathml::mml2pn::{ACSet, Term};
 // new imports
 use mathml::acset::{PetriNet, RegNet};
 use mathml::parsers::first_order_ode::get_FirstOrderODE_vec_from_file;
+use mathml::parsers::math_expression_tree::MathExpressionTree;
+use mathml::parsers::decapodes_serialization::{to_wiring_diagram, WiringDiagram, DecapodesCollection};
 use skema::model_extraction::{module_id2mathml_MET_ast, subgraph2_core_dyn_ast};
+use std::io::{BufRead, BufReader};
+use std::fs::File;
+
 
 #[derive(Parser, Debug)]
 struct Cli {
@@ -44,6 +49,25 @@ fn main() {
 
         // This does get a panic with a message, so need to figure out how to forward it
         //let _mathml_ast = get_mathml_asts_from_file(input_src.clone());
+
+        let f = File::open(input_src.clone()).unwrap();
+        let lines = BufReader::new(f).lines();
+        let mut deca_vec = Vec::<MathExpressionTree>::new();
+        let mut wiring_vec = Vec::<WiringDiagram>::new();
+
+        for line in lines.flatten() {
+            let mut deca = line
+                .parse::<MathExpressionTree>()
+                .unwrap_or_else(|_| panic!("Unable to parse line {}!", line));
+            wiring_vec.push(to_wiring_diagram(&deca))
+        }
+
+        let decapodescollection = DecapodesCollection {
+            decapodes: wiring_vec.clone()
+        };
+
+        println!("{:?}", wiring_vec.clone());
+        println!("decapode collection: {:?}", decapodescollection.clone());
 
         let odes = get_FirstOrderODE_vec_from_file(input_src.clone());
 

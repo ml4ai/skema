@@ -27,6 +27,8 @@ pub enum Operator {
     Comma,
     Grad,
     Dot,
+    Div,
+    Abs,
     Derivative(Derivative),
     Sin,
     Cos,
@@ -64,7 +66,7 @@ impl fmt::Display for Operator {
                 var_index,
                 bound_var,
             }) => {
-                write!(f, "D({order}, {var_index}, {bound_var})")
+                write!(f, "D({order}, {bound_var})")
             }
             Operator::Exp => write!(f, "exp"),
             Operator::Power => write!(f, "^"),
@@ -84,6 +86,8 @@ impl fmt::Display for Operator {
             Operator::Mean => write!(f, "Mean"),
             Operator::Grad => write!(f, "Grad"),
             Operator::Dot => write!(f, "Dot"),
+            Operator::Div => write!(f, "Div"),
+            Operator::Abs => write!(f, "Abs"),
         }
     }
 }

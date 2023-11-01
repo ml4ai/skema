@@ -10,7 +10,6 @@ use serde::{Deserialize, Serialize};
 use std::collections::{BTreeSet, HashMap, HashSet};
 use utoipa;
 use utoipa::ToSchema;
-use nanoid::nanoid;
 
 // We keep our ACSet representation in addition to the new SKEMA model representation since it is
 // more compact and easy to work with for development.
@@ -330,29 +329,30 @@ impl From<Vec<FirstOrderODE>> for PetriNet {
         let mut rate_vec = Vec::<Rate>::new();
         let mut state_string_list = Vec::<String>::new();
         let mut terms = Vec::<PnTerm>::new();
+        let mut dirty_terms = Vec::<PnTerm>::new();
 
         // this first for loop is for the creation state related parameters in the AMR
         for ode in ode_vec.iter() {
             let states = State {
-                id: format!("{}-{}", ode.lhs_var.to_string().clone(), nanoid!(8)),
+                id: ode.lhs_var.to_string().clone(),
                 name: ode.lhs_var.to_string().clone(),
                 ..Default::default()
             };
             let initials = Initial {
-                target: states.id.clone(),
-                //expression: format!("{}0", ode.lhs_var.to_string().clone()),
+                target: ode.lhs_var.to_string().clone(),
+                expression: "".to_string(),
                 ..Default::default()
             };
-            let parameters = Parameter {
+            /*let parameters = Parameter {
                 id: initials.expression.clone(),
                 name: Some(initials.expression.clone()),
-                /*description: Some(format!(
+                description: Some(format!(
                     "The total {} population at timestep 0",
                     ode.lhs_var.to_string().clone()
-                )),*/
+                )),
                 ..Default::default()
-            };
-            parameter_vec.push(parameters.clone());
+            };*/
+            //parameter_vec.push(parameters.clone());
             initial_vec.push(initials.clone());
             states_vec.insert(states.clone());
             state_string_list.push(ode.lhs_var.to_string().clone()); // used later for transition parsing
@@ -362,7 +362,14 @@ impl From<Vec<FirstOrderODE>> for PetriNet {
 
         // this collects all the terms from the equations
         for ode in ode_vec.iter() {
-            terms.append(&mut get_terms(state_string_list.clone(), ode.clone()));
+            dirty_terms.append(&mut get_terms(state_string_list.clone(), ode.clone()));
+        }
+
+        // now to trim off terms that are for euler methods, dyn_state != exp_state && parameters.len() != 0
+        for term in dirty_terms.iter() {
+            if term.dyn_state != term.exp_states[0] || term.parameters.len() != 0 {
+                terms.push(term.clone());
+            }
         }
 
         for term in terms.iter() {
@@ -471,22 +478,11 @@ impl From<Vec<FirstOrderODE>> for PetriNet {
         // now we construct transitions of all paired terms
         for (i, t) in transition_pair.iter().enumerate() {
             if t.0.exp_states.len() == 1 {
-                let mut input = Vec::<String>::new();
-                let mut output = Vec::<String>::new();
-
-                for state in states_vec.iter() {
-                    if state.name == t.1.dyn_state {
-                        input.push(state.id.clone());
-                    } 
-                    else if state.name == t.0.dyn_state {
-                        output.push(state.id.clone());
-                    }
-                }
                 // construct transtions for simple transtions
                 let transitions = Transition {
-                    id: format!("t{}-{}", i.clone(), nanoid!(8)),
-                    input: Some(input.clone()),
-                    output: Some(output.clone()),
+                    id: format!("t{}", i.clone()),
+                    input: Some([t.1.dyn_state.clone()].to_vec()),
+                    output: Some([t.0.dyn_state.clone()].to_vec()),
                     ..Default::default()
                 };
                 transitions_vec.insert(transitions.clone());
@@ -516,33 +512,17 @@ impl From<Vec<FirstOrderODE>> for PetriNet {
             } else {
                 // construct transitions for complicated transitions
                 // mainly need to construct the output specially,
-                let mut input = Vec::<String>::new();
-                let mut output = Vec::<String>::new();
-                for exp in t.1.exp_states.iter() {
-                    for state in states_vec.iter() {
-                        if state.name == *exp {
-                            input.push(state.id.clone());
-                        }
-                    }
-                }
-                for state in states_vec.iter() {
-                    if state.name == t.0.dyn_state {
-                        output.push(state.id.clone());
-                    }
-                }
-                for exp in t.0.exp_states.iter() {
-                    if *exp != t.1.dyn_state {
-                        for state in states_vec.iter() {
-                            if state.name == *exp {
-                                output.push(state.id.clone());
-                            }
-                        }
+                let mut output = [t.0.dyn_state.clone()].to_vec();
+
+                for state in t.0.exp_states.iter() {
+                    if *state != t.1.dyn_state {
+                        output.push(state.clone());
                     }
                 }
 
                 let transitions = Transition {
-                    id: format!("t{}-{}", i.clone(), nanoid!(8)),
-                    input: Some(input.clone()),
+                    id: format!("t{}", i.clone()),
+                    input: Some(t.1.exp_states.clone()),
                     output: Some(output.clone()),
                     ..Default::default()
                 };
@@ -578,23 +558,15 @@ impl From<Vec<FirstOrderODE>> for PetriNet {
             for (i, term) in terms.iter().enumerate() {
                 if term.polarity {
                     let mut input = Vec::<String>::new();
-                    let mut output = Vec::<String>::new();
 
-                    for state in states_vec.iter() {
-                        if state.name == term.dyn_state {
-                            output.push(state.id.clone());
-                        }
-                    }
-                    for exp in term.exp_states.iter() {
-                        for state in states_vec.iter() {
-                            if state.name == *exp {
-                                input.push(state.id.clone());
-                            }
-                        }
+                    let output = [term.dyn_state.clone()].to_vec();
+
+                    for state in term.exp_states.iter() {
+                        input.push(state.clone());
                     }
 
                     let transitions = Transition {
-                        id: format!("s{}-{}", i, nanoid!(8)),
+                        id: format!("s{}", i),
                         input: Some(input.clone()),
                         output: Some(output.clone()),
                         ..Default::default()
@@ -628,23 +600,14 @@ impl From<Vec<FirstOrderODE>> for PetriNet {
                     };
                     rate_vec.push(rate.clone());
                 } else {
-                    let mut input = Vec::<String>::new();
-                    for state in states_vec.iter() {
-                        if state.name == term.dyn_state {
-                            input.push(state.id.clone());
-                        }
-                    }
+                    let mut input = [term.dyn_state.clone()].to_vec();
 
-                    for exp in term.exp_states.iter() {
-                        for state in states_vec.iter() {
-                            if *exp == state.name {
-                                input.push(state.id.clone());
-                            }
-                        }
+                    for state in term.exp_states.iter() {
+                        input.push(state.clone());
                     }
 
                     let transitions = Transition {
-                        id: format!("s{}-{}", i, nanoid!(8)),
+                        id: format!("s{}", i),
                         input: Some(input.clone()),
                         output: None,
                         ..Default::default()
@@ -685,9 +648,6 @@ impl From<Vec<FirstOrderODE>> for PetriNet {
 
         parameter_vec.sort();
         parameter_vec.dedup();
-        for parameter in parameter_vec.iter_mut() {
-            parameter.id = format!("{}", nanoid!(8));
-        }
 
         // construct the PetriNet
         let ode = Ode {
@@ -706,7 +666,7 @@ impl From<Vec<FirstOrderODE>> for PetriNet {
         };
 
         let header = Header {
-            name: "math model".to_string(),
+            name: "mathml model".to_string(),
             schema: "https://github.com/DARPA-ASKEM/Model-Representations/blob/main/petrinet/petrinet_schema.json".to_string(),
             schema_name: "PetriNet".to_string(),
             description: "This is a model from equations".to_string(),
