@@ -18,11 +18,29 @@ def fn_preprocessor(function_network: Dict[str, Any]):
     2) metadata being inline for bf entries instead of an index into the metadata_collection -> which we will replace with an index of 2
     3) missing function_type field on a bf entry -> will replace with function_type: "IMPORTED"
     4) If there is not a body field to a function -> replace "FUNCTION" with "ABSTRACT and set "name":"unknown"
-    5) NOT DONE YET: In the future we will preprocess about function calls being arguments, in order to simplify extracting the dataflow 
+    5) If there are -1 entries in the metadata for line spans and col spans -> replaced with 1
+    6) NOT DONE YET: In the future we will preprocess about function calls being arguments, in order to simplify extracting the dataflow 
     '''
 
     # first we check the top bf level of wires and inline metadata: 
     keys_to_check = ['bf', 'wff', 'wfopi', 'wfopo', 'wopio']
+    metadata_keys_to_check = ['line_begin', 'line_end', 'col_begin', 'col_end']
+    for key in metadata_keys_to_check:
+        try: 
+            for (i, entry) in enumerate(fn_data['modules'][0]['metadata_collection']):
+                try:
+                    for (j, datum) in enumerate(entry):
+                        try:
+                            if datum[key] == -1:
+                                datum[key] = 1
+                                logs.append(f"The {j + 1}'th metadata in the {i+1} metadata index has -1 for the {key} entry")
+                        except:
+                            continue
+                except:
+                    continue
+        except:
+            continue
+                    
     for key in keys_to_check:
         if key == 'bf':
             try:
@@ -50,10 +68,16 @@ def fn_preprocessor(function_network: Dict[str, Any]):
                 continue
         else:
             try:
-                for (i, entry) in enumerate(fn_data['modules'][0]['fn'][key]):
-                    if entry['tgt'] == -1:
-                        del fn_data['modules'][0]['fn'][key][i]
-                        logs.append(f"The {i + 1}'th {key} wire in the top level bf is targeting -1")
+                for (i, entry) in enumerate(reversed(fn_data['modules'][0]['fn'][key])):
+                    try:
+                        if entry['tgt'] == -1:
+                            try:
+                                fn_data['modules'][0]['fn'][key].remove(entry)
+                                logs.append(f"The {i+1}'th {key} wire in the top level bf is targeting -1")
+                            except:
+                                entry['tgt'] = 1
+                    except:
+                        continue
             except:
                 continue
 
@@ -85,11 +109,14 @@ def fn_preprocessor(function_network: Dict[str, Any]):
                 except:
                     continue
             else:
-                try:
-                    for (i, entry) in enumerate(fn_ent[key]):
+                try: 
+                    for (i, entry) in enumerate(reversed(fn_ent[key])):
                         if entry['tgt'] == -1:
-                            del fn_ent[key][i]
-                            logs.append(f"The {i + 1}'th {key} wire in the {j + 1}'th fn_array is targeting -1")
+                            try:
+                                fn_ent[key][i].remove(entry)
+                                logs.append(f"The {i+1}'th {key} wire in the {j+1}'th fn_array is targeting -1")
+                            except:
+                                entry['tgt'] = 1
                 except:
                     continue
 
