@@ -6,7 +6,7 @@ from fastapi import APIRouter, FastAPI
 from pydantic import BaseModel, Field
 
 from skema.gromet.execution_engine.execution_engine import ExecutionEngine
-HOST = "localhost"
+HOST = "0.0.0.0"
 PORT = 7687
 
 router = APIRouter()
