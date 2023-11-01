@@ -119,6 +119,20 @@ def get_first_child_index(node, type: str):
             return i
 
 
+def remove_comments(node: Node):
+    &#34;&#34;&#34;Remove comment nodes from tree-sitter parse tree&#34;&#34;&#34;
+    # NOTE: tree-sitter Node objects are read-only, so we have to be careful about how we remove comments
+    # The below has been carefully designed to work around this restriction.
+    to_remove = sorted([index for index,child in enumerate(node.children) if child.type == &#34;comment&#34;], reverse=True)
+    for index in to_remove:
+        del node.children[index]
+
+    for i in range(len(node.children)):
+        node.children[i] = remove_comments(node.children[i])
+
+    return node
+
+
 def get_last_child_index(node, type: str):
     &#34;&#34;&#34;Get the index of the last child of node with type type.&#34;&#34;&#34;
     last = None
@@ -257,6 +271,29 @@ When the recurse argument is set, it will also recursivly search children nodes 
     return children</code></pre>
 </details>
 </dd>
+<dt id="skema.program_analysis.CAST.matlab.node_helper.remove_comments"><code class="name flex">
+<span>def <span class="ident">remove_comments</span></span>(<span>node: tree_sitter.Node)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Remove comment nodes from tree-sitter parse tree</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def remove_comments(node: Node):
+    &#34;&#34;&#34;Remove comment nodes from tree-sitter parse tree&#34;&#34;&#34;
+    # NOTE: tree-sitter Node objects are read-only, so we have to be careful about how we remove comments
+    # The below has been carefully designed to work around this restriction.
+    to_remove = sorted([index for index,child in enumerate(node.children) if child.type == &#34;comment&#34;], reverse=True)
+    for index in to_remove:
+        del node.children[index]
+
+    for i in range(len(node.children)):
+        node.children[i] = remove_comments(node.children[i])
+
+    return node</code></pre>
+</details>
+</dd>
 </dl>
 </section>
 <section>
@@ -384,6 +421,7 @@ When the recurse argument is set, it will also recursivly search children nodes 
 <li><code><a title="skema.program_analysis.CAST.matlab.node_helper.get_first_child_index" href="#skema.program_analysis.CAST.matlab.node_helper.get_first_child_index">get_first_child_index</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.matlab.node_helper.get_last_child_index" href="#skema.program_analysis.CAST.matlab.node_helper.get_last_child_index">get_last_child_index</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.matlab.node_helper.get_non_control_children" href="#skema.program_analysis.CAST.matlab.node_helper.get_non_control_children">get_non_control_children</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.matlab.node_helper.remove_comments" href="#skema.program_analysis.CAST.matlab.node_helper.remove_comments">remove_comments</a></code></li>
 </ul>
 </li>
 <li><h3><a href="#header-classes">Classes</a></h3>
