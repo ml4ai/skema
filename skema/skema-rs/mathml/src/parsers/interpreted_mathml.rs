@@ -431,12 +431,13 @@ pub fn absolute_with_msup(input: Span) -> IResult<MathExpression> {
         ws(delimited(
             tag("<mo>|</mo>"),
             tuple((
-                math_expression,
+                //math_expression,
+                map(many0(math_expression), |z| Mrow(z)),
                 preceded(tag("<msup><mo>|</mo>"), math_expression),
             )),
             tag("</msup>"),
         )),
-        |(x, y)| MathExpression::AbsoluteSup(Box::new(x), Box::new(y)),
+        |(x, y)| MathExpression::AbsoluteSup(Box::new(MathExpression::Mrow(x)), Box::new(y)),
     ))(input)?;
     Ok((s, sup))
 }

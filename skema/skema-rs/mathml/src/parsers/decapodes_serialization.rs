@@ -3,8 +3,8 @@ use crate::ast::{
     MathExpression,
 };
 use crate::parsers::math_expression_tree::MathExpressionTree;
-use utoipa::ToSchema;
 use serde::{Deserialize, Serialize};
+use utoipa::ToSchema;
 
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
 enum Type {
@@ -75,7 +75,7 @@ pub struct WiringDiagram {
 
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
 pub struct DecapodesCollection {
-    pub decapodes: Vec<WiringDiagram>
+    pub decapodes: Vec<WiringDiagram>,
 }
 
 pub fn to_decapodes_serialization(
@@ -471,6 +471,7 @@ fn test_serialize_halfar_dome_3_2() {
     ";
     let expression = input.parse::<MathExpressionTree>().unwrap();
     let s_exp = expression.to_string();
+    println!("s_exp={:?}", s_exp);
     let wiring_diagram = to_wiring_diagram(&expression);
     let json = to_decapodes_json(wiring_diagram);
     assert_eq!(json, "{\"Var\":[{\"type\":\"infer\",\"name\":\"mult_1\"},{\"type\":\"infer\",\"name\":\"mult_2\"},{\"type\":\"infer\",\"name\":\"•1\"},{\"type\":\"Literal\",\"name\":\"2\"},{\"type\":\"infer\",\"name\":\"sum_1\"},{\"type\":\"infer\",\"name\":\"n\"},{\"type\":\"infer\",\"name\":\"A\"},{\"type\":\"infer\",\"name\":\"•2\"},{\"type\":\"infer\",\"name\":\"mult_3\"},{\"type\":\"infer\",\"name\":\"ρ\"},{\"type\":\"infer\",\"name\":\"g\"},{\"type\":\"infer\",\"name\":\"Γ\"}],\"Op1\":[],\"Op2\":[{\"proj1\":4,\"proj2\":5,\"res\":3,\"op2\":\"/\"},{\"proj1\":3,\"proj2\":7,\"res\":2,\"op2\":\"*\"},{\"proj1\":10,\"proj2\":11,\"res\":9,\"op2\":\"*\"},{\"proj1\":9,\"proj2\":6,\"res\":8,\"op2\":\"^\"},{\"proj1\":2,\"proj2\":8,\"res\":1,\"op2\":\"*\"}],\"Σ\":[{\"sum\":5}],\"Summand\":[{\"summand\":6,\"summation\":1},{\"summand\":4,\"summation\":1}]}");
@@ -487,7 +488,7 @@ fn test_serialize_from_image_3_1() {
         <mo>(</mo>
         <mi>Γ</mi>
         <msup><mi>H</mi><mrow><mi>n</mi><mo>+</mo><mn>2</mn></mrow></msup>
-        <mo>|</mo><mrow><mo>∇</mo><mi>H</mi></mrow>
+        <mo>|</mo><mo>∇</mo><mi>H</mi>
         <msup><mo>|</mo>
         <mrow><mi>n</mi><mo>−</mo><mn>1</mn></mrow></msup>
         <mo>∇</mo><mi>H</mi>
