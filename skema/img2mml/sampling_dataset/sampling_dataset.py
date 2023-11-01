@@ -93,7 +93,7 @@ def read_latex(path: str) -> str:
     return latex
 
 
-def eqn_image_exists(path: str, root: str) -> bool:
+def eqn_image_exists(path: str) -> bool:
     yr, month, folder, type_of_eqn, eqn_num = path.split("_")
     img_path = os.path.join(
         root,
@@ -102,7 +102,7 @@ def eqn_image_exists(path: str, root: str) -> bool:
     return os.path.exists(img_path)
 
 
-def eqn_mml_exists(path: str, root: str) -> bool:
+def eqn_mml_exists(path: str) -> bool:
     yr, month, folder, type_of_eqn, eqn_num = path.split("_")
     mml_path = os.path.join(
         root,
