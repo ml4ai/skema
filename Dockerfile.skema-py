@@ -16,7 +16,7 @@ RUN apt-get update &&\
 
 # Node needed for img2mml
 RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - &&\
-apt-get install -y nodejs
+apt-get install -y nodejs=18.17.0-1nodesource1
 
 # The two commands below are to reduce the size of the Docker image
 RUN apt-get clean &&\
