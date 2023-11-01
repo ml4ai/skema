@@ -5447,6 +5447,11 @@
 <a href="#5447" id="5447">5447</a>
 <a href="#5448" id="5448">5448</a>
 <a href="#5449" id="5449">5449</a>
+<a href="#5450" id="5450">5450</a>
+<a href="#5451" id="5451">5451</a>
+<a href="#5452" id="5452">5452</a>
+<a href="#5453" id="5453">5453</a>
+<a href="#5454" id="5454">5454</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Interface to the graph database we are using for persisting GroMEt objects and performing
 //! queries on them. We currently use MemgraphDB, an in-memory graph database.
 
@@ -10226,45 +10231,50 @@ There being a second function call of the same function which contains an expres
         }
     } <span class="kw">else </span>{
         <span class="comment">// this means we are in function scope, concerns on if this is cross attributal or just internal wiring...
-        </span><span class="kw">let </span>eboxf = gromet.modules[<span class="number">0</span>].attributes[parent_node.contents - <span class="number">1</span>].clone();
+        </span><span class="kw">let </span><span class="kw-2">mut </span>eboxf = gromet.modules[<span class="number">0</span>].r#fn.clone();
+        <span class="kw">if </span>parent_node.contents != <span class="number">0 </span>{
+            eboxf = gromet.modules[<span class="number">0</span>].attributes[parent_node.contents - <span class="number">1</span>].clone();
+        }
 
         <span class="comment">// iterate through all wires of type
-        </span><span class="kw">for </span>wire <span class="kw">in </span>eboxf.wff.unwrap().iter() {
-            <span class="kw">let </span><span class="kw-2">mut </span>wff_src_tgt: Vec&lt;String&gt; = <span class="macro">vec!</span>[];
+        </span><span class="kw">if </span>eboxf.wff.is_some() {
+            <span class="kw">for </span>wire <span class="kw">in </span>eboxf.wff.unwrap().iter() {
+                <span class="kw">let </span><span class="kw-2">mut </span>wff_src_tgt: Vec&lt;String&gt; = <span class="macro">vec!</span>[];
 
-            <span class="kw">let </span>src_idx = wire.src; <span class="comment">// port index
+                <span class="kw">let </span>src_idx = wire.src; <span class="comment">// port index
 
-            </span><span class="kw">let </span>src_pif = eboxf.pif.as_ref().unwrap()[(src_idx - <span class="number">1</span>) <span class="kw">as </span>usize].clone(); <span class="comment">// src port
+                </span><span class="kw">let </span>src_pif = eboxf.pif.as_ref().unwrap()[(src_idx - <span class="number">1</span>) <span class="kw">as </span>usize].clone(); <span class="comment">// src port
 
-            </span><span class="kw">let </span>src_box = src_pif.r#box; <span class="comment">// src sub module box number
-            </span><span class="kw">let </span>src_att = idx; <span class="comment">// attribute index of submodule (also opi contents value)
-            </span><span class="kw">let </span>src_nbox = bf_counter; <span class="comment">// nbox value of src opi
+                </span><span class="kw">let </span>src_box = src_pif.r#box; <span class="comment">// src sub module box number
+                </span><span class="kw">let </span>src_att = idx; <span class="comment">// attribute index of submodule (also opi contents value)
+                </span><span class="kw">let </span>src_nbox = bf_counter; <span class="comment">// nbox value of src opi
 
-            </span><span class="kw">let </span>tgt_idx = wire.tgt; <span class="comment">// port index
+                </span><span class="kw">let </span>tgt_idx = wire.tgt; <span class="comment">// port index
 
-            </span><span class="kw">let </span>tgt_pof = eboxf.pof.as_ref().unwrap()[(tgt_idx - <span class="number">1</span>) <span class="kw">as </span>usize].clone(); <span class="comment">// tgt port
+                </span><span class="kw">let </span>tgt_pof = eboxf.pof.as_ref().unwrap()[(tgt_idx - <span class="number">1</span>) <span class="kw">as </span>usize].clone(); <span class="comment">// tgt port
 
-            </span><span class="kw">let </span>tgt_box = tgt_pof.r#box; <span class="comment">// tgt sub module box number
-            </span><span class="kw">let </span>tgt_att = idx; <span class="comment">// attribute index of submodule (also opo contents value)
-            </span><span class="kw">let </span>tgt_nbox = bf_counter; <span class="comment">// nbox value of tgt opo
+                </span><span class="kw">let </span>tgt_box = tgt_pof.r#box; <span class="comment">// tgt sub module box number
+                </span><span class="kw">let </span>tgt_att = idx; <span class="comment">// attribute index of submodule (also opo contents value)
+                </span><span class="kw">let </span>tgt_nbox = bf_counter; <span class="comment">// nbox value of tgt opo
 
-            // find the src node
-            </span><span class="kw">for </span>node <span class="kw">in </span>nodes.iter() {
-                <span class="comment">// make sure in correct box
-                </span><span class="kw">if </span>src_nbox == node.nbox {
-                    <span class="comment">// make sure only looking in current attribute nodes for srcs and tgts
-                    </span><span class="kw">if </span>src_att == node.contents {
-                        <span class="comment">// matche the box
-                        </span><span class="kw">if </span>(src_box <span class="kw">as </span>u32) == node.att_bf_idx <span class="kw">as </span>u32 {
-                            <span class="comment">// only include nodes with pifs
-                            </span><span class="kw">if </span>node.in_indx.is_some() {
-                                <span class="comment">// exclude opo&#39;s
-                                </span><span class="kw">if </span>node.n_type != <span class="string">&quot;Opi&quot; </span>{
-                                    <span class="comment">// iterate through port to check for src
-                                    </span><span class="kw">for </span>p <span class="kw">in </span>node.in_indx.as_ref().unwrap().iter() {
-                                        <span class="comment">// push the tgt
-                                        </span><span class="kw">if </span>(wire.src <span class="kw">as </span>u32) == <span class="kw-2">*</span>p {
-                                            wff_src_tgt.push(node.node_id.clone());
+                // find the src node
+                </span><span class="kw">for </span>node <span class="kw">in </span>nodes.iter() {
+                    <span class="comment">// make sure in correct box
+                    </span><span class="kw">if </span>src_nbox == node.nbox {
+                        <span class="comment">// make sure only looking in current attribute nodes for srcs and tgts
+                        </span><span class="kw">if </span>src_att == node.contents {
+                            <span class="comment">// matche the box
+                            </span><span class="kw">if </span>(src_box <span class="kw">as </span>u32) == node.att_bf_idx <span class="kw">as </span>u32 {
+                                <span class="comment">// only include nodes with pifs
+                                </span><span class="kw">if </span>node.in_indx.is_some() {
+                                    <span class="comment">// exclude opo&#39;s
+                                    </span><span class="kw">if </span>node.n_type != <span class="string">&quot;Opi&quot; </span>{
+                                        <span class="comment">// iterate through port to check for src
+                                        </span><span class="kw">for </span>p <span class="kw">in </span>node.in_indx.as_ref().unwrap().iter() {
+                                            <span class="comment">// push the tgt
+                                            </span><span class="kw">if </span>(wire.src <span class="kw">as </span>u32) == <span class="kw-2">*</span>p {
+                                                wff_src_tgt.push(node.node_id.clone());
+                                            }
                                         }
                                     }
                                 }
@@ -10272,24 +10282,24 @@ There being a second function call of the same function which contains an expres
                         }
                     }
                 }
-            }
-            <span class="comment">// finding the tgt node
-            </span><span class="kw">for </span>node <span class="kw">in </span>nodes.iter() {
-                <span class="comment">// make sure in correct box
-                </span><span class="kw">if </span>tgt_nbox == node.nbox {
-                    <span class="comment">// make sure only looking in current attribute nodes for srcs and tgts
-                    </span><span class="kw">if </span>tgt_att == node.contents {
-                        <span class="comment">// match internal box
-                        </span><span class="kw">if </span>(tgt_box <span class="kw">as </span>u32) == node.att_bf_idx <span class="kw">as </span>u32 {
-                            <span class="comment">// only include nodes with pofs
-                            </span><span class="kw">if </span>node.out_idx.is_some() {
-                                <span class="comment">// exclude opo&#39;s
-                                </span><span class="kw">if </span>node.n_type != <span class="string">&quot;Opo&quot; </span>{
-                                    <span class="comment">// iterate through port to check for tgt
-                                    </span><span class="kw">for </span>p <span class="kw">in </span>node.out_idx.as_ref().unwrap().iter() {
-                                        <span class="comment">// push the tgt
-                                        </span><span class="kw">if </span>(wire.tgt <span class="kw">as </span>u32) == <span class="kw-2">*</span>p {
-                                            wff_src_tgt.push(node.node_id.clone());
+                <span class="comment">// finding the tgt node
+                </span><span class="kw">for </span>node <span class="kw">in </span>nodes.iter() {
+                    <span class="comment">// make sure in correct box
+                    </span><span class="kw">if </span>tgt_nbox == node.nbox {
+                        <span class="comment">// make sure only looking in current attribute nodes for srcs and tgts
+                        </span><span class="kw">if </span>tgt_att == node.contents {
+                            <span class="comment">// match internal box
+                            </span><span class="kw">if </span>(tgt_box <span class="kw">as </span>u32) == node.att_bf_idx <span class="kw">as </span>u32 {
+                                <span class="comment">// only include nodes with pofs
+                                </span><span class="kw">if </span>node.out_idx.is_some() {
+                                    <span class="comment">// exclude opo&#39;s
+                                    </span><span class="kw">if </span>node.n_type != <span class="string">&quot;Opo&quot; </span>{
+                                        <span class="comment">// iterate through port to check for tgt
+                                        </span><span class="kw">for </span>p <span class="kw">in </span>node.out_idx.as_ref().unwrap().iter() {
+                                            <span class="comment">// push the tgt
+                                            </span><span class="kw">if </span>(wire.tgt <span class="kw">as </span>u32) == <span class="kw-2">*</span>p {
+                                                wff_src_tgt.push(node.node_id.clone());
+                                            }
                                         }
                                     }
                                 }
@@ -10297,15 +10307,15 @@ There being a second function call of the same function which contains an expres
                         }
                     }
                 }
-            }
-            <span class="kw">if </span>wff_src_tgt.len() == <span class="number">2 </span>{
-                <span class="kw">let </span>e8 = Edge {
-                    src: wff_src_tgt[<span class="number">0</span>].clone(),
-                    tgt: wff_src_tgt[<span class="number">1</span>].clone(),
-                    e_type: String::from(<span class="string">&quot;Wire&quot;</span>),
-                    prop: <span class="prelude-val">None</span>,
-                };
-                edges.push(e8);
+                <span class="kw">if </span>wff_src_tgt.len() == <span class="number">2 </span>{
+                    <span class="kw">let </span>e8 = Edge {
+                        src: wff_src_tgt[<span class="number">0</span>].clone(),
+                        tgt: wff_src_tgt[<span class="number">1</span>].clone(),
+                        e_type: String::from(<span class="string">&quot;Wire&quot;</span>),
+                        prop: <span class="prelude-val">None</span>,
+                    };
+                    edges.push(e8);
+                }
             }
         }
     }
