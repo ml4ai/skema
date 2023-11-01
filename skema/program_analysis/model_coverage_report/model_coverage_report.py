@@ -236,26 +236,20 @@ def process_single_model(html: HTML_Instance, output_dir: str, model_name: str):
                 model_name, supported_lines, total_lines, False, None
             )
         else:
-            return
+    
             system_filepaths = Path(temp) / "system_filepaths.txt"
             system_filepaths.write_text(
                 "\n".join([file.filename for file in zip.filelist])
             )
-            full_gromet_path = (
-                Path(output_dir)
-                / "data"
-                / "full_gromet"
-                / model_name
-                / f"{model_name}.json"
-            )
-            full_gromet_path.parent.mkdir(parents=True, exist_ok=True)
-            full_gromet_relative_path = str(full_gromet_path.relative_to(output_dir))
-            full_gromet_status = generate_data_product(
-                full_gromet_path,
+            full_gromet, full_gromet_relative_path, full_gromet_status = generate_data_product(
+                output_dir,
+                model_name,
+                f"{model_name}.json",
                 generate_full_gromet,
                 args=(model_name, str(Path(temp)), str(system_filepaths)),
                 kwargs=None,
             )
+            
             html.add_model_header_data(
                 model_name,
                 supported_lines,
