@@ -224,7 +224,7 @@ pub fn mean(input: Span) -> IResult<Operator> {
 }
 
 pub fn grad(input: Span) -> IResult<Operator> {
-    let (s, op) = value(Operator::Grad, alt((ws(tag("𝛁")), ws(tag("&#x2207;")))))(input)?;
+    let (s, op) = value(Operator::Grad, alt((ws(tag("∇")), ws(tag("&#x2207;")))))(input)?;
     Ok((s, op))
 }
 
