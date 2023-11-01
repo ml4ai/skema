@@ -1544,8 +1544,22 @@ class PyASTToCAST:
                             prev_scope_id_dict[unique_name] = self.global_identifier_dict[
                                 unique_name
                             ]
-                        source_code_data_type = ["Python","3.8","List"]
-                        func_name_arg = LiteralValue(StructureType.LIST, node.func.id, source_code_data_type, ref)
+                        unique_name = construct_unique_name(
+                            self.filenames[-1], node.func.id
+                        )
+                        if unique_name not in prev_scope_id_dict.keys(): # and unique_name not in curr_scope_id_dict.keys():
+                            # If a built-in is called, then it gets added to the global dictionary if
+                            # it hasn't been called before. This is to maintain one consistent ID per built-in
+                            # function
+                            if unique_name not in self.global_identifier_dict.keys():
+                                self.insert_next_id(
+                                    self.global_identifier_dict, unique_name
+                                )
+
+                            prev_scope_id_dict[unique_name] = self.global_identifier_dict[
+                                unique_name
+                            ]
+                        func_name_arg = Name(name=node.func.id, id=prev_scope_id_dict[unique_name], source_refs=ref)
 
                         return [
                             Call(
@@ -2479,8 +2493,6 @@ class PyASTToCAST:
             )
 
         functions_to_visit = []
-
-        print(self.curr_func_args)
 
         if len(node.body) > 0:
             # To account for nested loops we check to see if the CAST node is in a list and
