@@ -649,7 +649,6 @@ class MatlabToCast(object):
         &#34;&#34;&#34; return a ModelIf with comparison and body nodes. &#34;&#34;&#34;
         # get ModelIf with body nodes
         mi = self.visit_else_clause(node)
-
         # addd comparison operator
         comp: Operator = get_first_child_by_type(node, &#34;comparison_operator&#34;)
         mi.expr = self.visit(comp)
@@ -659,17 +658,15 @@ class MatlabToCast(object):
 
     def visit_else_clause(self, node):
         &#34;&#34;&#34; Return a ModelIf with body nodes only. &#34;&#34;&#34;
-        mi = ModelIf() 
-
         # get the top level body nodes
+        mi = ModelIf()
         block = get_first_child_by_type(node, &#34;block&#34;)
-        body_nodes = list()
         for child in block.children:
             body_node = self.visit(child)
             if body_node:
-                body_nodes.append(body_node)
-        if len(body_nodes) &gt; 0:
-            mi.body = body_nodes
+                if not mi.body:
+                    mi.body = list()
+                mi.body.append(body_node)
 
         return mi
 
@@ -1790,7 +1787,6 @@ class MatlabToCast(object):
         &#34;&#34;&#34; return a ModelIf with comparison and body nodes. &#34;&#34;&#34;
         # get ModelIf with body nodes
         mi = self.visit_else_clause(node)
-
         # addd comparison operator
         comp: Operator = get_first_child_by_type(node, &#34;comparison_operator&#34;)
         mi.expr = self.visit(comp)
@@ -1800,17 +1796,15 @@ class MatlabToCast(object):
 
     def visit_else_clause(self, node):
         &#34;&#34;&#34; Return a ModelIf with body nodes only. &#34;&#34;&#34;
-        mi = ModelIf() 
-
         # get the top level body nodes
+        mi = ModelIf()
         block = get_first_child_by_type(node, &#34;block&#34;)
-        body_nodes = list()
         for child in block.children:
             body_node = self.visit(child)
             if body_node:
-                body_nodes.append(body_node)
-        if len(body_nodes) &gt; 0:
-            mi.body = body_nodes
+                if not mi.body:
+                    mi.body = list()
+                mi.body.append(body_node)
 
         return mi
 
@@ -2811,17 +2805,15 @@ The do while loop will be passed off to a seperate visitor. Returns a Loop objec
 </summary>
 <pre><code class="python">def visit_else_clause(self, node):
     &#34;&#34;&#34; Return a ModelIf with body nodes only. &#34;&#34;&#34;
-    mi = ModelIf() 
-
     # get the top level body nodes
+    mi = ModelIf()
     block = get_first_child_by_type(node, &#34;block&#34;)
-    body_nodes = list()
     for child in block.children:
         body_node = self.visit(child)
         if body_node:
-            body_nodes.append(body_node)
-    if len(body_nodes) &gt; 0:
-        mi.body = body_nodes
+            if not mi.body:
+                mi.body = list()
+            mi.body.append(body_node)
 
     return mi</code></pre>
 </details>
@@ -2839,7 +2831,6 @@ The do while loop will be passed off to a seperate visitor. Returns a Loop objec
     &#34;&#34;&#34; return a ModelIf with comparison and body nodes. &#34;&#34;&#34;
     # get ModelIf with body nodes
     mi = self.visit_else_clause(node)
-
     # addd comparison operator
     comp: Operator = get_first_child_by_type(node, &#34;comparison_operator&#34;)
     mi.expr = self.visit(comp)
