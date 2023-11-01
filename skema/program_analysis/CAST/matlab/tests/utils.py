@@ -29,7 +29,7 @@ def assert_operand(operand, value = ""):
         assert(False)
 
 def assert_assignment(assignment, left = "", right = ""):
-    """ Test an Assignment correct type and operands. """
+    """ Test an Assignment for correct type and operands. """
     assert isinstance(assignment, Assignment)
     assert_operand(assignment.left, left)
     assert_operand(assignment.right, right)
@@ -43,16 +43,13 @@ def assert_expression(expression, op = "", left = "", right = ""):
 
 def first_cast_node(source):
     """ Return the first node from the first Module of MatlabToCast output """
-
     # there should only be one CAST object in the cast output list
     cast = MatlabToCast(source = source).out_cast
     assert len(cast) == 1
-
     # there should be one module in the CAST object
     assert len(cast[0].nodes) == 1
     module = cast[0].nodes[0]
     assert isinstance(module, Module)
-
     # currently we support one node per module.  This may change
     assert len(module.body) == 1
     return module.body[0]
