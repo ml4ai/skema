@@ -7,6 +7,7 @@ import subprocess
 import time
 from shutil import copyfile as CP
 from threading import Timer
+from typing import List, Set, Tuple, Union
 
 from tqdm import tqdm
 
@@ -81,7 +82,18 @@ count = 0
 lock = mp.Lock()
 
 
-def eqn_image_exists(path: str):
+def read_latex(path: str) -> str:
+    with open(path, "r") as f:
+        latex_arr = f.readlines()
+        latex = (
+            " ".join([l.replace("\n", "") for l in latex_arr])
+            if len(latex_arr) >= 1
+            else ""
+        )
+    return latex
+
+
+def eqn_image_exists(path: str, root: str) -> bool:
     yr, month, folder, type_of_eqn, eqn_num = path.split("_")
     img_path = os.path.join(
         root,
@@ -90,7 +102,7 @@ def eqn_image_exists(path: str):
     return os.path.exists(img_path)
 
 
-def eqn_mml_exists(path: str):
+def eqn_mml_exists(path: str, root: str) -> bool:
     yr, month, folder, type_of_eqn, eqn_num = path.split("_")
     mml_path = os.path.join(
         root,
@@ -99,7 +111,18 @@ def eqn_mml_exists(path: str):
     return os.path.exists(mml_path)
 
 
-def get_paths(yr, yr_path, month):
+def get_paths(yr: str, yr_path: str, month: str) -> List[str]:
+    """
+    Collects equation paths for a given year and month.
+
+    Args:
+        yr (str): The year.
+        yr_path (str): The path to the year directory.
+        month (str): The month.
+
+    Returns:
+        List[str]: A list of equation paths in the format "yr_month_paper_type-of-eqn_eqn_num".
+    """
     start_time = time.perf_counter()
     temp_files = []
     month_path = os.path.join(yr_path, month, "latex_equations")
@@ -119,15 +142,24 @@ def get_paths(yr, yr_path, month):
                 ]
             )
     end_time = time.perf_counter()
-    print(f"Finished collecting paths in {(end_time - start_time):2f} seconds")
+    print(f"Finished collecting paths in {(end_time - start_time):.2f} seconds")
     return temp_files
 
 
-def has_intersection(a: set, b: set):
+def has_intersection(a: Set, b: Set) -> bool:
     return bool(a & b)
 
 
-def filter_by_mml_existence(paths: list):
+def filter_by_mml_existence(paths: List[str]) -> List[str]:
+    """
+    Filters a list of paths by whether or not the corresponding MathML file exists.
+
+    Args:
+        paths (List[str]): A list of paths in the format "yr_month_paper_type-of-eqn_eqn_num".
+
+    Returns:
+        List[str]: A list of paths in the format "yr_month_paper_type-of-eqn_eqn_num" for which the corresponding MathML file exists.
+    """
     start_time = time.perf_counter()
     filtered_paths = []
     print("Filtering paths by mml existence. This may take a while...")
@@ -143,7 +175,16 @@ def filter_by_mml_existence(paths: list):
     return filtered_paths
 
 
-def filter_by_image_existence(paths: list):
+def filter_by_image_existence(paths: List[str]) -> List[str]:
+    """
+    Filters a list of paths by whether or not the corresponding image file exists.
+
+    Args:
+        paths (List[str]): A list of paths in the format "yr_month_paper_type-of-eqn_eqn_num".
+
+    Returns:
+        List[str]: A list of paths in the format "yr_month_paper_type-of-eqn_eqn_num" for which the corresponding image file exists.
+    """
     start_time = time.perf_counter()
     filtered_paths = []
     print("Filtering paths by image existence. This may take a while...")
@@ -159,18 +200,22 @@ def filter_by_image_existence(paths: list):
     return filtered_paths
 
 
-def filter_paths_by_field(paths: list, fields: set):
+def filter_paths_by_field(paths: List[str], fields: Set[str]) -> List[str]:
+    """Filters a list of paths by whether or not the corresponding paper is in the specified fields.
+
+    Args:
+        paths (List[str]): A list of paths in the format "yr_month_paper_type-of-eqn_eqn_num".
+        fields (Set[str]): A set of fields to filter by.
+
+    Returns:
+        List[str]: A list of paths in the format "yr_month_paper_type-of-eqn_eqn_num" for which the corresponding paper is in the specified fields.
+    """
     start_time = time.perf_counter()
     print(f"Filtering paths by fields: {','.join(fields)}")
     arxvid_id_list = []
     for path in tqdm(paths, desc="Collecting arxiv ids from paths", total=len(paths)):
         arxiv_id = path.split("_")[2]
         arxvid_id_list.append(arxiv_id)
-
-    with open("arxiv_2016-2018_paper_ids.json", "w") as f:
-        json.dump(arxvid_id_list, f, indent=4)
-
-    exit(0)
 
     script_dir = os.path.dirname(__file__)
     with open(
@@ -193,13 +238,13 @@ def filter_paths_by_field(paths: list, fields: set):
     return filtered_paths
 
 
-def divide_all_paths_into_chunks(all_paths):
+def divide_all_paths_into_chunks(all_paths: List[str]) -> List[List[str]]:
     global chunk_size
     for i in range(0, len(all_paths), chunk_size):
         yield all_paths[i : i + chunk_size]
 
 
-def copy_image(img_src, img_dst):
+def copy_image(img_src: str, img_dst: str) -> bool:
     try:
         CP(img_src, img_dst)
         return True
@@ -207,18 +252,26 @@ def copy_image(img_src, img_dst):
         return False
 
 
-def prepare_dataset(args):
-    i, ap = args
+def normalize_latex(eqn_path: Tuple[int, str]) -> bool:
+    """
+    Runs latex normalization and simplification on a given equation. The equation is specified by the path.
+    The normalized equation is stored in a temporary file in the temp_folder directory.
+
+    For example, if the path is (1, "2001_01_2015.00001_1_large_eqn1"), then the equation is located at sampling_dataset/temp_folder/eqn_set_1.txt since the index is 1.
+
+    Args:
+        path (Tuple[int, str]): A tuple containing the index of the equation (in the batch) and the path to the equation in the format "yr_month_paper_type-of-eqn_eqn_num".
+
+    Returns:
+        bool: True if the equation was successfully normalized and simplified, False otherwise.
+    """
+    i, ap = eqn_path
     yr, month, folder, type_of_eqn, eqn_num = ap.split("_")
     latex_path = os.path.join(
         root,
         f"{yr}/{month}/latex_equations/{folder}/{type_of_eqn}_eqns/{eqn_num}.txt",
     )
-    with open(latex_path, "r") as f:
-        latex = f.readlines()
-        latex = (
-            " ".join([l.replace("\n", "") for l in latex]) if len(latex) >= 1 else ""
-        )
+    latex = read_latex(latex_path)
 
     temp_file_path = f"{os.getcwd()}/sampling_dataset/temp_folder/eqn_set_{i}.txt"
     with open(temp_file_path, "w") as f:
@@ -230,31 +283,41 @@ def prepare_dataset(args):
     process = subprocess.Popen(cmd, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
     my_timer = Timer(10, kill, [process])
 
+    # start the timer and run the process
     try:
         my_timer.start()
 
     except:
         if verbose:
             lock.acquire()
-            print("current status: ", counter_dist_dict)
-            print(f"taking too long time. skipping {ap} equation...")
+            print(f"Taking too long time. skipping {ap} equation...")
             lock.release()
+        return False
 
     finally:
         my_timer.cancel()
 
+    return True
 
-def get_bin(af):
+
+def get_bin(eqn_path: Tuple[int, str]) -> Union[Tuple[str, str], None]:
+    """
+    Gets the distribution bin for a given equation. The equation is specified by the path. The bin is determined by the length of the normalized latex equation.
+    The normalized equation file is located in the temp_folder directory using the index of the equation in the batch.
+
+    Args:
+        eqn_path (Tuple[int, str]): A tuple containing the index of the equation (in the batch) and the path to the equation in the format "yr_month_paper_type-of-eqn_eqn_num".
+
+    Returns:
+        Tuple[str, str]: A tuple containing the distribution bin and the path to the equation in the format "yr_month_paper_type-of-eqn_eqn_num".
+    """
     try:
-        i, ap = af
-        with open(f"{os.getcwd()}/sampling_dataset/temp_folder/eqn_set_{i}.txt") as f:
-            latex = f.readlines()
-            latex = (
-                " ".join([l.replace("\n", "") for l in latex])
-                if len(latex) >= 1
-                else ""
-            )
-            latex_length = len(latex.split())
+        i, ap = eqn_path
+
+        latex = read_latex(
+            f"{os.getcwd()}/sampling_dataset/temp_folder/eqn_set_{i}.txt"
+        )
+        latex_length = len(latex.split())
 
         # finding the bin
         temp_dict = {}
@@ -273,84 +336,113 @@ def get_bin(af):
 
     except Exception as e:
         print(f"Error in {ap}:", e)
+        return None
 
 
-# Function to kill process if TimeoutError occurs
 def kill(process):
     return process.kill()
 
 
+def sample_paths_for_years(all_paths: List[str]) -> List[str]:
+    """
+    Collects equation paths for a given year.
+
+    Args:
+        all_paths (List[str]): A list of paths in the format "yr_month_paper_type-of-eqn_eqn_num".
+
+    Returns:
+        List[str]: A list of equation paths in the format "yr_month_paper_type-of-eqn_eqn_num".
+    """
+    years = [yr.strip() for yr in config["years"].split(",")]
+
+    # Prepare batches for multiprocessing over both years and months
+    batches = []
+    for yr in years:
+        yr_path = os.path.join(root, yr)
+        cur_year_months = [f"{yr[2:]}{m:02}" for m in range(1, 13)]
+        cur_year_batches = [(yr, yr_path, month) for month in cur_year_months]
+        batches.extend(cur_year_batches)
+
+    # Collect all paths for all the years in parallel
+    with mp.Pool(config["num_cpus"]) as pool:
+        results = [
+            pool.apply_async(get_paths, args=(yr, yr_path, month))
+            for yr, yr_path, month in batches
+        ]
+
+        for r in results:
+            all_paths.extend(r.get())
+
+    return all_paths
+
+
+def sample_paths_for_months(all_paths: List[str]) -> List[str]:
+    """
+    Collects equation paths for a given month.
+
+    Args:
+        all_paths (List[str]): A list of paths in the format "yr_month_paper_type-of-eqn_eqn_num".
+
+    Returns:
+        List[str]: A list of equation paths in the format "yr_month_paper_type-of-eqn_eqn_num".
+    """
+    months = [month.strip() for month in config["months"].split(",")]
+    corresponding_years = [f"20{month[:2]}" for month in months]
+
+    # Preparing batches for multiprocessing over months
+    batches = zip(corresponding_years, months)
+
+    # Collect all paths for all the months in parallel
+    with mp.Pool(config["num_cpus"]) as pool:
+        results = [
+            pool.apply_async(get_paths, args=(yr, os.path.join(root, yr), month))
+            for yr, month in batches
+        ]
+
+        for r in results:
+            all_paths.extend(r.get())
+
+    return all_paths
+
+
 def main():
+    """
+    The main function that runs the sampling process
+
+    Sampling Steps:
+
+        (1) All the equation paths will be collected according to the config.
+        (2) They will be randomly shuffled twice to ensure proper shuffling.
+        (3) They will sequentially be fetched and will be distributed according to the
+            length as per the distribution. The length will be determined by the normalized latex.
+        (4) The corresponding PNG and MathML will be copied to the destination folder.
+    """
     global count, total_eqns, final_paths, fields
     global lock, counter_dist_dict, dist_dict, chunk_size
 
-    """
-    Sampling Steps:
-
-    (1) All the MathML eqn paths will be collected in 'all_paths'.
-    (2) They will be randomly shuffled twice to ensure proper shuffling.
-    (3) They will sequentially be fetched and will be distributed according to the
-        length as per the distribution. The length of the preprocessed simplified
-        MathML used will be used to final distribution bin.
-    (4) Corresponding Latex and PNG will fetched and stored.
-
-    """
-
     all_paths = []
 
-    ######## step 1: get all LaTeX paths ########
-    print("collecting all the LaTeX paths...")
+    ######## Step 1: get all LaTeX paths ########
+    print("Collecting all the LaTeX paths...")
 
-    # collect all the paths in all_paths list according to the config
     if config["sample_entire_year"]:
-        years = [yr.strip() for yr in config["years"].split(",")]
-
-        # Prepare batches for multiprocessing
-        batches = []
-        for yr in years:
-            yr_path = os.path.join(root, yr)
-            cur_year_months = [f"{yr[2:]}{m:02}" for m in range(1, 13)]
-            cur_year_batches = [(yr, yr_path, month) for month in cur_year_months]
-            batches.extend(cur_year_batches)
-
-        with mp.Pool(config["num_cpus"]) as pool:
-            results = [
-                pool.apply_async(get_paths, args=(yr, yr_path, month))
-                for yr, yr_path, month in batches
-            ]
-
-            for r in results:
-                all_paths.extend(r.get())
-
+        all_paths = sample_paths_for_years(all_paths)
     elif config["sample_from_months"]:
-        months = [month.strip() for month in config["months"].split(",")]
-        corresponding_years = [f"20{month[:2]}" for month in months]
+        all_paths = sample_paths_for_months(all_paths)
 
-        with mp.Pool(config["num_cpus"]) as pool:
-            results = [
-                pool.apply_async(get_paths, args=(yr, os.path.join(root, yr), month))
-                for yr, month in zip(corresponding_years, months)
-            ]
-
-            for r in results:
-                all_paths.extend(r.get())
-
-    # filter paths by fields if fields are provided in config
     all_paths = filter_paths_by_field(all_paths, fields) if fields else all_paths
-    # filter paths by image existence and mml existence
     all_paths = filter_by_image_existence(all_paths)
     all_paths = filter_by_mml_existence(all_paths)
 
-    ######## step 2: shuffle it twice ########
+    ######## Step 2: shuffle it twice ########
     print("Shuffling all the paths to create randomness...")
     random.shuffle(all_paths)
     random.shuffle(all_paths)
 
-    ######## step 3: simplify MML and and find length  #####
-    ######## and grab the corresponding PNG and latex ############
-    print("Preparing dataset...")
+    ######## Step 3: Normalize latex and get bins ########
+    print("Normalizing dataset...")
 
-    # opening a temporary folder to store temp files
+    # Opening a temporary folder to store temp files
     # this folder will be deleted at the end of the run.
     # It is created to help expediting the process by avoiding
     # Lock functionality.
@@ -358,31 +450,31 @@ def main():
     if not os.path.exists(temp_folder):
         os.mkdir(temp_folder)
 
-    print("diving all_paths into batches of 10K to work efficiently...")
+    print("Diving all_paths into batches of 10K to work efficiently...")
     reject_count = 0
     batches = list(divide_all_paths_into_chunks(all_paths))
     for bidx, batch_paths in tqdm(
         enumerate(batches), desc="Batches", total=len(batches)
     ):
         if count <= total_eqns:
-            print("running batch: ", bidx)
-            print("current status: ", counter_dist_dict)
+            print("Running batch: ", bidx)
+            print("Current distribution status: ", counter_dist_dict)
 
-            # preparing dataset for multiprocessing
-            all_files = [[i, ap] for i, ap in enumerate(batch_paths)]
+            # Preparing dataset for multiprocessing
+            all_files = [(i, ap) for i, ap in enumerate(batch_paths)]
 
-            print("Preparing dataset...")
+            print("Normalizing latex...")
             with mp.Pool(config["num_cpus"]) as pool:
-                pool.map(prepare_dataset, all_files)
+                pool.map(normalize_latex, all_files)
 
             # getting bins for each equation's latex token length
-            print("Getting bins...")
+            print("Getting bins for each equation's latex token length...")
             with mp.Pool(config["num_cpus"]) as pool:
                 results = [
                     pool.apply_async(get_bin, args=(i,)).get() for i in all_files
                 ]
 
-            print("Collecting final paths...")
+            print("Collecting final paths for this batch...")
             for r in results:
                 if r is not None:
                     tgt_bin, ap = r
@@ -401,12 +493,12 @@ def main():
             subprocess.run(clean_cmd)
 
         else:
-            # remove temp_folder
+            # Remove temp_folder
             shutil.rmtree(temp_folder)
-            print("rejected: ", reject_count)
+            print("Rejected: ", reject_count)
             break
 
-    ######## step 4: writing the final dataset ########
+    ######## Step 4: writing the final dataset ########
 
     # random shuffle twice
     random.shuffle(final_paths)
@@ -414,8 +506,7 @@ def main():
 
     print("Writing the final dataset files and copying images...")
 
-    reject = 0
-    c_idx = 0
+    c_idx, reject = 0, 0
     for _, fp in tqdm(
         enumerate(final_paths), desc="Writing files...", total=len(final_paths)
     ):
@@ -430,38 +521,27 @@ def main():
             img_dst = os.path.join(os.path.join(data_path, "images"), f"{c_idx}.png")
             CP(img_src, img_dst)
 
-            # wrting path
+            # Saving path
             paths_file.write(fp + "\n")
 
-            # writing MathML
+            # Saving mml
             mml_path = os.path.join(
                 root,
                 f"{yr}/{month}/mathjax_mml/{folder}/{type_of_eqn}_mml/{eqn_num}.xml",
             )
-
             with open(mml_path, "r") as f:
                 mml = f.readline()
 
-            if "\n" not in mml:
-                mml = mml + "\n"
+            mml = mml + "\n" if "\n" not in mml else mml
             mml_file.write(mml)
 
-            # writing latex
+            # Saving latex
             latex_path = os.path.join(
                 root,
                 f"{yr}/{month}/latex_equations/{folder}/{type_of_eqn}_eqns/{eqn_num}.txt",
             )
-
-            with open(latex_path, "r") as f:
-                latex_arr = f.readlines()
-                latex = (
-                    " ".join([l.replace("\n", "") for l in latex_arr])
-                    if len(latex_arr) >= 1
-                    else ""
-                )
-
-            if "\n" not in latex:
-                latex = latex + "\n"
+            latex = read_latex(latex_path)
+            latex = latex + "\n" if "\n" not in latex else latex
             latex_file.write(latex)
 
             c_idx += 1
