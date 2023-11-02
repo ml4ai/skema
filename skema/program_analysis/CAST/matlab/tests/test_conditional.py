@@ -1,7 +1,7 @@
 from skema.program_analysis.CAST.matlab.tests.utils import (
     assert_assignment,
     assert_expression,
-    first_cast_node
+    cast_nodes
 )
 from skema.program_analysis.CAST2FN.model.cast import ModelIf
 
@@ -14,7 +14,8 @@ def test_if():
     end
     """
 
-    mi = first_cast_node(source)
+    mi = cast_nodes(source)[0]
+
     # if
     assert isinstance(mi, ModelIf)
     assert_expression(mi.expr, op = ">", left = "x", right = "5")
@@ -31,7 +32,7 @@ def test_if_else():
     end
     """
 
-    mi = first_cast_node(source)
+    mi = cast_nodes(source)[0]
     # if
     assert isinstance(mi, ModelIf)
     assert_expression(mi.expr, op = ">", left = "x", right = "5")
@@ -52,7 +53,7 @@ def test_if_elseif_else():
     end
     """
     
-    mi = first_cast_node(source)
+    mi = cast_nodes(source)[0]
     # if
     assert isinstance(mi, ModelIf)
     assert_expression(mi.expr, op = ">", left = "x", right = "5")
@@ -63,4 +64,3 @@ def test_if_elseif_else():
     assert_assignment(mi.orelse[0].body[0], left="y", right = "x")
     # else
     assert_assignment(mi.orelse[1], left="y", right = "0")
-

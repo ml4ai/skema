@@ -41,8 +41,8 @@ def assert_expression(expression, op = "", left = "", right = ""):
     assert_operand(expression.operands[0], left)
     assert_operand(expression.operands[1], right)
 
-def first_cast_node(source):
-    """ Return the first node from the first Module of MatlabToCast output """
+def cast_nodes(source):
+    """ Return the CAST nodes from the first Module of MatlabToCast output """
     # there should only be one CAST object in the cast output list
     cast = MatlabToCast(source = source).out_cast
     assert len(cast) == 1
@@ -50,6 +50,5 @@ def first_cast_node(source):
     assert len(cast[0].nodes) == 1
     module = cast[0].nodes[0]
     assert isinstance(module, Module)
-    # currently we support one node per module.  This may change
-    assert len(module.body) == 1
-    return module.body[0]
+    # return the module body node list
+    return module.body
