@@ -10,11 +10,13 @@ def test_assignment():
 
     source = """
     x = 5
-    y = 4
+    y = "xxx"
     """
     
     # nodes should be two assignments
     nodes = cast_nodes(source)
     assert len(nodes) == 2
     assert_assignment(nodes[0], left = "x", right = "5")
-    assert_assignment(nodes[1], left = "y", right = "4")
+
+    # When comparing strings you must include escaped quotes
+    assert_assignment(nodes[1], left = "y", right = "\"xxx\"")
