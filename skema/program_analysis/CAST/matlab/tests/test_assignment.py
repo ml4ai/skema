@@ -1,6 +1,6 @@
 from skema.program_analysis.CAST.matlab.tests.utils import (
     assert_assignment,
-    first_cast_node
+    cast_nodes
 )
 
 # Test the CAST returned by processing the simplest MATLAB assignment
@@ -8,10 +8,13 @@ from skema.program_analysis.CAST.matlab.tests.utils import (
 def test_assignment():
     """ Test CAST from MATLAB 'assignment' statement."""
 
-    source = 'x = 5'
+    source = """
+    x = 5
+    y = 4
+    """
     
-    # The root of the CAST should be Assignment
-    assignment = first_cast_node(source)
-
-    # The module body should contain a single assignment node
-    assert_assignment(assignment, left = "x", right = "5")
+    # nodes should be two assignments
+    nodes = cast_nodes(source)
+    assert len(nodes) == 2
+    assert_assignment(nodes[0], left = "x", right = "5")
+    assert_assignment(nodes[1], left = "y", right = "4")
