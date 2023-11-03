@@ -1,23 +1,25 @@
 #!/usr/bin/env python3
 import json
+from typing import List
 import sys
 from skema.program_analysis.CAST.matlab.matlab_to_cast import MatlabToCast
 
-def prune(json_obj, target_key):
-    """ remove all instances of the target key from the json object"""
+def prune(json_obj, target_keys: List):
+    """ remove all instances of the target keys from the json object"""
     def remove_key(json_obj, target_key):
         if isinstance(json_obj, dict):
-            if target_key in json_obj.keys():
-                json_obj.pop(target_key)
-            for key in json_obj.keys():
-                remove_key(json_obj[key], target_key)
+            for target_key in target_keys:
+                if target_key in json_obj.keys():
+                    json_obj.pop(target_key)
+                for key in json_obj.keys():
+                    remove_key(json_obj[key], target_keys)
         elif isinstance(json_obj, list):
             for item in json_obj:
-                remove_key(item, target_key)
+                remove_key(item, target_keys)
         return(json_obj)
 
-    print(f"Removed key: {target_key}")
-    return remove_key(json_obj, target_key)
+    print(f"Removed keys: {target_keys}")
+    return remove_key(json_obj, target_keys)
 
 def show_cast(filename):
     """ Run a file of any type through the Tree-sitter MATLAB parser"""
@@ -33,7 +35,7 @@ def show_cast(filename):
         json_obj = cast.to_json_object()
 
         # declutter
-        json_obj = prune(json_obj, "source_refs")
+        json_obj = prune(json_obj, ["source_refs"])
 
         print(json.dumps(json_obj, sort_keys = True, indent = 2))
 
