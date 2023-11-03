@@ -606,12 +606,10 @@ class MatlabToCast(object):
         mi = ModelIf()
 
         # get switch identifier
-        identifier = get_first_child_by_type(node, ("identifier"))
+        identifier = get_first_child_by_type(node, "identifier")
 
         # get n case clauses
-        types = list()
-        types.append("case_clause")
-        case_clauses = get_children_by_types(node, types)
+        case_clauses = get_children_by_types(node, ["case_clause"])
 
         return mi
 
@@ -638,7 +636,7 @@ class MatlabToCast(object):
         mi = self.visit_elseif_clause(node)
 
         # get 0-n elseif_clauses
-        elseif_clauses = get_children_by_types(node, ("elseif_clause"))
+        elseif_clauses = get_children_by_types(node, ["elseif_clause"])
         for child in elseif_clauses:
             elseif_node = self.visit(child)
             if elseif_node:
@@ -647,7 +645,7 @@ class MatlabToCast(object):
                 mi.orelse.append(elseif_node)
 
         # get 0-1 else_clauses
-        else_clauses = get_children_by_types(node, ("else_clause"))
+        else_clauses = get_children_by_types(node, ["else_clause"])
         for child in else_clauses:
             else_node = self.visit(child)
             if else_node.body:
