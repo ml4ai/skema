@@ -78,6 +78,7 @@ class MatlabToCast(object):
         """Interface for generating CAST."""
 
         # remove comments from tree before processing
+
         modules = self.run(remove_comments(self.tree.root_node))
         return [CAST([module], "matlab") for module in modules]
         
@@ -96,7 +97,6 @@ class MatlabToCast(object):
             "function_definition",
             "subroutine",
             "assignment",
-            "switch_statement"
         ]
 
         outer_body_nodes = get_children_by_types(root, body_node_names)
@@ -152,6 +152,10 @@ class MatlabToCast(object):
             return self.visit_extent_specifier(node)
         elif node.type == "do_loop_statement":
             return self.visit_do_loop_statement(node)
+        elif node.type == "switch_statement":
+            return self.visit_switch_statement(node)
+        elif node.type == "case_clause":
+            return self.visit_case_clause(node)
         elif node.type == "if_statement":
             return self.visit_if_statement(node)
         elif node.type == "elseif_clause":
@@ -578,6 +582,45 @@ class MatlabToCast(object):
             source_refs=[self.node_helper.get_source_ref(node)],
         )
 
+
+    def visit_switch_statement(self, node):
+        """ return a conditional logic statement based on the case statement """
+        # This case statement:
+        # switch s
+        #     case 'top'
+        #         n = 1;
+        #     case 'bottom'
+        #         n = 0;
+        # end
+        # 
+        # can be reduced to:
+        # if s == ‘top’
+        #     n = 1
+        # elseif s == ‘bottom’
+        #     n = 2
+        #
+        # The first case clause becomes an if statement
+        # any subsequent case clauses become elseif statements
+        # a default clause, if one exists, becomes an else statement
+
+        mi = ModelIf()
+
+        # get switch identifier
+        identifier = get_first_child_by_type(node, ("identifier"))
+
+        # get n case clauses
+        types = list()
+        types.append("case_clause")
+        case_clauses = get_children_by_types(node, types)
+
+        return mi
+
+
+    def visit_case_clause(self, node):
+        """ return an if statement defining the case clause"""
+        pass
+
+
     def visit_if_statement(self, node):
         """ return a ModelIf if, elseif, and else clauses"""
 
@@ -621,8 +664,8 @@ class MatlabToCast(object):
         # get ModelIf with body nodes
         mi = self.visit_else_clause(node)
         # addd comparison operator
-        comp: Operator = get_first_child_by_type(node, "comparison_operator")
-        mi.expr = self.visit(comp)
+        comparison_operator = get_first_child_by_type(node, "comparison_operator")
+        mi.expr = self.visit(comparison_operator)
 
         return mi
     
