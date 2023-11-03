@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "Activating conda environment"
-$conda_env_name = "image2mathml_venv"
+conda_env_name='image2mathml_venv'
 eval "$(conda shell.bash hook)"
 conda deactivate
 conda activate $conda_env_name
