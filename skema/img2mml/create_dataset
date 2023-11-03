@@ -1,18 +1,26 @@
 #!/bin/bash
 
+echo "Activating conda environment"
+$conda_env_name = "image2mathml_venv"
 eval "$(conda shell.bash hook)"
 conda deactivate
-conda activate image2mathml_venv
+conda activate $conda_env_name
 
+echo "Creating dataset"
 python3 create_dataset.py
+
+echo "Normalizing final dataset latex"
 cp training_data/sample_data/original_latex.lst sampling_dataset/temp.lst
 python3 sampling_dataset/preprocess_latex.py temp.lst temp.norm.lst
 cp sampling_dataset/temp.norm.lst training_data/sample_data/latex.norm.lst
 rm -rf sampling_dataset/*.lst
+
+echo "Normalizing final dataset image"
+python3 sampling_dataset/preprocess_images.py --input-dir training_data/sample_data/images --output-dir training_data/sample_data/images_processed
 
 cd training_data/
 tar -czvf data.tar.gz sample_data
 mv data.tar.gz ../
 cd ../
 
-echo "Done"
+echo "Done. Dataset is at data.tar.gz"
