@@ -60,6 +60,7 @@ def process_batch(batch):
     Returns:
         list: A list of results. Each result is a dictionary with the keys "prediction", "ground_truth", "bleu", "valid_latex", and "length".
     """
+    print(f"Processing batch of {len(batch)} results")
     for i, result in enumerate(batch):
         prediction = result["prediction"]
         ground_truth = result["ground_truth"]
@@ -74,6 +75,7 @@ def process_batch(batch):
                 "length": len(tokenizer(ground_truth).split(" ")),
             }
         )
+    print(f"Finished processing batch of {len(batch)} results")
     return batch
 
 
@@ -100,6 +102,7 @@ def calculate_test_results(test_results, num_processes=1):
 
 
 def bin_results(results):
+    print("Binning results")
     result_bins = {
         f"{i}-{i+50 if i < 350 else 'inf'}": {"bleu": [], "valid_latex": []}
         for i in get_bins()
@@ -114,6 +117,7 @@ def bin_results(results):
                 result_bins[res_bin]["bleu"].append(result["bleu"])
                 result_bins[res_bin]["valid_latex"].append(result["valid_latex"])
                 break
+    print("Finished binning results")
     return result_bins
 
 
