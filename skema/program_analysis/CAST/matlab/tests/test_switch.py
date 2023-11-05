@@ -10,12 +10,12 @@ def do_not_test_switch():
 
     source = """
     switch s
-        case 'axis'
-            n = 0;
-        case 'bottom'
+        case 'one'
             n = 1;
-        case 'top'
+        case 'two'
             n = 2;
+        otherwise
+            n = 0;
     end
     """
 
