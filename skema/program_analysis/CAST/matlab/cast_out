@@ -1,10 +1,19 @@
 #!/usr/bin/env python3
 import json
-from typing import List
 import sys
 from skema.program_analysis.CAST.matlab.matlab_to_cast import MatlabToCast
+from typing import List
 
-def prune(json_obj, target_keys: List):
+# Show a CAST object as JSON with certain keys filtered for clarity.
+
+# Keys to remove from the output for clarity.
+KEY_FILTER = [
+    "source_refs",
+    "default_value",
+    "interpreter"
+]
+
+def remove_keys(json_obj, target_keys: List):
     """ remove all instances of the target keys from the json object"""
     def remove_key(json_obj, target_key):
         if isinstance(json_obj, dict):
@@ -33,11 +42,13 @@ def show_cast(filename):
 
     for cast in cast_list:
         json_obj = cast.to_json_object()
-
-        # declutter
-        json_obj = prune(json_obj, ["source_refs"])
-
-        print(json.dumps(json_obj, sort_keys = True, indent = 2))
+        # declutter JSON by filtering keys
+        json_obj = remove_keys(json_obj, KEY_FILTER)
+        # pretty print JSON to string
+        output = json.dumps(json_obj, sort_keys=True, indent=2)
+        # json.dumps incorrectly reports None as null. Python has no null. 
+        output = output.replace (": null", ": None")
+        print(output)
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:
