@@ -583,19 +583,23 @@ class MatlabToCast(object):
 
     def visit_switch_statement(self, node):
         """ return a conditional logic statement based on the case statement """
-        # This case statement:
+        # This MATLAB case statement:
         # switch s
-        #     case 'top'
+        #     case 'one'
         #         n = 1;
-        #     case 'bottom'
+        #     case 'two'
+        #         n = 2;
+        #     otherwise
         #         n = 0;
         # end
         # 
         # can be reduced to:
-        # if s == ‘top’
+        # if s == 'one'
         #     n = 1
-        # elseif s == ‘bottom’
+        # elseif s == 'two'
         #     n = 2
+        # else
+        #     n = 0
         #
         # The first case clause becomes an if statement
         # any subsequent case clauses become elseif statements
@@ -611,11 +615,13 @@ class MatlabToCast(object):
 
             operand1 = self.visit(get_first_child_by_type(case_clause, "string"))     
 
-            expr = Operator(
+            mi = self.visit_else_clause(case_clause)
+            mi.expr = Operator(
                 op = "==",
-                operands = [identifier, operand1]
+                operands = [identifier, operand1],
+                source_language = "MATLAB",
+                version = MATLAB_VERSION
             )
-            mi = ModelIf(expr = expr)
 
             return mi
         
