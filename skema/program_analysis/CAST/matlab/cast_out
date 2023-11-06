@@ -4,18 +4,17 @@ import sys
 from skema.program_analysis.CAST.matlab.matlab_to_cast import MatlabToCast
 from typing import List
 
-# Show a CAST object as JSON with certain keys filtered for clarity.
+# Show a CAST object as pretty printed JSON with keys filtered for clarity.
 
-# Keys to remove from the output for clarity.
-KEY_FILTER = [
-    "source_refs",
-    "default_value",
-    "interpreter"
-]
+# Keys to remove from the output
+#KEY_FILTER = ["source_refs", "default_value", "interpreter"]
+KEY_FILTER = ["source_refs"]
 
 def remove_keys(json_obj, target_keys: List):
     """ remove all instances of the target keys from the json object"""
+
     def remove_key(json_obj, target_key):
+    """ remove all instances of the target key from the json object"""
         if isinstance(json_obj, dict):
             for target_key in target_keys:
                 if target_key in json_obj.keys():
@@ -30,6 +29,7 @@ def remove_keys(json_obj, target_keys: List):
     print(f"Removed keys: {target_keys}")
     return remove_key(json_obj, target_keys)
 
+
 def show_cast(filename):
     """ Run a file of any type through the Tree-sitter MATLAB parser"""
     parser = MatlabToCast(filename)
@@ -39,16 +39,14 @@ def show_cast(filename):
     print(parser.source)
     print('\nCAST:')
     cast_list = parser.out_cast
-
     for cast in cast_list:
         json_obj = cast.to_json_object()
         # declutter JSON by filtering keys
         json_obj = remove_keys(json_obj, KEY_FILTER)
         # pretty print JSON to string
         output = json.dumps(json_obj, sort_keys=True, indent=2)
-        # json.dumps incorrectly reports None as null. Python has no null. 
-        output = output.replace (": null", ": None")
         print(output)
+
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:
@@ -56,4 +54,3 @@ if __name__ == "__main__":
             show_cast(sys.argv[i])
     else:
         print("Please enter one filename to parse")
-
