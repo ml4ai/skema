@@ -90,6 +90,20 @@ def get_first_child_index(node, type: str):
             return i
 
 
+def remove_comments(node: Node):
+    """Remove comment nodes from tree-sitter parse tree"""
+    # NOTE: tree-sitter Node objects are read-only, so we have to be careful about how we remove comments
+    # The below has been carefully designed to work around this restriction.
+    to_remove = sorted([index for index,child in enumerate(node.children) if child.type == "comment"], reverse=True)
+    for index in to_remove:
+        del node.children[index]
+
+    for i in range(len(node.children)):
+        node.children[i] = remove_comments(node.children[i])
+
+    return node
+
+
 def get_last_child_index(node, type: str):
     """Get the index of the last child of node with type type."""
     last = None
