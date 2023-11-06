@@ -27,6 +27,7 @@ pub enum Operator {
     Comma,
     Grad,
     Dot,
+    Period,
     Div,
     Abs,
     Derivative(Derivative),
@@ -59,7 +60,7 @@ impl fmt::Display for Operator {
             Operator::Lparen => write!(f, "("),
             Operator::Rparen => write!(f, ")"),
             Operator::Compose => write!(f, "."),
-            Operator::Comma => write!(f, ","),
+            Operator::Comma => write!(f, ""),
             Operator::Factorial => write!(f, "!"),
             Operator::Derivative(Derivative {
                 order,
@@ -86,6 +87,7 @@ impl fmt::Display for Operator {
             Operator::Mean => write!(f, "Mean"),
             Operator::Grad => write!(f, "Grad"),
             Operator::Dot => write!(f, "Dot"),
+            Operator::Period => write!(f, ""),
             Operator::Div => write!(f, "Div"),
             Operator::Abs => write!(f, "Abs"),
         }
