@@ -158,7 +158,7 @@ class MatlabToCast(object):
             return self.visit_if_statement(node)
         elif node.type == "elseif_clause":
             return self.visit_elseif_clause(node)
-        elif node.type == "else_clause":
+        elif node.type in ["else_clause", "otherwise_clause"]:
             return self.visit_else_clause(node)
         elif node.type == "derived_type_definition":
             return self.visit_derived_type(node)
@@ -580,51 +580,33 @@ class MatlabToCast(object):
             source_refs=[self.node_helper.get_source_ref(node)],
         )
 
+    def visit_otherwise_clause(self, node):
+        mi = ModelIf()
+
+        # ...
+
+        return mi
 
     def visit_switch_statement(self, node):
-        """ return a conditional logic statement based on the case statement """
-        # This MATLAB case statement:
-        # switch s
+        """ return a conditional logic statement based on the switch statement """
         #     case 'one'
         #         n = 1;
-        #     case 'two'
-        #         n = 2;
+        #     case {2, '2', 'two'}
+        #         n = 2
         #     otherwise
         #         n = 0;
         # end
         # 
-        # can be reduced to:
-        # if s == 'one'
+        # The above statement can be reduced to:
+        # if s in ['one'] 
         #     n = 1
-        # elseif s == 'two'
+        # elseif s in [2, '2', 'two']
         #     n = 2
-        # else
+        # else 
         #     n = 0
-        #
         # The first case clause becomes an if statement
         # any subsequent case clauses become elseif statements
         # a default clause, if one exists, becomes an else statement
-
-        def if_clause(identifier, case_clause):
-            # {
-            #     "body": null,
-            #     "expr": null,
-            #     "node_type": "ModelIf",
-            #     "orelse": null
-            # }
-
-            operand1 = self.visit(get_first_child_by_type(case_clause, "string"))     
-
-            mi = self.visit_else_clause(case_clause)
-            mi.expr = Operator(
-                op = "==",
-                operands = [identifier, operand1],
-                source_language = "MATLAB",
-                version = MATLAB_VERSION
-            )
-
-            return mi
-        
 
         # get switch identifier
         identifier = self.visit(get_first_child_by_type(node, "identifier"))
@@ -632,18 +614,12 @@ class MatlabToCast(object):
         # get n case clauses
         case_clauses = get_children_by_types(node, ["case_clause"])
 
-        # use first case clause to create an if statment
-        if len(case_clauses) > 0:
-            mi = if_clause(identifier, case_clauses[0])
+        mi = self.visit(get_first_child_by_type(node, "otherwise_clause"))
 
         return mi
 
-
-
     def visit_if_statement(self, node):
         """ return a ModelIf if, elseif, and else clauses"""
-
-        # print('visit_if_statement')
 
         # if_statement Tree-sitter syntax tree:
         #     if
@@ -677,17 +653,13 @@ class MatlabToCast(object):
 
         return mi
     
-
     def visit_elseif_clause(self, node):
-        """ return a ModelIf with comparison and body nodes. """
-        # get ModelIf with body nodes
+        """ return a ModelIf with comparison operator and body nodes. """
         mi = self.visit_else_clause(node)
-        # addd comparison operator
         comparison_operator = get_first_child_by_type(node, "comparison_operator")
         mi.expr = self.visit(comparison_operator)
 
         return mi
-    
 
     def visit_else_clause(self, node):
         """ Return a ModelIf with body nodes only. """
@@ -702,7 +674,6 @@ class MatlabToCast(object):
                 mi.body.append(body_node)
 
         return mi
-
 
     def visit_assignment(self, node):
         """Docstring"""
@@ -772,7 +743,6 @@ class MatlabToCast(object):
                 source_code_data_type=["matlab", MATLAB_VERSION, "dimension"],
                 source_refs=[literal_source_ref],
             )
-
 
     def visit_identifier(self, node):
         """Docstring"""
@@ -1223,3 +1193,5 @@ class MatlabToCast(object):
             return self.variable_context.get_node(func_name)
 
         return self.variable_context.add_variable(func_name, "function", None)
+
+
