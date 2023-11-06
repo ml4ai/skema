@@ -46,7 +46,6 @@ MATLAB_VERSION='matlab_version_here'
 
 class MatlabToCast(object):
     def __init__(self, source_path = "", source = ""):
-        """docstring"""
 
         # if a source file path is provided, read source from file
         if not source_path == "":
@@ -118,7 +117,7 @@ class MatlabToCast(object):
 
     def visit(self, node):
         """Switch execution based on node type"""
-        # print(f"\nvisit node type = {node.type}")
+        # print(f"\nvisit {node.type}")
 
         if node.type in ["program", "module", "source_file"] :
             return self.visit_module(node)
@@ -169,7 +168,6 @@ class MatlabToCast(object):
 
     def visit_module(self, node: Node) -> Module:
         """Visitor for program and module statement. Returns a Module object"""
-        # print('visit_module')
         self.variable_context.push_context()
         
         program_body = []
@@ -190,13 +188,10 @@ class MatlabToCast(object):
 
     def visit_internal_procedures(self, node: Node) -> List[FunctionDef]:
         """Visitor for internal procedures. Returns list of FunctionDef"""
-        # print('visit_internal_procedures')
         internal_procedures = get_children_by_types(node, ["function_definition", "subroutine"])
         return [self.visit(procedure) for procedure in internal_procedures]
 
     def visit_name(self, node):
-        """Docstring"""
-        # print('visit_name')
         # Node structure
         # (name)
 
@@ -210,8 +205,6 @@ class MatlabToCast(object):
         )
 
     def visit_function_def(self, node):
-        """Docstring"""
-        # print('visit_function_def')
         # TODO: Refactor function def code to use new helper functions
         # Node structure
         # (subroutine)
@@ -318,8 +311,6 @@ class MatlabToCast(object):
         )
 
     def visit_function_call(self, node):
-        """Docstring"""
-        # print('visit_function_call')
         # Pull relevent nodes
         if node.type == "subroutine_call":
             function_node = node.children[1]
@@ -361,8 +352,6 @@ class MatlabToCast(object):
         )
 
     def visit_keyword_statement(self, node):
-        """Docstring"""
-        # print('visit_keyword_statement')
         # Currently, the only keyword_identifier produced by tree-sitter is Return
         # However, there may be other instances
 
@@ -398,8 +387,6 @@ class MatlabToCast(object):
         )
 
     def visit_use_statement(self, node):
-        """Docstring"""
-        # print('visit_use_statement')
         # (use)
         #   (use)
         #   (module_name)
@@ -459,7 +446,6 @@ class MatlabToCast(object):
             (body) ...
         """
 
-        # print('visit_do_loop_statement')
         # First check for
         # TODO: Add do until Loop support
         while_statement_node = get_first_child_by_type(node, "while_statement")
@@ -661,23 +647,13 @@ class MatlabToCast(object):
 
         return mi
 
-    def visit_else_clause(self, node):
-        """ Return a ModelIf with body nodes only. """
-        # get the top level body nodes
+    def visit_else_clause(self, node: Node):
+        """ Return a ModelIf with body nodes from Tree-sitter block nodes. """
         mi = ModelIf()
-        block = get_first_child_by_type(node, "block")
-        for child in block.children:
-            body_node = self.visit(child)
-            if body_node:
-                if not mi.body:
-                    mi.body = list()
-                mi.body.append(body_node)
-
+        mi.body = self.get_body_nodes(node)
         return mi
 
     def visit_assignment(self, node):
-        """Docstring"""
-        # print('visit_assignment')
         left, _, right = node.children
 
         return Assignment(
@@ -688,7 +664,6 @@ class MatlabToCast(object):
 
     def visit_literal(self, node) -> LiteralValue:
         """Visitor for literals. Returns a LiteralValue"""
-        # print('visit_literal')
         literal_type = node.type
         literal_value = self.node_helper.get_identifier(node)
         literal_source_ref = self.node_helper.get_source_ref(node)
@@ -745,8 +720,6 @@ class MatlabToCast(object):
             )
 
     def visit_identifier(self, node):
-        """Docstring"""
-        # print('visit_identifier')
         # By default, this is unknown, but can be updated by other visitors
         identifier = self.node_helper.get_identifier(node)
         if self.variable_context.is_variable(identifier):
@@ -769,8 +742,6 @@ class MatlabToCast(object):
         )
 
     def visit_math_expression(self, node):
-        """Docstring"""
-        # print('visit_math_expression')
         op = self.node_helper.get_identifier(
             get_control_children(node)[0]
         )  # The operator will be the first control character
@@ -896,8 +867,6 @@ class MatlabToCast(object):
         return vars
 
     def visit_extent_specifier(self, node):
-        """Docstring"""
-        # print('visit_extent_specifier')
         # Node structure
         # (extent_specifier)
         #   (identifier)
@@ -938,8 +907,6 @@ class MatlabToCast(object):
             (BODY_NODES)
             ...
         """
-        # print('visit_derived_type')
-
 
         record_name = self.node_helper.get_identifier(
             get_first_child_by_type(node, "type_name", recurse=True)
@@ -1021,7 +988,6 @@ class MatlabToCast(object):
                 (argument_list)
             (type_member)
         """
-        # print('visit_derived_type_member_expression')
 
         # If we are accessing an attribute of a scalar type, we can simply pull the name node from the variable context.
         # However, if this is a dimensional type, we must convert it to a call to _get.
@@ -1048,8 +1014,6 @@ class MatlabToCast(object):
     # NOTE: This function starts with _ because it will never be dispatched to directly. There is not a get node in the tree-sitter parse tree.
     # From context, we will determine when we are accessing an element of a List, and call this function,
     def _visit_get(self, node):
-        """Docstring"""
-        # print('_visit_get')
         # Node structure
         # (call_expression)
         #  (identifier)
@@ -1088,8 +1052,6 @@ class MatlabToCast(object):
         )
 
     def _visit_set(self, node):
-        """Docstring"""
-        # print('_visit_set')
         # Node structure
         # (assignment)
         #  (call_expression)
@@ -1116,7 +1078,6 @@ class MatlabToCast(object):
                     (...) ...
             (body) ...
         """
-        # print('_visit_while')
         while_statement_node = get_first_child_by_type(node, "while_statement")
 
         # The first body node will be the node after the while_statement
@@ -1145,7 +1106,6 @@ class MatlabToCast(object):
     def _visit_implied_do_loop(self, node) -> Call:
         """Custom visitor for implied_do_loop array literal. This form gets converted to a call to range"""
         # TODO: This loop_control is the same as the do loop. Can we turn this into one visitor?
-        # print('_visit_implied_do_loop')
         loop_control_node = get_first_child_by_type(
             node, "loop_control_expression", recurse=True
         )
@@ -1174,8 +1134,6 @@ class MatlabToCast(object):
         )
 
     def _visit_passthrough(self, node):
-        """Docstring"""
-        # print('_visit_passthrough')
         if len(node.children) == 0:
             return None
 
@@ -1185,8 +1143,6 @@ class MatlabToCast(object):
                 return child_cast
 
     def get_gromet_function_node(self, func_name: str) -> Name:
-        """Docstring"""
-        # print('get_gromet_function_node')
         # Idealy, we would be able to create a dummy node and just call the name visitor.
         # However, tree-sitter does not allow you to create or modify nodes, so we have to recreate the logic here.
         if self.variable_context.is_variable(func_name):
@@ -1194,4 +1150,11 @@ class MatlabToCast(object):
 
         return self.variable_context.add_variable(func_name, "function", None)
 
-
+    def get_body_nodes(self, node):
+        """ Return valid body nodes from Tree-sitter block node. """
+        block = get_first_child_by_type(node, "block")
+        ast_nodes = [self.visit(child) for child in block.children]
+        body_nodes = [ast_node for ast_node in ast_nodes if ast_node] 
+        if len(body_nodes) > 0:
+            return body_nodes
+        return None

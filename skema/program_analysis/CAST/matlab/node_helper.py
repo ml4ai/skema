@@ -27,7 +27,6 @@ CONTROL_CHARACTERS = [
 
 class NodeHelper():
     def __init__(self, source: str, source_file_name: str):
-        """Docstring"""
         self.source = source
         self.source_file_name = source_file_name
 
@@ -114,12 +113,10 @@ def get_last_child_index(node, type: str):
 
 
 def get_control_children(node: Node):
-    """Docstring"""
     return get_children_by_types(node, CONTROL_CHARACTERS)
 
 
 def get_non_control_children(node: Node):
-    """Docstring"""
     children = []
     for child in node.children:
         if child.type not in CONTROL_CHARACTERS:
