@@ -1,5 +1,6 @@
 #! /usr/bin/env python3
 
+import argparse
 import json
 import os
 import time
@@ -79,7 +80,7 @@ def process_batch(batch):
     return batch
 
 
-def calculate_test_results(test_results, num_processes=1):
+def calculate_test_results(test_results, num_processes):
     start_time = time.perf_counter()
     num_batches = num_processes
     batch_size = len(test_results) // num_batches
@@ -150,6 +151,14 @@ def calculate_bin_results(models, binned_results):
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--n",
+        type=int,
+        help="The number of processes to use for parallel processing",
+        default=1,
+    )
+    args = parser.parse_args()
     models = json.load(open(os.path.join(script_directory, "models.json"), "r"))
 
     final_results = {}
@@ -162,7 +171,7 @@ if __name__ == "__main__":
         for results_file in results_files:
             dataset_name = results_file.split("_")[0]
             results = calculate_test_results(
-                load_json(os.path.join(results_dir, results_file)), 4
+                load_json(os.path.join(results_dir, results_file)), args.n
             )
 
             binned_results = bin_results(results)
