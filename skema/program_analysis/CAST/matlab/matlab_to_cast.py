@@ -577,11 +577,6 @@ class MatlabToCast(object):
         literal_types = ["number", "string", "boolean", "array_literal"]
         sequence_types = ["cell", "row"]
         
-        def get_literals(node, literals):
-            for child in node.children:
-                get_literals(child, literals + get_children_by_types(child, literal_types))
-            return [self.visit(literal) for literal in literals]
-
         def get_operator(op, left, right):
             """ Return a comparison operator between identifier and literal"""
             return Operator(
@@ -597,16 +592,17 @@ class MatlabToCast(object):
             """ Create a sequence of if-then conditionals """
             mi=ModelIf()
 
-            # there will either be a list containing a single literal_value
+            # there will either be a list containing a single literal_value...
             literal_values = get_children_by_types(conditional_node, literal_types)
             ast_nodes = [self.visit(element) for element in literal_values]
             valid_nodes = [ast_node for ast_node in ast_nodes if ast_node]
             if len(valid_nodes) == 1:
                 mi.expr = get_operator("==", identifier, valid_nodes[0])
             
-            # else there will be a nested sequence containing them.
+            # ...or there will be a nested sequence containing them.
             multiple_values = get_children_by_types(conditional_node, sequence_types)
-            #  ... chain ifelse
+
+            #  ... chain ifelse or test if value in list?
 
 
             # instruction_block posibly None
@@ -660,15 +656,16 @@ class MatlabToCast(object):
 
         # the if statement is returned as a ModelIf AstNode
         model_ifs = [conditional(node)]
+
         # add 0-n elseif_clauses 
         elseif_clauses = get_children_by_types(node, ["elseif_clause"])
         model_ifs += [conditional(child) for child in elseif_clauses]
 
-        # link model_ifs as orelse lists
+        # chain model_ifs as orelse lists
         for i, model_if in enumerate(model_ifs[1:]):
             model_ifs[i].orelse = [model_if]
 
-        # add 0-1 else clause
+        # add 0-1 else clause 
         else_clause = get_first_child_by_type(node, "else_clause")
         if else_clause:
             block = get_first_child_by_type(else_clause, "block")
