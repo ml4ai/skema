@@ -27,8 +27,10 @@ def test_if_else():
     source = """
     if x > 5
         y = 6
+        three = 3
     else
         y = x
+        foo = 'bar'
     end
     """
 
@@ -37,8 +39,10 @@ def test_if_else():
     assert isinstance(mi, ModelIf)
     assert_expression(mi.expr, op = ">", left = "x", right = "5")
     assert_assignment(mi.body[0], left="y", right = "6")
+    assert_assignment(mi.body[1], left="three", right = "3")
     # else
     assert_assignment(mi.orelse[0], left="y", right = "x")
+    assert_assignment(mi.orelse[1], left="foo", right = "'bar'")
 
 def test_if_elseif_else():
     """ Test CAST from MATLAB 'if elseif else' conditional logic."""
