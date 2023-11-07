@@ -669,8 +669,8 @@ class MatlabToCast(object):
             model_ifs[i].orelse = [model_if]
 
         # add 0-1 else clause
-        else_clauses = [get_first_child_by_type(node, "else_clause")]
-        for else_clause in else_clauses:
+        else_clause = get_first_child_by_type(node, "else_clause")
+        if else_clause:
             block = get_first_child_by_type(else_clause, "block")
             if block:
                 ast_nodes = [self.visit(child) for child in block.children]
