@@ -155,10 +155,6 @@ class MatlabToCast(object):
             return self.visit_do_loop_statement(node)
         elif node.type == "switch_statement":
             return self.visit_switch_statement(node)
-        elif node.type == "case_clause":
-            return self.visit_case_clause(node)
-        elif node.type == "otherwise_clause":
-            return self.visit_otherwise_clause(node)
         elif node.type == "if_statement":
             return self.visit_if_statement(node)
         elif node.type == "derived_type_definition":
@@ -576,64 +572,100 @@ class MatlabToCast(object):
         return mi
 
     def visit_switch_statement(self, node):
-        """ return a conditional logic statement based on the switch statement """
-        #     case 'one'
-        #         n = 1;
-        #     case {2, '2', 'two'}
-        #         n = 2
-        #     otherwise
-        #         n = 0;
-        # end
-        # 
-        # The above statement can be reduced to:
-        # if s in ['one'] 
-        #     n = 1
-        # elseif s in [2, '2', 'two']
-        #     n = 2
-        # else 
-        #     n = 0
-        # The first case clause becomes an if statement
-        # any subsequent case clauses become elseif statements
-        # a default clause, if one exists, becomes an else statement
+        """ return a conditional statement based on the switch statement """
+        
+        literal_types = ["number", "string", "boolean", "array_literal"]
+        sequence_types = ["cell", "row"]
+        
+        def get_literals(literal_node, target_list):
+            # keep looking
+            sequences = get_children_by_types(literal_node, sequence_types)
+            for sequence in sequences:
+                get_literals(sequence, target_list)
+            # found 
+            literals = get_children_by_types(literal_node, literal_types)
+            print(f"get_literals: Literals found: {len(literals)}")
+            ast_nodes = [self.visit(child) for child in literals]
+            target_list += [ast_node for ast_node in ast_nodes if ast_node]
+            return target_list
+
+
+        return Operator(
+            source_language="matlab",
+            interpreter=None,
+            version=None,
+            op=op,
+            operands=operands,
+            source_refs=[self.node_helper.get_source_ref(node)],
+        )
+        def conditional(conditional_node, identifier):
+            """ Create a sequence of if-then conditionals """
+            ret=ModelIf()
+
+            # find target values
+            literals = get_literals(conditional_node, list())
+            print(f"conditional: Literals found: {len(literals)}")
+            ret.orelse = literals
+
+            # comparison operator
+            ret.expr = self.visit(get_first_child_by_type(
+                conditional_node,
+                "comparison_operator"
+            ))
+
+            # instruction_block possibly None
+            block = get_first_child_by_type(conditional_node, "block")
+            if block:
+                ast_nodes = [self.visit(child) for child in block.children]
+                ret.body = [ast_node for ast_node in ast_nodes if ast_node]
+            
+            return ret
 
         # get switch identifier
         identifier = self.visit(get_first_child_by_type(node, "identifier"))
 
+        # Create a placeholder ModelIf for now
+        ret = ModelIf()
+
         # get 0-n case clauses
         case_clauses = get_children_by_types(node, ["case_clause"])
+        ret.orelse = [conditional(child, identifier) for child in case_clauses]
 
         # get 0-1 otherwise clauses
-        mi = self.visit(get_first_child_by_type(node, "otherwise_clause"))
+        otherwise_clauses = get_children_by_types(node, ["otherwise_clause"])
+        for block in [conditional(child, identifier).body for child in otherwise_clauses]:
+            if block:
+                ret.orelse += block
 
-        return mi
+        return ret
 
     def visit_if_statement(self, node):
         """ return a node describing if, elseif, else conditional logic"""
 
-        def conditional(_node):
-            """ return a ModelIf struct for the conditional logic clause. """
+        def conditional(conditional_node):
+            """ return a ModelIf struct for the conditional logic node. """
             ret = ModelIf()
             # comparison_operator, possibly None
             ret.expr = self.visit(get_first_child_by_type(
-                _node, 
+                conditional_node,
                 "comparison_operator"
             ))
             # instruction_block possibly None
-            block = get_first_child_by_type(_node, "block")
+            block = get_first_child_by_type(conditional_node, "block")
             if block:
                 ast_nodes = [self.visit(child) for child in block.children]
                 ret.body = [ast_node for ast_node in ast_nodes if ast_node]
 
             return ret
 
-        # the if statement is returned as a ModelIf struct
+        # the if statement is returned as a ModelIf AstNode
         ret = conditional(node)
         # add 0-n elseif_clauses 
         elseif_clauses = get_children_by_types(node, ["elseif_clause"])
         ret.orelse = [conditional(child) for child in elseif_clauses]
         # add 0-1 else clause
         else_clauses = get_children_by_types(node, ["else_clause"])
-        for block in [conditional(e).body for e in else_clauses]:
+        for block in [conditional(child).body for child in else_clauses]:
             if block:
                 ret.orelse += block
 
