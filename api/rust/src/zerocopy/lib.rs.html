@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/zerocopy-0.7.21/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-cb6f1f67f1bcd037.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="zerocopy" data-themes="" data-resource-suffix="" data-rustdoc-version="1.73.0 (cc66ad468 2023-10-03)" data-channel="1.73.0" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-1596385f77d47ef2.css" data-theme-dark-css="dark-0a43001d3fc2282c.css" data-theme-ayu-css="ayu-fd19013d6ce078bf.css" ><script src="../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-1596385f77d47ef2.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-0a43001d3fc2282c.css"><link rel="stylesheet" href="../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../zerocopy/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/zerocopy-0.7.25/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-cb6f1f67f1bcd037.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="zerocopy" data-themes="" data-resource-suffix="" data-rustdoc-version="1.73.0 (cc66ad468 2023-10-03)" data-channel="1.73.0" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-1596385f77d47ef2.css" data-theme-dark-css="dark-0a43001d3fc2282c.css" data-theme-ayu-css="ayu-fd19013d6ce078bf.css" ><script src="../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-1596385f77d47ef2.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-0a43001d3fc2282c.css"><link rel="stylesheet" href="../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../zerocopy/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -5436,6 +5436,218 @@
 <a href="#5436" id="5436">5436</a>
 <a href="#5437" id="5437">5437</a>
 <a href="#5438" id="5438">5438</a>
+<a href="#5439" id="5439">5439</a>
+<a href="#5440" id="5440">5440</a>
+<a href="#5441" id="5441">5441</a>
+<a href="#5442" id="5442">5442</a>
+<a href="#5443" id="5443">5443</a>
+<a href="#5444" id="5444">5444</a>
+<a href="#5445" id="5445">5445</a>
+<a href="#5446" id="5446">5446</a>
+<a href="#5447" id="5447">5447</a>
+<a href="#5448" id="5448">5448</a>
+<a href="#5449" id="5449">5449</a>
+<a href="#5450" id="5450">5450</a>
+<a href="#5451" id="5451">5451</a>
+<a href="#5452" id="5452">5452</a>
+<a href="#5453" id="5453">5453</a>
+<a href="#5454" id="5454">5454</a>
+<a href="#5455" id="5455">5455</a>
+<a href="#5456" id="5456">5456</a>
+<a href="#5457" id="5457">5457</a>
+<a href="#5458" id="5458">5458</a>
+<a href="#5459" id="5459">5459</a>
+<a href="#5460" id="5460">5460</a>
+<a href="#5461" id="5461">5461</a>
+<a href="#5462" id="5462">5462</a>
+<a href="#5463" id="5463">5463</a>
+<a href="#5464" id="5464">5464</a>
+<a href="#5465" id="5465">5465</a>
+<a href="#5466" id="5466">5466</a>
+<a href="#5467" id="5467">5467</a>
+<a href="#5468" id="5468">5468</a>
+<a href="#5469" id="5469">5469</a>
+<a href="#5470" id="5470">5470</a>
+<a href="#5471" id="5471">5471</a>
+<a href="#5472" id="5472">5472</a>
+<a href="#5473" id="5473">5473</a>
+<a href="#5474" id="5474">5474</a>
+<a href="#5475" id="5475">5475</a>
+<a href="#5476" id="5476">5476</a>
+<a href="#5477" id="5477">5477</a>
+<a href="#5478" id="5478">5478</a>
+<a href="#5479" id="5479">5479</a>
+<a href="#5480" id="5480">5480</a>
+<a href="#5481" id="5481">5481</a>
+<a href="#5482" id="5482">5482</a>
+<a href="#5483" id="5483">5483</a>
+<a href="#5484" id="5484">5484</a>
+<a href="#5485" id="5485">5485</a>
+<a href="#5486" id="5486">5486</a>
+<a href="#5487" id="5487">5487</a>
+<a href="#5488" id="5488">5488</a>
+<a href="#5489" id="5489">5489</a>
+<a href="#5490" id="5490">5490</a>
+<a href="#5491" id="5491">5491</a>
+<a href="#5492" id="5492">5492</a>
+<a href="#5493" id="5493">5493</a>
+<a href="#5494" id="5494">5494</a>
+<a href="#5495" id="5495">5495</a>
+<a href="#5496" id="5496">5496</a>
+<a href="#5497" id="5497">5497</a>
+<a href="#5498" id="5498">5498</a>
+<a href="#5499" id="5499">5499</a>
+<a href="#5500" id="5500">5500</a>
+<a href="#5501" id="5501">5501</a>
+<a href="#5502" id="5502">5502</a>
+<a href="#5503" id="5503">5503</a>
+<a href="#5504" id="5504">5504</a>
+<a href="#5505" id="5505">5505</a>
+<a href="#5506" id="5506">5506</a>
+<a href="#5507" id="5507">5507</a>
+<a href="#5508" id="5508">5508</a>
+<a href="#5509" id="5509">5509</a>
+<a href="#5510" id="5510">5510</a>
+<a href="#5511" id="5511">5511</a>
+<a href="#5512" id="5512">5512</a>
+<a href="#5513" id="5513">5513</a>
+<a href="#5514" id="5514">5514</a>
+<a href="#5515" id="5515">5515</a>
+<a href="#5516" id="5516">5516</a>
+<a href="#5517" id="5517">5517</a>
+<a href="#5518" id="5518">5518</a>
+<a href="#5519" id="5519">5519</a>
+<a href="#5520" id="5520">5520</a>
+<a href="#5521" id="5521">5521</a>
+<a href="#5522" id="5522">5522</a>
+<a href="#5523" id="5523">5523</a>
+<a href="#5524" id="5524">5524</a>
+<a href="#5525" id="5525">5525</a>
+<a href="#5526" id="5526">5526</a>
+<a href="#5527" id="5527">5527</a>
+<a href="#5528" id="5528">5528</a>
+<a href="#5529" id="5529">5529</a>
+<a href="#5530" id="5530">5530</a>
+<a href="#5531" id="5531">5531</a>
+<a href="#5532" id="5532">5532</a>
+<a href="#5533" id="5533">5533</a>
+<a href="#5534" id="5534">5534</a>
+<a href="#5535" id="5535">5535</a>
+<a href="#5536" id="5536">5536</a>
+<a href="#5537" id="5537">5537</a>
+<a href="#5538" id="5538">5538</a>
+<a href="#5539" id="5539">5539</a>
+<a href="#5540" id="5540">5540</a>
+<a href="#5541" id="5541">5541</a>
+<a href="#5542" id="5542">5542</a>
+<a href="#5543" id="5543">5543</a>
+<a href="#5544" id="5544">5544</a>
+<a href="#5545" id="5545">5545</a>
+<a href="#5546" id="5546">5546</a>
+<a href="#5547" id="5547">5547</a>
+<a href="#5548" id="5548">5548</a>
+<a href="#5549" id="5549">5549</a>
+<a href="#5550" id="5550">5550</a>
+<a href="#5551" id="5551">5551</a>
+<a href="#5552" id="5552">5552</a>
+<a href="#5553" id="5553">5553</a>
+<a href="#5554" id="5554">5554</a>
+<a href="#5555" id="5555">5555</a>
+<a href="#5556" id="5556">5556</a>
+<a href="#5557" id="5557">5557</a>
+<a href="#5558" id="5558">5558</a>
+<a href="#5559" id="5559">5559</a>
+<a href="#5560" id="5560">5560</a>
+<a href="#5561" id="5561">5561</a>
+<a href="#5562" id="5562">5562</a>
+<a href="#5563" id="5563">5563</a>
+<a href="#5564" id="5564">5564</a>
+<a href="#5565" id="5565">5565</a>
+<a href="#5566" id="5566">5566</a>
+<a href="#5567" id="5567">5567</a>
+<a href="#5568" id="5568">5568</a>
+<a href="#5569" id="5569">5569</a>
+<a href="#5570" id="5570">5570</a>
+<a href="#5571" id="5571">5571</a>
+<a href="#5572" id="5572">5572</a>
+<a href="#5573" id="5573">5573</a>
+<a href="#5574" id="5574">5574</a>
+<a href="#5575" id="5575">5575</a>
+<a href="#5576" id="5576">5576</a>
+<a href="#5577" id="5577">5577</a>
+<a href="#5578" id="5578">5578</a>
+<a href="#5579" id="5579">5579</a>
+<a href="#5580" id="5580">5580</a>
+<a href="#5581" id="5581">5581</a>
+<a href="#5582" id="5582">5582</a>
+<a href="#5583" id="5583">5583</a>
+<a href="#5584" id="5584">5584</a>
+<a href="#5585" id="5585">5585</a>
+<a href="#5586" id="5586">5586</a>
+<a href="#5587" id="5587">5587</a>
+<a href="#5588" id="5588">5588</a>
+<a href="#5589" id="5589">5589</a>
+<a href="#5590" id="5590">5590</a>
+<a href="#5591" id="5591">5591</a>
+<a href="#5592" id="5592">5592</a>
+<a href="#5593" id="5593">5593</a>
+<a href="#5594" id="5594">5594</a>
+<a href="#5595" id="5595">5595</a>
+<a href="#5596" id="5596">5596</a>
+<a href="#5597" id="5597">5597</a>
+<a href="#5598" id="5598">5598</a>
+<a href="#5599" id="5599">5599</a>
+<a href="#5600" id="5600">5600</a>
+<a href="#5601" id="5601">5601</a>
+<a href="#5602" id="5602">5602</a>
+<a href="#5603" id="5603">5603</a>
+<a href="#5604" id="5604">5604</a>
+<a href="#5605" id="5605">5605</a>
+<a href="#5606" id="5606">5606</a>
+<a href="#5607" id="5607">5607</a>
+<a href="#5608" id="5608">5608</a>
+<a href="#5609" id="5609">5609</a>
+<a href="#5610" id="5610">5610</a>
+<a href="#5611" id="5611">5611</a>
+<a href="#5612" id="5612">5612</a>
+<a href="#5613" id="5613">5613</a>
+<a href="#5614" id="5614">5614</a>
+<a href="#5615" id="5615">5615</a>
+<a href="#5616" id="5616">5616</a>
+<a href="#5617" id="5617">5617</a>
+<a href="#5618" id="5618">5618</a>
+<a href="#5619" id="5619">5619</a>
+<a href="#5620" id="5620">5620</a>
+<a href="#5621" id="5621">5621</a>
+<a href="#5622" id="5622">5622</a>
+<a href="#5623" id="5623">5623</a>
+<a href="#5624" id="5624">5624</a>
+<a href="#5625" id="5625">5625</a>
+<a href="#5626" id="5626">5626</a>
+<a href="#5627" id="5627">5627</a>
+<a href="#5628" id="5628">5628</a>
+<a href="#5629" id="5629">5629</a>
+<a href="#5630" id="5630">5630</a>
+<a href="#5631" id="5631">5631</a>
+<a href="#5632" id="5632">5632</a>
+<a href="#5633" id="5633">5633</a>
+<a href="#5634" id="5634">5634</a>
+<a href="#5635" id="5635">5635</a>
+<a href="#5636" id="5636">5636</a>
+<a href="#5637" id="5637">5637</a>
+<a href="#5638" id="5638">5638</a>
+<a href="#5639" id="5639">5639</a>
+<a href="#5640" id="5640">5640</a>
+<a href="#5641" id="5641">5641</a>
+<a href="#5642" id="5642">5642</a>
+<a href="#5643" id="5643">5643</a>
+<a href="#5644" id="5644">5644</a>
+<a href="#5645" id="5645">5645</a>
+<a href="#5646" id="5646">5646</a>
+<a href="#5647" id="5647">5647</a>
+<a href="#5648" id="5648">5648</a>
+<a href="#5649" id="5649">5649</a>
+<a href="#5650" id="5650">5650</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018 The Fuchsia Authors
 //
 // Licensed under the 2-Clause BSD License &lt;LICENSE-BSD or
@@ -5661,6 +5873,7 @@
 ))]
 #![cfg_attr(not(test), no_std)]
 #![cfg_attr(feature = <span class="string">&quot;simd-nightly&quot;</span>, feature(stdsimd))]
+#![cfg_attr(doc_cfg, feature(doc_cfg))]
 #![cfg_attr(
     __INTERNAL_USE_ONLY_NIGHLTY_FEATURES_IN_TESTS,
     feature(layout_for_ptr, strict_provenance)
@@ -5669,6 +5882,7 @@
 </span><span class="kw">mod </span>macros;
 
 <span class="attr">#[cfg(feature = <span class="string">&quot;byteorder&quot;</span>)]
+#[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">&quot;byteorder&quot;</span>)))]
 </span><span class="kw">pub mod </span>byteorder;
 <span class="attr">#[doc(hidden)]
 </span><span class="kw">pub mod </span>macro_util;
@@ -5677,10 +5891,21 @@
 </span><span class="kw">mod </span>wrappers;
 
 <span class="attr">#[cfg(feature = <span class="string">&quot;byteorder&quot;</span>)]
+#[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">&quot;byteorder&quot;</span>)))]
 </span><span class="kw">pub use </span><span class="kw">crate</span>::byteorder::<span class="kw-2">*</span>;
 <span class="kw">pub use </span><span class="kw">crate</span>::wrappers::<span class="kw-2">*</span>;
+
 <span class="attr">#[cfg(any(feature = <span class="string">&quot;derive&quot;</span>, test))]
-</span><span class="kw">pub use </span>zerocopy_derive::<span class="kw-2">*</span>;
+#[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">&quot;derive&quot;</span>)))]
+</span><span class="kw">pub use </span>zerocopy_derive::{AsBytes, FromBytes, Unaligned};
+
+<span class="comment">// `pub use` separately here so that we can mark it `#[doc(hidden)]`.
+//
+// TODO(#29): Remove this or add a doc comment.
+</span><span class="attr">#[cfg(any(feature = <span class="string">&quot;derive&quot;</span>, test))]
+#[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">&quot;derive&quot;</span>)))]
+#[doc(hidden)]
+</span><span class="kw">pub use </span>zerocopy_derive::KnownLayout;
 
 <span class="kw">use </span>core::{
     cell::{<span class="self">self</span>, RefMut},
@@ -6141,6 +6366,8 @@
     T: <span class="question-mark">?</span>Sized =&gt; PhantomData&lt;T&gt;,
     T         =&gt; Wrapping&lt;T&gt;,
     T         =&gt; MaybeUninit&lt;T&gt;,
+    T: <span class="question-mark">?</span>Sized =&gt; <span class="kw-2">*const </span>T,
+    T: <span class="question-mark">?</span>Sized =&gt; <span class="kw-2">*mut </span>T,
 );
 <span class="macro">impl_known_layout!</span>(<span class="kw">const </span>N: usize, T =&gt; [T; N]);
 
@@ -6256,6 +6483,7 @@
 </span><span class="comment">// TODO(#146): Document why we don&#39;t require an enum to have an explicit `repr`
 // attribute.
 </span><span class="attr">#[cfg(any(feature = <span class="string">&quot;derive&quot;</span>, test))]
+#[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">&quot;derive&quot;</span>)))]
 </span><span class="kw">pub use </span>zerocopy_derive::FromZeroes;
 
 <span class="doccomment">/// Types for which a sequence of bytes all set to zero represents a valid
@@ -6442,6 +6670,7 @@
     ///
     /// Panics if allocation of `size_of::&lt;Self&gt;()` bytes fails.
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+    #[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">&quot;alloc&quot;</span>)))]
     #[inline]
     </span><span class="kw">fn </span>new_box_zeroed() -&gt; Box&lt;<span class="self">Self</span>&gt;
     <span class="kw">where
@@ -6489,6 +6718,7 @@
     /// * Panics if `size_of::&lt;Self&gt;() * len` overflows.
     /// * Panics if allocation of `size_of::&lt;Self&gt;() * len` bytes fails.
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+    #[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">&quot;alloc&quot;</span>)))]
     #[inline]
     </span><span class="kw">fn </span>new_box_slice_zeroed(len: usize) -&gt; Box&lt;[<span class="self">Self</span>]&gt;
     <span class="kw">where
@@ -6555,6 +6785,7 @@
     /// * Panics if `size_of::&lt;Self&gt;() * len` overflows.
     /// * Panics if allocation of `size_of::&lt;Self&gt;() * len` bytes fails.
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+    #[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">&quot;new_vec_zeroed&quot;</span>)))]
     #[inline(always)]
     </span><span class="kw">fn </span>new_vec_zeroed(len: usize) -&gt; Vec&lt;<span class="self">Self</span>&gt;
     <span class="kw">where
@@ -6734,6 +6965,134 @@
         </span><span class="self">Self</span>: Sized + AsBytes,
     {
         Ref::&lt;<span class="kw-2">&amp;mut </span>[u8], <span class="self">Self</span>&gt;::new_from_suffix(bytes).map(|(<span class="kw">_</span>, r)| r.into_mut())
+    }
+
+    <span class="doccomment">/// Interprets the given `bytes` as a `&amp;[Self]` without copying.
+    ///
+    /// If `bytes.len() % size_of::&lt;T&gt;() != 0` or `bytes` is not aligned to
+    /// `align_of::&lt;T&gt;()`, this returns `None`.
+    ///
+    /// If you need to convert a specific number of slice elements, see
+    /// [`slice_from_prefix`](FromBytes::slice_from_prefix) or
+    /// [`slice_from_suffix`](FromBytes::slice_from_suffix).
+    ///
+    /// # Panics
+    ///
+    /// If `T` is a zero-sized type.
+    </span><span class="attr">#[inline]
+    </span><span class="kw">fn </span>slice_from(bytes: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>[<span class="self">Self</span>]&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: Sized,
+    {
+        Ref::&lt;<span class="kw">_</span>, [<span class="self">Self</span>]&gt;::new_slice(bytes).map(|r| r.into_slice())
+    }
+
+    <span class="doccomment">/// Interprets the prefix of the given `bytes` as a `&amp;[Self]` with length
+    /// equal to `count` without copying.
+    ///
+    /// This method verifies that `bytes.len() &gt;= size_of::&lt;T&gt;() * count`
+    /// and that `bytes` is aligned to `align_of::&lt;T&gt;()`. It consumes the
+    /// first `size_of::&lt;T&gt;() * count` bytes from `bytes` to construct a
+    /// `&amp;[Self]`, and returns the remaining bytes to the caller. It also
+    /// ensures that `sizeof::&lt;T&gt;() * count` does not overflow a `usize`.
+    /// If any of the length, alignment, or overflow checks fail, it returns
+    /// `None`.
+    ///
+    /// # Panics
+    ///
+    /// If `T` is a zero-sized type.
+    </span><span class="attr">#[inline]
+    </span><span class="kw">fn </span>slice_from_prefix(bytes: <span class="kw-2">&amp;</span>[u8], count: usize) -&gt; <span class="prelude-ty">Option</span>&lt;(<span class="kw-2">&amp;</span>[<span class="self">Self</span>], <span class="kw-2">&amp;</span>[u8])&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: Sized,
+    {
+        Ref::&lt;<span class="kw">_</span>, [<span class="self">Self</span>]&gt;::new_slice_from_prefix(bytes, count).map(|(r, b)| (r.into_slice(), b))
+    }
+
+    <span class="doccomment">/// Interprets the suffix of the given `bytes` as a `&amp;[Self]` with length
+    /// equal to `count` without copying.
+    ///
+    /// This method verifies that `bytes.len() &gt;= size_of::&lt;T&gt;() * count`
+    /// and that `bytes` is aligned to `align_of::&lt;T&gt;()`. It consumes the
+    /// last `size_of::&lt;T&gt;() * count` bytes from `bytes` to construct a
+    /// `&amp;[Self]`, and returns the preceding bytes to the caller. It also
+    /// ensures that `sizeof::&lt;T&gt;() * count` does not overflow a `usize`.
+    /// If any of the length, alignment, or overflow checks fail, it returns
+    /// `None`.
+    ///
+    /// # Panics
+    ///
+    /// If `T` is a zero-sized type.
+    </span><span class="attr">#[inline]
+    </span><span class="kw">fn </span>slice_from_suffix(bytes: <span class="kw-2">&amp;</span>[u8], count: usize) -&gt; <span class="prelude-ty">Option</span>&lt;(<span class="kw-2">&amp;</span>[u8], <span class="kw-2">&amp;</span>[<span class="self">Self</span>])&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: Sized,
+    {
+        Ref::&lt;<span class="kw">_</span>, [<span class="self">Self</span>]&gt;::new_slice_from_suffix(bytes, count).map(|(b, r)| (b, r.into_slice()))
+    }
+
+    <span class="doccomment">/// Interprets the given `bytes` as a `&amp;mut [Self]` without copying.
+    ///
+    /// If `bytes.len() % size_of::&lt;T&gt;() != 0` or `bytes` is not aligned to
+    /// `align_of::&lt;T&gt;()`, this returns `None`.
+    ///
+    /// If you need to convert a specific number of slice elements, see
+    /// [`mut_slice_from_prefix`](FromBytes::mut_slice_from_prefix) or
+    /// [`mut_slice_from_suffix`](FromBytes::mut_slice_from_suffix).
+    ///
+    /// # Panics
+    ///
+    /// If `T` is a zero-sized type.
+    </span><span class="attr">#[inline]
+    </span><span class="kw">fn </span>mut_slice_from(bytes: <span class="kw-2">&amp;mut </span>[u8]) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>[<span class="self">Self</span>]&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: Sized + AsBytes,
+    {
+        Ref::&lt;<span class="kw">_</span>, [<span class="self">Self</span>]&gt;::new_slice(bytes).map(|r| r.into_mut_slice())
+    }
+
+    <span class="doccomment">/// Interprets the prefix of the given `bytes` as a `&amp;mut [Self]` with length
+    /// equal to `count` without copying.
+    ///
+    /// This method verifies that `bytes.len() &gt;= size_of::&lt;T&gt;() * count`
+    /// and that `bytes` is aligned to `align_of::&lt;T&gt;()`. It consumes the
+    /// first `size_of::&lt;T&gt;() * count` bytes from `bytes` to construct a
+    /// `&amp;[Self]`, and returns the remaining bytes to the caller. It also
+    /// ensures that `sizeof::&lt;T&gt;() * count` does not overflow a `usize`.
+    /// If any of the length, alignment, or overflow checks fail, it returns
+    /// `None`.
+    ///
+    /// # Panics
+    ///
+    /// If `T` is a zero-sized type.
+    </span><span class="attr">#[inline]
+    </span><span class="kw">fn </span>mut_slice_from_prefix(bytes: <span class="kw-2">&amp;mut </span>[u8], count: usize) -&gt; <span class="prelude-ty">Option</span>&lt;(<span class="kw-2">&amp;mut </span>[<span class="self">Self</span>], <span class="kw-2">&amp;mut </span>[u8])&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: Sized + AsBytes,
+    {
+        Ref::&lt;<span class="kw">_</span>, [<span class="self">Self</span>]&gt;::new_slice_from_prefix(bytes, count).map(|(r, b)| (r.into_mut_slice(), b))
+    }
+
+    <span class="doccomment">/// Interprets the suffix of the given `bytes` as a `&amp;mut [Self]` with length
+    /// equal to `count` without copying.
+    ///
+    /// This method verifies that `bytes.len() &gt;= size_of::&lt;T&gt;() * count`
+    /// and that `bytes` is aligned to `align_of::&lt;T&gt;()`. It consumes the
+    /// last `size_of::&lt;T&gt;() * count` bytes from `bytes` to construct a
+    /// `&amp;[Self]`, and returns the preceding bytes to the caller. It also
+    /// ensures that `sizeof::&lt;T&gt;() * count` does not overflow a `usize`.
+    /// If any of the length, alignment, or overflow checks fail, it returns
+    /// `None`.
+    ///
+    /// # Panics
+    ///
+    /// If `T` is a zero-sized type.
+    </span><span class="attr">#[inline]
+    </span><span class="kw">fn </span>mut_slice_from_suffix(bytes: <span class="kw-2">&amp;mut </span>[u8], count: usize) -&gt; <span class="prelude-ty">Option</span>&lt;(<span class="kw-2">&amp;mut </span>[u8], <span class="kw-2">&amp;mut </span>[<span class="self">Self</span>])&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: Sized + AsBytes,
+    {
+        Ref::&lt;<span class="kw">_</span>, [<span class="self">Self</span>]&gt;::new_slice_from_suffix(bytes, count).map(|(b, r)| (b, r.into_mut_slice()))
     }
 
     <span class="doccomment">/// Reads a copy of `Self` from `bytes`.
@@ -7173,6 +7532,37 @@
 
 <span class="macro">safety_comment! </span>{
     <span class="doccomment">/// SAFETY:
+    /// The following types can be transmuted from `[0u8; size_of::&lt;T&gt;()]`. [1]
+    /// None of them contain `UnsafeCell`s, and so they all soundly implement
+    /// `FromZeroes`.
+    ///
+    /// [1] Per
+    /// https://doc.rust-lang.org/nightly/core/option/index.html#representation:
+    ///
+    ///   Rust guarantees to optimize the following types `T` such that
+    ///   [`Option&lt;T&gt;`] has the same size and alignment as `T`. In some of these
+    ///   cases, Rust further guarantees that `transmute::&lt;_, Option&lt;T&gt;&gt;([0u8;
+    ///   size_of::&lt;T&gt;()])` is sound and produces `Option::&lt;T&gt;::None`. These
+    ///   cases are identified by the second column:
+    ///
+    ///   | `T`                 | `transmute::&lt;_, Option&lt;T&gt;&gt;([0u8; size_of::&lt;T&gt;()])` sound? |
+    ///   |---------------------|-----------------------------------------------------------|
+    ///   | [`Box&lt;U&gt;`]          | when `U: Sized`                                           |
+    ///   | `&amp;U`                | when `U: Sized`                                           |
+    ///   | `&amp;mut U`            | when `U: Sized`                                           |
+    ///   | [`ptr::NonNull&lt;U&gt;`] | when `U: Sized`                                           |
+    ///
+    /// TODO(#429), TODO(https://github.com/rust-lang/rust/pull/115333): Cite
+    /// the Stable docs once they&#39;re available.
+    </span><span class="attr">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+    </span><span class="macro">unsafe_impl!</span>(T =&gt; FromZeroes <span class="kw">for </span><span class="prelude-ty">Option</span>&lt;Box&lt;T&gt;&gt;);
+    <span class="macro">unsafe_impl!</span>(T =&gt; FromZeroes <span class="kw">for </span><span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;_ </span>T&gt;);
+    <span class="macro">unsafe_impl!</span>(T =&gt; FromZeroes <span class="kw">for </span><span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;_ </span><span class="kw-2">mut </span>T&gt;);
+    <span class="macro">unsafe_impl!</span>(T =&gt; FromZeroes <span class="kw">for </span><span class="prelude-ty">Option</span>&lt;NonNull&lt;T&gt;&gt;);
+}
+
+<span class="macro">safety_comment! </span>{
+    <span class="doccomment">/// SAFETY:
     /// For all `T`, `PhantomData&lt;T&gt;` has size 0 and alignment 1. [1]
     /// - `FromZeroes`, `FromBytes`: There is only one possible sequence of 0
     ///   bytes, and `PhantomData` is inhabited.
@@ -7294,6 +7684,22 @@
     <span class="macro">unsafe_impl!</span>(T: FromBytes =&gt; FromBytes <span class="kw">for </span>[T]);
     <span class="macro">unsafe_impl!</span>(T: AsBytes =&gt; AsBytes <span class="kw">for </span>[T]);
     <span class="macro">unsafe_impl!</span>(T: Unaligned =&gt; Unaligned <span class="kw">for </span>[T]);
+}
+<span class="macro">safety_comment! </span>{
+    <span class="doccomment">/// SAFETY:
+    /// - `FromZeroes`: For thin pointers (note that `T: Sized`), the zero
+    ///   pointer is considered &quot;null&quot;. [1] No operations which require
+    ///   provenance are legal on null pointers, so this is not a footgun.
+    ///
+    /// NOTE(#170): Implementing `FromBytes` and `AsBytes` for raw pointers
+    /// would be sound, but carries provenance footguns. We want to support
+    /// `FromBytes` and `AsBytes` for raw pointers eventually, but we are
+    /// holding off until we can figure out how to address those footguns.
+    ///
+    /// [1] TODO(https://github.com/rust-lang/rust/pull/116988): Cite the
+    /// documentation once this PR lands.
+    </span><span class="macro">unsafe_impl!</span>(T =&gt; FromZeroes <span class="kw">for </span><span class="kw-2">*const </span>T);
+    <span class="macro">unsafe_impl!</span>(T =&gt; FromZeroes <span class="kw">for </span><span class="kw-2">*mut </span>T);
 }
 
 <span class="comment">// SIMD support
@@ -9087,6 +9493,7 @@
 }
 
 <span class="attr">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+#[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">&quot;alloc&quot;</span>)))]
 #[doc(inline)]
 </span><span class="kw">pub use </span>alloc_support::<span class="kw-2">*</span>;
 
@@ -9094,7 +9501,7 @@
 </span><span class="kw">mod </span>tests {
     <span class="attr">#![allow(clippy::unreadable_literal)]
 
-    </span><span class="kw">use </span>core::{convert::TryInto <span class="kw">as _</span>, ops::Deref};
+    </span><span class="kw">use </span>core::{cell::UnsafeCell, convert::TryInto <span class="kw">as _</span>, ops::Deref};
 
     <span class="kw">use </span>static_assertions::assert_impl_all;
 
@@ -10789,6 +11196,16 @@
         <span class="comment">// Implements none of the ZC traits.
         </span><span class="kw">struct </span>NotZerocopy;
 
+        <span class="attr">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+        </span><span class="macro">assert_impls!</span>(<span class="prelude-ty">Option</span>&lt;Box&lt;UnsafeCell&lt;NotZerocopy&gt;&gt;&gt;: KnownLayout, FromZeroes, !FromBytes, !AsBytes, !Unaligned);
+        <span class="macro">assert_impls!</span>(<span class="prelude-ty">Option</span>&lt;Box&lt;[UnsafeCell&lt;NotZerocopy&gt;]&gt;&gt;: KnownLayout, !FromZeroes, !FromBytes, !AsBytes, !Unaligned);
+        <span class="macro">assert_impls!</span>(<span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>UnsafeCell&lt;NotZerocopy&gt;&gt;: KnownLayout, FromZeroes, !FromBytes, !AsBytes, !Unaligned);
+        <span class="macro">assert_impls!</span>(<span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[UnsafeCell&lt;NotZerocopy&gt;]&gt;: KnownLayout, !FromZeroes, !FromBytes, !AsBytes, !Unaligned);
+        <span class="macro">assert_impls!</span>(<span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span><span class="kw-2">mut </span>UnsafeCell&lt;NotZerocopy&gt;&gt;: KnownLayout, FromZeroes, !FromBytes, !AsBytes, !Unaligned);
+        <span class="macro">assert_impls!</span>(<span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span><span class="kw-2">mut </span>[UnsafeCell&lt;NotZerocopy&gt;]&gt;: KnownLayout, !FromZeroes, !FromBytes, !AsBytes, !Unaligned);
+        <span class="macro">assert_impls!</span>(<span class="prelude-ty">Option</span>&lt;NonNull&lt;UnsafeCell&lt;NotZerocopy&gt;&gt;&gt;: KnownLayout, FromZeroes, !FromBytes, !AsBytes, !Unaligned);
+        <span class="macro">assert_impls!</span>(<span class="prelude-ty">Option</span>&lt;NonNull&lt;[UnsafeCell&lt;NotZerocopy&gt;]&gt;&gt;: KnownLayout, !FromZeroes, !FromBytes, !AsBytes, !Unaligned);
+
         <span class="macro">assert_impls!</span>(PhantomData&lt;NotZerocopy&gt;: KnownLayout, FromZeroes, FromBytes, AsBytes, Unaligned);
         <span class="macro">assert_impls!</span>(PhantomData&lt;[u8]&gt;: KnownLayout, FromZeroes, FromBytes, AsBytes, Unaligned);
 
@@ -10812,6 +11229,13 @@
         <span class="macro">assert_impls!</span>([NotZerocopy; <span class="number">0</span>]: KnownLayout, !FromZeroes, !FromBytes, !AsBytes, !Unaligned);
         <span class="macro">assert_impls!</span>([u8; <span class="number">1</span>]: KnownLayout, FromZeroes, FromBytes, AsBytes, Unaligned);
         <span class="macro">assert_impls!</span>([NotZerocopy; <span class="number">1</span>]: KnownLayout, !FromZeroes, !FromBytes, !AsBytes, !Unaligned);
+
+        <span class="macro">assert_impls!</span>(<span class="kw-2">*const </span>NotZerocopy: KnownLayout, FromZeroes, !FromBytes, !AsBytes, !Unaligned);
+        <span class="macro">assert_impls!</span>(<span class="kw-2">*mut </span>NotZerocopy: KnownLayout, FromZeroes, !FromBytes, !AsBytes, !Unaligned);
+        <span class="macro">assert_impls!</span>(<span class="kw-2">*const </span>[NotZerocopy]: KnownLayout, !FromZeroes, !FromBytes, !AsBytes, !Unaligned);
+        <span class="macro">assert_impls!</span>(<span class="kw-2">*mut </span>[NotZerocopy]: KnownLayout, !FromZeroes, !FromBytes, !AsBytes, !Unaligned);
+        <span class="macro">assert_impls!</span>(<span class="kw-2">*const </span><span class="kw">dyn </span>Debug: KnownLayout, !FromZeroes, !FromBytes, !AsBytes, !Unaligned);
+        <span class="macro">assert_impls!</span>(<span class="kw-2">*mut </span><span class="kw">dyn </span>Debug: KnownLayout, !FromZeroes, !FromBytes, !AsBytes, !Unaligned);
 
         <span class="attr">#[cfg(feature = <span class="string">&quot;simd&quot;</span>)]
         </span>{

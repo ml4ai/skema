@@ -640,29 +640,6 @@
 <a href="#640" id="640">640</a>
 <a href="#641" id="641">641</a>
 <a href="#642" id="642">642</a>
-<a href="#643" id="643">643</a>
-<a href="#644" id="644">644</a>
-<a href="#645" id="645">645</a>
-<a href="#646" id="646">646</a>
-<a href="#647" id="647">647</a>
-<a href="#648" id="648">648</a>
-<a href="#649" id="649">649</a>
-<a href="#650" id="650">650</a>
-<a href="#651" id="651">651</a>
-<a href="#652" id="652">652</a>
-<a href="#653" id="653">653</a>
-<a href="#654" id="654">654</a>
-<a href="#655" id="655">655</a>
-<a href="#656" id="656">656</a>
-<a href="#657" id="657">657</a>
-<a href="#658" id="658">658</a>
-<a href="#659" id="659">659</a>
-<a href="#660" id="660">660</a>
-<a href="#661" id="661">661</a>
-<a href="#662" id="662">662</a>
-<a href="#663" id="663">663</a>
-<a href="#664" id="664">664</a>
-<a href="#665" id="665">665</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::ast::{
     operator::Operator,
     Math, MathExpression,
@@ -883,6 +860,11 @@
     <span class="prelude-val">Ok</span>((s, op))
 }
 
+<span class="kw">pub fn </span>period(input: Span) -&gt; IResult&lt;Operator&gt; {
+    <span class="kw">let </span>(s, op) = value(Operator::Period, ws(tag(<span class="string">&quot;.&quot;</span>)))(input)<span class="question-mark">?</span>;
+    <span class="prelude-val">Ok</span>((s, op))
+}
+
 <span class="kw">pub fn </span>mean(input: Span) -&gt; IResult&lt;Operator&gt; {
     <span class="kw">let </span>(s, op) = value(Operator::Mean, ws(tag(<span class="string">&quot;¯&quot;</span>)))(input)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((s, op))
@@ -898,36 +880,7 @@
     <span class="prelude-val">Ok</span>((s, op))
 }
 
-<span class="comment">/*pub fn absolute(input: Span) -&gt; IResult&lt;Operator&gt; {
-    let (s, op) = value(Operator::Abs, ws(tag(&quot;|&quot;)))(input)?;
-    Ok((s, op))
-}*/
-</span><span class="doccomment">///Absolute value
-
-</span><span class="comment">/*pub fn absolute(input: Span) -&gt; IResult&lt;Mrow&gt; {
-    let (s, elements) = ws(delimited(
-        stag!(&quot;&lt;mo&gt;|&lt;/mo&gt;&quot;),
-        many0(math_expression),
-        etag!(&quot;&lt;mo&gt;|&lt;/mo&gt;&quot;),
-    ))(input)?;
-    Ok((s, Mrow(elements)))
-}*/
-/*/// Example: Divergence
-pub fn divergence(input: Span) -&gt; IResult&lt;MathExpression&gt; {
-    let (s, op) = value(
-        Operator::Div,
-        pair(
-            ws(delimited(stag!(&quot;mo&quot;), grad, etag!(&quot;mo&quot;))),
-            ws(delimited(stag!(&quot;mo&quot;), dot, etag!(&quot;mo&quot;))),
-        ),
-    )(input)?;
-    println!(&quot;op={:?}&quot;, op);
-    //let div = Operator::Div;
-    //println!(&quot;div={:?}&quot;, div);
-    Ok((s, Mo(op)))
-}*/
-
-</span><span class="kw">fn </span>operator_other(input: Span) -&gt; IResult&lt;Operator&gt; {
+<span class="kw">fn </span>operator_other(input: Span) -&gt; IResult&lt;Operator&gt; {
     <span class="kw">let </span>(s, consumed) = ws(recognize(not_line_ending))(input)<span class="question-mark">?</span>;
     <span class="kw">let </span>op = Operator::Other(consumed.to_string());
     <span class="prelude-val">Ok</span>((s, op))
@@ -944,6 +897,7 @@ pub fn divergence(input: Span) -&gt; IResult&lt;MathExpression&gt; {
         multiply,
         grad,
         dot,
+        period,
         operator_other,
     ))(input)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((s, op))

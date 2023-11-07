@@ -586,6 +586,21 @@
 <a href="#586" id="586">586</a>
 <a href="#587" id="587">587</a>
 <a href="#588" id="588">588</a>
+<a href="#589" id="589">589</a>
+<a href="#590" id="590">590</a>
+<a href="#591" id="591">591</a>
+<a href="#592" id="592">592</a>
+<a href="#593" id="593">593</a>
+<a href="#594" id="594">594</a>
+<a href="#595" id="595">595</a>
+<a href="#596" id="596">596</a>
+<a href="#597" id="597">597</a>
+<a href="#598" id="598">598</a>
+<a href="#599" id="599">599</a>
+<a href="#600" id="600">600</a>
+<a href="#601" id="601">601</a>
+<a href="#602" id="602">602</a>
+<a href="#603" id="603">603</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! This module contains parsers that perform some amount of preliminary domain-specific
 //! interpretation of presentation MathML (e.g., globbing S(t) to an identifier S of type
 //! &#39;function&#39;). This is in contrast to the `generic_mathml.rs` module that contains parsers that
@@ -598,8 +613,8 @@
         Ci, Differential, Math, MathExpression, Mi, Mrow, Type,
     },
     parsers::generic_mathml::{
-        add, attribute, comma, dot, elem_many0, equals, etag, grad, lparen, mean, mi, mn, msqrt,
-        msub, msubsup, multiply, rparen, stag, subtract, tag_parser, ws, xml_declaration, IResult,
+        add, attribute, dot, elem_many0, equals, etag, grad, lparen, mean, mi, mn, msqrt, msub,
+        msubsup, multiply, rparen, stag, subtract, tag_parser, ws, xml_declaration, IResult,
         ParseError, Span,
     },
 };
@@ -609,7 +624,7 @@
     bytes::complete::tag,
     combinator::{map, opt, value},
     multi::{many0, many1, separated_list1},
-    sequence::{delimited, pair, preceded, tuple},
+    sequence::{delimited, pair, preceded, separated_pair, tuple},
 };
 
 <span class="doccomment">/// Function to parse operators. This function differs from the one in parsers::generic_mathml by
@@ -618,7 +633,7 @@
     <span class="kw">let </span>(s, op) = ws(delimited(
         <span class="macro">stag!</span>(<span class="string">&quot;mo&quot;</span>),
         alt((
-            add, subtract, multiply, equals, lparen, rparen, comma, mean, grad, dot,
+            add, subtract, multiply, equals, lparen, rparen, mean, grad, dot,
         )),
         <span class="macro">etag!</span>(<span class="string">&quot;mo&quot;</span>),
     ))(input)<span class="question-mark">?</span>;
@@ -630,7 +645,7 @@
 </span><span class="kw">fn </span>parenthesized_identifier(input: Span) -&gt; IResult&lt;Vec&lt;Mi&gt;&gt; {
     <span class="kw">let </span>mo_lparen = delimited(<span class="macro">stag!</span>(<span class="string">&quot;mo&quot;</span>), lparen, <span class="macro">etag!</span>(<span class="string">&quot;mo&quot;</span>));
     <span class="kw">let </span>mo_rparen = delimited(<span class="macro">stag!</span>(<span class="string">&quot;mo&quot;</span>), rparen, <span class="macro">etag!</span>(<span class="string">&quot;mo&quot;</span>));
-    <span class="kw">let </span>mo_comma = delimited(<span class="macro">stag!</span>(<span class="string">&quot;mo&quot;</span>), comma, <span class="macro">etag!</span>(<span class="string">&quot;mo&quot;</span>));
+    <span class="kw">let </span>mo_comma = delimited(<span class="macro">stag!</span>(<span class="string">&quot;mo&quot;</span>), ws(tag(<span class="string">&quot;,&quot;</span>)), <span class="macro">etag!</span>(<span class="string">&quot;mo&quot;</span>));
     <span class="kw">let </span>(s, bound_vars) = delimited(mo_lparen, separated_list1(mo_comma, mi), mo_rparen)(input)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((s, bound_vars))
 }
@@ -1171,7 +1186,22 @@
 <span class="doccomment">/// Parser for interpreted math expressions.
 /// testing MathML documents
 </span><span class="kw">pub fn </span>interpreted_math(input: Span) -&gt; IResult&lt;Math&gt; {
-    <span class="kw">let </span>(s, elements) = preceded(opt(xml_declaration), <span class="macro">elem_many0!</span>(<span class="string">&quot;math&quot;</span>))(input)<span class="question-mark">?</span>;
+    <span class="kw">let </span>(s, elements) = preceded(
+        opt(xml_declaration),
+        alt((
+            ws(delimited(
+                tag(<span class="string">&quot;&lt;math&gt;&quot;</span>),
+                many0(math_expression),
+                ws(tag(<span class="string">&quot;&lt;mo&gt;,&lt;/mo&gt;&lt;/math&gt;&quot;</span>)),
+            )),
+            ws(delimited(
+                tag(<span class="string">&quot;&lt;math&gt;&quot;</span>),
+                many0(math_expression),
+                ws(tag(<span class="string">&quot;&lt;mo&gt;.&lt;/mo&gt;&lt;/math&gt;&quot;</span>)),
+            )),
+            <span class="macro">elem_many0!</span>(<span class="string">&quot;math&quot;</span>),
+        )),
+    )(input)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((s, Math { content: elements }))
 }
 </code></pre></div></section></main></body></html>
