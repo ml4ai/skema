@@ -14,7 +14,7 @@ def remove_keys(json_obj, target_keys: List):
     """ remove all instances of the target keys from the json object"""
 
     def remove_key(json_obj, target_key):
-    """ remove all instances of the target key from the json object"""
+        """ remove all instances of the target key from the json object"""
         if isinstance(json_obj, dict):
             for target_key in target_keys:
                 if target_key in json_obj.keys():
