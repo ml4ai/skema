@@ -118,6 +118,8 @@ class MatlabToCast(object):
     def visit(self, node):
         """Switch execution based on node type"""
         # print(f"\nvisit {node.type}")
+        if node == None:
+            return None
 
         if node.type in ["program", "module", "source_file"] :
             return self.visit_module(node)
@@ -153,12 +155,12 @@ class MatlabToCast(object):
             return self.visit_do_loop_statement(node)
         elif node.type == "switch_statement":
             return self.visit_switch_statement(node)
+        elif node.type == "case_clause":
+            return self.visit_case_clause(node)
+        elif node.type == "otherwise_clause":
+            return self.visit_otherwise_clause(node)
         elif node.type == "if_statement":
             return self.visit_if_statement(node)
-        elif node.type == "elseif_clause":
-            return self.visit_elseif_clause(node)
-        elif node.type in ["else_clause", "otherwise_clause"]:
-            return self.visit_else_clause(node)
         elif node.type == "derived_type_definition":
             return self.visit_derived_type(node)
         elif node.type == "derived_type_member_expression":
@@ -597,15 +599,21 @@ class MatlabToCast(object):
         # get switch identifier
         identifier = self.visit(get_first_child_by_type(node, "identifier"))
 
-        # get n case clauses
+        # get 0-n case clauses
         case_clauses = get_children_by_types(node, ["case_clause"])
 
+        # get 0-1 otherwise clauses
         mi = self.visit(get_first_child_by_type(node, "otherwise_clause"))
 
         return mi
 
     def visit_if_statement(self, node):
         """ return a ModelIf if, elseif, and else clauses"""
+
+        # ModelIf (
+        #    expr: Expression
+        #    body: list(body nodes)
+        #    orelse: list(ModelIf)
 
         # if_statement Tree-sitter syntax tree:
         #     if
@@ -615,44 +623,35 @@ class MatlabToCast(object):
         #     else_clause (0-1 of these)
         #     end
 
-        # the initial ModelIf node is built just like the else-if clause
-        mi = self.visit_elseif_clause(node)
+        def model_if_node(_node):
+            """ return a ModelIf with comparison operator and body nodes. """
+            ret = ModelIf()
+            # expression
+            ret.expr = self.visit(get_first_child_by_type(
+                _node, 
+                "comparison_operator"
+            ))
+            # body
+            block = get_first_child_by_type(_node, "block")
+            if block:
+                ast_nodes = [self.visit(child) for child in block.children]
+                ret.body = [ast_node for ast_node in ast_nodes if ast_node]
+            return ret
 
-        # get 0-n elseif_clauses
+        # the if statement is defined by a ModelIf struct
+        mi = model_if_node(node)
+
+        # get 0-n elseif_clauses as ModelIf structs
         elseif_clauses = get_children_by_types(node, ["elseif_clause"])
-        for child in elseif_clauses:
-            elseif_node = self.visit(child)
-            if elseif_node:
-                if not mi.orelse:
-                    mi.orelse = list()
-                mi.orelse.append(elseif_node)
+        mi.orelse = [model_if_node(child) for child in elseif_clauses]
 
-        # get 0-1 else_clauses
-        else_clauses = get_children_by_types(node, ["else_clause"])
-        for child in else_clauses:
-            else_node = self.visit(child)
-            if else_node.body:
-                for body_node in else_node.body:
-                    if not mi.orelse:
-                        mi.orelse = list()
-                    mi.orelse.append(body_node)
+        # if an else clause exists, we add its ModelIf body directly
+        else_clauses = [get_first_child_by_type(node, "else_clause")]
+        for body in [model_if_node(e).body for e in else_clauses if e]:
+            mi.orelse += body
 
         return mi
     
-    def visit_elseif_clause(self, node):
-        """ return a ModelIf with comparison operator and body nodes. """
-        mi = self.visit_else_clause(node)
-        comparison_operator = get_first_child_by_type(node, "comparison_operator")
-        mi.expr = self.visit(comparison_operator)
-
-        return mi
-
-    def visit_else_clause(self, node: Node):
-        """ Return a ModelIf with body nodes from Tree-sitter block nodes. """
-        mi = ModelIf()
-        mi.body = self.get_body_nodes(node)
-        return mi
-
     def visit_assignment(self, node):
         left, _, right = node.children
 
@@ -1149,12 +1148,3 @@ class MatlabToCast(object):
             return self.variable_context.get_node(func_name)
 
         return self.variable_context.add_variable(func_name, "function", None)
-
-    def get_body_nodes(self, node):
-        """ Return valid body nodes from Tree-sitter block node. """
-        block = get_first_child_by_type(node, "block")
-        ast_nodes = [self.visit(child) for child in block.children]
-        body_nodes = [ast_node for ast_node in ast_nodes if ast_node] 
-        if len(body_nodes) > 0:
-            return body_nodes
-        return None
