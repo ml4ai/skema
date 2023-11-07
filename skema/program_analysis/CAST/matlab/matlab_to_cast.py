@@ -633,8 +633,9 @@ class MatlabToCast(object):
         ret.orelse = [conditional(child) for child in elseif_clauses]
         # add 0-1 else clause
         else_clauses = get_children_by_types(node, ["else_clause"])
-        for body in [conditional(e).body for e in else_clauses]:
-            ret.orelse += body
+        for block in [conditional(e).body for e in else_clauses]:
+            if block:
+                ret.orelse += block
 
         return ret
     
