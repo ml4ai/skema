@@ -88,6 +88,21 @@ def get_first_child_index(node, type: str):
         if child.type == type:
             return i
 
+def get_all(node: Node, types: List, found: List = list()):
+    """ return nodes with type in types in the entire node tree """
+    for child in node.children:
+        if child.type in types: 
+            found.append(child)
+        get_all(
+            node = child, 
+            types = types, 
+            found = found
+        )
+    return found
+
+def valid(nodes):
+    """ return the node list without any None elements """
+    return [node for node in nodes if node]
 
 def remove_comments(node: Node):
     """Remove comment nodes from tree-sitter parse tree"""
