@@ -608,13 +608,7 @@ class MatlabToCast(object):
         return mi
 
     def visit_if_statement(self, node):
-        """ return a ModelIf if, elseif, and else clauses"""
-
-        # ModelIf (
-        #    expr: Expression
-        #    body: list(body nodes)
-        #    orelse: list(ModelIf)
-
+        """ return a node describing if, elseif, else conditional logic"""
         # if_statement Tree-sitter syntax tree:
         #     if
         #     comparison_operator
@@ -623,34 +617,34 @@ class MatlabToCast(object):
         #     else_clause (0-1 of these)
         #     end
 
-        def model_if_node(_node):
-            """ return a ModelIf with comparison operator and body nodes. """
+        def conditional(_node):
+            """ return a ModelIf struct for the conditional logic clause. """
             ret = ModelIf()
-            # expression
+            # expression, possibly None
             ret.expr = self.visit(get_first_child_by_type(
                 _node, 
                 "comparison_operator"
             ))
-            # body
+            # body, possibly None
             block = get_first_child_by_type(_node, "block")
             if block:
                 ast_nodes = [self.visit(child) for child in block.children]
                 ret.body = [ast_node for ast_node in ast_nodes if ast_node]
             return ret
 
-        # the if statement is defined by a ModelIf struct
-        mi = model_if_node(node)
+        # the if statement is returned as a ModelIf struct
+        ret = conditional(node)
 
-        # get 0-n elseif_clauses as ModelIf structs
+        # add 0-n elseif_clauses to the returned or-else list
         elseif_clauses = get_children_by_types(node, ["elseif_clause"])
-        mi.orelse = [model_if_node(child) for child in elseif_clauses]
+        ret.orelse = [conditional(child) for child in elseif_clauses]
 
-        # if an else clause exists, we add its ModelIf body directly
+        # if an else clause exists, add its block nodes to the returned or-else list
         else_clauses = [get_first_child_by_type(node, "else_clause")]
-        for body in [model_if_node(e).body for e in else_clauses if e]:
-            mi.orelse += body
+        for body in [conditional(e).body for e in else_clauses]:
+            ret.orelse += body
 
-        return mi
+        return ret
     
     def visit_assignment(self, node):
         left, _, right = node.children
