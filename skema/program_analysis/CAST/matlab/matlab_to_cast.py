@@ -612,20 +612,20 @@ class MatlabToCast(object):
         # if_statement Tree-sitter syntax tree:
         #     if
         #     comparison_operator
-        #     body block with 1-n elements
-        #     elseif_clause (0-n of these)
-        #     else_clause (0-1 of these)
+        #     block with 1-n instructions
+        #     elseif_clause (0-n, with comparison_operator and instruction block)
+        #     else_clause (0-1, instruction block only)
         #     end
 
         def conditional(_node):
             """ return a ModelIf struct for the conditional logic clause. """
             ret = ModelIf()
-            # expression, possibly None
+            # comparison_operator, possibly None
             ret.expr = self.visit(get_first_child_by_type(
                 _node, 
                 "comparison_operator"
             ))
-            # body, possibly None
+            # instruction_block possibly None
             block = get_first_child_by_type(_node, "block")
             if block:
                 ast_nodes = [self.visit(child) for child in block.children]
@@ -635,12 +635,12 @@ class MatlabToCast(object):
         # the if statement is returned as a ModelIf struct
         ret = conditional(node)
 
-        # add 0-n elseif_clauses to the returned or-else list
+        # add 0-n elseif_clauses to the returned ModelIf or-else list
         elseif_clauses = get_children_by_types(node, ["elseif_clause"])
         ret.orelse = [conditional(child) for child in elseif_clauses]
 
-        # if an else clause exists, add its block nodes to the returned or-else list
-        else_clauses = [get_first_child_by_type(node, "else_clause")]
+        # 0-1 else clause, add instruction block to the ModelIf or-else list
+        else_clauses = get_children_by_types(node, ["else_clause"])
         for body in [conditional(e).body for e in else_clauses]:
             ret.orelse += body
 
