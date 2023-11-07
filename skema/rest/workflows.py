@@ -14,6 +14,7 @@ from skema.img2mml import eqn2mml
 from skema.rest import schema, utils
 from skema.rest.proxies import SKEMA_RS_ADDESS
 from skema.skema_py import server as code2fn
+from skema.rest.llm_proxy import get_lines_of_model
 
 router = APIRouter()
 
@@ -166,6 +167,28 @@ async def repo_to_pn_amr(zip_file: UploadFile = File()):
         )
     return res.json()
 
+# zip archive -> linespan -> snippet -> petrinet amr
+@router.post(
+    "/code/llm-assisted-codebase-to-pn-amr", summary="Code repo (zip archive) → PetriNet AMR"
+)
+async def llm_repo_to_pn_amr(zip_file: UploadFile = File()):
+    linespan = get_lines_of_model(zip_file)
+    lines = linespan['block'][0].split('-')
+    line_begin = int(lines[0][1:])
+    line_end = int(lines[1][1:])
+    '''
+    Some chunk of code that slices the code in the zip file using line_being
+    and line_end ints for line numbers. output would be sliced_code
+    '''
+    res = code_snippets_to_pn_amr(sliced_code)
+    if res.status_code != 200:
+        return JSONResponse(
+            status_code=400,
+            content={
+                "error": f"MORAE PUT /models/PN failed to process payload",
+            },
+        )
+    return res.json()
 
 """ TODO: The regnet endpoints are currently outdated
 # zip archive -> fn -> regnet amr
