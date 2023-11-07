@@ -577,67 +577,67 @@ class MatlabToCast(object):
         literal_types = ["number", "string", "boolean", "array_literal"]
         sequence_types = ["cell", "row"]
         
-        def get_literals(literal_node, target_list):
-            # keep looking
-            sequences = get_children_by_types(literal_node, sequence_types)
-            for sequence in sequences:
-                get_literals(sequence, target_list)
-            # found 
-            literals = get_children_by_types(literal_node, literal_types)
-            print(f"get_literals: Literals found: {len(literals)}")
-            ast_nodes = [self.visit(child) for child in literals]
-            target_list += [ast_node for ast_node in ast_nodes if ast_node]
-            return target_list
+        def get_literals(node, literals):
+            for child in node.children:
+                get_literals(child, literals + get_children_by_types(child, literal_types))
+            return [self.visit(literal) for literal in literals]
 
+        def get_operator(op, left, right):
+            """ Return a comparison operator between identifier and literal"""
+            return Operator(
+                source_language="matlab",
+                interpreter=None,
+                version=None,
+                op=op,
+                operands=[left, right]
+                # source_refs=[self.node_helper.get_source_ref(right)]
+            )
 
-        return Operator(
-            source_language="matlab",
-            interpreter=None,
-            version=None,
-            op=op,
-            operands=operands,
-            source_refs=[self.node_helper.get_source_ref(node)],
-        )
-        def conditional(conditional_node, identifier):
+        def conditional(conditional_node: Node, identifier):
             """ Create a sequence of if-then conditionals """
-            ret=ModelIf()
+            mi=ModelIf()
 
-            # find target values
-            literals = get_literals(conditional_node, list())
-            print(f"conditional: Literals found: {len(literals)}")
-            ret.orelse = literals
+            # there will either be a list containing a single literal_value
+            literal_values = get_children_by_types(conditional_node, literal_types)
+            ast_nodes = [self.visit(element) for element in literal_values]
+            valid_nodes = [ast_node for ast_node in ast_nodes if ast_node]
+            if len(valid_nodes) == 1:
+                mi.expr = get_operator("==", identifier, valid_nodes[0])
+            
+            # else there will be a nested sequence containing them.
+            multiple_values = get_children_by_types(conditional_node, sequence_types)
+            #  ... chain ifelse
 
-            # comparison operator
-            ret.expr = self.visit(get_first_child_by_type(
-                conditional_node,
-                "comparison_operator"
-            ))
 
-            # instruction_block possibly None
+            # instruction_block posibly None
             block = get_first_child_by_type(conditional_node, "block")
             if block:
                 ast_nodes = [self.visit(child) for child in block.children]
-                ret.body = [ast_node for ast_node in ast_nodes if ast_node]
+                mi.body = [ast_node for ast_node in ast_nodes if ast_node]
             
-            return ret
+            return mi
 
         # get switch identifier
         identifier = self.visit(get_first_child_by_type(node, "identifier"))
 
-        # Create a placeholder ModelIf for now
-        ret = ModelIf()
-
         # get 0-n case clauses
         case_clauses = get_children_by_types(node, ["case_clause"])
-        ret.orelse = [conditional(child, identifier) for child in case_clauses]
+        model_ifs = [conditional(child, identifier) for child in case_clauses]
+
+        # link model_ifs as orelse lists
+        for i, model_if in enumerate(model_ifs[1:]):
+            model_ifs[i].orelse = [model_if]
 
         # get 0-1 otherwise clauses
-        otherwise_clauses = get_children_by_types(node, ["otherwise_clause"])
-        for block in [conditional(child, identifier).body for child in otherwise_clauses]:
+        otherwise_clause = get_first_child_by_type(node, "otherwise_clause")
+        if otherwise_clause:
+            block = get_first_child_by_type(otherwise_clause, "block")
             if block:
-                ret.orelse += block
+                ast_nodes = [self.visit(child) for child in block.children]
+                last = model_ifs[len(model_ifs)-1]
+                last.orelse = [ast_node for ast_node in ast_nodes if ast_node]
 
-        return ret
+        return model_ifs[0]
 
     def visit_if_statement(self, node):
         """ return a node describing if, elseif, else conditional logic"""
@@ -659,17 +659,26 @@ class MatlabToCast(object):
             return ret
 
         # the if statement is returned as a ModelIf AstNode
-        ret = conditional(node)
+        model_ifs = [conditional(node)]
         # add 0-n elseif_clauses 
         elseif_clauses = get_children_by_types(node, ["elseif_clause"])
-        ret.orelse = [conditional(child) for child in elseif_clauses]
-        # add 0-1 else clause
-        else_clauses = get_children_by_types(node, ["else_clause"])
-        for block in [conditional(child).body for child in else_clauses]:
-            if block:
-                ret.orelse += block
+        model_ifs += [conditional(child) for child in elseif_clauses]
 
-        return ret
+        # link model_ifs as orelse lists
+        for i, model_if in enumerate(model_ifs[1:]):
+            model_ifs[i].orelse = [model_if]
+
+        # add 0-1 else clause
+        else_clauses = [get_first_child_by_type(node, "else_clause")]
+        for else_clause in else_clauses:
+            block = get_first_child_by_type(else_clause, "block")
+            if block:
+                ast_nodes = [self.visit(child) for child in block.children]
+                last = model_ifs[len(model_ifs)-1]
+                last.orelse = [ast_node for ast_node in ast_nodes if ast_node]
+
+        return model_ifs[0]
+
     
     def visit_assignment(self, node):
         left, _, right = node.children
