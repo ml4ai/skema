@@ -11,7 +11,7 @@ use crate::{
 };
 use derive_new::new;
 use nom::error::Error;
-
+use regex::Regex;
 use std::{fmt, str::FromStr};
 
 #[cfg(test)]
@@ -46,6 +46,196 @@ impl fmt::Display for MathExpressionTree {
             }
         }
     }
+}
+
+/// Converts Unicode, Greek letters, their symbols, and English representations of Greek letters in an input string to their respective LaTeX expressions.
+fn unicode_to_latex(input: &str) -> String {
+    // Step 1: Handle English representations of Greek letters
+    let re_english_greek = Regex::new(r"Lambda|lambda|Alpha|alpha|Beta|beta|Gamma|gamma|Delta|delta|Epsilon|epsilon|Zeta|zeta|Eta|eta|Theta|theta|Iota|iota|Kappa|kappa|Lambda|lambda|Mu|mu|Nu|nu|Xi|xi|Omicron|omicron|Pi|pi|Rho|rho|Sigma|sigma|Tau|tau|Upsilon|upsilon|Phi|phi|Chi|chi|Psi|psi|Omega|omega").unwrap();
+    let replaced_english_greek =
+        re_english_greek.replace_all(input, |caps: &regex::Captures| match &caps[0] {
+            "Lambda" => "\\Lambda".to_string(),
+            "lambda" => "\\lambda".to_string(),
+            "Alpha" => "\\Alpha".to_string(),
+            "alpha" => "\\alpha".to_string(),
+            "Beta" => "\\Beta".to_string(),
+            "beta" => "\\beta".to_string(),
+            "Gamma" => "\\Gamma".to_string(),
+            "gamma" => "\\gamma".to_string(),
+            "Delta" => "\\Delta".to_string(),
+            "delta" => "\\delta".to_string(),
+            "Epsilon" => "\\Epsilon".to_string(),
+            "epsilon" => "\\epsilon".to_string(),
+            "Zeta" => "\\Zeta".to_string(),
+            "zeta" => "\\zeta".to_string(),
+            "Eta" => "\\Eta".to_string(),
+            "eta" => "\\eta".to_string(),
+            "Theta" => "\\Theta".to_string(),
+            "theta" => "\\theta".to_string(),
+            "Iota" => "\\Iota".to_string(),
+            "iota" => "\\iota".to_string(),
+            "Kappa" => "\\Kappa".to_string(),
+            "kappa" => "\\kappa".to_string(),
+            "Lambda" => "\\Lambda".to_string(),
+            "lambda" => "\\lambda".to_string(),
+            "Mu" => "\\Mu".to_string(),
+            "mu" => "\\mu".to_string(),
+            "Nu" => "\\Nu".to_string(),
+            "nu" => "\\nu".to_string(),
+            "Xi" => "\\Xi".to_string(),
+            "xi" => "\\xi".to_string(),
+            "Omicron" => "\\Omicron".to_string(),
+            "omicron" => "\\omicron".to_string(),
+            "Pi" => "\\Pi".to_string(),
+            "pi" => "\\pi".to_string(),
+            "Rho" => "\\Rho".to_string(),
+            "rho" => "\\rho".to_string(),
+            "Sigma" => "\\Sigma".to_string(),
+            "sigma" => "\\sigma".to_string(),
+            "Tau" => "\\Tau".to_string(),
+            "tau" => "\\tau".to_string(),
+            "Upsilon" => "\\Upsilon".to_string(),
+            "upsilon" => "\\upsilon".to_string(),
+            "Phi" => "\\Phi".to_string(),
+            "phi" => "\\phi".to_string(),
+            "Chi" => "\\Chi".to_string(),
+            "chi" => "\\chi".to_string(),
+            "Psi" => "\\Psi".to_string(),
+            "psi" => "\\psi".to_string(),
+            "Omega" => "\\Omega".to_string(),
+            "omega" => "\\omega".to_string(),
+            _ => caps[0].to_string(),
+        });
+
+    // Step 2: Handle Greek letters represented in Unicode
+    let re_unicode = Regex::new(r"&#x([0-9A-Fa-f]+);").unwrap();
+    let replaced_unicode =
+        re_unicode.replace_all(&replaced_english_greek, |caps: &regex::Captures| {
+            let unicode = u32::from_str_radix(&caps[1], 16).unwrap();
+            match unicode {
+                0x0391 => "\\Alpha".to_string(),
+                0x03B1 => "\\alpha".to_string(),
+                0x0392 => "\\Beta".to_string(),
+                0x03B2 => "\\beta".to_string(),
+                0x0393 => "\\Gamma".to_string(),
+                0x03B3 => "\\gamma".to_string(),
+                0x0394 => "\\Delta".to_string(),
+                0x03B4 => "\\delta".to_string(),
+                0x0395 => "\\Epsilon".to_string(),
+                0x03B5 => "\\epsilon".to_string(),
+                0x0396 => "\\Zeta".to_string(),
+                0x03B6 => "\\zeta".to_string(),
+                0x0397 => "\\Eta".to_string(),
+                0x03B7 => "\\eta".to_string(),
+                0x0398 => "\\Theta".to_string(),
+                0x03B8 => "\\theta".to_string(),
+                0x0399 => "\\Iota".to_string(),
+                0x03B9 => "\\iota".to_string(),
+                0x039A => "\\Kappa".to_string(),
+                0x03BA => "\\kappa".to_string(),
+                0x039B => "\\Lambda".to_string(),
+                0x03BB => "\\lambda".to_string(),
+                0x039C => "\\Mu".to_string(),
+                0x03BC => "\\mu".to_string(),
+                0x039D => "\\Nu".to_string(),
+                0x03BD => "\\nu".to_string(),
+                0x039E => "\\Xi".to_string(),
+                0x03BE => "\\xi".to_string(),
+                0x039F => "\\Omicron".to_string(),
+                0x03BF => "\\omicron".to_string(),
+                0x03A0 => "\\Pi".to_string(),
+                0x03C0 => "\\pi".to_string(),
+                0x03A1 => "\\Rho".to_string(),
+                0x03C1 => "\\rho".to_string(),
+                0x03A3 => "\\Sigma".to_string(),
+                0x03C3 => "\\sigma".to_string(),
+                0x03A4 => "\\Tau".to_string(),
+                0x03C4 => "\\tau".to_string(),
+                0x03A5 => "\\Upsilon".to_string(),
+                0x03C5 => "\\upsilon".to_string(),
+                0x03A6 => "\\Phi".to_string(),
+                0x03C6 => "\\phi".to_string(),
+                0x03A7 => "\\Chi".to_string(),
+                0x03C7 => "\\chi".to_string(),
+                0x03A8 => "\\Psi".to_string(),
+                0x03C8 => "\\psi".to_string(),
+                0x03A9 => "\\Omega".to_string(),
+                0x03C9 => "\\omega".to_string(),
+                _ => caps[0].to_string(),
+            }
+        });
+
+    // Step 3: Handle other Unicode representations
+    let re_other_unicode = Regex::new(r"&#x([0-9A-Fa-f]+);").unwrap();
+    let replaced_other_unicode =
+        re_other_unicode.replace_all(&replaced_unicode, |caps: &regex::Captures| {
+            format!(
+                "\\unicode{{U+{:X}}}",
+                u32::from_str_radix(&caps[1], 16).unwrap()
+            )
+        });
+
+    // Step 4: Handle Greek letter symbols
+    let re_greek_symbols = Regex::new(r"Λ|λ|Α|α|Β|β|Γ|γ|Δ|δ|Ε|ε|Ζ|ζ|Η|η|Θ|θ|Ι|ι|Κ|κ|Λ|λ|Μ|μ|Ν|ν|Ξ|ξ|Ο|ο|Π|π|Ρ|ρ|Σ|σ|ς|Τ|τ|Υ|υ|Φ|φ|Χ|χ|Ψ|ψ|Ω|ω").unwrap();
+    let replaced_greek_symbols =
+        re_greek_symbols.replace_all(&replaced_other_unicode, |caps: &regex::Captures| {
+            match &caps[0] {
+                "Λ" => "\\Lambda".to_string(),
+                "λ" => "\\lambda".to_string(),
+                "Α" => "\\Alpha".to_string(),
+                "α" => "\\alpha".to_string(),
+                "Β" => "\\Beta".to_string(),
+                "β" => "\\beta".to_string(),
+                "Γ" => "\\Gamma".to_string(),
+                "γ" => "\\gamma".to_string(),
+                "Δ" => "\\Delta".to_string(),
+                "δ" => "\\delta".to_string(),
+                "Ε" => "\\Epsilon".to_string(),
+                "ε" => "\\epsilon".to_string(),
+                "Ζ" => "\\Zeta".to_string(),
+                "ζ" => "\\zeta".to_string(),
+                "Η" => "\\Eta".to_string(),
+                "η" => "\\eta".to_string(),
+                "Θ" => "\\Theta".to_string(),
+                "θ" => "\\theta".to_string(),
+                "Ι" => "\\Iota".to_string(),
+                "ι" => "\\iota".to_string(),
+                "Κ" => "\\Kappa".to_string(),
+                "κ" => "\\kappa".to_string(),
+                "Λ" => "\\Lambda".to_string(),
+                "λ" => "\\lambda".to_string(),
+                "Μ" => "\\Mu".to_string(),
+                "μ" => "\\mu".to_string(),
+                "Ν" => "\\Nu".to_string(),
+                "ν" => "\\nu".to_string(),
+                "Ξ" => "\\Xi".to_string(),
+                "ξ" => "\\xi".to_string(),
+                "Ο" => "\\Omicron".to_string(),
+                "ο" => "\\omicron".to_string(),
+                "Π" => "\\Pi".to_string(),
+                "π" => "\\pi".to_string(),
+                "Ρ" => "\\Rho".to_string(),
+                "ρ" => "\\rho".to_string(),
+                "Σ" => "\\Sigma".to_string(),
+                "σ" => "\\sigma".to_string(),
+                "ς" => "\\varsigma".to_string(), // 处理 sigma 的 final form
+                "Τ" => "\\Tau".to_string(),
+                "τ" => "\\tau".to_string(),
+                "Υ" => "\\Upsilon".to_string(),
+                "υ" => "\\upsilon".to_string(),
+                "Φ" => "\\Phi".to_string(),
+                "φ" => "\\phi".to_string(),
+                "Χ" => "\\Chi".to_string(),
+                "χ" => "\\chi".to_string(),
+                "Ψ" => "\\Psi".to_string(),
+                "ψ" => "\\psi".to_string(),
+                "Ω" => "\\Omega".to_string(),
+                "ω" => "\\omega".to_string(),
+                _ => caps[0].to_string(),
+            }
+        });
+
+    replaced_greek_symbols.to_string()
 }
 
 impl MathExpressionTree {
@@ -138,6 +328,40 @@ impl MathExpressionTree {
             }
         }
         expression
+    }
+
+    /// Translates a MathExpressionTree struct to a LaTeX expression.
+    pub fn to_latex(&self) -> String {
+        match self {
+            MathExpressionTree::Atom(expr) => match expr {
+                MathExpression::Ci(x) => format!("\\mathrm{{{}}}", x.content), // Assuming Ci represents variables
+                MathExpression::Mi(Mi(id)) => id.to_string(), // Assuming Mi represents mathematical identifiers
+                MathExpression::Mn(number) => number.to_string(), // Assuming Mn represents numbers
+                MathExpression::Mrow(_) => {
+                    panic!("All Mrows should have been removed by now!");
+                }
+                _ => {
+                    panic!("Unhandled MathExpression: {:?}", expr);
+                }
+            },
+            MathExpressionTree::Cons(head, rest) => {
+                let operator = match head {
+                    Operator::Add => "+",
+                    Operator::Subtract => "-",
+                    Operator::Multiply => "\\cdot",
+                    Operator::Divide => "\\frac",
+                    Operator::Power => "^",
+                    Operator::Exp => "\\exp",
+                    _ => {
+                        panic!("Unhandled Operator: {:?}", head);
+                    }
+                };
+
+                let components: Vec<String> =
+                    rest.iter().map(|sub_expr| sub_expr.to_latex()).collect();
+                format!("{}{{{}}}", components.join(&operator), operator)
+            }
+        }
     }
 }
 
@@ -1094,4 +1318,41 @@ fn test_mi_multiply() {
     let exp = input.parse::<MathExpressionTree>().unwrap();
     let s_exp = exp.to_string();
     println!("s_exp={:?}", s_exp);
+}
+
+#[test]
+fn test_unicode_conversion() {
+    let input1 = "&#x039B; is a Greek letter.";
+    let input2 = "&#x03bb; is another Greek letter.";
+    let input3 = "Λ and λ are Greek letters.";
+    let input4 = "Lambda and lambda are English representations of Greek letters.";
+
+    assert_eq!(unicode_to_latex(input1), "\\Lambda is a Greek letter.");
+    assert_eq!(
+        unicode_to_latex(input2),
+        "\\lambda is another Greek letter."
+    );
+    assert_eq!(
+        unicode_to_latex(input3),
+        "\\Lambda and \\lambda are Greek letters."
+    );
+    assert_eq!(
+        unicode_to_latex(input4),
+        "\\Lambda and \\lambda are English representations of Greek letters."
+    );
+}
+#[test]
+fn test_sexp2latex() {
+    let input = "
+    <math>
+        <mi>S</mi>
+        <mrow><mi>n</mi><mo>+</mo><mn>4</mn></mrow>
+        <mrow><mi>i</mi><mo>-</mo><mn>3</mn></mrow>
+        <msup><mi>H</mi><mrow><mi>m</mi><mo>-</mo><mn>2</mn></mrow></msup>
+    </math>
+    ";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    let s_exp = exp.to_infix_expression();
+    println!("s_exp={:?}", s_exp.to_string())
+    // assert_eq!(s_exp, "(* (* (* S (+ n 4)) (- i 3)) (^ H (- m 2)))");
 }
