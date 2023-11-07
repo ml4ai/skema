@@ -88,4 +88,4 @@ def test_if_elseif_else():
     assert_expression(mi.orelse[0].expr, op = ">", left = "x", right = "0")
     assert_assignment(mi.orelse[0].body[0], left="y", right = "x")
     # else
-    assert_assignment(mi.orelse[1], left="y", right = "0")
+    assert_assignment(mi.orelse[0].orelse[0], left="y", right = "0")
