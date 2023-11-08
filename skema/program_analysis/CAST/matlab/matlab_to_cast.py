@@ -576,60 +576,53 @@ class MatlabToCast(object):
         # node types used for case comparison
         case_node_types = self.literal_types + ["identifier"]
         
-        def get_value(ast_node):
+        def get_node_value(ast_node):
             """ return the CAST node value or var name """
             if isinstance(ast_node, Var):
                 return ast_node.val.name
             return ast_node.value
 
-        def multiple_argument_case_operand(cell_node):
-            """" return a list of values for case comparison """
-            nodes = get_all(cell_node, case_node_types)
-            ast_nodes = valid([self.visit(node) for node in nodes])
-            return LiteralValue(
-                value_type="List",
-                value = [get_value(ast_node) for ast_node in ast_nodes],
-                source_code_data_type=["matlab", MATLAB_VERSION, "unknown"],
-                source_refs=[self.node_helper.get_source_ref(cell_node)]
-            )
-
-        def single_argument_case_operand(case_node):
-            """" return an ast_node for case comparison """
-            nodes = get_children_by_types(case_node, case_node_types)
-            ast_nodes = valid([self.visit(element) for element in nodes])
-            return ast_nodes[0]
-
-        def get_case_operator(case_node, identifier):
+        def get_operator(op, operands):
             """ return an Operator representing the case test """
-            operator = Operator(
-                source_language="matlab",
-                interpreter=None,
-                version=MATLAB_VERSION,
-                operands = [identifier]
+            return Operator(
+                source_language = "matlab",
+                interpreter = None,
+                version = MATLAB_VERSION,
+                op = op,
+                operands = operands
             )
-            cell_node = get_first_child_by_type(case_node, "cell")
-            if (cell_node):
-                # multiple case arguments
-                operator.op = "in"
-                operator.operands += [multiple_argument_case_operand(cell_node)]
-            else:
-                # single case argument
-                operator.op = "=="
-                operator.operands += [single_argument_case_operand(case_node)]
-            return operator
 
-        def get_case_instructions(case_node):
+        def get_case_expression(case_node, identifier):
+            """ return an Operator representing the case test """
+            cell_node = get_first_child_by_type(case_node, "cell")
+            # multiple case arguments
+            if (cell_node):
+                nodes = get_all(cell_node, case_node_types)
+                ast_nodes = valid([self.visit(node) for node in nodes])
+                operand = LiteralValue(
+                    value_type="List",
+                    value = [get_node_value(node) for node in ast_nodes],
+                    source_code_data_type=["matlab", MATLAB_VERSION, "unknown"],
+                    source_refs=[self.node_helper.get_source_ref(cell_node)]
+                )
+                return get_operator("in", [identifier, operand])
+            # single case argument
+            nodes = get_children_by_types(case_node, case_node_types)
+            operand = valid([self.visit(node) for node in nodes])[0]
+            return get_operator("==", [identifier, operand])
+
+        def get_case_body(case_node):
             """ return the instruction block for the case """
             block = get_first_child_by_type(case_node, "block")
             if block:
                 return valid([self.visit(child) for child in block.children])
             return None
             
-        def model_if(case_node, identifier):
+        def get_model_if(case_node, identifier):
             """ return conditional logic representing the case """
             return ModelIf(
-                expr = get_case_operator(case_node, identifier),
-                body = get_case_instructions(case_node),
+                expr = get_case_expression(case_node, identifier),
+                body = get_case_body(case_node),
             )
         
         # switch statement identifier
@@ -637,7 +630,7 @@ class MatlabToCast(object):
         
         # n case clauses as 'if then' nodes
         case_nodes = get_children_by_types(node, ["case_clause"])
-        model_ifs=[model_if(case_node, identifier) for case_node in case_nodes]
+        model_ifs = [get_model_if(node, identifier) for node in case_nodes]
         for i, model_if in enumerate(model_ifs[1:]):
             model_ifs[i].orelse = [model_if]
 
