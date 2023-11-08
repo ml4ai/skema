@@ -577,24 +577,24 @@ class MatlabToCast(object):
         case_node_types = self.literal_types + ["identifier"]
         
         def get_value(ast_node):
-            """ return the value or var name of the CAST node """
+            """ return the CAST node value or var name """
             if isinstance(ast_node, Var):
                 return ast_node.val.name
             return ast_node.value
 
         def multiple_case_values(cell_node):
-            """" return a literalValue List with literal values and var names """
+            """" return a literalValue with List with values and var names """
             nodes = get_all(cell_node, case_node_types)
             ast_nodes = valid([self.visit(node) for node in nodes])
             return LiteralValue(
                 value_type="List",
                 value = [get_value(ast_node) for ast_node in ast_nodes],
-                source_code_data_type=["matlab", MATLAB_VERSION, "unknown"]
-#                source_refs=[self.node_helper.get_source_ref(cell_node)]
+                source_code_data_type=["matlab", MATLAB_VERSION, "unknown"],
+                source_refs=[self.node_helper.get_source_ref(cell_node)]
             )
 
         def get_operator(op, left, right):
-            """ Return a comparison operator between identifier and literal"""
+            """ Return a comparison operator between identifier and value """
             return Operator(
                 source_language="matlab",
                 interpreter=None,
@@ -604,7 +604,7 @@ class MatlabToCast(object):
             )
 
         def get_expr(case_node, identifier):
-            """ return an operator for the case_node """
+            """ return an Operator representing the case clause test """
             # multiple case values
             cell_node = get_first_child_by_type(case_node, "cell")
             if (cell_node):
