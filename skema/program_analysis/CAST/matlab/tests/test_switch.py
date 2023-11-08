@@ -64,7 +64,7 @@ def test_switch_multiple_values():
     mi1 = mi0.orelse[0]
     assert isinstance(mi1, ModelIf)
     assert_assignment(mi1.body[0], left="n", right = "2")
-    assert_expression(mi1.expr, op="==", left = 's', right = 2)
+    assert_expression(mi1.expr, op="==", left = 's', right = "2")
 
     # otherwise clause
     assert_assignment(mi1.orelse[0], left="n", right = "0")
