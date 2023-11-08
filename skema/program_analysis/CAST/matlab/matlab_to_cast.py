@@ -30,6 +30,7 @@ from skema.program_analysis.CAST2FN.model.cast import (
 
 from skema.program_analysis.CAST.matlab.variable_context import VariableContext
 from skema.program_analysis.CAST.matlab.node_helper import (
+    get_all,
     get_children_by_types,
     get_control_children,
     get_first_child_by_type,
@@ -38,6 +39,7 @@ from skema.program_analysis.CAST.matlab.node_helper import (
     get_non_control_children,
     remove_comments,
     NodeHelper,
+    valid
 )
 
 from skema.program_analysis.tree_sitter_parsers.build_parsers import INSTALLED_LANGUAGES_FILEPATH
@@ -45,6 +47,9 @@ from skema.program_analysis.tree_sitter_parsers.build_parsers import INSTALLED_L
 MATLAB_VERSION='matlab_version_here'
 
 class MatlabToCast(object):
+
+    literal_types = ["number","string", "boolean", "array_literal"]
+
     def __init__(self, source_path = "", source = ""):
 
         # if a source file path is provided, read source from file
@@ -145,7 +150,7 @@ class MatlabToCast(object):
             "math_expression",
             "relational_expression"
         ]: return self.visit_math_expression(node)
-        elif node.type in ["number", "array", "string", "boolean"]:
+        elif node.type in self.literal_types:
             return self.visit_literal(node)
         elif node.type == "keyword_statement":
             return self.visit_keyword_statement(node)
@@ -564,74 +569,80 @@ class MatlabToCast(object):
             source_refs=[self.node_helper.get_source_ref(node)],
         )
 
-    def visit_otherwise_clause(self, node):
-        mi = ModelIf()
-
-        # ...
-
-        return mi
 
     def visit_switch_statement(self, node):
         """ return a conditional statement based on the switch statement """
+    
+        # node types used for case comparison
+        case_node_types = self.literal_types + ["identifier"]
         
-        literal_types = ["number", "string", "boolean", "array_literal"]
-        sequence_types = ["cell", "row"]
-        
+        def get_value(ast_node):
+            """ return the value or var name of the CAST node """
+            if isinstance(ast_node, Var):
+                return ast_node.val.name
+            return ast_node.value
+
+        def multiple_case_values(cell_node):
+            """" return a literalValue List with literal values and var names """
+            nodes = get_all(cell_node, case_node_types)
+            ast_nodes = valid([self.visit(node) for node in nodes])
+            return LiteralValue(
+                value_type="List",
+                value = [get_value(ast_node) for ast_node in ast_nodes],
+                source_code_data_type=["matlab", MATLAB_VERSION, "unknown"]
+#                source_refs=[self.node_helper.get_source_ref(cell_node)]
+            )
+
         def get_operator(op, left, right):
             """ Return a comparison operator between identifier and literal"""
             return Operator(
                 source_language="matlab",
                 interpreter=None,
-                version=None,
+                version=MATLAB_VERSION,
                 op=op,
                 operands=[left, right]
-                # source_refs=[self.node_helper.get_source_ref(right)]
             )
 
-        def conditional(conditional_node: Node, identifier):
-            """ Create a sequence of if-then conditionals """
-            mi=ModelIf()
+        def get_expr(case_node, identifier):
+            """ return an operator for the case_node """
+            # multiple case values
+            cell_node = get_first_child_by_type(case_node, "cell")
+            if (cell_node):
+                return get_operator("in", identifier, multiple_case_values(cell_node))
+            # single case value
+            nodes = get_children_by_types(case_node, case_node_types)
+            ast_nodes = valid([self.visit(element) for element in nodes])
+            return get_operator("==", identifier, ast_nodes[0])
 
-            # there will either be a list containing a single literal_value...
-            literal_values = get_children_by_types(conditional_node, literal_types)
-            ast_nodes = [self.visit(element) for element in literal_values]
-            valid_nodes = [ast_node for ast_node in ast_nodes if ast_node]
-            if len(valid_nodes) == 1:
-                mi.expr = get_operator("==", identifier, valid_nodes[0])
-            
-            # ...or there will be a nested sequence containing them.
-            multiple_values = get_children_by_types(conditional_node, sequence_types)
-
-            #  ... chain ifelse or test if value in list?
-
-
-            # instruction_block posibly None
-            block = get_first_child_by_type(conditional_node, "block")
+        def get_block(case_node):
+            """ return the instruction block for the case_node """
+            block = get_first_child_by_type(case_node, "block")
             if block:
-                ast_nodes = [self.visit(child) for child in block.children]
-                mi.body = [ast_node for ast_node in ast_nodes if ast_node]
+                return valid([self.visit(child) for child in block.children])
+            return None
             
-            return mi
-
-        # get switch identifier
+        def model_if(case_node, identifier):
+            return ModelIf(
+                expr = get_expr(case_node, identifier),
+                body = get_block(case_node),
+            )
+        
+        # switch statement identifier
         identifier = self.visit(get_first_child_by_type(node, "identifier"))
-
-        # get 0-n case clauses
-        case_clauses = get_children_by_types(node, ["case_clause"])
-        model_ifs = [conditional(child, identifier) for child in case_clauses]
-
-        # link model_ifs as orelse lists
+        
+        # 1-n case clauses linked with orelse logic
+        case_nodes = get_children_by_types(node, ["case_clause"])
+        model_ifs=[model_if(case_node, identifier) for case_node in case_nodes]
         for i, model_if in enumerate(model_ifs[1:]):
             model_ifs[i].orelse = [model_if]
 
-        # get 0-1 otherwise clauses
+        # 0-1 otherwise clauses linked with else logic
         otherwise_clause = get_first_child_by_type(node, "otherwise_clause")
         if otherwise_clause:
             block = get_first_child_by_type(otherwise_clause, "block")
             if block:
-                ast_nodes = [self.visit(child) for child in block.children]
                 last = model_ifs[len(model_ifs)-1]
-                last.orelse = [ast_node for ast_node in ast_nodes if ast_node]
+                last.orelse = valid([self.visit(child) for child in block.children])
 
         return model_ifs[0]
 
@@ -649,8 +660,7 @@ class MatlabToCast(object):
             # instruction_block possibly None
             block = get_first_child_by_type(conditional_node, "block")
             if block:
-                ast_nodes = [self.visit(child) for child in block.children]
-                ret.body = [ast_node for ast_node in ast_nodes if ast_node]
+                ret.body = valid([self.visit(child) for child in block.children])
 
             return ret
 
@@ -661,7 +671,7 @@ class MatlabToCast(object):
         elseif_clauses = get_children_by_types(node, ["elseif_clause"])
         model_ifs += [conditional(child) for child in elseif_clauses]
 
-        # chain model_ifs as orelse lists
+        # chain model_ifs as orelse logic
         for i, model_if in enumerate(model_ifs[1:]):
             model_ifs[i].orelse = [model_if]
 
@@ -670,12 +680,10 @@ class MatlabToCast(object):
         if else_clause:
             block = get_first_child_by_type(else_clause, "block")
             if block:
-                ast_nodes = [self.visit(child) for child in block.children]
                 last = model_ifs[len(model_ifs)-1]
-                last.orelse = [ast_node for ast_node in ast_nodes if ast_node]
+                last.orelse = valid([self.visit(child) for child in block.children])
 
         return model_ifs[0]
-
     
     def visit_assignment(self, node):
         left, _, right = node.children
