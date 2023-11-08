@@ -88,17 +88,15 @@ def get_first_child_index(node, type: str):
         if child.type == type:
             return i
 
-def get_all(node: Node, types: List, found: List = list()):
-    """ return nodes with type in types in the entire node tree """
-    for child in node.children:
-        if child.type in types: 
-            found.append(child)
-        get_all(
-            node = child, 
-            types = types, 
-            found = found
-        )
-    return found
+def get_all(node, types):
+    """ return all nodes with type in types from the entire node tree """
+    def search(node, types, ret):
+        if node.type in types:
+            ret += [node]
+        for child in node.children:
+            search(child, types, ret)
+        return ret
+    return search(node, types, [])
 
 def valid(nodes):
     """ return the node list without any None elements """
