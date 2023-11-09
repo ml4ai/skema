@@ -1,30 +1,11 @@
 from typing import List, Dict
 from skema.program_analysis.CAST2FN.model.cast import SourceRef
+from skema.program_analysis.CAST.matlab.tokens import WaterlooTokens
 
 from tree_sitter import Node
 
-CONTROL_CHARACTERS = [
-    ",",
-    "=",
-    "==",
-    "(",
-    ")",
-    "(/",
-    "/)",
-    ":",
-    "::",
-    "+",
-    "-",
-    "*",
-    "**",
-    "/",
-    ">",
-    "<",
-    "<=",
-    ">=",
-    "only",
-]
-
+CONTROL_CHARACTERS = WaterlooTokens.OTHER_TOKENS
+        
 class NodeHelper():
     def __init__(self, source: str, source_file_name: str):
         self.source = source
