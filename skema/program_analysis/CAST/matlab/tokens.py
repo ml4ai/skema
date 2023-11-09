@@ -3,7 +3,7 @@
 class WaterlooTokens():
 
     """ syntax keywords """
-    KEYWORDS = [
+    SYNTAX_KEYWORDS = [
         'arguments',
         'assignment',
         'binary_operator',
@@ -56,6 +56,11 @@ class WaterlooTokens():
         'unary_operator'
     ]
 
+    """ Keywords used by CAST but not found in the Waterloo model """
+    CAST_KEYWORDS = [
+        'module'
+    ]
+
     """ anything not a keyword """
     OTHER_TOKENS = [
         '\"',
@@ -90,4 +95,4 @@ class WaterlooTokens():
     ]
 
     """ the Waterloo model token zoo """
-    NODE_TYPES = KEYWORDS + OTHER_TOKENS
+    NODE_TYPES = SYNTAX_KEYWORDS + CAST_KEYWORDS + OTHER_TOKENS
