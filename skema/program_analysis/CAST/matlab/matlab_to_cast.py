@@ -82,43 +82,13 @@ class MatlabToCast(object):
         """Interface for generating CAST."""
 
         # remove comments from tree before processing
-
         modules = self.run(remove_comments(self.tree.root_node))
+
         return [CAST([module], "matlab") for module in modules]
         
     def run(self, root) -> List[Module]:
         return [self.visit(root)]
 
-    def run_old(self, root) -> List[Module]:
-        """Annotated run routine."""
-        modules = []
-
-        # Currently, we are supporting functions and subroutines defined outside of programs and modules
-        # Other than comments, it is unclear if anything else is allowed.
-        # TODO: Research the above
-        # print("\nNODE VISITS ___________")
-        body_node_names = [
-            "function_definition",
-            "subroutine",
-            "assignment",
-        ]
-
-        outer_body_nodes = get_children_by_types(root, body_node_names)
-        if len(outer_body_nodes) > 0:
-            body = []
-            for body_node in outer_body_nodes:
-                child_cast = self.visit(body_node)
-                if isinstance(child_cast, List):
-                    body.extend(child_cast)
-                elif isinstance(child_cast, AstNode):
-                    body.append(child_cast)
-            modules.append(Module(
-                name=None,
-                body=body,
-                source_refs=[self.node_helper.get_source_ref(root)]
-            ))
-    
-        return modules
 
     def visit(self, node):
         """Switch execution based on node type"""
