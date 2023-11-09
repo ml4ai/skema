@@ -42,13 +42,15 @@ from skema.program_analysis.CAST.matlab.node_helper import (
     valid
 )
 
+from skema.program_analysis.CAST.matlab.tokens import KEYWORDS
+
 from skema.program_analysis.tree_sitter_parsers.build_parsers import INSTALLED_LANGUAGES_FILEPATH
 
 MATLAB_VERSION='matlab_version_here'
 
 class MatlabToCast(object):
 
-    literal_types = ["number","string", "boolean", "array_literal"]
+    literal_types = ["number","string", "boolean"]
 
     def __init__(self, source_path = "", source = ""):
 
@@ -96,18 +98,10 @@ class MatlabToCast(object):
         if node == None:
             return None
 
-        if node.type in ["program", "module", "source_file"] :
-            return self.visit_module(node)
-        elif node.type == "internal_procedures":
-            return self.visit_internal_procedures(node)
-        elif node.type in ["subroutine", "function_definition"]:
+        if node.type == "function_definition":
             return self.visit_function_def(node)
-        elif node.type in ["subroutine_call", "call_expression"]:
+        elif node.type in ["function_call"]:
             return self.visit_function_call(node)
-        elif node.type == "use_statement":
-            return self.visit_use_statement(node)
-        elif node.type == "variable_declaration":
-            return self.visit_variable_declaration(node)
         elif node.type == "assignment":
             return self.visit_assignment(node)
         elif node.type == "identifier":
@@ -136,6 +130,14 @@ class MatlabToCast(object):
             return self.visit_derived_type(node)
         elif node.type == "derived_type_member_expression":
             return self.visit_derived_type_member_expression(node)
+
+        # Not in Waterloo but likely needed
+        elif node.type == "import":   
+            return self._visit_import_statemement(node)
+        # CAST call
+        elif node.type == "source_file":
+            return self.visit_module(node)
+
         else:
             return self._visit_passthrough(node)
 
@@ -158,11 +160,6 @@ class MatlabToCast(object):
             body=program_body,
             source_refs = [self.node_helper.get_source_ref(node)]
         )
-
-    def visit_internal_procedures(self, node: Node) -> List[FunctionDef]:
-        """Visitor for internal procedures. Returns list of FunctionDef"""
-        internal_procedures = get_children_by_types(node, ["function_definition", "subroutine"])
-        return [self.visit(procedure) for procedure in internal_procedures]
 
     def visit_name(self, node):
         # Node structure
@@ -359,7 +356,8 @@ class MatlabToCast(object):
             value=value, source_refs=[self.node_helper.get_source_ref(node)]
         )
 
-    def visit_use_statement(self, node):
+    # this is not in the Waterloo model but will no doubt be encountred.
+    def visit_import_statemement(self, node):
         # (use)
         #   (use)
         #   (module_name)
@@ -757,7 +755,7 @@ class MatlabToCast(object):
             source_refs=[self.node_helper.get_source_ref(node)],
         )
 
-    def visit_variable_declaration(self, node) -> List:
+    def _visit_variable_declaration(self, node) -> List:
         """Visitor for variable declaration. Will return a List of Var and Assignment nodes."""
         """
         # Node structure
