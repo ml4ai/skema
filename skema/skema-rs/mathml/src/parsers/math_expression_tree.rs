@@ -518,6 +518,13 @@ impl MathExpressionTree {
                     Operator::Abs => {
                         expression.push_str(&format!("\\left|{}\\right|", rest[0].to_latex()));
                     }
+                    Operator::Derivative(d) => {
+                        expression.push_str("\\frac{d ");
+                        process_expression_parentheses(&mut expression, &rest[0]);
+                        expression.push_str("}{d");
+                        process_math_expression(&*d.bound_var.content, &mut expression);
+                        expression.push_str("}");
+                    }
                     Operator::Sin => {
                         expression.push_str(&format!("\\sin({})", rest[0].to_latex()));
                     }
@@ -1556,4 +1563,19 @@ fn test_sexp2latex() {
     let exp = input.parse::<MathExpressionTree>().unwrap();
     let latex_exp = exp.to_latex();
     assert_eq!(latex_exp, "\\lambda*(n+4)*(i-3)*H^{m-2}");
+}
+
+#[test]
+fn test_sexp2latex_derivative() {
+    let input = "
+    <math>
+    <mfrac>
+        <mrow><mi>d</mi><mi>S</mi></mrow>
+        <mrow><mi>d</mi><mi>t</mi></mrow>
+        </mfrac>
+    </math>
+    ";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    let latex_exp = exp.to_latex();
+    assert_eq!(latex_exp, "\\frac{d S}{dt}");
 }
