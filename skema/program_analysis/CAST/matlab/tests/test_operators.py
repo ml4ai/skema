@@ -6,7 +6,7 @@ from skema.program_analysis.CAST.matlab.tests.utils import (
 from skema.program_analysis.CAST2FN.model.cast import Assignment
 
 def test_binary_operator():
-    """ Test CAST from MATLAB binary operation statement."""
+    """ Test CAST from binary operation."""
 
     source = 'z = x + y'
 
@@ -22,7 +22,7 @@ def test_binary_operator():
     assert_expression(nodes[0].right, op = "+", left = "x", right = "y")
 
 def do_not_test_unary_operator():
-    """ Test CAST from MATLAB binary operation statement."""
+    """ Test CAST from unary operation."""
 
     source = 'z = -6'
 
@@ -34,5 +34,5 @@ def do_not_test_unary_operator():
     # Left assignment operand is the variable
     assert_var(nodes[0].left, name = "z")
 
-    # right assignment operand is a binary expression
-    assert_expression(nodes[0].right, op = "+", left = "x", right = "y")
+    # right assignment operand is a unary expression
+    assert_expression(nodes[0].right, op = "-", left = "x", right = "y")
