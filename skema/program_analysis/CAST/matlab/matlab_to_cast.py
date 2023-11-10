@@ -100,7 +100,7 @@ class MatlabToCast(object):
 
         if node.type == "function_definition":
             return self.visit_function_def(node)
-        elif node.type in ["function_call"]:
+        elif node.type == "function_call":
             return self.visit_function_call(node)
         elif node.type == "assignment":
             return self.visit_assignment(node)
@@ -108,12 +108,15 @@ class MatlabToCast(object):
             return self.visit_identifier(node)
         elif node.type == "name":
             return self.visit_name(node)
+        elif node.type in["unary_operator", "not_operator"]: 
+            return self.visit_unary_operator(node)
         elif node.type in [
             "binary_operator",
+            "boolean_operator",
             "comparison_operator",
-            "math_expression",
-            "relational_expression"
-        ]: return self.visit_math_expression(node)
+            "postfix_operator",
+            "spread_operator"
+        ]: return self.visit_operator(node)
         elif node.type in self.literal_types:
             return self.visit_literal(node)
         elif node.type == "keyword_statement":
@@ -282,42 +285,17 @@ class MatlabToCast(object):
 
     def visit_function_call(self, node):
         # Pull relevent nodes
-        if node.type == "subroutine_call":
-            function_node = node.children[1]
-            arguments_node = node.children[2]
-        elif node.type == "call_expression":
-            function_node = node.children[0]
-            arguments_node = node.children[1]
+
+
+        foo, bar = node.children
 
         function_identifier = self.node_helper.get_identifier(function_node)
 
-        # Tree-Sitter incorrectly parses mutlidimensional array accesses as function calls
-        # We will need to check if this is truly a function call or a subscript
-        if self.variable_context.is_variable(function_identifier):
-            if self.variable_context.get_type(function_identifier) == "List":
-                return self._visit_get(
-                    node
-                )  # This overrides the visitor and forces us to visit another
-
-        # TODO: What should get a name node? Instrincit functions? Imported functions?
-        # Judging from the Gromet generation pipeline, it appears that all functions need Name nodes.
-        if self.variable_context.is_variable(function_identifier):
-            func = self.variable_context.get_node(function_identifier)
-        else:
-            func = Name(function_identifier, -1)  # TODO: REFACTOR
-
-        # Add arguments to arguments list
-        arguments = []
-        for argument in arguments_node.children:
-            child_cast = self.visit(argument)
-            if child_cast:
-                arguments.append(child_cast)
-
         return Call(
-            func=func,
+            func=foo,
             source_language="matlab",
             source_language_version=MATLAB_VERSION,
-            arguments=arguments,
+            arguments=bar,
             source_refs=[self.node_helper.get_source_ref(node)],
         )
 
@@ -356,7 +334,7 @@ class MatlabToCast(object):
             value=value, source_refs=[self.node_helper.get_source_ref(node)]
         )
 
-    # this is not in the Waterloo model but will no doubt be encountred.
+    # this is not in the Waterloo model but will no doubt be encountered.
     def visit_import_statemement(self, node):
         # (use)
         #   (use)
@@ -397,6 +375,8 @@ class MatlabToCast(object):
 
             return imports
 
+    # CAST has no while loop, so this will have to be translated
+    # into a CAST-supported loop type.
     def visit_do_loop_statement(self, node) -> Loop:
         """Visitor for Loops. Do to complexity, this visitor logic only handles the range-based do loop.
         The do while loop will be passed off to a seperate visitor. Returns a Loop object.
@@ -732,12 +712,35 @@ class MatlabToCast(object):
 
         return Var(
             val=value,
+
             type=var_type,
             default_value=default_value,
             source_refs=[self.node_helper.get_source_ref(node)],
         )
 
-    def visit_math_expression(self, node):
+    def visit_unary_operator(self, node):
+        op = self.node_helper.get_identifier(
+            get_control_children(node)[0]
+        )  # The operator will be the first control character
+        operands = []
+        for operand in get_non_control_children(node):
+            operands.append(self.visit(operand))
+        operand = operands[0]
+
+        if isinstance(operand, LiteralValue):
+            ret: LiteralValue = operand
+            ret.value = op + ret.value
+            ret.source_refs = [self.node_helper.get_source_ref(node)]
+            print(f"visit_unary_operator, LiteralValue, {ret.value}")
+            return ret
+        
+        ret: Var = operand
+        ret.val.name = op + ret.val.name
+        ret.source_refs = [self.node_helper.get_source_ref(node)]
+        print(f"visit_unary_operator, Var, {ret.val.name}")
+        return ret
+
+    def visit_operator(self, node):
         op = self.node_helper.get_identifier(
             get_control_children(node)[0]
         )  # The operator will be the first control character
