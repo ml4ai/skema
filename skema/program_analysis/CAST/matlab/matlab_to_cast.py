@@ -719,26 +719,22 @@ class MatlabToCast(object):
         )
 
     def visit_unary_operator(self, node):
+        # The operator will be the first control character
         op = self.node_helper.get_identifier(
             get_control_children(node)[0]
-        )  # The operator will be the first control character
-        operands = []
-        for operand in get_non_control_children(node):
-            operands.append(self.visit(operand))
-        operand = operands[0]
+        )  
+        # The operand will be the first non control character
+        operand = self.visit(
+            [operand for operand in get_non_control_children(node)][0]
+        )
+
+        #operand.source_refs = [self.node_helper.get_source_ref(node)]
 
         if isinstance(operand, LiteralValue):
-            ret: LiteralValue = operand
-            ret.value = op + ret.value
-            ret.source_refs = [self.node_helper.get_source_ref(node)]
-            print(f"visit_unary_operator, LiteralValue, {ret.value}")
-            return ret
-        
-        ret: Var = operand
-        ret.val.name = op + ret.val.name
-        ret.source_refs = [self.node_helper.get_source_ref(node)]
-        print(f"visit_unary_operator, Var, {ret.val.name}")
-        return ret
+            operand.value = (op + operand.value)
+        else:
+            operand.val.name = (op + operand.val.name)
+        return operand
 
     def visit_operator(self, node):
         op = self.node_helper.get_identifier(
