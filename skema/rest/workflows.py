@@ -199,23 +199,22 @@ async def llm_assisted_codebase_to_pn_amr(zip_file: UploadFile = File()):
 
     # Currently the llm_proxy only works on the first file in a zip_archive.
     # So we are required to do the same when slicing the source code using its output.
-    files = []
-    blobs = []
     with ZipFile(BytesIO(zip_file.file.read()), "r") as zip:
-        files.append(zip.namelist()[0])
-        blobs.append(zip.open(files[0]).read().decode("utf-8"))
+        files = [zip.namelist()[0]]
+        blobs = [zip.open(files[0]).read().decode("utf-8")]
 
     # The source code is a string, so to slice using the line spans, we must first convert it to a list.
     # Then we can convert it back to a string using .join
     blobs[0] = "".join(blobs[0].splitlines(keepends=True)[line_begin:line_end])
 
-    system = code2fn.System(
-        files=files,
-        blobs=blobs,
-        root_name=Path(zip_file.filename).stem,
-        system_name=Path(zip_file.filename).stem,
+    amr = await code_snippets_to_pn_amr(
+        code2fn.System(
+            files=files,
+            blobs=blobs,
+            root_name=Path(zip_file.filename).stem,
+            system_name=Path(zip_file.filename).stem,
+        )
     )
-    amr = await code_snippets_to_pn_amr(system)
     return amr
 
 
