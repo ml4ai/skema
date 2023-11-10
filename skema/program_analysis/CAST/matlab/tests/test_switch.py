@@ -5,8 +5,8 @@ from skema.program_analysis.CAST.matlab.tests.utils import (
 )
 from skema.program_analysis.CAST2FN.model.cast import ModelIf
 
-def test_switch_single_values():
-    """ Test CAST from MATLAB switch statement."""
+def test_case_clause_1_argument():
+    """ Test CAST from single argument case clause."""
 
     source = """
     switch s
@@ -35,8 +35,8 @@ def test_switch_single_values():
     # otherwise clause
     assert_assignment(mi1.orelse[0], left="n", right = "0")
 
-def test_switch_multiple_values():
-    """ Test CAST from MATLAB switch statement."""
+def test_case_clause_n_arguments():
+    """ Test CAST from multipe argument case clause."""
 
     source = """
     switch s
