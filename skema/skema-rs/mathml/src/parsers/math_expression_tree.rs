@@ -499,7 +499,7 @@ impl MathExpressionTree {
                     Operator::Power => {
                         process_expression_parentheses(&mut expression, &rest[0]);
                         expression.push_str("^");
-                        process_expression_parentheses(&mut expression, &rest[1]);
+                        expression.push_str(&format!("{{{}}}", rest[1].to_latex()));
                     }
                     Operator::Comma => {
                         process_expression_parentheses(&mut expression, &rest[0]);
@@ -1555,5 +1555,5 @@ fn test_sexp2latex() {
     ";
     let exp = input.parse::<MathExpressionTree>().unwrap();
     let latex_exp = exp.to_latex();
-    assert_eq!(latex_exp, "\\lambda*(n+4)*(i-3)*H^(m-2)");
+    assert_eq!(latex_exp, "\\lambda*(n+4)*(i-3)*H^{m-2}");
 }
