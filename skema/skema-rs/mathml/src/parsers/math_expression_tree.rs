@@ -507,13 +507,19 @@ impl MathExpressionTree {
                         process_expression_parentheses(&mut expression, &rest[1]);
                     }
                     Operator::Grad => {
-                        expression.push_str("\\nabla");
-                        expression.push_str(&format!("{{{}}}", rest[0].to_latex()));
+                        expression.push_str("\\nabla{");
+                        process_expression_parentheses(&mut expression, &rest[0]);
+                        expression.push_str("}");
                     }
                     Operator::Dot => {
                         process_expression_parentheses(&mut expression, &rest[0]);
                         expression.push_str(" \\cdot ");
                         process_expression_parentheses(&mut expression, &rest[1]);
+                    }
+                    Operator::Div => {
+                        expression.push_str("\\nabla \\cdot {");
+                        process_expression_parentheses(&mut expression, &rest[0]);
+                        expression.push_str("}");
                     }
                     Operator::Abs => {
                         expression.push_str(&format!("\\left|{}\\right|", rest[0].to_latex()));
@@ -1578,4 +1584,30 @@ fn test_sexp2latex_derivative() {
     let exp = input.parse::<MathExpressionTree>().unwrap();
     let latex_exp = exp.to_latex();
     assert_eq!(latex_exp, "\\frac{d S}{dt}");
+}
+
+#[test]
+fn test_equation_halfar_dome_to_latex() {
+    let input = "
+    <math>
+        <mfrac><mrow><mi>∂</mi><mi>H</mi></mrow><mrow><mi>∂</mi><mi>t</mi></mrow></mfrac>
+        <mo>=</mo>
+        <mo>&#x2207;</mo>
+        <mo>&#x22c5;</mo>
+        <mo>(</mo>
+        <mi>Γ</mi>
+        <msup><mi>H</mi><mrow><mi>n</mi><mo>+</mo><mn>2</mn></mrow></msup>
+        <mo>|</mo><mrow><mo>&#x2207;</mo><mi>H</mi></mrow>
+        <msup><mo>|</mo>
+        <mrow><mi>n</mi><mo>−</mo><mn>1</mn></mrow></msup>
+        <mo>&#x2207;</mo><mi>H</mi>
+        <mo>)</mo>
+    </math>
+    ";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    let latex_exp = exp.to_latex();
+    assert_eq!(
+        latex_exp,
+        "\\frac{d H}{dt}=\\nabla \\cdot {(\\Gamma*H^{n+2}*\\left|\\nabla{H}\\right|^{n-1}*\\nabla{H})}"
+    );
 }
