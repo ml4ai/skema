@@ -218,6 +218,11 @@ pub fn comma(input: Span) -> IResult<Operator> {
     Ok((s, op))
 }
 
+pub fn period(input: Span) -> IResult<Operator> {
+    let (s, op) = value(Operator::Period, ws(tag(".")))(input)?;
+    Ok((s, op))
+}
+
 pub fn mean(input: Span) -> IResult<Operator> {
     let (s, op) = value(Operator::Mean, ws(tag("¯")))(input)?;
     Ok((s, op))
@@ -232,35 +237,6 @@ pub fn dot(input: Span) -> IResult<Operator> {
     let (s, op) = value(Operator::Dot, alt((ws(tag("⋅")), ws(tag("&#x22c5;")))))(input)?;
     Ok((s, op))
 }
-
-/*pub fn absolute(input: Span) -> IResult<Operator> {
-    let (s, op) = value(Operator::Abs, ws(tag("|")))(input)?;
-    Ok((s, op))
-}*/
-///Absolute value
-
-/*pub fn absolute(input: Span) -> IResult<Mrow> {
-    let (s, elements) = ws(delimited(
-        stag!("<mo>|</mo>"),
-        many0(math_expression),
-        etag!("<mo>|</mo>"),
-    ))(input)?;
-    Ok((s, Mrow(elements)))
-}*/
-/*/// Example: Divergence
-pub fn divergence(input: Span) -> IResult<MathExpression> {
-    let (s, op) = value(
-        Operator::Div,
-        pair(
-            ws(delimited(stag!("mo"), grad, etag!("mo"))),
-            ws(delimited(stag!("mo"), dot, etag!("mo"))),
-        ),
-    )(input)?;
-    println!("op={:?}", op);
-    //let div = Operator::Div;
-    //println!("div={:?}", div);
-    Ok((s, Mo(op)))
-}*/
 
 fn operator_other(input: Span) -> IResult<Operator> {
     let (s, consumed) = ws(recognize(not_line_ending))(input)?;
@@ -279,6 +255,7 @@ pub fn operator(input: Span) -> IResult<Operator> {
         multiply,
         grad,
         dot,
+        period,
         operator_other,
     ))(input)?;
     Ok((s, op))
