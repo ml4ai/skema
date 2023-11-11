@@ -36,10 +36,12 @@ def test_identifier():
 
     source = """
         x = y
+        r = x
     """
 
     nodes = cast_nodes(source)
-    assert len(nodes) == 1
+    assert len(nodes) == 2
 
     # identifier
     assert_assignment(nodes[0], left = 'x', right = 'y')
+    assert_assignment(nodes[1], left = 'r', right = 'x')

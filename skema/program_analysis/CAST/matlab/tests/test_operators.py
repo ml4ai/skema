@@ -19,53 +19,45 @@ def test_binary_operator():
     # Left assignment operand is the variable
     assert_var(nodes[0].left, name = "z")
     # right assignment operand is a binary expression
-    assert_expression(nodes[0].right, op = "+", left = "x", right = "y")
+    assert_expression(nodes[0].right, op = "+", operands = ["x", "y"])
 
 def test_not_operator():
     """ Test CAST from matrix not operator."""
 
     source = 'a = ~mat_val'
 
+    # we should have one Assignment
     nodes = cast_nodes(source)
     assert len(nodes) == 1
+    assert isinstance(nodes[0], Assignment)
 
-    # The expression becomes a CAST Assignment
-    assert_assignment(nodes[0], left = "a", right = "~mat_val")
-
-def test_unary_operator_literal():
-    """ Test CAST from unary operator."""
-
-    source = 'x = -6'
-
-    nodes = cast_nodes(source)
-    assert len(nodes) == 1
-
-    # Test with literal
-    assert_assignment(nodes[0], left = "x", right = "-6")
-
-def test_unary_operator_identifier():
-    """ Test CAST from unary operator."""
-
-    source = 'y = -x'
-
-    nodes = cast_nodes(source)
-    assert len(nodes) == 1
-
-    # Test with identifier
-    assert_assignment(nodes[0], left = "y", right = "-x")
+    # Left assignment operand is the variable
+    assert_var(nodes[0].left, name = "a")
+    # right assignment operand is a unary operator
+    assert_expression(nodes[0].right, op = "~", operands = ["mat_val"])
 
 def test_unary_operator():
     """ Test CAST from unary operator."""
 
     source = """
-        x = -6
-        y = -x
-        end
+        x = -6;
+        y = -x;
     """
 
     nodes = cast_nodes(source)
-    # assert len(nodes) == 2
+    assert len(nodes) == 2
 
-    # Test with literal and identifier
-    assert_assignment(nodes[0], left = 'x', right = '-6')
-    assert_assignment(nodes[1], left = 'y', right = '-x')
+    # Line 1
+    assert isinstance(nodes[0], Assignment)
+    # Left assignment operand is the variable
+    assert_var(nodes[0].left, name = "x")
+    # right assignment operand is a unary operator
+    assert_expression(nodes[0].right, op = "-", operands = ["6"])
+
+    # Line 2
+    assert isinstance(nodes[1], Assignment)
+    # Left assignment operand is the variable
+    assert_var(nodes[1].left, name = "y")
+    # right assignment operand is a unary operator
+    assert_expression(nodes[1].right, op = "-", operands = ["x"])
+
