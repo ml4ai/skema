@@ -67,6 +67,7 @@ pub enum MathExpression {
     Ci(Ci),
     Differential(Differential),
     AbsoluteSup(Box<MathExpression>, Box<MathExpression>),
+    Absolute(Box<MathExpression>, Box<MathExpression>),
     //Differential(Box<MathExpression>, Box<MathExpression>),
     #[default]
     None,
