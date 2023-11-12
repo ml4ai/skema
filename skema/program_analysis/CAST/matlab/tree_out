@@ -13,7 +13,7 @@ def print_tree(node: Node, indent = ''):
     for child in node.children:
         if not child.type == "\n":
             print(f"{indent} {child.type}")
-        print_tree(child, indent + '    ')
+        print_tree(child, indent + '  ')
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:
@@ -24,13 +24,14 @@ if __name__ == "__main__":
         )
         for i in range(1, len(sys.argv)):
             path = Path(sys.argv[i])
-            print("\n\nINPUT:")
-            print(path.name)
-            source = path.read_text().strip()
-            print("\nSOURCE:")
-            print(source)
-            print("\nSYNTAX TREE:")
-            tree = parser.parse(bytes(source, "utf8"))
-            print_tree(tree.root_node)
+            try:
+                source = path.read_text().strip()
+                print(f"\nSOURCE ({path.name}):")
+                print(source)
+                print("\nSYNTAX TREE:")
+                tree = parser.parse(bytes(source, "utf8"))
+                print_tree(tree.root_node)
+            except IOError:
+                print(f"File not found: {path.name}")
     else:
         print("Please enter at least one input file")
