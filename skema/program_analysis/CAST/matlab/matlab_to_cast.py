@@ -37,7 +37,6 @@ from skema.program_analysis.CAST.matlab.node_helper import (
     get_first_child_index,
     get_last_child_index,
     get_non_control_children,
-    remove_comments,
     NodeHelper,
     valid
 )
@@ -83,8 +82,7 @@ class MatlabToCast(object):
     def generate_cast(self) -> List[CAST]:
         """Interface for generating CAST."""
 
-        # remove comments from tree before processing
-        modules = self.run(remove_comments(self.tree.root_node))
+        modules = self.run(self.tree.root_node)
 
         return [CAST([module], "matlab") for module in modules]
         
@@ -94,7 +92,6 @@ class MatlabToCast(object):
 
     def visit(self, node):
         """Switch execution based on node type"""
-        # print(f"\nvisit {node.type}")
         if node == None:
             return None
 
