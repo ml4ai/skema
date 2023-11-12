@@ -72,20 +72,14 @@ class MatlabToCast(object):
         # create a syntax tree using the source file
         self.tree = parser.parse(bytes(self.source, "utf8"))
 
-        # Walking data
+        # create helper classes
         self.variable_context = VariableContext()
         self.node_helper = NodeHelper(self.source, self.filename)
 
-        # Create CAST object 
-        self.out_cast = self.generate_cast()
-
-    def generate_cast(self) -> List[CAST]:
-        """Interface for generating CAST."""
-
+        # create CAST object 
         modules = self.run(self.tree.root_node)
+        self.out_cast =  [CAST([module], "matlab") for module in modules]
 
-        return [CAST([module], "matlab") for module in modules]
-        
     def run(self, root) -> List[Module]:
         return [self.visit(root)]
 
