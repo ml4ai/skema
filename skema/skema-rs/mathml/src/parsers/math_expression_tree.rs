@@ -184,8 +184,6 @@ impl MathExpression {
                 }
                 tokens.push(MathExpression::Mo(Operator::Rparen));
             }
-            // Insert implicit division operators, and wrap numerators and denominators in
-            // parentheses for the Pratt parsing algorithm.
             MathExpression::Differential(x) => {
                 tokens.push(MathExpression::Mo(Operator::Lparen));
                 if x.diff == Box::new(MathExpression::Mo(Operator::Grad)) {
@@ -196,6 +194,8 @@ impl MathExpression {
                 x.func.flatten(tokens);
                 tokens.push(MathExpression::Mo(Operator::Rparen));
             }
+            // Insert implicit division operators, and wrap numerators and denominators in
+            // parentheses for the Pratt parsing algorithm.
             MathExpression::Mfrac(numerator, denominator) => {
                 tokens.push(MathExpression::Mo(Operator::Lparen));
                 numerator.flatten(tokens);
@@ -240,6 +240,14 @@ impl MathExpression {
                 tokens.push(MathExpression::Mo(Operator::Power));
                 tokens.push(MathExpression::Mo(Operator::Lparen));
                 superscript.flatten(tokens);
+                tokens.push(MathExpression::Mo(Operator::Rparen));
+            }
+            MathExpression::Absolute(operator, components) => {
+                tokens.push(MathExpression::Mo(Operator::Lparen));
+                tokens.push(MathExpression::Mo(Operator::Abs));
+                tokens.push(MathExpression::Mo(Operator::Lparen));
+                components.flatten(tokens);
+                tokens.push(MathExpression::Mo(Operator::Rparen));
                 tokens.push(MathExpression::Mo(Operator::Rparen));
             }
             MathExpression::Mover(base, over) => {
@@ -924,7 +932,18 @@ fn test_absolute_value() {
     ";
     let exp = input.parse::<MathExpressionTree>().unwrap();
     let s_exp = exp.to_string();
-    assert_eq!(s_exp, "(Grad H)");
+    assert_eq!(s_exp, "(Abs (Grad H))");
+}
+#[test]
+fn test_another_absolute() {
+    let input = "
+    <math>
+        <mo>|</mo><mi>H</mi><mo>|</mo>
+    </math>
+    ";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    let s_exp = exp.to_string();
+    assert_eq!(s_exp, "(Abs H)");
 }
 
 #[test]

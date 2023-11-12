@@ -398,13 +398,15 @@ pub fn mrow(input: Span) -> IResult<Mrow> {
 }
 
 ///Absolute value
-pub fn absolute(input: Span) -> IResult<Mrow> {
+pub fn absolute(input: Span) -> IResult<MathExpression>  {
     let (s, elements) = ws(delimited(
         tag("<mo>|</mo>"),
         many0(math_expression),
         tag("<mo>|</mo>"),
     ))(input)?;
-    Ok((s, Mrow(elements)))
+   let components = MathExpression::Absolute(Box::new(MathExpression::Mo(Operator::Abs)), Box::new(MathExpression::Mrow(Mrow(elements))));
+
+    Ok((s, components))
 }
 
 /// Example: Divergence
@@ -567,7 +569,7 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
             },
         ),
         //map(gradient, MathExpression::Mo),
-        map(absolute, MathExpression::Mrow),
+        absolute,
         map(operator, MathExpression::Mo),
         mn,
         superscript,
