@@ -13,14 +13,21 @@ def test_binary_operator():
     assert isinstance(nodes[0], Assignment)
     # Left assignment operand is the variable
     assert_var(nodes[0].left, name = "z")
-    # right assignment operand is a binary expression
+    # right assignment operand represents binary operation
     assert_expression(nodes[0].right, op = "+", operands = ["x", "y"])
 
 def no_test_boolean_operator():
     pass
 
-def no_test_comparison_operator():
-    pass
+def test_comparison_operator(): 
+    """ Test CAST from binary operator."""
+    nodes = cast_nodes('z = x < y')
+    # CAST should be one Assignment node
+    assert isinstance(nodes[0], Assignment)
+    # Left assignment operand is the variable
+    assert_var(nodes[0].left, name = "z")
+    # right assignment operand represents comparison operation
+    assert_expression(nodes[0].right, op = "<", operands = ["x", "y"])
 
 def test_not_operator():
     """ Test CAST from matrix not operator."""

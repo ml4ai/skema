@@ -38,6 +38,7 @@ def assert_expression(expression, op = None, operands = []):
     """ Test an Operator for correct type, operation, and operands. """
     assert isinstance(expression, Operator)
     assert expression.op == op
+    assert len(expression.operands) == len(operands)
     for i, operand in enumerate(expression.operands):
        assert_operand(operand, operands[i])
 
