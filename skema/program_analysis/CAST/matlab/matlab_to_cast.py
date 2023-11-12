@@ -49,8 +49,6 @@ MATLAB_VERSION='matlab_version_here'
 
 class MatlabToCast(object):
 
-    literal_types = ["number","string", "boolean"]
-
     def __init__(self, source_path = "", source = ""):
 
         # if a source file path is provided, read source from file
@@ -83,7 +81,6 @@ class MatlabToCast(object):
     def run(self, root) -> List[Module]:
         return [self.visit(root)]
 
-
     def visit(self, node):
         """Switch execution based on node type"""
         if node.type == "function_definition":
@@ -96,17 +93,24 @@ class MatlabToCast(object):
             return self.visit_identifier(node)
         elif node.type == "name":
             return self.visit_name(node)
-        elif node.type in["unary_operator", "not_operator"]: 
-            return self.visit_unary_operator(node)
+        elif node.type in[
+            "unary_operator",
+            "not_operator"
+        ]: return self.visit_unary_operator(node)
         elif node.type in [
             "binary_operator",
-            "boolean_operator",
             "comparison_operator",
-            "postfix_operator",
-            "spread_operator"
-        ]: return self.visit_operator(node)
-        elif node.type in self.literal_types:
-            return self.visit_literal(node)
+            "boolean_operator"
+        ]: return self.visit_binary_operator(node)
+        elif node.type == "postfix_operator":
+            return self.visit_postfix_operator(node)
+        elif node.type == "spread_operator":
+            return self.visit_spread_operator(node)
+        elif node.type in [
+            "number",
+            "string",
+            "boolean"
+        ]: return self.visit_literal(node)
         elif node.type == "keyword_statement":
             return self.visit_keyword_statement(node)
         elif node.type == "extent_specifier":
@@ -510,7 +514,7 @@ class MatlabToCast(object):
         """ return a conditional statement based on the switch statement """
     
         # node types used for case comparison
-        case_node_types = self.literal_types + ["identifier"]
+        case_node_types = ["number", "string", "boolean","identifier"]
         
         def get_node_value(ast_node):
             """ return the CAST node value or var name """
@@ -717,7 +721,7 @@ class MatlabToCast(object):
             source_refs=[self.node_helper.get_source_ref(node)],
         )
 
-    def visit_operator(self, node):
+    def visit_binary_operator(self, node):
         op = self.node_helper.get_identifier(
             get_control_children(node)[0]
         )  # The operator will be the first control character
@@ -734,6 +738,14 @@ class MatlabToCast(object):
             operands=operands,
             source_refs=[self.node_helper.get_source_ref(node)],
         )
+
+    # TODO
+    def visit_postfix_operator(self, node):
+        return None
+
+    # TODO implement as for loop
+    def visit_spread_operator(self, node):
+        return None
 
     def _visit_variable_declaration(self, node) -> List:
         """Visitor for variable declaration. Will return a List of Var and Assignment nodes."""
