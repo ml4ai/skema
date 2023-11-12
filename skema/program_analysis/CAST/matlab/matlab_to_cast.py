@@ -93,15 +93,15 @@ class MatlabToCast(object):
             return self.visit_identifier(node)
         elif node.type == "name":
             return self.visit_name(node)
-        elif node.type in[
-            "unary_operator",
-            "not_operator"
-        ]: return self.visit_unary_operator(node)
+        elif node.type == "unary_operator":
+            return self.visit_unary_operator(node)
         elif node.type in [
             "binary_operator",
             "comparison_operator",
             "boolean_operator"
         ]: return self.visit_binary_operator(node)
+        elif node.type == "not_operator":
+            return self.visit_not_operator(node)
         elif node.type == "postfix_operator":
             return self.visit_postfix_operator(node)
         elif node.type == "spread_operator":
@@ -738,6 +738,10 @@ class MatlabToCast(object):
             operands=operands,
             source_refs=[self.node_helper.get_source_ref(node)],
         )
+    # TODO implement as nested for loops
+    def visit_not_operator(self, node):
+        # The MATLAB not operator is a logical matrix inversion
+        return None
 
     # TODO
     def visit_postfix_operator(self, node):
