@@ -86,9 +86,6 @@ class MatlabToCast(object):
 
     def visit(self, node):
         """Switch execution based on node type"""
-        if node == None:
-            return None
-
         if node.type == "function_definition":
             return self.visit_function_def(node)
         elif node.type == "function_call":
