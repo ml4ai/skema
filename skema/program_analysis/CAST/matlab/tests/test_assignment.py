@@ -1,5 +1,6 @@
 from skema.program_analysis.CAST.matlab.tests.utils import (
     assert_assignment,
+    assert_identifier,
     cast_nodes
 )
 
@@ -30,7 +31,6 @@ def test_literal():
     assert_assignment(nodes[4], left = 'yes', right = 'true')
     assert_assignment(nodes[5], left = 'no', right = 'false')
 
-
 def test_identifier():
     """ Test assignment of identifiers."""
 
@@ -45,3 +45,16 @@ def test_identifier():
     # identifier
     assert_assignment(nodes[0], left = 'x', right = 'y')
     assert_assignment(nodes[1], left = 'r', right = 'x')
+
+def no_test_literal_matrix():
+    """ Test assignment MATLAB literal matrix value."""
+
+    source = """
+        x = [2, 3, 5, 7, 11];
+    """
+
+    nodes = cast_nodes(source)
+    assert len(nodes) == 1
+
+    # identifier
+    assert_assignment(nodes[0], left = 'x', right = [2])
