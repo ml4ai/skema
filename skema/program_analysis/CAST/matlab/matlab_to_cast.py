@@ -37,8 +37,7 @@ from skema.program_analysis.CAST.matlab.node_helper import (
     get_first_child_index,
     get_keyword_children,
     get_last_child_index,
-    NodeHelper,
-    denone
+    NodeHelper
 )
 
 from skema.program_analysis.CAST.matlab.tokens import KEYWORDS
@@ -541,7 +540,7 @@ class MatlabToCast(object):
             # multiple case arguments
             if (cell_node):
                 nodes = get_all(cell_node, case_node_types)
-                ast_nodes = denone([self.visit(node) for node in nodes])
+                ast_nodes = [self.visit(node) for node in nodes]
                 operand = LiteralValue(
                     value_type="List",
                     value = [get_node_value(node) for node in ast_nodes],
@@ -551,14 +550,14 @@ class MatlabToCast(object):
                 return get_operator("in", [identifier, operand])
             # single case argument
             nodes = get_children_by_types(case_node, case_node_types)
-            operand = denone([self.visit(node) for node in nodes])[0]
+            operand = [self.visit(node) for node in nodes][0]
             return get_operator("==", [identifier, operand])
 
         def get_case_body(case_node):
             """ return the instruction block for the case """
             block = get_first_child_by_type(case_node, "block")
             if block:
-                return denone([self.visit(child) for child in block.children])
+                return [self.visit(c) for c in get_keyword_children(block)]
             return None
             
         def get_model_if(case_node, identifier):
@@ -583,8 +582,7 @@ class MatlabToCast(object):
             block = get_first_child_by_type(otherwise_clause, "block")
             if block:
                 last = model_ifs[len(model_ifs)-1]
-                last.orelse = denone([self.visit(c) for c in block.children])
-
+                last.orelse = [self.visit(c) for c in get_keyword_children(block)]
         return model_ifs[0]
 
     def visit_if_statement(self, node):
@@ -621,7 +619,8 @@ class MatlabToCast(object):
             block = get_first_child_by_type(else_clause, "block")
             if block:
                 last = model_ifs[len(model_ifs)-1]
-                last.orelse = denone([self.visit(c) for c in block.children])
+                children = get_keyword_children(block)
+                last.orelse = [self.visit(child) for child in children]
 
         return model_ifs[0]
     
