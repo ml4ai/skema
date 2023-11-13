@@ -10,12 +10,13 @@ from skema.program_analysis.tree_sitter_parsers.build_parsers import (
 )
 from skema.program_analysis.CAST.matlab.matlab_to_cast import MatlabToCast
 from typing import List
-KEY_FILTER = ["source_refs"]
+#KEY_FILTER = ["source_refs"]
+KEY_FILTER = []
 
 # This script will inspect a matlab source file and print the source,
 # Tree-sitter syntax tree, and CAST tree depending on input args.
 
-def show_cast(args, source):
+def show_cast(args):
     """ Get the Tree-sitter syntax tree for MATLAB files"""
 
     def remove_keys(json_obj, target_keys: List):
@@ -36,7 +37,7 @@ def show_cast(args, source):
 
         return remove_key(json_obj, target_keys)
 
-    parser = MatlabToCast(source = source)
+    parser = MatlabToCast(args.filename)
     for cast in parser.out_cast:
         json_obj = cast.to_json_object()
         # declutter JSON by filtering keys
@@ -90,7 +91,7 @@ def run(args):
         if args.tree or args.all:
             show_tree(args, source)
         if args.cast or args.all:
-            show_cast(args, source)
+            show_cast(args)
     else:
         print(f"File not found: {path.name}")
 
