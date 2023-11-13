@@ -46,16 +46,16 @@ def test_identifier():
     assert_assignment(nodes[0], left = 'x', right = 'y')
     assert_assignment(nodes[1], left = 'r', right = 'x')
 
-def no_test_literal_matrix():
+def test_literal_matrix():
     """ Test assignment MATLAB literal matrix value."""
 
     source = """
-        x = [2 3 5 7];
+        x = [2 3];
     """
 
     nodes = cast_nodes(source)
     assert len(nodes) == 1
 
     # assignment
-    assert_assignment(nodes[0], left = 'x', right = ["2", "3", "5", "7"])
+    assert_assignment(nodes[0], left = 'x', right = ["2", "3"])
 

@@ -121,8 +121,6 @@ class MatlabToCast(object):
             return self.visit_operator_spread(node)
         elif node.type == "unary_operator":
             return self.visit_operator_unary(node)
-        elif node.type == "row":
-            return self.visit_row(node)
         elif node.type == "switch_statement":
             return self.visit_switch_statement(node)
         elif node.type == "while_statement":
@@ -541,9 +539,6 @@ class MatlabToCast(object):
             operands=[self.visit(node.children[1])],
             source_refs=[self.node_helper.get_source_ref(node)],
         )
-
-    def visit_operator_row(self, node):
-        return None
 
     def visit_switch_statement(self, node):
         """ return a conditional statement based on the switch statement """

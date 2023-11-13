@@ -34,7 +34,14 @@ def assert_literal_value(literal_value, value = None):
     """ Test the LiteralValue for correct type and value. """
     assert isinstance(literal_value, LiteralValue)
     if value:
-        assert literal_value.value == value
+        if literal_value.value_type == 'List':
+            assert len(literal_value.value) == len (value)
+            # test a list of values
+            for i, element in enumerate(literal_value.value):
+                assert_literal_value(element, value[i])
+        else:
+            # test one value
+            assert literal_value.value == value
 
 def assert_operand(operand, value = None):
     """ Test a Var or LiteralValue operand for correct type and value. """
