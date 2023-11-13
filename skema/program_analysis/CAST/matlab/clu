@@ -1,0 +1,95 @@
+#!/usr/bin/env python3
+import sys
+import json
+import argparse
+from os.path import exists
+from tree_sitter import Language, Node, Parser
+from pathlib import Path
+from skema.program_analysis.tree_sitter_parsers.build_parsers import (
+    INSTALLED_LANGUAGES_FILEPATH
+)
+from skema.program_analysis.CAST.matlab.matlab_to_cast import MatlabToCast
+from typing import List
+KEY_FILTER = ["source_refs"]
+
+def show_cast(args, source):
+    """ Get the Tree-sitter syntax tree for MATLAB files"""
+
+    def remove_keys(json_obj, target_keys: List):
+        """ remove all instances of the target keys from the json object"""
+
+        def remove_key(json_obj, target_key):
+            """ remove all instances of the target key from the json object"""
+            if isinstance(json_obj, dict):
+                for target_key in target_keys:
+                    if target_key in json_obj.keys():
+                        json_obj.pop(target_key)
+                    for key in json_obj.keys():
+                        remove_key(json_obj[key], target_keys)
+            elif isinstance(json_obj, list):
+                for item in json_obj:
+                    remove_key(item, target_keys)
+            return(json_obj)
+
+        return remove_key(json_obj, target_keys)
+
+    parser = MatlabToCast(source = source)
+    for cast in parser.out_cast:
+        json_obj = cast.to_json_object()
+        # declutter JSON by filtering keys
+        json_obj = remove_keys(json_obj, KEY_FILTER)
+        # pretty print JSON to string
+        output = json.dumps(json_obj, sort_keys=True, indent=args.indent)
+        if len(KEY_FILTER) > 0:
+            print(f"\nCAST: Removed keys: {KEY_FILTER}")
+        else:
+            print("\nCAST:")
+        print(output)
+
+
+def show_tree(args, source):
+    """Convert the file source into a Tree-sitter syntax tree"""
+
+    def print_tree(node: Node, offset = 0, indent = 0):
+        """Display the node branch in pretty format"""
+        for child in node.children:
+            if not child.type == "\n":
+                print(f"{' '*offset}{child.type}")
+            print_tree(child, offset + indent, indent)
+
+    # Create the Tree-sitter parser for the language name
+    parser = Parser()
+    parser.set_language(
+        Language(INSTALLED_LANGUAGES_FILEPATH, "matlab")
+    )
+    tree = parser.parse(bytes(source, "utf8"))
+    print("\nSYNTAX TREE:")
+    print_tree(tree.root_node, args.offset, args.indent)
+
+def run(args):
+    if exists(args.filename):
+        path = Path(args.filename)
+        source = path.read_text().strip()
+        print(f"\nSOURCE ({path.name}):")
+        print(source)
+        if args.tree:
+            show_tree(args, source)
+        if args.cast:
+            show_cast(args, source)
+    else:
+        print(f"File not found: {path.name}")
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument('filename', help="set the filename")
+    parser.add_argument('--indent', '-i', default=2, type=int, 
+        help="indent spaces, default = 2")
+    parser.add_argument('--offset', '-o', default=0, type=int, 
+        help="initial indent, default = 0")
+    parser.add_argument('--tree', '-t', action="store_true",
+        help="Display the Tree-sitter syntax tree for the source file")
+    parser.add_argument('--cast', '-c', action="store_true",
+        help="Display the CAST tree for the source file")
+    args = parser.parse_args()
+    run(args)
+
