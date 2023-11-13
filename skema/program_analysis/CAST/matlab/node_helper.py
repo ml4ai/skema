@@ -11,13 +11,11 @@ class NodeHelper():
         self.source = source
         self.source_file_name = source_file_name
 
-
     def get_source_ref(self, node: Node) -> SourceRef:
         """Given a node and file name, return a CAST SourceRef object."""
         row_start, col_start = node.start_point
         row_end, col_end = node.end_point
         return SourceRef(self.source_file_name, col_start, col_end, row_start, row_end)
-
 
     def get_identifier(self, node: Node) -> str:
         """Given a node, return the identifier it represents. ie. The code between node.start_point and node.end_point"""
@@ -57,11 +55,9 @@ def get_first_child_by_type(node: Node, type: str, recurse=False):
                 return out
     return None
 
-
 def get_children_by_types(node: Node, types: List):
     """Takes in a node and a list of types as inputs and returns all children matching those types. Otherwise, return an empty list"""
     return [child for child in node.children if child.type in types]
-
 
 def get_first_child_index(node, type: str):
     """Get the index of the first child of node with type type."""
@@ -78,10 +74,6 @@ def get_all(node, types):
             search(child, types, ret)
         return ret
     return search(node, types, [])
-
-def denone(nodes):
-    """ return the node list without any None elements """
-    return [node for node in nodes if node]
 
 def get_last_child_index(node, type: str):
     """Get the index of the last child of node with type type."""
