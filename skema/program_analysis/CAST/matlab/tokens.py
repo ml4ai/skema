@@ -16,6 +16,7 @@ SYNTAX_KEYWORDS = [
     'assignment',
     'binary_operator',
     'block',
+    'boolean_operator',
     'case_clause',
     'cell',
     'comment',
@@ -25,7 +26,6 @@ SYNTAX_KEYWORDS = [
     'end',
     'identifier',
     'if_statement',
-    'not_operator',
     'number',
     'otherwise_clause',
     'row',
@@ -36,7 +36,6 @@ SYNTAX_KEYWORDS = [
 
     # keywords to be supported
     'arguments',
-    'boolean_operator',
     'break_statement',
     'command',
     'command_argument',
@@ -54,10 +53,15 @@ SYNTAX_KEYWORDS = [
     'line_continuation',
     'matrix',
     'multioutput_variable',
+    'not_operator',
     'parenthesis',
     'postfix_operator',
     'range',
     'spread_operator',
+
+    # keywords not in model or CAST that we should support
+    'while',
+    'while_statement'
 ]
 
 """ Keywords used by CAST but not found in the Waterloo model """

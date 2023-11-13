@@ -87,6 +87,8 @@ class MatlabToCast(object):
             return self.visit_function_def(node)
         elif node.type == "function_call":
             return self.visit_function_call(node)
+        elif node.type == "command":
+            return self.visit_command(node)
         elif node.type == "assignment":
             return self.visit_assignment(node)
         elif node.type == "identifier":
@@ -117,6 +119,10 @@ class MatlabToCast(object):
             return self.visit_extent_specifier(node)
         elif node.type == "do_loop_statement":
             return self.visit_do_loop_statement(node)
+        elif node.type == "iterator":
+            return self.visit_iterator(node)
+        elif node.type == "for_statement":
+            return self.visit_for_statement(node)
         elif node.type == "switch_statement":
             return self.visit_switch_statement(node)
         elif node.type == "if_statement":
@@ -275,6 +281,13 @@ class MatlabToCast(object):
             source_refs=[self.node_helper.get_source_ref(node)],
         )
 
+    def visit_command(self, node):
+        # Pull relevent nodes
+        print ("visit_command")
+        print(node)
+        return None
+            
+
     def visit_function_call(self, node):
         # Pull relevent nodes
 
@@ -366,6 +379,76 @@ class MatlabToCast(object):
                 )
 
             return imports
+
+    # Handle the MATLAB iterator.   
+    # Note that this is a wrapper for an iterator
+    def visit_iterator(self, node) -> Loop:
+        """
+        SOURCE:
+        for n = 1:10:2
+            x = step_by_2(n)
+        end
+
+        SYNTAX TREE:
+        for_statement
+            iterator
+                identifier n
+                =
+                range
+                    number  % start
+                    :
+                    number  % stop
+                    :
+                    number  % step
+            block
+                assignment
+                    identifier x
+                    =
+                    function_call
+                        identifier step_by_2
+                        (
+                        arguments
+                            identifier n
+                        )
+            end
+        ;
+        """
+
+
+    # Handle the MATLAB for_statement.   
+    # Note that this is a wrapper for an iterator
+    def visit_for_statement(self, node) -> Loop:
+        """
+        SOURCE:
+        for n = 1:10:2
+            x = step_by_2(n)
+        end
+
+        SYNTAX TREE:
+        for_statement
+            iterator
+                identifier n
+                =
+                range
+                    number  % start
+                    :
+                    number  % stop
+                    :
+                    number  % step
+            block
+                assignment
+                    identifier x
+                    =
+                    function_call
+                        identifier step_by_2
+                        (
+                        arguments
+                            identifier n
+                        )
+            end
+        ;
+        """
+        return None
 
     # CAST has no while loop, so this will have to be translated
     # into a CAST-supported loop type.
@@ -512,6 +595,36 @@ class MatlabToCast(object):
 
     def visit_switch_statement(self, node):
         """ return a conditional statement based on the switch statement """
+        """
+        SOURCE:
+        switch x
+            case 'one'
+                n = 1;
+            otherwise
+                n = 0;
+        end
+
+        SYNTAX TREE:
+        switch_statement
+            identifier
+            case_clause
+                case
+                string
+                    string_content
+                block
+                    assignment
+                        identifier
+                        =
+                        number
+            otherwise_clause
+                otherwise
+                block
+                    assignment
+                        identifier
+                        =
+                        number
+            end
+        """
     
         # node types used for case comparison
         case_node_types = ["number", "string", "boolean","identifier"]
