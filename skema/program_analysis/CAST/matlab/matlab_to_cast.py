@@ -82,90 +82,149 @@ class MatlabToCast(object):
 
     def visit(self, node):
         """Switch execution based on node type"""
-        if node.type == "function_definition":
-            return self.visit_function_def(node)
-        elif node.type == "function_call":
-            return self.visit_function_call(node)
+        if node.type == "assignment":
+            return self.visit_assignment(node)
         elif node.type == "command":
             return self.visit_command(node)
-        elif node.type == "assignment":
-            return self.visit_assignment(node)
+        elif node.type == "for_statement":
+            return self.visit_for_statement(node)
+        elif node.type == "function_call":
+            return self.visit_function_call(node)
+        elif node.type == "function_definition":
+            return self.visit_function_def(node)
         elif node.type == "identifier":
             return self.visit_identifier(node)
-        elif node.type == "name":
-            return self.visit_name(node)
-        elif node.type == "unary_operator":
-            return self.visit_unary_operator(node)
-        elif node.type in [
-            "binary_operator",
-            "comparison_operator",
-            "boolean_operator"
-        ]: return self.visit_binary_operator(node)
-        elif node.type == "not_operator":
-            return self.visit_not_operator(node)
-        elif node.type == "postfix_operator":
-            return self.visit_postfix_operator(node)
-        elif node.type == "spread_operator":
-            return self.visit_spread_operator(node)
+        elif node.type == "if_statement":
+            return self.visit_if_statement(node)
+        elif node.type == "iterator":    # used?
+            return self.visit_iterator(node)
         elif node.type in [
             "boolean",
             "matrix",
             "number",
             "string"
         ]: return self.visit_literal(node)
-        elif node.type == "do_loop_statement":
-            return self.visit_do_loop_statement(node)
-        elif node.type == "iterator":
-            return self.visit_iterator(node)
-        elif node.type == "for_statement":
-            return self.visit_for_statement(node)
-        elif node.type == "while_statement":
-            return self.visit_while_statement(node)
+        elif node.type == "source_file":    # used?
+            return self.visit_module(node)
+        elif node.type == "name":
+            return self.visit_name(node)
+        elif node.type in [
+            "binary_operator",
+            "comparison_operator",
+            "boolean_operator"
+        ]: return self.visit_operator_binary(node)
+        elif node.type == "not_operator":
+            return self.visit_operator_not(node)
+        elif node.type == "postfix_operator":
+            return self.visit_operator_postfix(node)
+        elif node.type == "spread_operator":
+            return self.visit_operator_spread(node)
+        elif node.type == "unary_operator":
+            return self.visit_operator_unary(node)
+        elif node.type == "row":
+            return self.visit_row(node)
         elif node.type == "switch_statement":
             return self.visit_switch_statement(node)
-        elif node.type == "if_statement":
-            return self.visit_if_statement(node)
-        # Not in Waterloo but likely needed
-        elif node.type == "import":   
-            return self._visit_import_statemement(node)
-        # CAST call
-        elif node.type == "source_file":
-            return self.visit_module(node)
-
+        elif node.type == "while_statement":
+            return self.visit_while_statement(node)
         else:
             return self._visit_passthrough(node)
 
-    def visit_module(self, node: Node) -> Module:
-        """Visitor for program and module statement. Returns a Module object"""
-        self.variable_context.push_context()
-        
-        program_body = []
-        for child in node.children: 
-            child_cast = self.visit(child)
-            if isinstance(child_cast, List):
-                program_body.extend(child_cast)
-            elif isinstance(child_cast, AstNode):
-                program_body.append(child_cast)
-    
-        self.variable_context.pop_context()
-        
-        return Module(
-            name=None, #TODO: Fill out name field
-            body=program_body,
-            source_refs = [self.node_helper.get_source_ref(node)]
+    def visit_assignment(self, node):
+        left, _, right = node.children
+
+        return Assignment(
+            left=self.visit(left),
+            right=self.visit(right),
+            source_refs=[self.node_helper.get_source_ref(node)],
         )
 
-    def visit_name(self, node):
-        # Node structure
-        # (name)
+    def visit_command(self, node):
+        # Pull relevent nodes
+        print ("visit_command")
+        print(node)
+        return None
 
-        # First, we will check if this name is already defined, and if it is return the name node generated previously
-        identifier = self.node_helper.get_identifier(node)
-        if self.variable_context.is_variable(identifier):
-            return self.variable_context.get_node(identifier)
+    # Note that this is a wrapper for an iterator
+    def visit_for_statement(self, node) -> Loop:
+        """ Translate Tree-sitter for_loop node into CAST Loop node """
+        """
+        SOURCE:
+        for n = 1:10:2
+            x = step_by_2(n)
+        end
 
-        return self.variable_context.add_variable(
-            identifier, "Unknown", [self.node_helper.get_source_ref(node)]
+        SYNTAX TREE:
+        for_statement
+            iterator
+                identifier n
+                =
+                range
+                    number  % start
+                    :
+                    number  % stop
+                    :
+                    number  % step
+            block
+                assignment
+                    identifier x
+                    =
+                    function_call
+                        identifier step_by_2
+                        (
+                        arguments
+                            identifier n
+                        )
+            end
+        ;
+        """
+
+        """
+        class Loop(AstNode):
+            'pre': 'list[AstNode]',
+            'expr': 'AstNode',
+            'body': 'list[AstNode]',
+            'post': 'list[AstNode]'
+        """
+
+        iterator_node = get_first_child_by_type(node, "iterator")
+        range_var = get_first_child_by_type(iterator_node, "identifier")
+        range_node = get_first_child_by_type(iterator_node, "range")
+        range_children = get_keyword_children(range_node) + [None]
+        range_start, range_stop, range_step = range_children
+
+        return Loop(
+            source_refs=[self.node_helper.get_source_ref(node)],
+        )
+
+    def visit_function_call(self, node):
+        """
+        SOURCE:
+        subplot(3,5,7);
+
+        SYNTAX TREE:
+        function_call
+            identifier
+            (
+            arguments
+                number
+                ,
+                number
+                ,
+                number
+            )
+        ;
+        """
+
+        args_parent = get_first_child_by_type(node, "arguments")
+        args_children = [c for c in get_keyword_children(args_parent)]
+
+        return Call(
+            func = self.visit(get_first_child_by_type(node, "identifier")),
+            source_language = "matlab",
+            source_language_version = MATLAB_VERSION,
+            arguments = [self.visit(c) for c in args_children],
+            source_refs=[self.node_helper.get_source_ref(node)]
         )
 
     def visit_function_def(self, node):
@@ -263,83 +322,66 @@ class MatlabToCast(object):
             source_refs=[self.node_helper.get_source_ref(node)],
         )
 
-    def visit_command(self, node):
-        # Pull relevent nodes
-        print ("visit_command")
-        print(node)
-        return None
-            
+    def visit_identifier(self, node):
+        # By default, this is unknown, but can be updated by other visitors
+        identifier = self.node_helper.get_identifier(node)
+        if self.variable_context.is_variable(identifier):
+            var_type = self.variable_context.get_type(identifier)
+        else:
+            var_type = "Unknown"
 
-    def visit_function_call(self, node):
-        """
-        SOURCE:
-        subplot(3,5,7);
+        # Default value comes from Pytohn keyword arguments i.e. def foo(a, b=10)
+        # Fortran does have optional arguments introduced in F90, but these do not specify a default
+        default_value = None
 
-        SYNTAX TREE:
-        function_call
-            identifier
-            (
-            arguments
-                number
-                ,
-                number
-                ,
-                number
-            )
-        ;
-        """
+        # This is another case where we need to override the visitor to explicitly visit another node
+        value = self.visit_name(node)
 
-        args_parent = get_first_child_by_type(node, "arguments")
-        args_children = [c for c in get_keyword_children(args_parent)]
+        return Var(
+            val=value,
 
-        return Call(
-            func = self.visit(get_first_child_by_type(node, "identifier")),
-            source_language = "matlab",
-            source_language_version = MATLAB_VERSION,
-            arguments = [self.visit(c) for c in args_children],
-            source_refs=[self.node_helper.get_source_ref(node)]
+            type=var_type,
+            default_value=default_value,
+            source_refs=[self.node_helper.get_source_ref(node)],
         )
 
-    # this is not in the Waterloo model but will no doubt be encountered.
-    def visit_import_statemement(self, node):
-        # (use)
-        #   (use)
-        #   (module_name)
+    def visit_if_statement(self, node):
+        """ return a node describing if, elseif, else conditional logic"""
+        def conditional(conditional_node):
+            """ return a ModelIf struct for the conditional logic node. """
+            ret = ModelIf()
+            # comparison_operator
+            ret.expr = self.visit(get_first_child_by_type(
+                conditional_node,
+                "comparison_operator"
+            ))
+            # instruction_block
+            block = get_first_child_by_type(conditional_node, "block")
+            if block:
+                children = get_keyword_children(block)
+                ret.body = [self.visit(child) for child in children]
 
-        ## Pull relevent child nodes
-        module_name_node = get_first_child_by_type(node, "module_name")
-        module_name = self.node_helper.get_identifier(module_name_node)
-        included_items_node = get_first_child_by_type(node, "included_items")
+            return ret
 
-        import_all = included_items_node is None
-        import_alias = None  # TODO: Look into local-name and use-name fields
+        # the if statement is returned as a ModelIf AstNode
+        model_ifs = [conditional(node)]
 
-        # We need to check if this import is a full import of a module, i.e. use module
-        # Or a partial import i.e. use module,only: sub1, sub2
-        if import_all:
-            return ModelImport(
-                name=module_name,
-                alias=import_alias,
-                all=import_all,
-                symbol=None,
-                source_refs=None,
-            )
-        else:
-            imports = []
-            for symbol in get_keyword_children(included_items_node):
-                symbol_identifier = self.node_helper.get_identifier(symbol)
-                symbol_source_refs = [self.node_helper.get_source_ref(symbol)]
-                imports.append(
-                    ModelImport(
-                        name=module_name,
-                        alias=import_alias,
-                        all=import_all,
-                        symbol=symbol_identifier,
-                        source_refs=symbol_source_refs,
-                    )
-                )
+        # add 0-n elseif clauses 
+        elseif_clauses = get_children_by_types(node, ["elseif_clause"])
+        model_ifs += [conditional(child) for child in elseif_clauses]
+        for i, model_if in enumerate(model_ifs[1:]):
+            model_ifs[i].orelse = [model_if]
 
-            return imports
+        # add 0-1 else clause 
+        else_clause = get_first_child_by_type(node, "else_clause")
+        if else_clause:
+            block = get_first_child_by_type(else_clause, "block")
+            if block:
+                last = model_ifs[len(model_ifs)-1]
+                children = get_keyword_children(block)
+                last.orelse = [self.visit(child) for child in children]
+
+        return model_ifs[0]
 
     # Handle the MATLAB iterator.   
     # Note that this is a wrapper for an iterator
@@ -375,112 +417,133 @@ class MatlabToCast(object):
         ;
         """
 
-    # Note that this is a wrapper for an iterator
-    def visit_for_statement(self, node) -> Loop:
-        """ Translate Tree-sitter for_loop node into CAST Loop node """
-        """
-        SOURCE:
-        for n = 1:10:2
-            x = step_by_2(n)
-        end
+    def visit_literal(self, node) -> LiteralValue:
+        """Visitor for literals. Returns a LiteralValue"""
+        literal_type = node.type
+        literal_value = self.node_helper.get_identifier(node)
+        literal_source_ref = self.node_helper.get_source_ref(node)
 
-        SYNTAX TREE:
-        for_statement
-            iterator
-                identifier n
-                =
-                range
-                    number  % start
-                    :
-                    number  % stop
-                    :
-                    number  % step
-            block
-                assignment
-                    identifier x
-                    =
-                    function_call
-                        identifier step_by_2
-                        (
-                        arguments
-                            identifier n
-                        )
-            end
-        ;
-        """
+        if literal_type == "number":
+            # Check if this is a real value, or an Integer
+            if "e" in literal_value.lower() or "." in literal_value:
+                return LiteralValue(
+                    value_type="AbstractFloat",  # TODO verify this value
+                    value=literal_value,
+                    source_code_data_type=["matlab", MATLAB_VERSION, "real"],
+                    source_refs=[literal_source_ref],
+                )
+            else:
+                return LiteralValue(
+                    value_type="Integer",
+                    value=literal_value,
+                    source_code_data_type=["matlab", MATLAB_VERSION, "integer"],
+                    source_refs=[literal_source_ref],
+                )
 
-        """
-        class Loop(AstNode):
-            'pre': 'list[AstNode]',
-            'expr': 'AstNode',
-            'body': 'list[AstNode]',
-            'post': 'list[AstNode]'
-        """
+        elif literal_type == "string":
+            return LiteralValue(
+                value_type="Character",
+                value=literal_value,
+                source_code_data_type=["matlab", MATLAB_VERSION, "character"],
+                source_refs=[literal_source_ref],
+            )
 
-        iterator_node = get_first_child_by_type(node, "iterator")
-        range_var = get_first_child_by_type(iterator_node, "identifier")
-        range_node = get_first_child_by_type(iterator_node, "range")
-        range_children = get_keyword_children(range_node) + [None]
-        range_start, range_stop, range_step = range_children
+        elif literal_type == "boolean":
+            return LiteralValue(
+                value_type="Boolean",
+                value=literal_value,
+                source_code_data_type=["matlab", MATLAB_VERSION, "logical"],
+                source_refs=[literal_source_ref],
+            )
 
-        return Loop(
+        elif literal_type == "matrix":
+            elements = []
+            for child in get_keyword_children(node):
+                elements.append(self.visit(child))
+            return LiteralValue(
+                value_type="List",
+                value = elements,
+                source_code_data_type=["matlab", MATLAB_VERSION, "matrix"],
+                source_refs=[literal_source_ref],
+            )
+
+    def visit_module(self, node: Node) -> Module:
+        """Visitor for program and module statement. Returns a Module object"""
+        self.variable_context.push_context()
+        
+        program_body = []
+        for child in node.children: 
+            child_cast = self.visit(child)
+            if isinstance(child_cast, List):
+                program_body.extend(child_cast)
+            elif isinstance(child_cast, AstNode):
+                program_body.append(child_cast)
+    
+        self.variable_context.pop_context()
+        
+        return Module(
+            name=None, #TODO: Fill out name field
+            body=program_body,
+            source_refs = [self.node_helper.get_source_ref(node)]
+        )
+
+    def visit_name(self, node):
+        # Node structure
+        # (name)
+
+        # First, we will check if this name is already defined, and if it is return the name node generated previously
+        identifier = self.node_helper.get_identifier(node)
+        if self.variable_context.is_variable(identifier):
+            return self.variable_context.get_node(identifier)
+
+        return self.variable_context.add_variable(
+            identifier, "Unknown", [self.node_helper.get_source_ref(node)]
+        )
+
+    def visit_operator_binary(self, node):
+        op = self.node_helper.get_identifier(
+            get_control_children(node)[0]
+        )  # The operator will be the first control character
+
+        operands = []
+        for operand in get_keyword_children(node):
+            operands.append(self.visit(operand))
+
+        return Operator(
+            source_language="matlab",
+            interpreter=None,
+            version=None,
+            op=op,
+            operands=operands,
             source_refs=[self.node_helper.get_source_ref(node)],
         )
 
-    # into a CAST-supported loop type.
-    def visit_while_statement(self, node) -> Loop:
-        """ Translate MATLAB while_loop syntax node into CAST Loop node """
-        """
-        SOURCE:
-        n = 10;
-        f = n;
-        while n > 1
-            n = n-1;
-            f = f*n;
-        end
+    # TODO implement as nested for loops
+    def visit_operator_not(self, node):
+        # The MATLAB not operator is a logical matrix inversion
+        return None
 
-        SYNTAX TREE:
-        assignment
-            identifier
-            =
-            number
-        ;
-        assignment
-            identifier
-            =
-            identifier
-        ;
-        while_statement
-            while
-            comparison_operator
-                identifier
-                >
-                number
-            block
-                assignment
-                    identifier
-                    =
-                    binary_operator
-                        identifier
-                        -
-                        number
-                ;
-                assignment
-                    identifier
-                    =
-                    binary_operator
-                        identifier
-                        *
-                        identifier
-                ;
-            end
-        ;
-        """
+    # TODO
+    def visit_operator_postfix(self, node):
+        return None
 
-        return Loop(
+    # TODO implement as for loop
+    def visit_operator_spread(self, node):
+        return None
+
+    def visit_operator_unary(self, node):
+        # A unary operator is an Operator instance with a single operand
+        return Operator(
+            source_language="matlab",
+            interpreter=None,
+            version=None,
+            op = node.children[0].type,
+            operands=[self.visit(node.children[1])],
             source_refs=[self.node_helper.get_source_ref(node)],
         )
 
+    def visit_operator_row(self, node):
+        return None
 
     def visit_switch_statement(self, node):
         """ return a conditional statement based on the switch statement """
@@ -585,169 +648,102 @@ class MatlabToCast(object):
                 last.orelse = [self.visit(c) for c in get_keyword_children(block)]
         return model_ifs[0]
 
-    def visit_if_statement(self, node):
-        """ return a node describing if, elseif, else conditional logic"""
+    # into a CAST-supported loop type.
+    def visit_while_statement(self, node) -> Loop:
+        """ Translate MATLAB while_loop syntax node into CAST Loop node """
+        """
+        SOURCE:
+        n = 10;
+        f = n;
+        while n > 1
+            n = n-1;
+            f = f*n;
+        end
 
-        def conditional(conditional_node):
-            """ return a ModelIf struct for the conditional logic node. """
-            ret = ModelIf()
-            # comparison_operator
-            ret.expr = self.visit(get_first_child_by_type(
-                conditional_node,
-                "comparison_operator"
-            ))
-            # instruction_block
-            block = get_first_child_by_type(conditional_node, "block")
-            if block:
-                children = get_keyword_children(block)
-                ret.body = [self.visit(child) for child in children]
+        SYNTAX TREE:
+        assignment
+            identifier
+            =
+            number
+        ;
+        assignment
+            identifier
+            =
+            identifier
+        ;
+        while_statement
+            while
+            comparison_operator
+                identifier
+                >
+                number
+            block
+                assignment
+                    identifier
+                    =
+                    binary_operator
+                        identifier
+                        -
+                        number
+                ;
+                assignment
+                    identifier
+                    =
+                    binary_operator
+                        identifier
+                        *
+                        identifier
+                ;
+            end
+        ;
+        """
 
-            return ret
-
-        # the if statement is returned as a ModelIf AstNode
-        model_ifs = [conditional(node)]
-
-        # add 0-n elseif clauses 
-        elseif_clauses = get_children_by_types(node, ["elseif_clause"])
-        model_ifs += [conditional(child) for child in elseif_clauses]
-        for i, model_if in enumerate(model_ifs[1:]):
-            model_ifs[i].orelse = [model_if]
-
-        # add 0-1 else clause 
-        else_clause = get_first_child_by_type(node, "else_clause")
-        if else_clause:
-            block = get_first_child_by_type(else_clause, "block")
-            if block:
-                last = model_ifs[len(model_ifs)-1]
-                children = get_keyword_children(block)
-                last.orelse = [self.visit(child) for child in children]
-
-        return model_ifs[0]
-    
-    def visit_assignment(self, node):
-        left, _, right = node.children
-
-        return Assignment(
-            left=self.visit(left),
-            right=self.visit(right),
+        return Loop(
             source_refs=[self.node_helper.get_source_ref(node)],
         )
 
-    def visit_literal(self, node) -> LiteralValue:
-        """Visitor for literals. Returns a LiteralValue"""
-        literal_type = node.type
-        literal_value = self.node_helper.get_identifier(node)
-        literal_source_ref = self.node_helper.get_source_ref(node)
+    # this is not in the Waterloo model but will no doubt be encountered.
+    def visit_import_statemement(self, node):
+        # (use)
+        #   (use)
+        #   (module_name)
 
-        if literal_type == "number":
-            # Check if this is a real value, or an Integer
-            if "e" in literal_value.lower() or "." in literal_value:
-                return LiteralValue(
-                    value_type="AbstractFloat",  # TODO verify this value
-                    value=literal_value,
-                    source_code_data_type=["matlab", MATLAB_VERSION, "real"],
-                    source_refs=[literal_source_ref],
-                )
-            else:
-                return LiteralValue(
-                    value_type="Integer",
-                    value=literal_value,
-                    source_code_data_type=["matlab", MATLAB_VERSION, "integer"],
-                    source_refs=[literal_source_ref],
-                )
+        ## Pull relevent child nodes
+        module_name_node = get_first_child_by_type(node, "module_name")
+        module_name = self.node_helper.get_identifier(module_name_node)
+        included_items_node = get_first_child_by_type(node, "included_items")
 
-        elif literal_type == "string":
-            return LiteralValue(
-                value_type="Character",
-                value=literal_value,
-                source_code_data_type=["matlab", MATLAB_VERSION, "character"],
-                source_refs=[literal_source_ref],
+        import_all = included_items_node is None
+        import_alias = None  # TODO: Look into local-name and use-name fields
+
+        # We need to check if this import is a full import of a module, i.e. use module
+        # Or a partial import i.e. use module,only: sub1, sub2
+        if import_all:
+            return ModelImport(
+                name=module_name,
+                alias=import_alias,
+                all=import_all,
+                symbol=None,
+                source_refs=None,
             )
-
-        elif literal_type == "boolean":
-            return LiteralValue(
-                value_type="Boolean",
-                value=literal_value,
-                source_code_data_type=["matlab", MATLAB_VERSION, "logical"],
-                source_refs=[literal_source_ref],
-            )
-
-        elif literal_type == "matrix":
-            elements = []
-            for child in get_keyword_children(node):
-                elements.append(self.visit(child))
-            return LiteralValue(
-                value_type="List",
-                value = elements,
-                source_code_data_type=["matlab", MATLAB_VERSION, "matrix"],
-                source_refs=[literal_source_ref],
-            )
-
-    def visit_identifier(self, node):
-        # By default, this is unknown, but can be updated by other visitors
-        identifier = self.node_helper.get_identifier(node)
-        if self.variable_context.is_variable(identifier):
-            var_type = self.variable_context.get_type(identifier)
         else:
-            var_type = "Unknown"
+            imports = []
+            for symbol in get_keyword_children(included_items_node):
+                symbol_identifier = self.node_helper.get_identifier(symbol)
+                symbol_source_refs = [self.node_helper.get_source_ref(symbol)]
+                imports.append(
+                    ModelImport(
+                        name=module_name,
+                        alias=import_alias,
+                        all=import_all,
+                        symbol=symbol_identifier,
+                        source_refs=symbol_source_refs,
+                    )
+                )
 
-        # Default value comes from Pytohn keyword arguments i.e. def foo(a, b=10)
-        # Fortran does have optional arguments introduced in F90, but these do not specify a default
-        default_value = None
+            return imports
 
-        # This is another case where we need to override the visitor to explicitly visit another node
-        value = self.visit_name(node)
-
-        return Var(
-            val=value,
-
-            type=var_type,
-            default_value=default_value,
-            source_refs=[self.node_helper.get_source_ref(node)],
-        )
-
-    def visit_unary_operator(self, node):
-        # A unary operator is an Operator instance with a single operand
-        return Operator(
-            source_language="matlab",
-            interpreter=None,
-            version=None,
-            op = node.children[0].type,
-            operands=[self.visit(node.children[1])],
-            source_refs=[self.node_helper.get_source_ref(node)],
-        )
-
-    def visit_binary_operator(self, node):
-        op = self.node_helper.get_identifier(
-            get_control_children(node)[0]
-        )  # The operator will be the first control character
-
-        operands = []
-        for operand in get_keyword_children(node):
-            operands.append(self.visit(operand))
-
-        return Operator(
-            source_language="matlab",
-            interpreter=None,
-            version=None,
-            op=op,
-            operands=operands,
-            source_refs=[self.node_helper.get_source_ref(node)],
-        )
-    # TODO implement as nested for loops
-    def visit_not_operator(self, node):
-        # The MATLAB not operator is a logical matrix inversion
-        return None
-
-    # TODO
-    def visit_postfix_operator(self, node):
-        return None
-
-    # TODO implement as for loop
-    def visit_spread_operator(self, node):
-        return None
-
-    # how we skip control nodes and other junk
+    # skip control nodes and other junk
     def _visit_passthrough(self, node):
         if len(node.children) == 0:
             return None
