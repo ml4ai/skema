@@ -41,10 +41,11 @@ def show_cast(args, source):
         # pretty print JSON to string
         output = json.dumps(json_obj, sort_keys=True, indent=args.indent)
         if len(KEY_FILTER) > 0:
-            print(f"\nCAST: Removed keys: {KEY_FILTER}")
+            print(f"\n{' '*args.offset}CAST: Removed keys: {KEY_FILTER}")
         else:
-            print("\nCAST:")
-        print(output)
+            print(f"\n{' '*args.offset}CAST:")
+        for line in output.splitlines():
+            print(f"{' '*args.offset}{line}")
 
 
 def show_tree(args, source):
@@ -63,15 +64,21 @@ def show_tree(args, source):
         Language(INSTALLED_LANGUAGES_FILEPATH, "matlab")
     )
     tree = parser.parse(bytes(source, "utf8"))
-    print("\nSYNTAX TREE:")
+    print(f"\n{' '*args.offset}SYNTAX TREE:")
     print_tree(tree.root_node, args.offset, args.indent)
+
+def show_source(args, source):
+    print(f"\n{' '*args.offset}SOURCE ({args.filename}):")
+    for line in source.splitlines():
+        print(f"{' '*args.offset}{line}")
 
 def run(args):
     if exists(args.filename):
         path = Path(args.filename)
+        offset = ' '*args.offset
         source = path.read_text().strip()
-        print(f"\nSOURCE ({path.name}):")
-        print(source)
+        if args.source:
+            show_source(args, source)
         if args.tree:
             show_tree(args, source)
         if args.cast:
@@ -90,6 +97,8 @@ if __name__ == "__main__":
         help="Display the Tree-sitter syntax tree for the source file")
     parser.add_argument('--cast', '-c', action="store_true",
         help="Display the CAST tree for the source file")
+    parser.add_argument('--source', '-s', action="store_true",
+        help="Display the source file")
     args = parser.parse_args()
     run(args)
 
