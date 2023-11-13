@@ -27,7 +27,6 @@ CONTROL_CHARACTERS = [
 
 class NodeHelper():
     def __init__(self, source: str, source_file_name: str):
-        """Docstring"""
         self.source = source
         self.source_file_name = source_file_name
 
@@ -89,6 +88,19 @@ def get_first_child_index(node, type: str):
         if child.type == type:
             return i
 
+def get_all(node, types):
+    """ return all nodes with type in types from the entire node tree """
+    def search(node, types, ret):
+        if node.type in types:
+            ret += [node]
+        for child in node.children:
+            search(child, types, ret)
+        return ret
+    return search(node, types, [])
+
+def valid(nodes):
+    """ return the node list without any None elements """
+    return [node for node in nodes if node]
 
 def remove_comments(node: Node):
     """Remove comment nodes from tree-sitter parse tree"""
@@ -114,12 +126,10 @@ def get_last_child_index(node, type: str):
 
 
 def get_control_children(node: Node):
-    """Docstring"""
     return get_children_by_types(node, CONTROL_CHARACTERS)
 
 
 def get_non_control_children(node: Node):
-    """Docstring"""
     children = []
     for child in node.children:
         if child.type not in CONTROL_CHARACTERS:

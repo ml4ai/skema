@@ -11,10 +11,7 @@ from skema.program_analysis.tree_sitter_parsers.build_parsers import (
 def print_tree(node: Node, indent = ''):
     """Display the node branch in pretty format"""
     for child in node.children:
-        if child.type == "\n":
-            # print(f"{indent} <nl>")
-            pass
-        else:
+        if not child.type == "\n":
             print(f"{indent} {child.type}")
         print_tree(child, indent + '    ')
 
