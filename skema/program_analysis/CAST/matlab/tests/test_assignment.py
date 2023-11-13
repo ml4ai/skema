@@ -50,11 +50,12 @@ def no_test_literal_matrix():
     """ Test assignment MATLAB literal matrix value."""
 
     source = """
-        x = [2, 3, 5, 7, 11];
+        x = [2 3 5 7];
     """
 
     nodes = cast_nodes(source)
     assert len(nodes) == 1
 
-    # identifier
-    assert_assignment(nodes[0], left = 'x', right = [2])
+    # assignment
+    assert_assignment(nodes[0], left = 'x', right = ["2", "3", "5", "7"])
+
