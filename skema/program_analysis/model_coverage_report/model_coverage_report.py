@@ -91,8 +91,7 @@ def generate_data_product(
 
 
 def generate_parse_tree(source: str, language_name: str) -> str:
-    """Generator function for Tree-Sitter parse tree"""
-    print(INSTALLED_LANGUAGES_FILEPATH)
+    """Generator function for Tree-Sitter parse tree"""       
     # Determine the tree-sitter parser we need to use based on file extension
     parser = Parser()
     parser.set_language(Language(INSTALLED_LANGUAGES_FILEPATH, language_name))
