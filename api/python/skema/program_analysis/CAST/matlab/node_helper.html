@@ -56,7 +56,6 @@ CONTROL_CHARACTERS = [
 
 class NodeHelper():
     def __init__(self, source: str, source_file_name: str):
-        &#34;&#34;&#34;Docstring&#34;&#34;&#34;
         self.source = source
         self.source_file_name = source_file_name
 
@@ -118,6 +117,19 @@ def get_first_child_index(node, type: str):
         if child.type == type:
             return i
 
+def get_all(node, types):
+    &#34;&#34;&#34; return all nodes with type in types from the entire node tree &#34;&#34;&#34;
+    def search(node, types, ret):
+        if node.type in types:
+            ret += [node]
+        for child in node.children:
+            search(child, types, ret)
+        return ret
+    return search(node, types, [])
+
+def valid(nodes):
+    &#34;&#34;&#34; return the node list without any None elements &#34;&#34;&#34;
+    return [node for node in nodes if node]
 
 def remove_comments(node: Node):
     &#34;&#34;&#34;Remove comment nodes from tree-sitter parse tree&#34;&#34;&#34;
@@ -143,12 +155,10 @@ def get_last_child_index(node, type: str):
 
 
 def get_control_children(node: Node):
-    &#34;&#34;&#34;Docstring&#34;&#34;&#34;
     return get_children_by_types(node, CONTROL_CHARACTERS)
 
 
 def get_non_control_children(node: Node):
-    &#34;&#34;&#34;Docstring&#34;&#34;&#34;
     children = []
     for child in node.children:
         if child.type not in CONTROL_CHARACTERS:
@@ -164,6 +174,26 @@ def get_non_control_children(node: Node):
 <section>
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
+<dt id="skema.program_analysis.CAST.matlab.node_helper.get_all"><code class="name flex">
+<span>def <span class="ident">get_all</span></span>(<span>node, types)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>return all nodes with type in types from the entire node tree</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_all(node, types):
+    &#34;&#34;&#34; return all nodes with type in types from the entire node tree &#34;&#34;&#34;
+    def search(node, types, ret):
+        if node.type in types:
+            ret += [node]
+        for child in node.children:
+            search(child, types, ret)
+        return ret
+    return search(node, types, [])</code></pre>
+</details>
+</dd>
 <dt id="skema.program_analysis.CAST.matlab.node_helper.get_children_by_types"><code class="name flex">
 <span>def <span class="ident">get_children_by_types</span></span>(<span>node: tree_sitter.Node, types: List[~T])</span>
 </code></dt>
@@ -182,13 +212,12 @@ def get_non_control_children(node: Node):
 <span>def <span class="ident">get_control_children</span></span>(<span>node: tree_sitter.Node)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Docstring</p></div>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def get_control_children(node: Node):
-    &#34;&#34;&#34;Docstring&#34;&#34;&#34;
     return get_children_by_types(node, CONTROL_CHARACTERS)</code></pre>
 </details>
 </dd>
@@ -256,13 +285,12 @@ When the recurse argument is set, it will also recursivly search children nodes 
 <span>def <span class="ident">get_non_control_children</span></span>(<span>node: tree_sitter.Node)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Docstring</p></div>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def get_non_control_children(node: Node):
-    &#34;&#34;&#34;Docstring&#34;&#34;&#34;
     children = []
     for child in node.children:
         if child.type not in CONTROL_CHARACTERS:
@@ -294,6 +322,20 @@ When the recurse argument is set, it will also recursivly search children nodes 
     return node</code></pre>
 </details>
 </dd>
+<dt id="skema.program_analysis.CAST.matlab.node_helper.valid"><code class="name flex">
+<span>def <span class="ident">valid</span></span>(<span>nodes)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>return the node list without any None elements</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def valid(nodes):
+    &#34;&#34;&#34; return the node list without any None elements &#34;&#34;&#34;
+    return [node for node in nodes if node]</code></pre>
+</details>
+</dd>
 </dl>
 </section>
 <section>
@@ -304,14 +346,13 @@ When the recurse argument is set, it will also recursivly search children nodes 
 <span>(</span><span>source: str, source_file_name: str)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Docstring</p></div>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class NodeHelper():
     def __init__(self, source: str, source_file_name: str):
-        &#34;&#34;&#34;Docstring&#34;&#34;&#34;
         self.source = source
         self.source_file_name = source_file_name
 
@@ -415,6 +456,7 @@ When the recurse argument is set, it will also recursivly search children nodes 
 </li>
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
+<li><code><a title="skema.program_analysis.CAST.matlab.node_helper.get_all" href="#skema.program_analysis.CAST.matlab.node_helper.get_all">get_all</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.matlab.node_helper.get_children_by_types" href="#skema.program_analysis.CAST.matlab.node_helper.get_children_by_types">get_children_by_types</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.matlab.node_helper.get_control_children" href="#skema.program_analysis.CAST.matlab.node_helper.get_control_children">get_control_children</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.matlab.node_helper.get_first_child_by_type" href="#skema.program_analysis.CAST.matlab.node_helper.get_first_child_by_type">get_first_child_by_type</a></code></li>
@@ -422,6 +464,7 @@ When the recurse argument is set, it will also recursivly search children nodes 
 <li><code><a title="skema.program_analysis.CAST.matlab.node_helper.get_last_child_index" href="#skema.program_analysis.CAST.matlab.node_helper.get_last_child_index">get_last_child_index</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.matlab.node_helper.get_non_control_children" href="#skema.program_analysis.CAST.matlab.node_helper.get_non_control_children">get_non_control_children</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.matlab.node_helper.remove_comments" href="#skema.program_analysis.CAST.matlab.node_helper.remove_comments">remove_comments</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.matlab.node_helper.valid" href="#skema.program_analysis.CAST.matlab.node_helper.valid">valid</a></code></li>
 </ul>
 </li>
 <li><h3><a href="#header-classes">Classes</a></h3>

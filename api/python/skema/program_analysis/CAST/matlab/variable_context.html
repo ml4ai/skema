@@ -35,7 +35,6 @@ from skema.program_analysis.CAST2FN.model.cast import (
 
 class VariableContext(object):
     def __init__(self):
-        &#34;&#34;&#34;Docstring&#34;&#34;&#34;
         self.context = [{}]  # Stack of context dictionaries
         self.context_return_values = [set()]  # Stack of context return values
         self.all_symbols = {}
@@ -107,11 +106,9 @@ class VariableContext(object):
         return symbol in self.all_symbols
 
     def get_node(self, symbol: str) -&gt; Dict:
-        &#34;&#34;&#34;Docstring&#34;&#34;&#34;
         return self.all_symbols[symbol][&#34;node&#34;]
 
     def get_type(self, symbol: str) -&gt; str:
-        &#34;&#34;&#34;Docstring&#34;&#34;&#34;
         return self.all_symbols[symbol][&#34;type&#34;]
 
     def update_type(self, symbol: str, type: str):
@@ -121,22 +118,18 @@ class VariableContext(object):
         self.all_symbols[full_symbol_name][&#34;type&#34;] = type
 
     def add_return_value(self, symbol):
-        &#34;&#34;&#34;Docstring&#34;&#34;&#34;
         self.context_return_values[-1].add(symbol)
 
     def remove_return_value(self, symbol):
-        &#34;&#34;&#34;Docstring&#34;&#34;&#34;
         self.context_return_values[-1].discard(symbol)
 
     def generate_iterator(self):
-        &#34;&#34;&#34;Docstring&#34;&#34;&#34;
         symbol = f&#34;generated_iter_{self.iterator_id}&#34;
         self.iterator_id += 1
 
         return self.add_variable(symbol, &#34;iterator&#34;, None)
 
     def generate_stop_condition(self):
-        &#34;&#34;&#34;Docstring&#34;&#34;&#34;
         symbol = f&#34;sc_{self.stop_condition_id}&#34;
         self.stop_condition_id += 1
 
@@ -155,7 +148,6 @@ class VariableContext(object):
         self.internal = True
 
     def unset_internal(self):
-        &#34;&#34;&#34;Docstring&#34;&#34;&#34;
         self.internal = False</code></pre>
 </details>
 </section>
@@ -172,14 +164,13 @@ class VariableContext(object):
 <span>class <span class="ident">VariableContext</span></span>
 </code></dt>
 <dd>
-<div class="desc"><p>Docstring</p></div>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class VariableContext(object):
     def __init__(self):
-        &#34;&#34;&#34;Docstring&#34;&#34;&#34;
         self.context = [{}]  # Stack of context dictionaries
         self.context_return_values = [set()]  # Stack of context return values
         self.all_symbols = {}
@@ -251,11 +242,9 @@ class VariableContext(object):
         return symbol in self.all_symbols
 
     def get_node(self, symbol: str) -&gt; Dict:
-        &#34;&#34;&#34;Docstring&#34;&#34;&#34;
         return self.all_symbols[symbol][&#34;node&#34;]
 
     def get_type(self, symbol: str) -&gt; str:
-        &#34;&#34;&#34;Docstring&#34;&#34;&#34;
         return self.all_symbols[symbol][&#34;type&#34;]
 
     def update_type(self, symbol: str, type: str):
@@ -265,22 +254,18 @@ class VariableContext(object):
         self.all_symbols[full_symbol_name][&#34;type&#34;] = type
 
     def add_return_value(self, symbol):
-        &#34;&#34;&#34;Docstring&#34;&#34;&#34;
         self.context_return_values[-1].add(symbol)
 
     def remove_return_value(self, symbol):
-        &#34;&#34;&#34;Docstring&#34;&#34;&#34;
         self.context_return_values[-1].discard(symbol)
 
     def generate_iterator(self):
-        &#34;&#34;&#34;Docstring&#34;&#34;&#34;
         symbol = f&#34;generated_iter_{self.iterator_id}&#34;
         self.iterator_id += 1
 
         return self.add_variable(symbol, &#34;iterator&#34;, None)
 
     def generate_stop_condition(self):
-        &#34;&#34;&#34;Docstring&#34;&#34;&#34;
         symbol = f&#34;sc_{self.stop_condition_id}&#34;
         self.stop_condition_id += 1
 
@@ -299,7 +284,6 @@ class VariableContext(object):
         self.internal = True
 
     def unset_internal(self):
-        &#34;&#34;&#34;Docstring&#34;&#34;&#34;
         self.internal = False</code></pre>
 </details>
 <h3>Methods</h3>
@@ -308,13 +292,12 @@ class VariableContext(object):
 <span>def <span class="ident">add_return_value</span></span>(<span>self, symbol)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Docstring</p></div>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def add_return_value(self, symbol):
-    &#34;&#34;&#34;Docstring&#34;&#34;&#34;
     self.context_return_values[-1].add(symbol)</code></pre>
 </details>
 </dd>
@@ -383,13 +366,12 @@ class VariableContext(object):
 <span>def <span class="ident">generate_iterator</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Docstring</p></div>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def generate_iterator(self):
-    &#34;&#34;&#34;Docstring&#34;&#34;&#34;
     symbol = f&#34;generated_iter_{self.iterator_id}&#34;
     self.iterator_id += 1
 
@@ -400,13 +382,12 @@ class VariableContext(object):
 <span>def <span class="ident">generate_stop_condition</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Docstring</p></div>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def generate_stop_condition(self):
-    &#34;&#34;&#34;Docstring&#34;&#34;&#34;
     symbol = f&#34;sc_{self.stop_condition_id}&#34;
     self.stop_condition_id += 1
 
@@ -417,13 +398,12 @@ class VariableContext(object):
 <span>def <span class="ident">get_node</span></span>(<span>self, symbol: str) ‑> Dict[~KT, ~VT]</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Docstring</p></div>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def get_node(self, symbol: str) -&gt; Dict:
-    &#34;&#34;&#34;Docstring&#34;&#34;&#34;
     return self.all_symbols[symbol][&#34;node&#34;]</code></pre>
 </details>
 </dd>
@@ -431,13 +411,12 @@ class VariableContext(object):
 <span>def <span class="ident">get_type</span></span>(<span>self, symbol: str) ‑> str</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Docstring</p></div>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def get_type(self, symbol: str) -&gt; str:
-    &#34;&#34;&#34;Docstring&#34;&#34;&#34;
     return self.all_symbols[symbol][&#34;type&#34;]</code></pre>
 </details>
 </dd>
@@ -505,13 +484,12 @@ class VariableContext(object):
 <span>def <span class="ident">remove_return_value</span></span>(<span>self, symbol)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Docstring</p></div>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def remove_return_value(self, symbol):
-    &#34;&#34;&#34;Docstring&#34;&#34;&#34;
     self.context_return_values[-1].discard(symbol)</code></pre>
 </details>
 </dd>
@@ -533,13 +511,12 @@ class VariableContext(object):
 <span>def <span class="ident">unset_internal</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Docstring</p></div>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def unset_internal(self):
-    &#34;&#34;&#34;Docstring&#34;&#34;&#34;
     self.internal = False</code></pre>
 </details>
 </dd>
