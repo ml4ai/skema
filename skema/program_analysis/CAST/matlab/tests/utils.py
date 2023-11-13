@@ -8,7 +8,7 @@ from skema.program_analysis.CAST2FN.model.cast import (
     Var
 )
 
-def assert_var(var, name = None):
+def assert_identifier(var, name = None):
     """ Test the Var for correct type and name. """
     assert isinstance(var, Var)
     assert isinstance(var.val, Name)
@@ -22,7 +22,7 @@ def assert_literal_value(literal_value, value = None):
 def assert_operand(operand, value = None):
     """ Test a Var or LiteralValue operand for correct type and value. """
     if isinstance(operand, Var):
-        assert_var(operand, name = value)
+        assert_identifier(operand, name = value)
     elif isinstance(operand, LiteralValue):
         assert_literal_value(operand, value = value)
     else:
