@@ -217,24 +217,26 @@ pub fn first_order_with_func_in_parenthesis(input: Span) -> IResult<(Derivative,
         mi,
         pair(etag!("mrow"), etag!("mfrac")),
     )(s)?;
+    println!("with_respect_to = {:?}",with_respect_to);
 
-    let (s, _) = tuple((stag!("mo"), tag("("), etag!("mo")))(s)?;
-    let (s, func) = many0(math_expression)(s)?;
-    let (s, _) = tuple((stag!("mo"), tag(")"), etag!("mo")))(s)?;
+    let (s, func) = delimited(tuple((stag!("mo"), tag("("), etag!("mo"))),
+                              many0(math_expression),
+                              tuple((stag!("mo"), tag(")"), etag!("mo"))))(s)?;
+    println!("func={:?}", func);
+    let result =
+        Derivative::new(
+            1,
+            1,
+            Ci::new(
+                Some(Type::Real),
+                Box::new(MathExpression::Mi(with_respect_to)),
+                None,
+            ),
+    );
+    println!("result={:?}", result);
     Ok((
         s,
-        (
-            Derivative::new(
-                1,
-                1,
-                Ci::new(
-                    Some(Type::Real),
-                    Box::new(MathExpression::Mi(with_respect_to)),
-                    None,
-                ),
-            ),
-            Mrow(func),
-        ),
+        (result, Mrow(func))
     ))
 }
 
@@ -507,6 +509,26 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                 })
             },
         ),
+             map(
+                 first_order_with_func_in_parenthesis,
+                 |(
+                      Derivative {
+                          order,
+                          var_index,
+                          bound_var,
+                      },
+                      comp,
+                  )| {
+                     MathExpression::Differential(Differential {
+                         diff: Box::new(MathExpression::Mo(Operator::Derivative(Derivative {
+                             order,
+                             var_index,
+                             bound_var,
+                         }))),
+                         func: Box::new(MathExpression::Mrow(comp)),
+                     })
+                 },
+             ),
         map(ci_univariate_without_bounds, MathExpression::Ci),
         map(ci_subscript, MathExpression::Ci),
         map(
@@ -528,26 +550,6 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                 func_of: None,
             })
         }),
-        map(
-            first_order_with_func_in_parenthesis,
-            |(
-                Derivative {
-                    order,
-                    var_index,
-                    bound_var,
-                },
-                y,
-            )| {
-                MathExpression::Differential(Differential {
-                    diff: Box::new(MathExpression::Mo(Operator::Derivative(Derivative {
-                        order,
-                        var_index,
-                        bound_var,
-                    }))),
-                    func: Box::new(MathExpression::Mrow(y)),
-                })
-            },
-        ),
         map(
             grad_func,
             |(
@@ -574,9 +576,9 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
         mn,
         superscript,
         over_term,
-        msub,
+        alt((msub,
         msqrt,
-        mfrac,
+        mfrac)),
         map(mrow, MathExpression::Mrow),
         msubsup,
     )))(input)
