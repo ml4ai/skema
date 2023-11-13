@@ -623,6 +623,7 @@ class MatlabToCast(object):
             return ModelIf(
                 expr = get_case_expression(case_node, identifier),
                 body = get_case_body(case_node),
+                source_refs=[self.node_helper.get_source_ref(cell_node)]
             )
         
         # switch statement identifier
