@@ -122,7 +122,6 @@ def fn_preprocessor(function_network: Dict[str, Any]):
 
     return fn_data, logs
 
-
 def clean_mml(mml: str) -> str:
     """Cleans/sterilizes pMML for AMR generation service"""
     # FIXME: revisit if JSON deserialization on MORAE side changes
