@@ -424,24 +424,10 @@ class MatlabToCast(object):
         range_children = get_non_control_children(range_node) + [None]
         range_start, range_stop, range_step = range_children
 
-        n 
-        
-
-        args_children = [c for c in get_non_control_children(args_parent)]
-
-        return Call(
-            func = self.visit(get_first_child_by_type(node, "identifier")),
-            source_language = "matlab",
-            source_language_version = MATLAB_VERSION,
-            arguments = [self.visit(c) for c in args_children],
-            source_refs=[self.node_helper.get_source_ref(node)]
-        )
-
         return Loop(
             source_refs=[self.node_helper.get_source_ref(node)],
         )
 
-    # 
     # into a CAST-supported loop type.
     def visit_while_statement(self, node) -> Loop:
         """ Translate MATLAB while_loop syntax node into CAST Loop node """
