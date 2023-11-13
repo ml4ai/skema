@@ -128,15 +128,18 @@ build-backend = "setuptools.build_meta"
 minversion = "7.0"
 addopts = "-v --cov=skema --cov-report html:docs/coverage/python"
 testpaths = [
+    # NOTE: There are currently a couple of test ordering dependancies that should be maintained or could cause CI failures 
+    # 1. skema/img2mm/tests needs be run first to generate model files 
+    # 2. program_analysis/tests needs to be run before skema/gromet/execution_engine and any test that may build the python primitive map
     "skema/img2mml/tests",
     "skema/program_analysis/tests",
-    "skema/gromet/execution_engine/tests",
     "skema/program_analysis/comment_extractor/tests",
     "skema/program_analysis/tree_sitter_parsers/tests",
     "skema/program_analysis/CAST/matlab/tests",
     # TODO: Fix fortran tests
     #"skema/program_analysis/CAST/fortran/tests"
     #"skema/program_analysis/CAST/python/tests"
+    "skema/gromet/execution_engine/tests",
     "skema/rest/tests",
     "skema/skema_py/tests",
 ]
