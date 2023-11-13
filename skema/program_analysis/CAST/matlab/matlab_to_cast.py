@@ -35,10 +35,10 @@ from skema.program_analysis.CAST.matlab.node_helper import (
     get_control_children,
     get_first_child_by_type,
     get_first_child_index,
+    get_keyword_children,
     get_last_child_index,
-    get_non_control_children,
     NodeHelper,
-    valid
+    denone
 )
 
 from skema.program_analysis.CAST.matlab.tokens import KEYWORDS
@@ -232,7 +232,7 @@ class MatlabToCast(object):
         # Generating the function arguments by walking the parameters node
         func_args = []
         if parameters_node := get_first_child_by_type(statement_node, "parameters"):
-            for parameter in get_non_control_children(parameters_node):
+            for parameter in get_keyword_children(parameters_node):
                 # For both subroutine and functions, all arguments are assumes intent(inout) by default unless otherwise specified with intent(in)
                 # The variable declaration visitor will check for this and remove any arguments that are input only from the return values
                 self.variable_context.add_return_value(
@@ -291,7 +291,7 @@ class MatlabToCast(object):
         """
 
         args_parent = get_first_child_by_type(node, "arguments")
-        args_children = [c for c in get_non_control_children(args_parent)]
+        args_children = [c for c in get_keyword_children(args_parent)]
 
         return Call(
             func = self.visit(get_first_child_by_type(node, "identifier")),
@@ -327,7 +327,7 @@ class MatlabToCast(object):
             )
         else:
             imports = []
-            for symbol in get_non_control_children(included_items_node):
+            for symbol in get_keyword_children(included_items_node):
                 symbol_identifier = self.node_helper.get_identifier(symbol)
                 symbol_source_refs = [self.node_helper.get_source_ref(symbol)]
                 imports.append(
@@ -421,7 +421,7 @@ class MatlabToCast(object):
         iterator_node = get_first_child_by_type(node, "iterator")
         range_var = get_first_child_by_type(iterator_node, "identifier")
         range_node = get_first_child_by_type(iterator_node, "range")
-        range_children = get_non_control_children(range_node) + [None]
+        range_children = get_keyword_children(range_node) + [None]
         range_start, range_stop, range_step = range_children
 
         return Loop(
@@ -541,7 +541,7 @@ class MatlabToCast(object):
             # multiple case arguments
             if (cell_node):
                 nodes = get_all(cell_node, case_node_types)
-                ast_nodes = valid([self.visit(node) for node in nodes])
+                ast_nodes = denone([self.visit(node) for node in nodes])
                 operand = LiteralValue(
                     value_type="List",
                     value = [get_node_value(node) for node in ast_nodes],
@@ -551,14 +551,14 @@ class MatlabToCast(object):
                 return get_operator("in", [identifier, operand])
             # single case argument
             nodes = get_children_by_types(case_node, case_node_types)
-            operand = valid([self.visit(node) for node in nodes])[0]
+            operand = denone([self.visit(node) for node in nodes])[0]
             return get_operator("==", [identifier, operand])
 
         def get_case_body(case_node):
             """ return the instruction block for the case """
             block = get_first_child_by_type(case_node, "block")
             if block:
-                return valid([self.visit(child) for child in block.children])
+                return denone([self.visit(child) for child in block.children])
             return None
             
         def get_model_if(case_node, identifier):
@@ -583,7 +583,7 @@ class MatlabToCast(object):
             block = get_first_child_by_type(otherwise_clause, "block")
             if block:
                 last = model_ifs[len(model_ifs)-1]
-                last.orelse = valid([self.visit(child) for child in block.children])
+                last.orelse = denone([self.visit(c) for c in block.children])
 
         return model_ifs[0]
 
@@ -601,7 +601,8 @@ class MatlabToCast(object):
             # instruction_block
             block = get_first_child_by_type(conditional_node, "block")
             if block:
-                ret.body = valid([self.visit(child) for child in block.children])
+                children = get_keyword_children(block)
+                ret.body = [self.visit(child) for child in children]
 
             return ret
 
@@ -620,7 +621,7 @@ class MatlabToCast(object):
             block = get_first_child_by_type(else_clause, "block")
             if block:
                 last = model_ifs[len(model_ifs)-1]
-                last.orelse = valid([self.visit(child) for child in block.children])
+                last.orelse = denone([self.visit(c) for c in block.children])
 
         return model_ifs[0]
     
@@ -674,7 +675,7 @@ class MatlabToCast(object):
 
         elif literal_type == "matrix":
             elements = []
-            for child in get_non_control_children(node):
+            for child in get_keyword_children(node):
                 elements.append(self.visit(child))
             return LiteralValue(
                 value_type="List",
@@ -723,7 +724,7 @@ class MatlabToCast(object):
         )  # The operator will be the first control character
 
         operands = []
-        for operand in get_non_control_children(node):
+        for operand in get_keyword_children(node):
             operands.append(self.visit(operand))
 
         return Operator(
