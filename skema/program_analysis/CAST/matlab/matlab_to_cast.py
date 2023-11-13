@@ -274,7 +274,7 @@ class MatlabToCast(object):
     def visit_function_call(self, node):
         """
         SOURCE:
-        subplot(3,3,1);
+        subplot(3,5,7);
 
         SYNTAX TREE:
         function_call
@@ -409,6 +409,33 @@ class MatlabToCast(object):
             end
         ;
         """
+
+        """
+        class Loop(AstNode):
+            'pre': 'list[AstNode]',
+            'expr': 'AstNode',
+            'body': 'list[AstNode]',
+            'post': 'list[AstNode]'
+        """
+
+        iterator_node = get_first_child_by_type(node, "iterator")
+        range_var = get_first_child_by_type(iterator_node, "identifier")
+        range_node = get_first_child_by_type(iterator_node, "range")
+        range_children = get_non_control_children(range_node) + [None]
+        range_start, range_stop, range_step = range_children
+
+        n 
+        
+
+        args_children = [c for c in get_non_control_children(args_parent)]
+
+        return Call(
+            func = self.visit(get_first_child_by_type(node, "identifier")),
+            source_language = "matlab",
+            source_language_version = MATLAB_VERSION,
+            arguments = [self.visit(c) for c in args_children],
+            source_refs=[self.node_helper.get_source_ref(node)]
+        )
 
         return Loop(
             source_refs=[self.node_helper.get_source_ref(node)],
