@@ -1,0 +1,20 @@
+Traceback (most recent call last):
+  File "skema/program_analysis/model_coverage_report/model_coverage_report.py", line 76, in generate_data_product
+    output = func_timeout(10, data_product_function, args=args, kwargs=kwargs)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/func_timeout/dafunc.py", line 108, in func_timeout
+    raise_exception(exception)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/func_timeout/py3_raise.py", line 7, in raise_exception
+    raise exception[0] from None
+  File "skema/program_analysis/model_coverage_report/model_coverage_report.py", line 110, in generate_cast
+    cast = matlab_to_cast(source_path, cast_obj=True)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/matlab2cast.py", line 64, in matlab_to_cast
+    out_cast = MatlabToCast(source_path = input_path).out_cast
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST/matlab/matlab_to_cast.py", line 64, in __init__
+    Language(INSTALLED_LANGUAGES_FILEPATH, "matlab")
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/tree_sitter/__init__.py", line 131, in __init__
+    self.lib = cdll.LoadLibrary(library_path)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/ctypes/__init__.py", line 451, in LoadLibrary
+    return self._dlltype(name)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/ctypes/__init__.py", line 373, in __init__
+    self._handle = _dlopen(self._name, mode)
+OSError: /opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/tree_sitter_parsers/build/installed_languages.so: cannot open shared object file: No such file or directory

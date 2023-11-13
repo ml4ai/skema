@@ -1,0 +1,54 @@
+Traceback (most recent call last):
+  File "skema/program_analysis/model_coverage_report/model_coverage_report.py", line 76, in generate_data_product
+    output = func_timeout(10, data_product_function, args=args, kwargs=kwargs)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/func_timeout/dafunc.py", line 108, in func_timeout
+    raise_exception(exception)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/func_timeout/py3_raise.py", line 7, in raise_exception
+    raise exception[0] from None
+  File "skema/program_analysis/model_coverage_report/model_coverage_report.py", line 116, in generate_cast
+    return cast.to_json_str()
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/cast.py", line 253, in to_json_str
+    return json.dumps(
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/json/__init__.py", line 234, in dumps
+    return cls(
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/json/encoder.py", line 201, in encode
+    chunks = list(chunks)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/json/encoder.py", line 431, in _iterencode
+    yield from _iterencode_dict(o, _current_indent_level)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/json/encoder.py", line 405, in _iterencode_dict
+    yield from chunks
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/json/encoder.py", line 325, in _iterencode_list
+    yield from chunks
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/json/encoder.py", line 405, in _iterencode_dict
+    yield from chunks
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/json/encoder.py", line 325, in _iterencode_list
+    yield from chunks
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/json/encoder.py", line 405, in _iterencode_dict
+    yield from chunks
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/json/encoder.py", line 325, in _iterencode_list
+    yield from chunks
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/json/encoder.py", line 405, in _iterencode_dict
+    yield from chunks
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/json/encoder.py", line 325, in _iterencode_list
+    yield from chunks
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/json/encoder.py", line 405, in _iterencode_dict
+    yield from chunks
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/json/encoder.py", line 325, in _iterencode_list
+    yield from chunks
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/json/encoder.py", line 405, in _iterencode_dict
+    yield from chunks
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/json/encoder.py", line 325, in _iterencode_list
+    yield from chunks
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/json/encoder.py", line 405, in _iterencode_dict
+    yield from chunks
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/json/encoder.py", line 405, in _iterencode_dict
+    yield from chunks
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/json/encoder.py", line 325, in _iterencode_list
+    yield from chunks
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/json/encoder.py", line 405, in _iterencode_dict
+    yield from chunks
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/json/encoder.py", line 438, in _iterencode
+    o = _default(o)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/json/encoder.py", line 179, in default
+    raise TypeError(f'Object of type {o.__class__.__name__} '
+TypeError: Object of type Name is not JSON serializable

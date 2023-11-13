@@ -1,0 +1,67 @@
+Traceback (most recent call last):
+  File "skema/program_analysis/model_coverage_report/model_coverage_report.py", line 76, in generate_data_product
+    output = func_timeout(10, data_product_function, args=args, kwargs=kwargs)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/func_timeout/dafunc.py", line 108, in func_timeout
+    raise_exception(exception)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/func_timeout/py3_raise.py", line 7, in raise_exception
+    raise exception[0] from None
+  File "skema/program_analysis/model_coverage_report/model_coverage_report.py", line 121, in generate_gromet
+    gromet_collection = process_file(source_path)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/single_file_ingester.py", line 26, in process_file
+    gromet_collection = process_file_system(
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/multi_file_ingester.py", line 132, in process_file_system
+    raise e
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/multi_file_ingester.py", line 81, in process_file_system
+    generated_gromet = ann_cast_pipeline(
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/utils/script_functions.py", line 268, in ann_cast_pipeline
+    ToGrometPass(pipeline_state)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/to_gromet_pass.py", line 273, in __init__
+    self.visit(node, parent_gromet_fn=None, parent_cast_node=None)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/to_gromet_pass.py", line 608, in visit
+    raise e
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/to_gromet_pass.py", line 603, in visit
+    return self._visit(node, parent_gromet_fn, parent_cast_node)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/functools.py", line 912, in _method
+    return method.__get__(obj, cls)(*args, **kwargs)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/to_gromet_pass.py", line 4077, in visit_module
+    self.visit_node_list(node.body, new_gromet, node)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/to_gromet_pass.py", line 616, in visit_node_list
+    return [
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/to_gromet_pass.py", line 617, in <listcomp>
+    self.visit(node, parent_gromet_fn, parent_cast_node)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/to_gromet_pass.py", line 608, in visit
+    raise e
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/to_gromet_pass.py", line 603, in visit
+    return self._visit(node, parent_gromet_fn, parent_cast_node)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/functools.py", line 912, in _method
+    return method.__get__(obj, cls)(*args, **kwargs)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/to_gromet_pass.py", line 3017, in visit_function_def
+    self.handle_function_def(
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/to_gromet_pass.py", line 2813, in handle_function_def
+    self.visit(n, new_gromet_fn, node)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/to_gromet_pass.py", line 608, in visit
+    raise e
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/to_gromet_pass.py", line 603, in visit
+    return self._visit(node, parent_gromet_fn, parent_cast_node)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/functools.py", line 912, in _method
+    return method.__get__(obj, cls)(*args, **kwargs)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/to_gromet_pass.py", line 1043, in visit_assignment
+    func_bf_idx = self.visit(node.right, parent_gromet_fn, node)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/to_gromet_pass.py", line 608, in visit
+    raise e
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/to_gromet_pass.py", line 603, in visit
+    return self._visit(node, parent_gromet_fn, parent_cast_node)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/functools.py", line 912, in _method
+    return method.__get__(obj, cls)(*args, **kwargs)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/to_gromet_pass.py", line 2399, in visit_call
+    in_module = self.func_in_module(func_name)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/to_gromet_pass.py", line 2361, in func_in_module
+    if curr_module[2] and find_func_in_module(
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST/pythonAST/modules_list.py", line 324, in find_func_in_module
+    module_import = importlib.import_module(module_name)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/importlib/__init__.py", line 127, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 1014, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 991, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 973, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'vax_sims_LHS_samples'
