@@ -14,6 +14,7 @@ LANGUAGES_YAML_FILEPATH = Path(__file__).parent / "languages.yaml"
 
 
 def build_parsers(languages: List[str]) -> None:
+    print(INSTALLED_LANGUAGES_FILEPATH)
     # The 'build' directory containing the cloned tree-sitter parsers and shard object library may or may not already exist.
     # We need to create it first if it does not exist
     language_build_dir = Path(INSTALLED_LANGUAGES_FILEPATH.parent)
