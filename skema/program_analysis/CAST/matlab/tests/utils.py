@@ -8,6 +8,8 @@ from skema.program_analysis.CAST2FN.model.cast import (
     Var
 )
 
+# Tests now check for null source_refs nodes
+
 def assert_var(var, name = ""):
     """ Test the Var for correct type and name. """
     assert isinstance(var, Var)
