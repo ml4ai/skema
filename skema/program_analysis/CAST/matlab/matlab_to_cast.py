@@ -36,6 +36,7 @@ from skema.program_analysis.CAST.matlab.node_helper import (
     get_first_child_index,
     get_last_child_index,
     get_non_control_children,
+    remove_comments,
     NodeHelper,
 )
 
@@ -75,16 +76,15 @@ class MatlabToCast(object):
 
     def generate_cast(self) -> List[CAST]:
         """Interface for generating CAST."""
-        # print("generate_cast")
-        modules = self.run(self.tree.root_node)
-        # print('\nMODULES:')
-        # for m in modules:
-        #     print(m)
-        # print("MODULES done")
 
+        # remove comments from tree before processing
+        modules = self.run(remove_comments(self.tree.root_node))
         return [CAST([module], "matlab") for module in modules]
         
     def run(self, root) -> List[Module]:
+        return [self.visit(root)]
+
+    def run_old(self, root) -> List[Module]:
         """Annotated run routine."""
         modules = []
 
@@ -92,7 +92,14 @@ class MatlabToCast(object):
         # Other than comments, it is unclear if anything else is allowed.
         # TODO: Research the above
         # print("\nNODE VISITS ___________")
-        outer_body_nodes = get_children_by_types(root, ["function", "subroutine", "assignment"])
+        body_node_names = [
+            "function_definition",
+            "subroutine",
+            "assignment",
+            "switch_statement"
+        ]
+
+        outer_body_nodes = get_children_by_types(root, body_node_names)
         if len(outer_body_nodes) > 0:
             body = []
             for body_node in outer_body_nodes:
@@ -111,13 +118,13 @@ class MatlabToCast(object):
 
     def visit(self, node):
         """Switch execution based on node type"""
-        #print(f"\nvisit {node.type}")
+        # print(f"\nvisit node type = {node.type}")
 
         if node.type in ["program", "module", "source_file"] :
             return self.visit_module(node)
         elif node.type == "internal_procedures":
             return self.visit_internal_procedures(node)
-        elif node.type in ["subroutine", "function"]:
+        elif node.type in ["subroutine", "function_definition"]:
             return self.visit_function_def(node)
         elif node.type in ["subroutine_call", "call_expression"]:
             return self.visit_function_call(node)
@@ -131,8 +138,12 @@ class MatlabToCast(object):
             return self.visit_identifier(node)
         elif node.type == "name":
             return self.visit_name(node)
-        elif node.type in ["binary_operator", "math_expression", "relational_expression"]:
-            return self.visit_math_expression(node)
+        elif node.type in [
+            "binary_operator",
+            "comparison_operator",
+            "math_expression",
+            "relational_expression"
+        ]: return self.visit_math_expression(node)
         elif node.type in ["number", "array", "string", "boolean"]:
             return self.visit_literal(node)
         elif node.type == "keyword_statement":
@@ -143,6 +154,10 @@ class MatlabToCast(object):
             return self.visit_do_loop_statement(node)
         elif node.type == "if_statement":
             return self.visit_if_statement(node)
+        elif node.type == "elseif_clause":
+            return self.visit_elseif_clause(node)
+        elif node.type == "else_clause":
+            return self.visit_else_clause(node)
         elif node.type == "derived_type_definition":
             return self.visit_derived_type(node)
         elif node.type == "derived_type_member_expression":
@@ -174,7 +189,7 @@ class MatlabToCast(object):
     def visit_internal_procedures(self, node: Node) -> List[FunctionDef]:
         """Visitor for internal procedures. Returns list of FunctionDef"""
         # print('visit_internal_procedures')
-        internal_procedures = get_children_by_types(node, ["function", "subroutine"])
+        internal_procedures = get_children_by_types(node, ["function_definition", "subroutine"])
         return [self.visit(procedure) for procedure in internal_procedures]
 
     def visit_name(self, node):
@@ -217,7 +232,7 @@ class MatlabToCast(object):
         self.variable_context.push_context()
 
         # Top level statement node
-        statement_node = get_children_by_types(node, ["subroutine_statement", "function_statement"])[0]
+        statement_node = get_children_by_types(node, ["function_definition"])[0]
         name_node = get_first_child_by_type(statement_node, "name")
         name = self.visit(
             name_node
@@ -226,7 +241,7 @@ class MatlabToCast(object):
         # If this is a function, check for return type and return value
         intrinsic_type = None
         return_value = None
-        if node.type == "function":
+        if node.type == "function_definition":
             signature_qualifiers = get_children_by_types(
                 statement_node, ["intrinsic_type", "function_result"]
             )
@@ -564,66 +579,68 @@ class MatlabToCast(object):
         )
 
     def visit_if_statement(self, node):
-        """Docstring"""
+        """ return a ModelIf if, elseif, and else clauses"""
+
         # print('visit_if_statement')
-        # (if_statement)
-        #  (if)
-        #  (parenthesised_expression)
-        #  (then)
-        #  (body_nodes) ...
-        #  (elseif_clauses) ..
-        #  (else_clause)
-        #  (end_if_statement)
 
-        # First we need to identify if this is a componund conditional
-        # We can do this by counting the number of control characters in a relational expression
-        child_types = [child.type for child in node.children]
+        # if_statement Tree-sitter syntax tree:
+        #     if
+        #     comparison_operator
+        #     body block with 1-n elements
+        #     elseif_clause (0-n of these)
+        #     else_clause (0-1 of these)
+        #     end
 
-        try:
-            elseif_index = child_types.index("elseif_clause")
-        except ValueError:
-            elseif_index = -1
+        # the initial ModelIf node is built just like the else-if clause
+        mi = self.visit_elseif_clause(node)
 
-        try:
-            else_index = child_types.index("else_clause")
-        except ValueError:
-            else_index = -1
+        # get 0-n elseif_clauses
+        elseif_clauses = get_children_by_types(node, ("elseif_clause"))
+        for child in elseif_clauses:
+            elseif_node = self.visit(child)
+            if elseif_node:
+                if not mi.orelse:
+                    mi.orelse = list()
+                mi.orelse.append(elseif_node)
 
-        if elseif_index != -1:
-            body_stop_index = elseif_index
-        else:
-            body_stop_index = else_index
+        # get 0-1 else_clauses
+        else_clauses = get_children_by_types(node, ("else_clause"))
+        for child in else_clauses:
+            else_node = self.visit(child)
+            if else_node.body:
+                for body_node in else_node.body:
+                    if not mi.orelse:
+                        mi.orelse = list()
+                    mi.orelse.append(body_node)
 
-        prev = None
-        orelse = None
-        # If there are else_if statements, they need
-        if elseif_index != -1:
-            orelse = ModelIf()
-            prev = orelse
-            for condition in node.children[elseif_index:else_index]:
-                elseif_expr = self.visit(condition.children[2])
-                elseif_body = [self.visit(child) for child in condition.children[4:]]
+        return mi
+    
 
-                prev.orelse = ModelIf(elseif_expr, elseif_body, None)
-                prev = prev.orelse
+    def visit_elseif_clause(self, node):
+        """ return a ModelIf with comparison and body nodes. """
+        # get ModelIf with body nodes
+        mi = self.visit_else_clause(node)
+        # addd comparison operator
+        comp: Operator = get_first_child_by_type(node, "comparison_operator")
+        mi.expr = self.visit(comp)
 
-        if else_index != -1:
-            else_body = [
-                self.visit(child) for child in node.children[else_index].children[1:]
-            ]
-            if prev:
-                prev.orelse = else_body
-            else:
-                orelse = else_body
+        return mi
+    
 
-        if isinstance(orelse, ModelIf):
-            orelse = orelse.orelse
+    def visit_else_clause(self, node):
+        """ Return a ModelIf with body nodes only. """
+        # get the top level body nodes
+        mi = ModelIf()
+        block = get_first_child_by_type(node, "block")
+        for child in block.children:
+            body_node = self.visit(child)
+            if body_node:
+                if not mi.body:
+                    mi.body = list()
+                mi.body.append(body_node)
 
-        return ModelIf(
-            expr=self.visit(node.children[1]),
-            body=[self.visit(child) for child in node.children[3:body_stop_index]],
-            orelse=orelse,
-        )
+        return mi
+
 
     def visit_assignment(self, node):
         """Docstring"""

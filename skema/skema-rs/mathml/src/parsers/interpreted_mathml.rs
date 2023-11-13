@@ -10,8 +10,8 @@ use crate::{
         Ci, Differential, Math, MathExpression, Mi, Mrow, Type,
     },
     parsers::generic_mathml::{
-        add, attribute, comma, dot, elem_many0, equals, etag, grad, lparen, mean, mi, mn, msqrt,
-        msub, msubsup, multiply, rparen, stag, subtract, tag_parser, ws, xml_declaration, IResult,
+        add, attribute, dot, elem_many0, equals, etag, grad, lparen, mean, mi, mn, msqrt, msub,
+        msubsup, multiply, rparen, stag, subtract, tag_parser, ws, xml_declaration, IResult,
         ParseError, Span,
     },
 };
@@ -21,7 +21,7 @@ use nom::{
     bytes::complete::tag,
     combinator::{map, opt, value},
     multi::{many0, many1, separated_list1},
-    sequence::{delimited, pair, preceded, tuple},
+    sequence::{delimited, pair, preceded, separated_pair, tuple},
 };
 
 /// Function to parse operators. This function differs from the one in parsers::generic_mathml by
@@ -30,7 +30,7 @@ pub fn operator(input: Span) -> IResult<Operator> {
     let (s, op) = ws(delimited(
         stag!("mo"),
         alt((
-            add, subtract, multiply, equals, lparen, rparen, comma, mean, grad, dot,
+            add, subtract, multiply, equals, lparen, rparen, mean, grad, dot,
         )),
         etag!("mo"),
     ))(input)?;
@@ -42,7 +42,7 @@ pub fn operator(input: Span) -> IResult<Operator> {
 fn parenthesized_identifier(input: Span) -> IResult<Vec<Mi>> {
     let mo_lparen = delimited(stag!("mo"), lparen, etag!("mo"));
     let mo_rparen = delimited(stag!("mo"), rparen, etag!("mo"));
-    let mo_comma = delimited(stag!("mo"), comma, etag!("mo"));
+    let mo_comma = delimited(stag!("mo"), ws(tag(",")), etag!("mo"));
     let (s, bound_vars) = delimited(mo_lparen, separated_list1(mo_comma, mi), mo_rparen)(input)?;
     Ok((s, bound_vars))
 }
@@ -431,12 +431,13 @@ pub fn absolute_with_msup(input: Span) -> IResult<MathExpression> {
         ws(delimited(
             tag("<mo>|</mo>"),
             tuple((
-                math_expression,
+                //math_expression,
+                map(many0(math_expression), |z| Mrow(z)),
                 preceded(tag("<msup><mo>|</mo>"), math_expression),
             )),
             tag("</msup>"),
         )),
-        |(x, y)| MathExpression::AbsoluteSup(Box::new(x), Box::new(y)),
+        |(x, y)| MathExpression::AbsoluteSup(Box::new(MathExpression::Mrow(x)), Box::new(y)),
     ))(input)?;
     Ok((s, sup))
 }
@@ -582,6 +583,21 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
 /// Parser for interpreted math expressions.
 /// testing MathML documents
 pub fn interpreted_math(input: Span) -> IResult<Math> {
-    let (s, elements) = preceded(opt(xml_declaration), elem_many0!("math"))(input)?;
+    let (s, elements) = preceded(
+        opt(xml_declaration),
+        alt((
+            ws(delimited(
+                tag("<math>"),
+                many0(math_expression),
+                ws(tag("<mo>,</mo></math>")),
+            )),
+            ws(delimited(
+                tag("<math>"),
+                many0(math_expression),
+                ws(tag("<mo>.</mo></math>")),
+            )),
+            elem_many0!("math"),
+        )),
+    )(input)?;
     Ok((s, Math { content: elements }))
 }
