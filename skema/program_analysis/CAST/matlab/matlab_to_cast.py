@@ -272,19 +272,33 @@ class MatlabToCast(object):
             
 
     def visit_function_call(self, node):
-        # Pull relevent nodes
+        """
+        SOURCE:
+        subplot(3,3,1);
 
+        SYNTAX TREE:
+        function_call
+            identifier
+            (
+            arguments
+                number
+                ,
+                number
+                ,
+                number
+            )
+        ;
+        """
 
-        foo, bar = node.children
-
-        function_identifier = self.node_helper.get_identifier(function_node)
+        args_parent = get_first_child_by_type(node, "arguments")
+        args_children = [c for c in get_non_control_children(args_parent)]
 
         return Call(
-            func=foo,
-            source_language="matlab",
-            source_language_version=MATLAB_VERSION,
-            arguments=bar,
-            source_refs=[self.node_helper.get_source_ref(node)],
+            func = self.visit(get_first_child_by_type(node, "identifier")),
+            source_language = "matlab",
+            source_language_version = MATLAB_VERSION,
+            arguments = [self.visit(c) for c in args_children],
+            source_refs=[self.node_helper.get_source_ref(node)]
         )
 
     # this is not in the Waterloo model but will no doubt be encountered.
