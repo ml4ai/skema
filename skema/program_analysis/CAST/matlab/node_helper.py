@@ -1,6 +1,6 @@
 from typing import List, Dict
 from skema.program_analysis.CAST2FN.model.cast import SourceRef
-from skema.program_analysis.CAST.matlab.tokens import OTHER_TOKENS
+from skema.program_analysis.CAST.matlab.tokens import OTHER_TOKENS, KEYWORDS
 
 from tree_sitter import Node
 
@@ -79,7 +79,7 @@ def get_all(node, types):
         return ret
     return search(node, types, [])
 
-def valid(nodes):
+def denone(nodes):
     """ return the node list without any None elements """
     return [node for node in nodes if node]
 
@@ -91,15 +91,10 @@ def get_last_child_index(node, type: str):
             last = child
     return last
 
-
 def get_control_children(node: Node):
+    """ return node children with control character types """
     return get_children_by_types(node, CONTROL_CHARACTERS)
 
-
-def get_non_control_children(node: Node):
-    children = []
-    for child in node.children:
-        if child.type not in CONTROL_CHARACTERS:
-            children.append(child)
-
-    return children
+def get_keyword_children(node: Node):
+    """ return node children with Tree-sitter syntax keyword types """
+    return get_children_by_types(node, KEYWORDS)
