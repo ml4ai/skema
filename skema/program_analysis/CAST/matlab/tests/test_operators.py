@@ -1,6 +1,6 @@
 from skema.program_analysis.CAST.matlab.tests.utils import (
     assert_assignment,
-    assert_var,
+    assert_identifier,
     assert_expression,
     cast_nodes
 )
@@ -12,7 +12,7 @@ def test_binary_operator():
     # CAST should be one Assignment node
     assert isinstance(nodes[0], Assignment)
     # Left assignment operand is the variable
-    assert_var(nodes[0].left, name = "z")
+    assert_identifier(nodes[0].left, name = "z")
     # right assignment operand represents binary operation
     assert_expression(nodes[0].right, op = "+", operands = ["x", "y"])
 
@@ -22,7 +22,7 @@ def test_boolean_operator():
     # CAST should be one Assignment node
     assert isinstance(nodes[0], Assignment)
     # Left assignment operand is the variable
-    assert_var(nodes[0].left, name = "z")
+    assert_identifier(nodes[0].left, name = "z")
     # right assignment operand represents binary operation
     assert_expression(nodes[0].right, op = "&&", operands = ["x", "y"])
 
@@ -32,7 +32,7 @@ def test_comparison_operator():
     # CAST should be one Assignment node
     assert isinstance(nodes[0], Assignment)
     # Left assignment operand is the variable
-    assert_var(nodes[0].left, name = "z")
+    assert_identifier(nodes[0].left, name = "z")
     # right assignment operand represents comparison operation
     assert_expression(nodes[0].right, op = "<", operands = ["x", "y"])
 
@@ -91,10 +91,10 @@ def no_test_spread_operator():
     # CAST should be one Assignment node
     assert isinstance(nodes[0], Assignment)
     # Left assignment operand a function call
-    # assert_var(nodes[0].left, name = "a")
+    # assert_identifier(nodes[0].left, name = "a")
 
     # right assignment operand an identifier
-    assert_var(nodes[0].right, "new_beta_v1")
+    assert_identifier(nodes[0].right, "new_beta_v1")
 
 def test_unary_operator():
     """ Test CAST from unary operator."""
@@ -102,7 +102,7 @@ def test_unary_operator():
     # CAST should be one Assignment node
     assert isinstance(nodes[0], Assignment)
     # Left assignment operand is the variable
-    assert_var(nodes[0].left, name = "x")
+    assert_identifier(nodes[0].left, name = "x")
     # right assignment operand is a unary operator
     assert_expression(nodes[0].right, op = "-", operands = ["6"])
 
