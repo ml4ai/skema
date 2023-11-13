@@ -30,6 +30,7 @@ from skema.program_analysis.CAST2FN.model.cast import (
 
 from skema.program_analysis.CAST.matlab.variable_context import VariableContext
 from skema.program_analysis.CAST.matlab.node_helper import (
+    get_all,
     get_children_by_types,
     get_control_children,
     get_first_child_by_type,
@@ -38,6 +39,7 @@ from skema.program_analysis.CAST.matlab.node_helper import (
     get_non_control_children,
     remove_comments,
     NodeHelper,
+    valid
 )
 
 from skema.program_analysis.tree_sitter_parsers.build_parsers import INSTALLED_LANGUAGES_FILEPATH
@@ -45,8 +47,10 @@ from skema.program_analysis.tree_sitter_parsers.build_parsers import INSTALLED_L
 MATLAB_VERSION='matlab_version_here'
 
 class MatlabToCast(object):
+
+    literal_types = ["number","string", "boolean", "array_literal"]
+
     def __init__(self, source_path = "", source = ""):
-        """docstring"""
 
         # if a source file path is provided, read source from file
         if not source_path == "":
@@ -78,6 +82,7 @@ class MatlabToCast(object):
         """Interface for generating CAST."""
 
         # remove comments from tree before processing
+
         modules = self.run(remove_comments(self.tree.root_node))
         return [CAST([module], "matlab") for module in modules]
         
@@ -96,7 +101,6 @@ class MatlabToCast(object):
             "function_definition",
             "subroutine",
             "assignment",
-            "switch_statement"
         ]
 
         outer_body_nodes = get_children_by_types(root, body_node_names)
@@ -118,7 +122,9 @@ class MatlabToCast(object):
 
     def visit(self, node):
         """Switch execution based on node type"""
-        # print(f"\nvisit node type = {node.type}")
+        # print(f"\nvisit {node.type}")
+        if node == None:
+            return None
 
         if node.type in ["program", "module", "source_file"] :
             return self.visit_module(node)
@@ -144,7 +150,7 @@ class MatlabToCast(object):
             "math_expression",
             "relational_expression"
         ]: return self.visit_math_expression(node)
-        elif node.type in ["number", "array", "string", "boolean"]:
+        elif node.type in self.literal_types:
             return self.visit_literal(node)
         elif node.type == "keyword_statement":
             return self.visit_keyword_statement(node)
@@ -152,12 +158,10 @@ class MatlabToCast(object):
             return self.visit_extent_specifier(node)
         elif node.type == "do_loop_statement":
             return self.visit_do_loop_statement(node)
+        elif node.type == "switch_statement":
+            return self.visit_switch_statement(node)
         elif node.type == "if_statement":
             return self.visit_if_statement(node)
-        elif node.type == "elseif_clause":
-            return self.visit_elseif_clause(node)
-        elif node.type == "else_clause":
-            return self.visit_else_clause(node)
         elif node.type == "derived_type_definition":
             return self.visit_derived_type(node)
         elif node.type == "derived_type_member_expression":
@@ -167,7 +171,6 @@ class MatlabToCast(object):
 
     def visit_module(self, node: Node) -> Module:
         """Visitor for program and module statement. Returns a Module object"""
-        # print('visit_module')
         self.variable_context.push_context()
         
         program_body = []
@@ -188,13 +191,10 @@ class MatlabToCast(object):
 
     def visit_internal_procedures(self, node: Node) -> List[FunctionDef]:
         """Visitor for internal procedures. Returns list of FunctionDef"""
-        # print('visit_internal_procedures')
         internal_procedures = get_children_by_types(node, ["function_definition", "subroutine"])
         return [self.visit(procedure) for procedure in internal_procedures]
 
     def visit_name(self, node):
-        """Docstring"""
-        # print('visit_name')
         # Node structure
         # (name)
 
@@ -208,8 +208,6 @@ class MatlabToCast(object):
         )
 
     def visit_function_def(self, node):
-        """Docstring"""
-        # print('visit_function_def')
         # TODO: Refactor function def code to use new helper functions
         # Node structure
         # (subroutine)
@@ -316,8 +314,6 @@ class MatlabToCast(object):
         )
 
     def visit_function_call(self, node):
-        """Docstring"""
-        # print('visit_function_call')
         # Pull relevent nodes
         if node.type == "subroutine_call":
             function_node = node.children[1]
@@ -359,8 +355,6 @@ class MatlabToCast(object):
         )
 
     def visit_keyword_statement(self, node):
-        """Docstring"""
-        # print('visit_keyword_statement')
         # Currently, the only keyword_identifier produced by tree-sitter is Return
         # However, there may be other instances
 
@@ -396,8 +390,6 @@ class MatlabToCast(object):
         )
 
     def visit_use_statement(self, node):
-        """Docstring"""
-        # print('visit_use_statement')
         # (use)
         #   (use)
         #   (module_name)
@@ -457,7 +449,6 @@ class MatlabToCast(object):
             (body) ...
         """
 
-        # print('visit_do_loop_statement')
         # First check for
         # TODO: Add do until Loop support
         while_statement_node = get_first_child_by_type(node, "while_statement")
@@ -578,73 +569,128 @@ class MatlabToCast(object):
             source_refs=[self.node_helper.get_source_ref(node)],
         )
 
+
+    def visit_switch_statement(self, node):
+        """ return a conditional statement based on the switch statement """
+    
+        # node types used for case comparison
+        case_node_types = self.literal_types + ["identifier"]
+        
+        def get_node_value(ast_node):
+            """ return the CAST node value or var name """
+            if isinstance(ast_node, Var):
+                return ast_node.val.name
+            return ast_node.value
+
+        def get_operator(op, operands, source_refs):
+            """ return an Operator representing the case test """
+            return Operator(
+                source_language = "matlab",
+                interpreter = None,
+                version = MATLAB_VERSION,
+                op = op,
+                operands = operands,
+                source_refs = source_refs
+            )
+
+        def get_case_expression(case_node, identifier):
+            """ return an Operator representing the case test """
+            cell_node = get_first_child_by_type(case_node, "cell")
+            source_refs = self.node_helper.get_source_ref(case_node)
+            # multiple case arguments
+            if (cell_node):
+                nodes = get_all(cell_node, case_node_types)
+                ast_nodes = valid([self.visit(node) for node in nodes])
+                operand = LiteralValue(
+                    value_type="List",
+                    value = [get_node_value(node) for node in ast_nodes],
+                    source_code_data_type=["matlab", MATLAB_VERSION, "unknown"],
+                    source_refs=[self.node_helper.get_source_ref(cell_node)]
+                )
+                return get_operator("in", [identifier, operand], source_refs)
+            # single case argument
+            nodes = get_children_by_types(case_node, case_node_types)
+            operand = valid([self.visit(node) for node in nodes])[0]
+            return get_operator("==", [identifier, operand], source_refs)
+
+        def get_case_body(case_node):
+            """ return the instruction block for the case """
+            block = get_first_child_by_type(case_node, "block")
+            if block:
+                return valid([self.visit(child) for child in block.children])
+            return None
+            
+        def get_model_if(case_node, identifier):
+            """ return conditional logic representing the case """
+            return ModelIf(
+                expr = get_case_expression(case_node, identifier),
+                body = get_case_body(case_node),
+                source_refs=[self.node_helper.get_source_ref(case_node)]
+            )
+        
+        # switch statement identifier
+        identifier = self.visit(get_first_child_by_type(node, "identifier"))
+        
+        # n case clauses as 'if then' nodes
+        case_nodes = get_children_by_types(node, ["case_clause"])
+        model_ifs = [get_model_if(node, identifier) for node in case_nodes]
+        for i, model_if in enumerate(model_ifs[1:]):
+            model_ifs[i].orelse = [model_if]
+
+        # otherwise clause as 'else' node after last 'if then' node
+        otherwise_clause = get_first_child_by_type(node, "otherwise_clause")
+        if otherwise_clause:
+            block = get_first_child_by_type(otherwise_clause, "block")
+            if block:
+                last = model_ifs[len(model_ifs)-1]
+                last.orelse = valid([self.visit(child) for child in block.children])
+
+        return model_ifs[0]
+
     def visit_if_statement(self, node):
-        """ return a ModelIf if, elseif, and else clauses"""
+        """ return a node describing if, elseif, else conditional logic"""
 
-        # print('visit_if_statement')
+        def conditional(conditional_node):
+            """ return a ModelIf struct for the conditional logic node. """
+            
+            # comparison_operator
+            expr = self.visit(get_first_child_by_type(
+                conditional_node,
+                "comparison_operator"
+            ))
+            
+            ret = ModelIf(
+                expr = expr,
+                source_refs=[self.node_helper.get_source_ref(conditional_node)]
+            )
 
-        # if_statement Tree-sitter syntax tree:
-        #     if
-        #     comparison_operator
-        #     body block with 1-n elements
-        #     elseif_clause (0-n of these)
-        #     else_clause (0-1 of these)
-        #     end
+            # instruction_block
+            block = get_first_child_by_type(conditional_node, "block")
+            if block:
+                ret.body = valid([self.visit(child) for child in block.children])
 
-        # the initial ModelIf node is built just like the else-if clause
-        mi = self.visit_elseif_clause(node)
+            return ret
 
-        # get 0-n elseif_clauses
-        elseif_clauses = get_children_by_types(node, ("elseif_clause"))
-        for child in elseif_clauses:
-            elseif_node = self.visit(child)
-            if elseif_node:
-                if not mi.orelse:
-                    mi.orelse = list()
-                mi.orelse.append(elseif_node)
+        # the if statement is returned as a ModelIf AstNode
+        model_ifs = [conditional(node)]
 
-        # get 0-1 else_clauses
-        else_clauses = get_children_by_types(node, ("else_clause"))
-        for child in else_clauses:
-            else_node = self.visit(child)
-            if else_node.body:
-                for body_node in else_node.body:
-                    if not mi.orelse:
-                        mi.orelse = list()
-                    mi.orelse.append(body_node)
+        # add 0-n elseif clauses 
+        elseif_clauses = get_children_by_types(node, ["elseif_clause"])
+        model_ifs += [conditional(child) for child in elseif_clauses]
+        for i, model_if in enumerate(model_ifs[1:]):
+            model_ifs[i].orelse = [model_if]
 
-        return mi
+        # add 0-1 else clause 
+        else_clause = get_first_child_by_type(node, "else_clause")
+        if else_clause:
+            block = get_first_child_by_type(else_clause, "block")
+            if block:
+                last = model_ifs[len(model_ifs)-1]
+                last.orelse = valid([self.visit(child) for child in block.children])
+
+        return model_ifs[0]
     
-
-    def visit_elseif_clause(self, node):
-        """ return a ModelIf with comparison and body nodes. """
-        # get ModelIf with body nodes
-        mi = self.visit_else_clause(node)
-        # addd comparison operator
-        comp: Operator = get_first_child_by_type(node, "comparison_operator")
-        mi.expr = self.visit(comp)
-
-        return mi
-    
-
-    def visit_else_clause(self, node):
-        """ Return a ModelIf with body nodes only. """
-        # get the top level body nodes
-        mi = ModelIf()
-        block = get_first_child_by_type(node, "block")
-        for child in block.children:
-            body_node = self.visit(child)
-            if body_node:
-                if not mi.body:
-                    mi.body = list()
-                mi.body.append(body_node)
-
-        return mi
-
-
     def visit_assignment(self, node):
-        """Docstring"""
-        # print('visit_assignment')
         left, _, right = node.children
 
         return Assignment(
@@ -655,7 +701,6 @@ class MatlabToCast(object):
 
     def visit_literal(self, node) -> LiteralValue:
         """Visitor for literals. Returns a LiteralValue"""
-        # print('visit_literal')
         literal_type = node.type
         literal_value = self.node_helper.get_identifier(node)
         literal_source_ref = self.node_helper.get_source_ref(node)
@@ -711,10 +756,7 @@ class MatlabToCast(object):
                 source_refs=[literal_source_ref],
             )
 
-
     def visit_identifier(self, node):
-        """Docstring"""
-        # print('visit_identifier')
         # By default, this is unknown, but can be updated by other visitors
         identifier = self.node_helper.get_identifier(node)
         if self.variable_context.is_variable(identifier):
@@ -737,8 +779,6 @@ class MatlabToCast(object):
         )
 
     def visit_math_expression(self, node):
-        """Docstring"""
-        # print('visit_math_expression')
         op = self.node_helper.get_identifier(
             get_control_children(node)[0]
         )  # The operator will be the first control character
@@ -864,8 +904,6 @@ class MatlabToCast(object):
         return vars
 
     def visit_extent_specifier(self, node):
-        """Docstring"""
-        # print('visit_extent_specifier')
         # Node structure
         # (extent_specifier)
         #   (identifier)
@@ -906,8 +944,6 @@ class MatlabToCast(object):
             (BODY_NODES)
             ...
         """
-        # print('visit_derived_type')
-
 
         record_name = self.node_helper.get_identifier(
             get_first_child_by_type(node, "type_name", recurse=True)
@@ -989,7 +1025,6 @@ class MatlabToCast(object):
                 (argument_list)
             (type_member)
         """
-        # print('visit_derived_type_member_expression')
 
         # If we are accessing an attribute of a scalar type, we can simply pull the name node from the variable context.
         # However, if this is a dimensional type, we must convert it to a call to _get.
@@ -1016,8 +1051,6 @@ class MatlabToCast(object):
     # NOTE: This function starts with _ because it will never be dispatched to directly. There is not a get node in the tree-sitter parse tree.
     # From context, we will determine when we are accessing an element of a List, and call this function,
     def _visit_get(self, node):
-        """Docstring"""
-        # print('_visit_get')
         # Node structure
         # (call_expression)
         #  (identifier)
@@ -1056,8 +1089,6 @@ class MatlabToCast(object):
         )
 
     def _visit_set(self, node):
-        """Docstring"""
-        # print('_visit_set')
         # Node structure
         # (assignment)
         #  (call_expression)
@@ -1084,7 +1115,6 @@ class MatlabToCast(object):
                     (...) ...
             (body) ...
         """
-        # print('_visit_while')
         while_statement_node = get_first_child_by_type(node, "while_statement")
 
         # The first body node will be the node after the while_statement
@@ -1113,7 +1143,6 @@ class MatlabToCast(object):
     def _visit_implied_do_loop(self, node) -> Call:
         """Custom visitor for implied_do_loop array literal. This form gets converted to a call to range"""
         # TODO: This loop_control is the same as the do loop. Can we turn this into one visitor?
-        # print('_visit_implied_do_loop')
         loop_control_node = get_first_child_by_type(
             node, "loop_control_expression", recurse=True
         )
@@ -1142,8 +1171,6 @@ class MatlabToCast(object):
         )
 
     def _visit_passthrough(self, node):
-        """Docstring"""
-        # print('_visit_passthrough')
         if len(node.children) == 0:
             return None
 
@@ -1153,8 +1180,6 @@ class MatlabToCast(object):
                 return child_cast
 
     def get_gromet_function_node(self, func_name: str) -> Name:
-        """Docstring"""
-        # print('get_gromet_function_node')
         # Idealy, we would be able to create a dummy node and just call the name visitor.
         # However, tree-sitter does not allow you to create or modify nodes, so we have to recreate the logic here.
         if self.variable_context.is_variable(func_name):
