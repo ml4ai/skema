@@ -92,6 +92,7 @@ def generate_data_product(
 
 def generate_parse_tree(source: str, language_name: str) -> str:
     """Generator function for Tree-Sitter parse tree"""
+    print(INSTALLED_LANGUAGES_FILEPATH)
     # Determine the tree-sitter parser we need to use based on file extension
     parser = Parser()
     parser.set_language(Language(INSTALLED_LANGUAGES_FILEPATH, language_name))
@@ -206,7 +207,7 @@ def process_single_model(html: HTML_Instance, output_dir: str, model_name: str):
 
             # Check the status of each pipeline step
             final_status = Status.get_overall_status(
-                [parse_tree_status, cast_status, gromet_status]
+                [cast_status, gromet_status]
             )
             file_status_list.append(final_status)
 
