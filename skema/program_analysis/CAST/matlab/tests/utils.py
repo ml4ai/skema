@@ -11,12 +11,15 @@ from skema.program_analysis.CAST2FN.model.cast import (
 def assert_var(var, name = ""):
     """ Test the Var for correct type and name. """
     assert isinstance(var, Var)
+    assert not var.source_refs == None
     assert isinstance(var.val, Name)
+    assert not var.val.source_refs == None
     assert var.val.name == name
 
 def assert_literal_value(literal_value, value = ""):
     """ Test the LiteralValue for correct type and value. """
     assert isinstance(literal_value, LiteralValue)
+    assert not literal_value.source_refs == None
     assert literal_value.value == value
 
 def assert_operand(operand, value = ""):
@@ -31,12 +34,14 @@ def assert_operand(operand, value = ""):
 def assert_assignment(assignment, left = "", right = ""):
     """ Test an Assignment for correct type and operands. """
     assert isinstance(assignment, Assignment)
+    assert not assignment.source_refs == None
     assert_operand(assignment.left, left)
     assert_operand(assignment.right, right)
 
 def assert_expression(expression, op = "", left = "", right = ""):
     """ Test an Operator for correct type, operation, and operands. """
     assert isinstance(expression, Operator)
+    assert not expression.source_refs == None
     assert expression.op == op
     assert_operand(expression.operands[0], left)
     assert_operand(expression.operands[1], right)
