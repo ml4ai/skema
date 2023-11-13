@@ -582,19 +582,21 @@ class MatlabToCast(object):
                 return ast_node.val.name
             return ast_node.value
 
-        def get_operator(op, operands):
+        def get_operator(op, operands, source_refs):
             """ return an Operator representing the case test """
             return Operator(
                 source_language = "matlab",
                 interpreter = None,
                 version = MATLAB_VERSION,
                 op = op,
-                operands = operands
+                operands = operands,
+                source_refs = source_refs
             )
 
         def get_case_expression(case_node, identifier):
             """ return an Operator representing the case test """
             cell_node = get_first_child_by_type(case_node, "cell")
+            source_refs = self.node_helper.get_source_ref(case_node)
             # multiple case arguments
             if (cell_node):
                 nodes = get_all(cell_node, case_node_types)
@@ -605,11 +607,11 @@ class MatlabToCast(object):
                     source_code_data_type=["matlab", MATLAB_VERSION, "unknown"],
                     source_refs=[self.node_helper.get_source_ref(cell_node)]
                 )
-                return get_operator("in", [identifier, operand])
+                return get_operator("in", [identifier, operand], source_refs)
             # single case argument
             nodes = get_children_by_types(case_node, case_node_types)
             operand = valid([self.visit(node) for node in nodes])[0]
-            return get_operator("==", [identifier, operand])
+            return get_operator("==", [identifier, operand], source_refs)
 
         def get_case_body(case_node):
             """ return the instruction block for the case """
@@ -650,12 +652,18 @@ class MatlabToCast(object):
 
         def conditional(conditional_node):
             """ return a ModelIf struct for the conditional logic node. """
-            ret = ModelIf()
+            
             # comparison_operator
-            ret.expr = self.visit(get_first_child_by_type(
+            expr = self.visit(get_first_child_by_type(
                 conditional_node,
                 "comparison_operator"
             ))
+            
+            ret = ModelIf(
+                expr = expr,
+                source_refs=[self.node_helper.get_source_ref(conditional_node)]
+            )
+
             # instruction_block
             block = get_first_child_by_type(conditional_node, "block")
             if block:
