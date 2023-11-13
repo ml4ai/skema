@@ -10,6 +10,7 @@ SYNTAX_KEYWORDS = [
     # 'function',
     # 'if',
     # 'otherwise',
+    # 'while',
     # 'switch',
 
     # keywords we currently support
@@ -60,7 +61,6 @@ SYNTAX_KEYWORDS = [
     'spread_operator',
 
     # keywords not in model or CAST that we should support
-    'while',
     'while_statement'
 ]
 
