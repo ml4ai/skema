@@ -109,29 +109,23 @@ class MatlabToCast(object):
         elif node.type == "spread_operator":
             return self.visit_spread_operator(node)
         elif node.type in [
+            "boolean",
+            "matrix",
             "number",
-            "string",
-            "boolean"
+            "string"
         ]: return self.visit_literal(node)
-        elif node.type == "keyword_statement":
-            return self.visit_keyword_statement(node)
-        elif node.type == "extent_specifier":
-            return self.visit_extent_specifier(node)
         elif node.type == "do_loop_statement":
             return self.visit_do_loop_statement(node)
         elif node.type == "iterator":
             return self.visit_iterator(node)
         elif node.type == "for_statement":
             return self.visit_for_statement(node)
+        elif node.type == "while_statement":
+            return self.visit_while_statement(node)
         elif node.type == "switch_statement":
             return self.visit_switch_statement(node)
         elif node.type == "if_statement":
             return self.visit_if_statement(node)
-        elif node.type == "derived_type_definition":
-            return self.visit_derived_type(node)
-        elif node.type == "derived_type_member_expression":
-            return self.visit_derived_type_member_expression(node)
-
         # Not in Waterloo but likely needed
         elif node.type == "import":   
             return self._visit_import_statemement(node)
@@ -260,17 +254,6 @@ class MatlabToCast(object):
         for i, arg in enumerate(func_args):
             func_args[i].type = self.variable_context.get_type(arg.val.name)
 
-        # TODO:
-        # This logic can be made cleaner
-        # Fortran doesn't require a return statement, so we need to check if there is a top-level return statement
-        # If there is not, then we will create a dummy one
-        return_found = False
-        for child in body:
-            if isinstance(child, ModelReturn):
-                return_found = True
-        if not return_found:
-            body.append(self.visit_keyword_statement(node))
-
         # Pop variable context off of stack before leaving this scope
         self.variable_context.pop_context()
 
@@ -302,41 +285,6 @@ class MatlabToCast(object):
             source_language_version=MATLAB_VERSION,
             arguments=bar,
             source_refs=[self.node_helper.get_source_ref(node)],
-        )
-
-    def visit_keyword_statement(self, node):
-        # Currently, the only keyword_identifier produced by tree-sitter is Return
-        # However, there may be other instances
-
-        # In Fortran the return statement doesn't return a value (there is the obsolete "alternative return")
-        # We keep track of values that need to be returned in the variable context
-        return_values = self.variable_context.context_return_values[
-            -1
-        ]  # TODO: Make function for this
-
-        if len(return_values) == 1:
-            # TODO: Fix this case
-            value = self.variable_context.get_node(list(return_values)[0])
-        elif len(return_values) > 1:
-            value = LiteralValue(
-                value_type="Tuple",
-                value=[
-                    Var(
-                        val=self.variable_context.get_node(ret),
-                        type=self.variable_context.get_type(ret),
-                        default_value=None,
-                        source_refs=None,
-                    )
-                    for ret in return_values
-                ],
-                source_code_data_type=None,  # TODO: REFACTOR
-                source_refs=None,
-            )
-        else:
-            value = LiteralValue(val=None, type=None, source_refs=None)
-
-        return ModelReturn(
-            value=value, source_refs=[self.node_helper.get_source_ref(node)]
         )
 
     # this is not in the Waterloo model but will no doubt be encountered.
@@ -414,10 +362,9 @@ class MatlabToCast(object):
         ;
         """
 
-
-    # Handle the MATLAB for_statement.   
     # Note that this is a wrapper for an iterator
     def visit_for_statement(self, node) -> Loop:
+        """ Translate Tree-sitter for_loop node into CAST Loop node """
         """
         SOURCE:
         for n = 1:10:2
@@ -448,147 +395,63 @@ class MatlabToCast(object):
             end
         ;
         """
-        return None
-
-    # CAST has no while loop, so this will have to be translated
-    # into a CAST-supported loop type.
-    def visit_do_loop_statement(self, node) -> Loop:
-        """Visitor for Loops. Do to complexity, this visitor logic only handles the range-based do loop.
-        The do while loop will be passed off to a seperate visitor. Returns a Loop object.
-        """
-        """
-        Node structure
-        Do loop
-        (do_loop_statement)
-            (loop_control_expression)
-                (...) ...
-            (body) ...
-        
-        Do while
-        (do_loop_statement)
-            (while_statement)
-                (parenthesized_expression)
-                    (...) ...
-            (body) ...
-        """
-
-        # First check for
-        # TODO: Add do until Loop support
-        while_statement_node = get_first_child_by_type(node, "while_statement")
-        if while_statement_node:
-            return self._visit_while(node)
-
-        # The first body node will be the node after the loop_control_expression
-        # NOTE: This code is for the creation of the main body. The do loop will still add some additional nodes at the end of this body.
-        body = []
-        body_start_index = 1 + get_first_child_index(node, "loop_control_expression")
-        for body_node in node.children[body_start_index:]:
-            child_cast = self.visit(body_node)
-            if isinstance(child_cast, List):
-                body.extend(child_cast)
-            elif isinstance(child_cast, AstNode):
-                body.append(child_cast)
-
-        # For the init and expression fields, we first need to determine if we are in a regular "do" or a "do while" loop
-        # PRE:
-        # _next(_iter(range(start, stop, step)))
-        loop_control_node = get_first_child_by_type(node, "loop_control_expression")
-        loop_control_children = get_non_control_children(loop_control_node)
-        if len(loop_control_children) == 3:
-            iterator, start, stop = [
-                self.visit(child) for child in loop_control_children
-            ]
-            step = LiteralValue("Integer", "1")
-        elif len(loop_control_children) == 4:
-            iterator, start, stop, step = [
-                self.visit(child) for child in loop_control_children
-            ]
-        else:
-            iterator = None
-            start = None
-            stop = None
-            step = None
-
-        range_name_node = self.get_gromet_function_node("range")
-        iter_name_node = self.get_gromet_function_node("iter")
-        next_name_node = self.get_gromet_function_node("next")
-        generated_iter_name_node = self.variable_context.generate_iterator()
-        stop_condition_name_node = self.variable_context.generate_stop_condition()
-
-        # generated_iter_0 = iter(range(start, stop, step))
-        pre = []
-        pre.append(
-            Assignment(
-                left=Var(generated_iter_name_node, "Iterator"),
-                right=Call(
-                    iter_name_node,
-                    arguments=[Call(range_name_node, arguments=[start, stop, step])],
-                ),
-            )
-        )
-
-        # (i, generated_iter_0, sc_0) = next(generated_iter_0)
-        pre.append(
-            Assignment(
-                left=LiteralValue(
-                    "Tuple",
-                    [
-                        iterator,
-                        Var(generated_iter_name_node, "Iterator"),
-                        Var(stop_condition_name_node, "Boolean"),
-                    ],
-                ),
-                right=Call(
-                    next_name_node,
-                    arguments=[Var(generated_iter_name_node, "Iterator")],
-                ),
-            )
-        )
-
-        # EXPR
-        expr = []
-        expr = Operator(
-            op="!=",  # TODO: Should this be == or !=
-            operands=[
-                Var(stop_condition_name_node, "Boolean"),
-                LiteralValue("Boolean", True),
-            ],
-        )
-
-        # BODY
-        # At this point, the body nodes have already been visited
-        # We just need to append the iterator next call
-        body.append(
-            Assignment(
-                left=LiteralValue(
-                    "Tuple",
-                    [
-                        iterator,
-                        Var(generated_iter_name_node, "Iterator"),
-                        Var(stop_condition_name_node, "Boolean"),
-                    ],
-                ),
-                right=Call(
-                    next_name_node,
-                    arguments=[Var(generated_iter_name_node, "Iterator")],
-                ),
-            )
-        )
-
-        # POST
-        post = []
-        post.append(
-            Assignment(
-                left=iterator,
-                right=Operator(op="+", operands=[iterator, step]),
-            )
-        )
 
         return Loop(
-            pre=pre,
-            expr=expr,
-            body=body,
-            post=post,
+            source_refs=[self.node_helper.get_source_ref(node)],
+        )
+
+    # 
+    # into a CAST-supported loop type.
+    def visit_while_statement(self, node) -> Loop:
+        """ Translate MATLAB while_loop syntax node into CAST Loop node """
+        """
+        SOURCE:
+        n = 10;
+        f = n;
+        while n > 1
+            n = n-1;
+            f = f*n;
+        end
+
+        SYNTAX TREE:
+        assignment
+            identifier
+            =
+            number
+        ;
+        assignment
+            identifier
+            =
+            identifier
+        ;
+        while_statement
+            while
+            comparison_operator
+                identifier
+                >
+                number
+            block
+                assignment
+                    identifier
+                    =
+                    binary_operator
+                        identifier
+                        -
+                        number
+                ;
+                assignment
+                    identifier
+                    =
+                    binary_operator
+                        identifier
+                        *
+                        identifier
+                ;
+            end
+        ;
+        """
+
+        return Loop(
             source_refs=[self.node_helper.get_source_ref(node)],
         )
 
@@ -782,21 +645,14 @@ class MatlabToCast(object):
                 source_refs=[literal_source_ref],
             )
 
-        elif literal_type == "array_literal":
-            # There are a multiple ways to create an array literal. This visitor is for the traditional explicit creation (/ 1,2,3 /)
-            # For the do loop based version, we pass it off to another visitor
-            implied_do_loop_expression_node = get_first_child_by_type(
-                node, "implied_do_loop_expression"
-            )
-            if implied_do_loop_expression_node:
-                return self._visit_implied_do_loop(implied_do_loop_expression_node)
-
+        elif literal_type == "matrix":
+            elements = []
+            for child in get_non_control_children(node):
+                elements.append(self.visit(child))
             return LiteralValue(
                 value_type="List",
-                value=[
-                    self.visit(element) for element in get_non_control_children(node)
-                ],
-                source_code_data_type=["matlab", MATLAB_VERSION, "dimension"],
+                value = elements,
+                source_code_data_type=["matlab", MATLAB_VERSION, "matrix"],
                 source_refs=[literal_source_ref],
             )
 
@@ -864,380 +720,7 @@ class MatlabToCast(object):
     def visit_spread_operator(self, node):
         return None
 
-    def _visit_variable_declaration(self, node) -> List:
-        """Visitor for variable declaration. Will return a List of Var and Assignment nodes."""
-        """
-        # Node structure
-        (variable_declaration)
-            (intrinsic_type)
-            (type_qualifier)
-                (qualifier)
-                (value)
-            (identifier) ...
-            (assignment) ...
-
-        (variable_declaration)
-            (derived_type)
-                (type_name)
-        """
-        # print('visit_variable_declaration')
-        # A variable can be declared with an intrinsic_type if its built-in, or a derived_type if it is user defined.
-        intrinsic_type_node = get_first_child_by_type(node, "intrinsic_type")
-        derived_type_node = get_first_child_by_type(node, "derived_type")
-
-        variable_type = ""
-        variable_intent = ""
-
-        if intrinsic_type_node:
-            type_map = {
-                "integer": "Integer",
-                "real": "AbstractFloat",
-                "complex": None,
-                "logical": "Boolean",
-                "character": "String",
-            }
-            variable_type = type_map[self.node_helper.get_identifier(intrinsic_type_node)]
-        elif derived_type_node:
-            variable_type = self.node_helper.get_identifier(
-                get_first_child_by_type(derived_type_node, "type_name", recurse=True),
-            )
-
-        # There are multiple type qualifiers that change the way we generate a variable
-        # For example, we need to determine if we are creating an array (dimension) or a single variable
-        type_qualifiers = get_children_by_types(node, ["type_qualifier"])
-        for qualifier in type_qualifiers:
-            field = self.node_helper.get_identifier(qualifier.children[0])
-
-            if field == "dimension":
-                variable_type = "List"
-            elif field == "intent":
-                variable_intent = self.node_helper.get_identifier(qualifier.children[1])
-
-        # You can declare multiple variables of the same type in a single statement, so we need to create a Var or Assignment node for each instance
-        definied_variables = get_children_by_types(
-            node,
-            [
-                "identifier",  # Variable declaration
-                "assignment",  # Variable assignment
-                "call_expression",  # Dimension without intent
-            ],
-        )
-        vars = []
-        for variable in definied_variables:
-            if variable.type == "assignment":
-                if variable.children[0].type == "call_expression":
-                    vars.append(
-                        Assignment(
-                            left=self.visit(
-                                get_first_child_by_type(
-                                    variable.children[0], "identifier"
-                                )
-                            ),
-                            right=self.visit(variable.children[2]),
-                            source_refs=[
-                                self.node_helper.get_source_ref(variable)
-                            ],
-                        )
-                    )
-                    vars[-1].left.type = "dimension"
-                    self.variable_context.update_type(
-                        vars[-1].left.val.name, "dimension"
-                    )
-                else:
-                    # If its a regular assignment, we can update the type normally
-                    vars.append(self.visit(variable))
-                    vars[-1].left.type = variable_type
-                    self.variable_context.update_type(
-                        vars[-1].left.val.name, variable_type
-                    )
-
-            elif variable.type == "identifier":
-                # A basic variable declaration, we visit the identifier and then update the type
-                vars.append(self.visit(variable))
-                vars[-1].type = variable_type
-                self.variable_context.update_type(vars[-1].val.name, variable_type)
-            elif variable.type == "call_expression":
-                # Declaring a dimension variable using the x(1:5) format. It will look like a call expression in tree-sitter.
-                # We treat it like an identifier by visiting its identifier node. Then the type gets overridden by "dimension"
-                vars.append(self.visit(get_first_child_by_type(variable, "identifier")))
-                vars[-1].type = "dimension"
-                self.variable_context.update_type(vars[-1].val.name, "dimension")
-
-        # By default, all variables are added to a function's list of return values
-        # If the intent is actually in, then we need to remove them from the list
-        if variable_intent == "in":
-            for var in vars:
-                self.variable_context.remove_return_value(var.val.name)
-
-        return vars
-
-    def visit_extent_specifier(self, node):
-        # Node structure
-        # (extent_specifier)
-        #   (identifier)
-        #   (identifier)
-
-        # The extent specifier is the same as a slice, it can have a start, stop, and step
-        # We can determine these by looking at the number of control characters in this node.
-        # Fortran uses the character ':' to differentiate these values
-        argument_pointer = 0
-        arguments = [
-            LiteralValue("None", "None"),
-            LiteralValue("None", "None"),
-            LiteralValue("None", "None"),
-        ]
-        for child in node.children:
-            if child.type == ":":
-                argument_pointer += 1
-            else:
-                arguments[argument_pointer] = self.visit(child)
-
-        return Call(
-            func=self.get_gromet_function_node("slice"),
-            source_language="matlab",
-            source_language_version=MATLAB_VERSION,
-            arguments=arguments,
-            source_refs=[self.node_helper.get_source_ref(node)],
-        )
-
-    def visit_derived_type(self, node: Node) -> RecordDef:
-        """Visitor function for derived type definition. Will return a RecordDef"""
-        """Node Structure:
-        (derived_type_definition)
-            (derived_type_statement)
-                (base)
-                    (base_type_specifier)
-                        (identifier)
-                (type_name)
-            (BODY_NODES)
-            ...
-        """
-
-        record_name = self.node_helper.get_identifier(
-            get_first_child_by_type(node, "type_name", recurse=True)
-        )
-
-        # There is no multiple inheritance in Fortran, so a type may only extend 1 other type
-        bases = []
-        derived_type_statement_node = get_first_child_by_type(
-            node, "derived_type_statement"
-        )
-        base_node = get_first_child_by_type(
-            derived_type_statement_node, "identifier", recurse=True
-        )
-        if base_node:
-            bases.append([self.node_helper.get_identifier(base_node)])
-
-        # A derived type can contain symbols with the same name as those already in the main program body.
-        # If we tell the variable context we are in a record definition, it will append the type name as a prefix to all defined variables.
-        self.variable_context.enter_record_definition(record_name)
-
-        # TODO: Full support for this requires handling the contains statement generally
-        funcs = []
-        derived_type_procedures_node = get_first_child_by_type(
-            node, "derived_type_procedures"
-        )
-        if derived_type_procedures_node:
-            for procedure_node in get_children_by_types(
-                derived_type_procedures_node, ["procedure_statement"]
-            ):
-                funcs.append(
-                    self.visit_name(
-                        get_first_child_by_type(procedure_node, "method_name")
-                    )
-                )
-
-        # A derived type can only have variable declarations in its body.
-        fields = []
-        variable_declarations = [
-            self.visit(variable_declaration)
-            for variable_declaration in get_children_by_types(
-                node, ["variable_declaration"]
-            )
-        ]
-        for declaration in variable_declarations:
-            # Variable declarations always returns a list of Var or Assignment, even when only one var is being created
-            for var in declaration:
-                if isinstance(var, Var):
-                    fields.append(var)
-                elif isinstance(var, Assignment):
-                    # Since this is a record definition, an assignment is actually equivalent to setting the default value
-                    var.left.default_value = var.right
-                    fields.append(var.left)
-                # TODO: Handle dimension type (Call type)
-                elif isinstance(var, Call):
-                    pass
-        # Leaving the record definition sets the prefix back to an empty string
-        self.variable_context.exit_record_definition()
-
-        return RecordDef(
-            name=record_name,
-            bases=bases,
-            funcs=funcs,
-            fields=fields,
-            source_refs=[self.node_helper.get_source_ref(node)],
-        )
-
-    def visit_derived_type_member_expression(self, node) -> Attribute:
-        """Visitor function for derived type access. Returns an Attribute object"""
-        """ Node Structure
-        Scalar Access
-        (derived_type_member_expression)
-            (identifier)
-            (type_member)
-
-        Dimensional Access
-        (derived_type_member_expression)
-            (call_expression)
-                (identifier)
-                (argument_list)
-            (type_member)
-        """
-
-        # If we are accessing an attribute of a scalar type, we can simply pull the name node from the variable context.
-        # However, if this is a dimensional type, we must convert it to a call to _get.
-        call_expression_node = get_first_child_by_type(node, "call_expression")
-        if call_expression_node:
-            value = self._visit_get(call_expression_node)
-        else:
-            value = self.variable_context.get_node(
-                self.node_helper.get_identifier(
-                    get_first_child_by_type(node, "identifier", recurse=True),
-                )
-            )
-
-        attr = self.node_helper.get_identifier(
-            get_first_child_by_type(node, "type_member", recurse=True)
-        )
-
-        return Attribute(
-            value=value,
-            attr=attr,
-            source_refs=[self.node_helper.get_source_ref(node)],
-        )
-
-    # NOTE: This function starts with _ because it will never be dispatched to directly. There is not a get node in the tree-sitter parse tree.
-    # From context, we will determine when we are accessing an element of a List, and call this function,
-    def _visit_get(self, node):
-        # Node structure
-        # (call_expression)
-        #  (identifier)
-        #  (argument_list)
-
-        identifier_node = node.children[0]
-        argument_nodes = get_non_control_children(node.children[1])
-
-        # First argument to get is the List itself. We can get this by passing the identifier to the identifier visitor
-        arguments = []
-        arguments.append(self.visit(identifier_node))
-
-        # If there are more than one arguments, then this is a multi dimensional array and we need to use an extended slice
-        if len(argument_nodes) > 1:
-            dimension_list = LiteralValue()
-            dimension_list.value_type = "List"
-            dimension_list.value = []
-            for argument in argument_nodes:
-                dimension_list.value.append(self.visit(argument))
-
-            extslice_call = Call()
-            extslice_call.func = self.get_gromet_function_node("ext_slice")
-            extslice_call.arguments = []
-            extslice_call.arguments.append(dimension_list)
-
-            arguments.append(extslice_call)
-        else:
-            arguments.append(self.visit(argument_nodes[0]))
-
-        return Call(
-            func=self.get_gromet_function_node("get"),
-            source_language="matlab",
-            source_language_version=MATLAB_VERSION,
-            arguments=arguments,
-            source_refs=[self.node_helper.get_source_ref(node)],
-        )
-
-    def _visit_set(self, node):
-        # Node structure
-        # (assignment)
-        #  (call_expression)
-        #  (right side)
-
-        left, _, right = node.children
-
-        # The left side is equivilent to a call gromet "get", so we will first pass the left side to the get visitor
-        # Then we can easily convert this to a "set" call by modifying the fields and then appending the right side to the function arguments
-        cast_call = self._visit_get(left)
-        cast_call.func = self.get_gromet_function_node("set")
-        cast_call.arguments.append(self.visit(right))
-
-        return cast_call
-
-    def _visit_while(self, node) -> Loop:
-        """Custom visitor for while loop. Returns a Loop object"""
-        """
-        Node structure
-        Do while
-        (do_loop_statement)
-            (while_statement)
-                (parenthesized_expression)
-                    (...) ...
-            (body) ...
-        """
-        while_statement_node = get_first_child_by_type(node, "while_statement")
-
-        # The first body node will be the node after the while_statement
-        body = []
-        body_start_index = 1 + get_first_child_index(node, "while_statement")
-        for body_node in node.children[body_start_index:]:
-            child_cast = self.visit(body_node)
-            if isinstance(child_cast, List):
-                body.extend(child_cast)
-            elif isinstance(child_cast, AstNode):
-                body.append(child_cast)
-
-        # We don't have explicit handling for parenthesized_expression, but the passthrough handler will make sure that we visit the expression correctly.
-        expr = self.visit(
-            get_first_child_by_type(while_statement_node, "parenthesized_expression")
-        )
-
-        return Loop(
-            pre=[],  # TODO: Should pre and post contain anything?
-            expr=expr,
-            body=body,
-            post=[],
-            source_refs=[self.node_helper.get_source_ref(node)],
-        )
-
-    def _visit_implied_do_loop(self, node) -> Call:
-        """Custom visitor for implied_do_loop array literal. This form gets converted to a call to range"""
-        # TODO: This loop_control is the same as the do loop. Can we turn this into one visitor?
-        loop_control_node = get_first_child_by_type(
-            node, "loop_control_expression", recurse=True
-        )
-        loop_control_children = get_non_control_children(loop_control_node)
-        if len(loop_control_children) == 3:
-            iterator, start, stop = [
-                self.visit(child) for child in loop_control_children
-            ]
-            step = LiteralValue("Integer", "1")
-        elif len(loop_control_children) == 4:
-            iterator, start, stop, step = [
-                self.visit(child) for child in loop_control_children
-            ]
-        else:
-            iterator = None
-            start = None
-            stop = None
-            step = None
-
-        return Call(
-            func=self.get_gromet_function_node("range"),
-            source_language=None,
-            source_language_version=None,
-            arguments=[start, stop, step],
-            source_refs=[self.node_helper.get_source_ref(node)],
-        )
-
+    # how we skip control nodes and other junk
     def _visit_passthrough(self, node):
         if len(node.children) == 0:
             return None
@@ -1246,11 +729,3 @@ class MatlabToCast(object):
             child_cast = self.visit(child)
             if child_cast:
                 return child_cast
-
-    def get_gromet_function_node(self, func_name: str) -> Name:
-        # Idealy, we would be able to create a dummy node and just call the name visitor.
-        # However, tree-sitter does not allow you to create or modify nodes, so we have to recreate the logic here.
-        if self.variable_context.is_variable(func_name):
-            return self.variable_context.get_node(func_name)
-
-        return self.variable_context.add_variable(func_name, "function", None)
