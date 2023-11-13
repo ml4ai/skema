@@ -12,6 +12,9 @@ from skema.program_analysis.CAST.matlab.matlab_to_cast import MatlabToCast
 from typing import List
 KEY_FILTER = ["source_refs"]
 
+# This script will inspect a matlab source file and print the source,
+# Tree-sitter syntax tree, and CAST tree depending on input args.
+
 def show_cast(args, source):
     """ Get the Tree-sitter syntax tree for MATLAB files"""
 
@@ -90,15 +93,15 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('filename', help="set the filename")
     parser.add_argument('--indent', '-i', default=2, type=int, 
-        help="indent spaces, default = 2")
+        help="Tree indent spaces, default = 2")
     parser.add_argument('--offset', '-o', default=0, type=int, 
-        help="initial indent, default = 0")
+        help="Global output indent, default = 0")
     parser.add_argument('--tree', '-t', action="store_true",
-        help="Display the Tree-sitter syntax tree for the source file")
+        help="Display the Tree-sitter syntax tree")
     parser.add_argument('--cast', '-c', action="store_true",
-        help="Display the CAST tree for the source file")
+        help="Display the CAST representation ")
     parser.add_argument('--source', '-s', action="store_true",
-        help="Display the source file")
+        help="Display the file source")
     args = parser.parse_args()
     run(args)
 
