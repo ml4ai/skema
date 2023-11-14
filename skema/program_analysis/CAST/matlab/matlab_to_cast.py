@@ -467,9 +467,14 @@ class MatlabToCast(object):
                         ret.append(self.visit(child))
                 return ret;
 
+            matrix_values = get_values(node, [])
+            value = []
+            if len(matrix_values) > 0:
+                value = matrix_values[0]
+
             return LiteralValue(
                 value_type="List",
-                value = get_values(node, [])[0],
+                value = value,
                 source_code_data_type=["matlab", MATLAB_VERSION, "matrix"],
                 source_refs=[literal_source_ref],
             )
