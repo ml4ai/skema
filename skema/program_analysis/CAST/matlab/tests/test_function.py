@@ -11,8 +11,8 @@ def no_test_function():
     """ Test function """
 
     source = """
-        function both = add_them(x, y)
-            both = x + y
+    function both = add_them(x, y)
+        both = x + y
     end
     """
 

@@ -135,10 +135,16 @@ class MatlabToCast(object):
         )
 
     def visit_command(self, node):
-        # Pull relevent nodes
-        print ("visit_command")
-        print(node)
-        return None
+        """ Translate the Tree-sitter command node """
+        command_name = get_first_child_by_type(node, "command_name")
+        command_argument = get_first_child_by_type(node, "command_argument")
+        return Call(
+            func = self.visit(command_name),
+            source_language = "matlab",
+            source_language_version = MATLAB_VERSION,
+            arguments = [self.visit(command_argument)]
+            source_refs=[self.node_helper.get_source_ref(node)]
+        )
 
     def visit_function_call(self, node):
         """ Translate Tree-sitter function call node """
