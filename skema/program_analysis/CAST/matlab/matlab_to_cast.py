@@ -426,14 +426,14 @@ class MatlabToCast(object):
             if "e" in literal_value.lower() or "." in literal_value:
                 return LiteralValue(
                     value_type="AbstractFloat",  # TODO verify this value
-                    value=literal_value,
+                    value=float(literal_value),
                     source_code_data_type=["matlab", MATLAB_VERSION, "real"],
                     source_refs=[literal_source_ref],
                 )
             else:
                 return LiteralValue(
                     value_type="Integer",
-                    value=literal_value,
+                    value=int(literal_value),
                     source_code_data_type=["matlab", MATLAB_VERSION, "integer"],
                     source_refs=[literal_source_ref],
                 )
@@ -447,20 +447,29 @@ class MatlabToCast(object):
             )
 
         elif literal_type == "boolean":
+
+            # capitalize lower-case MATLAB booleans for python
+            value = literal_value[0].upper() + literal_value[1:].lower() 
+
             return LiteralValue(
                 value_type="Boolean",
-                value=literal_value,
+                value = value,
                 source_code_data_type=["matlab", MATLAB_VERSION, "logical"],
                 source_refs=[literal_source_ref],
             )
 
         elif literal_type == "matrix":
-            elements = []
-            for child in get_keyword_children(node):
-                elements.append(self.visit(child))
+            def get_values(values, ret) -> List:
+                for child in get_keyword_children(values):
+                    if child.type in ['row', 'matrix']:
+                        ret.append(get_values(child, []))
+                    else:
+                        ret.append(self.visit(child))
+                return ret;
+
             return LiteralValue(
                 value_type="List",
-                value = elements,
+                value = get_values(node, [])[0],
                 source_code_data_type=["matlab", MATLAB_VERSION, "matrix"],
                 source_refs=[literal_source_ref],
             )
@@ -542,37 +551,6 @@ class MatlabToCast(object):
 
     def visit_switch_statement(self, node):
         """ return a conditional statement based on the switch statement """
-        """
-        SOURCE:
-        switch x
-            case 'one'
-                n = 1;
-            otherwise
-                n = 0;
-        end
-
-        SYNTAX TREE:
-        switch_statement
-            identifier
-            case_clause
-                case
-                string
-                    string_content
-                block
-                    assignment
-                        identifier
-                        =
-                        number
-            otherwise_clause
-                otherwise
-                block
-                    assignment
-                        identifier
-                        =
-                        number
-            end
-        """
-    
         # node types used for case comparison
         case_node_types = ["number", "string", "boolean","identifier"]
         
@@ -582,34 +560,35 @@ class MatlabToCast(object):
                 return ast_node.val.name
             return ast_node.value
 
-        def get_operator(op, operands):
+        def get_operator(op, operands, source_refs):
             """ return an Operator representing the case test """
             return Operator(
                 source_language = "matlab",
                 interpreter = None,
                 version = MATLAB_VERSION,
                 op = op,
-                operands = operands
+                operands = operands,
+                source_refs = source_refs
             )
 
         def get_case_expression(case_node, identifier):
             """ return an Operator representing the case test """
+            source_refs=[self.node_helper.get_source_ref(case_node)]
             cell_node = get_first_child_by_type(case_node, "cell")
             # multiple case arguments
             if (cell_node):
                 nodes = get_all(cell_node, case_node_types)
-                ast_nodes = [self.visit(node) for node in nodes]
                 operand = LiteralValue(
                     value_type="List",
-                    value = [get_node_value(node) for node in ast_nodes],
+                    value = [self.visit(node) for node in nodes],
                     source_code_data_type=["matlab", MATLAB_VERSION, "unknown"],
                     source_refs=[self.node_helper.get_source_ref(cell_node)]
                 )
-                return get_operator("in", [identifier, operand])
+                return get_operator("in", [identifier, operand], source_refs)
             # single case argument
             nodes = get_children_by_types(case_node, case_node_types)
             operand = [self.visit(node) for node in nodes][0]
-            return get_operator("==", [identifier, operand])
+            return get_operator("==", [identifier, operand], source_refs)
 
         def get_case_body(case_node):
             """ return the instruction block for the case """
@@ -623,6 +602,7 @@ class MatlabToCast(object):
             return ModelIf(
                 expr = get_case_expression(case_node, identifier),
                 body = get_case_body(case_node),
+                source_refs=[self.node_helper.get_source_ref(case_node)]
             )
         
         # switch statement identifier
