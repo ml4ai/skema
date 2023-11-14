@@ -390,7 +390,7 @@ class ToGrometPass:
         """Called after a Gromet FN is added to the whole collection
         Properly sets the index of the Gromet FN that was just added
         """
-        # return # comment this line if we need the indices
+        return # comment this line if we need the indices
         idx = len(self.gromet_module.fn_array)
         self.gromet_module._fn_array[-1].index = idx
 
@@ -1115,7 +1115,6 @@ class ToGrometPass:
                             len(parent_gromet_fn.pof) - 1
                         ].name = node.left.val.attr.name
                     else:
-                        print(len(parent_gromet_fn.pof))
                         self.add_var_to_env(
                             get_left_side_name(node.left),
                             node.left,
@@ -3332,7 +3331,6 @@ class ToGrometPass:
                 gromet_body_fn.opi[-1],
                 len(gromet_body_fn.opi),
             )
-            # print(f"{val} {arg_env[val][2]}")
             gromet_body_fn.opo = insert_gromet_object(
                 gromet_body_fn.opo,
                 GrometPort(name=val, box=len(gromet_body_fn.b)),
