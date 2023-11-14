@@ -71,11 +71,11 @@ class MatlabToCast(object):
         self.node_helper = NodeHelper(self.source, self.filename)
 
         # create CAST object 
-        modules = self.run(self.tree.root_node)
-        self.out_cast =  [CAST([module], "matlab") for module in modules]
+        module = self.run(self.tree.root_node)
+        self.out_cast = CAST([module], "matlab")
 
-    def run(self, root) -> List[Module]:
-        return [self.visit(root)]
+    def run(self, root) -> Module:
+        return self.visit(root)
 
     def visit(self, node):
         """Switch execution based on node type"""

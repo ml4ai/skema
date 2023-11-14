@@ -10,8 +10,8 @@ from skema.program_analysis.tree_sitter_parsers.build_parsers import (
 )
 from skema.program_analysis.CAST.matlab.matlab_to_cast import MatlabToCast
 from typing import List
-KEY_FILTER = ["source_refs"]
-#KEY_FILTER = []
+#KEY_FILTER = ["source_refs"]
+KEY_FILTER = []
 
 # This script will inspect a matlab source file and print the source,
 # Tree-sitter syntax tree, and CAST tree depending on input args.
@@ -37,19 +37,18 @@ def show_cast(args):
 
         return remove_key(json_obj, target_keys)
 
-    parser = MatlabToCast(args.filename)
-    for cast in parser.out_cast:
-        json_obj = cast.to_json_object()
-        # declutter JSON by filtering keys
-        json_obj = remove_keys(json_obj, KEY_FILTER)
-        # pretty print JSON to string
-        output = json.dumps(json_obj, sort_keys=True, indent=args.indent)
-        if len(KEY_FILTER) > 0:
-            print(f"\n{' '*args.offset}CAST: Removed keys: {KEY_FILTER}")
-        else:
-            print(f"\n{' '*args.offset}CAST:")
-        for line in output.splitlines():
-            print(f"{' '*args.offset}{line}")
+    cast = MatlabToCast(args.filename).out_cast
+    json_obj = cast.to_json_object()
+    # declutter JSON by filtering keys
+    json_obj = remove_keys(json_obj, KEY_FILTER)
+    # pretty print JSON to string
+    output = json.dumps(json_obj, sort_keys=True, indent=args.indent)
+    if len(KEY_FILTER) > 0:
+        print(f"\n{' '*args.offset}CAST: Removed keys: {KEY_FILTER}")
+    else:
+        print(f"\n{' '*args.offset}CAST:")
+    for line in output.splitlines():
+        print(f"{' '*args.offset}{line}")
 
 
 def show_tree(args, source):

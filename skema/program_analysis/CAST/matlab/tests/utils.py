@@ -67,14 +67,14 @@ def assert_operand(operand, value = None):
         else:
             assert operand == value
 
+# you should expect a single CAST object with a list of nodes, which are modules
 def cast_nodes(source):
     """ Return the CAST nodes from the first Module of MatlabToCast output """
     # there should only be one CAST object in the cast output list
     cast = MatlabToCast(source = source).out_cast
-    assert len(cast) == 1
     # there should be one module in the CAST object
-    assert len(cast[0].nodes) == 1
-    module = cast[0].nodes[0]
+    assert len(cast.nodes) == 1
+    module = cast.nodes[0]
     assert isinstance(module, Module)
     # return the module body node list
     return module.body
