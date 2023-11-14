@@ -142,7 +142,7 @@ class MatlabToCast(object):
             func = self.visit(command_name),
             source_language = "matlab",
             source_language_version = MATLAB_VERSION,
-            arguments = [self.visit(command_argument)]
+            arguments = [self.visit(command_argument)],
             source_refs=[self.node_helper.get_source_ref(node)]
         )
 
