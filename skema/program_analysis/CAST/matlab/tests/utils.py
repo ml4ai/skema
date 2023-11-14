@@ -69,7 +69,7 @@ def assert_operand(operand, value = None):
 
 # we curently produce a CAST object with a single Module in the nodes list.
 def cast_nodes(source):
-    """ Return the CAST nodes from the first Module of MatlabToCast output """
+    """ Return the MatlabToCast output """
     # there should only be one CAST object in the cast output list
     cast = MatlabToCast(source = source).out_cast
     # there should be one module in the CAST object
