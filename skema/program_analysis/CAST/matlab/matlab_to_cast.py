@@ -459,7 +459,7 @@ class MatlabToCast(object):
         )
 
     def visit_switch_statement(self, node):
-        """ return a conditional statement based on the switch statement """
+        """ return a conditional statement based on a MATLAB switch statement """
         # node types used for case comparison
         case_node_types = [
             "boolean",
@@ -538,7 +538,6 @@ class MatlabToCast(object):
                 last.orelse = [self.visit(c) for c in get_keyword_children(block)]
         return model_ifs[0]
 
-    # into a CAST-supported loop type.
     def visit_while_statement(self, node) -> Loop:
         """ Translate MATLAB while_loop syntax node into CAST Loop node """
         return None
