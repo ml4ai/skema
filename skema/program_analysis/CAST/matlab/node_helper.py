@@ -59,12 +59,6 @@ def get_children_by_types(node: Node, types: List):
     """Takes in a node and a list of types as inputs and returns all children matching those types. Otherwise, return an empty list"""
     return [child for child in node.children if child.type in types]
 
-def get_first_child_index(node, type: str):
-    """Get the index of the first child of node with type type."""
-    for i, child in enumerate(node.children):
-        if child.type == type:
-            return i
-
 def get_all(node, types):
     """ return all nodes with type in types from the entire node tree """
     def search(node, types, ret):
@@ -74,14 +68,6 @@ def get_all(node, types):
             search(child, types, ret)
         return ret
     return search(node, types, [])
-
-def get_last_child_index(node, type: str):
-    """Get the index of the last child of node with type type."""
-    last = None
-    for i, child in enumerate(node.children):
-        if child.type == type:
-            last = child
-    return last
 
 def get_control_children(node: Node):
     """ return node children with control character types """

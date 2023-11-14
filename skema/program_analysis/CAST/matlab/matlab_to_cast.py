@@ -34,9 +34,7 @@ from skema.program_analysis.CAST.matlab.node_helper import (
     get_children_by_types,
     get_control_children,
     get_first_child_by_type,
-    get_first_child_index,
     get_keyword_children,
-    get_last_child_index,
     NodeHelper
 )
 
