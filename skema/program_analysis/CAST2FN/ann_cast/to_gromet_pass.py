@@ -437,25 +437,26 @@ class ToGrometPass:
                             tgt=len(parent_gromet_fn.pof),
                         ),
                     )
-                else:
-                    var_env = self.symtab_variables()
-                    parent_gromet_fn.pif = insert_gromet_object(
-                        parent_gromet_fn.pif, GrometPort(box=inline_bf_loc)
-                    )
-                    arg_name = get_left_side_name(arg)
-                    if arg_name not in var_env["local"] and arg_name not in var_env["args"]:
-                        parent_gromet_fn.opi = insert_gromet_object(
-                            parent_gromet_fn.opi, GrometPort(box=len(parent_gromet_fn.b))
-                        )
-                        parent_gromet_fn.wfopi = insert_gromet_object(
-                            parent_gromet_fn.wfopi,
-                            GrometWire(
-                                src=len(parent_gromet_fn.pif),
-                                tgt=len(parent_gromet_fn.opi),
-                            ),
-                        )
-                    else:
-                        self.wire_from_var_env(arg_name, parent_gromet_fn)
+                # else:
+                #     var_env = self.symtab_variables()
+                #     parent_gromet_fn.pif = insert_gromet_object(
+                #         parent_gromet_fn.pif, GrometPort(box=inline_bf_loc)
+                #     )
+                #     arg_name = get_left_side_name(arg)
+                #     if arg_name not in var_env["local"] and arg_name not in var_env["args"] and arg_name not in var_env["global"]:
+                #         print("HI")
+                #         parent_gromet_fn.opi = insert_gromet_object(
+                #             parent_gromet_fn.opi, GrometPort(box=len(parent_gromet_fn.b))
+                #         )
+                #         parent_gromet_fn.wfopi = insert_gromet_object(
+                #             parent_gromet_fn.wfopi,
+                #             GrometWire(
+                #                 src=len(parent_gromet_fn.pif),
+                #                 tgt=len(parent_gromet_fn.opi),
+                #             ),
+                #         )
+                #     else:
+                #         self.wire_from_var_env(arg_name, parent_gromet_fn)
             return inline_bf_loc
         else:
             # Create the Expression FN and its box function
