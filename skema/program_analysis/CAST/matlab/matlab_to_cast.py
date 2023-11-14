@@ -145,77 +145,12 @@ class MatlabToCast(object):
     # Note that this is a wrapper for an iterator
     def visit_for_statement(self, node) -> Loop:
         """ Translate Tree-sitter for_loop node into CAST Loop node """
-        """
-        SOURCE:
-        for n = 1:10:2
-            x = step_by_2(n)
-        end
-
-        SYNTAX TREE:
-        for_statement
-            iterator
-                identifier n
-                =
-                range
-                    number  % start
-                    :
-                    number  % stop
-                    :
-                    number  % step
-            block
-                assignment
-                    identifier x
-                    =
-                    function_call
-                        identifier step_by_2
-                        (
-                        arguments
-                            identifier n
-                        )
-            end
-        ;
-        """
-
-        """
-        class Loop(AstNode):
-            'pre': 'list[AstNode]',
-            'expr': 'AstNode',
-            'body': 'list[AstNode]',
-            'post': 'list[AstNode]'
-        """
-
-        iterator_node = get_first_child_by_type(node, "iterator")
-        range_var = get_first_child_by_type(iterator_node, "identifier")
-        range_node = get_first_child_by_type(iterator_node, "range")
-        range_children = get_keyword_children(range_node) + [None]
-        range_start, range_stop, range_step = range_children
-
-        return Loop(
-            source_refs=[self.node_helper.get_source_ref(node)],
-        )
+        return None
 
     def visit_function_call(self, node):
-        """
-        SOURCE:
-        subplot(3,5,7);
-
-        SYNTAX TREE:
-        function_call
-            identifier
-            (
-            arguments
-                number
-                ,
-                number
-                ,
-                number
-            )
-        ;
-        """
-
+        """ Translate Tree-sitter function call node """
         args_parent = get_first_child_by_type(node, "arguments")
         args_children = [c for c in get_keyword_children(args_parent)]
-
         return Call(
             func = self.visit(get_first_child_by_type(node, "identifier")),
             source_language = "matlab",
@@ -383,36 +318,8 @@ class MatlabToCast(object):
     # Handle the MATLAB iterator.   
     # Note that this is a wrapper for an iterator
     def visit_iterator(self, node) -> Loop:
-        """
-        SOURCE:
-        for n = 1:10:2
-            x = step_by_2(n)
-        end
-
-        SYNTAX TREE:
-        for_statement
-            iterator
-                identifier n
-                =
-                range
-                    number  % start
-                    :
-                    number  % stop
-                    :
-                    number  % step
-            block
-                assignment
-                    identifier x
-                    =
-                    function_call
-                        identifier step_by_2
-                        (
-                        arguments
-                            identifier n
-                        )
-            end
-        ;
-        """
+        """ Add the Tree-sitter iterator as a Loop node """
+        return None
 
     def visit_literal(self, node) -> LiteralValue:
         """Visitor for literals. Returns a LiteralValue"""
@@ -446,10 +353,8 @@ class MatlabToCast(object):
             )
 
         elif literal_type == "boolean":
-
-            # capitalize lower-case MATLAB booleans for python
+            # store as string, use Python boolean capitalization.
             value = literal_value[0].upper() + literal_value[1:].lower() 
-
             return LiteralValue(
                 value_type="Boolean",
                 value = value,
@@ -636,56 +541,7 @@ class MatlabToCast(object):
     # into a CAST-supported loop type.
     def visit_while_statement(self, node) -> Loop:
         """ Translate MATLAB while_loop syntax node into CAST Loop node """
-        """
-        SOURCE:
-        n = 10;
-        f = n;
-        while n > 1
-            n = n-1;
-            f = f*n;
-        end
-
-        SYNTAX TREE:
-        assignment
-            identifier
-            =
-            number
-        ;
-        assignment
-            identifier
-            =
-            identifier
-        ;
-        while_statement
-            while
-            comparison_operator
-                identifier
-                >
-                number
-            block
-                assignment
-                    identifier
-                    =
-                    binary_operator
-                        identifier
-                        -
-                        number
-                ;
-                assignment
-                    identifier
-                    =
-                    binary_operator
-                        identifier
-                        *
-                        identifier
-                ;
-            end
-        ;
-        """
-
-        return Loop(
-            source_refs=[self.node_helper.get_source_ref(node)],
-        )
+        return None
 
     # this is not in the Waterloo model but will no doubt be encountered.
     def visit_import_statemement(self, node):
