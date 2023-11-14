@@ -500,7 +500,6 @@ class ToGrometPass:
                     or isinstance(arg, AnnCastLiteralValue)
                     or isinstance(arg, AnnCastCall)
                 ):
-                    pass
                     self.visit(arg, primitive_fn, parent_cast_node)
                     primitive_fn.pif = insert_gromet_object(
                         primitive_fn.pif, GrometPort(box=primitive_bf_loc)
@@ -518,19 +517,16 @@ class ToGrometPass:
                         primitive_fn.pif, GrometPort(box=primitive_bf_loc)
                     )
                     arg_name = get_left_side_name(arg)
-                    if arg_name not in var_env["local"] and arg_name not in var_env["args"]:
-                        primitive_fn.opi = insert_gromet_object(
-                            primitive_fn.opi, GrometPort(box=len(primitive_fn.b))
-                        )
-                        primitive_fn.wfopi = insert_gromet_object(
-                            primitive_fn.wfopi,
-                            GrometWire(
-                                src=len(primitive_fn.pif),
-                                tgt=len(primitive_fn.opi),
-                            ),
-                        )
-                    else:
-                        self.wire_from_var_env(arg_name, primitive_fn)
+                    primitive_fn.opi = insert_gromet_object(
+                        primitive_fn.opi, GrometPort(box=len(primitive_fn.b))
+                    )
+                    primitive_fn.wfopi = insert_gromet_object(
+                        primitive_fn.wfopi,
+                        GrometWire(
+                            src=len(primitive_fn.pif),
+                            tgt=len(primitive_fn.opi),
+                        ),
+                    )
 
             # Insert it into the overall Gromet FN collection
             self.gromet_module.fn_array = insert_gromet_object(
