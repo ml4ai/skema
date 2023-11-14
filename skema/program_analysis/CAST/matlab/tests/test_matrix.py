@@ -7,10 +7,12 @@ from skema.program_analysis.CAST.matlab.tests.utils import (
 # Test CAST from assignment
 
 def test_matrix_empty():
-    """ Test assignment 1 dimensional matrix value."""
-    nodes = cast_nodes("x = []")
-    assert len(nodes) == 1
+    """ Test assignment of empty matrices."""
+    nodes = cast_nodes("x = []; y = [[] []]; z = [[[] []] [[] []]]")
+    assert len(nodes) == 3
     assert_assignment(nodes[0], left = 'x', right = [])
+    assert_assignment(nodes[1], left = 'y', right = [])
+    assert_assignment(nodes[2], left = 'z', right = [])
 
 def test_matrix_integer():
     """ Test assignment 1 dimensional matrix value."""
