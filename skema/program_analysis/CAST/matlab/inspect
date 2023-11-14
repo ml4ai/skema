@@ -1,0 +1,120 @@
+#!/usr/bin/env python3
+import sys
+import json
+import argparse
+from os.path import exists
+from tree_sitter import Language, Node, Parser
+from pathlib import Path
+from skema.program_analysis.tree_sitter_parsers.build_parsers import (
+    INSTALLED_LANGUAGES_FILEPATH
+)
+from skema.program_analysis.CAST.matlab.matlab_to_cast import MatlabToCast
+from typing import List
+#KEY_FILTER = ["source_refs"]
+KEY_FILTER = []
+
+# This script will inspect a matlab source file and print the source,
+# Tree-sitter syntax tree, and CAST tree depending on input args.
+
+def show_cast(args):
+    """ Get the Tree-sitter syntax tree for MATLAB files"""
+
+    def remove_keys(json_obj, target_keys: List):
+        """ remove all instances of the target keys from the json object"""
+
+        def remove_key(json_obj, target_key):
+            """ remove all instances of the target key from the json object"""
+            if isinstance(json_obj, dict):
+                for target_key in target_keys:
+                    if target_key in json_obj.keys():
+                        json_obj.pop(target_key)
+                    for key in json_obj.keys():
+                        remove_key(json_obj[key], target_keys)
+            elif isinstance(json_obj, list):
+                for item in json_obj:
+                    remove_key(item, target_keys)
+            return(json_obj)
+
+        return remove_key(json_obj, target_keys)
+
+    cast = MatlabToCast(args.filename).out_cast
+    json_obj = cast.to_json_object()
+    # declutter JSON by filtering keys
+    json_obj = remove_keys(json_obj, KEY_FILTER)
+    # pretty print JSON to string
+    output = json.dumps(json_obj, sort_keys=True, indent=args.indent)
+    if len(KEY_FILTER) > 0:
+        print(f"\n{' '*args.offset}CAST: Removed keys: {KEY_FILTER}")
+    else:
+        print(f"\n{' '*args.offset}CAST:")
+    for line in output.splitlines():
+        print(f"{' '*args.offset}{line}")
+
+
+def show_tree(args, source):
+    """Convert the file source into a Tree-sitter syntax tree"""
+
+    def print_tree(node: Node, offset = 0, indent = 0):
+        """Display the node branch in pretty format"""
+        for child in node.children:
+            if not child.type == "\n":
+                print(f"{' '*offset}{child.type}")
+            print_tree(child, offset + indent, indent)
+
+    # Create the Tree-sitter parser for the language name
+    parser = Parser()
+    parser.set_language(
+        Language(INSTALLED_LANGUAGES_FILEPATH, "matlab")
+    )
+    tree = parser.parse(bytes(source, "utf8"))
+    print(f"\n{' '*args.offset}SYNTAX TREE:")
+    print_tree(tree.root_node, args.offset, args.indent)
+
+def show_source(args, source):
+    print(f"\n{' '*args.offset}SOURCE:")
+    for line in source.splitlines():
+        print(f"{' '*args.offset}{line}")
+
+def show_file(args):
+    print(f"\n{' '*args.offset}FILE:")
+    print(f"{' '*args.offset}{args.filename}")
+
+def run(args):
+    if exists(args.filename):
+        path = Path(args.filename)
+        offset = ' '*args.offset
+        source = path.read_text().strip()
+        show_file(args)
+
+        # display everything if no flags selected
+        if not args.source and not args.tree and not args.cast:
+            show_source(args, source)
+            show_tree(args, source)
+            show_cast(args)
+
+        # otherwise show per selection
+        if args.source:
+            show_source(args, source)
+        if args.tree:
+            show_tree(args, source)
+        if args.cast:
+            show_cast(args)
+    else:
+        print(f"File not found: {path.name}")
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument('filename', help="set the filename")
+    parser.add_argument('--indent', '-i', default=2, type=int, 
+        help="Tree indent spaces, default = 2")
+    parser.add_argument('--offset', '-o', default=0, type=int, 
+        help="Global output indent, default = 0")
+    parser.add_argument('--tree', '-t', action="store_true",
+        help="Display the Tree-sitter syntax tree")
+    parser.add_argument('--cast', '-c', action="store_true",
+        help="Display the CAST representation ")
+    parser.add_argument('--source', '-s', action="store_true",
+        help="Display the file source")
+    args = parser.parse_args()
+    run(args)
+
