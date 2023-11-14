@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/zerocopy-0.7.25/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-cb6f1f67f1bcd037.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="zerocopy" data-themes="" data-resource-suffix="" data-rustdoc-version="1.73.0 (cc66ad468 2023-10-03)" data-channel="1.73.0" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-1596385f77d47ef2.css" data-theme-dark-css="dark-0a43001d3fc2282c.css" data-theme-ayu-css="ayu-fd19013d6ce078bf.css" ><script src="../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-1596385f77d47ef2.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-0a43001d3fc2282c.css"><link rel="stylesheet" href="../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../zerocopy/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/zerocopy-0.7.26/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-cb6f1f67f1bcd037.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="zerocopy" data-themes="" data-resource-suffix="" data-rustdoc-version="1.73.0 (cc66ad468 2023-10-03)" data-channel="1.73.0" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-1596385f77d47ef2.css" data-theme-dark-css="dark-0a43001d3fc2282c.css" data-theme-ayu-css="ayu-fd19013d6ce078bf.css" ><script src="../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-1596385f77d47ef2.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-0a43001d3fc2282c.css"><link rel="stylesheet" href="../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../zerocopy/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -5648,6 +5648,63 @@
 <a href="#5648" id="5648">5648</a>
 <a href="#5649" id="5649">5649</a>
 <a href="#5650" id="5650">5650</a>
+<a href="#5651" id="5651">5651</a>
+<a href="#5652" id="5652">5652</a>
+<a href="#5653" id="5653">5653</a>
+<a href="#5654" id="5654">5654</a>
+<a href="#5655" id="5655">5655</a>
+<a href="#5656" id="5656">5656</a>
+<a href="#5657" id="5657">5657</a>
+<a href="#5658" id="5658">5658</a>
+<a href="#5659" id="5659">5659</a>
+<a href="#5660" id="5660">5660</a>
+<a href="#5661" id="5661">5661</a>
+<a href="#5662" id="5662">5662</a>
+<a href="#5663" id="5663">5663</a>
+<a href="#5664" id="5664">5664</a>
+<a href="#5665" id="5665">5665</a>
+<a href="#5666" id="5666">5666</a>
+<a href="#5667" id="5667">5667</a>
+<a href="#5668" id="5668">5668</a>
+<a href="#5669" id="5669">5669</a>
+<a href="#5670" id="5670">5670</a>
+<a href="#5671" id="5671">5671</a>
+<a href="#5672" id="5672">5672</a>
+<a href="#5673" id="5673">5673</a>
+<a href="#5674" id="5674">5674</a>
+<a href="#5675" id="5675">5675</a>
+<a href="#5676" id="5676">5676</a>
+<a href="#5677" id="5677">5677</a>
+<a href="#5678" id="5678">5678</a>
+<a href="#5679" id="5679">5679</a>
+<a href="#5680" id="5680">5680</a>
+<a href="#5681" id="5681">5681</a>
+<a href="#5682" id="5682">5682</a>
+<a href="#5683" id="5683">5683</a>
+<a href="#5684" id="5684">5684</a>
+<a href="#5685" id="5685">5685</a>
+<a href="#5686" id="5686">5686</a>
+<a href="#5687" id="5687">5687</a>
+<a href="#5688" id="5688">5688</a>
+<a href="#5689" id="5689">5689</a>
+<a href="#5690" id="5690">5690</a>
+<a href="#5691" id="5691">5691</a>
+<a href="#5692" id="5692">5692</a>
+<a href="#5693" id="5693">5693</a>
+<a href="#5694" id="5694">5694</a>
+<a href="#5695" id="5695">5695</a>
+<a href="#5696" id="5696">5696</a>
+<a href="#5697" id="5697">5697</a>
+<a href="#5698" id="5698">5698</a>
+<a href="#5699" id="5699">5699</a>
+<a href="#5700" id="5700">5700</a>
+<a href="#5701" id="5701">5701</a>
+<a href="#5702" id="5702">5702</a>
+<a href="#5703" id="5703">5703</a>
+<a href="#5704" id="5704">5704</a>
+<a href="#5705" id="5705">5705</a>
+<a href="#5706" id="5706">5706</a>
+<a href="#5707" id="5707">5707</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018 The Fuchsia Authors
 //
 // Licensed under the 2-Clause BSD License &lt;LICENSE-BSD or
@@ -5878,7 +5935,14 @@
     __INTERNAL_USE_ONLY_NIGHLTY_FEATURES_IN_TESTS,
     feature(layout_for_ptr, strict_provenance)
 )]
-#[macro_use]
+
+</span><span class="comment">// This is a hack to allow zerocopy-derive derives to work in this crate. They
+// assume that zerocopy is linked as an extern crate, so they access items from
+// it as `zerocopy::Xxx`. This makes that still work.
+</span><span class="attr">#[cfg(any(feature = <span class="string">&quot;derive&quot;</span>, test))]
+</span><span class="kw">extern crate </span><span class="self">self </span><span class="kw">as </span>zerocopy;
+
+<span class="attr">#[macro_use]
 </span><span class="kw">mod </span>macros;
 
 <span class="attr">#[cfg(feature = <span class="string">&quot;byteorder&quot;</span>)]
@@ -5939,14 +6003,6 @@
 // See the documentation on `util::polyfills` for more information.
 </span><span class="attr">#[allow(unused_imports)]
 </span><span class="kw">use </span><span class="kw">crate</span>::util::polyfills::NonNullExt <span class="kw">as _</span>;
-
-<span class="comment">// This is a hack to allow zerocopy-derive derives to work in this crate. They
-// assume that zerocopy is linked as an extern crate, so they access items from
-// it as `zerocopy::Xxx`. This makes that still work.
-</span><span class="attr">#[cfg(any(feature = <span class="string">&quot;derive&quot;</span>, test))]
-</span><span class="kw">mod </span>zerocopy {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use crate</span>::<span class="kw-2">*</span>;
-}
 
 <span class="attr">#[rustversion::nightly]
 #[cfg(all(test, not(__INTERNAL_USE_ONLY_NIGHLTY_FEATURES_IN_TESTS)))]
@@ -6382,7 +6438,9 @@
     ///   `ManuallyDrop&lt;T&gt;` is guaranteed to have the same layout and bit
     ///   validity as `T`
     ///
-    /// TODO(#429): Once this text (added in
+    /// TODO(#429):
+    /// -  Add quotes from docs.
+    /// -  Once [1] (added in
     /// https://github.com/rust-lang/rust/pull/115522) is available on stable,
     /// quote the stable docs instead of the nightly docs.
     </span><span class="macro">unsafe_impl_known_layout!</span>(<span class="attr">#[repr([u8]</span>)] str);
@@ -6615,6 +6673,8 @@
         //   as required by `u8`.
         // - Since `Self: FromZeroes`, the all-zeroes instance is a valid
         //   instance of `Self.`
+        //
+        // TODO(#429): Add references to docs and quotes.
         </span><span class="kw">unsafe </span>{ ptr::write_bytes(slf.cast::&lt;u8&gt;(), <span class="number">0</span>, len) };
     }
 
@@ -7255,6 +7315,8 @@
         // - The total size of the resulting slice is no larger than
         //   `isize::MAX` because no allocation produced by safe code can be
         //   larger than `isize::MAX`.
+        //
+        // TODO(#429): Add references to docs and quotes.
         </span><span class="kw">unsafe </span>{ slice::from_raw_parts(slf.cast::&lt;u8&gt;(), len) }
     }
 
@@ -7290,6 +7352,8 @@
         // - The total size of the resulting slice is no larger than
         //   `isize::MAX` because no allocation produced by safe code can be
         //   larger than `isize::MAX`.
+        //
+        // TODO(#429): Add references to docs and quotes.
         </span><span class="kw">unsafe </span>{ slice::from_raw_parts_mut(slf.cast::&lt;u8&gt;(), len) }
     }
 
@@ -7386,6 +7450,8 @@
     ///   - The only value &gt;= 1 for which 1 is an integer multiple is 1
     ///   Therefore, the only possible alignment for `u8` and `i8` is 1.
     ///
+    /// TODO(#429): Add quotes from documentation.
+    ///
     /// [1] TODO(https://github.com/rust-lang/reference/issues/1291): Once the
     ///     reference explicitly guarantees these properties, cite it.
     /// [2] https://doc.rust-lang.org/reference/type-layout.html#primitive-data-layout
@@ -7412,7 +7478,9 @@
     /// - `AsBytes`: the `{f32,f64}::to_bits` methods&#39; documentation [4,5]
     ///   states that they are currently equivalent to `transmute`. [3]
     ///
-    /// TODO: Make these arguments more precisely in terms of the documentation.
+    /// TODO(#429):
+    /// - Make these arguments more precisely in terms of the documentation.
+    /// - Add quotes from documentation.
     ///
     /// [1] https://doc.rust-lang.org/nightly/std/primitive.f32.html#method.from_bits
     /// [2] https://doc.rust-lang.org/nightly/std/primitive.f64.html#method.from_bits
@@ -7426,11 +7494,12 @@
 
 <span class="macro">safety_comment! </span>{
     <span class="doccomment">/// SAFETY:
-    /// - `FromZeroes`: Per the reference [1], 0x00 is a valid bit pattern for
-    ///   `bool`.
-    /// - `AsBytes`: Per the reference [1], `bool` always has a size of 1 with
-    ///   valid bit patterns 0x01 and 0x00, so the only byte of the bool is
-    ///   always initialized
+    /// - `FromZeroes`: Valid since &quot;[t]he value false has the bit pattern
+    ///   0x00&quot; [1].
+    /// - `AsBytes`: Since &quot;the boolean type has a size and alignment of 1 each&quot;
+    ///   and &quot;The value false has the bit pattern 0x00 and the value true has
+    ///   the bit pattern 0x01&quot; [1]. Thus, the only byte of the bool is always
+    ///   initialized.
     /// - `Unaligned`: Per the reference [1], &quot;[a]n object with the boolean type
     ///   has a size and alignment of 1 each.&quot;
     ///
@@ -7440,23 +7509,27 @@
 }
 <span class="macro">safety_comment! </span>{
     <span class="doccomment">/// SAFETY:
-    /// - `FromZeroes`: Per the reference [1], 0x0000 is a valid bit pattern for
-    ///   `char`.
-    /// - `AsBytes`: `char` is represented as a 32-bit unsigned word (`u32`)
-    ///   [1], which is `AsBytes`. Note that unlike `u32`, not all bit patterns
-    ///   are valid for `char`.
+    /// - `FromZeroes`: Per reference [1], &quot;[a] value of type char is a Unicode
+    ///   scalar value (i.e. a code point that is not a surrogate), represented
+    ///   as a 32-bit unsigned word in the 0x0000 to 0xD7FF or 0xE000 to
+    ///   0x10FFFF range&quot; which contains 0x0000.
+    /// - `AsBytes`: `char` is per reference [1] &quot;represented as a 32-bit
+    ///   unsigned word&quot; (`u32`) which is `AsBytes`. Note that unlike `u32`, not
+    ///   all bit patterns are valid for `char`.
     ///
     /// [1] https://doc.rust-lang.org/reference/types/textual.html
     </span><span class="macro">unsafe_impl!</span>(char: FromZeroes, AsBytes);
 }
 <span class="macro">safety_comment! </span>{
     <span class="doccomment">/// SAFETY:
-    /// - `FromZeroes`, `AsBytes`, `Unaligned`: Per the reference [1], `str` has
-    ///   the same layout as `[u8]`, and `[u8]` is `FromZeroes`, `AsBytes`, and
-    ///   `Unaligned`.
+    /// - `FromZeroes`, `AsBytes`, `Unaligned`: Per the reference [1], `str`
+    ///   has the same layout as `[u8]`, and `[u8]` is `FromZeroes`, `AsBytes`,
+    ///   and `Unaligned`.
     ///
     /// Note that we don&#39;t `assert_unaligned!(str)` because `assert_unaligned!`
     /// uses `align_of`, which only works for `Sized` types.
+    ///
+    /// TODO(#429): Add quotes from documentation.
     ///
     /// [1] https://doc.rust-lang.org/reference/type-layout.html#str-layout
     </span><span class="macro">unsafe_impl!</span>(str: FromZeroes, AsBytes, Unaligned);
@@ -7479,6 +7552,8 @@
     ///   size 1 or 0. `NonZeroX8` can represent multiple states, so they cannot
     ///   be 0 bytes, which means that they must be 1 byte. The only valid
     ///   alignment for a 1-byte type is 1.
+    ///
+    /// TODO(#429): Add quotes from documentation.
     ///
     /// [1] https://doc.rust-lang.org/stable/std/num/struct.NonZeroU8.html
     /// [2] https://doc.rust-lang.org/stable/std/num/struct.NonZeroI8.html
@@ -7509,6 +7584,8 @@
     ///   guarantee, but given the purpose of those types, it&#39;s virtually
     ///   unthinkable that that would ever change. The only valid alignment for
     ///   a 1-byte type is 1.
+    ///
+    /// TODO(#429): Add quotes from documentation.
     ///
     /// [1] https://doc.rust-lang.org/stable/std/num/struct.NonZeroU8.html
     /// [2] https://doc.rust-lang.org/stable/std/num/struct.NonZeroI8.html
@@ -7545,25 +7622,35 @@
     ///   size_of::&lt;T&gt;()])` is sound and produces `Option::&lt;T&gt;::None`. These
     ///   cases are identified by the second column:
     ///
-    ///   | `T`                 | `transmute::&lt;_, Option&lt;T&gt;&gt;([0u8; size_of::&lt;T&gt;()])` sound? |
-    ///   |---------------------|-----------------------------------------------------------|
-    ///   | [`Box&lt;U&gt;`]          | when `U: Sized`                                           |
-    ///   | `&amp;U`                | when `U: Sized`                                           |
-    ///   | `&amp;mut U`            | when `U: Sized`                                           |
-    ///   | [`ptr::NonNull&lt;U&gt;`] | when `U: Sized`                                           |
+    ///   | `T`                   | `transmute::&lt;_, Option&lt;T&gt;&gt;([0u8; size_of::&lt;T&gt;()])` sound? |
+    ///   |-----------------------|-----------------------------------------------------------|
+    ///   | [`Box&lt;U&gt;`]            | when `U: Sized`                                           |
+    ///   | `&amp;U`                  | when `U: Sized`                                           |
+    ///   | `&amp;mut U`              | when `U: Sized`                                           |
+    ///   | [`ptr::NonNull&lt;U&gt;`]   | when `U: Sized`                                           |
+    ///   | `fn`, `extern &quot;C&quot; fn` | always                                                    |
     ///
     /// TODO(#429), TODO(https://github.com/rust-lang/rust/pull/115333): Cite
     /// the Stable docs once they&#39;re available.
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
-    </span><span class="macro">unsafe_impl!</span>(T =&gt; FromZeroes <span class="kw">for </span><span class="prelude-ty">Option</span>&lt;Box&lt;T&gt;&gt;);
+    </span><span class="macro">unsafe_impl!</span>(
+        <span class="attr">#[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">&quot;alloc&quot;</span>)))]
+        </span>T =&gt; FromZeroes <span class="kw">for </span><span class="prelude-ty">Option</span>&lt;Box&lt;T&gt;&gt;
+    );
     <span class="macro">unsafe_impl!</span>(T =&gt; FromZeroes <span class="kw">for </span><span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;_ </span>T&gt;);
     <span class="macro">unsafe_impl!</span>(T =&gt; FromZeroes <span class="kw">for </span><span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;_ </span><span class="kw-2">mut </span>T&gt;);
     <span class="macro">unsafe_impl!</span>(T =&gt; FromZeroes <span class="kw">for </span><span class="prelude-ty">Option</span>&lt;NonNull&lt;T&gt;&gt;);
+    <span class="macro">unsafe_impl_for_power_set!</span>(A, B, C, D, E, F, G, H, I, J, K, L -&gt; M =&gt; FromZeroes <span class="kw">for </span><span class="macro">opt_fn!</span>(...));
+    <span class="macro">unsafe_impl_for_power_set!</span>(A, B, C, D, E, F, G, H, I, J, K, L -&gt; M =&gt; FromZeroes <span class="kw">for </span><span class="macro">opt_extern_c_fn!</span>(...));
 }
 
 <span class="macro">safety_comment! </span>{
     <span class="doccomment">/// SAFETY:
-    /// For all `T`, `PhantomData&lt;T&gt;` has size 0 and alignment 1. [1]
+    /// Per reference [1]:
+    /// &quot;For all T, the following are guaranteed:
+    /// size_of::&lt;PhantomData&lt;T&gt;&gt;() == 0
+    /// align_of::&lt;PhantomData&lt;T&gt;&gt;() == 1&quot;.
+    /// This gives:
     /// - `FromZeroes`, `FromBytes`: There is only one possible sequence of 0
     ///   bytes, and `PhantomData` is inhabited.
     /// - `AsBytes`: Since `PhantomData` has size 0, it contains no padding
@@ -7585,7 +7672,11 @@
     /// field, which is `pub`. Per the reference [2], this means that the
     /// `#[repr(transparent)]` attribute is &quot;considered part of the public ABI&quot;.
     ///
-    /// [1] https://doc.rust-lang.org/nightly/core/num/struct.Wrapping.html#layout-1
+    /// TODO(#429): Add quotes from documentation.
+    ///
+    /// [1] TODO(https://doc.rust-lang.org/nightly/core/num/struct.Wrapping.html#layout-1):
+    /// Reference this documentation once it&#39;s available on stable.
+    ///
     /// [2] https://doc.rust-lang.org/nomicon/other-reprs.html#reprtransparent
     </span><span class="macro">unsafe_impl!</span>(T: FromZeroes =&gt; FromZeroes <span class="kw">for </span>Wrapping&lt;T&gt;);
     <span class="macro">unsafe_impl!</span>(T: FromBytes =&gt; FromBytes <span class="kw">for </span>Wrapping&lt;T&gt;);
@@ -7604,11 +7695,10 @@
     ///   Thus, we require `T: FromZeroes` and `T: FromBytes` in order to ensure
     ///   that `T` - and thus `MaybeUninit&lt;T&gt;` - contains to `UnsafeCell`s.
     ///   Thus, requiring that `T` implement each of these traits is sufficient
-    /// - `Unaligned`: `MaybeUninit&lt;T&gt;` is guaranteed by its documentation [1]
-    ///   to have the same alignment as `T`.
+    /// - `Unaligned`: &quot;MaybeUninit&lt;T&gt; is guaranteed to have the same size,
+    ///    alignment, and ABI as T&quot; [1]
     ///
-    /// [1]
-    /// https://doc.rust-lang.org/nightly/core/mem/union.MaybeUninit.html#layout-1
+    /// [1] https://doc.rust-lang.org/stable/core/mem/union.MaybeUninit.html#layout-1
     ///
     /// TODO(https://github.com/google/zerocopy/issues/251): If we split
     /// `FromBytes` and `RefFromBytes`, or if we introduce a separate
@@ -7638,12 +7728,14 @@
     /// - `Unaligned`: `ManuallyDrop` has the same layout (and thus alignment)
     ///   as `T`, and `T: Unaligned` guarantees that that alignment is 1.
     ///
-    /// [1] Per https://doc.rust-lang.org/nightly/core/mem/struct.ManuallyDrop.html:
-    ///
     ///   `ManuallyDrop&lt;T&gt;` is guaranteed to have the same layout and bit
     ///   validity as `T`
     ///
-    /// TODO(#429): Once this text (added in
+    /// [1] Per https://doc.rust-lang.org/nightly/core/mem/struct.ManuallyDrop.html:
+    ///
+    /// TODO(#429):
+    /// - Add quotes from docs.
+    /// - Once [1] (added in
     /// https://github.com/rust-lang/rust/pull/115522) is available on stable,
     /// quote the stable docs instead of the nightly docs.
     </span><span class="macro">unsafe_impl!</span>(T: <span class="question-mark">?</span>Sized + FromZeroes =&gt; FromZeroes <span class="kw">for </span>ManuallyDrop&lt;T&gt;);
@@ -7767,6 +7859,7 @@
 // [1] https://rust-lang.github.io/unsafe-code-guidelines/layout/packed-simd-vectors.html
 // [2] https://github.com/rust-lang/unsafe-code-guidelines/issues/38
 </span><span class="attr">#[cfg(feature = <span class="string">&quot;simd&quot;</span>)]
+#[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">&quot;simd&quot;</span>)))]
 </span><span class="kw">mod </span>simd {
     <span class="doccomment">/// Defines a module which implements `FromZeroes`, `FromBytes`, and
     /// `AsBytes` for a set of types from a module in `core::arch`.
@@ -7778,8 +7871,10 @@
                             // target/feature combinations don&#39;t emit any impls
                             // and thus don&#39;t use this macro.
     </span><span class="macro">macro_rules! </span>simd_arch_mod {
-        (<span class="macro-nonterminal">$arch</span>:ident, <span class="macro-nonterminal">$</span><span class="kw">mod</span>:<span class="macro-nonterminal">ident</span>, $(<span class="macro-nonterminal">$typ</span>:ident),<span class="kw-2">*</span>) =&gt; {
-            <span class="kw">mod </span><span class="macro-nonterminal">$</span><span class="kw">mod </span>{
+        (<span class="attr">#[cfg <span class="macro-nonterminal">$cfg</span>:tt] </span><span class="macro-nonterminal">$arch</span>:ident, <span class="macro-nonterminal">$</span><span class="kw">mod</span>:<span class="macro-nonterminal">ident</span>, $(<span class="macro-nonterminal">$typ</span>:ident),<span class="kw-2">*</span>) =&gt; {
+            <span class="attr">#[cfg <span class="macro-nonterminal">$cfg</span>]
+            #[cfg_attr(doc_cfg, doc(cfg <span class="macro-nonterminal">$cfg</span>))]
+            </span><span class="kw">mod </span><span class="macro-nonterminal">$</span><span class="kw">mod </span>{
                 <span class="kw">use </span><span class="macro-nonterminal">core::arch</span>::<span class="macro-nonterminal">$arch</span>::{$(<span class="macro-nonterminal">$typ</span>),<span class="kw-2">*</span>};
 
                 <span class="kw">use crate</span>::<span class="kw-2">*</span>;
@@ -7793,48 +7888,51 @@
         };
     }
 
-    <span class="attr">#[cfg(target_arch = <span class="string">&quot;x86&quot;</span>)]
-    </span><span class="macro">simd_arch_mod!</span>(x86, x86, __m128, __m128d, __m128i, __m256, __m256d, __m256i);
-    <span class="attr">#[cfg(all(feature = <span class="string">&quot;simd-nightly&quot;</span>, target_arch = <span class="string">&quot;x86&quot;</span>))]
-    </span><span class="macro">simd_arch_mod!</span>(x86, x86_nightly, __m512bh, __m512, __m512d, __m512i);
-    <span class="attr">#[cfg(target_arch = <span class="string">&quot;x86_64&quot;</span>)]
-    </span><span class="macro">simd_arch_mod!</span>(x86_64, x86_64, __m128, __m128d, __m128i, __m256, __m256d, __m256i);
-    <span class="attr">#[cfg(all(feature = <span class="string">&quot;simd-nightly&quot;</span>, target_arch = <span class="string">&quot;x86_64&quot;</span>))]
-    </span><span class="macro">simd_arch_mod!</span>(x86_64, x86_64_nightly, __m512bh, __m512, __m512d, __m512i);
-    <span class="attr">#[cfg(target_arch = <span class="string">&quot;wasm32&quot;</span>)]
-    </span><span class="macro">simd_arch_mod!</span>(wasm32, wasm32, v128);
-    <span class="attr">#[cfg(all(feature = <span class="string">&quot;simd-nightly&quot;</span>, target_arch = <span class="string">&quot;powerpc&quot;</span>))]
-    </span><span class="macro">simd_arch_mod!</span>(
-        powerpc,
-        powerpc,
-        vector_bool_long,
-        vector_double,
-        vector_signed_long,
-        vector_unsigned_long
-    );
-    <span class="attr">#[cfg(all(feature = <span class="string">&quot;simd-nightly&quot;</span>, target_arch = <span class="string">&quot;powerpc64&quot;</span>))]
-    </span><span class="macro">simd_arch_mod!</span>(
-        powerpc64,
-        powerpc64,
-        vector_bool_long,
-        vector_double,
-        vector_signed_long,
-        vector_unsigned_long
-    );
-    <span class="attr">#[cfg(target_arch = <span class="string">&quot;aarch64&quot;</span>)]
-    #[rustfmt::skip]
-    </span><span class="macro">simd_arch_mod!</span>(
-        aarch64, aarch64, float32x2_t, float32x4_t, float64x1_t, float64x2_t, int8x8_t, int8x8x2_t,
-        int8x8x3_t, int8x8x4_t, int8x16_t, int8x16x2_t, int8x16x3_t, int8x16x4_t, int16x4_t,
-        int16x8_t, int32x2_t, int32x4_t, int64x1_t, int64x2_t, poly8x8_t, poly8x8x2_t, poly8x8x3_t,
-        poly8x8x4_t, poly8x16_t, poly8x16x2_t, poly8x16x3_t, poly8x16x4_t, poly16x4_t, poly16x8_t,
-        poly64x1_t, poly64x2_t, uint8x8_t, uint8x8x2_t, uint8x8x3_t, uint8x8x4_t, uint8x16_t,
-        uint8x16x2_t, uint8x16x3_t, uint8x16x4_t, uint16x4_t, uint16x8_t, uint32x2_t, uint32x4_t,
-        uint64x1_t, uint64x2_t
-    );
-    <span class="attr">#[cfg(all(feature = <span class="string">&quot;simd-nightly&quot;</span>, target_arch = <span class="string">&quot;arm&quot;</span>))]
-    #[rustfmt::skip]
-    </span><span class="macro">simd_arch_mod!</span>(arm, arm, int8x4_t, uint8x4_t);
+    <span class="attr">#[rustfmt::skip]
+    </span><span class="kw">const _</span>: () = {
+        <span class="macro">simd_arch_mod!</span>(
+            <span class="attr">#[cfg(target_arch = <span class="string">&quot;x86&quot;</span>)]
+            </span>x86, x86, __m128, __m128d, __m128i, __m256, __m256d, __m256i
+        );
+        <span class="macro">simd_arch_mod!</span>(
+            <span class="attr">#[cfg(all(feature = <span class="string">&quot;simd-nightly&quot;</span>, target_arch = <span class="string">&quot;x86&quot;</span>))]
+            </span>x86, x86_nightly, __m512bh, __m512, __m512d, __m512i
+        );
+        <span class="macro">simd_arch_mod!</span>(
+            <span class="attr">#[cfg(target_arch = <span class="string">&quot;x86_64&quot;</span>)]
+            </span>x86_64, x86_64, __m128, __m128d, __m128i, __m256, __m256d, __m256i
+        );
+        <span class="macro">simd_arch_mod!</span>(
+            <span class="attr">#[cfg(all(feature = <span class="string">&quot;simd-nightly&quot;</span>, target_arch = <span class="string">&quot;x86_64&quot;</span>))]
+            </span>x86_64, x86_64_nightly, __m512bh, __m512, __m512d, __m512i
+        );
+        <span class="macro">simd_arch_mod!</span>(
+            <span class="attr">#[cfg(target_arch = <span class="string">&quot;wasm32&quot;</span>)]
+            </span>wasm32, wasm32, v128
+        );
+        <span class="macro">simd_arch_mod!</span>(
+            <span class="attr">#[cfg(all(feature = <span class="string">&quot;simd-nightly&quot;</span>, target_arch = <span class="string">&quot;powerpc&quot;</span>))]
+            </span>powerpc, powerpc, vector_bool_long, vector_double, vector_signed_long, vector_unsigned_long
+        );
+        <span class="macro">simd_arch_mod!</span>(
+            <span class="attr">#[cfg(all(feature = <span class="string">&quot;simd-nightly&quot;</span>, target_arch = <span class="string">&quot;powerpc64&quot;</span>))]
+            </span>powerpc64, powerpc64, vector_bool_long, vector_double, vector_signed_long, vector_unsigned_long
+        );
+        <span class="macro">simd_arch_mod!</span>(
+            <span class="attr">#[cfg(target_arch = <span class="string">&quot;aarch64&quot;</span>)]
+            </span>aarch64, aarch64, float32x2_t, float32x4_t, float64x1_t, float64x2_t, int8x8_t, int8x8x2_t,
+            int8x8x3_t, int8x8x4_t, int8x16_t, int8x16x2_t, int8x16x3_t, int8x16x4_t, int16x4_t,
+            int16x8_t, int32x2_t, int32x4_t, int64x1_t, int64x2_t, poly8x8_t, poly8x8x2_t, poly8x8x3_t,
+            poly8x8x4_t, poly8x16_t, poly8x16x2_t, poly8x16x3_t, poly8x16x4_t, poly16x4_t, poly16x8_t,
+            poly64x1_t, poly64x2_t, uint8x8_t, uint8x8x2_t, uint8x8x3_t, uint8x8x4_t, uint8x16_t,
+            uint8x16x2_t, uint8x16x3_t, uint8x16x4_t, uint16x4_t, uint16x8_t, uint32x2_t, uint32x4_t,
+            uint64x1_t, uint64x2_t
+        );
+        <span class="macro">simd_arch_mod!</span>(
+            <span class="attr">#[cfg(all(feature = <span class="string">&quot;simd-nightly&quot;</span>, target_arch = <span class="string">&quot;arm&quot;</span>))]
+            </span>arm, arm, int8x4_t, uint8x4_t
+        );
+    };
 }
 
 <span class="doccomment">/// Safely transmutes a value of one type to a value of another type of the same
@@ -9276,6 +9374,7 @@
 </span><span class="kw">unsafe impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; ByteSliceMut <span class="kw">for </span>RefMut&lt;<span class="lifetime">&#39;a</span>, [u8]&gt; {}
 
 <span class="attr">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+#[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">&quot;alloc&quot;</span>)))]
 </span><span class="kw">mod </span>alloc_support {
     <span class="kw">use </span>alloc::vec::Vec;
 
@@ -9493,7 +9592,6 @@
 }
 
 <span class="attr">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
-#[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">&quot;alloc&quot;</span>)))]
 #[doc(inline)]
 </span><span class="kw">pub use </span>alloc_support::<span class="kw-2">*</span>;
 
@@ -11196,6 +11294,18 @@
         <span class="comment">// Implements none of the ZC traits.
         </span><span class="kw">struct </span>NotZerocopy;
 
+        <span class="attr">#[rustfmt::skip]
+        </span><span class="kw">type </span>FnManyArgs = <span class="kw">fn</span>(
+            NotZerocopy, u8, u8, u8, u8, u8, u8, u8, u8, u8, u8, u8,
+        ) -&gt; (NotZerocopy, NotZerocopy);
+
+        <span class="comment">// Allowed, because we&#39;re not actually using this type for FFI.
+        </span><span class="attr">#[allow(improper_ctypes_definitions)]
+        #[rustfmt::skip]
+        </span><span class="kw">type </span>ECFnManyArgs = <span class="kw">extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn</span>(
+            NotZerocopy, u8, u8, u8, u8, u8, u8, u8, u8, u8, u8, u8,
+        ) -&gt; (NotZerocopy, NotZerocopy);
+
         <span class="attr">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
         </span><span class="macro">assert_impls!</span>(<span class="prelude-ty">Option</span>&lt;Box&lt;UnsafeCell&lt;NotZerocopy&gt;&gt;&gt;: KnownLayout, FromZeroes, !FromBytes, !AsBytes, !Unaligned);
         <span class="macro">assert_impls!</span>(<span class="prelude-ty">Option</span>&lt;Box&lt;[UnsafeCell&lt;NotZerocopy&gt;]&gt;&gt;: KnownLayout, !FromZeroes, !FromBytes, !AsBytes, !Unaligned);
@@ -11205,6 +11315,10 @@
         <span class="macro">assert_impls!</span>(<span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span><span class="kw-2">mut </span>[UnsafeCell&lt;NotZerocopy&gt;]&gt;: KnownLayout, !FromZeroes, !FromBytes, !AsBytes, !Unaligned);
         <span class="macro">assert_impls!</span>(<span class="prelude-ty">Option</span>&lt;NonNull&lt;UnsafeCell&lt;NotZerocopy&gt;&gt;&gt;: KnownLayout, FromZeroes, !FromBytes, !AsBytes, !Unaligned);
         <span class="macro">assert_impls!</span>(<span class="prelude-ty">Option</span>&lt;NonNull&lt;[UnsafeCell&lt;NotZerocopy&gt;]&gt;&gt;: KnownLayout, !FromZeroes, !FromBytes, !AsBytes, !Unaligned);
+        <span class="macro">assert_impls!</span>(<span class="prelude-ty">Option</span>&lt;<span class="kw">fn</span>()&gt;: KnownLayout, FromZeroes, !FromBytes, !AsBytes, !Unaligned);
+        <span class="macro">assert_impls!</span>(<span class="prelude-ty">Option</span>&lt;FnManyArgs&gt;: KnownLayout, FromZeroes, !FromBytes, !AsBytes, !Unaligned);
+        <span class="macro">assert_impls!</span>(<span class="prelude-ty">Option</span>&lt;<span class="kw">extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn</span>()&gt;: KnownLayout, FromZeroes, !FromBytes, !AsBytes, !Unaligned);
+        <span class="macro">assert_impls!</span>(<span class="prelude-ty">Option</span>&lt;ECFnManyArgs&gt;: KnownLayout, FromZeroes, !FromBytes, !AsBytes, !Unaligned);
 
         <span class="macro">assert_impls!</span>(PhantomData&lt;NotZerocopy&gt;: KnownLayout, FromZeroes, FromBytes, AsBytes, Unaligned);
         <span class="macro">assert_impls!</span>(PhantomData&lt;[u8]&gt;: KnownLayout, FromZeroes, FromBytes, AsBytes, Unaligned);
