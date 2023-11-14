@@ -19,7 +19,7 @@ def assert_assignment(assignment, left = None, right = None):
         assert_operand(assignment.right, right)
 
 def assert_call(call, func = None, arguments = None):
-    """ Test the call for correct type, name, and arguments. """
+    """ Test the call for correct type, function, and arguments. """
     assert isinstance(call, Call)
     if func:
         assert_identifier(call.func, func)
@@ -33,29 +33,15 @@ def assert_expression(expression, op = None, operands = None):
     if op:
         assert expression.op == op
     if operands:
-        print("utils.assert_expression");
-        print(f"expression = {expression}")
-        print(f"operands = {operands}")
         assert len(expression.operands) == len(operands)
         for i, operand in enumerate(expression.operands):
             assert_operand(operand, operands[i])
 
-def assert_identifier(var, name = None):
+def assert_identifier(node, name = None):
     """ Test the Var for correct type and name. """
-    assert isinstance(var, Var)
+    assert isinstance(node, Var)
     if name:
-        assert_name(var.val, name)
-
-
-def assert_list(nodes, values = None):
-    print("utils.assert_list");
-    print(f"nodes = {nodes}")
-    print(f"values = {values}")
-    if values:
-        assert isinstance(nodes, List)
-        assert len(nodes) == len(values)
-        for i, node in enumerate(nodes):
-            assert_operand(node, values[i])
+        assert_name(node.val, name)
 
 def assert_name(node, name = None):
     """ Test the node for correct type and name """
@@ -67,7 +53,8 @@ def assert_operand(operand, value = None):
     """ Test a Var or LiteralValue operand for correct type and value. """
     if value:
         if isinstance(operand, List):
-            assert_list(operand, value)
+            for i, element in enumerate(operand):
+                assert_operand(element, value[i])
         elif isinstance(operand, Var):
             assert_identifier(operand, name = value)
         elif isinstance(operand, LiteralValue):
