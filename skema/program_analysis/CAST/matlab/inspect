@@ -10,8 +10,8 @@ from skema.program_analysis.tree_sitter_parsers.build_parsers import (
 )
 from skema.program_analysis.CAST.matlab.matlab_to_cast import MatlabToCast
 from typing import List
-#KEY_FILTER = ["source_refs"]
-KEY_FILTER = []
+KEY_FILTER = ["source_refs"]
+#KEY_FILTER = []
 
 # This script will inspect a matlab source file and print the source,
 # Tree-sitter syntax tree, and CAST tree depending on input args.
@@ -86,11 +86,19 @@ def run(args):
         offset = ' '*args.offset
         source = path.read_text().strip()
         show_file(args)
-        if args.source or args.all:
+
+        # display everything if no flags selected
+        if not args.source and not args.tree and not args.cast:
             show_source(args, source)
-        if args.tree or args.all:
             show_tree(args, source)
-        if args.cast or args.all:
+            show_cast(args)
+
+        # otherwise show per selection
+        if args.source:
+            show_source(args, source)
+        if args.tree:
+            show_tree(args, source)
+        if args.cast:
             show_cast(args)
     else:
         print(f"File not found: {path.name}")
@@ -108,8 +116,6 @@ if __name__ == "__main__":
         help="Display the CAST representation ")
     parser.add_argument('--source', '-s', action="store_true",
         help="Display the file source")
-    parser.add_argument('--all', '-a', action="store_true",
-        help="Display everything")
     args = parser.parse_args()
     run(args)
 
