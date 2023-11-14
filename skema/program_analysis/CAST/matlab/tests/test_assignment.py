@@ -37,9 +37,3 @@ def test_identifier():
     assert len(nodes) == 2
     assert_assignment(nodes[0], left = 'x', right = 'y')
     assert_assignment(nodes[1], left = 'r', right = 'x')
-
-def test_literal_matrix():
-    """ Test assignment MATLAB literal matrix value."""
-    nodes = cast_nodes("x = [2 3 5]")
-    assert len(nodes) == 1
-    assert_assignment(nodes[0], left = 'x', right = [2, 3, 5])

@@ -14,7 +14,6 @@ def no_test_function():
         function both = add_them(x, y)
             both = x + y
     end
-         = false
     """
 
     nodes = cast_nodes(source)
@@ -27,29 +26,7 @@ def no_test_function():
 def test_function_call():
     """ Test function call """
 
-    source = 'x = subplot(3, 5, 7)'
-
-    """
-    SYNTAX TREE:
-    assignment
-      identifier
-      =
-      function_call
-        identifier
-        (
-        arguments
-          number
-          ,
-          number
-          ,
-          number
-        )
-    ;
-    """
-    nodes = cast_nodes(source)
+    nodes = cast_nodes("x = subplot(3, 5, 7)")
     assert len(nodes) == 1
-
     assert_assignment(nodes[0], left='x')
-    assert_call(nodes[0].right, func = 'subplot', arguments = ['3', '5', '7'])
-
-
+    assert_call(nodes[0].right, func = 'subplot', arguments = [3, 5, 7])

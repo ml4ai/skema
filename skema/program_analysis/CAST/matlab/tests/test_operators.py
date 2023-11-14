@@ -104,5 +104,5 @@ def test_unary_operator():
     # Left assignment operand is the variable
     assert_identifier(nodes[0].left, name = "x")
     # right assignment operand is a unary operator
-    assert_expression(nodes[0].right, op = "-", operands = ["6"])
+    assert_expression(nodes[0].right, op = "-", operands = [6])
 
