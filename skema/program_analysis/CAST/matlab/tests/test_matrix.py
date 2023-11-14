@@ -1,0 +1,25 @@
+from skema.program_analysis.CAST.matlab.tests.utils import (
+    assert_assignment,
+    assert_identifier,
+    cast_nodes
+)
+
+# Test CAST from assignment
+
+def test_matrix_1_dimension_integer():
+    """ Test assignment 1 dimensional matrix value."""
+    nodes = cast_nodes("x = [1 2 3]")
+    assert len(nodes) == 1
+    assert_assignment(nodes[0], left = 'x', right = [1, 2, 3])
+
+def test_matrix_1_dimension_identifier():
+    """ Test assignment 1 dimensional matrix value."""
+    nodes = cast_nodes("x = [a b c]")
+    assert len(nodes) == 1
+    assert_assignment(nodes[0], left = 'x', right = ['a', 'b', 'c'])
+
+def test_matrix_2_dimension():
+    """ Test assignment 2 dimensional matrix value."""
+    nodes = cast_nodes("x = [[a b] [c d]]")
+    assert len(nodes) == 1
+    assert_assignment(nodes[0], left = 'x', right = [['a', 'b'], ['c', 'd']])

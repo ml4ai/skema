@@ -459,9 +459,9 @@ class MatlabToCast(object):
             )
 
         elif literal_type == "matrix":
-            def get_values(values, ret) -> List:
+            def get_values(values, ret)-> List:
                 for child in get_keyword_children(values):
-                    if child.type in ['row', 'matrix']:
+                    if child.type == "row": 
                         ret.append(get_values(child, []))
                     else:
                         ret.append(self.visit(child))
