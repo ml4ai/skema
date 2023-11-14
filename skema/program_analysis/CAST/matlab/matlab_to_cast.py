@@ -79,7 +79,9 @@ class MatlabToCast(object):
 
     def visit(self, node):
         """Switch execution based on node type"""
-        if node.type == "assignment":
+        if node == None:
+            return None
+        elif node.type == "assignment":
             return self.visit_assignment(node)
         elif node.type == "command":
             return self.visit_command(node)
