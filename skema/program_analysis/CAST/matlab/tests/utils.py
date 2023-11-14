@@ -13,6 +13,7 @@ from skema.program_analysis.CAST2FN.model.cast import (
 def assert_assignment(assignment, left = None, right = None):
     """ Test an Assignment for correct type and operands. """
     assert isinstance(assignment, Assignment)
+    assert not assignment.source_refs == None
     if left:
         assert_operand(assignment.left, left)
     if right:
@@ -21,6 +22,7 @@ def assert_assignment(assignment, left = None, right = None):
 def assert_call(call, func = None, arguments = None):
     """ Test the call for correct type, function, and arguments. """
     assert isinstance(call, Call)
+    assert not call.source_refs == None
     if func:
         assert_identifier(call.func, func)
     if arguments:
@@ -30,6 +32,7 @@ def assert_call(call, func = None, arguments = None):
 def assert_expression(expression, op = None, operands = None):
     """ Test an Operator for correct type, operation, and operands. """
     assert isinstance(expression, Operator)
+    assert not expression.source_refs == None
     if op:
         assert expression.op == op
     if operands:
@@ -40,12 +43,14 @@ def assert_expression(expression, op = None, operands = None):
 def assert_identifier(node, name = None):
     """ Test the Var for correct type and name. """
     assert isinstance(node, Var)
+    assert not node.source_refs == None
     if name:
         assert_name(node.val, name)
 
 def assert_name(node, name = None):
     """ Test the node for correct type and name """
     assert isinstance(node, Name)
+    assert not node.source_refs == None
     if name:
         assert(node.name == name)
             
