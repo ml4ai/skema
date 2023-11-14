@@ -4,6 +4,7 @@ from skema.program_analysis.CAST2FN.model.cast import (
     Assignment,
     Call,
     LiteralValue,
+    Loop,
     Operator,
     Module,
     Name,
@@ -46,6 +47,19 @@ def assert_identifier(node, name = None):
     assert not node.source_refs == None
     if name:
         assert_name(node.val, name)
+
+def assert_loop(loop, pre = None, expr = None, body = None, post = None):
+    """ Test the Loop for correct type and fields. """
+    assert isinstance(loop, Loop)
+    assert not loop.source_refs == None
+    if pre:
+        assert_operand(loop.pre, pre)
+    if expr:
+        assert_operand(loop.expr, expr)
+    if body:
+        assert_operand(loop.body, body)
+    if post:
+        assert_operand(loop.post, post)
 
 def assert_name(node, name = None):
     """ Test the node for correct type and name """
