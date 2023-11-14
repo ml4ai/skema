@@ -67,7 +67,7 @@ def assert_operand(operand, value = None):
         else:
             assert operand == value
 
-# you should expect a single CAST object with a list of nodes, which are modules
+# we curently produce a CAST object with a single Module in the nodes list.
 def cast_nodes(source):
     """ Return the CAST nodes from the first Module of MatlabToCast output """
     # there should only be one CAST object in the cast output list
