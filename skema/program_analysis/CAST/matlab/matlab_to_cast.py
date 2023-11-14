@@ -30,7 +30,6 @@ from skema.program_analysis.CAST2FN.model.cast import (
 
 from skema.program_analysis.CAST.matlab.variable_context import VariableContext
 from skema.program_analysis.CAST.matlab.node_helper import (
-    get_all,
     get_children_by_types,
     get_control_children,
     get_first_child_by_type,
@@ -555,7 +554,13 @@ class MatlabToCast(object):
     def visit_switch_statement(self, node):
         """ return a conditional statement based on the switch statement """
         # node types used for case comparison
-        case_node_types = ["number", "string", "boolean","identifier"]
+        case_node_types = [
+            "boolean",
+            "identifier",
+            "number",
+            "string",
+            "unary_operator"
+        ]
         
         def get_node_value(ast_node):
             """ return the CAST node value or var name """
@@ -580,7 +585,7 @@ class MatlabToCast(object):
             cell_node = get_first_child_by_type(case_node, "cell")
             # multiple case arguments
             if (cell_node):
-                nodes = get_all(cell_node, case_node_types)
+                nodes = get_children_by_types(cell_node, case_node_types)
                 operand = LiteralValue(
                     value_type="List",
                     value = [self.visit(node) for node in nodes],

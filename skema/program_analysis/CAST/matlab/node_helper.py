@@ -59,16 +59,6 @@ def get_children_by_types(node: Node, types: List):
     """Takes in a node and a list of types as inputs and returns all children matching those types. Otherwise, return an empty list"""
     return [child for child in node.children if child.type in types]
 
-def get_all(node, types):
-    """ return all nodes with type in types from the entire node tree """
-    def search(node, types, ret):
-        if node.type in types:
-            ret += [node]
-        for child in node.children:
-            search(child, types, ret)
-        return ret
-    return search(node, types, [])
-
 def get_control_children(node: Node):
     """ return node children with control character types """
     return get_children_by_types(node, CONTROL_CHARACTERS)
