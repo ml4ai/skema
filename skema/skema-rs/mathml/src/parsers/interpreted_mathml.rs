@@ -30,7 +30,7 @@ pub fn operator(input: Span) -> IResult<Operator> {
     let (s, op) = ws(delimited(
         stag!("mo"),
         alt((
-            add, subtract, multiply, equals, lparen, rparen, mean, grad, dot,
+            add, subtract, multiply, equals, lparen, mean, grad, dot,
         )),
         etag!("mo"),
     ))(input)?;
@@ -211,18 +211,15 @@ pub fn ci_unknown(input: Span) -> IResult<Ci> {
 }
 
 pub fn first_order_with_func_in_parenthesis(input: Span) -> IResult<(Derivative, Mrow)> {
-    let (s, _) = tuple((stag!("mfrac"), alt((d, partial))))(input)?;
+    let (s, _) = pair(stag!("mfrac"), alt((d, partial)))(input)?;
     let (s, with_respect_to) = delimited(
         tuple((stag!("mrow"), alt((d, partial)))),
         mi,
         pair(etag!("mrow"), etag!("mfrac")),
     )(s)?;
-    println!("with_respect_to = {:?}",with_respect_to);
-
-    let (s, func) = delimited(tuple((stag!("mo"), tag("("), etag!("mo"))),
-                              many0(math_expression),
-                              tuple((stag!("mo"), tag(")"), etag!("mo"))))(s)?;
-    println!("func={:?}", func);
+    let (s, func) = ws(delimited(tuple((stag!("mo"), lparen, etag!("mo"))),
+                              map(many0(math_expression), |x| Mrow(x)),
+                              tuple((stag!("mo"), rparen, etag!("mo")))))(s)?;
     let result =
         Derivative::new(
             1,
@@ -233,10 +230,10 @@ pub fn first_order_with_func_in_parenthesis(input: Span) -> IResult<(Derivative,
                 None,
             ),
     );
-    println!("result={:?}", result);
+
     Ok((
         s,
-        (result, Mrow(func))
+        (result, func)
     ))
 }
 
