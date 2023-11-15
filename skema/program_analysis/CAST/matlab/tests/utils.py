@@ -2,6 +2,7 @@ from skema.program_analysis.CAST.matlab.matlab_to_cast import MatlabToCast
 from typing import List
 from skema.program_analysis.CAST2FN.model.cast import (
     Assignment,
+    AstNode,
     Call,
     LiteralValue,
     Loop,
@@ -20,12 +21,21 @@ def assert_assignment(assignment, left = None, right = None):
     if right:
         assert_operand(assignment.right, right)
 
-def assert_call(call, func = None, arguments = None):
+def assert_command(call, command_name = None, command_argument = None):
+    """ Test the call for correct type, function, and arguments. """
+    assert isinstance(call, Call)
+    assert not call.source_refs == None
+    if command_name:
+        assert_name(call.func, command_name)
+    if command_argument:
+        assert_name(call.arguments[0], command_argument)
+
+def assert_call(call, func: AstNode = None, arguments: List[AstNode] = []):
     """ Test the call for correct type, function, and arguments. """
     assert isinstance(call, Call)
     assert not call.source_refs == None
     if func:
-        assert_identifier(call.func, func)
+        assert_name(call.func, func)
     if arguments:
         for i, argument in enumerate(call.arguments):
             assert_operand(argument, arguments[i])

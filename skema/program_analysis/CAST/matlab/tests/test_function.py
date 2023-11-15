@@ -7,7 +7,7 @@ from skema.program_analysis.CAST.matlab.tests.utils import (
 
 # Test CAST from functions
 
-def no_test_function():
+def test_function_definition():
     """ Test function """
 
     source = """
@@ -17,16 +17,13 @@ def no_test_function():
     """
 
     nodes = cast_nodes(source)
-    assert len(nodes) == 2
+    assert len(nodes) == 1
 
-    # identifier
-    assert_assignment(nodes[0], left = 'x', right = 'y')
-    assert_assignment(nodes[1], left = 'r', right = 'x')
 
 def test_function_call():
     """ Test function call """
 
-    nodes = cast_nodes("x = subplot(3, 5, 7)")
+    nodes = cast_nodes("z = both(3, 5)")
     assert len(nodes) == 1
-    assert_assignment(nodes[0], left='x')
-    assert_call(nodes[0].right, func = 'subplot', arguments = [3, 5, 7])
+    assert_assignment(nodes[0], left='z')
+    assert_call(nodes[0].right, func = "both", arguments = [3, 5])
