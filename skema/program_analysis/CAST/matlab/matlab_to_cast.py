@@ -84,13 +84,14 @@ class MatlabToCast(object):
         elif node.type == "assignment":
             return self.visit_assignment(node)
         elif node.type == "command":
-            return self.visit_command(node)
+            return self.visit_call_command(node)
         elif node.type == "function_call":
-            return self.visit_function_call(node)
+            return self.visit_call_function(node)
         elif node.type == "function_definition":
             return self.visit_function_def(node)
-        elif node.type == "identifier":
-            return self.visit_identifier(node)
+        elif node.type in [
+            "identifier"
+        ]:return self.visit_identifier(node)
         elif node.type == "if_statement":
             return self.visit_if_statement(node)
         elif node.type in [
@@ -107,8 +108,11 @@ class MatlabToCast(object):
         ]: return self.visit_loop(node)
         elif node.type == "source_file":    # used?
             return self.visit_module(node)
-        elif node.type == "name":
-            return self.visit_name(node)
+        elif node.type in [
+            "command_name",
+            "command_argument",
+            "name"
+        ]:  return self.visit_name(node)
         elif node.type in [
             "binary_operator",
             "comparison_operator",
@@ -134,10 +138,9 @@ class MatlabToCast(object):
             source_refs=[self.node_helper.get_source_ref(node)],
         )
 
-    def visit_command(self, node):
+    def visit_call_command(self, node):
         """ Translate the Tree-sitter command node """
-        command_name = get_first_child_by_type(node, "command_name")
-        command_argument = get_first_child_by_type(node, "command_argument")
+        command_name, command_argument = get_keyword_children(node)
         return Call(
             func = self.visit(command_name),
             source_language = "matlab",
@@ -146,15 +149,15 @@ class MatlabToCast(object):
             source_refs=[self.node_helper.get_source_ref(node)]
         )
 
-    def visit_function_call(self, node):
+    def visit_call_function(self, node):
         """ Translate Tree-sitter function call node """
-        args_parent = get_first_child_by_type(node, "arguments")
-        args_children = [c for c in get_keyword_children(args_parent)]
+        arguments = [self.visit(child) for child in 
+            get_keyword_children(get_first_child_by_type(node, "arguments"))]
         return Call(
-            func = self.visit(get_first_child_by_type(node, "identifier")),
+            func = self.visit_name(node),
             source_language = "matlab",
             source_language_version = MATLAB_VERSION,
-            arguments = [self.visit(c) for c in args_children],
+            arguments = arguments,
             source_refs=[self.node_helper.get_source_ref(node)]
         )
 
@@ -328,16 +331,13 @@ class MatlabToCast(object):
             get_control_children(node)[0]
         )  # The operator will be the first control character
 
-        operands = []
-        for operand in get_keyword_children(node):
-            operands.append(self.visit(operand))
-
         return Operator(
             source_language="matlab",
             interpreter=None,
             version=None,
             op=op,
-            operands=operands,
+            operands=[self.visit(operand) for operand in
+                get_keyword_children(node)],
             source_refs=[self.node_helper.get_source_ref(node)],
         )
 
@@ -395,24 +395,25 @@ class MatlabToCast(object):
             cell_node = get_first_child_by_type(case_node, "cell")
             # multiple case arguments
             if (cell_node):
-                nodes = get_children_by_types(cell_node, case_node_types)
                 operand = LiteralValue(
                     value_type="List",
-                    value = [self.visit(node) for node in nodes],
+                    value = [self.visit(node) for node in 
+                        get_children_by_types(cell_node, case_node_types)],
                     source_code_data_type=["matlab", MATLAB_VERSION, "unknown"],
                     source_refs=[self.node_helper.get_source_ref(cell_node)]
                 )
                 return get_operator("in", [identifier, operand], source_refs)
             # single case argument
-            nodes = get_children_by_types(case_node, case_node_types)
-            operand = [self.visit(node) for node in nodes][0]
+            operand = [self.visit(node) for node in 
+                get_children_by_types(case_node, case_node_types)][0]
             return get_operator("==", [identifier, operand], source_refs)
 
         def get_case_body(case_node):
             """ return the instruction block for the case """
             block = get_first_child_by_type(case_node, "block")
             if block:
-                return [self.visit(c) for c in get_keyword_children(block)]
+                return [self.visit(child) for child in 
+                    get_keyword_children(block)]
             return None
             
         def get_model_if(case_node, identifier):
@@ -438,7 +439,8 @@ class MatlabToCast(object):
             block = get_first_child_by_type(otherwise_clause, "block")
             if block:
                 last = model_ifs[len(model_ifs)-1]
-                last.orelse = [self.visit(c) for c in get_keyword_children(block)]
+                last.orelse = [self.visit(child) for child in
+                    get_keyword_children(block)]
         return model_ifs[0]
 
     # this is not in the Waterloo model but will no doubt be encountered.
