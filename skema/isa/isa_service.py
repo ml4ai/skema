@@ -21,7 +21,9 @@ def ping():
 
 
 @app.put("/align-eqns", summary="Align two MathML equations")
-async def align_eqns(file1: str, file2: str) -> ISA_Result:
+async def align_eqns(
+    file1: str, file2: str, mention_json1: str = "", mention_json2: str = ""
+) -> ISA_Result:
     """
     Endpoint for align two MathML equations.
     """
@@ -34,7 +36,7 @@ async def align_eqns(file1: str, file2: str) -> ISA_Result:
         aligned_indices2,
         union_graph,
         perfectly_matched_indices1,
-    ) = align_mathml_eqs(file1, file2)
+    ) = align_mathml_eqs(file1, file2, mention_json1, mention_json2)
     ir = ISA_Result()
     ir.matching_ratio = matching_ratio
     ir.union_graph = union_graph.to_string()

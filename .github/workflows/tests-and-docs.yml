@@ -20,6 +20,18 @@ jobs:
         #     python-version: '3.8'
         #   - os: windows-latest
         #     python-version: '3.6'
+    services:
+      graphdb:
+        image: "memgraph/memgraph-platform"
+        ports:
+          - "7687:7687"
+          - "3000:3000"
+          - "7444:7444"
+        volumes:
+          - mg_lib:/var/lib/memgraph
+          - mg_log:/var/log/memgraph
+          - mg_etc:/etc/memgraph
+
     steps:
     # Checkout code
     - name: Checkout code
@@ -105,11 +117,27 @@ jobs:
       run: |
         pytest
 
+    - name: "Code2fn model coverage reports"
+      run: python skema/program_analysis/model_coverage_report/model_coverage_report.py $GITHUB_WORKSPACE/docs/coverage/code2fn_coverage/ all
+
     - name: "Unit tests for Rust components"
       working-directory: ./skema/skema-rs
       run: |
         cargo test --verbose --all
-
+   
+    - name: Free disk space (aggressively)
+      # https://github.com/jlumbroso/free-disk-space
+      uses: jlumbroso/free-disk-space@v1.3.0
+      with:
+        android: true
+        dotnet: true
+        haskell: true
+        large-packages: true
+        docker-images: true
+        swap-storage: true
+        # NOTE: this might remove things we actually need.
+        tool-cache: true
+        
     # docs (other)
     - name: "Create documentation (other)"
       run: |

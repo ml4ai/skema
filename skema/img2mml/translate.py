@@ -9,10 +9,11 @@ from skema.img2mml.models.encoders.cnn_encoder import CNN_Encoder
 from skema.img2mml.models.encoders.xfmer_encoder import Transformer_Encoder
 from skema.img2mml.models.decoders.xfmer_decoder import Transformer_Decoder
 import io
-from typing import List
+from typing import List, Union
 import logging
 import re
 from skema.img2mml.models.image2mml_xfmer import Image2MathML_Xfmer
+from xml.etree import ElementTree as ET
 
 # Set logging level to INFO
 logging.basicConfig(level=logging.INFO)
@@ -206,6 +207,80 @@ def define_model(
     return model
 
 
+def process_mtext(xml_string: str) -> str:
+    """
+    Process the input MathML string by merging consecutive <mi> elements and replacing specific <mrow> structures.
+
+    Args:
+        xml_string (str): The input MathML string.
+
+    Returns:
+        str: The modified MathML string.
+    """
+    root = ET.fromstring(xml_string)
+
+    def merge_mi_elements(elements):
+        """
+        Merge consecutive <mi> elements into an <mtext> element.
+
+        Args:
+            elements (list): List of consecutive <mi> elements.
+
+        Returns:
+            Element: The merged <mtext> element.
+        """
+        merged_text = "".join([elem.text for elem in elements])
+        mtext = ET.Element("mtext")
+        mtext.text = merged_text
+        return mtext
+
+    # Replace specific <mrow> structures with <mtext>
+    for mrow in root.findall(".//mrow"):
+        mi_count = sum(1 for child in mrow if child.tag == "mi")
+        non_mi_count = sum(1 for child in mrow if child.tag != "mi")
+
+        if mi_count >= 3 and non_mi_count == 0:
+            mi_elements = [child for child in mrow if child.tag == "mi"]
+            mtext = merge_mi_elements(mi_elements)
+            mrow.clear()
+            mrow.tag = "to_be_removed"
+            mrow.append(mtext)
+
+    mi_count = 0
+    consecutive_mi_elements = []
+    new_children = []
+
+    # Merge consecutive <mi> elements
+    for child in root:
+        if child.tag == "mi":
+            mi_count += 1
+            consecutive_mi_elements.append(child)
+        else:
+            if mi_count >= 5:
+                mtext = merge_mi_elements(consecutive_mi_elements)
+                new_children.append(mtext)
+            else:
+                new_children.extend(consecutive_mi_elements)
+            mi_count = 0
+            consecutive_mi_elements = []
+            new_children.append(child)
+
+    if mi_count >= 5:
+        mtext = merge_mi_elements(consecutive_mi_elements)
+        new_children.append(mtext)
+    else:
+        new_children.extend(consecutive_mi_elements)
+
+    root.clear()
+    root.extend(new_children)
+
+    modified_xml_string = ET.tostring(root, encoding="unicode")
+    modified_xml_string = modified_xml_string.replace("<to_be_removed>", "")
+    modified_xml_string = modified_xml_string.replace("</to_be_removed>", "")
+
+    return modified_xml_string
+
+
 def add_semicolon_to_unicode(string: str) -> str:
     """
     Checks if the string contains Unicode starting with '&#x' and adds a semicolon ';' after each occurrence if missing.
@@ -287,27 +362,9 @@ def render_mml(
             pred.append(vocab_itos[str(p)])
 
         pred_seq = " ".join(pred[1:-1])
-        return add_semicolon_to_unicode(remove_spaces_between_tags(pred_seq))
-
-
-# def render_mml(
-#     model: Image2MathML_Xfmer,
-#     vocab_itos: dict,
-#     vocab_stoi: dict,
-#     imagetensor: torch.Tensor,
-#     device: torch.device,
-# ) -> str:
-#     """
-#     Render MathML for an input image using the provided model.
-#
-#     Args:
-#         model (Image2MathML_Xfmer): The image-to-MathML model.
-#         vocab_itos (dict): The vocabulary lookup dictionary (index to symbol).
-#         vocab_stoi (dict): The vocabulary lookup dictionary (symbol to index).
-#         imagetensor (torch.Tensor): The input image as a tensor.
-#         device (torch.device): The device (GPU or CPU) to be used for computation.
-#
-#     Returns:
-#         str: The generated MathML string.
-#     """
-#     return evaluate(model, vocab_itos, vocab_stoi, imagetensor, device)
+        try:
+            return process_mtext(
+                add_semicolon_to_unicode(remove_spaces_between_tags(pred_seq))
+            )
+        except:
+            return add_semicolon_to_unicode(remove_spaces_between_tags(pred_seq))

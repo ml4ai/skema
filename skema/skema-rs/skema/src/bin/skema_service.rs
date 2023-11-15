@@ -63,6 +63,7 @@ async fn main() -> std::io::Result<()> {
             skema::services::mathml::get_content_mathml,
             skema::services::mathml::get_regnet,
             skema::services::mathml::get_amr,
+            skema::services::mathml::get_decapodes,
             gromet::get_model_ids,
             gromet::post_model,
             gromet::delete_model,
@@ -70,7 +71,6 @@ async fn main() -> std::io::Result<()> {
             gromet::get_named_opis,
             gromet::get_named_ports,
             gromet::get_subgraph,
-            gromet::get_model_PN,
             gromet::get_model_RN,
             gromet::model2PN,
             gromet::model2RN,
@@ -79,6 +79,8 @@ async fn main() -> std::io::Result<()> {
         ),
         components(
             schemas(
+                mathml::parsers::decapodes_serialization::DecapodesCollection,
+                mathml::parsers::decapodes_serialization::WiringDiagram,
                 mathml::acset::AMRmathml,
                 mathml::acset::RegNet,
                 mathml::acset::ModelRegNet,
@@ -144,7 +146,7 @@ async fn main() -> std::io::Result<()> {
             .service(skema::services::mathml::get_acset)
             .service(skema::services::mathml::get_regnet)
             .service(skema::services::mathml::get_amr)
-            .service(gromet::get_model_PN)
+            .service(skema::services::mathml::get_decapodes)
             .service(gromet::get_model_RN)
             .service(gromet::model2PN)
             .service(gromet::model2RN)

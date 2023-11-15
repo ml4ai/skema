@@ -939,7 +939,6 @@ class ToGrometPass:
         """
         func_name, _ = retrieve_name_id_pair(node)
 
-        # print(f"Checking {func_name}...")
         if is_primitive(func_name, "Python"):
             # print(f"{func_name} is a primitive GroMEt function")
             return (FunctionType.ABSTRACT, None, None, None, None, None)
@@ -974,13 +973,43 @@ class ToGrometPass:
                     # print(f"Module {func_name} has imported function {attr_node.attr.name}")
                     # Check if it's gromet_fn_module/native/other
                     # TODO: import_version/import_source
+                    if isinstance(node.func.attr, AnnCastName):
+                        name = node.func.attr.name
+                        if name in self.import_collection[func_name][1]:
+                            return (
+                                FunctionType.IMPORTED_METHOD,
+                                ImportType.NATIVE,
+                                None,
+                                None,
+                                "Python",
+                                PYTHON_VERSION
+                            )
+                        else:
+                            return (
+                                FunctionType.IMPORTED,
+                                ImportType.OTHER,
+                                None,
+                                None,
+                                "Python",
+                                PYTHON_VERSION
+                            )
+                    else:
+                        return (
+                            FunctionType.IMPORTED,
+                            ImportType.OTHER,
+                            None,
+                            None,
+                            "Python",
+                            PYTHON_VERSION
+                        )
+                else:
                     return (
-                        FunctionType.IMPORTED,
+                        FunctionType.IMPORTED_METHOD,
                         ImportType.OTHER,
                         None,
                         None,
                         "Python",
-                        PYTHON_VERSION,
+                        PYTHON_VERSION
                     )
             else:
                 return (
@@ -1027,7 +1056,6 @@ class ToGrometPass:
                 )
             # Attribute of a class we don't have access to
             else:
-                # print(self.import_collection)
                 return (
                     FunctionType.IMPORTED_METHOD,
                     ImportType.OTHER,
@@ -1819,22 +1847,29 @@ class ToGrometPass:
         if isinstance(node.value, AnnCastName):
             name = node.value.name
             if name in self.import_collection:
-                func_info = self.determine_func_type(node)
-                metadata = self.create_source_code_reference(ref)
-                parent_gromet_fn.bf = insert_gromet_object(
-                    parent_gromet_fn.bf,
-                    GrometBoxFunction(
-                        name=f"{name}.{node.attr.name}",
-                        function_type=func_info[0],
-                        import_type=func_info[1],
-                        import_version=func_info[2],
-                        import_source=func_info[3],
-                        source_language=func_info[4],
-                        source_language_version=func_info[5],
-                        body=None,
-                        metadata=self.insert_metadata(metadata)
-                    ),
-                )
+                if isinstance(node.attr, AnnCastName):
+                    if not node.attr.name in self.import_collection[name][1]:
+                        self.import_collection[name][1].append(node.attr.name)
+                        self.add_import_symbol_to_env(
+                            node.attr.name, parent_gromet_fn, parent_cast_node
+                        )
+                else:
+                    func_info = self.determine_func_type(node)
+                    metadata = self.create_source_code_reference(ref)
+                    parent_gromet_fn.bf = insert_gromet_object(
+                        parent_gromet_fn.bf,
+                        GrometBoxFunction(
+                            name=f"{name}.{node.attr.name}",
+                            function_type=func_info[0],
+                            import_type=func_info[1],
+                            import_version=func_info[2],
+                            import_source=func_info[3],
+                            source_language=func_info[4],
+                            source_language_version=func_info[5],
+                            body=None,
+                            metadata=self.insert_metadata(metadata)
+                        ),
+                    )
             elif isinstance(node.attr, AnnCastName):
                 if node.value.name == "self":
                     # Compose the case of "self.x" where x is an attribute
@@ -2515,11 +2550,12 @@ class ToGrometPass:
         elif isinstance(parent_cast_node, AnnCastOperator):
             from_operator = True
 
+        if isinstance(node.func, AnnCastAttribute):
+            self.visit(node.func, parent_gromet_fn, parent_cast_node)
+
         in_module = self.func_in_module(func_name)
         func_info = self.determine_func_type(node)
 
-        if isinstance(node.func, AnnCastAttribute):
-            self.visit(node.func, parent_gromet_fn, parent_cast_node)
 
 
         # Have to find the index of the function we're trying to call

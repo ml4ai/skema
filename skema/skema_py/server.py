@@ -16,6 +16,7 @@ import skema.skema_py.acsets
 import skema.skema_py.petris
 
 import skema.program_analysis.comment_extractor.server as comment_service
+from skema.utils.fold import del_nulls
 from skema.gromet.fn.gromet_fn_module_collection import GrometFNModuleCollection
 from skema.gromet.metadata.debug import Debug
 from skema.program_analysis.multi_file_ingester import process_file_system
@@ -340,6 +341,88 @@ async def fn_given_filepaths_zip(zip_file: UploadFile = File()):
     )
 
     return await system_to_gromet(system)
+
+
+@router.post(
+    "/gromet-object-count",
+    summary=("Endpoint for counting the number of boxes, wires, and ports in a Gromet object."),
+)
+async def gromet_object_count(gromet_object: Dict):
+    """
+    Endpoint for counting the number of boxes, wires, and ports in a Gromet object.
+    ### Python example
+    ```
+    import requests
+
+    system = {
+        "files": ["example1.py"],
+        "blobs": [
+            "greet = lambda: print('howdy!')"
+        ],
+    }
+    response = client.post("/code2fn/fn-given-filepaths", json=system)
+    gromet_collection = response.json()
+    response = client.post("/code2fn/gromet-object-count", json=gromet_collection)
+    gromet_object_count = response.json()
+    """
+
+    gromet_keys = {
+        "b": 0,
+        "bf": 0,
+        "opi": 0,
+        "opo": 0,
+        "pil": 0,
+        "pol": 0,
+        "wlopi": 0,
+        "wll": 0,
+        "wlf": 0,
+        "wlc": 0,
+        "wlopo": 0,
+        "pof": 0,
+        "pif": 0,
+        "wfopi": 0,
+        "wfl": 0,
+        "wff": 0,
+        "wfc": 0,
+        "wfopo": 0,
+        "pic": 0,
+        "poc": 0,
+        "wcopi": 0,
+        "wcl": 0,
+        "wcf": 0,
+        "wcc": 0,
+        "wcopo": 0,
+    }
+
+    def recurse(gromet_object: Dict):
+        """Recursive walking function for Gromet"""
+        for key, value in gromet_object.items():
+            if key in gromet_keys:
+                gromet_keys[key] += len(value)
+            elif isinstance(value, List):
+                for element in value:
+                    if isinstance(element, Dict):
+                        recurse(element)
+            elif isinstance(value, Dict):
+                recurse(value)
+
+    # Its likely that the Gromet passed to this endpoint will not have None values removed.
+    # So, we need to remove None values ahead of time.
+    del_nulls(gromet_object)
+    recurse(gromet_object)
+
+    # We also will aggregate the boxes, wires, and ports to better support MORAE usecases
+    gromet_keys["boxes"] = sum(
+        [val for key, val in gromet_keys.items() if key.startswith("b")]
+    )
+    gromet_keys["wires"] = sum(
+        [val for key, val in gromet_keys.items() if key.startswith("w")]
+    )
+    gromet_keys["ports"] = sum(
+        [val for key, val in gromet_keys.items() if key.startswith(("p", "o"))]
+    )
+
+    return gromet_keys
 
 
 @router.post(
