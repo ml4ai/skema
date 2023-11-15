@@ -218,13 +218,18 @@ pub fn comma(input: Span) -> IResult<Operator> {
     Ok((s, op))
 }
 
+pub fn period(input: Span) -> IResult<Operator> {
+    let (s, op) = value(Operator::Period, ws(tag(".")))(input)?;
+    Ok((s, op))
+}
+
 pub fn mean(input: Span) -> IResult<Operator> {
     let (s, op) = value(Operator::Mean, ws(tag("¯")))(input)?;
     Ok((s, op))
 }
 
 pub fn grad(input: Span) -> IResult<Operator> {
-    let (s, op) = value(Operator::Grad, alt((ws(tag("𝛁")), ws(tag("&#x2207;")))))(input)?;
+    let (s, op) = value(Operator::Grad, alt((ws(tag("∇")), ws(tag("&#x2207;")))))(input)?;
     Ok((s, op))
 }
 
@@ -250,6 +255,7 @@ pub fn operator(input: Span) -> IResult<Operator> {
         multiply,
         grad,
         dot,
+        period,
         operator_other,
     ))(input)?;
     Ok((s, op))

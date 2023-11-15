@@ -67,26 +67,48 @@ pub fn get_line_span(
 
 #[allow(non_snake_case)]
 pub fn module_id2mathml_MET_ast(module_id: i64, host: &str) -> Vec<FirstOrderODE> {
+    let mut core_dynamics_ast = Vec::<FirstOrderODE>::new();
+    let mut _metadata_map_ast = HashMap::new();
     let graph = subgraph2petgraph(module_id, host); // makes petgraph of graph
 
     let core_id = find_pn_dynamics(module_id, host); // gives back list of function nodes that might contain the dynamics
-    let _line_span = get_line_span(core_id[0], graph); // get's the line span of function id
+    //let _line_span = get_line_span(core_id[0], graph); // get's the line span of function id
 
     //println!("\n{:?}", line_span);
+    if core_id.len() == 0 {
+        let deriv = Ci {
+            r#type: Some(Function),
+            content: Box::new(MathExpression::Mi(Mi("temp".to_string()))),
+            func_of: None,
+        };
+        let operate = Operator::Subtract;
+        let rhs_arg = MathExpressionTree::Atom(MathExpression::Mi(Mi("temp".to_string())));
+        let rhs = MathExpressionTree::Cons(operate, [rhs_arg].to_vec());
+        let fo_eq = FirstOrderODE {
+            lhs_var: deriv.clone(),
+            func_of: [deriv.clone()].to_vec(), // just place holders for construction
+            with_respect_to: deriv.clone(),    // just place holders for construction
+            rhs: rhs,
+        };
+        core_dynamics_ast.push(fo_eq);
+    } else {
+        (core_dynamics_ast, _metadata_map_ast) =
+        subgrapg2_core_dyn_MET_ast(core_id[0], host).unwrap();
+    }
 
     //println!("function_core_id: {:?}", core_id[0].clone());
     //println!("module_id: {:?}\n", module_id.clone());
     // 4.5 now to check if of those expressions, if they are arithmetric in nature
 
     // 5. pass id to subgrapg2_core_dyn to get core dynamics
-    let (core_dynamics_ast, _metadata_map_ast) =
-        subgrapg2_core_dyn_MET_ast(core_id[0], host).unwrap();
+    //let (core_dynamics_ast, _metadata_map_ast) =
+        //subgrapg2_core_dyn_MET_ast(core_id[0], host).unwrap();
 
     core_dynamics_ast
 }
 
 pub fn module_id2mathml_ast(module_id: i64, host: &str) -> Vec<Math> {
-    let graph = subgraph2petgraph(module_id, host); // makes petgraph of graph
+    let _graph = subgraph2petgraph(module_id, host); // makes petgraph of graph
 
     let core_id = find_pn_dynamics(module_id, host); // gives back list of function nodes that might contain the dynamics
 
@@ -204,7 +226,6 @@ pub fn subgrapg2_core_dyn_MET_ast(
     for node in graph.node_indices() {
         if graph[node].labels == ["Expression"] {
             expression_nodes.push(node);
-            // println!("Expression Nodes: {:?}", graph[node].clone().id);
         }
     }
 
@@ -238,13 +259,16 @@ pub fn subgrapg2_core_dyn_MET_ast(
 
     for expr in trimmed_expressions_wiring.clone() {
         let mut root_node = Vec::<NodeIndex>::new();
+        let mut primitive_counter = 0;
         for node_index in expr.clone().node_indices() {
             if expr[node_index].labels == ["Opo"] {
                 root_node.push(node_index);
+            } else if expr[node_index].labels == ["Primitive"] {
+                primitive_counter += 1;
             }
         }
-        if root_node.len() >= 2 {
-            // println!("More than one Opo! Skipping Expression!");
+        if root_node.len() >= 2 || primitive_counter == 0 {
+            //println!("More than one Opo! Skipping Expression!");
         } else {
             core_dynamics.push(tree_2_MET_ast(expr.clone(), root_node[0]).unwrap());
         }
@@ -433,9 +457,15 @@ pub fn get_args_MET(
 
     // fix order of args
     let mut ordered_args = args.clone();
+    //println!("ordered_args: {:?}", ordered_args.clone());
+    //println!("ordered_args[0]: {:?}", ordered_args[0]);
+    //println!("ordered_args.len(): {:?}", ordered_args.len());
+    //println!("arg_order: {:?}", arg_order.clone());
     for (i, ind) in arg_order.iter().enumerate() {
         // the ind'th element of order_args is the ith element of the unordered args
-        let _temp = std::mem::replace(&mut ordered_args[*ind as usize], args[i].clone());
+        if ordered_args.len() > *ind as usize {
+            let _temp = std::mem::replace(&mut ordered_args[*ind as usize], args[i].clone());
+        }
     }
 
     ordered_args

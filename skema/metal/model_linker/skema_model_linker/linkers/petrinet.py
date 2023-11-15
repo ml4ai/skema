@@ -11,19 +11,18 @@ class PetriNetLinker(AMRLinker):
     def _generate_linking_sources(self, elements: Iterable[JsonNode]) -> Dict[str, List[Any]]:
         ret = defaultdict(list)
         for name, val, ix in elements:
-            if name == "states":
-                key = val['name'].strip().lower()
+            if (name == "states") or (name == "parameters" and 'name' in val):
+                key = val['name'].strip()
+                lower_case_key = key.lower()
 
                 if "description" in val:
-                    ret[f"{val['name'].strip()}: {val['description']}"] = val
+                    ret[f"{key}: {val['description']}"] = val
                 else:
-                    if key in heuristics:
-                        descs = heuristics[key]
+                    if lower_case_key in heuristics:
+                        descs = heuristics[lower_case_key]
                         for desc in descs:
-                            ret[f"{val['name'].strip()}: {desc}"] = val
-                    ret[val['name'].strip()] = val
-            elif name == "parameters" and 'id' in val:
-                ret[val['id'].strip()] = val
+                            ret[f"{key}: {desc}"] = val
+                ret[key] = val
             # elif name == "transitions":
             #     if "description" in val:
             #         ret[f"{val['id'].strip()}: {val['description']}"] = val

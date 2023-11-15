@@ -2,16 +2,18 @@
 """
 End-to-end skema workflows
 """
-
-
-from typing import List
-
+import copy
 import requests
+from zipfile import ZipFile
+from io import BytesIO
+from typing import List
+from pathlib import Path
+
 from fastapi import APIRouter, File, UploadFile
 from starlette.responses import JSONResponse
 
 from skema.img2mml import eqn2mml
-from skema.rest import schema, utils
+from skema.rest import schema, utils, llm_proxy
 from skema.rest.proxies import SKEMA_RS_ADDESS
 from skema.skema_py import server as code2fn
 
@@ -47,7 +49,9 @@ async def equations_to_amr(data: schema.EquationImagesToAMR):
     r = requests.post(f"{url}/workflows/images/base64/equations-to-amr", json={"images": images_b64, "model": "regnet"})
     r.json()
     """
-    mml: List[str] = [utils.clean_mml(eqn2mml.b64_image_to_mml(img)) for img in data.images]
+    mml: List[str] = [
+        utils.clean_mml(eqn2mml.b64_image_to_mml(img)) for img in data.images
+    ]
     payload = {"mathml": mml, "model": data.model}
     # FIXME: why is this a PUT?
     res = requests.put(f"{SKEMA_RS_ADDESS}/mathml/amr", json=payload)
@@ -55,7 +59,7 @@ async def equations_to_amr(data: schema.EquationImagesToAMR):
         return JSONResponse(
             status_code=400,
             content={
-                "error": f"MORAE PUT /mathml/amr failed to process payload",
+                "error": f"MORAE PUT /mathml/amr failed to process payload with error {res.text}",
                 "payload": payload,
             },
         )
@@ -116,6 +120,7 @@ async def equations_to_amr(data: schema.MmlToAMR):
 @router.post("/code/snippets-to-pn-amr", summary="Code snippets → PetriNet AMR")
 async def code_snippets_to_pn_amr(system: code2fn.System):
     gromet = await code2fn.fn_given_filepaths(system)
+    gromet, logs = utils.fn_preprocessor(gromet)
     res = requests.put(f"{SKEMA_RS_ADDESS}/models/PN", json=gromet)
     if res.status_code != 200:
         return JSONResponse(
@@ -153,6 +158,7 @@ async def code_snippets_to_rn_amr(system: code2fn.System):
 )
 async def repo_to_pn_amr(zip_file: UploadFile = File()):
     gromet = await code2fn.fn_given_filepaths_zip(zip_file)
+    gromet, logs = utils.fn_preprocessor(gromet)
     res = requests.put(f"{SKEMA_RS_ADDESS}/models/PN", json=gromet)
     if res.status_code != 200:
         return JSONResponse(
@@ -163,6 +169,53 @@ async def repo_to_pn_amr(zip_file: UploadFile = File()):
             },
         )
     return res.json()
+
+
+# zip archive -> linespan -> snippet -> petrinet amr
+@router.post(
+    "/code/llm-assisted-codebase-to-pn-amr",
+    summary="Code repo (zip archive) → PetriNet AMR",
+)
+async def llm_assisted_codebase_to_pn_amr(zip_file: UploadFile = File()):
+    """Codebase->AMR workflow using an llm to extract the dynamics line span.
+    ### Python example
+    ```
+    import requests
+
+    files = {
+        'zip_archive': open('model_source.zip')
+    }
+    response = requests.post("localhost:8000/workflows/code/llm-assisted-codebase-to-pn-amr", files=files)
+    amr = response.json()
+    """
+    # NOTE: Opening the zip file mutates the object and prevents it from being reopened.
+    # Since llm_proxy also needs to open the zip file, we should send a copy instead.
+    linespan = await llm_proxy.get_lines_of_model(copy.deepcopy(zip_file))
+    lines = linespan.block[0].split("-")
+    line_begin = max(
+        int(lines[0][1:]) - 1, 0
+    )  # Normalizing the 1-index response from llm_proxy
+    line_end = int(lines[1][1:])
+
+    # Currently the llm_proxy only works on the first file in a zip_archive.
+    # So we are required to do the same when slicing the source code using its output.
+    with ZipFile(BytesIO(zip_file.file.read()), "r") as zip:
+        files = [zip.namelist()[0]]
+        blobs = [zip.open(files[0]).read().decode("utf-8")]
+
+    # The source code is a string, so to slice using the line spans, we must first convert it to a list.
+    # Then we can convert it back to a string using .join
+    blobs[0] = "".join(blobs[0].splitlines(keepends=True)[line_begin:line_end])
+
+    amr = await code_snippets_to_pn_amr(
+        code2fn.System(
+            files=files,
+            blobs=blobs,
+            root_name=Path(zip_file.filename).stem,
+            system_name=Path(zip_file.filename).stem,
+        )
+    )
+    return amr
 
 
 """ TODO: The regnet endpoints are currently outdated

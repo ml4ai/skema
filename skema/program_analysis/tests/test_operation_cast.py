@@ -56,7 +56,7 @@ def test_binop1():
     assert binop_node.left.val.name == "x"
 
     assert isinstance(binop_node.right, Operator)
-    assert binop_node.right.op == "+"
+    assert binop_node.right.op == "ast.Add"
 
     assert isinstance(binop_node.right.operands[0], LiteralValue)
     assert binop_node.right.operands[0].value == '2'
@@ -90,11 +90,11 @@ def test_binop2():
     assert binop_node.left.val.id == 1
 
     assert isinstance(binop_node.right, Operator)
-    assert binop_node.right.op == "+"
+    assert binop_node.right.op == "ast.Add"
 
-    assert isinstance(binop_node.right.operands[0], Var)
-    assert binop_node.right.operands[0].val.name == 'x'
-    assert binop_node.right.operands[0].val.id == 0
+    assert isinstance(binop_node.right.operands[0], Name)
+    assert binop_node.right.operands[0].name == 'x'
+    assert binop_node.right.operands[0].id == 0
 
     assert isinstance(binop_node.right.operands[1], LiteralValue)
     assert binop_node.right.operands[1].value == '3'
@@ -136,37 +136,37 @@ def test_binop3():
     assert binop_node.left.val.id == 2
 
     assert isinstance(binop_node.right, Operator)
-    assert binop_node.right.op == "-"
+    assert binop_node.right.op == "ast.Sub"
 
     binop_node_1 = binop_node.right.operands[0]
-    assert binop_node_1.op == "+"   
+    assert binop_node_1.op == "ast.Add"   
 
-    assert isinstance(binop_node_1.operands[0], Var)
-    assert binop_node_1.operands[0].val.name == "x"
-    assert binop_node_1.operands[0].val.id == 0
+    assert isinstance(binop_node_1.operands[0], Name)
+    assert binop_node_1.operands[0].name == "x"
+    assert binop_node_1.operands[0].id == 0
 
-    assert isinstance(binop_node_1.operands[1], Var)
-    assert binop_node_1.operands[1].val.name == "y"
-    assert binop_node_1.operands[1].val.id == 1
+    assert isinstance(binop_node_1.operands[1], Name)
+    assert binop_node_1.operands[1].name == "y"
+    assert binop_node_1.operands[1].id == 1
 
     binop_node_2 = binop_node.right.operands[1]
-    assert binop_node_2.op == "/"   
+    assert binop_node_2.op == "ast.Div"   
     assert isinstance(binop_node_2.operands[0], Operator)
 
-    assert isinstance(binop_node_2.operands[1], Var)
-    assert binop_node_2.operands[1].val.name == "x"
-    assert binop_node_2.operands[1].val.id == 0
+    assert isinstance(binop_node_2.operands[1], Name)
+    assert binop_node_2.operands[1].name == "x"
+    assert binop_node_2.operands[1].id == 0
 
     binop_node_3 = binop_node_2.operands[0]
-    assert binop_node_3.op == "*"
+    assert binop_node_3.op == "ast.Mult"
 
-    assert isinstance(binop_node_3.operands[0], Var)
-    assert binop_node_3.operands[0].val.name == "y"
-    assert binop_node_3.operands[0].val.id == 1
+    assert isinstance(binop_node_3.operands[0], Name)
+    assert binop_node_3.operands[0].name == "y"
+    assert binop_node_3.operands[0].id == 1
 
-    assert isinstance(binop_node_3.operands[1], Var)
-    assert binop_node_3.operands[1].val.name == "x"
-    assert binop_node_3.operands[1].val.id == 0
+    assert isinstance(binop_node_3.operands[1], Name)
+    assert binop_node_3.operands[1].name == "x"
+    assert binop_node_3.operands[1].id == 0
 
 def test_unary1():
     exp_cast = generate_cast(unary1())
@@ -180,7 +180,7 @@ def test_unary1():
     assert unary_node.left.val.id == 0
 
     assert isinstance(unary_node.right, Operator)
-    assert unary_node.right.op == "-"
+    assert unary_node.right.op == "ast.USub"
 
     assert isinstance(unary_node.right.operands[0], LiteralValue)
     assert unary_node.right.operands[0].value == '1'
@@ -210,8 +210,8 @@ def test_unary2():
     assert unary_node.left.val.id == 1
 
     assert isinstance(unary_node.right, Operator)
-    assert unary_node.right.op == "-"
+    assert unary_node.right.op == "ast.USub"
 
-    assert isinstance(unary_node.right.operands[0], Var)
-    assert unary_node.right.operands[0].val.name == 'x'
-    assert unary_node.right.operands[0].val.id == 0
+    assert isinstance(unary_node.right.operands[0], Name)
+    assert unary_node.right.operands[0].name == 'x'
+    assert unary_node.right.operands[0].id == 0

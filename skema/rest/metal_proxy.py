@@ -8,7 +8,8 @@ from pydantic import Json
 
 from skema.metal.model_linker.skema_model_linker.linkers import PetriNetLinker, RegNetLinker
 from skema.metal.model_linker.skema_model_linker.link_amr import replace_xml_codepoints
-from skema.rest.schema import TextReadingAnnotationsOutput
+from skema.rest.schema import TextReadingAnnotationsOutput, TextReadingEvaluationResults, AMRLinkingEvaluationResults
+from skema.rest.utils import compute_amr_linking_evaluation
 
 router = APIRouter()
 
@@ -46,15 +47,19 @@ def link_amr(amr_type: str,
 
     # Load the extractions, that come out of the TR Proxy endpoint
     raw_extractions = json.load(text_extractions_file.file)
-    text_extractions = [AttributeCollection.from_json(o['data']) for o in raw_extractions['outputs']]
+    if 'outputs' in raw_extractions:
+        text_extractions = [AttributeCollection.from_json(o['data']) for o in raw_extractions['outputs']]
+        # Merge all the attribute collections
+        extractions = AttributeCollection(
+            attributes=list(
+                it.chain.from_iterable(o.attributes for o in text_extractions)
+            )
+        )
+    else:
+        extractions = AttributeCollection.from_json(raw_extractions)
     # text_extractions = TextReadingAnnotationsOutput(**json.load(text_extractions_file.file))
 
-    # Merge all the attribute collections
-    extractions = AttributeCollection(
-        attributes=list(
-            it.chain.from_iterable(o.attributes for o in text_extractions)
-        )
-    )
+
 
     # Link the AMR
     if amr_type == "petrinet":
@@ -88,6 +93,27 @@ def link_amr(amr_type: str,
 def healthcheck():
     return 200
 
+@router.post("/eval", response_model=AMRLinkingEvaluationResults, status_code=200)
+def quantitative_eval(linked_amr_file: UploadFile, gt_linked_amr_file: UploadFile) -> AMRLinkingEvaluationResults:
+    """
+     # Gets performance metrics of a linked amr with variable extractions against a ground truth linked amr.
+
+    ## Example:
+    ```python
+    files = {
+        "linked_amr": ("linked_amr_file.json", open("linked_amr_file.json", 'rb')),
+        "gt_linked_amr_file": ("gt_linked_amr_file.json", open("gt_linked_amr_file.json", 'rb')),
+    }
+
+    response = requests.post(f"{endpoint}/metal/eval", files=files)
+    ```
+
+    """
+
+    linked_amr = json.load(linked_amr_file.file)
+    gt_linked_amr_file = json.load(gt_linked_amr_file.file)
+
+    return compute_amr_linking_evaluation(linked_amr, gt_linked_amr_file)
 
 app = FastAPI()
 app.include_router(router)

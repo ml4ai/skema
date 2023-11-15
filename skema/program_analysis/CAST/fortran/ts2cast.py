@@ -30,6 +30,7 @@ from skema.program_analysis.CAST2FN.model.cast import (
 from skema.program_analysis.CAST.fortran.variable_context import VariableContext
 from skema.program_analysis.CAST.fortran.node_helper import (
     NodeHelper,
+    remove_comments,
     get_children_by_types,
     get_first_child_by_type,
     get_control_children,
@@ -58,16 +59,19 @@ class TS2CAST(object):
             )
         )
         self.tree = parser.parse(bytes(self.source, "utf8"))
-
+        self.root_node = remove_comments(self.tree.root_node)
+        #print(self.root_node.sexp())
         # Walking data
         self.variable_context = VariableContext()
         self.node_helper = NodeHelper(self.source, self.source_file_name)
 
         # Start visiting
         self.out_cast = self.generate_cast()
+        #print(self.out_cast[0].to_json_str())
+        
     def generate_cast(self) -> List[CAST]:
         '''Interface for generating CAST.'''
-        modules = self.run(self.tree.root_node)
+        modules = self.run(self.root_node)
         return [CAST([generate_dummy_source_refs(module)], "Fortran") for module in modules]
         
     def run(self, root) -> List[Module]:
@@ -77,7 +81,6 @@ class TS2CAST(object):
         # 2. A program body
         # 3. Everything else (defined functions)
         modules = []
-
         contexts = get_children_by_types(root, ["module", "program"])
         for context in contexts:
             modules.append(self.visit(context))
@@ -100,6 +103,7 @@ class TS2CAST(object):
                 source_refs=[self.node_helper.get_source_ref(root)]
             ))
     
+
         return modules
 
     def visit(self, node: Node):
@@ -293,12 +297,15 @@ class TS2CAST(object):
 
     def visit_function_call(self, node):
         # Pull relevent nodes
-        if node.type == "subroutine_call":
-            function_node = node.children[1]
-            arguments_node = node.children[2]
-        elif node.type == "call_expression":
-            function_node = node.children[0]
-            arguments_node = node.children[1]
+        # A subroutine and function won't neccessarily have an arguments node.
+        # So we should be careful about trying to access it.
+        function_node = get_children_by_types(node, ["unary_expression", "subroutine", "identifier",])[0]
+        arguments_node = get_first_child_by_type(node, "argument_list")
+        
+        # If this is a unary expression (+foo()) the identifier will be nested.
+        # TODO: If this is a non '+' unary expression, how do we add it to the CAST?
+        if function_node.type == "unary_expression":
+            function_node = get_first_child_by_type(node, "identifier", recurse=True)
 
         function_identifier = self.node_helper.get_identifier(function_node)
 
@@ -319,10 +326,11 @@ class TS2CAST(object):
 
         # Add arguments to arguments list
         arguments = []
-        for argument in arguments_node.children:
-            child_cast = self.visit(argument)
-            if child_cast:
-                arguments.append(child_cast)
+        if arguments_node:
+            for argument in arguments_node.children:
+                child_cast = self.visit(argument)
+                if child_cast:
+                    arguments.append(child_cast)
 
         return Call(
             func=func,
@@ -432,7 +440,9 @@ class TS2CAST(object):
         if while_statement_node:
             return self._visit_while(node)
 
-        # The first body node will be the node after the loop_control_expression
+        # If there is a loop control expression, the first body node will be the node after the loop_control_expression
+        # It is valid Fortran to have a single itteration do loop as well.
+        # TODO: Add support for single itteration do-loop
         # NOTE: This code is for the creation of the main body. The do loop will still add some additional nodes at the end of this body.
         body = []
         body_start_index = 1 + get_first_child_index(node, "loop_control_expression")
@@ -575,6 +585,15 @@ class TS2CAST(object):
         else:
             body_stop_index = else_index
 
+        # Single line if conditions don't have a 'then' or 'end if' clause. 
+        # So the starting index for the body can either be 2 or 3.
+        then_index = get_first_child_index(node, "then")
+        if then_index:
+            body_start_index = then_index+1
+        else:
+            body_start_index = 2
+            body_stop_index = len(node.children)
+
         prev = None
         orelse = None
         # If there are else_if statements, they need
@@ -586,7 +605,7 @@ class TS2CAST(object):
                     continue
                 elseif_expr = self.visit(condition.children[2])
                 elseif_body = [self.visit(child) for child in condition.children[4:]]
-
+                
                 prev.orelse = ModelIf(elseif_expr, elseif_body, [])
                 prev = prev.orelse
 
@@ -599,17 +618,25 @@ class TS2CAST(object):
             else:
                 orelse = else_body
 
+        # TODO: This orelse logic has gotten a little complex, we might want to refactor this.
         if isinstance(orelse, ModelIf):
             orelse = orelse.orelse
+        if orelse:
+            if isinstance(orelse, ModelIf):
+                orelse = [orelse]
 
         return ModelIf(
             expr=self.visit(node.children[1]),
-            body=[self.visit(child) for child in node.children[3:body_stop_index]],
-            orelse=[orelse] if orelse else [],
+            body=[self.visit(child) for child in node.children[body_start_index:body_stop_index]],
+            orelse=orelse if orelse else [],
         )
 
     def visit_logical_expression(self, node):
         """Visitior for logical expression (i.e. true and false) which is used in compound conditional"""
+        # If this is a .not. operator, we need to pass it on to the math_expression visitor
+        if len(node.children) < 3:
+            return self.visit_math_expression(node)
+        
         literal_value_false = LiteralValue("Boolean", False)
         literal_value_true = LiteralValue("Boolean", True)
         
@@ -733,7 +760,6 @@ class TS2CAST(object):
         op = self.node_helper.get_identifier(
             get_control_children(node)[0]
         )  # The operator will be the first control character
-
         operands = []
         for operand in get_non_control_children(node):
             operands.append(self.visit(operand))

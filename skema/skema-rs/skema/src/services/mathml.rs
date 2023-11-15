@@ -7,6 +7,8 @@ use mathml::{
     expression::{preprocess_content, wrap_math},
     parsers::first_order_ode::{first_order_ode, FirstOrderODE},
 };
+use mathml::parsers::math_expression_tree::MathExpressionTree;
+use mathml::parsers::decapodes_serialization::{to_wiring_diagram, WiringDiagram, DecapodesCollection};
 use petgraph::dot::{Config, Dot};
 use utoipa;
 
@@ -73,6 +75,30 @@ pub async fn get_math_exp_graph(payload: String) -> String {
 pub async fn get_content_mathml(payload: String) -> String {
     let ode = payload.parse::<FirstOrderODE>().unwrap();
     ode.to_cmml()
+}
+
+/// Return a JSON representation of a DecapodeCollection, which should be the foundation of a DecapodeCollection AMR, from
+/// an array of MathML strings.
+#[utoipa::path(
+    request_body = Vec<String>,
+    responses(
+        (
+            status = 200,
+            body = DecapodeCollection
+        )
+    )
+)]
+#[put("/mathml/decapodes")]
+pub async fn get_decapodes(payload: web::Json<Vec<String>>) -> HttpResponse {
+    let met_vec: Vec<MathExpressionTree> = payload.iter().map(|x| x.parse::<MathExpressionTree>().unwrap()).collect();
+    let mut deca_vec = Vec::<WiringDiagram>::new();
+    for term in met_vec.iter() {
+        deca_vec.push(to_wiring_diagram(term));
+    }
+    let decapodes_collection = DecapodesCollection {
+        decapodes: deca_vec.clone()
+    };
+    HttpResponse::Ok().json(web::Json(decapodes_collection))
 }
 
 /// Return a JSON representation of a PetriNet ModelRep constructed from an array of MathML strings.
