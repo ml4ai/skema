@@ -1,7 +1,6 @@
 //! Pratt parsing module to construct S-expressions from presentation MathML.
 //! This is based on the nice tutorial at https://matklad.github.io/2020/04/13/simple-but-powerful-pratt-parsing.html
 
-//use crate::parsers::math_expression_tree::MathExpression::Differential;
 use crate::{
     ast::{
         operator::{Derivative, Operator},
@@ -571,6 +570,7 @@ impl MathExpressionTree {
                         expression.push_str(&format!("\\langle {} \\rangle", rest[0].to_latex()));
                     }
                     _ => {
+                        expression = "".to_string();
                         return "Contain unsupported operators.".to_string();
                     }
                 }
