@@ -34,7 +34,7 @@ class Dynamics(BaseModel):
     "/linespan-given-filepaths-zip",
     summary=(
         "Send a zip file containing a code file,"
-        " get a line span of the dynamics back."
+        " get a line span of the dynamics back. One for each code file."
     ),
 )
 async def get_lines_of_model(zip_file: UploadFile = File()) -> list[Dynamics]:
