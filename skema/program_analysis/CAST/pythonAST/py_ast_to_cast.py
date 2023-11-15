@@ -1916,7 +1916,7 @@ class PyASTToCAST:
         elif node.value is None:
             return [LiteralValue(None, None, source_code_data_type, ref)]
         elif isinstance(node.value, type(...)):
-            return []
+            return [LiteralValue(ScalarType.ELLIPSIS, "...", source_code_data_type, ref)]
         else:
             raise TypeError(f"Type {str(type(node.value))} not supported")
 
@@ -4123,7 +4123,6 @@ class PyASTToCAST:
             AstNode: Depending on what the value of the Index node is,
                      different CAST nodes are returned.
         """
-
         return self.visit(node.value, prev_scope_id_dict, curr_scope_id_dict)
 
     @visit.register
