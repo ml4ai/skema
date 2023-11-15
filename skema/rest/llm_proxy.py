@@ -37,7 +37,7 @@ class Dynamics(BaseModel):
         " get a line span of the dynamics back."
     ),
 )
-async def get_lines_of_model(zip_file: UploadFile = File()) -> Dynamics:
+async def get_lines_of_model(zip_file: UploadFile = File()) -> list[Dynamics]:
     """
     Endpoint for generating a line span containing the dynamics from a zip archive. Currently
     it only expects there to be one python file in the zip. There can be other files, such as a
@@ -57,90 +57,97 @@ async def get_lines_of_model(zip_file: UploadFile = File()) -> Dynamics:
     files=[]
     blobs=[]
     block=[]
+    outputs=[]
+    description=None
     with ZipFile(BytesIO(zip_file.file.read()), "r") as zip:
         for file in zip.namelist():
             file_obj = Path(file)
             if file_obj.suffix in [".py"]:
                 files.append(file)
-                blobs.append(zip.open(file).read())
+                blobs.append(zip.open(file).read().decode("utf-8"))
 
+    # iterate through each file 
+    for f in len(files):
     # read in the code, for the prompt
-    code = blobs[0].decode("utf-8") # needs to be regular string, not byte string
-    file = files[0]
-    # json for the fn construction
-    single_snippet_payload = {
-            "files": [file],
-            "blobs": [code],
-        }
+        code = blobs[f]
+        file = files[f]
+        # json for the fn construction
+        single_snippet_payload = {
+                "files": [file],
+                "blobs": [code],
+            }
 
-    # this is the formatting instructions
-    response_schemas = [
-        ResponseSchema(name="model_function", description="The name of the function that contains the model dynamics")
-    ]
+        # this is the formatting instructions
+        response_schemas = [
+            ResponseSchema(name="model_function", description="The name of the function that contains the model dynamics")
+        ]
 
-    # for structured output parsing, converts schema to langhchain object
-    output_parser = StructuredOutputParser.from_response_schemas(response_schemas)
+        # for structured output parsing, converts schema to langhchain object
+        output_parser = StructuredOutputParser.from_response_schemas(response_schemas)
 
-    # for structured output parsing, makes the instructions to be passed as a variable to prompt template
-    format_instructions = output_parser.get_format_instructions()
+        # for structured output parsing, makes the instructions to be passed as a variable to prompt template
+        format_instructions = output_parser.get_format_instructions()
 
-    # low temp as is not generative
-    temperature = 0.1
+        # low temp as is not generative
+        temperature = 0.0
 
-    # initialize the models
-    openai = ChatOpenAI(
-        temperature=temperature,
-        model_name='gpt-3.5-turbo',
-        openai_api_key=SKEMA_OPENAI_KEY
-    )
+        # initialize the models
+        openai = ChatOpenAI(
+            temperature=temperature,
+            model_name='gpt-3.5-turbo',
+            openai_api_key=SKEMA_OPENAI_KEY
+        )
 
-    # construct the prompts
-    template="You are a assistant that answers questions about code."
-    system_message_prompt = SystemMessagePromptTemplate.from_template(template)
-    human_template="Find the function that contains the model dynamics in {code} \n{format_instructions}"
-    human_message_prompt = HumanMessagePromptTemplate.from_template(human_template)
+        # construct the prompts
+        template="You are a assistant that answers questions about code."
+        system_message_prompt = SystemMessagePromptTemplate.from_template(template)
+        human_template="Find the function that contains the model dynamics in {code} \n{format_instructions}"
+        human_message_prompt = HumanMessagePromptTemplate.from_template(human_template)
 
-    # combining the templates for a chat template
-    chat_prompt = ChatPromptTemplate.from_messages([system_message_prompt, human_message_prompt])
+        # combining the templates for a chat template
+        chat_prompt = ChatPromptTemplate.from_messages([system_message_prompt, human_message_prompt])
 
-    # formatting the prompt with input variables
-    formatted_prompt = chat_prompt.format_prompt(code=code, format_instructions = format_instructions).to_messages()
+        # formatting the prompt with input variables
+        formatted_prompt = chat_prompt.format_prompt(code=code, format_instructions = format_instructions).to_messages()
 
-    # running the model
-    output = openai(formatted_prompt)
+        # running the model
+        output = openai(formatted_prompt)
 
-    # parsing the output
-    try:
-        parsed_output = output_parser.parse(output.content)
+        # parsing the output
+        try:
+            parsed_output = output_parser.parse(output.content)
 
-        function_name = parsed_output['model_function']
+            function_name = parsed_output['model_function']
 
-        # Get the FN from it
-        url = "https://api.askem.lum.ai/code2fn/fn-given-filepaths"
-        response_zip = requests.post(url, json=single_snippet_payload)
+            # Get the FN from it
+            url = "https://api.askem.lum.ai/code2fn/fn-given-filepaths"
+            response_zip = requests.post(url, json=single_snippet_payload)
 
-        # get metadata entry for function
-        for entry in response_zip.json()['modules'][0]['fn_array']:
-            try:
-                if entry['b'][0]['name'][0:len(function_name)] == function_name:
-                    metadata_idx = entry['b'][0]['metadata']
-            except:
-                None
+            # get metadata entry for function
+            for entry in response_zip.json()['modules'][0]['fn_array']:
+                try:
+                    if entry['b'][0]['name'][0:len(function_name)] == function_name:
+                        metadata_idx = entry['b'][0]['metadata']
+                except:
+                    continue
 
-        # get line span using metadata
-        for (i,metadata) in enumerate(response_zip.json()['modules'][0]['metadata_collection']):
-            if i == (metadata_idx - 1):
-                line_begin = metadata[0]['line_begin']
-                line_end =  metadata[0]['line_end']
-    except:
-        print("Failed to parse dynamics")
-        line_begin = 0
-        line_end = 0
+            # get line span using metadata
+            for (i,metadata) in enumerate(response_zip.json()['modules'][0]['metadata_collection']):
+                if i == (metadata_idx - 1):
+                    line_begin = metadata[0]['line_begin']
+                    line_end =  metadata[0]['line_end']
+        except:
+            print("Failed to parse dynamics")
+            description = "Failed to parse dynamics"
+            line_begin = 0
+            line_end = 0
 
-    block.append(f"L{line_begin}-L{line_end}")
+        block.append(f"L{line_begin}-L{line_end}")
 
-    output = Dynamics(name=None, description=None, block=block)
-    return output
+        output = Dynamics(name=file, description=description, block=block)
+        outputs.append(output)
+
+    return outputs
 
 
 app = FastAPI()
