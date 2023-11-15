@@ -5,9 +5,10 @@ from pathlib import Path
 from fastapi import APIRouter, FastAPI
 from pydantic import BaseModel, Field
 
+from skema.rest.proxies import SKEMA_GRAPH_DB_HOST, SKEMA_GRAPH_DB_PORT
 from skema.gromet.execution_engine.execution_engine import ExecutionEngine
-HOST = "localhost"
-PORT = 7687
+HOST = SKEMA_GRAPH_DB_HOST
+PORT = int(SKEMA_GRAPH_DB_PORT)
 
 router = APIRouter()
 
