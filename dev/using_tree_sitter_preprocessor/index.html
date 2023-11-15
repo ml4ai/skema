@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <meta name="author" content="University of Arizona &amp; Lum AI">
+  <link rel="canonical" href="https://ml4ai.github.io/skema/dev/using_tree_sitter_preprocessor/">
+  <link rel="shortcut icon" href="../../img/favicon.ico">
+  <title>Using tree-sitter preprocessor - skema</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
+
+  <link rel="stylesheet" href="../../css/theme.css" />
+  <link rel="stylesheet" href="../../css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+  <link href="../../css/extra.css" rel="stylesheet" />
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Using tree-sitter preprocessor";
+    var mkdocs_page_input_path = "dev/using_tree_sitter_preprocessor.md";
+    var mkdocs_page_url = "/skema/dev/using_tree_sitter_preprocessor/";
+  </script>
+  
+  <script src="../../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href="../.." class="icon icon-home"> skema</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../..">Home</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../software/">Software</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../changes/">Releases</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">About</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../team/">Team</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../license/">License</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../examples/">Examples</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Developing</span></p>
+                <ul class="current">
+                    <li class="toctree-l1"><a class="reference internal" href="../env/">Configuring your development environment</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../eqn2mml/">Configuring <code>img2mml</code></a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../docs/">Building documentation</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../coverage/">Test coverage reports</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../coverage/code2fn_coverage/report.html">Code2fn coverage reports</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../docker/">Building docker images</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../creating-an-incremental-release/">Publishing an incremental release</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../adding_new_model/">Adding a new model</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../adding_new_tree_sitter_frontend/">Adding a new tree-sitter frontend</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../generating_code2fn_model_coverage/">Generating code2fn model coverage reports</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../using_code_ingestion_frontends/">Using code ingestion frontends</a>
+                    </li>
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Using tree-sitter preprocessor</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#command-line-options">Command line options</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#required">Required</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#optional">Optional</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#preprocessing-include-directives">Preprocessing #include directives</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#running-as-library">Running as library</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#running-as-script">Running as script</a>
+    </li>
+    </ul>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">API (Python)</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../api/python/skema/gromet/"><code>skema.gromet</code></a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../api/python/skema/img2mml/"><code>skema.img2mml</code></a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../api/python/skema/isa/"><code>skema.isa</code></a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../api/python/skema/skema_py/"><code>skema.skema_py</code></a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">API (Rust)</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../api/rust/help.html"><code>skema.rust</code></a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">API (Scala)</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="" href="../../api/scala/index.html"><code>skema.scala</code></a>
+                    </li>
+                </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../..">skema</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../..">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>Developing &raquo;</li>
+        
+      
+    
+    <li>Using tree-sitter preprocessor</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        <a href="https://github.com/ml4ai/skema/blob/main/docs/dev/using_tree_sitter_preprocessor.md"
+          class="icon icon-github"> Edit on GitHub</a>
+      
+    </li>
+  </ul>
+  
+  <hr/>
+</div>
+
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="tree-sitter-fortran-preprocessor">tree-sitter Fortran preprocessor<a class="headerlink" href="#tree-sitter-fortran-preprocessor" title="Permanent link"></a></h1>
+<h2 id="command-line-options">Command line options<a class="headerlink" href="#command-line-options" title="Permanent link"></a></h2>
+<h3 id="required">Required<a class="headerlink" href="#required" title="Permanent link"></a></h3>
+<ul>
+<li><strong>source_path (str)</strong> - The path to the Fortran source file that the preprocessor will be run on</li>
+<li><strong>out_path (str)</strong> - The path to the directory where intermediate products will be stored</li>
+</ul>
+<h3 id="optional">Optional<a class="headerlink" href="#optional" title="Permanent link"></a></h3>
+<ul>
+<li><strong>overwrite (bool)</strong> - If True, overwrite the files in the directory specified by out_path</li>
+<li><strong>out_missing_includes (bool)</strong> - If True, output report of missing included files</li>
+<li><strong>out_gcc (bool)</strong> - If True, output intermediate product generated by GCC</li>
+<li><strong>out_unsupported (bool)</strong> - If True, output report of unsupported idioms contained in the source</li>
+<li><strong>out_corrected (bool)</strong> - If True, output the final source that will be sent to tree-sitter.</li>
+<li><strong>out_parse (bool)</strong> - If True, output the tree-sitter parse tree in sexp format</li>
+</ul>
+<h2 id="preprocessing-include-directives">Preprocessing #include directives<a class="headerlink" href="#preprocessing-include-directives" title="Permanent link"></a></h2>
+<p>To handle the include directive, the preprocessor requires a directory containing any additional files that a source file includes.</p>
+<p>This directory should be located in the same directory as the source at source_path and follow the naming structure <em>include_filename</em>.</p>
+<p>For example, in the source file:
+<strong>cons.F</strong></p>
+<pre><code>#include &lt;defs.h&gt;
+</code></pre>
+<p>The directory structure should look like the following:</p>
+<p><strong>TIE_GCM
+&emsp; cons.F 
+&emsp; include_cons
+&emsp;&emsp; defs.h</strong></p>
+<h2 id="running-as-library">Running as library<a class="headerlink" href="#running-as-library" title="Permanent link"></a></h2>
+<pre><code class="language-python">from skema.program_analysis.TS2CAST.preprocessor.preprocess import preprocess
+
+parse_tree = preprocess(&quot;skema/data/TIE_GCM/cons.F&quot;, &quot;skema/data/TIE_GCM/intermediate_products_cons/&quot;, out_parse=True) 
+</code></pre>
+<h2 id="running-as-script">Running as script<a class="headerlink" href="#running-as-script" title="Permanent link"></a></h2>
+<pre><code class="language-bash">python preproces.py skema/data/TIE_GCM/cons.F skema/data/TIE_GCM/intermediate_prodcuts_cons/ --out_parse
+</code></pre>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../../api/python/skema/gromet/" class="btn btn-neutral float-right" title="<code>skema.gromet</code>">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../using_code_ingestion_frontends/" class="btn btn-neutral" title="Using code ingestion frontends"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+      <p>Copyright &copy; 2023 University of Arizona &amp; Lum AI.</p>
+    
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/ml4ai/skema/" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../using_code_ingestion_frontends/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../../api/python/skema/gromet/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '../..';</script>
+    <script src="../../js/theme_extra.js" defer></script>
+    <script src="../../js/theme.js" defer></script>
+      <script src="../../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

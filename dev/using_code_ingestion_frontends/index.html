@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <meta name="author" content="University of Arizona &amp; Lum AI">
+  <link rel="canonical" href="https://ml4ai.github.io/skema/dev/using_code_ingestion_frontends/">
+  <link rel="shortcut icon" href="../../img/favicon.ico">
+  <title>Using code ingestion frontends - skema</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
+
+  <link rel="stylesheet" href="../../css/theme.css" />
+  <link rel="stylesheet" href="../../css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+  <link href="../../css/extra.css" rel="stylesheet" />
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Using code ingestion frontends";
+    var mkdocs_page_input_path = "dev/using_code_ingestion_frontends.md";
+    var mkdocs_page_url = "/skema/dev/using_code_ingestion_frontends/";
+  </script>
+  
+  <script src="../../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href="../.." class="icon icon-home"> skema</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../..">Home</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../software/">Software</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../changes/">Releases</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">About</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../team/">Team</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../license/">License</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../examples/">Examples</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Developing</span></p>
+                <ul class="current">
+                    <li class="toctree-l1"><a class="reference internal" href="../env/">Configuring your development environment</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../eqn2mml/">Configuring <code>img2mml</code></a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../docs/">Building documentation</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../coverage/">Test coverage reports</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../coverage/code2fn_coverage/report.html">Code2fn coverage reports</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../docker/">Building docker images</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../creating-an-incremental-release/">Publishing an incremental release</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../adding_new_model/">Adding a new model</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../adding_new_tree_sitter_frontend/">Adding a new tree-sitter frontend</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../generating_code2fn_model_coverage/">Generating code2fn model coverage reports</a>
+                    </li>
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Using code ingestion frontends</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#command-line-arguments">Command line arguments</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#system_filepathstxt">system_filepaths.txt</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#running-as-script">Running as script</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#running-as-library">Running as library</a>
+    </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../using_tree_sitter_preprocessor/">Using tree-sitter preprocessor</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">API (Python)</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../api/python/skema/gromet/"><code>skema.gromet</code></a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../api/python/skema/img2mml/"><code>skema.img2mml</code></a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../api/python/skema/isa/"><code>skema.isa</code></a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../api/python/skema/skema_py/"><code>skema.skema_py</code></a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">API (Rust)</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../api/rust/help.html"><code>skema.rust</code></a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">API (Scala)</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="" href="../../api/scala/index.html"><code>skema.scala</code></a>
+                    </li>
+                </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../..">skema</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../..">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>Developing &raquo;</li>
+        
+      
+    
+    <li>Using code ingestion frontends</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        <a href="https://github.com/ml4ai/skema/blob/main/docs/dev/using_code_ingestion_frontends.md"
+          class="icon icon-github"> Edit on GitHub</a>
+      
+    </li>
+  </ul>
+  
+  <hr/>
+</div>
+
+          <div role="main">
+            <div class="section">
+              
+                <h2 id="multi_file_ingester">multi_file_ingester<a class="headerlink" href="#multi_file_ingester" title="Permanent link"></a></h2>
+<h3 id="command-line-arguments">Command line arguments<a class="headerlink" href="#command-line-arguments" title="Permanent link"></a></h3>
+<ul>
+<li><strong>sysname (str)</strong> - The name of the system being ingested</li>
+<li><strong>path (str)</strong> - The path to the root of the system</li>
+<li><strong>files (str)</strong> - The path to system_filepaths.txt</li>
+</ul>
+<h3 id="system_filepathstxt">system_filepaths.txt<a class="headerlink" href="#system_filepathstxt" title="Permanent link"></a></h3>
+<p>Processing a multi-file system requires a system_filepaths.txt file describing the structure of the system. Each line represents the path to one file in the system relative to the root directory. For example the system_filepaths.txt file for chime_penn_full would be:</p>
+<pre><code>cli.py
+constants.py
+model/parameters.py
+model/sir.py
+model/validators/base.py
+model/validators/validators.py
+</code></pre>
+<h3 id="running-as-script">Running as script<a class="headerlink" href="#running-as-script" title="Permanent link"></a></h3>
+<pre><code class="language-bash">python multi_file_ingester.py --sysname &quot;CHIME&quot; --path /path/to/root --files /path/to/system_filepaths.txt
+</code></pre>
+<h3 id="running-as-library">Running as library<a class="headerlink" href="#running-as-library" title="Permanent link"></a></h3>
+<pre><code class="language-python">from skema.program_analysis.multi_file_ingester import process_file_system
+gromet_collection = process_file_system(&quot;CHIME&quot;, &quot;data/chime/&quot;, &quot;data/chime/system_filepaths.txt&quot;, write_to_file=True)
+</code></pre>
+<h2 id="single_file_ingester">single_file_ingester<a class="headerlink" href="#single_file_ingester" title="Permanent link"></a></h2>
+<h3 id="command-line-arguments_1">Command line arguments<a class="headerlink" href="#command-line-arguments_1" title="Permanent link"></a></h3>
+<ul>
+<li><strong>path (str)</strong> - The relative or absolute path of the file to process"</li>
+</ul>
+<h3 id="running-as-script_1">Running as script<a class="headerlink" href="#running-as-script_1" title="Permanent link"></a></h3>
+<pre><code class="language-bash">python single_file_ingester.py data/TIEGCM/cpktkm.F
+</code></pre>
+<h3 id="running-as-library_1">Running as library<a class="headerlink" href="#running-as-library_1" title="Permanent link"></a></h3>
+<pre><code class="language-python">from skema.program_analysis.single_file_ingester import process_file
+gromet_collection = process_file(&quot;cpktkm.F&quot;, write_to_file=True)
+</code></pre>
+<h2 id="snippet_file_ingester">snippet_file_ingester<a class="headerlink" href="#snippet_file_ingester" title="Permanent link"></a></h2>
+<h3 id="command-line-arguments_2">Command line arguments<a class="headerlink" href="#command-line-arguments_2" title="Permanent link"></a></h3>
+<ul>
+<li><strong>snippet(str)</strong> - The snippet of Python/Fortran code to process"</li>
+<li><strong>extension(str)</strong> - A file extension representing the language of the code snippet(.f95, .f, .py)"</li>
+</ul>
+<h3 id="running-as-script_2">Running as script<a class="headerlink" href="#running-as-script_2" title="Permanent link"></a></h3>
+<pre><code class="language-bash">python snippet_file_ingester.py &quot;x=2&quot; &quot;.py&quot;
+</code></pre>
+<h3 id="running-as-library_2">Running as library<a class="headerlink" href="#running-as-library_2" title="Permanent link"></a></h3>
+<p>```python
+from skema.program_analysis.snippet_file_ingester import process_snippet
+gromet_collection = process_snippet("x=2", ".py", write_to_file=True)</p>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../using_tree_sitter_preprocessor/" class="btn btn-neutral float-right" title="Using tree-sitter preprocessor">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../generating_code2fn_model_coverage/" class="btn btn-neutral" title="Generating code2fn model coverage reports"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+      <p>Copyright &copy; 2023 University of Arizona &amp; Lum AI.</p>
+    
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/ml4ai/skema/" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../generating_code2fn_model_coverage/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../using_tree_sitter_preprocessor/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '../..';</script>
+    <script src="../../js/theme_extra.js" defer></script>
+    <script src="../../js/theme.js" defer></script>
+      <script src="../../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

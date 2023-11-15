@@ -140,7 +140,7 @@ queue reaches this maximum value, a connection error with the code of
 flow control will not “poll” additional capacity. Once bytes for the
 stream have been written to the connection, the send buffer capacity
 will be freed up again.</p>
-<p>The default is currently ~400MB, but may change.</p>
+<p>The default is currently ~400KB, but may change.</p>
 <h5 id="panics-1"><a href="#panics-1">Panics</a></h5>
 <p>This function panics if <code>max</code> is larger than <code>u32::MAX</code>.</p>
 </div></details><details class="toggle method-toggle" open><summary><section id="method.reset_stream_duration" class="method"><a class="src rightside" href="../../src/h2/server.rs.html#993-996">source</a><h4 class="code-header">pub fn <a href="#method.reset_stream_duration" class="fn">reset_stream_duration</a>(&amp;mut self, dur: <a class="struct" href="https://doc.rust-lang.org/1.73.0/core/time/struct.Duration.html" title="struct core::time::Duration">Duration</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/1.73.0/std/primitive.reference.html">&amp;mut Self</a></h4></section></summary><div class="docblock"><p>Sets the maximum number of concurrent locally reset streams.</p>
