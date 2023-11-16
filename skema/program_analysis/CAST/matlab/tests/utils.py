@@ -13,43 +13,45 @@ from skema.program_analysis.CAST2FN.model.cast import (
     Var
 )
 
-def assert_foo(result, expected = None):
-    """ Test for equality. """
-    if isinstance(result, Assignment):
+def check_result(result, expected = None):
+    """ Test for match with the same datatypes. """
+
+    if isinstance(result, List):
+        assert len(result) == len(expected)
+        for i, _ in enumerate(result):
+            check_result(_, expected[i])
+
+    # structures 
+    elif isinstance(result, Assignment):
         assert isinstance(expected, Assignment)
-        assert_foo(result.left, expected.left)
-        assert_foo(result.right, expected.right)
+        check_result(result.left, expected.left)
+        check_result(result.right, expected.right)
     elif isinstance(result, Operator):
         assert isinstance(expected, Operator)
-        assert_foo(result.op, expected.op)
-        assert_foo(result.operands, expected.operands)
+        check_result(result.op, expected.op)
+        check_result(result.operands, expected.operands)
     elif isinstance(result, Call):
         assert isinstance(expected, Call)
-        assert_foo(result.func, expected.func)
-        assert_foo(result.arguments, expected.arguments)
+        check_result(result.func, expected.func)
+        check_result(result.arguments, expected.arguments)
     elif isinstance(result, ModelIf):
         assert isinstance(expected, ModelIf)
-        assert_foo(result.expr, expected.expr)
-        assert_foo(result.body, expected.body)
-    elif isinstance(result, LiteralValue):
-        assert_foo(result.value, expected)
-    elif isinstance(result, Var):
-        assert_foo(result.val, expected)
-    elif isinstance(result, Name):
-        assert_foo(result.name, expected)
+        check_result(result.expr, expected.expr)
+        check_result(result.body, expected.body)
 
-    elif isinstance(result, List):
-        print("\nassert_foo with List")
-        print(f"result = {result}")
-        print(f"expected = {expected}")
-        print(f"len(result) = {len(result)}")
-        print(f"len(expected) = {len(expected)}")
-        assert len(result) == len(expected)
-        for i, element in enumerate(result):
-            assert_foo(element, expected[i])
+    # values
+    elif isinstance(result, LiteralValue):
+        check_result(result.value, expected)
+    elif isinstance(result, Var):
+        check_result(result.val, expected)
+    elif isinstance(result, Name):
+        check_result(result.name, expected)
+
+    # primitives
     else:
         assert result == expected
 
+    # every CAST node 
     if isinstance(result, AstNode):
         assert not result.source_refs == None
 
