@@ -1,6 +1,5 @@
 from skema.program_analysis.CAST.matlab.tests.utils import (
     assert_assignment,
-    assert_identifier,
     cast_nodes
 )
 
