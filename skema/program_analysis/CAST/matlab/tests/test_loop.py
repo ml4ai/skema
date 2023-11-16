@@ -1,5 +1,5 @@
 from skema.program_analysis.CAST.matlab.tests.utils import (
-    assert_foo,
+    check_result,
     cast_nodes
 )
 
@@ -15,4 +15,4 @@ def no_test_for_loop():
         end
     """
     nodes = cast_nodes(source)
-    assert_foo(nodes[0], Loop())
+    check_result(nodes[0], Loop())

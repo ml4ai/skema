@@ -1,5 +1,5 @@
 from skema.program_analysis.CAST.matlab.tests.utils import (
-    assert_foo,
+    check_result,
     cast_nodes
 )
 from skema.program_analysis.CAST2FN.model.cast import (
@@ -9,7 +9,7 @@ from skema.program_analysis.CAST2FN.model.cast import (
 
 def operator_only_test(node, operator: Operator):
     """ An assignment of 'x = operator' is presumed """
-    assert_foo(
+    check_result(
         node,
         Assignment(
             left = "x", 
