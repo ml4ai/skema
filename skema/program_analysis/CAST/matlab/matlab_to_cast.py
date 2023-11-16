@@ -83,8 +83,10 @@ class MatlabToCast(object):
             return None
         elif node.type == "assignment":
             return self.visit_assignment(node)
-        elif node.type =="cell":
-            return self.visit_cell(node)
+        elif node.type in [
+            "cell",
+            "matrix"
+        ]:   return self.visit_matrix(node)
         elif node.type == "command":
             return self.visit_command(node)
         elif node.type == "function_call":
@@ -98,7 +100,6 @@ class MatlabToCast(object):
             return self.visit_if_statement(node)
         elif node.type in [
             "boolean",
-            "matrix",
             "number",
             "string"
         ]: return self.visit_literal(node)
@@ -138,29 +139,6 @@ class MatlabToCast(object):
             left=self.visit(left),
             right=self.visit(right),
             source_refs=[self.node_helper.get_source_ref(node)],
-        )
-
-    def visit_cell(self, node):
-        """ Translate the Tree-sitter cell node into a List """
-
-        def get_values(values, ret)-> List:
-            for child in get_keyword_children(values):
-                if child.type == "row": 
-                    ret.append(get_values(child, []))
-                else:
-                    ret.append(self.visit(child))
-            return ret;
-
-        cell_values = get_values(node, [])
-        value = []
-        if len(cell_values) > 0:
-            value = cell_values[0]
-
-        return LiteralValue(
-            value_type="List",
-            value = value,
-            source_code_data_type=["matlab", MATLAB_VERSION, "matrix"],
-            source_refs=[literal_source_ref],
         )
 
     def visit_command(self, node):
@@ -287,7 +265,7 @@ class MatlabToCast(object):
             )
 
         elif literal_type == "boolean":
-            # store as string, use Python boolean capitalization.
+            # store as string, use Python Boolean capitalization.
             value = literal_value[0].upper() + literal_value[1:].lower() 
             return LiteralValue(
                 value_type="Boolean",
@@ -296,26 +274,28 @@ class MatlabToCast(object):
                 source_refs=[literal_source_ref],
             )
 
-        elif literal_type == "matrix":
-            def get_values(values, ret)-> List:
-                for child in get_keyword_children(values):
-                    if child.type == "row": 
-                        ret.append(get_values(child, []))
-                    else:
-                        ret.append(self.visit(child))
-                return ret;
+    def visit_matrix(self, node):
+        """ Translate the Tree-sitter cell node into a List """
 
-            matrix_values = get_values(node, [])
-            value = []
-            if len(matrix_values) > 0:
-                value = matrix_values[0]
+        def get_values(values, ret)-> List:
+            for child in get_keyword_children(values):
+                if child.type == "row": 
+                    ret.append(get_values(child, []))
+                else:
+                    ret.append(self.visit(child))
+            return ret;
 
-            return LiteralValue(
-                value_type="List",
-                value = value,
-                source_code_data_type=["matlab", MATLAB_VERSION, "matrix"],
-                source_refs=[literal_source_ref],
-            )
+        values = get_values(node, [])
+        value = []
+        if len(values) > 0:
+            value = values[0]
+
+        return LiteralValue(
+            value_type="List",
+            value = value,
+            source_code_data_type=["matlab", MATLAB_VERSION, "matrix"],
+            source_refs=[self.node_helper.get_source_ref(node)],
+        )
 
     # General loop translator for all MATLAB loop types
     def visit_loop(self, node) -> Loop:
@@ -396,6 +376,7 @@ class MatlabToCast(object):
         case_node_types = [
             "boolean",
             "identifier",
+            "matrix",
             "number",
             "string",
             "unary_operator"
@@ -426,8 +407,7 @@ class MatlabToCast(object):
             if (cell_node):
                 operand = LiteralValue(
                     value_type="List",
-                    value = [self.visit(node) for node in 
-                        get_children_by_types(cell_node, case_node_types)],
+                    value = self.visit(cell_node),
                     source_code_data_type=["matlab", MATLAB_VERSION, "unknown"],
                     source_refs=[self.node_helper.get_source_ref(cell_node)]
                 )
