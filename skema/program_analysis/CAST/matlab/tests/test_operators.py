@@ -1,6 +1,6 @@
 from skema.program_analysis.CAST.matlab.tests.utils import (
     assert_assignment,
-    assert_expression,
+    assert_operator,
     cast_nodes
 )
 from skema.program_analysis.CAST2FN.model.cast import Assignment
@@ -11,7 +11,7 @@ def test_binary_operator():
     # Left assignment operand is the variable
     assert_assignment(nodes[0], left = "z")
     # right assignment operand represents binary operation
-    assert_expression(nodes[0].right, op = "+", operands = ["x", "y"])
+    assert_operator(nodes[0].right, op = "+", operands = ["x", "y"])
 
 def test_boolean_operator():
     """ Test CAST from boolean operator."""
@@ -19,7 +19,7 @@ def test_boolean_operator():
     # Left assignment operand is the variable
     assert_assignment(nodes[0], left = "z")
     # right assignment operand represents binary operation
-    assert_expression(nodes[0].right, op = "&&", operands = ["x", "y"])
+    assert_operator(nodes[0].right, op = "&&", operands = ["x", "y"])
 
 def test_comparison_operator(): 
     """ Test CAST from comparison operator."""
@@ -27,7 +27,7 @@ def test_comparison_operator():
     # Left assignment operand is the variable
     assert_assignment(nodes[0], left = "z")
     # right assignment operand represents comparison operation
-    assert_expression(nodes[0].right, op = "<", operands = ["x", "y"])
+    assert_operator(nodes[0].right, op = "<", operands = ["x", "y"])
 
 def test_unary_operator():
     """ Test CAST from unary operator."""
@@ -35,7 +35,7 @@ def test_unary_operator():
     # Left assignment operand is the variable
     assert_assignment(nodes[0], left = "z")
     # right assignment operand is a unary operator
-    assert_expression(nodes[0].right, op = "-", operands = [6])
+    assert_operator(nodes[0].right, op = "-", operands = [6])
 
 
 # no test

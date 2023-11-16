@@ -1,6 +1,6 @@
 from skema.program_analysis.CAST.matlab.tests.utils import (
     assert_assignment,
-    assert_expression,
+    assert_operator,
     cast_nodes
 )
 from skema.program_analysis.CAST2FN.model.cast import ModelIf
@@ -18,7 +18,7 @@ def test_if():
 
     # if
     assert isinstance(mi, ModelIf)
-    assert_expression(mi.expr, op = "==", operands = ["x", 5])
+    assert_operator(mi.expr, op = "==", operands = ["x", 5])
     assert_assignment(mi.body[0], left="y", right = 6)
 
 def test_if_else():
@@ -37,7 +37,7 @@ def test_if_else():
     mi = cast_nodes(source)[0]
     # if
     assert isinstance(mi, ModelIf)
-    assert_expression(mi.expr, op = ">", operands = ["x", 5])
+    assert_operator(mi.expr, op = ">", operands = ["x", 5])
     assert_assignment(mi.body[0], left="y", right = 6)
     assert_assignment(mi.body[1], left="three", right = 3)
     # else
@@ -58,11 +58,11 @@ def test_if_elseif():
     mi = cast_nodes(source)[0]
     # if
     assert isinstance(mi, ModelIf)
-    assert_expression(mi.expr, op = ">=", operands = ["x", 5])
+    assert_operator(mi.expr, op = ">=", operands = ["x", 5])
     assert_assignment(mi.body[0], left="y", right = 6)
     # elseif
     assert isinstance(mi.orelse[0], ModelIf)
-    assert_expression(mi.orelse[0].expr, op = "<=", operands = ["x", 0])
+    assert_operator(mi.orelse[0].expr, op = "<=", operands = ["x", 0])
     assert_assignment(mi.orelse[0].body[0], left="y", right = "x")
 
 def test_if_elseif_else():
@@ -81,11 +81,11 @@ def test_if_elseif_else():
     mi = cast_nodes(source)[0]
     # if
     assert isinstance(mi, ModelIf)
-    assert_expression(mi.expr, op = ">", operands = ["x", 5])
+    assert_operator(mi.expr, op = ">", operands = ["x", 5])
     assert_assignment(mi.body[0], left="a", right = 6)
     # elseif
     assert isinstance(mi.orelse[0], ModelIf)
-    assert_expression(mi.orelse[0].expr, op = ">", operands = ["x", 0])
+    assert_operator(mi.orelse[0].expr, op = ">", operands = ["x", 0])
     assert_assignment(mi.orelse[0].body[0], left="b", right = "x")
     # else
     assert_assignment(mi.orelse[0].orelse[0], left="c", right = 0)
