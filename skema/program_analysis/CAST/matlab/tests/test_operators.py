@@ -1,41 +1,51 @@
 from skema.program_analysis.CAST.matlab.tests.utils import (
-    assert_assignment,
-    assert_operator,
+    assert_foo,
     cast_nodes
 )
-from skema.program_analysis.CAST2FN.model.cast import Assignment
+from skema.program_analysis.CAST2FN.model.cast import (
+    Assignment,
+    Operator
+)
+
+def operator_only_test(node, operator: Operator):
+    """ An assignment of 'x = operator' is presumed """
+    assert_foo(
+        node,
+        Assignment(
+            left = "x", 
+            right = operator
+        )
+    )
 
 def test_binary_operator():
     """ Test CAST from binary operator."""
-    nodes = cast_nodes("z = x + y")
-    # Left assignment operand is the variable
-    assert_assignment(nodes[0], left = "z")
-    # right assignment operand represents binary operation
-    assert_operator(nodes[0].right, op = "+", operands = ["x", "y"])
+    nodes = cast_nodes("x = y + z")
+    operator_only_test(nodes[0], Operator(op = "+", operands = ["y", "z"]))
+
+def test_binary_operator_with_zero_term():
+    """ Test CAST from binary operator."""
+    nodes = cast_nodes("x = y + 0")
+    operator_only_test(nodes[0], Operator(op = "+", operands = ["y", 0]))
 
 def test_boolean_operator():
     """ Test CAST from boolean operator."""
-    nodes = cast_nodes("z = x && y")
-    # Left assignment operand is the variable
-    assert_assignment(nodes[0], left = "z")
-    # right assignment operand represents binary operation
-    assert_operator(nodes[0].right, op = "&&", operands = ["x", "y"])
-
-def test_comparison_operator(): 
-    """ Test CAST from comparison operator."""
-    nodes = cast_nodes("z = x < y")
-    # Left assignment operand is the variable
-    assert_assignment(nodes[0], left = "z")
-    # right assignment operand represents comparison operation
-    assert_operator(nodes[0].right, op = "<", operands = ["x", "y"])
+    nodes = cast_nodes("x = yes && no")
+    operator_only_test(nodes[0], Operator(op = "&&", operands = ["yes", "no"]))
 
 def test_unary_operator():
     """ Test CAST from unary operator."""
-    nodes = cast_nodes("z = -6;")
-    # Left assignment operand is the variable
-    assert_assignment(nodes[0], left = "z")
-    # right assignment operand is a unary operator
-    assert_operator(nodes[0].right, op = "-", operands = [6])
+    nodes = cast_nodes("x = -6;")
+    operator_only_test(nodes[0], Operator(op = "-", operands = [6]))
+
+def test_comparison_operator(): 
+    """ Test CAST from comparison operator."""
+    nodes = cast_nodes("x = y < 4")
+    operator_only_test(nodes[0], Operator(op = "<", operands = ["y", 4]))
+
+def test_comparison_operator_with_zero_term(): 
+    """ Test CAST from comparison operator."""
+    nodes = cast_nodes("x = y < 0")
+    operator_only_test(nodes[0], Operator(op = "<", operands = ["y", 0]))
 
 
 # no test

@@ -1,42 +1,56 @@
 from skema.program_analysis.CAST.matlab.tests.utils import (
-    assert_assignment,
+    assert_foo,
     cast_nodes
 )
+from skema.program_analysis.CAST2FN.model.cast import (
+    Assignment,
+    LiteralValue
+)
+
 
 # Test CAST from assignment
 
 def test_matrix_empty():
     """ Test assignment of empty matrices."""
-    nodes = cast_nodes("x = []; y = [[] []]; z = [[[] []] [[] []]]")
-    assert len(nodes) == 3
-    assert_assignment(nodes[0], left = 'x', right = [])
-    assert_assignment(nodes[1], left = 'y', right = [])
-    assert_assignment(nodes[2], left = 'z', right = [])
+    nodes = cast_nodes("x = [];")
+    assert_foo(nodes[0], Assignment(left = 'x', right = []))
+
+def test_matrix_empty_2D():
+    """ Test assignment of empty matrices."""
+    nodes = cast_nodes("x = [[] []];")
+    assert_foo(nodes[0], Assignment(left = 'x', right = [[], []]))
+
+def test_matrix_empty_3D():
+    """ Test assignment of empty matrices."""
+    nodes = cast_nodes("x = [[[] []] [[] []]]")
+    assert_foo(nodes[0], Assignment(left = 'x', right = [[[], []], [[], []]]))
 
 def test_matrix_integer():
     """ Test assignment 1 dimensional matrix value."""
     nodes = cast_nodes("x = [1 2 3]")
     assert len(nodes) == 1
-    assert_assignment(nodes[0], left = 'x', right = [1, 2, 3])
+    assert_foo(nodes[0], Assignment(left = 'x', right = [1, 2, 3]))
 
 def test_matrix_identifier():
     """ Test assignment 1 dimensional matrix value."""
     nodes = cast_nodes("x = [a b c]")
     assert len(nodes) == 1
-    assert_assignment(nodes[0], left = 'x', right = ['a', 'b', 'c'])
+    assert_foo(nodes[0], Assignment(left = 'x', right = ['a', 'b', 'c']))
 
 def test_matrix_2D_identifier():
     """ Test assignment 2 dimensional matrix value."""
     nodes = cast_nodes("x = [[a b] [c d]]")
     assert len(nodes) == 1
-    assert_assignment(nodes[0], left = 'x', right = [['a', 'b'], ['c', 'd']])
+    assert_foo(nodes[0], Assignment(left = 'x', right = [['a', 'b'], ['c', 'd']]))
 
 def test_matrix_3D_identifier():
     """ Test assignment 2 dimensional matrix value."""
     nodes = cast_nodes("x = [[[a b] [c d]] [[e f] [g h]]]")
     assert len(nodes) == 1
-    assert_assignment(
+    assert_foo(
         nodes[0], 
-        left = 'x', 
-        right = [[['a', 'b'], ['c', 'd']], [['e', 'f'], ['g', 'h']]]
+        Assignment(
+            left = 'x', 
+            right = [[['a', 'b'], ['c', 'd']], [['e', 'f'], ['g', 'h']]]
+        )
     )

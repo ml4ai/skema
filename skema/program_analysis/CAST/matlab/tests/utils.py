@@ -7,55 +7,52 @@ from skema.program_analysis.CAST2FN.model.cast import (
     LiteralValue,
     Loop,
     Operator,
+    ModelIf,
     Module,
     Name,
     Var
 )
 
-def assert_assignment(assignment, left = None, right = None):
-    """ Test an Assignment for correct type and operands. """
-    assert isinstance(assignment, Assignment)
-    assert not assignment.source_refs == None
-    assert_value(assignment.left, left)
-    assert_value(assignment.right, right)
-
-def assert_call(call, func = None, arguments = None):
-    """ Test a call for correct type, function, and arguments. """
-    assert isinstance(call, Call)
-    assert not call.source_refs == None
-    assert_value(call.func, func)
-    assert_value(call.arguments, arguments)
-
-def assert_operator(operator, op = None, operands = None):
-    """ Test an Operator for correct type, operation, and operands. """
-    assert isinstance(operator, Operator)
-    assert not operator.source_refs == None
-    assert operator.op == op
-    assert_value(operator.operands, operands)
-
-def assert_loop(loop, pre = None, expr = None, body = None, post = None):
-    """ Test a Loop for correct type and fields. """
-    assert isinstance(loop, Loop)
-    assert not loop.source_refs == None
-    assert_value(loop.pre, pre)
-    assert_value(loop.expr, expr)
-    assert_value(loop.body, body)
-    assert_value(loop.post, post)
-
-def assert_value(operand, value = None):
+def assert_foo(result, expected = None):
     """ Test for equality. """
-    if value:
-        if isinstance(operand, List):
-            for i, element in enumerate(operand):
-                assert_value(element, value[i])
-        elif isinstance(operand, Var):
-            assert_value(operand.val, value)
-        elif isinstance(operand, Name):
-            assert_value(operand.name, value)
-        elif isinstance(operand, LiteralValue):
-            assert_value(operand.value, value)
-        else:
-            assert operand == value
+    if isinstance(result, Assignment):
+        assert isinstance(expected, Assignment)
+        assert_foo(result.left, expected.left)
+        assert_foo(result.right, expected.right)
+    elif isinstance(result, Operator):
+        assert isinstance(expected, Operator)
+        assert_foo(result.op, expected.op)
+        assert_foo(result.operands, expected.operands)
+    elif isinstance(result, Call):
+        assert isinstance(expected, Call)
+        assert_foo(result.func, expected.func)
+        assert_foo(result.arguments, expected.arguments)
+    elif isinstance(result, ModelIf):
+        assert isinstance(expected, ModelIf)
+        assert_foo(result.expr, expected.expr)
+        assert_foo(result.body, expected.body)
+    elif isinstance(result, LiteralValue):
+        assert_foo(result.value, expected)
+    elif isinstance(result, Var):
+        assert_foo(result.val, expected)
+    elif isinstance(result, Name):
+        assert_foo(result.name, expected)
+
+    elif isinstance(result, List):
+        print("\nassert_foo with List")
+        print(f"result = {result}")
+        print(f"expected = {expected}")
+        print(f"len(result) = {len(result)}")
+        print(f"len(expected) = {len(expected)}")
+        assert len(result) == len(expected)
+        for i, element in enumerate(result):
+            assert_foo(element, expected[i])
+    else:
+        assert result == expected
+
+    if isinstance(result, AstNode):
+        assert not result.source_refs == None
+
 
 # we curently produce a CAST object with a single Module in the nodes list.
 def cast_nodes(source):
