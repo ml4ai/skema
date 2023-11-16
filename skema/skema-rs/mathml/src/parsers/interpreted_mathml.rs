@@ -6,7 +6,7 @@
 
 use crate::{
     ast::{
-        operator::{Derivative, Operator},
+        operator::{Derivative, Operator, PartialDerivative},
         Ci, Differential, Math, MathExpression, Mi, Mrow, Type,
     },
     parsers::generic_mathml::{
@@ -29,9 +29,7 @@ use nom::{
 pub fn operator(input: Span) -> IResult<Operator> {
     let (s, op) = ws(delimited(
         stag!("mo"),
-        alt((
-            add, subtract, multiply, equals, lparen, mean, grad, dot,
-        )),
+        alt((add, subtract, multiply, equals, lparen, mean, grad, dot)),
         etag!("mo"),
     ))(input)?;
     Ok((s, op))
@@ -210,30 +208,67 @@ pub fn ci_unknown(input: Span) -> IResult<Ci> {
     ))
 }
 
+/// Parse first order derivative where the function of derivative is within a parenthesis
+/// e.g. d/dt ( S(t)* I(t) )
 pub fn first_order_with_func_in_parenthesis(input: Span) -> IResult<(Derivative, Mrow)> {
-    let (s, _) = pair(stag!("mfrac"), alt((d, partial)))(input)?;
+    let (s, _) = pair(stag!("mfrac"), d)(input)?;
     let (s, with_respect_to) = delimited(
-        tuple((stag!("mrow"), alt((d, partial)))),
+        tuple((stag!("mrow"), d)),
         mi,
         pair(etag!("mrow"), etag!("mfrac")),
     )(s)?;
-    let (s, func) = ws(delimited(tuple((stag!("mo"), lparen, etag!("mo"))),
-                              map(many0(math_expression), |x| Mrow(x)),
-                              tuple((stag!("mo"), rparen, etag!("mo")))))(s)?;
-    let result =
-        Derivative::new(
-            1,
-            1,
-            Ci::new(
-                Some(Type::Real),
-                Box::new(MathExpression::Mi(with_respect_to)),
-                None,
-            ),
-    );
-
+    let (s, func) = ws(delimited(
+        tuple((stag!("mo"), lparen, etag!("mo"))),
+        map(many0(math_expression), |x| Mrow(x)),
+        tuple((stag!("mo"), rparen, etag!("mo"))),
+    ))(s)?;
     Ok((
         s,
-        (result, func)
+        (
+            Derivative::new(
+                1,
+                1,
+                Ci::new(
+                    Some(Type::Real),
+                    Box::new(MathExpression::Mi(with_respect_to)),
+                    None,
+                ),
+            ),
+            func,
+        ),
+    ))
+}
+
+/// Parse first order partial derivative where the function of derivative is within a parenthesis
+/// e.g. d/dt ( S(t)* I(t) )
+pub fn first_order_partial_with_func_in_parenthesis(
+    input: Span,
+) -> IResult<(PartialDerivative, Mrow)> {
+    let (s, _) = pair(stag!("mfrac"), partial)(input)?;
+    let (s, with_respect_to) = delimited(
+        tuple((stag!("mrow"), partial)),
+        mi,
+        pair(etag!("mrow"), etag!("mfrac")),
+    )(s)?;
+    let (s, func) = ws(delimited(
+        tuple((stag!("mo"), lparen, etag!("mo"))),
+        map(many0(math_expression), |x| Mrow(x)),
+        tuple((stag!("mo"), rparen, etag!("mo"))),
+    ))(s)?;
+    Ok((
+        s,
+        (
+            PartialDerivative::new(
+                1,
+                1,
+                Ci::new(
+                    Some(Type::Real),
+                    Box::new(MathExpression::Mi(with_respect_to)),
+                    None,
+                ),
+            ),
+            func,
+        ),
     ))
 }
 
@@ -397,13 +432,16 @@ pub fn mrow(input: Span) -> IResult<Mrow> {
 }
 
 ///Absolute value
-pub fn absolute(input: Span) -> IResult<MathExpression>  {
+pub fn absolute(input: Span) -> IResult<MathExpression> {
     let (s, elements) = ws(delimited(
         tag("<mo>|</mo>"),
         many0(math_expression),
         tag("<mo>|</mo>"),
     ))(input)?;
-   let components = MathExpression::Absolute(Box::new(MathExpression::Mo(Operator::Abs)), Box::new(MathExpression::Mrow(Mrow(elements))));
+    let components = MathExpression::Absolute(
+        Box::new(MathExpression::Mo(Operator::Abs)),
+        Box::new(MathExpression::Mrow(Mrow(elements))),
+    );
 
     Ok((s, components))
 }
@@ -506,26 +544,48 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                 })
             },
         ),
-             map(
-                 first_order_with_func_in_parenthesis,
-                 |(
-                      Derivative {
-                          order,
-                          var_index,
-                          bound_var,
-                      },
-                      comp,
-                  )| {
-                     MathExpression::Differential(Differential {
-                         diff: Box::new(MathExpression::Mo(Operator::Derivative(Derivative {
-                             order,
-                             var_index,
-                             bound_var,
-                         }))),
-                         func: Box::new(MathExpression::Mrow(comp)),
-                     })
-                 },
-             ),
+        map(
+            first_order_with_func_in_parenthesis,
+            |(
+                Derivative {
+                    order,
+                    var_index,
+                    bound_var,
+                },
+                comp,
+            )| {
+                MathExpression::Differential(Differential {
+                    diff: Box::new(MathExpression::Mo(Operator::Derivative(Derivative {
+                        order,
+                        var_index,
+                        bound_var,
+                    }))),
+                    func: Box::new(MathExpression::Mrow(comp)),
+                })
+            },
+        ),
+        map(
+            first_order_partial_with_func_in_parenthesis,
+            |(
+                PartialDerivative {
+                    order,
+                    var_index,
+                    bound_var,
+                },
+                comp,
+            )| {
+                MathExpression::Differential(Differential {
+                    diff: Box::new(MathExpression::Mo(Operator::PartialDerivative(
+                        PartialDerivative {
+                            order,
+                            var_index,
+                            bound_var,
+                        },
+                    ))),
+                    func: Box::new(MathExpression::Mrow(comp)),
+                })
+            },
+        ),
         map(ci_univariate_without_bounds, MathExpression::Ci),
         map(ci_subscript, MathExpression::Ci),
         map(
@@ -573,9 +633,7 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
         mn,
         superscript,
         over_term,
-        alt((msub,
-        msqrt,
-        mfrac)),
+        alt((msub, msqrt, mfrac)),
         map(mrow, MathExpression::Mrow),
         msubsup,
     )))(input)

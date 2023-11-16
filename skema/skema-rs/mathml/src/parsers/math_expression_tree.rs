@@ -4,7 +4,7 @@
 //use crate::parsers::math_expression_tree::MathExpression::Differential;
 use crate::{
     ast::{
-        operator::{Derivative, Operator},
+        operator::{Derivative, Operator, PartialDerivative},
         Math, MathExpression, Mi, Mrow,
     },
     parsers::interpreted_mathml::interpreted_math,
@@ -459,6 +459,7 @@ fn prefix_binding_power(op: &Operator) -> ((), u8) {
         Operator::Dot => ((), 25),
         Operator::Grad => ((), 25),
         Operator::Derivative(Derivative { .. }) => ((), 25),
+        Operator::PartialDerivative(PartialDerivative { .. }) => ((), 25),
         Operator::Div => ((), 25),
         Operator::Abs => ((), 25),
         _ => panic!("Bad operator: {:?}", op),
@@ -902,7 +903,7 @@ fn test_one_dimensional_ebm() {
         <mo>(</mo><mi>A</mi><mo>+</mo><mi>B</mi><mi>T</mi><mo>(</mo><mi>ϕ</mi><mo>,</mo><mi>t</mi><mo>)</mo><mo>)</mo>
         <mo>+</mo>
         <mfrac>
-        <mn>1</mn>
+        <mn>D</mn>
         <mrow><mi>cos</mi><mi>ϕ</mi></mrow>
         </mfrac>
         <mfrac>
@@ -915,6 +916,46 @@ fn test_one_dimensional_ebm() {
         <mrow><mi>∂</mi><mi>T</mi></mrow>
         <mrow><mi>∂</mi><mi>ϕ</mi></mrow>
         </mfrac>
+        <mo>)</mo>
+    </math>
+    ";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    let s_exp = exp.to_string();
+    println!("S-exp={:?}", s_exp);
+}
+
+#[test]
+fn test_derivative_with_func_comp_in_parenthesis() {
+    let input = "
+    <math>
+        <mfrac>
+        <mi>∂</mi>
+        <mrow><mi>∂</mi><mi>ϕ</mi></mrow>
+        </mfrac>
+        <mo>(</mo>
+        <mrow><mi>cos</mi><mi>ϕ</mi></mrow>
+        <mfrac>
+        <mrow><mi>∂</mi><mi>T</mi></mrow>
+        <mrow><mi>∂</mi><mi>ϕ</mi></mrow>
+        </mfrac>
+        <mo>)</mo>
+    </math>
+    ";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    let s_exp = exp.to_string();
+    println!("S-exp={:?}", s_exp);
+}
+
+#[test]
+fn test_derivative_with_func_inside_parenthesis() {
+    let input = "
+    <math>
+        <mfrac>
+        <mi>∂</mi>
+        <mrow><mi>∂</mi><mi>ϕ</mi></mrow>
+        </mfrac>
+        <mo>(</mo>
+        <mi>T</mi>
         <mo>)</mo>
     </math>
     ";
