@@ -1,6 +1,6 @@
 from skema.program_analysis.CAST.matlab.tests.utils import (
     assert_call,
-    assert_operand,
+    assert_value,
     cast_nodes
 )
 
@@ -11,4 +11,4 @@ def test_command():
     assert len (nodes) == 1
 
     assert_call(nodes[0], func = "clear")
-    assert_operand(nodes[0].arguments[0], "all")
+    assert_value(nodes[0].arguments[0], "all")
