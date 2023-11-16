@@ -13,6 +13,8 @@ class QueryRunner:
         self.queries_map = yaml.safe_load(self.queries_path.read_text())
 
         # Set up memgrpah instance
+        print(host)
+        print(port)
         self.memgraph = Memgraph(host=host, port=port)
 
     def run_query(
