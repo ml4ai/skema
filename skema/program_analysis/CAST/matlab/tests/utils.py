@@ -16,44 +16,31 @@ def assert_assignment(assignment, left = None, right = None):
     """ Test an Assignment for correct type and operands. """
     assert isinstance(assignment, Assignment)
     assert not assignment.source_refs == None
-    if left:
-        assert_value(assignment.left, left)
-    if right:
-        assert_value(assignment.right, right)
+    assert_value(assignment.left, left)
+    assert_value(assignment.right, right)
 
 def assert_call(call, func = None, arguments = None):
     """ Test a call for correct type, function, and arguments. """
     assert isinstance(call, Call)
     assert not call.source_refs == None
-    if func:
-        assert_value(call.func, func)
-    if arguments:
-        assert_value(call.arguments, arguments)
+    assert_value(call.func, func)
+    assert_value(call.arguments, arguments)
 
 def assert_operator(operator, op = None, operands = None):
     """ Test an Operator for correct type, operation, and operands. """
     assert isinstance(operator, Operator)
     assert not operator.source_refs == None
-    if op:
-        assert operator.op == op
-    if operands:
-        assert len(operator.operands) == len(operands)
-        for i, operand in enumerate(operator.operands):
-            assert_value(operand, operands[i])
-        # assert_value(operator.operands, operands)
+    assert operator.op == op
+    assert_value(operator.operands, operands)
 
 def assert_loop(loop, pre = None, expr = None, body = None, post = None):
     """ Test a Loop for correct type and fields. """
     assert isinstance(loop, Loop)
     assert not loop.source_refs == None
-    if pre:
-        assert_value(loop.pre, pre)
-    if expr:
-        assert_value(loop.expr, expr)
-    if body:
-        assert_value(loop.body, body)
-    if post:
-        assert_value(loop.post, post)
+    assert_value(loop.pre, pre)
+    assert_value(loop.expr, expr)
+    assert_value(loop.body, body)
+    assert_value(loop.post, post)
 
 def assert_value(operand, value = None):
     """ Test for equality. """
