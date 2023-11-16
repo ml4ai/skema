@@ -22,7 +22,7 @@ def assert_assignment(assignment, left = None, right = None):
         assert_operand(assignment.right, right)
 
 def assert_command(call, command_name = None, command_argument = None):
-    """ Test the call for correct type, function, and arguments. """
+    """ Test the command for correct name and argument name. """
     assert isinstance(call, Call)
     assert not call.source_refs == None
     if command_name:
@@ -30,15 +30,14 @@ def assert_command(call, command_name = None, command_argument = None):
     if command_argument:
         assert_name(call.arguments[0], command_argument)
 
-def assert_call(call, func: AstNode = None, arguments: List[AstNode] = []):
+def assert_function(call, func = None, arguments = None):
     """ Test the call for correct type, function, and arguments. """
     assert isinstance(call, Call)
     assert not call.source_refs == None
     if func:
         assert_name(call.func, func)
     if arguments:
-        for i, argument in enumerate(call.arguments):
-            assert_operand(argument, arguments[i])
+        assert_operands(call.arguments, arguments)
 
 def assert_expression(expression, op = None, operands = None):
     """ Test an Operator for correct type, operation, and operands. """
