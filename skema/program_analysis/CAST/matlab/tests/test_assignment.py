@@ -1,17 +1,39 @@
 from skema.program_analysis.CAST.matlab.tests.utils import (
     assert_assignment,
-    first_cast_node
+    assert_identifier,
+    cast_nodes
 )
 
-# Test the CAST returned by processing the simplest MATLAB assignment
+# Test CAST from assignment
 
-def test_assignment():
-    """ Test CAST from MATLAB 'assignment' statement."""
+def test_number():
+    """ Test assignment of integer and real numbers."""
+    nodes = cast_nodes("x = 5; y = 1.8")
+    assert len(nodes) == 2
+    assert_assignment(nodes[0], left = "x", right = 5)
+    assert_assignment(nodes[1], left = "y", right = 1.8)
 
-    source = 'x = 5'
-    
-    # The root of the CAST should be Assignment
-    assignment = first_cast_node(source)
+def test_string():
+    """ Test assignment of single and double quoted strings."""
+    source = """
+    x = 'single'
+    y = "double"
+    """
+    nodes = cast_nodes(source)
+    assert len(nodes) == 2
+    assert_assignment(nodes[0], left = "x", right = "'single'")
+    assert_assignment(nodes[1], left = "y", right = "\"double\"") 
 
-    # The module body should contain a single assignment node
-    assert_assignment(assignment, left = "x", right = "5")
+def test_boolean():
+    """ Test assignment of literal boolean types. """
+    nodes = cast_nodes("x = true; y = false")
+    assert len(nodes) == 2
+    assert_assignment(nodes[0], left = "x", right = "True")
+    assert_assignment(nodes[1], left = "y", right = "False")
+
+def test_identifier():
+    """ Test assignment of identifiers."""
+    nodes = cast_nodes("x = y; r = x")
+    assert len(nodes) == 2
+    assert_assignment(nodes[0], left = 'x', right = 'y')
+    assert_assignment(nodes[1], left = 'r', right = 'x')
