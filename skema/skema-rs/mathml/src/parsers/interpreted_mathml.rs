@@ -29,7 +29,9 @@ use nom::{
 pub fn operator(input: Span) -> IResult<Operator> {
     let (s, op) = ws(delimited(
         stag!("mo"),
-        alt((add, subtract, multiply, equals, lparen, mean, grad, dot)),
+        alt((
+            add, subtract, multiply, equals, lparen, rparen, mean, grad, dot,
+        )),
         etag!("mo"),
     ))(input)?;
     Ok((s, op))
@@ -217,11 +219,11 @@ pub fn first_order_with_func_in_parenthesis(input: Span) -> IResult<(Derivative,
         mi,
         pair(etag!("mrow"), etag!("mfrac")),
     )(s)?;
-    let (s, func) = ws(delimited(
+    let (s, mut func) = ws(preceded(
         tuple((stag!("mo"), lparen, etag!("mo"))),
-        map(many0(math_expression), |x| Mrow(x)),
-        tuple((stag!("mo"), rparen, etag!("mo"))),
+        many0(math_expression),
     ))(s)?;
+    let Some(_) = func.pop() else { todo!() };
     Ok((
         s,
         (
@@ -234,7 +236,7 @@ pub fn first_order_with_func_in_parenthesis(input: Span) -> IResult<(Derivative,
                     None,
                 ),
             ),
-            func,
+            Mrow(func),
         ),
     ))
 }
@@ -250,11 +252,11 @@ pub fn first_order_partial_with_func_in_parenthesis(
         mi,
         pair(etag!("mrow"), etag!("mfrac")),
     )(s)?;
-    let (s, func) = ws(delimited(
+    let (s, mut func) = ws(preceded(
         tuple((stag!("mo"), lparen, etag!("mo"))),
-        map(many0(math_expression), |x| Mrow(x)),
-        tuple((stag!("mo"), rparen, etag!("mo"))),
+        many0(math_expression),
     ))(s)?;
+    let Some(_) = func.pop() else { todo!() };
     Ok((
         s,
         (
@@ -267,7 +269,7 @@ pub fn first_order_partial_with_func_in_parenthesis(
                     None,
                 ),
             ),
-            func,
+            Mrow(func),
         ),
     ))
 }
@@ -324,6 +326,81 @@ pub fn first_order_derivative_leibniz_notation(input: Span) -> IResult<(Derivati
                     s,
                     (
                         Derivative::new(
+                            1,
+                            1,
+                            Ci::new(
+                                Some(Type::Real),
+                                Box::new(MathExpression::Mi(with_respect_to)),
+                                None,
+                            ),
+                        ),
+                        func,
+                    ),
+                ));
+            }
+        }
+    }
+
+    Err(nom::Err::Error(ParseError::new(
+        "Unable to match  function_of  with with_respect_to".to_string(),
+        input,
+    )))
+}
+
+/// Parse a first-order partial ordinary derivative written in Leibniz notation.
+pub fn first_order_partial_derivative_leibniz_notation(
+    input: Span,
+) -> IResult<(PartialDerivative, Ci)> {
+    let (s, _) = tuple((stag!("mfrac"), stag!("mrow"), partial))(input)?;
+    let (s, func) = ws(alt((
+        ci_univariate_func,
+        map(
+            ci_unknown,
+            |Ci {
+                 content, func_of, ..
+             }| {
+                Ci {
+                    r#type: Some(Type::Function),
+                    content,
+                    func_of,
+                }
+            },
+        ),
+        ci_subscript_func,
+    )))(s)?;
+    let (s, with_respect_to) = delimited(
+        tuple((etag!("mrow"), stag!("mrow"), partial)),
+        mi,
+        pair(etag!("mrow"), etag!("mfrac")),
+    )(s)?;
+
+    if let Some(ref ci_vec) = func.func_of {
+        for (indx, bvar) in ci_vec.iter().enumerate() {
+            if Some(bvar.content.clone())
+                == Some(Box::new(MathExpression::Mi(with_respect_to.clone())))
+            {
+                return Ok((
+                    s,
+                    (
+                        PartialDerivative::new(
+                            1,
+                            (indx + 1) as u8,
+                            Ci::new(
+                                Some(Type::Real),
+                                Box::new(MathExpression::Mi(with_respect_to)),
+                                None,
+                            ),
+                        ),
+                        func,
+                    ),
+                ));
+            } else if Some(bvar.content.clone())
+                == Some(Box::new(MathExpression::Mi(Mi("".to_string()))))
+            {
+                return Ok((
+                    s,
+                    (
+                        PartialDerivative::new(
                             1,
                             1,
                             Ci::new(
@@ -524,6 +601,36 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                         var_index,
                         bound_var,
                     }))),
+                    func: Box::new(MathExpression::Ci(Ci {
+                        r#type,
+                        content,
+                        func_of,
+                    })),
+                })
+            },
+        ),
+        map(
+            first_order_partial_derivative_leibniz_notation,
+            |(
+                PartialDerivative {
+                    order,
+                    var_index,
+                    bound_var,
+                },
+                Ci {
+                    r#type,
+                    content,
+                    func_of,
+                },
+            )| {
+                MathExpression::Differential(Differential {
+                    diff: Box::new(MathExpression::Mo(Operator::PartialDerivative(
+                        PartialDerivative {
+                            order,
+                            var_index,
+                            bound_var,
+                        },
+                    ))),
                     func: Box::new(MathExpression::Ci(Ci {
                         r#type,
                         content,

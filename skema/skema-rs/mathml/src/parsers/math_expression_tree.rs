@@ -86,6 +86,14 @@ impl MathExpressionTree {
                         content_mathml.push_str("<diff/>");
                         content_mathml.push_str(&format!("<bvar>{}</bar>", bound_var));
                     }
+                    Operator::PartialDerivative(PartialDerivative {
+                        order,
+                        var_index,
+                        bound_var,
+                    }) if (*order, *var_index) == (1_u8, 1_u8) => {
+                        content_mathml.push_str("<partialdiff/>");
+                        content_mathml.push_str(&format!("<bvar>{}</bar>", bound_var));
+                    }
                     _ => {}
                 }
                 for s in rest {
@@ -640,6 +648,7 @@ fn test_content_hackathon2_scenario1_eq3() {
     ";
     let ode = input.parse::<FirstOrderODE>().unwrap();
     let cmml = ode.to_cmml();
+    println!("cmml={:?}", cmml);
     assert_eq!(cmml, "<apply><eq/><apply><diff/><bvar>t</bar><ci>I</ci></apply><apply><minus/><apply><minus/><apply><times/><ci>δ</ci><ci>E</ci></apply><apply><times/><apply><times/><apply><minus/><cn>1</cn><ci>α</ci></apply><ci>γ</ci></apply><ci>I</ci></apply></apply><apply><times/><apply><times/><ci>α</ci><ci>ρ</ci></apply><ci>I</ci></apply></apply></apply>");
 }
 
@@ -921,7 +930,7 @@ fn test_one_dimensional_ebm() {
     ";
     let exp = input.parse::<MathExpressionTree>().unwrap();
     let s_exp = exp.to_string();
-    println!("S-exp={:?}", s_exp);
+    assert_eq!(s_exp, "(= (* C (D(1, t) T)) (+ (- (* (- 1 α) S) (+ A (* B T))) (* (/ D (Cos ϕ)) (PD(1, ϕ) (* (Cos ϕ) (D(1, ϕ) T))))))");
 }
 
 #[test]
@@ -943,7 +952,7 @@ fn test_derivative_with_func_comp_in_parenthesis() {
     ";
     let exp = input.parse::<MathExpressionTree>().unwrap();
     let s_exp = exp.to_string();
-    println!("S-exp={:?}", s_exp);
+    assert_eq!(s_exp, "(PD(1, ϕ) (* (Cos ϕ) (D(1, ϕ) T)))");
 }
 
 #[test]
@@ -961,7 +970,7 @@ fn test_derivative_with_func_inside_parenthesis() {
     ";
     let exp = input.parse::<MathExpressionTree>().unwrap();
     let s_exp = exp.to_string();
-    println!("S-exp={:?}", s_exp);
+    assert_eq!(s_exp, "(PD(1, ϕ) T)");
 }
 
 #[test]
