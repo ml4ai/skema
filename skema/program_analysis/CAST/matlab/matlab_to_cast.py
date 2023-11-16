@@ -83,6 +83,8 @@ class MatlabToCast(object):
             return None
         elif node.type == "assignment":
             return self.visit_assignment(node)
+        elif node.type =="cell":
+            return self.visit_cell(node)
         elif node.type == "command":
             return self.visit_command(node)
         elif node.type == "function_call":
@@ -136,6 +138,29 @@ class MatlabToCast(object):
             left=self.visit(left),
             right=self.visit(right),
             source_refs=[self.node_helper.get_source_ref(node)],
+        )
+
+    def visit_cell(self, node):
+        """ Translate the Tree-sitter cell node into a List """
+
+        def get_values(values, ret)-> List:
+            for child in get_keyword_children(values):
+                if child.type == "row": 
+                    ret.append(get_values(child, []))
+                else:
+                    ret.append(self.visit(child))
+            return ret;
+
+        cell_values = get_values(node, [])
+        value = []
+        if len(cell_values) > 0:
+            value = cell_values[0]
+
+        return LiteralValue(
+            value_type="List",
+            value = value,
+            source_code_data_type=["matlab", MATLAB_VERSION, "matrix"],
+            source_refs=[literal_source_ref],
         )
 
     def visit_command(self, node):
@@ -193,13 +218,16 @@ class MatlabToCast(object):
         """ return a node describing if, elseif, else conditional logic"""
         def conditional(conditional_node):
             """ return a ModelIf struct for the conditional logic node. """
-            ret = ModelIf()
-            # comparison_operator
-            ret.expr = self.visit(get_first_child_by_type(
-                conditional_node,
-                "comparison_operator"
-            ))
-            # instruction_block
+            ret = ModelIf(
+                # comparison_operator
+                expr = self.visit(get_first_child_by_type(
+                    conditional_node,
+                    "comparison_operator"
+                )),
+                source_refs=[self.node_helper.get_source_ref(conditional_node)]
+            )
+
+            # instruction_block may not exist
             block = get_first_child_by_type(conditional_node, "block")
             if block:
                 children = get_keyword_children(block)
@@ -335,7 +363,7 @@ class MatlabToCast(object):
         return Operator(
             source_language="matlab",
             interpreter=None,
-            version=None,
+            version=MATLAB_VERSION,
             op=op,
             operands=[self.visit(operand) for operand in
                 get_keyword_children(node)],
@@ -356,7 +384,7 @@ class MatlabToCast(object):
         return Operator(
             source_language="matlab",
             interpreter=None,
-            version=None,
+            version=MATLAB_VERSION,
             op = node.children[0].type,
             operands=[self.visit(node.children[1])],
             source_refs=[self.node_helper.get_source_ref(node)],
