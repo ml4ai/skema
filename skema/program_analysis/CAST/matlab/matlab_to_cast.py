@@ -84,9 +84,9 @@ class MatlabToCast(object):
         elif node.type == "assignment":
             return self.visit_assignment(node)
         elif node.type == "command":
-            return self.visit_call_command(node)
+            return self.visit_command(node)
         elif node.type == "function_call":
-            return self.visit_call_function(node)
+            return self.visit_function_call(node)
         elif node.type == "function_definition":
             return self.visit_function_def(node)
         elif node.type in [
@@ -138,7 +138,7 @@ class MatlabToCast(object):
             source_refs=[self.node_helper.get_source_ref(node)],
         )
 
-    def visit_call_command(self, node):
+    def visit_command(self, node):
         """ Translate the Tree-sitter command node """
         command_name, command_argument = get_keyword_children(node)
         return Call(
@@ -149,15 +149,16 @@ class MatlabToCast(object):
             source_refs=[self.node_helper.get_source_ref(node)]
         )
 
-    def visit_call_function(self, node):
+    def visit_function_call(self, node):
         """ Translate Tree-sitter function call node """
-        arguments = [self.visit(child) for child in 
-            get_keyword_children(get_first_child_by_type(node, "arguments"))]
+        identifier, arguments = get_keyword_children(node)
+
         return Call(
-            func = self.visit_name(node),
+            func = self.visit(identifier),
             source_language = "matlab",
             source_language_version = MATLAB_VERSION,
-            arguments = arguments,
+            arguments = [self.visit(child) for child in
+                get_keyword_children(arguments)],
             source_refs=[self.node_helper.get_source_ref(node)]
         )
 
