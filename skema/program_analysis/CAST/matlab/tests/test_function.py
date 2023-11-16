@@ -1,7 +1,6 @@
 from skema.program_analysis.CAST.matlab.tests.utils import (
     assert_assignment,
-    assert_function,
-    assert_identifier,
+    assert_call,
     cast_nodes
 )
 
@@ -22,8 +21,7 @@ def no_test_function_definition():
 
 def test_function_call():
     """ Test function call """
-
     nodes = cast_nodes("z = both(3, 5)")
     assert len(nodes) == 1
     assert_assignment(nodes[0], left='z')
-    assert_function(nodes[0].right, func = "both", arguments = [3, 5])
+    assert_call(nodes[0].right, func = "both", arguments = [3, 5])
