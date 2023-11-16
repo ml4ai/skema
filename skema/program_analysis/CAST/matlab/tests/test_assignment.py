@@ -1,16 +1,26 @@
 from skema.program_analysis.CAST.matlab.tests.utils import (
-    assert_assignment,
+    assert_foo,
     cast_nodes
 )
+from skema.program_analysis.CAST2FN.model.cast import Assignment
+
 
 # Test CAST from assignment
 
-def test_number():
+def test_number_zero_integer():
     """ Test assignment of integer and real numbers."""
-    nodes = cast_nodes("x = 5; y = 1.8")
-    assert len(nodes) == 2
-    assert_assignment(nodes[0], left = "x", right = 5)
-    assert_assignment(nodes[1], left = "y", right = 1.8)
+    nodes = cast_nodes("x = 0")
+    assert_foo(nodes[0], Assignment(left = "x", right = 0))
+
+def test_number_zero_real():
+    """ Test assignment of integer and real numbers."""
+    nodes = cast_nodes("y = 0.0")
+    assert_foo(nodes[0], Assignment(left = "y", right = 0.0))
+
+def test_number_nonzero():
+    """ Test assignment of integer and real numbers."""
+    nodes = cast_nodes("z = 1.8")
+    assert_foo(nodes[0], Assignment(left = "z", right = 1.8))
 
 def test_string():
     """ Test assignment of single and double quoted strings."""
@@ -19,20 +29,17 @@ def test_string():
     y = "double"
     """
     nodes = cast_nodes(source)
-    assert len(nodes) == 2
-    assert_assignment(nodes[0], left = "x", right = "'single'")
-    assert_assignment(nodes[1], left = "y", right = "\"double\"") 
+    assert_foo(nodes[0], Assignment(left = "x", right = "'single'"))
+    assert_foo(nodes[1], Assignment(left = "y", right = "\"double\""))
 
 def test_boolean():
     """ Test assignment of literal boolean types. """
     nodes = cast_nodes("x = true; y = false")
-    assert len(nodes) == 2
-    assert_assignment(nodes[0], left = "x", right = "True")
-    assert_assignment(nodes[1], left = "y", right = "False")
+    assert_foo(nodes[0], Assignment(left = "x", right = "True"))
+    assert_foo(nodes[1], Assignment(left = "y", right = "False"))
 
 def test_identifier():
     """ Test assignment of identifiers."""
     nodes = cast_nodes("x = y; r = x")
-    assert len(nodes) == 2
-    assert_assignment(nodes[0], left = 'x', right = 'y')
-    assert_assignment(nodes[1], left = 'r', right = 'x')
+    assert_foo(nodes[0], Assignment(left = 'x', right = 'y'))
+    assert_foo(nodes[1], Assignment(left = 'r', right = 'x'))
