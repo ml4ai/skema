@@ -242,7 +242,7 @@ pub fn first_order_with_func_in_parenthesis(input: Span) -> IResult<(Derivative,
 }
 
 /// Parse first order partial derivative where the function of derivative is within a parenthesis
-/// e.g. d/dt ( S(t)* I(t) )
+/// e.g. ∂/∂t ( S(t)* I(t) )
 pub fn first_order_partial_with_func_in_parenthesis(
     input: Span,
 ) -> IResult<(PartialDerivative, Mrow)> {
