@@ -15,13 +15,10 @@ from skema.program_analysis.CAST2FN.model.cast import (
 
 def check_result(result, expected = None):
     """ Test for match with the same datatypes. """
-
     if isinstance(result, List):
         assert len(result) == len(expected)
         for i, _ in enumerate(result):
             check_result(_, expected[i])
-
-    # structures 
     elif isinstance(result, Assignment):
         assert isinstance(expected, Assignment)
         check_result(result.left, expected.left)
@@ -38,23 +35,18 @@ def check_result(result, expected = None):
         assert isinstance(expected, ModelIf)
         check_result(result.expr, expected.expr)
         check_result(result.body, expected.body)
-
-    # values
     elif isinstance(result, LiteralValue):
         check_result(result.value, expected)
     elif isinstance(result, Var):
         check_result(result.val, expected)
     elif isinstance(result, Name):
         check_result(result.name, expected)
-
-    # primitives
     else:
         assert result == expected
 
-    # every CAST node 
+    # every CAST node has a source_refs element
     if isinstance(result, AstNode):
         assert not result.source_refs == None
-
 
 # we curently produce a CAST object with a single Module in the nodes list.
 def cast_nodes(source):
