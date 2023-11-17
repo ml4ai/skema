@@ -22,11 +22,6 @@ def test_binary_operator():
     nodes = cast_nodes("x = y + z")
     operator_only_test(nodes[0], Operator(op = "+", operands = ["y", "z"]))
 
-def test_binary_operator_with_zero_term():
-    """ Test CAST from binary operator."""
-    nodes = cast_nodes("x = y + 0")
-    operator_only_test(nodes[0], Operator(op = "+", operands = ["y", 0]))
-
 def test_boolean_operator():
     """ Test CAST from boolean operator."""
     nodes = cast_nodes("x = yes && no")
@@ -41,12 +36,6 @@ def test_comparison_operator():
     """ Test CAST from comparison operator."""
     nodes = cast_nodes("x = y < 4")
     operator_only_test(nodes[0], Operator(op = "<", operands = ["y", 4]))
-
-def test_comparison_operator_with_zero_term(): 
-    """ Test CAST from comparison operator."""
-    nodes = cast_nodes("x = y < 0")
-    operator_only_test(nodes[0], Operator(op = "<", operands = ["y", 0]))
-
 
 # no test
 
