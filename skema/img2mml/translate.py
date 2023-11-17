@@ -59,7 +59,7 @@ def remove_eqn_number(image: Image.Image, threshold: float = 0.1) -> Image.Image
 
 
 def calculate_scale_factor(
-    image: Image.Image, target_width: int, target_height: int
+        image: Image.Image, target_width: int, target_height: int
 ) -> float:
     """
     Calculate the scale factor to normalize the input image to the target width and height while preserving the
@@ -152,7 +152,7 @@ def set_random_seed(seed: int) -> None:
 
 
 def define_model(
-    config: dict, vocab: List[str], device: torch.device, model_type="xfmer"
+        config: dict, vocab: List[str], device: torch.device, model_type="xfmer"
 ) -> Image2MathML_Xfmer:
     """
     Defining the model
@@ -217,6 +217,7 @@ def process_mtext(xml_string: str) -> str:
     Returns:
         str: The modified MathML string.
     """
+    xml_string = xml_string.replace("&#x", "###")  # keep the unicode representation
     root = ET.fromstring(xml_string)
 
     def merge_mi_elements(elements):
@@ -274,9 +275,10 @@ def process_mtext(xml_string: str) -> str:
     root.clear()
     root.extend(new_children)
 
-    modified_xml_string = ET.tostring(root, encoding="unicode")
+    modified_xml_string = ET.tostring(root, encoding="utf-8", method="xml").decode('utf-8')
     modified_xml_string = modified_xml_string.replace("<to_be_removed>", "")
     modified_xml_string = modified_xml_string.replace("</to_be_removed>", "")
+    modified_xml_string = modified_xml_string.replace("###", "&#x")
 
     return modified_xml_string
 
@@ -324,11 +326,11 @@ def remove_spaces_between_tags(mathml_string: str) -> str:
 
 
 def render_mml(
-    model: Image2MathML_Xfmer,
-    vocab_itos: dict,
-    vocab_stoi: dict,
-    img: torch.Tensor,
-    device: torch.device,
+        model: Image2MathML_Xfmer,
+        vocab_itos: dict,
+        vocab_stoi: dict,
+        img: torch.Tensor,
+        device: torch.device,
 ) -> str:
     """
     Perform sequence prediction for an input image to translate it into MathML contents.
@@ -362,6 +364,7 @@ def render_mml(
             pred.append(vocab_itos[str(p)])
 
         pred_seq = " ".join(pred[1:-1])
+
         try:
             return process_mtext(
                 add_semicolon_to_unicode(remove_spaces_between_tags(pred_seq))
