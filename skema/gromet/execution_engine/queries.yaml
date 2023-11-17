@@ -5,10 +5,17 @@ reset_state:
   DETACH DELETE (n)
   "
 
+delete_model:
+  "
+  MATCH (n)-[r*0..]->(m)
+  WHERE id(n)=$ID
+  DETACH DELETE (m)
+  "
+
 module:
   "
   MATCH (n)-[r*]->(m)
-  WHERE n.filename='$FILENAME'
+  WHERE id(n)=$ID
   MATCH (n:Module)
   RETURN DISTINCT n
   "

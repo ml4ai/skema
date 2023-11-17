@@ -22,6 +22,8 @@ from skema.gromet.execution_engine.query_runner import QueryRunner
 from skema.gromet.execution_engine.symbol_table import SymbolTable
 from skema.utils.fold import dictionary_to_gromet_json, del_nulls
 from skema.rest.utils import fn_preprocessor
+from skema.rest.morae_proxy import post_model
+from skema.skema_py.server import System, fn_given_filepaths
 
 SKEMA_BIN = Path(__file__).resolve().parents[2] / "skema-rs" / "skema" / "src" / "bin"
 
@@ -49,7 +51,10 @@ class ExecutionEngine:
         self.filename = Path(source_path).stem
 
         # Upload source to Memgraph instance
-        self.upload_source()
+        self.model_id = None
+        self.upload_source_remote()
+
+        
 
     ''' NOTE: Currently we are assuming the amr will be provided seperatly
     def generate_amr(self, source_path: str):
@@ -84,7 +89,8 @@ class ExecutionEngine:
 
         return amr
 
-    def upload_source(self):
+    ''' NOTE: Deprecated for upload_source_remote
+    def upload_source_local(self):
         """Ingest source file and upload Gromet to Memgraph"""
 
         # Currently, the Gromet ingester writes the output JSON to the directory where the script is run from.
@@ -103,6 +109,15 @@ class ExecutionEngine:
         subprocess.run(
             ["cargo", "run", "--bin", "gromet2graphdb", str(gromet_path)], cwd=SKEMA_BIN
         )
+    '''
+
+    def upload_source_remote(self):
+        """Ingest source file and upload Gromet to Memgraph"""
+        gromet_collection = asyncio.run(fn_given_filepaths(System(files=[self.source_path], blobs=[Path(self.source_path).read_text()])))
+        gromet_collection = fn_preprocessor(gromet_collection)[0]
+
+        # Upload to memgraph
+        self.model_id = asyncio.run(post_model(gromet_collection))
 
     def execute(
         self,
@@ -114,10 +129,14 @@ class ExecutionEngine:
         """Run the execution engine at specified scope"""
         if module:
             module_list = self.query_runner.run_query(
-                "module", n_or_m="n", filename=self.filename
+                "module", n_or_m="n", id=self.model_id
             )
+            print(module_list)
             self.visit(module_list[0])
 
+        # After execution, delete the model and close down the memgraph connection
+        self.query_runner.run_query("delete_model", id=self.model_id)
+        self.query_runner.memgraph.close()
     def parameter_extraction(self):
         """Run the execution engine and extract initial values for each parameter"""
 
