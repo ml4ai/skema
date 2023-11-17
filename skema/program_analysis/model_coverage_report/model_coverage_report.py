@@ -144,18 +144,26 @@ def process_single_model(html: HTML_Instance, output_dir: str, model_name: str):
     if model_name in MODEL_YAML:
         model_url = MODEL_YAML[model_name]["zip_archive"]
         response = requests.get(model_url)
-
-
+    
     zip = ZipFile(BytesIO(response.content))
     with TemporaryDirectory() as temp:
+        # We need to write all the files to the temporary directory before processing
+        # This is because some steps may require additional files, such as include directories in Fortran
+        for file in zip.filelist:
+            source = str(zip.open(file).read(), encoding="utf-8")
+            temp_path = Path(temp) / file.filename
+            if not file.is_dir():
+                temp_path.parent.mkdir(parents=True, exist_ok=True)
+                temp_path.touch()
+                temp_path.write_text(source)
+
+        
         file_status_list = []
         supported_lines = 0
         total_lines = 0
         for file in zip.filelist:
             source = str(zip.open(file).read(), encoding="utf-8")
             temp_path = Path(temp) / file.filename
-            temp_path.parent.mkdir(parents=True, exist_ok=True)
-            temp_path.write_text(source)
             filename = Path(file.filename).stem
 
             # Determine the language name by cross referencing the file extension in languages.yaml
