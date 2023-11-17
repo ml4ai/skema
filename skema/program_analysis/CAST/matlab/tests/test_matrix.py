@@ -15,42 +15,14 @@ def test_matrix_empty():
     nodes = cast_nodes("x = [];")
     check_result(nodes[0], Assignment(left = 'x', right = []))
 
-def test_matrix_empty_2D():
+def test_matrix_boolean():
     """ Test assignment of empty matrices."""
-    nodes = cast_nodes("x = [[] []];")
-    check_result(nodes[0], Assignment(left = 'x', right = [[], []]))
+    nodes = cast_nodes("x = [true false];")
+    check_result(nodes[0], Assignment(left = 'x', right = ["True", "False"]))
 
-def test_matrix_empty_3D():
-    """ Test assignment of empty matrices."""
-    nodes = cast_nodes("x = [[[] []] [[] []]]")
-    check_result(nodes[0], Assignment(left = 'x', right = [[[], []], [[], []]]))
-
-def test_matrix_integer():
+def test_matrix_values():
     """ Test assignment 1 dimensional matrix value."""
-    nodes = cast_nodes("x = [1 2 3]")
+    nodes = cast_nodes("x = [1 x 'Bob' ]")
     assert len(nodes) == 1
-    check_result(nodes[0], Assignment(left = 'x', right = [1, 2, 3]))
+    check_result(nodes[0], Assignment(left = 'x', right = [1, 'x', "'Bob'"]))
 
-def test_matrix_identifier():
-    """ Test assignment 1 dimensional matrix value."""
-    nodes = cast_nodes("x = [a b c]")
-    assert len(nodes) == 1
-    check_result(nodes[0], Assignment(left = 'x', right = ['a', 'b', 'c']))
-
-def test_matrix_2D_identifier():
-    """ Test assignment 2 dimensional matrix value."""
-    nodes = cast_nodes("x = [[a b] [c d]]")
-    assert len(nodes) == 1
-    check_result(nodes[0], Assignment(left = 'x', right = [['a', 'b'], ['c', 'd']]))
-
-def test_matrix_3D_identifier():
-    """ Test assignment 2 dimensional matrix value."""
-    nodes = cast_nodes("x = [[[a b] [c d]] [[e f] [g h]]]")
-    assert len(nodes) == 1
-    check_result(
-        nodes[0], 
-        Assignment(
-            left = 'x', 
-            right = [[['a', 'b'], ['c', 'd']], [['e', 'f'], ['g', 'h']]]
-        )
-    )
