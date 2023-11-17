@@ -13,6 +13,8 @@ from fastapi import APIRouter, File, UploadFile
 from starlette.responses import JSONResponse
 
 from skema.img2mml import eqn2mml
+from skema.img2mml.eqn2mml import image2mathml_db
+from skema.img2mml.api import get_mathml_from_bytes
 from skema.rest import schema, utils, llm_proxy
 from skema.rest.proxies import SKEMA_RS_ADDESS
 from skema.skema_py import server as code2fn
@@ -64,6 +66,43 @@ async def equations_to_amr(data: schema.EquationImagesToAMR):
             },
         )
     return res.json()
+
+
+# equation images -> mml -> latex
+@router.post("/images/equations-to-latex", summary="Equations (images) → MML → LaTeX")
+async def equations_to_latex(data: UploadFile):
+    """
+    Converts images of equations to LaTeX.
+
+    ### Python example
+    ```
+    Endpoint for generating LaTeX from an input image.
+
+    ### Python example
+    ```
+    import requests
+
+    files = {
+      "data": open("bayes-rule-white-bg.png", "rb"),
+    }
+    r = requests.post("http://0.0.0.0:8000/images/equations-to-latex", files=files)
+    print(r.text)
+    """
+    # Read image data
+    image_bytes = await data.read()
+
+    # pass image bytes to get_mathml_from_bytes function
+    mml_res = get_mathml_from_bytes(image_bytes, image2mathml_db)
+    response = requests.put(f"{SKEMA_RS_ADDESS}/mathml/latex", data=mml_res)
+    # Check the response
+    if response.status_code == 200:
+        # The request was successful
+        return response.text
+    else:
+        # The request failed
+        print(f"Error: {response.status_code}")
+        print(response.text)
+        return f"Error: {response.status_code} {response.text}"
 
 
 # tex equations -> pmml -> amr
