@@ -35,6 +35,7 @@ def check(result, expected = None):
         assert isinstance(expected, ModelIf)
         check(result.expr, expected.expr)
         check(result.body, expected.body)
+        check(result.orelse, expected.orelse)
     elif isinstance(result, LiteralValue):
         check(result.value, expected)
     elif isinstance(result, Var):
