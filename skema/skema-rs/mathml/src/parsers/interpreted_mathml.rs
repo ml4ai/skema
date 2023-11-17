@@ -165,7 +165,9 @@ fn partial(input: Span) -> IResult<()> {
     let (s, Mi(x)) = mi(input)?;
     if let "∂" = x.as_ref() {
         Ok((s, ()))
-    } else {
+    } else if let "&#x2202;" = x.as_ref() {
+        Ok((s, ()))
+    }else {
         Err(nom::Err::Error(ParseError::new(
             "Unable to identify Mi('∂')".to_string(),
             input,
