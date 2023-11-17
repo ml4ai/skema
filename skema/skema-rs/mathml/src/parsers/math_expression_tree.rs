@@ -292,6 +292,18 @@ fn process_math_expression(expr: &MathExpression, expression: &mut String) {
         // If it's a Ci variant, recursively process its content
         MathExpression::Ci(x) => {
             process_math_expression(&*x.content, expression);
+            if let Some(func_of_vec) = &x.func_of {
+                if func_of_vec.len() > 0 && func_of_vec[0].content.to_string().len() > 0 {
+                    expression.push_str("(");
+                    for (index, func_ci) in func_of_vec.iter().enumerate() {
+                        process_math_expression(&*func_ci.content, expression);
+                        if index < func_of_vec.len() - 1 {
+                            expression.push_str(",");
+                        }
+                    }
+                    expression.push_str(")");
+                }
+            }
         }
         MathExpression::Mi(Mi(id)) => {
             expression.push_str(unicode_to_latex(&id.to_string()).as_str());
@@ -524,24 +536,23 @@ impl MathExpressionTree {
                         expression.push_str(&format!("{}", rest[1].to_latex()));
                     }
                     Operator::Divide => {
-
-                            if let MathExpressionTree::Cons(op, _) = &rest[0] {
-                                if is_unary_operator(op) {
-                                    expression.push_str(&format!("{}", &rest[0].to_latex()));
-                                } else if let Operator::Multiply = op {
-                                    expression.push_str(&format!("{}", &rest[0].to_latex()));
-                                } else if let Operator::Divide = op {
-                                    expression.push_str(&format!("{}", &rest[0].to_latex()));
-                                } else if let Operator::Dot = op {
-                                    expression.push_str(&format!("{}", &rest[0].to_latex()));
-                                } else {
-                                    expression.push_str(&format!("({})", &rest[0].to_latex()));
-                                }
-                            } else {
+                        if let MathExpressionTree::Cons(op, _) = &rest[0] {
+                            if is_unary_operator(op) {
                                 expression.push_str(&format!("{}", &rest[0].to_latex()));
+                            } else if let Operator::Multiply = op {
+                                expression.push_str(&format!("{}", &rest[0].to_latex()));
+                            } else if let Operator::Divide = op {
+                                expression.push_str(&format!("{}", &rest[0].to_latex()));
+                            } else if let Operator::Dot = op {
+                                expression.push_str(&format!("{}", &rest[0].to_latex()));
+                            } else {
+                                expression.push_str(&format!("({})", &rest[0].to_latex()));
                             }
-                            expression.push_str("/");
-                            process_expression_parentheses(&mut expression, &rest[1]);
+                        } else {
+                            expression.push_str(&format!("{}", &rest[0].to_latex()));
+                        }
+                        expression.push_str("/");
+                        process_expression_parentheses(&mut expression, &rest[1]);
                     }
                     Operator::Exp => {
                         expression.push_str("\\mathrm{exp}");
@@ -1908,7 +1919,7 @@ fn test_equation_halfar_dome_8_3_to_latex() {
     let latex_exp = exp.to_latex();
     assert_eq!(
         latex_exp,
-        "H=H_{0}*(t_{0}/t)^{1/9}*(1-((t_{0}/t)^{1/18}*r/R_{0})^{4/3})^{3/7}"
+        "H(t,r)=H_{0}*(t_{0}/t)^{1/9}*(1-((t_{0}/t)^{1/18}*r/R_{0})^{4/3})^{3/7}"
     );
 }
 
