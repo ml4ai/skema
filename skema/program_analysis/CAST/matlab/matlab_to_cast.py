@@ -79,14 +79,17 @@ class MatlabToCast(object):
 
     def visit(self, node):
         """Switch execution based on node type"""
+        print(f"visit {node.type}")
         if node == None:
             return None
         elif node.type == "assignment":
             return self.visit_assignment(node)
+        elif node.type == "boolean":
+            return self.visit_boolean(node)
         elif node.type in [
-            "cell",
-            "matrix"
-        ]:   return self.visit_matrix(node)
+            "true",
+            "false"
+        ]: return self.visit_boolean_value(node)
         elif node.type == "command":
             return self.visit_command(node)
         elif node.type == "function_call":
@@ -99,16 +102,15 @@ class MatlabToCast(object):
         elif node.type == "if_statement":
             return self.visit_if_statement(node)
         elif node.type in [
-            "boolean",
-            "number",
-            "string"
-        ]: return self.visit_literal(node)
-        elif node.type in [
             "for_statement",
             "iterator",
             "while_statement",
             "spread_operator"
         ]: return self.visit_loop(node)
+        elif node.type in [
+            "cell",
+            "matrix"
+        ]:   return self.visit_matrix(node)
         elif node.type == "source_file":    # used?
             return self.visit_module(node)
         elif node.type in [
@@ -116,6 +118,8 @@ class MatlabToCast(object):
             "command_argument",
             "name"
         ]:  return self.visit_name(node)
+        elif node.type == "number":
+            return self.visit_number(node)
         elif node.type in [
             "binary_operator",
             "comparison_operator",
@@ -127,6 +131,8 @@ class MatlabToCast(object):
             return self.visit_operator_postfix(node)
         elif node.type == "unary_operator":
             return self.visit_operator_unary(node)
+        elif node.type == "string":
+           return self.visit_string(node)
         elif node.type == "switch_statement":
             return self.visit_switch_statement(node)
         else:
@@ -140,6 +146,43 @@ class MatlabToCast(object):
             right=self.visit(right),
             source_refs=[self.node_helper.get_source_ref(node)],
         )
+
+
+
+
+
+    #def visit_string(self, node):
+    #    return LiteralValue(
+    #        value_type="Character",
+    #        value=self.node_helper.get_identifier(node),
+    #        source_code_data_type=["matlab", MATLAB_VERSION, "character"],
+    #        source_refs=[self.node_helper.get_source_ref(node)]
+    #    )
+
+    def visit_boolean(self, node):
+        """ Translate Tree-sitter boolean node """
+
+
+        print("visit_boolean")
+        for child in node.children:
+
+            # store as string, use Python Boolean capitalization.
+            return LiteralValue(
+                value_type="Boolean",
+                value = self.visit(child),
+                source_code_data_type=["matlab", MATLAB_VERSION, "boolean"],
+                source_refs=[self.node_helper.get_source_ref(node)],
+            )
+
+    def visit_boolean_value(self, node):
+        #value = node.type[0].upper() + node.type[1:].lower() 
+        return LiteralValue(
+            value_type="Character",
+            value=self.node_helper.get_identifier(node),
+            source_code_data_type=["matlab", MATLAB_VERSION, "boolean"],
+            source_refs=[self.node_helper.get_source_ref(node)]
+        )
+
 
     def visit_command(self, node):
         """ Translate the Tree-sitter command node """
@@ -156,13 +199,45 @@ class MatlabToCast(object):
         """ Translate Tree-sitter function call node """
         identifier, arguments = get_keyword_children(node)
 
+        print("matlabToCast.visit_function_call")
+        print("Arguments as read:")
+        for i, child in enumerate(arguments.children):
+            print(f"{i}, {child}")
+
+        # break arg list at commas
+        args = []
+        arg = []
+        for child in arguments.children:
+            if child.type == ",":
+                args += [arg]
+                arg = []
+            else:
+                arg += [child]
+        args += [arg]
+
+
+        print("\nArguments as reprocessed:")
+        for i, arg in enumerate(args):
+            print(f"{i}")
+            source = ""
+            for j, arg_node in enumerate(arg):
+                token = self.node_helper.get_identifier(arg_node)
+                source += token
+                print(f"  {j}, {token}")
+            print(f"{source}")
+
         return Call(
             func = self.visit(identifier),
             source_language = "matlab",
             source_language_version = MATLAB_VERSION,
+            source_refs=[self.node_helper.get_source_ref(node)],
+
+            # function arguments may be calls to other functions
+
+
+
             arguments = [self.visit(child) for child in
-                get_keyword_children(arguments)],
-            source_refs=[self.node_helper.get_source_ref(node)]
+                get_keyword_children(arguments)]
         )
 
     def visit_function_def(self, node):
@@ -233,52 +308,40 @@ class MatlabToCast(object):
 
         return model_ifs[0]
 
-    def visit_literal(self, node) -> LiteralValue:
-        """Visitor for literals. Returns a LiteralValue"""
-        literal_type = node.type
+    def visit_number(self, node) -> LiteralValue:
+        """Visitor for numbers """
         literal_value = self.node_helper.get_identifier(node)
-        literal_source_ref = self.node_helper.get_source_ref(node)
-
-        if literal_type == "number":
-            # Check if this is a real value, or an Integer
-            if "e" in literal_value.lower() or "." in literal_value:
-                return LiteralValue(
-                    value_type="AbstractFloat",  # TODO verify this value
-                    value=float(literal_value),
-                    source_code_data_type=["matlab", MATLAB_VERSION, "real"],
-                    source_refs=[literal_source_ref],
-                )
-            else:
-                return LiteralValue(
-                    value_type="Integer",
-                    value=int(literal_value),
-                    source_code_data_type=["matlab", MATLAB_VERSION, "integer"],
-                    source_refs=[literal_source_ref],
-                )
-
-        elif literal_type == "string":
+        # Check if this is a real value, or an Integer
+        if "e" in literal_value.lower() or "." in literal_value:
             return LiteralValue(
-                value_type="Character",
-                value=literal_value,
-                source_code_data_type=["matlab", MATLAB_VERSION, "character"],
-                source_refs=[literal_source_ref],
+                value_type="AbstractFloat",  # TODO verify this value
+                value=float(literal_value),
+                source_code_data_type=["matlab", MATLAB_VERSION, "real"],
+                source_refs=[self.node_helper.get_source_ref(node)]
             )
+        return LiteralValue(
+            value_type="Integer",
+            value=int(literal_value),
+            source_code_data_type=["matlab", MATLAB_VERSION, "integer"],
+            source_refs=[self.node_helper.get_source_ref(node)]
+        )
 
-        elif literal_type == "boolean":
-            # store as string, use Python Boolean capitalization.
-            value = literal_value[0].upper() + literal_value[1:].lower() 
-            return LiteralValue(
-                value_type="Boolean",
-                value = value,
-                source_code_data_type=["matlab", MATLAB_VERSION, "logical"],
-                source_refs=[literal_source_ref],
-            )
+    def visit_string(self, node):
+        return LiteralValue(
+            value_type="Character",
+            value=self.node_helper.get_identifier(node),
+            source_code_data_type=["matlab", MATLAB_VERSION, "character"],
+            source_refs=[self.node_helper.get_source_ref(node)]
+        )
 
     def visit_matrix(self, node):
         """ Translate the Tree-sitter cell node into a List """
 
-        def get_values(values, ret)-> List:
-            for child in get_keyword_children(values):
+        print("visit_matrix")
+        def get_values(element, ret)-> List:
+            for child in element.children:
+                token = self.node_helper.get_identifier(child)
+                print(f"keyword child = {token}")
                 if child.type == "row": 
                     ret.append(get_values(child, []))
                 else:
@@ -286,6 +349,7 @@ class MatlabToCast(object):
             return ret;
 
         values = get_values(node, [])
+        print(f"values = {values}")
         value = []
         if len(values) > 0:
             value = values[0]
