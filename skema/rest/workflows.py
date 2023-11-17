@@ -9,7 +9,7 @@ from io import BytesIO
 from typing import List
 from pathlib import Path
 
-from fastapi import APIRouter, File, UploadFile
+from fastapi import APIRouter, File, UploadFile, FastAPI
 from starlette.responses import JSONResponse
 
 from skema.img2mml import eqn2mml
@@ -298,3 +298,6 @@ async def repo_to_rn_amr(zip_file: UploadFile = File()):
         )
     return res.json()
 """
+
+app = FastAPI()
+app.include_router(router)
