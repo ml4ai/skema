@@ -40,19 +40,12 @@ class NodeHelper():
 
         return identifier
 
-def get_first_child_by_type(node: Node, type: str, recurse=False):
-    """Takes in a node and a type string as inputs and returns the first child matching that type. Otherwise, return None
-    When the recurse argument is set, it will also recursivly search children nodes as well.
-    """
+def get_first_child_by_type(node: Node, child_type: str):
+    """ Return the first node child with matching type """
     for child in node.children:
-        if child.type == type:
+        if child.type == child_type:
             return child
 
-    if recurse:
-        for child in node.children:
-            out = get_first_child_by_type(child, type, True)
-            if out:
-                return out
     return None
 
 def get_children_by_types(node: Node, types: List):
