@@ -9,7 +9,7 @@ on:
 env:
   # used by both Python and Rust services
   # to connect to Memgraph
-  SKEMA_GRAPH_DB_HOST: "bolt://127.0.0.1"
+  SKEMA_GRAPH_DB_HOST: "127.0.0.1"
   SKEMA_GRAPH_DB_PORT: "7687"
 
 jobs:
@@ -120,6 +120,8 @@ jobs:
     #     sbt coverageAggregate
     # code coverage (Python)
     - name: "Code coverage reports for Python components"
+      # env:
+      #   SKEMA_GRAPH_DB_HOST: "bolt://127.0.0.1"
       run: |
         pytest
 
