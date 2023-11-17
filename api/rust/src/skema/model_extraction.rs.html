@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `skema/src/model_extraction.rs`."><title>model_extraction.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-cb6f1f67f1bcd037.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="skema" data-themes="" data-resource-suffix="" data-rustdoc-version="1.73.0 (cc66ad468 2023-10-03)" data-channel="1.73.0" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-1596385f77d47ef2.css" data-theme-dark-css="dark-0a43001d3fc2282c.css" data-theme-ayu-css="ayu-fd19013d6ce078bf.css" ><script src="../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-1596385f77d47ef2.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-0a43001d3fc2282c.css"><link rel="stylesheet" href="../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../skema/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `skema/src/model_extraction.rs`."><title>model_extraction.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-fa3bb1812debf86c.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="skema" data-themes="" data-resource-suffix="" data-rustdoc-version="1.74.0 (79e9716c9 2023-11-13)" data-channel="1.74.0" data-search-js="search-8be46b629f5f14a8.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-c5bd66d33317d69f.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../skema/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1230,7 +1230,7 @@
 <a href="#1230" id="1230">1230</a>
 <a href="#1231" id="1231">1231</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>mathml::ast::{operator::Operator, Math};
-
+<span class="kw">use </span><span class="kw">crate</span>::config::Config;
 <span class="kw">pub use </span>mathml::mml2pn::{ACSet, Term};
 <span class="kw">use </span>petgraph::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span>rsmgclient::{ConnectParams, Connection, MgError, Node, Relationship, Value};
@@ -1297,12 +1297,12 @@
 }
 
 <span class="attr">#[allow(non_snake_case)]
-</span><span class="kw">pub fn </span>module_id2mathml_MET_ast(module_id: i64, host: <span class="kw-2">&amp;</span>str) -&gt; Vec&lt;FirstOrderODE&gt; {
+</span><span class="kw">pub fn </span>module_id2mathml_MET_ast(module_id: i64, config: Config) -&gt; Vec&lt;FirstOrderODE&gt; {
     <span class="kw">let </span><span class="kw-2">mut </span>core_dynamics_ast = Vec::&lt;FirstOrderODE&gt;::new();
     <span class="kw">let </span><span class="kw-2">mut </span>_metadata_map_ast = HashMap::new();
-    <span class="kw">let </span>graph = subgraph2petgraph(module_id, host); <span class="comment">// makes petgraph of graph
+    <span class="kw">let </span>graph = subgraph2petgraph(module_id, config.clone()); <span class="comment">// makes petgraph of graph
 
-    </span><span class="kw">let </span>core_id = find_pn_dynamics(module_id, host); <span class="comment">// gives back list of function nodes that might contain the dynamics
+    </span><span class="kw">let </span>core_id = find_pn_dynamics(module_id, config.clone()); <span class="comment">// gives back list of function nodes that might contain the dynamics
     //let _line_span = get_line_span(core_id[0], graph); // get&#39;s the line span of function id
 
     //println!(&quot;\n{:?}&quot;, line_span);
@@ -1324,7 +1324,7 @@
         core_dynamics_ast.push(fo_eq);
     } <span class="kw">else </span>{
         (core_dynamics_ast, _metadata_map_ast) =
-        subgrapg2_core_dyn_MET_ast(core_id[<span class="number">0</span>], host).unwrap();
+        subgrapg2_core_dyn_MET_ast(core_id[<span class="number">0</span>], config.clone()).unwrap();
     }
 
     <span class="comment">//println!(&quot;function_core_id: {:?}&quot;, core_id[0].clone());
@@ -1338,10 +1338,10 @@
     </span>core_dynamics_ast
 }
 
-<span class="kw">pub fn </span>module_id2mathml_ast(module_id: i64, host: <span class="kw-2">&amp;</span>str) -&gt; Vec&lt;Math&gt; {
-    <span class="kw">let </span>_graph = subgraph2petgraph(module_id, host); <span class="comment">// makes petgraph of graph
+<span class="kw">pub fn </span>module_id2mathml_ast(module_id: i64, config: Config) -&gt; Vec&lt;Math&gt; {
+    <span class="kw">let </span>_graph = subgraph2petgraph(module_id, config.clone()); <span class="comment">// makes petgraph of graph
 
-    </span><span class="kw">let </span>core_id = find_pn_dynamics(module_id, host); <span class="comment">// gives back list of function nodes that might contain the dynamics
+    </span><span class="kw">let </span>core_id = find_pn_dynamics(module_id, config.clone()); <span class="comment">// gives back list of function nodes that might contain the dynamics
 
     //let _line_span = get_line_span(core_id[0], graph); // get&#39;s the line span of function id
 
@@ -1352,7 +1352,7 @@
     // 4.5 now to check if of those expressions, if they are arithmetric in nature
 
     // 5. pass id to subgrapg2_core_dyn to get core dynamics
-    </span><span class="kw">let </span>(core_dynamics_ast, _metadata_map_ast) = subgraph2_core_dyn_ast(core_id[<span class="number">0</span>], host).unwrap();
+    </span><span class="kw">let </span>(core_dynamics_ast, _metadata_map_ast) = subgraph2_core_dyn_ast(core_id[<span class="number">0</span>], config.clone()).unwrap();
 
     <span class="comment">//println!(&quot;\ncore_dynamics_ast[0]: {:?}&quot;, core_dynamics_ast[0].clone());
 
@@ -1371,8 +1371,8 @@
 <span class="comment">// this function finds the core dynamics and returns a vector of
 // node id&#39;s that meet the criteria for identification
 </span><span class="attr">#[allow(clippy::if_same_then_else)]
-</span><span class="kw">pub fn </span>find_pn_dynamics(module_id: i64, host: <span class="kw-2">&amp;</span>str) -&gt; Vec&lt;i64&gt; {
-    <span class="kw">let </span>graph = subgraph2petgraph(module_id, host);
+</span><span class="kw">pub fn </span>find_pn_dynamics(module_id: i64, config: Config) -&gt; Vec&lt;i64&gt; {
+    <span class="kw">let </span>graph = subgraph2petgraph(module_id, config.clone());
     <span class="comment">// 1. find each function node
     </span><span class="kw">let </span><span class="kw-2">mut </span>function_nodes = Vec::&lt;NodeIndex&gt;::new();
     <span class="kw">for </span>node <span class="kw">in </span>graph.node_indices() {
@@ -1385,7 +1385,7 @@
     </span><span class="kw">let </span><span class="kw-2">mut </span>functions = Vec::&lt;petgraph::Graph&lt;rsmgclient::Node, rsmgclient::Relationship&gt;&gt;::new();
     <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..function_nodes.len() {
         <span class="comment">// grab the subgraph of the given expression
-        </span>functions.push(subgraph2petgraph(graph[function_nodes[i]].id, host));
+        </span>functions.push(subgraph2petgraph(graph[function_nodes[i]].id, config.clone()));
     }
     <span class="comment">// get a sense of the number of expressions in each function
     </span><span class="kw">let </span><span class="kw-2">mut </span>func_counter = <span class="number">0</span>;
@@ -1430,10 +1430,10 @@
 <span class="attr">#[allow(non_snake_case)]
 </span><span class="kw">pub fn </span>subgrapg2_core_dyn_MET_ast(
     root_node_id: i64,
-    host: <span class="kw-2">&amp;</span>str,
+    config: Config,
 ) -&gt; <span class="prelude-ty">Result</span>&lt;(Vec&lt;FirstOrderODE&gt;, HashMap&lt;String, rsmgclient::Node&gt;), MgError&gt; {
     <span class="comment">// get the petgraph of the subgraph
-    </span><span class="kw">let </span>graph = subgraph2petgraph(root_node_id, host);
+    </span><span class="kw">let </span>graph = subgraph2petgraph(root_node_id, config.clone());
 
     <span class="comment">/* MAKE THIS A FUNCTION THAT TAKES IN A PETGRAPH */
     // create the metadata rust rep
@@ -1464,7 +1464,7 @@
     </span><span class="kw">let </span><span class="kw-2">mut </span>expressions = Vec::&lt;petgraph::Graph&lt;rsmgclient::Node, rsmgclient::Relationship&gt;&gt;::new();
     <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..expression_nodes.len() {
         <span class="comment">// grab the subgraph of the given expression
-        </span>expressions.push(subgraph2petgraph(graph[expression_nodes[i]].id, host));
+        </span>expressions.push(subgraph2petgraph(graph[expression_nodes[i]].id, config.clone()));
     }
 
     <span class="comment">// initialize vector to collect all expression wiring graphs
@@ -1472,7 +1472,7 @@
         Vec::&lt;petgraph::Graph&lt;rsmgclient::Node, rsmgclient::Relationship&gt;&gt;::new();
     <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..expression_nodes.len() {
         <span class="comment">// grab the wiring subgraph of the given expression
-        </span>expressions_wiring.push(subgraph_wiring(graph[expression_nodes[i]].id, host).unwrap());
+        </span>expressions_wiring.push(subgraph_wiring(graph[expression_nodes[i]].id, config.clone()).unwrap());
     }
 
     <span class="comment">// now to trim off the un-named filler nodes and filler expressions
@@ -1510,10 +1510,10 @@
 
 <span class="kw">pub fn </span>subgraph2_core_dyn_ast(
     root_node_id: i64,
-    host: <span class="kw-2">&amp;</span>str,
+    config: Config,
 ) -&gt; <span class="prelude-ty">Result</span>&lt;(Vec&lt;Vec&lt;MathExpression&gt;&gt;, HashMap&lt;String, rsmgclient::Node&gt;), MgError&gt; {
     <span class="comment">// get the petgraph of the subgraph
-    </span><span class="kw">let </span>graph = subgraph2petgraph(root_node_id, host);
+    </span><span class="kw">let </span>graph = subgraph2petgraph(root_node_id, config.clone());
 
     <span class="comment">/* MAKE THIS A FUNCTION THAT TAKES IN A PETGRAPH */
     // create the metadata rust rep
@@ -1549,7 +1549,7 @@
             &quot;These are the nodes for expressions: {:?}&quot;,
             graph[expression_nodes[i]].id.clone()
         );*/
-        </span>expressions.push(subgraph2petgraph(graph[expression_nodes[i]].id, host));
+        </span>expressions.push(subgraph2petgraph(graph[expression_nodes[i]].id, config.clone()));
     }
 
     <span class="comment">// initialize vector to collect all expression wiring graphs
@@ -1557,7 +1557,7 @@
         Vec::&lt;petgraph::Graph&lt;rsmgclient::Node, rsmgclient::Relationship&gt;&gt;::new();
     <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..expression_nodes.len() {
         <span class="comment">// grab the wiring subgraph of the given expression
-        </span>expressions_wiring.push(subgraph_wiring(graph[expression_nodes[i]].id, host).unwrap());
+        </span>expressions_wiring.push(subgraph_wiring(graph[expression_nodes[i]].id, config.clone()).unwrap());
     }
 
     <span class="comment">// now to trim off the un-named filler nodes and filler expressions
@@ -2269,11 +2269,14 @@
 
 <span class="kw">fn </span>subgraph_wiring(
     module_id: i64,
-    host: <span class="kw-2">&amp;</span>str,
+    config: Config,
 ) -&gt; <span class="prelude-ty">Result</span>&lt;petgraph::Graph&lt;rsmgclient::Node, rsmgclient::Relationship&gt;, MgError&gt; {
     <span class="comment">// Connect to Memgraph.
+    // FIXME: refactor using a util method 
+    // that constructs ConnectParams uniformly everwhere
     </span><span class="kw">let </span>connect_params = ConnectParams {
-        host: <span class="prelude-val">Some</span>(host.to_string()),
+        port: config.clone().db_port,
+        host: <span class="prelude-val">Some</span>(config.db_host.clone()),
         ..Default::default()
     };
     <span class="kw">let </span><span class="kw-2">mut </span>connection = Connection::connect(<span class="kw-2">&amp;</span>connect_params)<span class="question-mark">?</span>;
@@ -2363,9 +2366,9 @@
 
 <span class="kw">fn </span>subgraph2petgraph(
     module_id: i64,
-    host: <span class="kw-2">&amp;</span>str,
+    config: Config,
 ) -&gt; petgraph::Graph&lt;rsmgclient::Node, rsmgclient::Relationship&gt; {
-    <span class="kw">let </span>(x, y) = get_subgraph(module_id, host).unwrap();
+    <span class="kw">let </span>(x, y) = get_subgraph(module_id, config.clone()).unwrap();
 
     <span class="comment">// Create a petgraph graph
     </span><span class="kw">let </span><span class="kw-2">mut </span>graph: petgraph::Graph&lt;rsmgclient::Node, rsmgclient::Relationship&gt; = Graph::new();
@@ -2396,14 +2399,11 @@
     graph
 }
 
-<span class="kw">pub fn </span>get_subgraph(module_id: i64, host: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;(Vec&lt;Node&gt;, Vec&lt;Relationship&gt;), MgError&gt; {
+<span class="kw">pub fn </span>get_subgraph(module_id: i64, config: Config) -&gt; <span class="prelude-ty">Result</span>&lt;(Vec&lt;Node&gt;, Vec&lt;Relationship&gt;), MgError&gt; {
     <span class="comment">// construct the query that will delete the module with a given unique identifier
 
     // Connect to Memgraph.
-    </span><span class="kw">let </span>connect_params = ConnectParams {
-        host: <span class="prelude-val">Some</span>(host.to_string()),
-        ..Default::default()
-    };
+    </span><span class="kw">let </span>connect_params = config.db_connection();
     <span class="kw">let </span><span class="kw-2">mut </span>connection = Connection::connect(<span class="kw-2">&amp;</span>connect_params)<span class="question-mark">?</span>;
 
     <span class="comment">// create query for nodes

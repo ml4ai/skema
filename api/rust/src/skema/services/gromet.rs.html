@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `skema/src/services/gromet.rs`."><title>gromet.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-cb6f1f67f1bcd037.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="skema" data-themes="" data-resource-suffix="" data-rustdoc-version="1.73.0 (cc66ad468 2023-10-03)" data-channel="1.73.0" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-1596385f77d47ef2.css" data-theme-dark-css="dark-0a43001d3fc2282c.css" data-theme-ayu-css="ayu-fd19013d6ce078bf.css" ><script src="../../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-1596385f77d47ef2.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-0a43001d3fc2282c.css"><link rel="stylesheet" href="../../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../skema/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `skema/src/services/gromet.rs`."><title>gromet.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-fa3bb1812debf86c.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="skema" data-themes="" data-resource-suffix="" data-rustdoc-version="1.74.0 (79e9716c9 2023-11-13)" data-channel="1.74.0" data-search-js="search-8be46b629f5f14a8.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-c5bd66d33317d69f.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../skema/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -364,6 +364,34 @@
 <a href="#364" id="364">364</a>
 <a href="#365" id="365">365</a>
 <a href="#366" id="366">366</a>
+<a href="#367" id="367">367</a>
+<a href="#368" id="368">368</a>
+<a href="#369" id="369">369</a>
+<a href="#370" id="370">370</a>
+<a href="#371" id="371">371</a>
+<a href="#372" id="372">372</a>
+<a href="#373" id="373">373</a>
+<a href="#374" id="374">374</a>
+<a href="#375" id="375">375</a>
+<a href="#376" id="376">376</a>
+<a href="#377" id="377">377</a>
+<a href="#378" id="378">378</a>
+<a href="#379" id="379">379</a>
+<a href="#380" id="380">380</a>
+<a href="#381" id="381">381</a>
+<a href="#382" id="382">382</a>
+<a href="#383" id="383">383</a>
+<a href="#384" id="384">384</a>
+<a href="#385" id="385">385</a>
+<a href="#386" id="386">386</a>
+<a href="#387" id="387">387</a>
+<a href="#388" id="388">388</a>
+<a href="#389" id="389">389</a>
+<a href="#390" id="390">390</a>
+<a href="#391" id="391">391</a>
+<a href="#392" id="392">392</a>
+<a href="#393" id="393">393</a>
+<a href="#394" id="394">394</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! REST API endpoints related to CRUD operations and other queries on GroMEt objects.
 </span><span class="kw">use </span><span class="kw">crate</span>::config::Config;
 <span class="kw">use </span><span class="kw">crate</span>::database::{execute_query, parse_gromet_queries};
@@ -391,27 +419,27 @@
     }
 }
 <span class="attr">#[allow(non_snake_case)]
-</span><span class="kw">pub fn </span>model_to_RN(gromet: ModuleCollection, host: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;RegNet, MgError&gt; {
-    <span class="kw">let </span>module_id = push_model_to_db(gromet, host); <span class="comment">// pushes model to db and gets id
+</span><span class="kw">pub fn </span>model_to_RN(gromet: ModuleCollection, config: Config) -&gt; <span class="prelude-ty">Result</span>&lt;RegNet, MgError&gt; {
+    <span class="kw">let </span>module_id = push_model_to_db(gromet, config.clone()); <span class="comment">// pushes model to db and gets id
     </span><span class="kw">let </span>ref_module_id1 = module_id.as_ref();
     <span class="kw">let </span>ref_module_id2 = module_id.as_ref();
-    <span class="kw">let </span>mathml_ast = module_id2mathml_ast(<span class="kw-2">*</span>ref_module_id1.unwrap(), host); <span class="comment">// turns model into mathml ast equations
-    </span><span class="kw">let </span>_del_response = delete_module(<span class="kw-2">*</span>ref_module_id2.unwrap(), host); <span class="comment">// deletes model from db
+    <span class="kw">let </span>mathml_ast = module_id2mathml_ast(<span class="kw-2">*</span>ref_module_id1.unwrap(), config.clone()); <span class="comment">// turns model into mathml ast equations
+    </span><span class="kw">let </span>_del_response = delete_module(<span class="kw-2">*</span>ref_module_id2.unwrap(), config.clone()); <span class="comment">// deletes model from db
     </span><span class="prelude-val">Ok</span>(RegNet::from(mathml_ast))
 }
 
 <span class="comment">// this is updated to mathexpressiontrees
 </span><span class="attr">#[allow(non_snake_case)]
-</span><span class="kw">pub fn </span>model_to_PN(gromet: ModuleCollection, host: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;PetriNet, MgError&gt; {
-    <span class="kw">let </span>module_id = push_model_to_db(gromet, host); <span class="comment">// pushes model to db and gets id
+</span><span class="kw">pub fn </span>model_to_PN(gromet: ModuleCollection, config: Config) -&gt; <span class="prelude-ty">Result</span>&lt;PetriNet, MgError&gt; {
+    <span class="kw">let </span>module_id = push_model_to_db(gromet, config.clone()); <span class="comment">// pushes model to db and gets id
     </span><span class="kw">let </span>ref_module_id1 = module_id.as_ref();
     <span class="kw">let </span>ref_module_id2 = module_id.as_ref();
-    <span class="kw">let </span>mathml_ast = module_id2mathml_MET_ast(<span class="kw-2">*</span>ref_module_id1.unwrap(), host); <span class="comment">// turns model into mathml ast equations
-    </span><span class="kw">let </span>_del_response = delete_module(<span class="kw-2">*</span>ref_module_id2.unwrap(), host); <span class="comment">// deletes model from db
+    <span class="kw">let </span>mathml_ast = module_id2mathml_MET_ast(<span class="kw-2">*</span>ref_module_id1.unwrap(), config.clone()); <span class="comment">// turns model into mathml ast equations
+    </span><span class="kw">let </span>_del_response = delete_module(<span class="kw-2">*</span>ref_module_id2.unwrap(), config.clone()); <span class="comment">// deletes model from db
     </span><span class="prelude-val">Ok</span>(PetriNet::from(mathml_ast))
 }
 
-<span class="kw">pub fn </span>push_model_to_db(gromet: ModuleCollection, host: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;i64, MgError&gt; {
+<span class="kw">pub fn </span>push_model_to_db(gromet: ModuleCollection, config: Config) -&gt; <span class="prelude-ty">Result</span>&lt;i64, MgError&gt; {
     <span class="comment">// parse gromet into vec of queries
     </span><span class="kw">let </span>queries = parse_gromet_queries(gromet);
 
@@ -422,31 +450,28 @@
         <span class="kw">let </span>temp_str = <span class="kw-2">&amp;</span>queries[i].clone();
         full_query.push_str(temp_str);
     }
-    execute_query(<span class="kw-2">&amp;</span>full_query, host)<span class="question-mark">?</span>;
-    <span class="kw">let </span>model_ids = module_query(host)<span class="question-mark">?</span>;
+    execute_query(<span class="kw-2">&amp;</span>full_query, config.clone())<span class="question-mark">?</span>;
+    <span class="kw">let </span>model_ids = module_query(config.clone())<span class="question-mark">?</span>;
     <span class="kw">let </span>last_model_id = model_ids[model_ids.len() - <span class="number">1</span>];
     <span class="prelude-val">Ok</span>(last_model_id)
 }
 
-<span class="kw">pub fn </span>delete_module(module_id: i64, host: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;(), MgError&gt; {
+<span class="kw">pub fn </span>delete_module(module_id: i64, config: Config) -&gt; <span class="prelude-ty">Result</span>&lt;(), MgError&gt; {
     <span class="comment">// construct the query that will delete the module with a given unique identifier
 
     </span><span class="kw">let </span>query = <span class="macro">format!</span>(
         <span class="string">&quot;MATCH (n)-[r:Contains|Port_Of|Wire*1..5]-&gt;(m) WHERE id(n) = {}\nDETACH DELETE n,m&quot;</span>,
         module_id
     );
-    execute_query(<span class="kw-2">&amp;</span>query, host)<span class="question-mark">?</span>;
+    execute_query(<span class="kw-2">&amp;</span>query, config.clone())<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="kw">pub fn </span>named_opi_query(module_id: i64, host: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;String&gt;, MgError&gt; {
+<span class="kw">pub fn </span>named_opi_query(module_id: i64, config: Config) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;String&gt;, MgError&gt; {
     <span class="comment">// construct the query that will delete the module with a given unique identifier
 
     // Connect to Memgraph.
-    </span><span class="kw">let </span>connect_params = ConnectParams {
-        host: <span class="prelude-val">Some</span>(host.to_string()),
-        ..Default::default()
-    };
+    </span><span class="kw">let </span>connect_params = config.db_connection();
     <span class="kw">let </span><span class="kw-2">mut </span>connection = Connection::connect(<span class="kw-2">&amp;</span>connect_params)<span class="question-mark">?</span>;
 
     <span class="comment">// create query
@@ -475,14 +500,11 @@
     <span class="prelude-val">Ok</span>(port_names)
 }
 
-<span class="kw">pub fn </span>named_opo_query(module_id: i64, host: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;String&gt;, MgError&gt; {
+<span class="kw">pub fn </span>named_opo_query(module_id: i64, config: Config) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;String&gt;, MgError&gt; {
     <span class="comment">// construct the query that will delete the module with a given unique identifier
 
     // Connect to Memgraph.
-    </span><span class="kw">let </span>connect_params = ConnectParams {
-        host: <span class="prelude-val">Some</span>(host.to_string()),
-        ..Default::default()
-    };
+    </span><span class="kw">let </span>connect_params = config.db_connection();
     <span class="kw">let </span><span class="kw-2">mut </span>connection = Connection::connect(<span class="kw-2">&amp;</span>connect_params)<span class="question-mark">?</span>;
 
     <span class="comment">// create query
@@ -511,21 +533,18 @@
     <span class="prelude-val">Ok</span>(port_names)
 }
 
-<span class="kw">pub fn </span>named_port_query(module_id: i64, host: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;HashMap&lt;<span class="kw-2">&amp;</span>str, Vec&lt;String&gt;&gt;, MgError&gt; {
+<span class="kw">pub fn </span>named_port_query(module_id: i64, config: Config) -&gt; <span class="prelude-ty">Result</span>&lt;HashMap&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, Vec&lt;String&gt;&gt;, MgError&gt; {
     <span class="kw">let </span><span class="kw-2">mut </span>result = HashMap::&lt;<span class="kw-2">&amp;</span>str, Vec&lt;String&gt;&gt;::new();
-    <span class="kw">let </span>opis = named_opi_query(module_id, host);
-    <span class="kw">let </span>opos = named_opo_query(module_id, host);
+    <span class="kw">let </span>opis = named_opi_query(module_id, config.clone());
+    <span class="kw">let </span>opos = named_opo_query(module_id, config.clone());
     result.insert(<span class="string">&quot;opis&quot;</span>, opis.unwrap());
     result.insert(<span class="string">&quot;opos&quot;</span>, opos.unwrap());
     <span class="prelude-val">Ok</span>(result)
 }
 
-<span class="kw">pub fn </span>get_subgraph_query(module_id: i64, host: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;String&gt;, MgError&gt; {
+<span class="kw">pub fn </span>get_subgraph_query(module_id: i64, config: Config) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;String&gt;, MgError&gt; {
     <span class="comment">// Connect to Memgraph.
-    </span><span class="kw">let </span>connect_params = ConnectParams {
-        host: <span class="prelude-val">Some</span>(host.to_string()),
-        ..Default::default()
-    };
+    </span><span class="kw">let </span>connect_params = config.db_connection();
     <span class="kw">let </span><span class="kw-2">mut </span>connection = Connection::connect(<span class="kw-2">&amp;</span>connect_params)<span class="question-mark">?</span>;
 
     <span class="comment">// create query1
@@ -557,12 +576,9 @@
     <span class="prelude-val">Ok</span>(node_list)
 }
 
-<span class="kw">pub fn </span>module_query(host: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;i64&gt;, MgError&gt; {
+<span class="kw">pub fn </span>module_query(config: Config) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;i64&gt;, MgError&gt; {
     <span class="comment">// Connect to Memgraph.
-    </span><span class="kw">let </span>connect_params = ConnectParams {
-        host: <span class="prelude-val">Some</span>(host.to_string()),
-        ..Default::default()
-    };
+    </span><span class="kw">let </span>connect_params = config.db_connection();
     <span class="kw">let </span><span class="kw-2">mut </span>connection = Connection::connect(<span class="kw-2">&amp;</span>connect_params)<span class="question-mark">?</span>;
 
     <span class="comment">// Run Query.
@@ -592,7 +608,11 @@
 )]
 #[get(<span class="string">&quot;/models&quot;</span>)]
 </span><span class="kw">pub async fn </span>get_model_ids(config: web::Data&lt;Config&gt;) -&gt; HttpResponse {
-    <span class="kw">let </span>response = module_query(<span class="kw-2">&amp;</span>config.db_host).unwrap();
+    <span class="kw">let </span>config1 = Config {
+        db_host: config.db_host.clone(),
+        db_port: config.db_port.clone(),
+    };
+    <span class="kw">let </span>response = module_query(config1).unwrap();
     HttpResponse::Ok().json(web::Json(response))
 }
 
@@ -608,7 +628,11 @@
     payload: web::Json&lt;ModuleCollection&gt;,
     config: web::Data&lt;Config&gt;,
 ) -&gt; HttpResponse {
-    <span class="kw">let </span>model_id = push_model_to_db(payload.into_inner(), <span class="kw-2">&amp;</span>config.db_host).unwrap();
+    <span class="kw">let </span>config1 = Config {
+        db_host: config.db_host.clone(),
+        db_port: config.db_port.clone(),
+    };
+    <span class="kw">let </span>model_id = push_model_to_db(payload.into_inner(), config1).unwrap();
     HttpResponse::Ok().json(web::Json(model_id))
 }
 
@@ -621,7 +645,11 @@
 #[delete(<span class="string">&quot;/models/{id}&quot;</span>)]
 </span><span class="kw">pub async fn </span>delete_model(path: web::Path&lt;i64&gt;, config: web::Data&lt;Config&gt;) -&gt; HttpResponse {
     <span class="kw">let </span>id = path.into_inner();
-    delete_module(id, <span class="kw-2">&amp;</span>config.db_host).unwrap();
+    <span class="kw">let </span>config1 = Config {
+        db_host: config.db_host.clone(),
+        db_port: config.db_port.clone(),
+    };
+    delete_module(id, config1).unwrap();
     HttpResponse::Ok().body(<span class="string">&quot;Model deleted&quot;</span>)
 }
 
@@ -633,7 +661,11 @@
 )]
 #[get(<span class="string">&quot;/models/{id}/named_opos&quot;</span>)]
 </span><span class="kw">pub async fn </span>get_named_opos(path: web::Path&lt;i64&gt;, config: web::Data&lt;Config&gt;) -&gt; HttpResponse {
-    <span class="kw">let </span>response = named_opo_query(path.into_inner(), <span class="kw-2">&amp;</span>config.db_host).unwrap();
+    <span class="kw">let </span>config1 = Config {
+        db_host: config.db_host.clone(),
+        db_port: config.db_port.clone(),
+    };
+    <span class="kw">let </span>response = named_opo_query(path.into_inner(), config1).unwrap();
     HttpResponse::Ok().json(web::Json(response))
 }
 
@@ -645,7 +677,11 @@
 )]
 #[get(<span class="string">&quot;/models/{id}/named_ports&quot;</span>)]
 </span><span class="kw">pub async fn </span>get_named_ports(path: web::Path&lt;i64&gt;, config: web::Data&lt;Config&gt;) -&gt; HttpResponse {
-    <span class="kw">let </span>response = named_port_query(path.into_inner(), <span class="kw-2">&amp;</span>config.db_host).unwrap();
+    <span class="kw">let </span>config1 = Config {
+        db_host: config.db_host.clone(),
+        db_port: config.db_port.clone(),
+    };
+    <span class="kw">let </span>response = named_port_query(path.into_inner(), config1).unwrap();
     HttpResponse::Ok().json(web::Json(response))
 }
 
@@ -657,7 +693,11 @@
 )]
 #[get(<span class="string">&quot;/models/{id}/named_opis&quot;</span>)]
 </span><span class="kw">pub async fn </span>get_named_opis(path: web::Path&lt;i64&gt;, config: web::Data&lt;Config&gt;) -&gt; HttpResponse {
-    <span class="kw">let </span>response = named_opi_query(path.into_inner(), <span class="kw-2">&amp;</span>config.db_host).unwrap();
+    <span class="kw">let </span>config1 = Config {
+        db_host: config.db_host.clone(),
+        db_port: config.db_port.clone(),
+    };
+    <span class="kw">let </span>response = named_opi_query(path.into_inner(), config1).unwrap();
     HttpResponse::Ok().json(web::Json(response))
 }
 
@@ -669,7 +709,11 @@
 )]
 #[get(<span class="string">&quot;/models/{id}/subgraph&quot;</span>)]
 </span><span class="kw">pub async fn </span>get_subgraph(path: web::Path&lt;i64&gt;, config: web::Data&lt;Config&gt;) -&gt; HttpResponse {
-    <span class="kw">let </span>response = get_subgraph_query(path.into_inner(), <span class="kw-2">&amp;</span>config.db_host).unwrap();
+    <span class="kw">let </span>config1 = Config {
+        db_host: config.db_host.clone(),
+        db_port: config.db_port.clone(),
+    };
+    <span class="kw">let </span>response = get_subgraph_query(path.into_inner(), config1).unwrap();
     HttpResponse::Ok().json(web::Json(response))
 }
 
@@ -685,7 +729,11 @@
 )]
 #[get(<span class="string">&quot;/models/{id}/RN&quot;</span>)]
 </span><span class="kw">pub async fn </span>get_model_RN(path: web::Path&lt;i64&gt;, config: web::Data&lt;Config&gt;) -&gt; HttpResponse {
-    <span class="kw">let </span>mathml_ast = module_id2mathml_ast(path.into_inner(), <span class="kw-2">&amp;</span>config.db_host);
+    <span class="kw">let </span>config1 = Config {
+        db_host: config.db_host.clone(),
+        db_port: config.db_port.clone(),
+    };
+    <span class="kw">let </span>mathml_ast = module_id2mathml_ast(path.into_inner(), config1);
     HttpResponse::Ok().json(web::Json(RegNet::from(mathml_ast)))
 }
 
@@ -705,8 +753,12 @@
     payload: web::Json&lt;ModuleCollection&gt;,
     config: web::Data&lt;Config&gt;,
 ) -&gt; HttpResponse {
+    <span class="kw">let </span>config1 = Config {
+        db_host: config.db_host.clone(),
+        db_port: config.db_port.clone(),
+    };
     HttpResponse::Ok().json(web::Json(
-        model_to_PN(payload.into_inner(), <span class="kw-2">&amp;</span>config.db_host).unwrap(),
+        model_to_PN(payload.into_inner(), config1).unwrap(),
     ))
 }
 
@@ -726,8 +778,12 @@
     payload: web::Json&lt;ModuleCollection&gt;,
     config: web::Data&lt;Config&gt;,
 ) -&gt; HttpResponse {
+    <span class="kw">let </span>config1 = Config {
+        db_host: config.db_host.clone(),
+        db_port: config.db_port.clone(),
+    };
     HttpResponse::Ok().json(web::Json(
-        model_to_RN(payload.into_inner(), <span class="kw-2">&amp;</span>config.db_host).unwrap(),
+        model_to_RN(payload.into_inner(), config1).unwrap(),
     ))
 }
 </code></pre></div></section></main></body></html>
