@@ -7,6 +7,7 @@ SYNTAX_KEYWORDS = [
     'assignment',
     'binary_operator',
     'block',
+    'boolean',
     'boolean_operator',
     'case',
     'case_clause',
@@ -57,12 +58,11 @@ SYNTAX_KEYWORDS = [
     'range',
     'spread_operator',
     'while',
-    'while_statement' 
+    'while_statement'
 ]
 
 """ Keywords used by CAST but not found in the Waterloo model """
 OTHER_KEYWORDS = [
-    'import',
     'source_file',
     'module'
 ]
