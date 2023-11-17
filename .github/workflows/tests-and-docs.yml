@@ -6,6 +6,12 @@ on:
   pull_request:
     branches: [main]
 
+env:
+  # used by both Python and Rust services
+  # to connect to Memgraph
+  SKEMA_GRAPH_DB_HOST: "bolt://127.0.0.1"
+  SKEMA_GRAPH_DB_PORT: "7687"
+
 jobs:
   docs:
     name: "Run tests and generate project documenation"
