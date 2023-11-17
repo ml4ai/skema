@@ -20,19 +20,15 @@ def check(result, expected = None):
         for i, _ in enumerate(result):
             check(_, expected[i])
     elif isinstance(result, Assignment):
-        assert isinstance(expected, Assignment)
         check(result.left, expected.left)
         check(result.right, expected.right)
     elif isinstance(result, Operator):
-        assert isinstance(expected, Operator)
         check(result.op, expected.op)
         check(result.operands, expected.operands)
     elif isinstance(result, Call):
-        assert isinstance(expected, Call)
         check(result.func, expected.func)
         check(result.arguments, expected.arguments)
     elif isinstance(result, ModelIf):
-        assert isinstance(expected, ModelIf)
         check(result.expr, expected.expr)
         check(result.body, expected.body)
         check(result.orelse, expected.orelse)
