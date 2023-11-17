@@ -144,8 +144,7 @@ def process_single_model(html: HTML_Instance, output_dir: str, model_name: str):
     if model_name in MODEL_YAML:
         model_url = MODEL_YAML[model_name]["zip_archive"]
         response = requests.get(model_url)
-    else:
-        pass
+
 
     zip = ZipFile(BytesIO(response.content))
     with TemporaryDirectory() as temp:
@@ -262,7 +261,10 @@ def process_single_model(html: HTML_Instance, output_dir: str, model_name: str):
 def process_all_models(html: HTML_Instance, output_dir: str):
     """Generate an HTML report for all models in models.yaml"""
     for model_name in MODEL_YAML:
-        process_single_model(html, output_dir, model_name)
+        try:
+            process_single_model(html, output_dir, model_name)
+        except:
+            continue
 
 def main():
 
