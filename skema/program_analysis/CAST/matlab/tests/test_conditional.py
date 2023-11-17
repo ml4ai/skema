@@ -1,5 +1,5 @@
 from skema.program_analysis.CAST.matlab.tests.utils import (
-    check_result,
+    check,
     cast_nodes
 )
 from skema.program_analysis.CAST2FN.model.cast import (
@@ -17,7 +17,7 @@ def test_if():
     end
     """
 
-    check_result(
+    check(
         cast_nodes(source)[0],
         ModelIf(
             # if
@@ -40,7 +40,7 @@ def test_if_else():
     end
     """
 
-    check_result(
+    check(
         cast_nodes(source)[0],
         ModelIf(
             # if
@@ -69,7 +69,7 @@ def test_if_elseif():
         y = x
     end
     """
-    check_result(
+    check(
         cast_nodes(source)[0],
         ModelIf(
             # if
@@ -104,7 +104,7 @@ def test_if_elseif_else():
     end
     """
     
-    check_result(
+    check(
         cast_nodes(source)[0],
         ModelIf(
             # if

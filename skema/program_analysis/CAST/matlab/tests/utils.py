@@ -13,34 +13,34 @@ from skema.program_analysis.CAST2FN.model.cast import (
     Var
 )
 
-def check_result(result, expected = None):
+def check(result, expected = None):
     """ Test for match with the same datatypes. """
     if isinstance(result, List):
         assert len(result) == len(expected)
         for i, _ in enumerate(result):
-            check_result(_, expected[i])
+            check(_, expected[i])
     elif isinstance(result, Assignment):
         assert isinstance(expected, Assignment)
-        check_result(result.left, expected.left)
-        check_result(result.right, expected.right)
+        check(result.left, expected.left)
+        check(result.right, expected.right)
     elif isinstance(result, Operator):
         assert isinstance(expected, Operator)
-        check_result(result.op, expected.op)
-        check_result(result.operands, expected.operands)
+        check(result.op, expected.op)
+        check(result.operands, expected.operands)
     elif isinstance(result, Call):
         assert isinstance(expected, Call)
-        check_result(result.func, expected.func)
-        check_result(result.arguments, expected.arguments)
+        check(result.func, expected.func)
+        check(result.arguments, expected.arguments)
     elif isinstance(result, ModelIf):
         assert isinstance(expected, ModelIf)
-        check_result(result.expr, expected.expr)
-        check_result(result.body, expected.body)
+        check(result.expr, expected.expr)
+        check(result.body, expected.body)
     elif isinstance(result, LiteralValue):
-        check_result(result.value, expected)
+        check(result.value, expected)
     elif isinstance(result, Var):
-        check_result(result.val, expected)
+        check(result.val, expected)
     elif isinstance(result, Name):
-        check_result(result.name, expected)
+        check(result.name, expected)
     else:
         assert result == expected
 

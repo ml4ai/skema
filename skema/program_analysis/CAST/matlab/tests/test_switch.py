@@ -1,5 +1,5 @@
 from skema.program_analysis.CAST.matlab.tests.utils import (
-    check_result,
+    check,
     cast_nodes
 )
 from skema.program_analysis.CAST2FN.model.cast import (
@@ -24,7 +24,7 @@ def test_case_clause_1_argument():
     """
 
     # switch statement translated into conditional
-    check_result(
+    check(
         cast_nodes(source)[0],
         ModelIf(
             # if
@@ -64,7 +64,7 @@ def test_case_clause_n_arguments():
     """
 
     # switch statement translated into conditional
-    check_result(
+    check(
         cast_nodes(source)[0],
         ModelIf(
             # if

@@ -1,5 +1,5 @@
 from skema.program_analysis.CAST.matlab.tests.utils import (
-    check_result,
+    check,
     cast_nodes
 )
 
@@ -12,4 +12,4 @@ def test_command():
     """ Test the MATLAB command syntax elements"""
 
     nodes = cast_nodes("clear all;")
-    check_result(nodes[0], Call(func = "clear", arguments=["all"]))
+    check(nodes[0], Call(func = "clear", arguments=["all"]))
