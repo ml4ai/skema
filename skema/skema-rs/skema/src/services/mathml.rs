@@ -1,14 +1,17 @@
 use actix_web::{put, web, HttpResponse};
+use mathml::parsers::decapodes_serialization::{
+    to_wiring_diagram, DecapodesCollection, WiringDiagram,
+};
 use mathml::parsers::first_order_ode::flatten_mults;
 use mathml::parsers::generic_mathml::math;
+use mathml::parsers::math_expression_tree::MathExpressionTree;
+use mathml::parsers::math_expression_tree::{replace_unicode_with_symbols, preprocess_mathml_for_to_latex};
 use mathml::{
     acset::{AMRmathml, PetriNet, RegNet},
     ast::Math,
     expression::{preprocess_content, wrap_math},
     parsers::first_order_ode::{first_order_ode, FirstOrderODE},
 };
-use mathml::parsers::math_expression_tree::MathExpressionTree;
-use mathml::parsers::decapodes_serialization::{to_wiring_diagram, WiringDiagram, DecapodesCollection};
 use petgraph::dot::{Config, Dot};
 use utoipa;
 
@@ -60,6 +63,25 @@ pub async fn get_math_exp_graph(payload: String) -> String {
     dot_representation.to_string()
 }
 
+/// Parse a presentation MathML representation of an equation and
+/// return the corresponding LaTeX representation
+#[utoipa::path(
+request_body = String,
+responses(
+(
+status = 200,
+body = String
+)
+)
+)]
+#[put("/mathml/latex")]
+pub async fn get_latex(payload: String) -> String {
+    let modified_input1 = &replace_unicode_with_symbols(&payload).to_string();
+    let modified_input2 = &preprocess_mathml_for_to_latex(modified_input1).to_string();
+    let exp = modified_input2.parse::<MathExpressionTree>().unwrap();
+    exp.to_latex()
+}
+
 /// Parse presentation MathML and return a content MathML representation. Currently limited to
 /// first-order ODEs.
 #[utoipa::path(
@@ -90,13 +112,16 @@ pub async fn get_content_mathml(payload: String) -> String {
 )]
 #[put("/mathml/decapodes")]
 pub async fn get_decapodes(payload: web::Json<Vec<String>>) -> HttpResponse {
-    let met_vec: Vec<MathExpressionTree> = payload.iter().map(|x| x.parse::<MathExpressionTree>().unwrap()).collect();
+    let met_vec: Vec<MathExpressionTree> = payload
+        .iter()
+        .map(|x| x.parse::<MathExpressionTree>().unwrap())
+        .collect();
     let mut deca_vec = Vec::<WiringDiagram>::new();
     for term in met_vec.iter() {
         deca_vec.push(to_wiring_diagram(term));
     }
     let decapodes_collection = DecapodesCollection {
-        decapodes: deca_vec.clone()
+        decapodes: deca_vec.clone(),
     };
     HttpResponse::Ok().json(web::Json(decapodes_collection))
 }

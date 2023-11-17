@@ -524,27 +524,24 @@ impl MathExpressionTree {
                         expression.push_str(&format!("{}", rest[1].to_latex()));
                     }
                     Operator::Divide => {
-                        for (index, r) in rest.iter().enumerate() {
-                            if let MathExpressionTree::Cons(op, _) = r {
+
+                            if let MathExpressionTree::Cons(op, _) = &rest[0] {
                                 if is_unary_operator(op) {
-                                    expression.push_str(&format!("{}", r.to_latex()));
+                                    expression.push_str(&format!("{}", &rest[0].to_latex()));
                                 } else if let Operator::Multiply = op {
-                                    expression.push_str(&format!("{}", r.to_latex()));
+                                    expression.push_str(&format!("{}", &rest[0].to_latex()));
                                 } else if let Operator::Divide = op {
-                                    expression.push_str(&format!("{}", r.to_latex()));
+                                    expression.push_str(&format!("{}", &rest[0].to_latex()));
                                 } else if let Operator::Dot = op {
-                                    expression.push_str(&format!("{}", r.to_latex()));
+                                    expression.push_str(&format!("{}", &rest[0].to_latex()));
                                 } else {
-                                    expression.push_str(&format!("({})", r.to_latex()));
+                                    expression.push_str(&format!("({})", &rest[0].to_latex()));
                                 }
                             } else {
-                                expression.push_str(&format!("{}", r.to_latex()));
+                                expression.push_str(&format!("{}", &rest[0].to_latex()));
                             }
-                            // Add "/" if it's not the last element
-                            if index < rest.len() - 1 {
-                                expression.push_str("/");
-                            }
-                        }
+                            expression.push_str("/");
+                            process_expression_parentheses(&mut expression, &rest[1]);
                     }
                     Operator::Exp => {
                         expression.push_str("\\mathrm{exp}");
@@ -996,7 +993,7 @@ fn infix_binding_power(op: &Operator) -> Option<(u8, u8)> {
 }
 
 /// Replaces Unicode representations in the input string with their corresponding symbols.
-fn replace_unicode_with_symbols(input: &str) -> String {
+pub fn replace_unicode_with_symbols(input: &str) -> String {
     // Define a regex pattern to match Unicode representations
     let re = Regex::new(r#"&#x([0-9A-Fa-f]+);"#).unwrap();
 
@@ -1022,7 +1019,7 @@ fn replace_unicode_with_symbols(input: &str) -> String {
 /// cleaner conversion to LaTeX. It removes newline characters, eliminates spaces between MathML
 /// elements, and replaces occurrences of "<mi>∇</mi>" with "<mo>∇</mo>" to enhance compatibility
 /// with LaTeX rendering. The resulting processed MathML string is then ready for conversion to LaTeX.
-fn preprocess_mathml_for_to_latex(input: &str) -> String {
+pub fn preprocess_mathml_for_to_latex(input: &str) -> String {
     // Remove all newline characters
     let no_newlines = input.replace('\n', "");
 
@@ -1962,6 +1959,6 @@ fn test_equation_halfar_dome_8_4_to_latex() {
     let latex_exp = exp.to_latex();
     assert_eq!(
         latex_exp,
-        "t_{0}=1/18*\\Gamma*(7/4)^{3}*R_{0}^{4}/H_{0}^{7}"
+        "t_{0}=1/(18*\\Gamma)*(7/4)^{3}*R_{0}^{4}/H_{0}^{7}"
     );
 }
