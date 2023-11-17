@@ -53,7 +53,7 @@ def test_if_else():
             # else
             orelse = [
                 Assignment(left="y", right = "x"),
-                Assignment(left="foo", right = "bar")
+                Assignment(left="foo", right = "'bar'")
             ]
         )
     )
@@ -79,14 +79,16 @@ def test_if_elseif():
                 Assignment(left="y", right = 6)
             ],
             # else
-            orelse = ModelIf(
-                # if
-                expr = Operator(op = "<=", operands = ["x", 0]),
-                # then
-                body = [
-                    Assignment(left="y", right = "x")
-                ]
-            )
+            orelse = [
+                ModelIf(
+                    # if
+                    expr = Operator(op = "<=", operands = ["x", 0]),
+                    # then
+                    body = [
+                        Assignment(left="y", right = "x")
+                    ]   
+                )   
+            ]
         )
     )
     
@@ -114,16 +116,18 @@ def test_if_elseif_else():
                 Assignment(left="a", right = 6)
             ],
             # else
-            orelse = ModelIf(
-                # if
-                expr = Operator(op = ">", operands = ["x", 0]),
-                # then
-                body = [
-                    Assignment(left="y", right = "x")
-                ],
-                orelse = [
-                    Assignment(left="c", right = "0")
-                ]
-            )
+            orelse = [
+                ModelIf(
+                    # if
+                    expr = Operator(op = ">", operands = ["x", 0]),
+                    # then
+                    body = [
+                        Assignment(left="b", right = "x")
+                    ],
+                    orelse = [
+                        Assignment(left="c", right = 0)
+                    ]
+                )
+            ]
         )
     )

@@ -34,19 +34,21 @@ def test_case_clause_1_argument():
                 Assignment(left="n", right = 1)
             ],
             # else
-            orelse = ModelIf(
-                # if
-                expr = Operator(op = "==", operands = ["s", "'two'"]),
-                # then
-                body = [
-                    Assignment(left="n", right = 2),
-                    Assignment(left="x", right = "y"),
-                ],
-                # else
-                orelse = [
-                    Assignment(left="n", right = 0)
-                ]
-            )
+            orelse = [
+                ModelIf(
+                    # if
+                    expr = Operator(op = "==", operands = ["s", "'two'"]),
+                    # then
+                    body = [
+                        Assignment(left="n", right = 2),
+                        Assignment(left="x", right = "y"),
+                    ],
+                    # else
+                    orelse = [
+                        Assignment(left="n", right = 0)
+                    ]
+                )
+            ]
         )
     )
                        
