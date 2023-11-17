@@ -207,6 +207,73 @@ def define_model(
     return model
 
 
+def merge_mn_elements(input_mathml: str) -> str:
+    """
+    Merge consecutive <mn> elements in the <mrow> structure of MathML.
+
+    Args:
+        input_mathml (str): Input MathML string.
+
+    Returns:
+        str: MathML string with consecutive <mn> elements merged.
+    """
+    input_mathml = input_mathml.replace("&#x", "###")  # keep the unicode representation
+    root = ET.fromstring(input_mathml)
+
+    def merge_mn_in_mrow(mrow: ET.Element) -> List[ET.Element]:
+        """
+        Merge consecutive <mn> elements within a given <mrow>.
+
+        Args:
+            mrow (ET.Element): <mrow> element.
+
+        Returns:
+            List[ET.Element]: List of merged elements.
+        """
+        merged_elements = []
+        current_number = None
+
+        for child in mrow:
+            if child.tag == 'mn':
+                if current_number is None:
+                    current_number = int(child.text)
+                else:
+                    current_number = current_number * 10 + int(child.text)
+            else:
+                if current_number is not None:
+                    merged_elements.append(ET.Element('mn'))
+                    merged_elements[-1].text = str(current_number)
+                    current_number = None
+                merged_elements.append(child)
+
+        if current_number is not None:
+            merged_elements.append(ET.Element('mn'))
+            merged_elements[-1].text = str(current_number)
+
+        return merged_elements
+
+    def process_element(element: ET.Element) -> None:
+        """
+        Recursively process each element in the MathML structure.
+
+        Args:
+            element (ET.Element): Current element to process.
+        """
+        if element.tag == 'mrow':
+            element[:] = merge_mn_in_mrow(element)
+            for child in element:
+                process_element(child)
+        else:
+            for child in element:
+                process_element(child)
+
+    process_element(root)
+    modified_xml_string = ET.tostring(root, encoding="utf-8", method="xml").decode('utf-8')
+    modified_xml_string = modified_xml_string.replace("###", "&#x")
+
+    return modified_xml_string
+
+
 def process_mtext(xml_string: str) -> str:
     """
     Process the input MathML string by merging consecutive <mi> elements and replacing specific <mrow> structures.
@@ -366,8 +433,9 @@ def render_mml(
         pred_seq = " ".join(pred[1:-1])
 
         try:
-            return process_mtext(
-                add_semicolon_to_unicode(remove_spaces_between_tags(pred_seq))
-            )
+            res = add_semicolon_to_unicode(remove_spaces_between_tags(pred_seq))
+            res = merge_mn_elements(res)
+            res = process_mtext(res)
+            return res
         except:
-            return add_semicolon_to_unicode(remove_spaces_between_tags(pred_seq))
+            return res
