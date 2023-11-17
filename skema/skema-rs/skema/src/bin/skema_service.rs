@@ -116,9 +116,8 @@ async fn main() -> std::io::Result<()> {
     let version_hash = env::var("APP_VERSION").unwrap_or("?????".to_string());
     let host_env = env::var("SKEMA_RS_HOST").unwrap_or("0.0.0.0".to_string());
     let port_env = env::var("SKEMA_RS_PORT").unwrap_or("8080".to_string());
-    let db_protocol = env::var("DB_PROTOCOL").unwrap_or("https://".to_string());
-    let db_host = env::var("DB_HOST").unwrap_or("127.0.0.1".to_string());
-    let db_port = env::var("DB_PORT").unwrap_or("7687".to_string());
+    let db_host = env::var("SKEMA_GRAPH_DB_HOST").unwrap_or("127.0.0.1".to_string());
+    let db_port = env::var("SKEMA_GRAPH_DB_PORT").unwrap_or("7687".to_string());
 
 
     let mut openapi = ApiDoc::openapi();
@@ -128,9 +127,7 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .app_data(Data::new(Config {
                 db_host: db_host.clone(),
-                db_port: db_port.parse::<u16>().unwrap(),
-                db_proto: db_protocol.clone(),
-
+                db_port: db_port.parse::<u16>().unwrap()
             }))
             .configure(gromet::configure())
             .service(skema::services::mathml::get_ast_graph)

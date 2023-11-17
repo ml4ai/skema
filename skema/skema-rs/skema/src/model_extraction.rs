@@ -1041,9 +1041,11 @@ fn subgraph_wiring(
     config: Config,
 ) -> Result<petgraph::Graph<rsmgclient::Node, rsmgclient::Relationship>, MgError> {
     // Connect to Memgraph.
+    // FIXME: refactor using a util method 
+    // that constructs ConnectParams uniformly everwhere
     let connect_params = ConnectParams {
         port: config.clone().db_port,
-        host: Some(format!("{}{}", config.db_proto.clone(), config.db_host.clone())),
+        host: Some(config.db_host.clone()),
         ..Default::default()
     };
     let mut connection = Connection::connect(&connect_params)?;
@@ -1170,11 +1172,7 @@ pub fn get_subgraph(module_id: i64, config: Config) -> Result<(Vec<Node>, Vec<Re
     // construct the query that will delete the module with a given unique identifier
 
     // Connect to Memgraph.
-    let connect_params = ConnectParams {
-        port: config.clone().db_port,
-        host: Some(format!("{}{}", config.db_proto.clone(), config.db_host.clone())),
-        ..Default::default()
-    };
+    let connect_params = config.db_connection();
     let mut connection = Connection::connect(&connect_params)?;
 
     // create query for nodes

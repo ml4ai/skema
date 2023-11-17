@@ -77,11 +77,7 @@ pub fn named_opi_query(module_id: i64, config: Config) -> Result<Vec<String>, Mg
     // construct the query that will delete the module with a given unique identifier
 
     // Connect to Memgraph.
-    let connect_params = ConnectParams {
-        port: config.clone().db_port,
-        host: Some(format!("{}{}", config.db_proto.clone(), config.db_host.clone())),
-        ..Default::default()
-    };
+    let connect_params = config.db_connection();
     let mut connection = Connection::connect(&connect_params)?;
 
     // create query
@@ -114,11 +110,7 @@ pub fn named_opo_query(module_id: i64, config: Config) -> Result<Vec<String>, Mg
     // construct the query that will delete the module with a given unique identifier
 
     // Connect to Memgraph.
-    let connect_params = ConnectParams {
-        port: config.clone().db_port,
-        host: Some(format!("{}{}", config.db_proto.clone(), config.db_host.clone())),
-        ..Default::default()
-    };
+    let connect_params = config.db_connection();
     let mut connection = Connection::connect(&connect_params)?;
 
     // create query
@@ -158,11 +150,7 @@ pub fn named_port_query(module_id: i64, config: Config) -> Result<HashMap<&'stat
 
 pub fn get_subgraph_query(module_id: i64, config: Config) -> Result<Vec<String>, MgError> {
     // Connect to Memgraph.
-    let connect_params = ConnectParams {
-        port: config.clone().db_port,
-        host: Some(format!("{}{}", config.db_proto.clone(), config.db_host.clone())),
-        ..Default::default()
-    };
+    let connect_params = config.db_connection();
     let mut connection = Connection::connect(&connect_params)?;
 
     // create query1
@@ -196,11 +184,7 @@ pub fn get_subgraph_query(module_id: i64, config: Config) -> Result<Vec<String>,
 
 pub fn module_query(config: Config) -> Result<Vec<i64>, MgError> {
     // Connect to Memgraph.
-    let connect_params = ConnectParams {
-        port: config.clone().db_port,
-        host: Some(format!("{}{}", config.db_proto.clone(), config.db_host.clone())),
-        ..Default::default()
-    };
+    let connect_params = config.db_connection();
     let mut connection = Connection::connect(&connect_params)?;
 
     // Run Query.
@@ -233,7 +217,6 @@ pub async fn get_model_ids(config: web::Data<Config>) -> HttpResponse {
     let config1 = Config {
         db_host: config.db_host.clone(),
         db_port: config.db_port.clone(),
-        db_proto: config.db_proto.clone(),
     };
     let response = module_query(config1).unwrap();
     HttpResponse::Ok().json(web::Json(response))
@@ -254,7 +237,6 @@ pub async fn post_model(
     let config1 = Config {
         db_host: config.db_host.clone(),
         db_port: config.db_port.clone(),
-        db_proto: config.db_proto.clone(),
     };
     let model_id = push_model_to_db(payload.into_inner(), config1).unwrap();
     HttpResponse::Ok().json(web::Json(model_id))
@@ -272,7 +254,6 @@ pub async fn delete_model(path: web::Path<i64>, config: web::Data<Config>) -> Ht
     let config1 = Config {
         db_host: config.db_host.clone(),
         db_port: config.db_port.clone(),
-        db_proto: config.db_proto.clone(),
     };
     delete_module(id, config1).unwrap();
     HttpResponse::Ok().body("Model deleted")
@@ -289,7 +270,6 @@ pub async fn get_named_opos(path: web::Path<i64>, config: web::Data<Config>) -> 
     let config1 = Config {
         db_host: config.db_host.clone(),
         db_port: config.db_port.clone(),
-        db_proto: config.db_proto.clone(),
     };
     let response = named_opo_query(path.into_inner(), config1).unwrap();
     HttpResponse::Ok().json(web::Json(response))
@@ -306,7 +286,6 @@ pub async fn get_named_ports(path: web::Path<i64>, config: web::Data<Config>) ->
     let config1 = Config {
         db_host: config.db_host.clone(),
         db_port: config.db_port.clone(),
-        db_proto: config.db_proto.clone(),
     };
     let response = named_port_query(path.into_inner(), config1).unwrap();
     HttpResponse::Ok().json(web::Json(response))
@@ -323,7 +302,6 @@ pub async fn get_named_opis(path: web::Path<i64>, config: web::Data<Config>) -> 
     let config1 = Config {
         db_host: config.db_host.clone(),
         db_port: config.db_port.clone(),
-        db_proto: config.db_proto.clone(),
     };
     let response = named_opi_query(path.into_inner(), config1).unwrap();
     HttpResponse::Ok().json(web::Json(response))
@@ -340,7 +318,6 @@ pub async fn get_subgraph(path: web::Path<i64>, config: web::Data<Config>) -> Ht
     let config1 = Config {
         db_host: config.db_host.clone(),
         db_port: config.db_port.clone(),
-        db_proto: config.db_proto.clone(),
     };
     let response = get_subgraph_query(path.into_inner(), config1).unwrap();
     HttpResponse::Ok().json(web::Json(response))
@@ -361,7 +338,6 @@ pub async fn get_model_RN(path: web::Path<i64>, config: web::Data<Config>) -> Ht
     let config1 = Config {
         db_host: config.db_host.clone(),
         db_port: config.db_port.clone(),
-        db_proto: config.db_proto.clone(),
     };
     let mathml_ast = module_id2mathml_ast(path.into_inner(), config1);
     HttpResponse::Ok().json(web::Json(RegNet::from(mathml_ast)))
@@ -386,7 +362,6 @@ pub async fn model2PN(
     let config1 = Config {
         db_host: config.db_host.clone(),
         db_port: config.db_port.clone(),
-        db_proto: config.db_proto.clone(),
     };
     HttpResponse::Ok().json(web::Json(
         model_to_PN(payload.into_inner(), config1).unwrap(),
@@ -412,7 +387,6 @@ pub async fn model2RN(
     let config1 = Config {
         db_host: config.db_host.clone(),
         db_port: config.db_port.clone(),
-        db_proto: config.db_proto.clone(),
     };
     HttpResponse::Ok().json(web::Json(
         model_to_RN(payload.into_inner(), config1).unwrap(),

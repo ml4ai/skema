@@ -43,14 +43,12 @@ fn main() {
             module_id = new_args.model_id.unwrap();
         }
 
-        let db_protocol = env::var("DB_PROTOCOL").unwrap_or("https://".to_string());
-        let db_host = env::var("DB_HOST").unwrap_or("127.0.0.1".to_string());
-        let db_port = env::var("DB_PORT").unwrap_or("7687".to_string());
+        let db_host = env::var("SKEMA_GRAPH_DB_HOST").unwrap_or("127.0.0.1".to_string());
+        let db_port = env::var("SKEMA_GRAPH_DB_PORT").unwrap_or("7687".to_string());
 
         let config = Config {
             db_host: db_host.clone(),
             db_port: db_port.parse::<u16>().unwrap(),
-            db_proto: db_protocol.clone(),
         };
 
         let math_content = module_id2mathml_MET_ast(module_id, config.clone());

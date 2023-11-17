@@ -89,11 +89,7 @@ pub struct ConstructorArgs {
 
 pub fn execute_query(query: &str, config: Config) -> Result<(), MgError> {
     // Connect to Memgraph.
-    let connect_params = ConnectParams {
-        port: config.db_port,
-        host: Some(format!("{}{}", config.db_proto.clone(), config.db_host.clone())),
-        ..Default::default()
-    };
+    let connect_params = config.db_connection();
     let mut connection = Connection::connect(&connect_params)?;
 
     // Create simple graph.
