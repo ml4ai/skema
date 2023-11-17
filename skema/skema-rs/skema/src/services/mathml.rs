@@ -66,13 +66,13 @@ pub async fn get_math_exp_graph(payload: String) -> String {
 /// Parse a presentation MathML representation of an equation and
 /// return the corresponding LaTeX representation
 #[utoipa::path(
-request_body = String,
-responses(
-(
-status = 200,
-body = String
-)
-)
+    request_body = String,
+        responses(
+        (
+            status = 200,
+            body = String
+        )
+    )
 )]
 #[put("/mathml/latex")]
 pub async fn get_latex(payload: String) -> String {
