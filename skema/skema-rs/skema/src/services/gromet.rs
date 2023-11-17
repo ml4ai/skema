@@ -25,27 +25,27 @@ pub fn configure() -> impl FnOnce(&mut ServiceConfig) {
     }
 }
 #[allow(non_snake_case)]
-pub fn model_to_RN(gromet: ModuleCollection, host: &str) -> Result<RegNet, MgError> {
-    let module_id = push_model_to_db(gromet, host); // pushes model to db and gets id
+pub fn model_to_RN(gromet: ModuleCollection, config: Config) -> Result<RegNet, MgError> {
+    let module_id = push_model_to_db(gromet, config.clone()); // pushes model to db and gets id
     let ref_module_id1 = module_id.as_ref();
     let ref_module_id2 = module_id.as_ref();
-    let mathml_ast = module_id2mathml_ast(*ref_module_id1.unwrap(), host); // turns model into mathml ast equations
-    let _del_response = delete_module(*ref_module_id2.unwrap(), host); // deletes model from db
+    let mathml_ast = module_id2mathml_ast(*ref_module_id1.unwrap(), config.clone()); // turns model into mathml ast equations
+    let _del_response = delete_module(*ref_module_id2.unwrap(), config.clone()); // deletes model from db
     Ok(RegNet::from(mathml_ast))
 }
 
 // this is updated to mathexpressiontrees
 #[allow(non_snake_case)]
-pub fn model_to_PN(gromet: ModuleCollection, host: &str) -> Result<PetriNet, MgError> {
-    let module_id = push_model_to_db(gromet, host); // pushes model to db and gets id
+pub fn model_to_PN(gromet: ModuleCollection, config: Config) -> Result<PetriNet, MgError> {
+    let module_id = push_model_to_db(gromet, config.clone()); // pushes model to db and gets id
     let ref_module_id1 = module_id.as_ref();
     let ref_module_id2 = module_id.as_ref();
-    let mathml_ast = module_id2mathml_MET_ast(*ref_module_id1.unwrap(), host); // turns model into mathml ast equations
-    let _del_response = delete_module(*ref_module_id2.unwrap(), host); // deletes model from db
+    let mathml_ast = module_id2mathml_MET_ast(*ref_module_id1.unwrap(), config.clone()); // turns model into mathml ast equations
+    let _del_response = delete_module(*ref_module_id2.unwrap(), config.clone()); // deletes model from db
     Ok(PetriNet::from(mathml_ast))
 }
 
-pub fn push_model_to_db(gromet: ModuleCollection, host: &str) -> Result<i64, MgError> {
+pub fn push_model_to_db(gromet: ModuleCollection, config: Config) -> Result<i64, MgError> {
     // parse gromet into vec of queries
     let queries = parse_gromet_queries(gromet);
 
@@ -56,29 +56,30 @@ pub fn push_model_to_db(gromet: ModuleCollection, host: &str) -> Result<i64, MgE
         let temp_str = &queries[i].clone();
         full_query.push_str(temp_str);
     }
-    execute_query(&full_query, host)?;
-    let model_ids = module_query(host)?;
+    execute_query(&full_query, config.clone())?;
+    let model_ids = module_query(config.clone())?;
     let last_model_id = model_ids[model_ids.len() - 1];
     Ok(last_model_id)
 }
 
-pub fn delete_module(module_id: i64, host: &str) -> Result<(), MgError> {
+pub fn delete_module(module_id: i64, config: Config) -> Result<(), MgError> {
     // construct the query that will delete the module with a given unique identifier
 
     let query = format!(
         "MATCH (n)-[r:Contains|Port_Of|Wire*1..5]->(m) WHERE id(n) = {}\nDETACH DELETE n,m",
         module_id
     );
-    execute_query(&query, host)?;
+    execute_query(&query, config.clone())?;
     Ok(())
 }
 
-pub fn named_opi_query(module_id: i64, host: &str) -> Result<Vec<String>, MgError> {
+pub fn named_opi_query(module_id: i64, config: Config) -> Result<Vec<String>, MgError> {
     // construct the query that will delete the module with a given unique identifier
 
     // Connect to Memgraph.
     let connect_params = ConnectParams {
-        host: Some(host.to_string()),
+        port: config.clone().db_port,
+        host: Some(format!("{}{}", config.db_proto.clone(), config.db_host.clone())),
         ..Default::default()
     };
     let mut connection = Connection::connect(&connect_params)?;
@@ -109,12 +110,13 @@ pub fn named_opi_query(module_id: i64, host: &str) -> Result<Vec<String>, MgErro
     Ok(port_names)
 }
 
-pub fn named_opo_query(module_id: i64, host: &str) -> Result<Vec<String>, MgError> {
+pub fn named_opo_query(module_id: i64, config: Config) -> Result<Vec<String>, MgError> {
     // construct the query that will delete the module with a given unique identifier
 
     // Connect to Memgraph.
     let connect_params = ConnectParams {
-        host: Some(host.to_string()),
+        port: config.clone().db_port,
+        host: Some(format!("{}{}", config.db_proto.clone(), config.db_host.clone())),
         ..Default::default()
     };
     let mut connection = Connection::connect(&connect_params)?;
@@ -145,19 +147,20 @@ pub fn named_opo_query(module_id: i64, host: &str) -> Result<Vec<String>, MgErro
     Ok(port_names)
 }
 
-pub fn named_port_query(module_id: i64, host: &str) -> Result<HashMap<&str, Vec<String>>, MgError> {
+pub fn named_port_query(module_id: i64, config: Config) -> Result<HashMap<&'static str, Vec<String>>, MgError> {
     let mut result = HashMap::<&str, Vec<String>>::new();
-    let opis = named_opi_query(module_id, host);
-    let opos = named_opo_query(module_id, host);
+    let opis = named_opi_query(module_id, config.clone());
+    let opos = named_opo_query(module_id, config.clone());
     result.insert("opis", opis.unwrap());
     result.insert("opos", opos.unwrap());
     Ok(result)
 }
 
-pub fn get_subgraph_query(module_id: i64, host: &str) -> Result<Vec<String>, MgError> {
+pub fn get_subgraph_query(module_id: i64, config: Config) -> Result<Vec<String>, MgError> {
     // Connect to Memgraph.
     let connect_params = ConnectParams {
-        host: Some(host.to_string()),
+        port: config.clone().db_port,
+        host: Some(format!("{}{}", config.db_proto.clone(), config.db_host.clone())),
         ..Default::default()
     };
     let mut connection = Connection::connect(&connect_params)?;
@@ -191,10 +194,11 @@ pub fn get_subgraph_query(module_id: i64, host: &str) -> Result<Vec<String>, MgE
     Ok(node_list)
 }
 
-pub fn module_query(host: &str) -> Result<Vec<i64>, MgError> {
+pub fn module_query(config: Config) -> Result<Vec<i64>, MgError> {
     // Connect to Memgraph.
     let connect_params = ConnectParams {
-        host: Some(host.to_string()),
+        port: config.clone().db_port,
+        host: Some(format!("{}{}", config.db_proto.clone(), config.db_host.clone())),
         ..Default::default()
     };
     let mut connection = Connection::connect(&connect_params)?;
@@ -226,7 +230,12 @@ pub fn module_query(host: &str) -> Result<Vec<i64>, MgError> {
 )]
 #[get("/models")]
 pub async fn get_model_ids(config: web::Data<Config>) -> HttpResponse {
-    let response = module_query(&config.db_host).unwrap();
+    let config1 = Config {
+        db_host: config.db_host.clone(),
+        db_port: config.db_port.clone(),
+        db_proto: config.db_proto.clone(),
+    };
+    let response = module_query(config1).unwrap();
     HttpResponse::Ok().json(web::Json(response))
 }
 
@@ -242,7 +251,12 @@ pub async fn post_model(
     payload: web::Json<ModuleCollection>,
     config: web::Data<Config>,
 ) -> HttpResponse {
-    let model_id = push_model_to_db(payload.into_inner(), &config.db_host).unwrap();
+    let config1 = Config {
+        db_host: config.db_host.clone(),
+        db_port: config.db_port.clone(),
+        db_proto: config.db_proto.clone(),
+    };
+    let model_id = push_model_to_db(payload.into_inner(), config1).unwrap();
     HttpResponse::Ok().json(web::Json(model_id))
 }
 
@@ -255,7 +269,12 @@ pub async fn post_model(
 #[delete("/models/{id}")]
 pub async fn delete_model(path: web::Path<i64>, config: web::Data<Config>) -> HttpResponse {
     let id = path.into_inner();
-    delete_module(id, &config.db_host).unwrap();
+    let config1 = Config {
+        db_host: config.db_host.clone(),
+        db_port: config.db_port.clone(),
+        db_proto: config.db_proto.clone(),
+    };
+    delete_module(id, config1).unwrap();
     HttpResponse::Ok().body("Model deleted")
 }
 
@@ -267,7 +286,12 @@ pub async fn delete_model(path: web::Path<i64>, config: web::Data<Config>) -> Ht
 )]
 #[get("/models/{id}/named_opos")]
 pub async fn get_named_opos(path: web::Path<i64>, config: web::Data<Config>) -> HttpResponse {
-    let response = named_opo_query(path.into_inner(), &config.db_host).unwrap();
+    let config1 = Config {
+        db_host: config.db_host.clone(),
+        db_port: config.db_port.clone(),
+        db_proto: config.db_proto.clone(),
+    };
+    let response = named_opo_query(path.into_inner(), config1).unwrap();
     HttpResponse::Ok().json(web::Json(response))
 }
 
@@ -279,7 +303,12 @@ pub async fn get_named_opos(path: web::Path<i64>, config: web::Data<Config>) -> 
 )]
 #[get("/models/{id}/named_ports")]
 pub async fn get_named_ports(path: web::Path<i64>, config: web::Data<Config>) -> HttpResponse {
-    let response = named_port_query(path.into_inner(), &config.db_host).unwrap();
+    let config1 = Config {
+        db_host: config.db_host.clone(),
+        db_port: config.db_port.clone(),
+        db_proto: config.db_proto.clone(),
+    };
+    let response = named_port_query(path.into_inner(), config1).unwrap();
     HttpResponse::Ok().json(web::Json(response))
 }
 
@@ -291,7 +320,12 @@ pub async fn get_named_ports(path: web::Path<i64>, config: web::Data<Config>) ->
 )]
 #[get("/models/{id}/named_opis")]
 pub async fn get_named_opis(path: web::Path<i64>, config: web::Data<Config>) -> HttpResponse {
-    let response = named_opi_query(path.into_inner(), &config.db_host).unwrap();
+    let config1 = Config {
+        db_host: config.db_host.clone(),
+        db_port: config.db_port.clone(),
+        db_proto: config.db_proto.clone(),
+    };
+    let response = named_opi_query(path.into_inner(), config1).unwrap();
     HttpResponse::Ok().json(web::Json(response))
 }
 
@@ -303,7 +337,12 @@ pub async fn get_named_opis(path: web::Path<i64>, config: web::Data<Config>) -> 
 )]
 #[get("/models/{id}/subgraph")]
 pub async fn get_subgraph(path: web::Path<i64>, config: web::Data<Config>) -> HttpResponse {
-    let response = get_subgraph_query(path.into_inner(), &config.db_host).unwrap();
+    let config1 = Config {
+        db_host: config.db_host.clone(),
+        db_port: config.db_port.clone(),
+        db_proto: config.db_proto.clone(),
+    };
+    let response = get_subgraph_query(path.into_inner(), config1).unwrap();
     HttpResponse::Ok().json(web::Json(response))
 }
 
@@ -319,7 +358,12 @@ pub async fn get_subgraph(path: web::Path<i64>, config: web::Data<Config>) -> Ht
 )]
 #[get("/models/{id}/RN")]
 pub async fn get_model_RN(path: web::Path<i64>, config: web::Data<Config>) -> HttpResponse {
-    let mathml_ast = module_id2mathml_ast(path.into_inner(), &config.db_host);
+    let config1 = Config {
+        db_host: config.db_host.clone(),
+        db_port: config.db_port.clone(),
+        db_proto: config.db_proto.clone(),
+    };
+    let mathml_ast = module_id2mathml_ast(path.into_inner(), config1);
     HttpResponse::Ok().json(web::Json(RegNet::from(mathml_ast)))
 }
 
@@ -339,8 +383,13 @@ pub async fn model2PN(
     payload: web::Json<ModuleCollection>,
     config: web::Data<Config>,
 ) -> HttpResponse {
+    let config1 = Config {
+        db_host: config.db_host.clone(),
+        db_port: config.db_port.clone(),
+        db_proto: config.db_proto.clone(),
+    };
     HttpResponse::Ok().json(web::Json(
-        model_to_PN(payload.into_inner(), &config.db_host).unwrap(),
+        model_to_PN(payload.into_inner(), config1).unwrap(),
     ))
 }
 
@@ -360,7 +409,12 @@ pub async fn model2RN(
     payload: web::Json<ModuleCollection>,
     config: web::Data<Config>,
 ) -> HttpResponse {
+    let config1 = Config {
+        db_host: config.db_host.clone(),
+        db_port: config.db_port.clone(),
+        db_proto: config.db_proto.clone(),
+    };
     HttpResponse::Ok().json(web::Json(
-        model_to_RN(payload.into_inner(), &config.db_host).unwrap(),
+        model_to_RN(payload.into_inner(), config1).unwrap(),
     ))
 }

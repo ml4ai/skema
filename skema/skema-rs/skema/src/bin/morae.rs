@@ -4,6 +4,8 @@ use mathml::mml2pn::get_mathml_asts_from_file;
 pub use mathml::mml2pn::{ACSet, Term};
 
 // new imports
+use std::env;
+use skema::config::Config;
 use mathml::acset::{PetriNet, RegNet};
 use mathml::parsers::first_order_ode::get_FirstOrderODE_vec_from_file;
 use mathml::parsers::math_expression_tree::MathExpressionTree;
@@ -41,9 +43,17 @@ fn main() {
             module_id = new_args.model_id.unwrap();
         }
 
-        let host = "localhost";
+        let db_protocol = env::var("DB_PROTOCOL").unwrap_or("https://".to_string());
+        let db_host = env::var("DB_HOST").unwrap_or("127.0.0.1".to_string());
+        let db_port = env::var("DB_PORT").unwrap_or("7687".to_string());
 
-        let math_content = module_id2mathml_MET_ast(module_id, host);
+        let config = Config {
+            db_host: db_host.clone(),
+            db_port: db_port.parse::<u16>().unwrap(),
+            db_proto: db_protocol.clone(),
+        };
+
+        let math_content = module_id2mathml_MET_ast(module_id, config.clone());
 
         let input_src = "../../data/mml2pn_inputs/testing_eqns/sidarthe_mml.txt";
 
@@ -81,28 +91,6 @@ fn main() {
         println!("\nAMR from code: {:?}", PetriNet::from(math_content));
     }
     // This is the graph id for the top level function for the core dynamics for our test case.
-    else if new_args.arg == *"manual" {
-        // still need to grab the module id
-
-        let host = "localhost";
-
-        let (core_dynamics_ast, _metadata_map_ast) =
-            subgraph2_core_dyn_ast(module_id, host).unwrap();
-
-        // expressions that are working: 5 (T), 6 (H)
-        // 7 (E) should be fixable, the USub is not being subsituted and is at the end of the RHS instead of the start
-
-        println!("\n Ast:\n {:?}", core_dynamics_ast[5].clone());
-    } else if new_args.arg == *"AMR_test" {
-        let mathml_asts =
-            get_mathml_asts_from_file("../../data/mml2pn_inputs/lotka_voltera/mml_list.txt");
-        let regnet = RegNet::from(mathml_asts);
-        println!("\nRegnet AMR: {:?}\n", regnet);
-        let regnet_serial = serde_json::to_string(&regnet).unwrap();
-        println!("For serialization test:\n\n {}", regnet_serial);
-    } else {
-        println!("Unknown Command!");
-    }
 }
 
 /*#[test]
