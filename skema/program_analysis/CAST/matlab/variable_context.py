@@ -26,20 +26,11 @@ class VariableContext(object):
     def push_context(self):
         """Create a new variable context and add it to the stack"""
         
-        # TODO: Could this add unwanted variables to the context or overwrite existing variables
-        # If the internal flag is set, then all new scopes will use the top-level context
-        if self.internal:
-            return None
-
         self.context.append({})
         self.context_return_values.append(set())
 
     def pop_context(self):
         """Pop the current variable context off of the stack and remove any references to those symbols."""
-        
-        # If the internal flag is set, then all new scopes will use the top-level context
-        if self.internal:
-            return None
         
         context = self.context.pop()
 
@@ -81,42 +72,3 @@ class VariableContext(object):
 
     def get_type(self, symbol: str) -> str:
         return self.all_symbols[symbol]["type"]
-
-    def update_type(self, symbol: str, type: str):
-        """Update the type associated with a given symbol"""
-        # Generate the full symbol name using the prefix
-        full_symbol_name = ".".join(self.prefix + [symbol])
-        self.all_symbols[full_symbol_name]["type"] = type
-
-    def add_return_value(self, symbol):
-        self.context_return_values[-1].add(symbol)
-
-    def remove_return_value(self, symbol):
-        self.context_return_values[-1].discard(symbol)
-
-    def generate_iterator(self):
-        symbol = f"generated_iter_{self.iterator_id}"
-        self.iterator_id += 1
-
-        return self.add_variable(symbol, "iterator", None)
-
-    def generate_stop_condition(self):
-        symbol = f"sc_{self.stop_condition_id}"
-        self.stop_condition_id += 1
-
-        return self.add_variable(symbol, "boolean", None)
-
-    def enter_record_definition(self, name: str):
-        """Enter a record definition. Updates the prefix to the name of the record"""
-        self.prefix.append(name)
-
-    def exit_record_definition(self):
-        """Exit a record definition. Resets the prefix to the empty string"""
-        self.prefix.pop()
-
-    def set_internal(self):
-        """Set the internal flag, meaning, all """
-        self.internal = True
-
-    def unset_internal(self):
-        self.internal = False
