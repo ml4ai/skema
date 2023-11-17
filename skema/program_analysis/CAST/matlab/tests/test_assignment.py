@@ -7,6 +7,12 @@ from skema.program_analysis.CAST2FN.model.cast import Assignment
 
 # Test CAST from assignment
 
+def test_boolean():
+    """ Test assignment of literal boolean types. """
+    nodes = cast_nodes("x = true; y = false")
+    check_result(nodes[0], Assignment(left = "x", right = "True"))
+    check_result(nodes[1], Assignment(left = "y", right = "False"))
+
 def test_number_zero_integer():
     """ Test assignment of integer and real numbers."""
     nodes = cast_nodes("x = 0")
@@ -31,12 +37,6 @@ def test_string():
     nodes = cast_nodes(source)
     check_result(nodes[0], Assignment(left = "x", right = "'single'"))
     check_result(nodes[1], Assignment(left = "y", right = "\"double\""))
-
-def test_boolean():
-    """ Test assignment of literal boolean types. """
-    nodes = cast_nodes("x = true; y = false")
-    check_result(nodes[0], Assignment(left = "x", right = "True"))
-    check_result(nodes[1], Assignment(left = "y", right = "False"))
 
 def test_identifier():
     """ Test assignment of identifiers."""
