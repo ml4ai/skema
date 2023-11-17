@@ -1,12 +1,10 @@
-from skema.program_analysis.CAST.matlab.tests.utils import (
-    check,
-    cast_nodes
-)
+from skema.program_analysis.CAST.matlab.tests.utils import (check, cast)
 from skema.program_analysis.CAST2FN.model.cast import (
     Assignment,
     Call,
     Operator
 )
+
 # Test CAST from functions
 def no_test_function_definition():
     """ Test function definition """
@@ -15,12 +13,12 @@ def no_test_function_definition():
         both = x + y
     end
     """
-    nodes = cast_nodes(source)
+    nodes = cast(source)
     assert len(nodes) == 1
 
 def test_literal_args():
     """ Test function call with literal arguments """
-    nodes = cast_nodes("x = both(3, 5)")
+    nodes = cast("x = both(3, 5)")
     check(
         nodes[0],
         Assignment(
@@ -34,7 +32,7 @@ def test_literal_args():
 
 def test_inline_operator_args():
     """ Test function call with Operator arguments """
-    nodes = cast_nodes("foo(x < a, -6)")
+    nodes = cast("foo(x < a, -6)")
     check(
         nodes[0],
         Call(
@@ -54,7 +52,7 @@ def test_inline_operator_args():
 
 def test_nested_calls():
     """ Test function call with matrix of function call arguments """
-    nodes = cast_nodes("foo(bar(x), baz(y))")
+    nodes = cast("foo(bar(x), baz(y))")
     check(
         nodes[0],
         Call(

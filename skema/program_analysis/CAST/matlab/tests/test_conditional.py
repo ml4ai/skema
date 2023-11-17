@@ -1,7 +1,4 @@
-from skema.program_analysis.CAST.matlab.tests.utils import (
-    check,
-    cast_nodes
-)
+from skema.program_analysis.CAST.matlab.tests.utils import (check, cast)
 from skema.program_analysis.CAST2FN.model.cast import (
     Assignment,
     ModelIf,
@@ -18,7 +15,7 @@ def test_if():
     """
 
     check(
-        cast_nodes(source)[0],
+        cast(source)[0],
         ModelIf(
             # if
             expr = Operator(op = "==", operands = ["x", 5]),
@@ -41,7 +38,7 @@ def test_if_else():
     """
 
     check(
-        cast_nodes(source)[0],
+        cast(source)[0],
         ModelIf(
             # if
             expr = Operator(op = ">", operands = ["x", 5]),
@@ -70,7 +67,7 @@ def test_if_elseif():
     end
     """
     check(
-        cast_nodes(source)[0],
+        cast(source)[0],
         ModelIf(
             # if
             expr = Operator(op = ">=", operands = ["x", 5]),
@@ -107,7 +104,7 @@ def test_if_elseif_else():
     """
     
     check(
-        cast_nodes(source)[0],
+        cast(source)[0],
         ModelIf(
             # if
             expr = Operator(op = ">", operands = ["x", 5]),

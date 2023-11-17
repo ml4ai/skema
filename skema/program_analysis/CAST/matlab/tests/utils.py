@@ -46,7 +46,7 @@ def check(result, expected = None):
         assert not result.source_refs == None
 
 # we curently produce a CAST object with a single Module in the nodes list.
-def cast_nodes(source):
+def cast(source):
     """ Return the MatlabToCast output """
     # there should only be one CAST object in the cast output list
     cast = MatlabToCast(source = source).out_cast
