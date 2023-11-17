@@ -1,11 +1,8 @@
 import json
 import os.path
-import pprint
 from pathlib import Path
 from typing import Any, Dict, List, Union
-
 from tree_sitter import Language, Parser, Node, Tree
-
 from skema.program_analysis.CAST2FN.cast import CAST
 from skema.program_analysis.CAST2FN.model.cast import (
     Assignment,
@@ -27,8 +24,9 @@ from skema.program_analysis.CAST2FN.model.cast import (
     Var,
     VarType,
 )
-
-from skema.program_analysis.CAST.matlab.variable_context import VariableContext
+from skema.program_analysis.CAST.matlab.variable_context import (
+    VariableContext
+)
 from skema.program_analysis.CAST.matlab.node_helper import (
     get_children_by_types,
     get_control_children,
@@ -36,10 +34,10 @@ from skema.program_analysis.CAST.matlab.node_helper import (
     get_keyword_children,
     NodeHelper
 )
-
 from skema.program_analysis.CAST.matlab.tokens import KEYWORDS
-
-from skema.program_analysis.tree_sitter_parsers.build_parsers import INSTALLED_LANGUAGES_FILEPATH
+from skema.program_analysis.tree_sitter_parsers.build_parsers import(
+    INSTALLED_LANGUAGES_FILEPATH
+)
 
 MATLAB_VERSION='matlab_version_here'
 
@@ -79,34 +77,27 @@ class MatlabToCast(object):
 
     def visit(self, node):
         """Switch execution based on node type"""
-        print(f"visit {node.type}")
-        if node == None:
-            return None
-        elif node.type == "assignment":
+        if node.type == "assignment":
             return self.visit_assignment(node)
         elif node.type == "boolean":
             return self.visit_boolean(node)
-        elif node.type in [
-            "true",
-            "false"
-        ]: return self.visit_boolean_value(node)
         elif node.type == "command":
             return self.visit_command(node)
         elif node.type == "function_call":
             return self.visit_function_call(node)
-        elif node.type == "function_definition":
-            return self.visit_function_def(node)
+#        elif node.type == "function_definition":
+#            return self.visit_function_def(node)
         elif node.type in [
             "identifier"
         ]:return self.visit_identifier(node)
         elif node.type == "if_statement":
             return self.visit_if_statement(node)
-        elif node.type in [
-            "for_statement",
-            "iterator",
-            "while_statement",
-            "spread_operator"
-        ]: return self.visit_loop(node)
+#        elif node.type in [
+#            "for_statement",
+#            "iterator",
+#            "while_statement",
+#            "spread_operator"
+#        ]: return self.visit_loop(node)
         elif node.type in [
             "cell",
             "matrix"
@@ -125,10 +116,10 @@ class MatlabToCast(object):
             "comparison_operator",
             "boolean_operator"
         ]: return self.visit_operator_binary(node)
-        elif node.type == "not_operator":
-            return self.visit_operator_not(node)
-        elif node.type == "postfix_operator":
-            return self.visit_operator_postfix(node)
+#        elif node.type == "not_operator":
+#            return self.visit_operator_not(node)
+#        elif node.type == "postfix_operator":
+#            return self.visit_operator_postfix(node)
         elif node.type == "unary_operator":
             return self.visit_operator_unary(node)
         elif node.type == "string":
@@ -140,49 +131,26 @@ class MatlabToCast(object):
 
     def visit_assignment(self, node):
         """ Translate Tree-sitter assignment node """
-        left, _, right = node.children
+        children = get_keyword_children(node)
         return Assignment(
-            left=self.visit(left),
-            right=self.visit(right),
+            left=self.visit(children[0]),
+            right=self.visit(children[1]),
             source_refs=[self.node_helper.get_source_ref(node)],
         )
 
-
-
-
-
-    #def visit_string(self, node):
-    #    return LiteralValue(
-    #        value_type="Character",
-    #        value=self.node_helper.get_identifier(node),
-    #        source_code_data_type=["matlab", MATLAB_VERSION, "character"],
-    #        source_refs=[self.node_helper.get_source_ref(node)]
-    #    )
-
     def visit_boolean(self, node):
         """ Translate Tree-sitter boolean node """
-
-
-        print("visit_boolean")
         for child in node.children:
-
+            # set the first letter to upper case for python
+            value = child.type
+            value = value[0].upper() + value[1:].lower()
             # store as string, use Python Boolean capitalization.
             return LiteralValue(
                 value_type="Boolean",
-                value = self.visit(child),
+                value = value,
                 source_code_data_type=["matlab", MATLAB_VERSION, "boolean"],
                 source_refs=[self.node_helper.get_source_ref(node)],
             )
-
-    def visit_boolean_value(self, node):
-        #value = node.type[0].upper() + node.type[1:].lower() 
-        return LiteralValue(
-            value_type="Character",
-            value=self.node_helper.get_identifier(node),
-            source_code_data_type=["matlab", MATLAB_VERSION, "boolean"],
-            source_refs=[self.node_helper.get_source_ref(node)]
-        )
-
 
     def visit_command(self, node):
         """ Translate the Tree-sitter command node """
@@ -198,55 +166,19 @@ class MatlabToCast(object):
     def visit_function_call(self, node):
         """ Translate Tree-sitter function call node """
         identifier, arguments = get_keyword_children(node)
-
-        print("matlabToCast.visit_function_call")
-        print("Arguments as read:")
-        for i, child in enumerate(arguments.children):
-            print(f"{i}, {child}")
-
-        # break arg list at commas
-        args = []
-        arg = []
-        for child in arguments.children:
-            if child.type == ",":
-                args += [arg]
-                arg = []
-            else:
-                arg += [child]
-        args += [arg]
-
-
-        print("\nArguments as reprocessed:")
-        for i, arg in enumerate(args):
-            print(f"{i}")
-            source = ""
-            for j, arg_node in enumerate(arg):
-                token = self.node_helper.get_identifier(arg_node)
-                source += token
-                print(f"  {j}, {token}")
-            print(f"{source}")
-
         return Call(
             func = self.visit(identifier),
             source_language = "matlab",
             source_language_version = MATLAB_VERSION,
-            source_refs=[self.node_helper.get_source_ref(node)],
-
-            # function arguments may be calls to other functions
-
-
-
             arguments = [self.visit(child) for child in
-                get_keyword_children(arguments)]
-        )
-
-    def visit_function_def(self, node):
-
-        # ...
-
-        return FunctionDef(
+                get_keyword_children(arguments)],
             source_refs=[self.node_helper.get_source_ref(node)]
         )
+
+    # def visit_function_def(self, node):
+    #     return FunctionDef(
+    #         source_refs=[self.node_helper.get_source_ref(node)]
+    #     )
 
     def visit_identifier(self, node):
         """ return an identifier (variable) node """
@@ -337,11 +269,9 @@ class MatlabToCast(object):
     def visit_matrix(self, node):
         """ Translate the Tree-sitter cell node into a List """
 
-        print("visit_matrix")
         def get_values(element, ret)-> List:
-            for child in element.children:
+            for child in get_keyword_children(element):
                 token = self.node_helper.get_identifier(child)
-                print(f"keyword child = {token}")
                 if child.type == "row": 
                     ret.append(get_values(child, []))
                 else:
@@ -349,7 +279,6 @@ class MatlabToCast(object):
             return ret;
 
         values = get_values(node, [])
-        print(f"values = {values}")
         value = []
         if len(values) > 0:
             value = values[0]
@@ -362,11 +291,11 @@ class MatlabToCast(object):
         )
 
     # General loop translator for all MATLAB loop types
-    def visit_loop(self, node) -> Loop:
-        """ Translate Tree-sitter for_loop node into CAST Loop node """
-        return Loop (
-            source_refs = [self.node_helper.get_source_ref(node)]
-        )
+    # def visit_loop(self, node) -> Loop:
+    #     """ Translate Tree-sitter for_loop node into CAST Loop node """
+    #     return Loop (
+    #         source_refs = [self.node_helper.get_source_ref(node)]
+    #     )
 
     def visit_module(self, node: Node) -> Module:
         """Visitor for program and module statement. Returns a Module object"""
@@ -415,13 +344,13 @@ class MatlabToCast(object):
         )
 
     # TODO implement as nested for loops
-    def visit_operator_not(self, node):
-        # The MATLAB not operator is a logical matrix inversion
-        return None
+    # The MATLAB not operator is a logical matrix inversion
+    # def visit_operator_not(self, node):
+    #   return None
 
     # TODO
-    def visit_operator_postfix(self, node):
-        return None
+    # def visit_operator_postfix(self, node):
+    #     return None
 
     def visit_operator_unary(self, node):
         # A unary operator is an Operator instance with a single operand
@@ -446,12 +375,6 @@ class MatlabToCast(object):
             "unary_operator"
         ]
         
-        def get_node_value(ast_node):
-            """ return the CAST node value or var name """
-            if isinstance(ast_node, Var):
-                return ast_node.val.name
-            return ast_node.value
-
         def get_operator(op, operands, source_refs):
             """ return an Operator representing the case test """
             return Operator(
@@ -487,7 +410,6 @@ class MatlabToCast(object):
             if block:
                 return [self.visit(child) for child in 
                     get_keyword_children(block)]
-            return None
             
         def get_model_if(case_node, identifier):
             """ return conditional logic representing the case """
@@ -515,47 +437,6 @@ class MatlabToCast(object):
                 last.orelse = [self.visit(child) for child in
                     get_keyword_children(block)]
         return model_ifs[0]
-
-    # this is not in the Waterloo model but will no doubt be encountered.
-    def visit_import_statemement(self, node):
-        # (use)
-        #   (use)
-        #   (module_name)
-
-        ## Pull relevent child nodes
-        module_name_node = get_first_child_by_type(node, "module_name")
-        module_name = self.node_helper.get_identifier(module_name_node)
-        included_items_node = get_first_child_by_type(node, "included_items")
-
-        import_all = included_items_node is None
-        import_alias = None  # TODO: Look into local-name and use-name fields
-
-        # We need to check if this import is a full import of a module, i.e. use module
-        # Or a partial import i.e. use module,only: sub1, sub2
-        if import_all:
-            return ModelImport(
-                name=module_name,
-                alias=import_alias,
-                all=import_all,
-                symbol=None,
-                source_refs=None,
-            )
-        else:
-            imports = []
-            for symbol in get_keyword_children(included_items_node):
-                symbol_identifier = self.node_helper.get_identifier(symbol)
-                symbol_source_refs = [self.node_helper.get_source_ref(symbol)]
-                imports.append(
-                    ModelImport(
-                        name=module_name,
-                        alias=import_alias,
-                        all=import_all,
-                        symbol=symbol_identifier,
-                        source_refs=symbol_source_refs,
-                    )
-                )
-
-            return imports
 
     # skip control nodes and other junk
     def _visit_passthrough(self, node):
