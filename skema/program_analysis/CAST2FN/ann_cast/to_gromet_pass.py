@@ -426,7 +426,7 @@ class ToGrometPass:
                     or isinstance(arg, AnnCastLiteralValue)
                     or isinstance(arg, AnnCastCall)
                 ):
-                    self.visit(arg, parent_gromet_fn, parent_cast_node)
+                    self.visit(arg, parent_gromet_fn, node)
                     parent_gromet_fn.pif = insert_gromet_object(
                         parent_gromet_fn.pif, GrometPort(box=inline_bf_loc)
                     )
@@ -3193,9 +3193,43 @@ class ToGrometPass:
         self, node: AnnCastLiteralValue, parent_gromet_fn, parent_cast_node
     ):
         if node.value_type == StructureType.TUPLE:
-            self.visit_node_list(
-                node.value, parent_gromet_fn, parent_cast_node
-            )
+            # We create a pack here to pack all the arguments into one single value 
+            # for a function call
+            if isinstance(parent_cast_node, AnnCastCall):
+                pack_bf = GrometBoxFunction(
+                    name="pack", function_type=FunctionType.ABSTRACT
+                )
+
+                parent_gromet_fn.bf = insert_gromet_object(
+                    parent_gromet_fn.bf, pack_bf
+                )
+
+                pack_index = len(parent_gromet_fn.bf)
+
+                for val in node.value:
+                    parent_gromet_fn.pif = insert_gromet_object(
+                        parent_gromet_fn.pif, GrometPort(box=pack_index)
+                    )
+                    pif_idx = len(parent_gromet_fn.pif)
+
+                    if isinstance(val, AnnCastName):
+                        self.wire_from_var_env(val.name, parent_gromet_fn)
+                    else:
+                        self.visit(val, parent_gromet_fn, parent_cast_node)
+                        
+                        parent_gromet_fn.wff = insert_gromet_object(
+                            parent_gromet_fn.wff, GrometWire(src=pif_idx, tgt=len(parent_gromet_fn.pof))
+                        )
+
+
+                parent_gromet_fn.pof = insert_gromet_object(
+                    parent_gromet_fn.pof, GrometPort(box=pack_index)
+                )
+
+            else:
+                self.visit_node_list(
+                    node.value, parent_gromet_fn, parent_cast_node
+                )
         else:
             # Create the GroMEt literal value (A type of Function box)
             # This will have a single outport (the little blank box)
