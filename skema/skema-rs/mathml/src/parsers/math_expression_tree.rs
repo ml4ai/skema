@@ -12,7 +12,6 @@ use derive_new::new;
 use nom::error::Error;
 use regex::Regex;
 use std::{fmt, str::FromStr};
-// use crate::expression::Atom::Operator;
 
 #[cfg(test)]
 use crate::parsers::first_order_ode::{first_order_ode, FirstOrderODE};
@@ -300,6 +299,65 @@ fn process_math_expression(expr: &MathExpression, expression: &mut String) {
         MathExpression::Mn(number) => {
             expression.push_str(&number.to_string());
         }
+        MathExpression::Msqrt(x) => {
+            expression.push_str("\\sqrt{");
+            process_math_expression(&*x, expression);
+            expression.push_str("}");
+        }
+        MathExpression::Mfrac(x1, x2) => {
+            expression.push_str("\\frac{");
+            process_math_expression(&*x1, expression);
+            expression.push_str("}{");
+            process_math_expression(&*x2, expression);
+            expression.push_str("}");
+        }
+        MathExpression::Msup(x1, x2) => {
+            process_math_expression(&*x1, expression);
+            expression.push_str("^{");
+            process_math_expression(&*x2, expression);
+            expression.push_str("}");
+        }
+        MathExpression::Msub(x1, x2) => {
+            process_math_expression(&*x1, expression);
+            expression.push_str("_{");
+            process_math_expression(&*x2, expression);
+            expression.push_str("}");
+        }
+        MathExpression::Msubsup(x1, x2, x3) => {
+            process_math_expression(&*x1, expression);
+            expression.push_str("_{");
+            process_math_expression(&*x2, expression);
+            expression.push_str("}^{");
+            process_math_expression(&*x3, expression);
+            expression.push_str("}");
+        }
+        MathExpression::Munder(x1, x2) => {
+            expression.push_str("\\underset{");
+            process_math_expression(&*x2, expression);
+            expression.push_str("}{");
+            process_math_expression(&*x1, expression);
+            expression.push_str("}");
+        }
+        MathExpression::Mover(x1, x2) => {
+            expression.push_str("\\overset{");
+            process_math_expression(&*x2, expression);
+            expression.push_str("}{");
+            process_math_expression(&*x1, expression);
+            expression.push_str("}");
+        }
+        MathExpression::Mtext(x) => {
+            expression.push_str(x);
+        }
+        MathExpression::Mspace(x) => {
+            expression.push_str(x);
+        }
+        MathExpression::AbsoluteSup(x1, x2) => {
+            expression.push_str("\\left| ");
+            process_math_expression(&*x1, expression);
+            expression.push_str(" \\right|_{");
+            process_math_expression(&*x2, expression);
+            expression.push_str("}");
+        }
         MathExpression::Mrow(_) => {
             panic!("All Mrows should have been removed by now!");
         }
@@ -466,9 +524,27 @@ impl MathExpressionTree {
                         expression.push_str(&format!("{}", rest[1].to_latex()));
                     }
                     Operator::Divide => {
-                        process_expression_parentheses(&mut expression, &rest[0]);
-                        expression.push_str("/");
-                        process_expression_parentheses(&mut expression, &rest[1]);
+                        for (index, r) in rest.iter().enumerate() {
+                            if let MathExpressionTree::Cons(op, _) = r {
+                                if is_unary_operator(op) {
+                                    expression.push_str(&format!("{}", r.to_latex()));
+                                } else if let Operator::Multiply = op {
+                                    expression.push_str(&format!("{}", r.to_latex()));
+                                } else if let Operator::Divide = op {
+                                    expression.push_str(&format!("{}", r.to_latex()));
+                                } else if let Operator::Dot = op {
+                                    expression.push_str(&format!("{}", r.to_latex()));
+                                } else {
+                                    expression.push_str(&format!("({})", r.to_latex()));
+                                }
+                            } else {
+                                expression.push_str(&format!("{}", r.to_latex()));
+                            }
+                            // Add "/" if it's not the last element
+                            if index < rest.len() - 1 {
+                                expression.push_str("/");
+                            }
+                        }
                     }
                     Operator::Exp => {
                         expression.push_str("\\mathrm{exp}");
@@ -917,6 +993,49 @@ fn infix_binding_power(op: &Operator) -> Option<(u8, u8)> {
         _ => return None,
     };
     Some(res)
+}
+
+/// Replaces Unicode representations in the input string with their corresponding symbols.
+fn replace_unicode_with_symbols(input: &str) -> String {
+    // Define a regex pattern to match Unicode representations
+    let re = Regex::new(r#"&#x([0-9A-Fa-f]+);"#).unwrap();
+
+    // Use replace_all to replace Unicode representations with corresponding symbols
+    let replaced_str = re.replace_all(input, |captures: &regex::Captures| {
+        // captures[0] contains the entire match, captures[1] contains the hexadecimal code
+        let hex_code = &captures[1];
+        // Convert hexadecimal code to u32 and then to char
+        let unicode_char = u32::from_str_radix(hex_code, 16)
+            .ok()
+            .and_then(std::char::from_u32);
+
+        // Replace with the Unicode character if conversion is successful, otherwise keep the original
+        unicode_char.map_or_else(|| captures[0].to_string(), |c| c.to_string())
+    });
+
+    replaced_str.to_string()
+}
+
+/// Preprocesses a MathML string for conversion to LaTeX format.
+///
+/// This function takes a MathML string as input and performs preprocessing steps to ensure a
+/// cleaner conversion to LaTeX. It removes newline characters, eliminates spaces between MathML
+/// elements, and replaces occurrences of "<mi>∇</mi>" with "<mo>∇</mo>" to enhance compatibility
+/// with LaTeX rendering. The resulting processed MathML string is then ready for conversion to LaTeX.
+fn preprocess_mathml_for_to_latex(input: &str) -> String {
+    // Remove all newline characters
+    let no_newlines = input.replace('\n', "");
+
+    // Remove spaces between MathML elements
+    let no_spaces = Regex::new(r#">\s*<"#)
+        .unwrap()
+        .replace_all(&no_newlines, "><")
+        .to_string();
+
+    // Replace <mi>∇</mi> with <mo>∇</mo>
+    let replaced_str = no_spaces.replace(r#"<mi>∇</mi>"#, "<mo>∇</mo>").to_string();
+
+    replaced_str
 }
 
 #[test]
@@ -1609,5 +1728,240 @@ fn test_equation_halfar_dome_to_latex() {
     assert_eq!(
         latex_exp,
         "\\frac{d H}{dt}=\\nabla \\cdot {(\\Gamma*H^{n+2}*\\left|\\nabla{H}\\right|^{n-1}*\\nabla{H})}"
+    );
+}
+
+#[test]
+fn test_equation_halfar_dome_8_1_to_latex() {
+    let input = "
+    <math>
+      <mfrac>
+        <mrow>
+          <mi>&#x2202;</mi>
+          <mi>H</mi>
+        </mrow>
+        <mrow>
+          <mi>&#x2202;</mi>
+          <mi>t</mi>
+        </mrow>
+      </mfrac>
+      <mo>=</mo>
+      <mi>&#x2207;</mi>
+      <mo>&#x22C5;</mo>
+      <mo>(</mo>
+      <mi>&#x0393;</mi>
+      <msup>
+        <mi>H</mi>
+        <mrow>
+          <mi>n</mi>
+          <mo>+</mo>
+          <mn>2</mn>
+        </mrow>
+      </msup>
+      <mo>|</mo>
+      <mi>&#x2207;</mi>
+      <mi>H</mi>
+      <msup>
+        <mo>|</mo>
+        <mrow>
+          <mi>n</mi>
+          <mo>&#x2212;</mo>
+          <mn>1</mn>
+        </mrow>
+      </msup>
+      <mi>&#x2207;</mi>
+      <mi>H</mi>
+      <mo>)</mo>
+    </math>
+    ";
+    let modified_input1 = &replace_unicode_with_symbols(input).to_string();
+    let modified_input2 = &preprocess_mathml_for_to_latex(modified_input1).to_string();
+    let exp = modified_input2.parse::<MathExpressionTree>().unwrap();
+    let latex_exp = exp.to_latex();
+    assert_eq!(
+        latex_exp,
+        "\\frac{d H}{dt}=\\nabla \\cdot {(\\Gamma*H^{n+2}*\\left|\\nabla{H}\\right|^{n-1}*\\nabla{H})}"
+    );
+}
+
+#[test]
+fn test_equation_halfar_dome_8_2_to_latex() {
+    let input = "
+    <math>
+      <mi>&#x0393;</mi>
+      <mo>=</mo>
+      <mfrac>
+        <mn>2</mn>
+        <mrow>
+          <mi>n</mi>
+          <mo>+</mo>
+          <mn>2</mn>
+        </mrow>
+      </mfrac>
+      <mi>A</mi>
+      <mo>(</mo>
+      <mi>&#x03C1;</mi>
+      <mi>g</mi>
+      <msup>
+        <mo>)</mo>
+        <mi>n</mi>
+      </msup>
+    </math>
+    ";
+    let modified_input1 = &replace_unicode_with_symbols(input).to_string();
+    let modified_input2 = &preprocess_mathml_for_to_latex(modified_input1).to_string();
+    let exp = modified_input2.parse::<MathExpressionTree>().unwrap();
+    let latex_exp = exp.to_latex();
+    assert_eq!(latex_exp, "\\Gamma=2/(n+2)*A*(\\rho*g)^{n}");
+}
+
+#[test]
+fn test_equation_halfar_dome_8_3_to_latex() {
+    let input = "
+    <math>
+      <mi>H</mi>
+      <mo>(</mo>
+      <mi>t</mi>
+      <mo>,</mo>
+      <mi>r</mi>
+      <mo>)</mo>
+      <mo>=</mo>
+      <msub>
+        <mi>H</mi>
+        <mn>0</mn>
+      </msub>
+      <msup>
+        <mrow>
+          <mo>(</mo>
+          <mfrac>
+            <msub>
+              <mi>t</mi>
+              <mn>0</mn>
+            </msub>
+            <mi>t</mi>
+          </mfrac>
+          <mo>)</mo>
+        </mrow>
+        <mrow>
+          <mfrac>
+            <mn>1</mn>
+            <mn>9</mn>
+          </mfrac>
+        </mrow>
+      </msup>
+      <msup>
+        <mrow>
+          <mo>[</mo>
+          <mn>1</mn>
+          <mo>&#x2212;</mo>
+          <msup>
+            <mrow>
+              <mo>(</mo>
+              <msup>
+                <mrow>
+                  <mo>(</mo>
+                  <mfrac>
+                    <msub>
+                      <mi>t</mi>
+                      <mn>0</mn>
+                    </msub>
+                    <mi>t</mi>
+                  </mfrac>
+                  <mo>)</mo>
+                </mrow>
+                <mrow>
+                  <mfrac>
+                    <mn>1</mn>
+                    <mrow>
+                      <mn>18</mn>
+                    </mrow>
+                  </mfrac>
+                </mrow>
+              </msup>
+              <mfrac>
+                <mi>r</mi>
+                <msub>
+                  <mi>R</mi>
+                  <mn>0</mn>
+                </msub>
+              </mfrac>
+              <mo>)</mo>
+            </mrow>
+            <mrow>
+              <mfrac>
+                <mn>4</mn>
+                <mn>3</mn>
+              </mfrac>
+            </mrow>
+          </msup>
+          <mo>]</mo>
+        </mrow>
+        <mrow>
+          <mfrac>
+            <mn>3</mn>
+            <mn>7</mn>
+          </mfrac>
+        </mrow>
+      </msup>
+    </math>
+    ";
+    let modified_input1 = &replace_unicode_with_symbols(input).to_string();
+    let modified_input2 = &preprocess_mathml_for_to_latex(modified_input1).to_string();
+    let exp = modified_input2.parse::<MathExpressionTree>().unwrap();
+    let latex_exp = exp.to_latex();
+    assert_eq!(
+        latex_exp,
+        "H=H_{0}*(t_{0}/t)^{1/9}*(1-((t_{0}/t)^{1/18}*r/R_{0})^{4/3})^{3/7}"
+    );
+}
+
+#[test]
+fn test_equation_halfar_dome_8_4_to_latex() {
+    let input = "
+    <math>
+      <msub>
+        <mi>t</mi>
+        <mn>0</mn>
+      </msub>
+      <mo>=</mo>
+      <mfrac>
+        <mn>1</mn>
+        <mrow>
+          <mn>18</mn>
+          <mi>&#x0393;</mi>
+        </mrow>
+      </mfrac>
+      <msup>
+        <mrow>
+          <mo>(</mo>
+          <mfrac>
+            <mn>7</mn>
+            <mn>4</mn>
+          </mfrac>
+          <mo>)</mo>
+        </mrow>
+        <mn>3</mn>
+      </msup>
+      <mfrac>
+        <msubsup>
+          <mi>R</mi>
+          <mn>0</mn>
+          <mn>4</mn>
+        </msubsup>
+        <msubsup>
+          <mi>H</mi>
+          <mn>0</mn>
+          <mn>7</mn>
+        </msubsup>
+      </mfrac>
+    </math>
+    ";
+    let modified_input1 = &replace_unicode_with_symbols(input).to_string();
+    let modified_input2 = &preprocess_mathml_for_to_latex(modified_input1).to_string();
+    let exp = modified_input2.parse::<MathExpressionTree>().unwrap();
+    let latex_exp = exp.to_latex();
+    assert_eq!(
+        latex_exp,
+        "t_{0}=1/18*\\Gamma*(7/4)^{3}*R_{0}^{4}/H_{0}^{7}"
     );
 }
