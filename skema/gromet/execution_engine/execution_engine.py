@@ -42,8 +42,8 @@ execute = Execute.apply
 
 
 class ExecutionEngine:
-    def __init__(self, host: str, port: str, source_path: str):
-        self.query_runner = QueryRunner(host, port)
+    def __init__(self, protocol: str, host: str, port: str, source_path: str):
+        self.query_runner = QueryRunner(protocol, host, port)
         self.symbol_table = SymbolTable()
         self.source_path = source_path
 
