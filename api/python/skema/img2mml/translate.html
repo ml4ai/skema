@@ -88,7 +88,7 @@ def remove_eqn_number(image: Image.Image, threshold: float = 0.1) -&gt; Image.Im
 
 
 def calculate_scale_factor(
-    image: Image.Image, target_width: int, target_height: int
+        image: Image.Image, target_width: int, target_height: int
 ) -&gt; float:
     &#34;&#34;&#34;
     Calculate the scale factor to normalize the input image to the target width and height while preserving the
@@ -181,7 +181,7 @@ def set_random_seed(seed: int) -&gt; None:
 
 
 def define_model(
-    config: dict, vocab: List[str], device: torch.device, model_type=&#34;xfmer&#34;
+        config: dict, vocab: List[str], device: torch.device, model_type=&#34;xfmer&#34;
 ) -&gt; Image2MathML_Xfmer:
     &#34;&#34;&#34;
     Defining the model
@@ -236,6 +236,73 @@ def define_model(
     return model
 
 
+def merge_mn_elements(input_mathml: str) -&gt; str:
+    &#34;&#34;&#34;
+    Merge consecutive &lt;mn&gt; elements in the &lt;mrow&gt; structure of MathML.
+
+    Args:
+        input_mathml (str): Input MathML string.
+
+    Returns:
+        str: MathML string with consecutive &lt;mn&gt; elements merged.
+    &#34;&#34;&#34;
+    input_mathml = input_mathml.replace(&#34;&amp;#x&#34;, &#34;###&#34;)  # keep the unicode representation
+    root = ET.fromstring(input_mathml)
+
+    def merge_mn_in_mrow(mrow: ET.Element) -&gt; List[ET.Element]:
+        &#34;&#34;&#34;
+        Merge consecutive &lt;mn&gt; elements within a given &lt;mrow&gt;.
+
+        Args:
+            mrow (ET.Element): &lt;mrow&gt; element.
+
+        Returns:
+            List[ET.Element]: List of merged elements.
+        &#34;&#34;&#34;
+        merged_elements = []
+        current_number = None
+
+        for child in mrow:
+            if child.tag == &#39;mn&#39;:
+                if current_number is None:
+                    current_number = int(child.text)
+                else:
+                    current_number = current_number * 10 + int(child.text)
+            else:
+                if current_number is not None:
+                    merged_elements.append(ET.Element(&#39;mn&#39;))
+                    merged_elements[-1].text = str(current_number)
+                    current_number = None
+                merged_elements.append(child)
+
+        if current_number is not None:
+            merged_elements.append(ET.Element(&#39;mn&#39;))
+            merged_elements[-1].text = str(current_number)
+
+        return merged_elements
+
+    def process_element(element: ET.Element) -&gt; None:
+        &#34;&#34;&#34;
+        Recursively process each element in the MathML structure.
+
+        Args:
+            element (ET.Element): Current element to process.
+        &#34;&#34;&#34;
+        if element.tag == &#39;mrow&#39;:
+            element[:] = merge_mn_in_mrow(element)
+            for child in element:
+                process_element(child)
+        else:
+            for child in element:
+                process_element(child)
+
+    process_element(root)
+    modified_xml_string = ET.tostring(root, encoding=&#34;utf-8&#34;, method=&#34;xml&#34;).decode(&#39;utf-8&#39;)
+    modified_xml_string = modified_xml_string.replace(&#34;###&#34;, &#34;&amp;#x&#34;)
+
+    return modified_xml_string
+
+
 def process_mtext(xml_string: str) -&gt; str:
     &#34;&#34;&#34;
     Process the input MathML string by merging consecutive &lt;mi&gt; elements and replacing specific &lt;mrow&gt; structures.
@@ -246,6 +313,7 @@ def process_mtext(xml_string: str) -&gt; str:
     Returns:
         str: The modified MathML string.
     &#34;&#34;&#34;
+    xml_string = xml_string.replace(&#34;&amp;#x&#34;, &#34;###&#34;)  # keep the unicode representation
     root = ET.fromstring(xml_string)
 
     def merge_mi_elements(elements):
@@ -303,9 +371,10 @@ def process_mtext(xml_string: str) -&gt; str:
     root.clear()
     root.extend(new_children)
 
-    modified_xml_string = ET.tostring(root, encoding=&#34;unicode&#34;)
+    modified_xml_string = ET.tostring(root, encoding=&#34;utf-8&#34;, method=&#34;xml&#34;).decode(&#39;utf-8&#39;)
     modified_xml_string = modified_xml_string.replace(&#34;&lt;to_be_removed&gt;&#34;, &#34;&#34;)
     modified_xml_string = modified_xml_string.replace(&#34;&lt;/to_be_removed&gt;&#34;, &#34;&#34;)
+    modified_xml_string = modified_xml_string.replace(&#34;###&#34;, &#34;&amp;#x&#34;)
 
     return modified_xml_string
 
@@ -353,11 +422,11 @@ def remove_spaces_between_tags(mathml_string: str) -&gt; str:
 
 
 def render_mml(
-    model: Image2MathML_Xfmer,
-    vocab_itos: dict,
-    vocab_stoi: dict,
-    img: torch.Tensor,
-    device: torch.device,
+        model: Image2MathML_Xfmer,
+        vocab_itos: dict,
+        vocab_stoi: dict,
+        img: torch.Tensor,
+        device: torch.device,
 ) -&gt; str:
     &#34;&#34;&#34;
     Perform sequence prediction for an input image to translate it into MathML contents.
@@ -391,12 +460,14 @@ def render_mml(
             pred.append(vocab_itos[str(p)])
 
         pred_seq = &#34; &#34;.join(pred[1:-1])
+
         try:
-            return process_mtext(
-                add_semicolon_to_unicode(remove_spaces_between_tags(pred_seq))
-            )
+            res = add_semicolon_to_unicode(remove_spaces_between_tags(pred_seq))
+            res = merge_mn_elements(res)
+            res = process_mtext(res)
+            return res
         except:
-            return add_semicolon_to_unicode(remove_spaces_between_tags(pred_seq))</code></pre>
+            return res</code></pre>
 </details>
 </section>
 <section>
@@ -476,7 +547,7 @@ will be calculated based on width. Otherwise, it will be calculated based on hei
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def calculate_scale_factor(
-    image: Image.Image, target_width: int, target_height: int
+        image: Image.Image, target_width: int, target_height: int
 ) -&gt; float:
     &#34;&#34;&#34;
     Calculate the scale factor to normalize the input image to the target width and height while preserving the
@@ -536,7 +607,7 @@ initializing encoder, decoder, and model</p></div>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def define_model(
-    config: dict, vocab: List[str], device: torch.device, model_type=&#34;xfmer&#34;
+        config: dict, vocab: List[str], device: torch.device, model_type=&#34;xfmer&#34;
 ) -&gt; Image2MathML_Xfmer:
     &#34;&#34;&#34;
     Defining the model
@@ -589,6 +660,92 @@ initializing encoder, decoder, and model</p></div>
     model = Image2MathML_Xfmer(enc, dec, vocab, device)
 
     return model</code></pre>
+</details>
+</dd>
+<dt id="skema.img2mml.translate.merge_mn_elements"><code class="name flex">
+<span>def <span class="ident">merge_mn_elements</span></span>(<span>input_mathml: str) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Merge consecutive <mn> elements in the <mrow> structure of MathML.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>input_mathml</code></strong> :&ensp;<code>str</code></dt>
+<dd>Input MathML string.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>str</code></dt>
+<dd>MathML string with consecutive <mn> elements merged.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def merge_mn_elements(input_mathml: str) -&gt; str:
+    &#34;&#34;&#34;
+    Merge consecutive &lt;mn&gt; elements in the &lt;mrow&gt; structure of MathML.
+
+    Args:
+        input_mathml (str): Input MathML string.
+
+    Returns:
+        str: MathML string with consecutive &lt;mn&gt; elements merged.
+    &#34;&#34;&#34;
+    input_mathml = input_mathml.replace(&#34;&amp;#x&#34;, &#34;###&#34;)  # keep the unicode representation
+    root = ET.fromstring(input_mathml)
+
+    def merge_mn_in_mrow(mrow: ET.Element) -&gt; List[ET.Element]:
+        &#34;&#34;&#34;
+        Merge consecutive &lt;mn&gt; elements within a given &lt;mrow&gt;.
+
+        Args:
+            mrow (ET.Element): &lt;mrow&gt; element.
+
+        Returns:
+            List[ET.Element]: List of merged elements.
+        &#34;&#34;&#34;
+        merged_elements = []
+        current_number = None
+
+        for child in mrow:
+            if child.tag == &#39;mn&#39;:
+                if current_number is None:
+                    current_number = int(child.text)
+                else:
+                    current_number = current_number * 10 + int(child.text)
+            else:
+                if current_number is not None:
+                    merged_elements.append(ET.Element(&#39;mn&#39;))
+                    merged_elements[-1].text = str(current_number)
+                    current_number = None
+                merged_elements.append(child)
+
+        if current_number is not None:
+            merged_elements.append(ET.Element(&#39;mn&#39;))
+            merged_elements[-1].text = str(current_number)
+
+        return merged_elements
+
+    def process_element(element: ET.Element) -&gt; None:
+        &#34;&#34;&#34;
+        Recursively process each element in the MathML structure.
+
+        Args:
+            element (ET.Element): Current element to process.
+        &#34;&#34;&#34;
+        if element.tag == &#39;mrow&#39;:
+            element[:] = merge_mn_in_mrow(element)
+            for child in element:
+                process_element(child)
+        else:
+            for child in element:
+                process_element(child)
+
+    process_element(root)
+    modified_xml_string = ET.tostring(root, encoding=&#34;utf-8&#34;, method=&#34;xml&#34;).decode(&#39;utf-8&#39;)
+    modified_xml_string = modified_xml_string.replace(&#34;###&#34;, &#34;&amp;#x&#34;)
+
+    return modified_xml_string</code></pre>
 </details>
 </dd>
 <dt id="skema.img2mml.translate.preprocess_img"><code class="name flex">
@@ -672,6 +829,7 @@ initializing encoder, decoder, and model</p></div>
     Returns:
         str: The modified MathML string.
     &#34;&#34;&#34;
+    xml_string = xml_string.replace(&#34;&amp;#x&#34;, &#34;###&#34;)  # keep the unicode representation
     root = ET.fromstring(xml_string)
 
     def merge_mi_elements(elements):
@@ -729,9 +887,10 @@ initializing encoder, decoder, and model</p></div>
     root.clear()
     root.extend(new_children)
 
-    modified_xml_string = ET.tostring(root, encoding=&#34;unicode&#34;)
+    modified_xml_string = ET.tostring(root, encoding=&#34;utf-8&#34;, method=&#34;xml&#34;).decode(&#39;utf-8&#39;)
     modified_xml_string = modified_xml_string.replace(&#34;&lt;to_be_removed&gt;&#34;, &#34;&#34;)
     modified_xml_string = modified_xml_string.replace(&#34;&lt;/to_be_removed&gt;&#34;, &#34;&#34;)
+    modified_xml_string = modified_xml_string.replace(&#34;###&#34;, &#34;&amp;#x&#34;)
 
     return modified_xml_string</code></pre>
 </details>
@@ -862,11 +1021,11 @@ Defaults to 0.1.</dd>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def render_mml(
-    model: Image2MathML_Xfmer,
-    vocab_itos: dict,
-    vocab_stoi: dict,
-    img: torch.Tensor,
-    device: torch.device,
+        model: Image2MathML_Xfmer,
+        vocab_itos: dict,
+        vocab_stoi: dict,
+        img: torch.Tensor,
+        device: torch.device,
 ) -&gt; str:
     &#34;&#34;&#34;
     Perform sequence prediction for an input image to translate it into MathML contents.
@@ -900,12 +1059,14 @@ Defaults to 0.1.</dd>
             pred.append(vocab_itos[str(p)])
 
         pred_seq = &#34; &#34;.join(pred[1:-1])
+
         try:
-            return process_mtext(
-                add_semicolon_to_unicode(remove_spaces_between_tags(pred_seq))
-            )
+            res = add_semicolon_to_unicode(remove_spaces_between_tags(pred_seq))
+            res = merge_mn_elements(res)
+            res = process_mtext(res)
+            return res
         except:
-            return add_semicolon_to_unicode(remove_spaces_between_tags(pred_seq))</code></pre>
+            return res</code></pre>
 </details>
 </dd>
 <dt id="skema.img2mml.translate.set_random_seed"><code class="name flex">
@@ -948,6 +1109,7 @@ Defaults to 0.1.</dd>
 <li><code><a title="skema.img2mml.translate.calculate_scale_factor" href="#skema.img2mml.translate.calculate_scale_factor">calculate_scale_factor</a></code></li>
 <li><code><a title="skema.img2mml.translate.convert_to_torch_tensor" href="#skema.img2mml.translate.convert_to_torch_tensor">convert_to_torch_tensor</a></code></li>
 <li><code><a title="skema.img2mml.translate.define_model" href="#skema.img2mml.translate.define_model">define_model</a></code></li>
+<li><code><a title="skema.img2mml.translate.merge_mn_elements" href="#skema.img2mml.translate.merge_mn_elements">merge_mn_elements</a></code></li>
 <li><code><a title="skema.img2mml.translate.preprocess_img" href="#skema.img2mml.translate.preprocess_img">preprocess_img</a></code></li>
 <li><code><a title="skema.img2mml.translate.process_mtext" href="#skema.img2mml.translate.process_mtext">process_mtext</a></code></li>
 <li><code><a title="skema.img2mml.translate.remove_eqn_number" href="#skema.img2mml.translate.remove_eqn_number">remove_eqn_number</a></code></li>

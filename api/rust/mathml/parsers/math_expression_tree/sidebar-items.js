@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["MathExpressionTree","Token"]};
+window.SIDEBAR_ITEMS = {"enum":["MathExpressionTree","Token"],"fn":["preprocess_mathml_for_to_latex","replace_unicode_with_symbols"]};

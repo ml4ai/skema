@@ -92,29 +92,29 @@ class Ports(BaseModel):
 class System(BaseModel):
     files: List[str] = Field(
         description=&#34;The relative file path from the directory specified by `root_name`, corresponding to each entry in `blobs`&#34;,
-        example=[&#34;example1.py&#34;, &#34;dir/example2.py&#34;],
+        examples=[[&#34;example1.py&#34;, &#34;dir/example2.py&#34;]],
     )
     blobs: List[str] = Field(
         description=&#34;Contents of each file to be analyzed&#34;,
-        example=[
+        examples=[[
             &#34;greet = lambda: print(&#39;howdy!&#39;)\ngreet()&#34;,
             &#34;#Variable declaration\nx=2\n#Function definition\ndef foo(x):\n    &#39;&#39;&#39;Increment the input variable&#39;&#39;&#39;\n    return x+1&#34;,
-        ],
+        ]],
     )
     system_name: Optional[str] = Field(
         default=None,
         description=&#34;A model name to associate with the provided code&#34;,
-        example=&#34;example-system&#34;,
+        examples=[&#34;example-system&#34;],
     )
     root_name: Optional[str] = Field(
         default=None,
         description=&#34;The name of the code system&#39;s root directory.&#34;,
-        example=&#34;example-system&#34;,
+        examples=[&#34;example-system&#34;],
     )
     comments: Optional[CodeComments] = Field(
         default=None,
         description=&#34;A CodeComments object representing the comments extracted from the source code in &#39;blobs&#39;. Can provide comments for a single file (SingleFileCodeComments) or multiple files (MultiFileCodeComments)&#34;,
-        example={
+        examples=[{
             &#34;files&#34;: {
                 &#34;example-system/dir/example2.py&#34;: {
                     &#34;single&#34;: [
@@ -132,7 +132,7 @@ class System(BaseModel):
                     ],
                 }
             }
-        },
+        }],
     )
 
 
@@ -1121,29 +1121,29 @@ allow <code>self</code> as a field name.</p></div>
 <pre><code class="python">class System(BaseModel):
     files: List[str] = Field(
         description=&#34;The relative file path from the directory specified by `root_name`, corresponding to each entry in `blobs`&#34;,
-        example=[&#34;example1.py&#34;, &#34;dir/example2.py&#34;],
+        examples=[[&#34;example1.py&#34;, &#34;dir/example2.py&#34;]],
     )
     blobs: List[str] = Field(
         description=&#34;Contents of each file to be analyzed&#34;,
-        example=[
+        examples=[[
             &#34;greet = lambda: print(&#39;howdy!&#39;)\ngreet()&#34;,
             &#34;#Variable declaration\nx=2\n#Function definition\ndef foo(x):\n    &#39;&#39;&#39;Increment the input variable&#39;&#39;&#39;\n    return x+1&#34;,
-        ],
+        ]],
     )
     system_name: Optional[str] = Field(
         default=None,
         description=&#34;A model name to associate with the provided code&#34;,
-        example=&#34;example-system&#34;,
+        examples=[&#34;example-system&#34;],
     )
     root_name: Optional[str] = Field(
         default=None,
         description=&#34;The name of the code system&#39;s root directory.&#34;,
-        example=&#34;example-system&#34;,
+        examples=[&#34;example-system&#34;],
     )
     comments: Optional[CodeComments] = Field(
         default=None,
         description=&#34;A CodeComments object representing the comments extracted from the source code in &#39;blobs&#39;. Can provide comments for a single file (SingleFileCodeComments) or multiple files (MultiFileCodeComments)&#34;,
-        example={
+        examples=[{
             &#34;files&#34;: {
                 &#34;example-system/dir/example2.py&#34;: {
                     &#34;single&#34;: [
@@ -1161,7 +1161,7 @@ allow <code>self</code> as a field name.</p></div>
                     ],
                 }
             }
-        },
+        }],
     )</code></pre>
 </details>
 <h3>Ancestors</h3>

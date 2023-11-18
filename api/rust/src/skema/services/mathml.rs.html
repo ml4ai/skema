@@ -198,17 +198,45 @@
 <a href="#198" id="198">198</a>
 <a href="#199" id="199">199</a>
 <a href="#200" id="200">200</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>actix_web::{put, web, HttpResponse};
+<a href="#201" id="201">201</a>
+<a href="#202" id="202">202</a>
+<a href="#203" id="203">203</a>
+<a href="#204" id="204">204</a>
+<a href="#205" id="205">205</a>
+<a href="#206" id="206">206</a>
+<a href="#207" id="207">207</a>
+<a href="#208" id="208">208</a>
+<a href="#209" id="209">209</a>
+<a href="#210" id="210">210</a>
+<a href="#211" id="211">211</a>
+<a href="#212" id="212">212</a>
+<a href="#213" id="213">213</a>
+<a href="#214" id="214">214</a>
+<a href="#215" id="215">215</a>
+<a href="#216" id="216">216</a>
+<a href="#217" id="217">217</a>
+<a href="#218" id="218">218</a>
+<a href="#219" id="219">219</a>
+<a href="#220" id="220">220</a>
+<a href="#221" id="221">221</a>
+<a href="#222" id="222">222</a>
+<a href="#223" id="223">223</a>
+<a href="#224" id="224">224</a>
+<a href="#225" id="225">225</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span>actix_web::{post, put, web, HttpResponse};
+<span class="kw">use </span>mathml::parsers::decapodes_serialization::{
+    to_wiring_diagram, DecapodesCollection, WiringDiagram,
+};
 <span class="kw">use </span>mathml::parsers::first_order_ode::flatten_mults;
 <span class="kw">use </span>mathml::parsers::generic_mathml::math;
+<span class="kw">use </span>mathml::parsers::math_expression_tree::MathExpressionTree;
+<span class="kw">use </span>mathml::parsers::math_expression_tree::{replace_unicode_with_symbols, preprocess_mathml_for_to_latex};
 <span class="kw">use </span>mathml::{
     acset::{AMRmathml, PetriNet, RegNet},
     ast::Math,
     expression::{preprocess_content, wrap_math},
     parsers::first_order_ode::{first_order_ode, FirstOrderODE},
 };
-<span class="kw">use </span>mathml::parsers::math_expression_tree::MathExpressionTree;
-<span class="kw">use </span>mathml::parsers::decapodes_serialization::{to_wiring_diagram, WiringDiagram, DecapodesCollection};
 <span class="kw">use </span>petgraph::dot::{Config, Dot};
 <span class="kw">use </span>utoipa;
 
@@ -260,6 +288,25 @@
     dot_representation.to_string()
 }
 
+<span class="doccomment">/// Parse a presentation MathML representation of an equation and
+/// return the corresponding LaTeX representation
+</span><span class="attr">#[utoipa::path(
+    request_body = String,
+        responses(
+        (
+            status = <span class="number">200</span>,
+            body = String
+        )
+    )
+)]
+#[post(<span class="string">&quot;/mathml/latex&quot;</span>)]
+</span><span class="kw">pub async fn </span>get_latex(payload: String) -&gt; String {
+    <span class="kw">let </span>modified_input1 = <span class="kw-2">&amp;</span>replace_unicode_with_symbols(<span class="kw-2">&amp;</span>payload).to_string();
+    <span class="kw">let </span>modified_input2 = <span class="kw-2">&amp;</span>preprocess_mathml_for_to_latex(modified_input1).to_string();
+    <span class="kw">let </span>exp = modified_input2.parse::&lt;MathExpressionTree&gt;().unwrap();
+    exp.to_latex()
+}
+
 <span class="doccomment">/// Parse presentation MathML and return a content MathML representation. Currently limited to
 /// first-order ODEs.
 </span><span class="attr">#[utoipa::path(
@@ -290,13 +337,16 @@
 )]
 #[put(<span class="string">&quot;/mathml/decapodes&quot;</span>)]
 </span><span class="kw">pub async fn </span>get_decapodes(payload: web::Json&lt;Vec&lt;String&gt;&gt;) -&gt; HttpResponse {
-    <span class="kw">let </span>met_vec: Vec&lt;MathExpressionTree&gt; = payload.iter().map(|x| x.parse::&lt;MathExpressionTree&gt;().unwrap()).collect();
+    <span class="kw">let </span>met_vec: Vec&lt;MathExpressionTree&gt; = payload
+        .iter()
+        .map(|x| x.parse::&lt;MathExpressionTree&gt;().unwrap())
+        .collect();
     <span class="kw">let </span><span class="kw-2">mut </span>deca_vec = Vec::&lt;WiringDiagram&gt;::new();
     <span class="kw">for </span>term <span class="kw">in </span>met_vec.iter() {
         deca_vec.push(to_wiring_diagram(term));
     }
     <span class="kw">let </span>decapodes_collection = DecapodesCollection {
-        decapodes: deca_vec.clone()
+        decapodes: deca_vec.clone(),
     };
     HttpResponse::Ok().json(web::Json(decapodes_collection))
 }
