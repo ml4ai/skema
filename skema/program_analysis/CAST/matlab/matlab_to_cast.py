@@ -217,25 +217,22 @@ class MatlabToCast(object):
                 source_refs=[self.node_helper.get_source_ref(conditional_node)]
             )
 
-        # the if statement is returned as a ModelIf AstNode
-        model_ifs = [get_conditional(node)]
+        # start with the if statement
+        first = get_conditional(node)
+        current = first
 
-        # add 0-n elseif clauses 
-        elseif_clauses = get_children_by_types(node, ["elseif_clause"])
-        model_ifs += [get_conditional(child) for child in elseif_clauses]
-
-        # link
-        for i, model_if in enumerate(model_ifs[1:]):
-            model_ifs[i].orelse = [model_if]
+        # add 0-n elseif clauses
+        for child in get_children_by_types(node, ["elseif_clause"]):
+            conditional = get_conditional(child)
+            current.orelse = [conditional]
+            current = conditional
 
         # add 0-1 else clause 
         else_clause = get_first_child_by_type(node, "else_clause")
         if else_clause:
+            current.orelse = self.get_block(else_clause)
 
-            #link
-            model_ifs[len(model_ifs)-1].orelse = self.get_block(else_clause)
-
-        return model_ifs[0]
+        return first
 
     def visit_number(self, node) -> LiteralValue:
         """Visitor for numbers """
