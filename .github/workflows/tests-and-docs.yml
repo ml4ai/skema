@@ -137,6 +137,7 @@ jobs:
       # env:
       #   SKEMA_GRAPH_DB_HOST: "bolt://127.0.0.1"
       run: |
+        echo "SKEMA_RS_ADDESS: $SKEMA_RS_ADDESS"
         echo "results for ${SKEMA_RS_HOST}:${SKEMA_RS_PORT}/version: `curl -s ${SKEMA_RS_HOST}:${SKEMA_RS_PORT}/version`"
         pytest
 
