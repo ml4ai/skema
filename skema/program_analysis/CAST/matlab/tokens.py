@@ -4,6 +4,7 @@
 # commented out words are not used for CAST parsing.
 SYNTAX_KEYWORDS = [
     # keywords we currently support
+    'arguments',
     'assignment',
     'binary_operator',
     'block',
@@ -24,6 +25,7 @@ SYNTAX_KEYWORDS = [
     'end',
     'function',
     'function_call',
+    'function_definition',
     'identifier',
     'if',
     'if_statement',
@@ -31,6 +33,7 @@ SYNTAX_KEYWORDS = [
     'number',
     'otherwise',
     'otherwise_clause',
+    'parenthesis',
     'row',
     'string',
     'string_content',
@@ -39,21 +42,18 @@ SYNTAX_KEYWORDS = [
     'unary_operator',
 
     # keywords to be supported
-    'arguments',
     'break_statement',
     'continue_statement',
     'field_expression',
     'for',
     'for_statement',
     'function_arguments',
-    'function_definition',
     'function_output',
     'iterator',
     'lambda',
     'line_continuation',
     'multioutput_variable',
     'not_operator',
-    'parenthesis',
     'postfix_operator',
     'range',
     'spread_operator',
