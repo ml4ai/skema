@@ -2,73 +2,51 @@ from skema.program_analysis.CAST.matlab.matlab_to_cast import MatlabToCast
 from typing import List
 from skema.program_analysis.CAST2FN.model.cast import (
     Assignment,
+    AstNode,
     Call,
     LiteralValue,
+    Loop,
     Operator,
+    ModelIf,
     Module,
     Name,
     Var
 )
 
-def assert_assignment(assignment, left = None, right = None):
-    """ Test an Assignment for correct type and operands. """
-    assert isinstance(assignment, Assignment)
-    assert not assignment.source_refs == None
-    if left:
-        assert_operand(assignment.left, left)
-    if right:
-        assert_operand(assignment.right, right)
+def check(result, expected = None):
+    """ Test for match with the same datatypes. """
+    if isinstance(result, List):
+        assert len(result) == len(expected)
+        for i, _ in enumerate(result):
+            check(_, expected[i])
+    elif isinstance(result, Assignment):
+        check(result.left, expected.left)
+        check(result.right, expected.right)
+    elif isinstance(result, Operator):
+        check(result.op, expected.op)
+        check(result.operands, expected.operands)
+    elif isinstance(result, Call):
+        check(result.func, expected.func)
+        check(result.arguments, expected.arguments)
+    elif isinstance(result, ModelIf):
+        check(result.expr, expected.expr)
+        check(result.body, expected.body)
+        check(result.orelse, expected.orelse)
+    elif isinstance(result, LiteralValue):
+        check(result.value, expected)
+    elif isinstance(result, Var):
+        check(result.val, expected)
+    elif isinstance(result, Name):
+        check(result.name, expected)
+    else:
+        assert result == expected
 
-def assert_call(call, func = None, arguments = None):
-    """ Test the call for correct type, function, and arguments. """
-    assert isinstance(call, Call)
-    assert not call.source_refs == None
-    if func:
-        assert_identifier(call.func, func)
-    if arguments:
-        for i, argument in enumerate(call.arguments):
-            assert_operand(argument, arguments[i])
-
-def assert_expression(expression, op = None, operands = None):
-    """ Test an Operator for correct type, operation, and operands. """
-    assert isinstance(expression, Operator)
-    assert not expression.source_refs == None
-    if op:
-        assert expression.op == op
-    if operands:
-        assert len(expression.operands) == len(operands)
-        for i, operand in enumerate(expression.operands):
-            assert_operand(operand, operands[i])
-
-def assert_identifier(node, name = None):
-    """ Test the Var for correct type and name. """
-    assert isinstance(node, Var)
-    assert not node.source_refs == None
-    if name:
-        assert_name(node.val, name)
-
-def assert_name(node, name = None):
-    """ Test the node for correct type and name """
-    assert isinstance(node, Name)
-    assert not node.source_refs == None
-    if name:
-        assert(node.name == name)
-            
-def assert_operand(operand, value = None):
-    """ Test a Var or LiteralValue operand for correct type and value. """
-    if value:
-        if isinstance(operand, List):
-            for i, element in enumerate(operand):
-                assert_operand(element, value[i])
-        elif isinstance(operand, Var):
-            assert_identifier(operand, name = value)
-        elif isinstance(operand, LiteralValue):
-            assert_operand(operand.value, value)
-        else:
-            assert operand == value
+    # every CAST node has a source_refs element
+    if isinstance(result, AstNode):
+        assert not result.source_refs == None
 
 # we curently produce a CAST object with a single Module in the nodes list.
-def cast_nodes(source):
+def cast(source):
     """ Return the MatlabToCast output """
     # there should only be one CAST object in the cast output list
     cast = MatlabToCast(source = source).out_cast
