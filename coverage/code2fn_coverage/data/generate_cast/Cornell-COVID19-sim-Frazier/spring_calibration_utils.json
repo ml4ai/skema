@@ -11,12 +11,12 @@ Traceback (most recent call last):
     C = convert.visit(contents, {}, {})
   File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/functools.py", line 912, in _method
     return method.__get__(obj, cls)(*args, **kwargs)
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST/pythonAST/py_ast_to_cast.py", line 3478, in visit_Module
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST/pythonAST/py_ast_to_cast.py", line 3545, in visit_Module
     to_add = self.visit(piece, prev_scope_id_dict, curr_scope_id_dict)
   File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/functools.py", line 912, in _method
     return method.__get__(obj, cls)(*args, **kwargs)
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST/pythonAST/py_ast_to_cast.py", line 1632, in visit_ClassDef
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST/pythonAST/py_ast_to_cast.py", line 1684, in visit_ClassDef
     self.collect_fields(
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST/pythonAST/py_ast_to_cast.py", line 1574, in collect_fields
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST/pythonAST/py_ast_to_cast.py", line 1626, in collect_fields
     elif attr_node.value.id == "self":
 AttributeError: 'Subscript' object has no attribute 'id'

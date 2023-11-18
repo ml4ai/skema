@@ -15,10 +15,10 @@ Traceback (most recent call last):
     C = convert.visit(contents, {}, {})
   File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/functools.py", line 912, in _method
     return method.__get__(obj, cls)(*args, **kwargs)
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST/pythonAST/py_ast_to_cast.py", line 3495, in visit_Module
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST/pythonAST/py_ast_to_cast.py", line 3562, in visit_Module
     names = get_node_name(to_add[0])
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST/pythonAST/py_ast_to_cast.py", line 126, in get_node_name
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST/pythonAST/py_ast_to_cast.py", line 129, in get_node_name
     return get_node_name(ast_node.left)
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST/pythonAST/py_ast_to_cast.py", line 124, in get_node_name
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST/pythonAST/py_ast_to_cast.py", line 127, in get_node_name
     return [ast_node.val.name]
 AttributeError: 'Attribute' object has no attribute 'name'

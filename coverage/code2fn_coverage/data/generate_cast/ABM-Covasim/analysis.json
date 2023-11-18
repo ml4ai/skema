@@ -11,30 +11,30 @@ Traceback (most recent call last):
     C = convert.visit(contents, {}, {})
   File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/functools.py", line 912, in _method
     return method.__get__(obj, cls)(*args, **kwargs)
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST/pythonAST/py_ast_to_cast.py", line 3478, in visit_Module
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST/pythonAST/py_ast_to_cast.py", line 3545, in visit_Module
     to_add = self.visit(piece, prev_scope_id_dict, curr_scope_id_dict)
   File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/functools.py", line 912, in _method
     return method.__get__(obj, cls)(*args, **kwargs)
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST/pythonAST/py_ast_to_cast.py", line 1637, in visit_ClassDef
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST/pythonAST/py_ast_to_cast.py", line 1689, in visit_ClassDef
     self.visit(func, prev_scope_id_dict, curr_scope_id_dict)
   File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/functools.py", line 912, in _method
     return method.__get__(obj, cls)(*args, **kwargs)
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST/pythonAST/py_ast_to_cast.py", line 2471, in visit_FunctionDef
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST/pythonAST/py_ast_to_cast.py", line 2540, in visit_FunctionDef
     to_add = self.visit(
   File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/functools.py", line 912, in _method
     return method.__get__(obj, cls)(*args, **kwargs)
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST/pythonAST/py_ast_to_cast.py", line 4282, in visit_With
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST/pythonAST/py_ast_to_cast.py", line 4348, in visit_With
     self.visit(piece, prev_scope_id_dict, curr_scope_id_dict)
   File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/functools.py", line 912, in _method
     return method.__get__(obj, cls)(*args, **kwargs)
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST/pythonAST/py_ast_to_cast.py", line 2048, in visit_For
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST/pythonAST/py_ast_to_cast.py", line 2100, in visit_For
     self.visit(piece, curr_scope_id_dict, loop_scope_id_dict)
   File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/functools.py", line 912, in _method
     return method.__get__(obj, cls)(*args, **kwargs)
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST/pythonAST/py_ast_to_cast.py", line 1092, in visit_AugAssign
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST/pythonAST/py_ast_to_cast.py", line 1099, in visit_AugAssign
     return self.visit(convert, prev_scope_id_dict, curr_scope_id_dict)
   File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/functools.py", line 912, in _method
     return method.__get__(obj, cls)(*args, **kwargs)
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST/pythonAST/py_ast_to_cast.py", line 837, in visit_Assign
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST/pythonAST/py_ast_to_cast.py", line 844, in visit_Assign
     if type(list_node.elts[0].value) == float
 AttributeError: 'Call' object has no attribute 'value'

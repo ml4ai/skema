@@ -13,42 +13,42 @@ Traceback (most recent call last):
     generated_gromet = ann_cast_pipeline(
   File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/utils/script_functions.py", line 268, in ann_cast_pipeline
     ToGrometPass(pipeline_state)
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/to_gromet_pass.py", line 273, in __init__
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/to_gromet_pass.py", line 276, in __init__
     self.visit(node, parent_gromet_fn=None, parent_cast_node=None)
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/to_gromet_pass.py", line 608, in visit
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/to_gromet_pass.py", line 634, in visit
     raise e
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/to_gromet_pass.py", line 603, in visit
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/to_gromet_pass.py", line 629, in visit
     return self._visit(node, parent_gromet_fn, parent_cast_node)
   File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/functools.py", line 912, in _method
     return method.__get__(obj, cls)(*args, **kwargs)
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/to_gromet_pass.py", line 4077, in visit_module
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/to_gromet_pass.py", line 4277, in visit_module
     self.visit_node_list(node.body, new_gromet, node)
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/to_gromet_pass.py", line 616, in visit_node_list
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/to_gromet_pass.py", line 642, in visit_node_list
     return [
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/to_gromet_pass.py", line 617, in <listcomp>
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/to_gromet_pass.py", line 643, in <listcomp>
     self.visit(node, parent_gromet_fn, parent_cast_node)
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/to_gromet_pass.py", line 608, in visit
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/to_gromet_pass.py", line 634, in visit
     raise e
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/to_gromet_pass.py", line 603, in visit
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/to_gromet_pass.py", line 629, in visit
     return self._visit(node, parent_gromet_fn, parent_cast_node)
   File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/functools.py", line 912, in _method
     return method.__get__(obj, cls)(*args, **kwargs)
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/to_gromet_pass.py", line 4427, in visit_record_def
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/to_gromet_pass.py", line 4627, in visit_record_def
     self.visit(
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/to_gromet_pass.py", line 608, in visit
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/to_gromet_pass.py", line 634, in visit
     raise e
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/to_gromet_pass.py", line 603, in visit
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/to_gromet_pass.py", line 629, in visit
     return self._visit(node, parent_gromet_fn, parent_cast_node)
   File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/functools.py", line 912, in _method
     return method.__get__(obj, cls)(*args, **kwargs)
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/to_gromet_pass.py", line 3298, in visit_loop
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/to_gromet_pass.py", line 3498, in visit_loop
     self.visit(
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/to_gromet_pass.py", line 608, in visit
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/to_gromet_pass.py", line 634, in visit
     raise e
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/to_gromet_pass.py", line 603, in visit
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/to_gromet_pass.py", line 629, in visit
     return self._visit(node, parent_gromet_fn, parent_cast_node)
   File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/functools.py", line 912, in _method
     return method.__get__(obj, cls)(*args, **kwargs)
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/to_gromet_pass.py", line 1138, in visit_assignment
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/to_gromet_pass.py", line 1162, in visit_assignment
     name = elem.value[0].val.name
 AttributeError: 'AnnCastLiteralValue' object has no attribute 'val'
