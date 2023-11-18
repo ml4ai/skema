@@ -16,4 +16,4 @@ def test_post_image_to_latex():
 
     response = client.post("/images/equations-to-latex", files=files)
     assert response.status_code == 200, "Request was unsuccessful"
-    assert response.text == "\\frac{d H}{dt}=\\nabla \\cdot {(\\Gamma*H^{n+2}*\\left|\\nabla{H}\\right|^{n-1}*\\nabla{H})}", "Response was empty"
+    assert response.text == '"\\frac{d H}{dt}=\\nabla \\cdot {(\\Gamma*H^{n+2}*\\left|\\nabla{H}\\right|^{n-1}*\\nabla{H})}"', "Response was empty"
