@@ -222,9 +222,8 @@ class MatlabToCast(object):
 
         # add 0-n elseif clauses
         for child in get_children_by_types(node, ["elseif_clause"]):
-            conditional = get_conditional(child)
-            current.orelse = [conditional]
-            current = conditional
+            current.orelse = [get_conditional(child)]
+            current = current.orelse[0]
 
         # add 0-1 else clause 
         else_clause = get_first_child_by_type(node, "else_clause")
