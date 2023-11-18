@@ -13,9 +13,13 @@ def test_post_image_to_latex():
     files = {
         "data": open(image_path, "rb"),
     }
-
-    response = client.post("/images/equations-to-latex", files=files)
+    
+    endpoint = "/images/equations-to-latex"
+    response = client.post(endpoint, files=files)
     expected = '"\\frac{d H}{dt}=\\nabla \\cdot {(\\Gamma*H^{n+2}*\\left|\\nabla{H}\\right|^{n-1}*\\nabla{H})}"'
-
-    assert response.status_code == 200, "Request was unsuccessful"
+    # check for route's existence
+    assert any(route.path == endpoint for route in app.routes) == True, "{endpoint} does not exist for app"
+    # check status code
+    assert response.status_code == 200, f"Request was unsuccessful (status code was {response.status_code} instead of 200)"
+    # check response
     assert response.text == expected, f"Response should be {expected}, but instead received {response.text}"
