@@ -127,6 +127,7 @@ jobs:
     - name: "Launch skema-rs in background for testing"
       working-directory: ./skema/skema-rs
       run : |
+        cargo build --release --bin skema_service &&
         ./target/release/skema_service --host "127.0.0.1" --port "${SKEMA_RS_PORT}" &
     # test & code coverage (Python)
     - name: "Unit tests and code coverage reports for Python components"
