@@ -24,8 +24,8 @@ class Dynamics(BaseModel):
     Dynamics Data Model for capturing dynamics within a CodeFile.
     """
 
-    name: Optional[str] = Field(description="Name of the dynamics section.")
-    description: Optional[str] = Field(description="Description of the dynamics.")
+    name: Optional[str] = Field(None, description="Name of the dynamics section.")
+    description: Optional[str] = Field(None, description="Description of the dynamics.")
     block: List[str] = Field(
         description="A list containing strings indicating the line numbers in the file that contain the dynamics, e.g., ['L205-L213', 'L225-L230']."
     )
