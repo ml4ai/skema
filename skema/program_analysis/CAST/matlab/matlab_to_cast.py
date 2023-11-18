@@ -234,31 +234,12 @@ class MatlabToCast(object):
 
         return first
 
-    def visit_number(self, node) -> LiteralValue:
-        """Visitor for numbers """
-        literal_value = self.node_helper.get_identifier(node)
-        # Check if this is a real value, or an Integer
-        if "e" in literal_value.lower() or "." in literal_value:
-            return LiteralValue(
-                value_type="AbstractFloat",  # TODO verify this value
-                value=float(literal_value),
-                source_code_data_type=["matlab", MATLAB_VERSION, "real"],
-                source_refs=[self.node_helper.get_source_ref(node)]
-            )
-        return LiteralValue(
-            value_type="Integer",
-            value=int(literal_value),
-            source_code_data_type=["matlab", MATLAB_VERSION, "integer"],
-            source_refs=[self.node_helper.get_source_ref(node)]
-        )
-
-    def visit_string(self, node):
-        return LiteralValue(
-            value_type="Character",
-            value=self.node_helper.get_identifier(node),
-            source_code_data_type=["matlab", MATLAB_VERSION, "character"],
-            source_refs=[self.node_helper.get_source_ref(node)]
-        )
+    # General loop translator for all MATLAB loop types
+    # def visit_loop(self, node) -> Loop:
+    #     """ Translate Tree-sitter for_loop node into CAST Loop node """
+    #     return Loop (
+    #         source_refs = [self.node_helper.get_source_ref(node)]
+    #     )
 
     def visit_matrix(self, node):
         """ Translate the Tree-sitter cell node into a List """
@@ -283,13 +264,6 @@ class MatlabToCast(object):
             source_code_data_type=["matlab", MATLAB_VERSION, "matrix"],
             source_refs=[self.node_helper.get_source_ref(node)],
         )
-
-    # General loop translator for all MATLAB loop types
-    # def visit_loop(self, node) -> Loop:
-    #     """ Translate Tree-sitter for_loop node into CAST Loop node """
-    #     return Loop (
-    #         source_refs = [self.node_helper.get_source_ref(node)]
-    #     )
 
     def visit_module(self, node: Node) -> Module:
         """Visitor for program and module statement. Returns a Module object"""
@@ -320,6 +294,24 @@ class MatlabToCast(object):
         # create a new node
         return self.variable_context.add_variable(
             identifier, "Unknown", [self.node_helper.get_source_ref(node)]
+        )
+
+    def visit_number(self, node) -> LiteralValue:
+        """Visitor for numbers """
+        literal_value = self.node_helper.get_identifier(node)
+        # Check if this is a real value, or an Integer
+        if "e" in literal_value.lower() or "." in literal_value:
+            return LiteralValue(
+                value_type="AbstractFloat",  # TODO verify this value
+                value=float(literal_value),
+                source_code_data_type=["matlab", MATLAB_VERSION, "real"],
+                source_refs=[self.node_helper.get_source_ref(node)]
+            )
+        return LiteralValue(
+            value_type="Integer",
+            value=int(literal_value),
+            source_code_data_type=["matlab", MATLAB_VERSION, "integer"],
+            source_refs=[self.node_helper.get_source_ref(node)]
         )
 
     def visit_operator_binary(self, node):
@@ -355,6 +347,14 @@ class MatlabToCast(object):
             op = node.children[0].type,
             operands=[self.visit(node.children[1])],
             source_refs=[self.node_helper.get_source_ref(node)],
+        )
+
+    def visit_string(self, node):
+        return LiteralValue(
+            value_type="Character",
+            value=self.node_helper.get_identifier(node),
+            source_code_data_type=["matlab", MATLAB_VERSION, "character"],
+            source_refs=[self.node_helper.get_source_ref(node)]
         )
 
     def visit_switch_statement(self, node):
