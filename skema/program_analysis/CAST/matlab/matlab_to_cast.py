@@ -43,7 +43,7 @@ MATLAB_VERSION='matlab_version_here'
 
 class MatlabToCast(object):
 
-    node_visits = dict()
+    visits = dict()
 
     def __init__(self, source_path = "", source = ""):
 
@@ -74,32 +74,32 @@ class MatlabToCast(object):
         module = self.run(self.tree.root_node)
         self.out_cast = CAST([module], "matlab")
 
-        # report node node_visits
-        print("NODE VISITS: ")
-        total = 0
-        for key in self.node_visits:
-            print(f"{key} {self.node_visits[key]}")
-            total += self.node_visits[key]
-        print(f"Total node visits {total}")
+        # show nodes processed
+        # self.show_visits()
+
+    def show_visits(self):
+        """ show the number of each node type visited """
+        print(f"\nNODE VISITS: {sum(self.visits.values())}")
+        for key in self.visits:
+            print(f"{key} {self.visits[key]}")
+
+    def log_visit(self, node: Node):
+        """ record a visit of a node type """
+        key = node.type if node else "None"
+        value = self.visits[key] + 1 if key in self.visits else 1
+        self.visits[key] = value
 
     def run(self, root) -> Module:
+        """ process an entire Tree-sitter syntax instance """
         return self.visit(root)
 
-
-    def log_visit(self, node_type: str):
-        value = 1
-        if node_type in self.node_visits:
-            value += self.node_visits[node_type]
-        self.node_visits[node_type] = value
-
     def visit(self, node):
-        if node == None:
-            self.log_visit("None")
-            return None
-        self.log_visit(node.type)
-
         """Switch execution based on node type"""
-        if node.type == "assignment":
+        self.log_visit(node)
+
+        if node == None:
+            return None
+        elif node.type == "assignment":
             return self.visit_assignment(node)
         elif node.type == "boolean":
             return self.visit_boolean(node)
@@ -176,15 +176,12 @@ class MatlabToCast(object):
     def visit_command(self, node):
         """ Translate the Tree-sitter command node """
         children =  get_keyword_children(node)
-        command_name = children[0]
-        command_argument = None
-        if len(children) > 1:
-            command_argument = [self.visit(children[1])]
+        argument = [self.visit(children[1])] if len(children) > 1 else None
         return Call(
-            func = self.visit(command_name),
+            func = self.visit(children[0]),
             source_language = "matlab",
             source_language_version = MATLAB_VERSION,
-            arguments = command_argument,
+            arguments = argument,
             source_refs=[self.node_helper.get_source_ref(node)]
         )
 
@@ -214,20 +211,12 @@ class MatlabToCast(object):
     def visit_identifier(self, node):
         """ return an identifier (variable) node """
         identifier = self.node_helper.get_identifier(node)
-        if self.variable_context.is_variable(identifier):
-            var_type = self.variable_context.get_type(identifier)
-        else:
-            var_type = "Unknown"
-
-        default_value = None
-
-        value = self.visit_name(node)
-
         return Var(
-            val=value,
-            type=var_type,
-            default_value=default_value,
-            source_refs=[self.node_helper.get_source_ref(node)],
+            val = self.visit_name(node),
+            type = self.variable_context.get_type(identifier) if
+                self.variable_context.is_variable(identifier) else "Unknown",
+            default_value = None,
+            source_refs = [self.node_helper.get_source_ref(node)],
         )
 
     def visit_if_statement(self, node):
@@ -273,7 +262,6 @@ class MatlabToCast(object):
 
         def get_values(element, ret)-> List:
             for child in get_keyword_children(element):
-                token = self.node_helper.get_identifier(child)
                 if child.type == "row": 
                     ret.append(get_values(child, []))
                 else:
@@ -329,7 +317,7 @@ class MatlabToCast(object):
         # Check if this is a real value, or an Integer
         if "e" in literal_value.lower() or "." in literal_value:
             return LiteralValue(
-                value_type="AbstractFloat",  # TODO verify this value
+                value_type="AbstractFloat",
                 value=float(literal_value),
                 source_code_data_type=["matlab", MATLAB_VERSION, "real"],
                 source_refs=[self.node_helper.get_source_ref(node)]
