@@ -93,7 +93,7 @@ async def equations_to_latex(data: UploadFile):
 
     # pass image bytes to get_mathml_from_bytes function
     mml_res = get_mathml_from_bytes(image_bytes, image2mathml_db)
-    response = requests.put(f"{SKEMA_RS_ADDESS}/mathml/latex", data=mml_res)
+    response = requests.post(f"{SKEMA_RS_ADDESS}/mathml/latex", data=mml_res)
     # Check the response
     if response.status_code == 200:
         # The request was successful
