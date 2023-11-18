@@ -139,7 +139,7 @@ jobs:
       run: |
         echo "SKEMA_RS_ADDESS: $SKEMA_RS_ADDESS"
         python -c "import requests; print(requests.get('$SKEMA_RS_ADDESS/version').text)"
-        pytest
+        SKEMA_RS_ADDRESS=$SKEMA_RS_ADDESS pytest -vvv
 
     - name: "Code2fn model coverage reports"
       run: python skema/program_analysis/model_coverage_report/model_coverage_report.py $GITHUB_WORKSPACE/docs/coverage/code2fn_coverage/ all
