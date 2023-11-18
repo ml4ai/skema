@@ -2,19 +2,36 @@ from skema.program_analysis.CAST.matlab.tests.utils import (check, cast)
 from skema.program_analysis.CAST2FN.model.cast import (
     Assignment,
     Call,
+    FunctionDef,
     Operator
 )
 
 # Test CAST from functions
-def no_test_function_definition():
+def test_function_definition():
     """ Test function definition """
     source = """
     function both = add_them(x, y)
         both = x + y
     end
     """
-    nodes = cast(source)
-    assert len(nodes) == 1
+    nodes = cast(source)[0]
+    check(
+        cast(source)[0],
+        FunctionDef(
+            name = "both",
+            func_args = ["x", "y"],
+            body = [
+                Assignment(
+                    left = "both",
+                    right = Operator (
+                        op = "+",
+                        operands =  ["x", "y"]
+                    )
+                )
+            ]
+        )
+    )
+
 
 def test_literal_args():
     """ Test function call with literal arguments """
