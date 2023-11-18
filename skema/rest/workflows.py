@@ -75,25 +75,27 @@ async def equations_to_latex(data: UploadFile):
     Converts images of equations to LaTeX.
 
     ### Python example
-    ```
+  
     Endpoint for generating LaTeX from an input image.
 
-    ### Python example
     ```
     import requests
 
     files = {
       "data": open("bayes-rule-white-bg.png", "rb"),
     }
-    r = requests.post("http://0.0.0.0:8000/images/equations-to-latex", files=files)
+    r = requests.post("http://0.0.0.0:8000/workflows/images/equations-to-latex", files=files)
     print(r.text)
+    ```
     """
     # Read image data
     image_bytes = await data.read()
 
     # pass image bytes to get_mathml_from_bytes function
     mml_res = get_mathml_from_bytes(image_bytes, image2mathml_db)
-    response = requests.post(f"{SKEMA_RS_ADDESS}/mathml/latex", data=mml_res)
+    proxy_url = f"{SKEMA_RS_ADDESS}/mathml/latex"
+    print(f"Proxying request to {proxy_url}")
+    response = requests.post(proxy_url, data=mml_res)
     # Check the response
     if response.status_code == 200:
         # The request was successful
