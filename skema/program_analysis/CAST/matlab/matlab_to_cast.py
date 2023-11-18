@@ -113,15 +113,14 @@ class MatlabToCast(object):
             return self.visit_number(node)
         elif node.type in [
             "binary_operator",
+            "boolean_operator",
             "comparison_operator",
-            "boolean_operator"
-        ]: return self.visit_operator_binary(node)
+            "unary_operator"
+        ]: return self.visit_operator(node)
 #        elif node.type == "not_operator":
 #            return self.visit_operator_not(node)
 #        elif node.type == "postfix_operator":
 #            return self.visit_operator_postfix(node)
-        elif node.type == "unary_operator":
-            return self.visit_operator_unary(node)
         elif node.type == "string":
            return self.visit_string(node)
         elif node.type == "switch_statement":
@@ -314,18 +313,20 @@ class MatlabToCast(object):
             source_refs=[self.node_helper.get_source_ref(node)]
         )
 
-    def visit_operator_binary(self, node):
+    def visit_operator(self, node):
+        """return an Operator based on the Tree-sitter node """
+        # The operator will be the first control character
         op = self.node_helper.get_identifier(
-            get_control_children(node)[0]
-        )  # The operator will be the first control character
-
+           get_control_children(node)[0]
+        )  
+        # the operands will be the keyword children
+        operands=[self.visit(child) for child in get_keyword_children(node)]
         return Operator(
             source_language="matlab",
             interpreter=None,
             version=MATLAB_VERSION,
-            op=op,
-            operands=[self.visit(operand) for operand in
-                get_keyword_children(node)],
+            op = op,
+            operands = operands,
             source_refs=[self.node_helper.get_source_ref(node)],
         )
 
@@ -337,17 +338,6 @@ class MatlabToCast(object):
     # TODO
     # def visit_operator_postfix(self, node):
     #     return None
-
-    def visit_operator_unary(self, node):
-        # A unary operator is an Operator instance with a single operand
-        return Operator(
-            source_language="matlab",
-            interpreter=None,
-            version=MATLAB_VERSION,
-            op = node.children[0].type,
-            operands=[self.visit(node.children[1])],
-            source_refs=[self.node_helper.get_source_ref(node)],
-        )
 
     def visit_string(self, node):
         return LiteralValue(
@@ -423,8 +413,8 @@ class MatlabToCast(object):
 
         return model_ifs[0]
     
-    # return all the children of the block
-    def get_block(self, node):
+    def get_block(self, node) -> List[AstNode]:
+        """return all the children of the block as a list of AstNodes"""
         block = get_first_child_by_type(node, "block")
         if block:
             return [self.visit(child) for child in 
