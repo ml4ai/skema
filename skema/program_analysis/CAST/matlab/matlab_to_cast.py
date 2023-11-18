@@ -174,11 +174,14 @@ class MatlabToCast(object):
             source_refs=[self.node_helper.get_source_ref(node)]
         )
 
-    # xxx
     def visit_function_def(self, node):
-        block = self.get_block(node)
-
+        """ return a CAST transation of a MATLAB function definition """
         return FunctionDef(
+            name = self.visit(get_first_child_by_type(node, "function_output")),
+            body = self.get_block(node),
+            func_args = [self.visit(child) for child in 
+                get_keyword_children(
+                    get_first_child_by_type(node, "function_arguments"))],
             source_refs=[self.node_helper.get_source_ref(node)]
         )
 
