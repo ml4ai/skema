@@ -11,6 +11,7 @@ from skema.rest.workflows import (
     code_snippets_to_pn_amr,
 )
 from skema.rest.llm_proxy import Dynamics
+from skema.rest.proxies import SKEMA_RS_ADDESS
 from skema.skema_py.server import System
 
 CHIME_SIR_URL = (
@@ -40,7 +41,7 @@ def test_any_amr_chime_sir():
                 .splitlines(keepends=True)[line_begin:line_end]
             )
         ]
-
+    print(f"SKEMA_RS_ADDESS:\t{SKEMA_RS_ADDESS}")
     amr = asyncio.run(
         code_snippets_to_pn_amr(
             System(
