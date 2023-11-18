@@ -43,6 +43,8 @@ MATLAB_VERSION='matlab_version_here'
 
 class MatlabToCast(object):
 
+    node_visits = dict()
+
     def __init__(self, source_path = "", source = ""):
 
         # if a source file path is provided, read source from file
@@ -72,10 +74,30 @@ class MatlabToCast(object):
         module = self.run(self.tree.root_node)
         self.out_cast = CAST([module], "matlab")
 
+        # report node node_visits
+        print("NODE VISITS: ")
+        total = 0
+        for key in self.node_visits:
+            print(f"{key} {self.node_visits[key]}")
+            total += self.node_visits[key]
+        print(f"Total node visits {total}")
+
     def run(self, root) -> Module:
         return self.visit(root)
 
+
+    def log_visit(self, node_type: str):
+        value = 1
+        if node_type in self.node_visits:
+            value += self.node_visits[node_type]
+        self.node_visits[node_type] = value
+
     def visit(self, node):
+        if node == None:
+            self.log_visit("None")
+            return None
+        self.log_visit(node.type)
+
         """Switch execution based on node type"""
         if node.type == "assignment":
             return self.visit_assignment(node)
@@ -153,12 +175,16 @@ class MatlabToCast(object):
 
     def visit_command(self, node):
         """ Translate the Tree-sitter command node """
-        command_name, command_argument = get_keyword_children(node)
+        children =  get_keyword_children(node)
+        command_name = children[0]
+        command_argument = None
+        if len(children) > 1:
+            command_argument = [self.visit(children[1])]
         return Call(
             func = self.visit(command_name),
             source_language = "matlab",
             source_language_version = MATLAB_VERSION,
-            arguments = [self.visit(command_argument)],
+            arguments = command_argument,
             source_refs=[self.node_helper.get_source_ref(node)]
         )
 
