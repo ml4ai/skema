@@ -127,7 +127,7 @@ jobs:
     #     sbt coverageAggregate
     - name: "Launch skema-rs in background for testing"
       working-directory: ./skema/skema-rs
-      run : |
+      run: |
         echo "skema-rs REST service: $SKEMA_RS_HOST:$SKEMA_RS_PORT"
         cargo build --release --bin skema_service
         ./target/release/skema_service &
@@ -138,7 +138,7 @@ jobs:
       #   SKEMA_GRAPH_DB_HOST: "bolt://127.0.0.1"
       run: |
         echo "SKEMA_RS_ADDESS: $SKEMA_RS_ADDESS"
-        echo "results for ${SKEMA_RS_HOST}:${SKEMA_RS_PORT}/version: `curl -s ${SKEMA_RS_HOST}:${SKEMA_RS_PORT}/version`"
+        python -c "import requests; print(requests.get('$SKEMA_RS_ADDESS/version').text)"
         pytest
 
     - name: "Code2fn model coverage reports"
