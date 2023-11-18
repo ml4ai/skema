@@ -51,4 +51,4 @@ def test_any_amr_chime_sir():
         )
     )
     # For this test, we are just checking that AMR was generated without crashing. We are not checking for accuracy.
-    assert "model" in amr
+    assert "model" in amr, f"'model' should be in AMR response, but got {amr}"
