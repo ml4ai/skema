@@ -131,13 +131,13 @@ jobs:
         echo "skema-rs REST service: $SKEMA_RS_HOST:$SKEMA_RS_PORT"
         cargo build --release --bin skema_service
         ./target/release/skema_service &
-        curl ${SKEMA_RS_HOST}:${SKEMA_RS_PORT}/version
+        echo "results for ${SKEMA_RS_HOST}:${SKEMA_RS_PORT}/version: `curl -s ${SKEMA_RS_HOST}:${SKEMA_RS_PORT}/version`"
     # test & code coverage (Python)
     - name: "Unit tests and code coverage reports for Python components"
       # env:
       #   SKEMA_GRAPH_DB_HOST: "bolt://127.0.0.1"
       run: |
-        curl ${SKEMA_RS_HOST}:${SKEMA_RS_PORT}/version
+        echo "results for ${SKEMA_RS_HOST}:${SKEMA_RS_PORT}/version: `curl -s ${SKEMA_RS_HOST}:${SKEMA_RS_PORT}/version`"
         pytest
 
     - name: "Code2fn model coverage reports"
