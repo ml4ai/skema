@@ -85,8 +85,8 @@ class MatlabToCast(object):
             return self.visit_command(node)
         elif node.type == "function_call":
             return self.visit_function_call(node)
-#        elif node.type == "function_definition":
-#            return self.visit_function_def(node)
+        elif node.type == "function_definition":
+            return self.visit_function_def(node)
         elif node.type in [
             "identifier"
         ]:return self.visit_identifier(node)
@@ -175,10 +175,13 @@ class MatlabToCast(object):
             source_refs=[self.node_helper.get_source_ref(node)]
         )
 
-    # def visit_function_def(self, node):
-    #     return FunctionDef(
-    #         source_refs=[self.node_helper.get_source_ref(node)]
-    #     )
+    # xxx
+    def visit_function_def(self, node):
+        block = self.get_block(node)
+
+        return FunctionDef(
+            source_refs=[self.node_helper.get_source_ref(node)]
+        )
 
     def visit_identifier(self, node):
         """ return an identifier (variable) node """
@@ -201,42 +204,36 @@ class MatlabToCast(object):
 
     def visit_if_statement(self, node):
         """ return a node describing if, elseif, else conditional logic"""
-        def conditional(conditional_node):
+        def get_conditional(conditional_node):
             """ return a ModelIf struct for the conditional logic node. """
-            ret = ModelIf(
-                # comparison_operator
+            return ModelIf(
+                # if
                 expr = self.visit(get_first_child_by_type(
                     conditional_node,
                     "comparison_operator"
                 )),
+                # then
+                body = self.get_block(conditional_node),
                 source_refs=[self.node_helper.get_source_ref(conditional_node)]
             )
 
-            # instruction_block may not exist
-            block = get_first_child_by_type(conditional_node, "block")
-            if block:
-                children = get_keyword_children(block)
-                ret.body = [self.visit(child) for child in children]
-
-            return ret
-
         # the if statement is returned as a ModelIf AstNode
-        model_ifs = [conditional(node)]
+        model_ifs = [get_conditional(node)]
 
         # add 0-n elseif clauses 
         elseif_clauses = get_children_by_types(node, ["elseif_clause"])
-        model_ifs += [conditional(child) for child in elseif_clauses]
+        model_ifs += [get_conditional(child) for child in elseif_clauses]
+
+        # link
         for i, model_if in enumerate(model_ifs[1:]):
             model_ifs[i].orelse = [model_if]
 
         # add 0-1 else clause 
         else_clause = get_first_child_by_type(node, "else_clause")
         if else_clause:
-            block = get_first_child_by_type(else_clause, "block")
-            if block:
-                last = model_ifs[len(model_ifs)-1]
-                children = get_keyword_children(block)
-                last.orelse = [self.visit(child) for child in children]
+
+            #link
+            model_ifs[len(model_ifs)-1].orelse = self.get_block(else_clause)
 
         return model_ifs[0]
 
@@ -404,18 +401,11 @@ class MatlabToCast(object):
                 get_children_by_types(case_node, case_node_types)][0]
             return get_operator("==", [identifier, operand], source_refs)
 
-        def get_case_body(case_node):
-            """ return the instruction block for the case """
-            block = get_first_child_by_type(case_node, "block")
-            if block:
-                return [self.visit(child) for child in 
-                    get_keyword_children(block)]
-            
         def get_model_if(case_node, identifier):
             """ return conditional logic representing the case """
             return ModelIf(
                 expr = get_case_expression(case_node, identifier),
-                body = get_case_body(case_node),
+                body = self.get_block(case_node),
                 source_refs=[self.node_helper.get_source_ref(case_node)]
             )
         
@@ -431,12 +421,17 @@ class MatlabToCast(object):
         # otherwise clause as 'else' node after last 'if then' node
         otherwise_clause = get_first_child_by_type(node, "otherwise_clause")
         if otherwise_clause:
-            block = get_first_child_by_type(otherwise_clause, "block")
-            if block:
-                last = model_ifs[len(model_ifs)-1]
-                last.orelse = [self.visit(child) for child in
-                    get_keyword_children(block)]
+            last = model_ifs[len(model_ifs)-1]
+            last.orelse = self.get_block(otherwise_clause)
+
         return model_ifs[0]
+    
+    # return all the children of the block
+    def get_block(self, node):
+        block = get_first_child_by_type(node, "block")
+        if block:
+            return [self.visit(child) for child in 
+                get_keyword_children(block)]
 
     # skip control nodes and other junk
     def _visit_passthrough(self, node):
