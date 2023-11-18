@@ -75,17 +75,18 @@ async def equations_to_latex(data: UploadFile):
     Converts images of equations to LaTeX.
 
     ### Python example
-  
+
     Endpoint for generating LaTeX from an input image.
 
     ```
     import requests
+    import json
 
     files = {
       "data": open("bayes-rule-white-bg.png", "rb"),
     }
     r = requests.post("http://0.0.0.0:8000/workflows/images/equations-to-latex", files=files)
-    print(r.text)
+    print(json.loads(r.text))
     ```
     """
     # Read image data
@@ -232,17 +233,17 @@ async def llm_assisted_codebase_to_pn_amr(zip_file: UploadFile = File()):
     # NOTE: Opening the zip file mutates the object and prevents it from being reopened.
     # Since llm_proxy also needs to open the zip file, we should send a copy instead.
     linespans = await llm_proxy.get_lines_of_model(copy.deepcopy(zip_file))
-    
-    line_begin=[]
-    line_end=[]
-    files=[]
-    blobs=[]
-    amrs=[]
+
+    line_begin = []
+    line_end = []
+    files = []
+    blobs = []
+    amrs = []
     for linespan in linespans:
         lines = linespan.block[0].split("-")
-        line_begin.append(max(
-            int(lines[0][1:]) - 1, 0
-        ))  # Normalizing the 1-index response from llm_proxy
+        line_begin.append(
+            max(int(lines[0][1:]) - 1, 0)
+        )  # Normalizing the 1-index response from llm_proxy
         line_end.append(int(lines[1][1:]))
 
         # Currently the llm_proxy only works on the first file in a zip_archive.
@@ -259,23 +260,25 @@ async def llm_assisted_codebase_to_pn_amr(zip_file: UploadFile = File()):
     for i in len(blobs):
         if line_begin[i] == line_end[i]:
             print("failed linespan")
-        else: 
+        else:
             blobs[i] = "".join(blobs[i].splitlines(keepends=True)[line_begin:line_end])
-            amrs.append(await code_snippets_to_pn_amr(
-                code2fn.System(
-                    files=files,
-                    blobs=blobs,
-                    root_name=Path(zip_file.files[i]).stem,
-                    system_name=Path(zip_file.files[i]).stem,
+            amrs.append(
+                await code_snippets_to_pn_amr(
+                    code2fn.System(
+                        files=files,
+                        blobs=blobs,
+                        root_name=Path(zip_file.files[i]).stem,
+                        system_name=Path(zip_file.files[i]).stem,
+                    )
                 )
-            ))
+            )
     # we will return the amr with most states, in assumption it is the most "correct"
     # by default it returns the first entry
     amr = amrs[0]
     for temp_amr in amrs:
         try:
-            temp_len = len(temp_amr['model']['states'])
-            amr_len = len(amr['model']['states'])
+            temp_len = len(temp_amr["model"]["states"])
+            amr_len = len(amr["model"]["states"])
             if temp_len > amr_len:
                 amr = temp_amr
         except:
