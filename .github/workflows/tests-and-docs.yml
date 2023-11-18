@@ -128,8 +128,8 @@ jobs:
     - name: "Launch skema-rs in background for testing"
       working-directory: ./skema/skema-rs
       run : |
-        echo "skema-rs REST service: ${SKEMA_RS_HOST}:${SKEMA_RS_PORT}"
-        cargo build --release --bin skema_service &&
+        echo "skema-rs REST service: $SKEMA_RS_HOST:$SKEMA_RS_PORT"
+        cargo build --release --bin skema_service
         ./target/release/skema_service &
         curl ${SKEMA_RS_HOST}:${SKEMA_RS_PORT}/version
     # test & code coverage (Python)
