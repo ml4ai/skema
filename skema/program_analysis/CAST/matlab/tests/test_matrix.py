@@ -5,19 +5,15 @@ from skema.program_analysis.CAST2FN.model.cast import (
 )
 
 # Test CAST using matrices
-def test_matrix_empty():
-    """ Test assignment of empty matrices."""
-    nodes = cast("x = [];")
-    check(nodes[0], Assignment(left = 'x', right = []))
+def test_empty():
+    """ Test empty matrix."""
+    check(cast("[];")[0], [])
 
-def test_matrix_boolean():
-    """ Test assignment of empty matrices."""
-    nodes = cast("x = [true false];")
-    check(nodes[0], Assignment(left = 'x', right = ["True", "False"]))
+def test_booleans():
+    """ Test matrix with MATLAB booleans."""
+    check(cast("[true false];")[0], ["True", "False"])
 
-def test_matrix_values():
+def test_values():
     """ Test assignment 1 dimensional matrix value."""
-    nodes = cast("x = [1 x 'Bob' ]")
-    assert len(nodes) == 1
-    check(nodes[0], Assignment(left = 'x', right = [1, 'x', "'Bob'"]))
+    check(cast("[1 x 'Bob' ]")[0], [1, 'x', "'Bob'"])
 
