@@ -1,6 +1,7 @@
 from skema.program_analysis.CAST.matlab.tests.utils import (check, cast)
 from skema.program_analysis.CAST2FN.model.cast import (
     Assignment,
+    Call,
     Operator
 )
 
@@ -28,10 +29,17 @@ def test_postfix_operator():
     """ Test CAST from postfix operator."""
     check(cast("y'")[0], Operator(op = "'", operands = ["y"]))
     
-def no_test_spread_operator():
+def test_spread_operator():
     """ Test CAST from spread operator."""
-    nodes = cast("beta_v1(:,1) = new_beta_v1;")
-    # CAST should be one Assignment node
-
-    # right assignment operand an identifier
-    check_operator(nodes[0].right, "new_beta_v1")
+    check(
+        cast("foo(:)")[0], 
+        Call(
+            func = "foo",
+            arguments = [
+                Operator(
+                    op = ":",
+                    operands = []
+                )
+            ]
+        )
+    )
