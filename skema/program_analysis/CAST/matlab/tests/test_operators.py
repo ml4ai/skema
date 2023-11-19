@@ -43,3 +43,36 @@ def test_spread_operator():
             ]
         )
     )
+
+
+def test_pemdas_add_multiply():
+    """ Test PEMDAS compliance with addition and multiplication."""
+    check(
+        cast("foo + bar * baz")[0], 
+        Operator(
+            op = "+",
+            operands = [
+                "foo",
+                Operator(
+                    op = "*",
+                    operands = ["bar", "baz"]
+                ),
+            ]
+        )
+    )
+
+def test_pemdas_multiply_parenthesis_add():
+    """ Test PEMDAS compliance with multiplication of parenthesized addition."""
+    check(
+        cast("(foo + bar) * baz")[0],
+        Operator(
+            op = "*",
+            operands = [
+                Operator(
+                    op = "+",
+                    operands = ["foo", "bar"]
+                ),
+                "baz"
+            ]
+        )
+    )
