@@ -43,7 +43,7 @@ MATLAB_VERSION='matlab_version_here'
 
 class MatlabToCast(object):
 
-    visits = dict()
+    node_visits = dict()
 
     def __init__(self, source_path = "", source = ""):
 
@@ -74,17 +74,11 @@ class MatlabToCast(object):
         module = self.run(self.tree.root_node)
         self.out_cast = CAST([module], "matlab")
 
-    def show_visits(self):
-        """ show the number of each node type visited """
-        print(f"\nNODE VISITS: {sum(self.visits.values())}")
-        for key in self.visits:
-            print(f"{key} {self.visits[key]}")
-
     def log_visit(self, node: Node):
         """ record a visit of a node type """
         key = node.type if node else "None"
-        value = self.visits[key] + 1 if key in self.visits else 1
-        self.visits[key] = value
+        value = self.node_visits[key] + 1 if key in self.node_visits else 1
+        self.node_visits[key] = value
 
     def run(self, root) -> Module:
         """ process an entire Tree-sitter syntax instance """
