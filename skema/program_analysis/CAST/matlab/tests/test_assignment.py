@@ -5,6 +5,7 @@ from skema.program_analysis.CAST2FN.model.cast import Assignment
 
 def test_boolean():
     """ Test assignment of literal boolean types. """
+    # we translate these MATLAB keywords into capitalized strings for Python
     nodes = cast("x = true; y = false")
     check(nodes[0], Assignment(left = "x", right = "True"))
     check(nodes[1], Assignment(left = "y", right = "False"))
