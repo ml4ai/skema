@@ -74,9 +74,6 @@ class MatlabToCast(object):
         module = self.run(self.tree.root_node)
         self.out_cast = CAST([module], "matlab")
 
-        # show nodes processed
-        # self.show_visits()
-
     def show_visits(self):
         """ show the number of each node type visited """
         print(f"\nNODE VISITS: {sum(self.visits.values())}")
@@ -96,10 +93,7 @@ class MatlabToCast(object):
     def visit(self, node):
         """Switch execution based on node type"""
         self.log_visit(node)
-
-        if node == None:
-            return None
-        elif node.type == "assignment":
+        if node.type == "assignment":
             return self.visit_assignment(node)
         elif node.type == "boolean":
             return self.visit_boolean(node)
@@ -137,12 +131,13 @@ class MatlabToCast(object):
             "binary_operator",
             "boolean_operator",
             "comparison_operator",
-            "unary_operator"
+            "unary_operator",
+            "spread_operator",
+            "postfix_operator",
+            "not_operator"
         ]: return self.visit_operator(node)
-#        elif node.type == "not_operator":
-#            return self.visit_operator_not(node)
-#        elif node.type == "postfix_operator":
-#            return self.visit_operator_postfix(node)
+        elif node.type == "parenthsis":
+           return self.visit_parenthsis(node)
         elif node.type == "string":
            return self.visit_string(node)
         elif node.type == "switch_statement":
@@ -176,7 +171,7 @@ class MatlabToCast(object):
     def visit_command(self, node):
         """ Translate the Tree-sitter command node """
         children =  get_keyword_children(node)
-        argument = [self.visit(children[1])] if len(children) > 1 else None
+        argument = [self.visit(children[1])] if len(children) > 1 else []
         return Call(
             func = self.visit(children[0]),
             source_language = "matlab",
@@ -187,13 +182,14 @@ class MatlabToCast(object):
 
     def visit_function_call(self, node):
         """ Translate Tree-sitter function call node """
-        identifier, arguments = get_keyword_children(node)
+        func = self.visit(get_keyword_children(node)[0])
+        arguments = [self.visit(child) for child in 
+            get_keyword_children(get_first_child_by_type(node, "arguments"))]
         return Call(
-            func = self.visit(identifier),
+            func = func,
             source_language = "matlab",
             source_language_version = MATLAB_VERSION,
-            arguments = [self.visit(child) for child in
-                get_keyword_children(arguments)],
+            arguments = arguments,
             source_refs=[self.node_helper.get_source_ref(node)]
         )
 
@@ -221,14 +217,18 @@ class MatlabToCast(object):
 
     def visit_if_statement(self, node):
         """ return a node describing if, elseif, else conditional logic"""
+
         def get_conditional(conditional_node):
             """ return a ModelIf struct for the conditional logic node. """
+
+            # Conditional will be after the "if" or "elseif" child
+            for i, child in enumerate(conditional_node.children):
+                if child.type in ["if", "elseif"]:
+                    expr = conditional_node.children[i+1]
+
             return ModelIf(
                 # if
-                expr = self.visit(get_first_child_by_type(
-                    conditional_node,
-                    "comparison_operator"
-                )),
+                expr = self.visit(expr),
                 # then
                 body = self.get_block(conditional_node),
                 source_refs=[self.node_helper.get_source_ref(conditional_node)]
@@ -334,7 +334,7 @@ class MatlabToCast(object):
         # The operator will be the first control character
         op = self.node_helper.get_identifier(
            get_control_children(node)[0]
-        )  
+        )
         # the operands will be the keyword children
         operands=[self.visit(child) for child in get_keyword_children(node)]
         return Operator(
@@ -351,9 +351,25 @@ class MatlabToCast(object):
     # def visit_operator_not(self, node):
     #   return None
 
-    # TODO
-    # def visit_operator_postfix(self, node):
-    #     return None
+    # postfix operator will have the identifier then function
+    def _visit_operator_postfix(self, node):
+        operands = [get_keyword_children(node)[0]]
+        op = self.node_helper.get_identifier(
+           get_control_children(node)[0]
+        )  
+
+        return Operator(
+            source_language="matlab",
+            interpreter=None,
+            version=MATLAB_VERSION,
+            op = op,
+            operands = operands,
+            source_refs=[self.node_helper.get_source_ref(node)],
+        )
+
+
+    def visit_parenthesis(self, node):
+        return self.visit(get_keyword_children(node)[0])
 
     def visit_string(self, node):
         return LiteralValue(
@@ -439,7 +455,7 @@ class MatlabToCast(object):
     # skip control nodes and other junk
     def _visit_passthrough(self, node):
         if len(node.children) == 0:
-            return None
+            return []
 
         for child in node.children:
             child_cast = self.visit(child)
