@@ -21,7 +21,7 @@ use nom::{
     bytes::complete::tag,
     combinator::{map, opt, value},
     multi::{many0, many1, separated_list1},
-    sequence::{delimited, pair, preceded, separated_pair, tuple},
+    sequence::{delimited, pair, preceded, tuple},
 };
 
 /// Function to parse operators. This function differs from the one in parsers::generic_mathml by
@@ -409,7 +409,7 @@ pub fn absolute(input: Span) -> IResult<Mrow> {
 
 /// Example: Divergence
 pub fn div(input: Span) -> IResult<Operator> {
-    let (s, op) = ws(pair(gradient, ws(delimited(stag!("mo"), dot, etag!("mo")))))(input)?;
+    let (s, _op) = ws(pair(gradient, ws(delimited(stag!("mo"), dot, etag!("mo")))))(input)?;
     let div = Operator::Div;
     Ok((s, div))
 }

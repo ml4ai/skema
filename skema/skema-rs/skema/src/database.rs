@@ -25,7 +25,7 @@ There being a second function call of the same function which contains an expres
 use crate::FunctionType;
 use crate::{Files, Grounding, ModuleCollection, Provenance, TextExtraction, ValueMeta};
 use crate::{FunctionNet, GrometBox, ValueL};
-use rsmgclient::{ConnectParams, Connection, MgError};
+use rsmgclient::{Connection, MgError};
 use crate::config::Config;
 
 #[derive(Debug, Clone)]

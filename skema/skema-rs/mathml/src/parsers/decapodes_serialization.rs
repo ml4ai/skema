@@ -517,7 +517,7 @@ fn test_serialize_from_image_3_2() {
     </math>
     ";
     let expression = input.parse::<MathExpressionTree>().unwrap();
-    let s_exp = expression.to_string();
+    let _s_exp = expression.to_string();
     let wiring_diagram = to_wiring_diagram(&expression);
     let json = to_decapodes_json(wiring_diagram);
     assert_eq!(json, "{\"Var\":[{\"type\":\"infer\",\"name\":\"mult_1\"},{\"type\":\"infer\",\"name\":\"mult_2\"},{\"type\":\"infer\",\"name\":\"•1\"},{\"type\":\"Literal\",\"name\":\"2\"},{\"type\":\"infer\",\"name\":\"sum_1\"},{\"type\":\"infer\",\"name\":\"n\"},{\"type\":\"infer\",\"name\":\"A\"},{\"type\":\"infer\",\"name\":\"•2\"},{\"type\":\"infer\",\"name\":\"mult_3\"},{\"type\":\"infer\",\"name\":\"ρ\"},{\"type\":\"infer\",\"name\":\"g\"},{\"type\":\"infer\",\"name\":\"Γ\"}],\"Op1\":[],\"Op2\":[{\"proj1\":4,\"proj2\":5,\"res\":3,\"op2\":\"/\"},{\"proj1\":3,\"proj2\":7,\"res\":2,\"op2\":\"*\"},{\"proj1\":10,\"proj2\":11,\"res\":9,\"op2\":\"*\"},{\"proj1\":9,\"proj2\":6,\"res\":8,\"op2\":\"^\"},{\"proj1\":2,\"proj2\":8,\"res\":1,\"op2\":\"*\"}],\"Σ\":[{\"sum\":5}],\"Summand\":[{\"summand\":6,\"summation\":1},{\"summand\":4,\"summation\":1}]}");

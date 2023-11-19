@@ -64,7 +64,7 @@ impl fmt::Display for Operator {
             Operator::Factorial => write!(f, "!"),
             Operator::Derivative(Derivative {
                 order,
-                var_index,
+                var_index: _,
                 bound_var,
             }) => {
                 write!(f, "D({order}, {bound_var})")

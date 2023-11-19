@@ -7,8 +7,8 @@ use crate::ModuleCollection;
 use actix_web::web::ServiceConfig;
 use actix_web::{delete, get, post, put, web, HttpResponse};
 use mathml::acset::{PetriNet, RegNet};
-use mathml::mml2pn::ACSet;
-use rsmgclient::{ConnectParams, Connection, MgError, Value};
+
+use rsmgclient::{Connection, MgError, Value};
 use std::collections::HashMap;
 use utoipa;
 

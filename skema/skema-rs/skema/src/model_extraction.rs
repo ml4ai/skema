@@ -69,7 +69,7 @@ pub fn get_line_span(
 pub fn module_id2mathml_MET_ast(module_id: i64, config: Config) -> Vec<FirstOrderODE> {
     let mut core_dynamics_ast = Vec::<FirstOrderODE>::new();
     let mut _metadata_map_ast = HashMap::new();
-    let graph = subgraph2petgraph(module_id, config.clone()); // makes petgraph of graph
+    let _graph = subgraph2petgraph(module_id, config.clone()); // makes petgraph of graph
 
     let core_id = find_pn_dynamics(module_id, config.clone()); // gives back list of function nodes that might contain the dynamics
     //let _line_span = get_line_span(core_id[0], graph); // get's the line span of function id

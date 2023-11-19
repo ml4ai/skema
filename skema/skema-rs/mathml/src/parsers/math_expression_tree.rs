@@ -864,7 +864,7 @@ fn expr(input: Vec<MathExpression>) -> MathExpressionTree {
     let mut result: MathExpressionTree = expr_bp(&mut lexer, 0);
     let mut math_vec: Vec<MathExpressionTree> = vec![];
     while lexer.next() != Token::Eof {
-        let mut math_result = expr_bp(&mut lexer, 0);
+        let math_result = expr_bp(&mut lexer, 0);
         math_vec.push(math_result.clone());
     }
 
@@ -1153,7 +1153,7 @@ fn test_content_hackathon2_scenario1_eq1() {
         lhs_var: _,
         func_of: _,
         with_respect_to: _,
-        rhs,
+        rhs: _,
     } = first_order_ode(input.into()).unwrap().1;
     assert_eq!(cmml, "<apply><eq/><apply><diff/><bvar>t</bar><ci>S</ci></apply><apply><divide/><apply><times/><apply><times/><apply><minus/><ci>β</ci></apply><ci>I</ci></apply><ci>S</ci></apply><ci>N</ci></apply></apply>");
 }
