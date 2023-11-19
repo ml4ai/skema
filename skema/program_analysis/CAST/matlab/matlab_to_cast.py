@@ -136,8 +136,6 @@ class MatlabToCast(object):
             "postfix_operator",
             "not_operator"
         ]: return self.visit_operator(node)
-        elif node.type == "parenthsis":
-           return self.visit_parenthsis(node)
         elif node.type == "string":
            return self.visit_string(node)
         elif node.type == "switch_statement":
@@ -345,31 +343,6 @@ class MatlabToCast(object):
             operands = operands,
             source_refs=[self.node_helper.get_source_ref(node)],
         )
-
-    # TODO implement as nested for loops
-    # The MATLAB not operator is a logical matrix inversion
-    # def visit_operator_not(self, node):
-    #   return None
-
-    # postfix operator will have the identifier then function
-    def _visit_operator_postfix(self, node):
-        operands = [get_keyword_children(node)[0]]
-        op = self.node_helper.get_identifier(
-           get_control_children(node)[0]
-        )  
-
-        return Operator(
-            source_language="matlab",
-            interpreter=None,
-            version=MATLAB_VERSION,
-            op = op,
-            operands = operands,
-            source_refs=[self.node_helper.get_source_ref(node)],
-        )
-
-
-    def visit_parenthesis(self, node):
-        return self.visit(get_keyword_children(node)[0])
 
     def visit_string(self, node):
         return LiteralValue(
