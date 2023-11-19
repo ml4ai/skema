@@ -35,17 +35,7 @@ def test_function_definition():
 
 def test_literal_args():
     """ Test function call with literal arguments """
-    nodes = cast("x = both(3, 5)")
-    check(
-        nodes[0],
-        Assignment(
-            left = "x",
-            right = Call(
-                func = "both", 
-                arguments = [3, 5]
-            )
-        )
-    )
+    check(cast("both(3, 5)")[0], Call(func = "both", arguments = [3, 5]))
 
 def test_inline_operator_args():
     """ Test function call with Operator arguments """
@@ -67,7 +57,7 @@ def test_inline_operator_args():
         )
     )
 
-def test_nested_calls():
+def test_inline_call_args():
     """ Test function call with matrix of function call arguments """
     nodes = cast("foo(bar(x), baz(y))")
     check(
@@ -86,3 +76,18 @@ def test_nested_calls():
             ]
         )
     )
+
+def test_anonymous_call_arg():
+    nodes = cast("foo{x}(y)")
+    check(
+        nodes[0],
+        Call(
+            func = Call (
+                func = "foo",
+                arguments = ["x"]
+            ),
+            arguments = ["y"]
+
+        )
+    )
+
