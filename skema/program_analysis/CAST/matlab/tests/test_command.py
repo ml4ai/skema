@@ -6,3 +6,9 @@ def test_command():
 
     nodes = cast("clear all;")
     check(nodes[0], Call(func = "clear", arguments=["all"]))
+
+def test_command_no_args():
+    """ Test the MATLAB command syntax elements"""
+
+    nodes = cast("validate;")
+    check(nodes[0], Call(func = "validate", arguments=[]))
