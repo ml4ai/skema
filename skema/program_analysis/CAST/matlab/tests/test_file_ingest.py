@@ -7,7 +7,7 @@ from skema.program_analysis.CAST2FN.model.cast import Assignment
 def test_file_ingest():
     """ Test the ability of the CAST translator to read from a file"""
 
-    filename = "data/matlab.m"
+    filename = "./data/matlab.m"
     cast = MatlabToCast(source_path = filename).out_cast
     module = cast.nodes[0]
     nodes = module.body
