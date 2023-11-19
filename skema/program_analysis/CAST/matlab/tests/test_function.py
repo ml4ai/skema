@@ -7,7 +7,7 @@ from skema.program_analysis.CAST2FN.model.cast import (
 )
 
 # Test CAST from functions
-def test_function_definition():
+def test_definition():
     """ Test function definition """
     source = """
     function both = add_them(x, y)
@@ -33,11 +33,11 @@ def test_function_definition():
     )
 
 
-def test_literal_args():
+def test_call_with_literal_args():
     """ Test function call with literal arguments """
     check(cast("both(3, 5)")[0], Call(func = "both", arguments = [3, 5]))
 
-def test_inline_operator_args():
+def test_call_with_operator_args():
     """ Test function call with Operator arguments """
     nodes = cast("foo(x < a, -6)")
     check(
@@ -57,7 +57,7 @@ def test_inline_operator_args():
         )
     )
 
-def test_inline_call_args():
+def test_call_with_call_args():
     """ Test function call with matrix of function call arguments """
     nodes = cast("foo(bar(x), baz(y))")
     check(
@@ -77,7 +77,7 @@ def test_inline_call_args():
         )
     )
 
-def test_anonymous_call_arg():
+def test_call_with_anonymous_call_arg():
     nodes = cast("foo{x}(y)")
     check(
         nodes[0],
