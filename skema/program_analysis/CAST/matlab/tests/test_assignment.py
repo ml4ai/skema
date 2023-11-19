@@ -1,5 +1,8 @@
 from skema.program_analysis.CAST.matlab.tests.utils import (check, cast)
-from skema.program_analysis.CAST2FN.model.cast import Assignment
+from skema.program_analysis.CAST2FN.model.cast import (
+    Assignment,
+    Operator
+)
 
 # Test CAST from assignment
 
@@ -12,18 +15,15 @@ def test_boolean():
 
 def test_number_zero_integer():
     """ Test assignment of integer and real numbers."""
-    nodes = cast("x = 0")
-    check(nodes[0], Assignment(left = "x", right = 0))
+    check(cast("x = 0")[0], Assignment(left = "x", right = 0))
 
 def test_number_zero_real():
     """ Test assignment of integer and real numbers."""
-    nodes = cast("y = 0.0")
-    check(nodes[0], Assignment(left = "y", right = 0.0))
+    check(cast("y = 0.0")[0], Assignment(left = "y", right = 0.0))
 
 def test_number_nonzero():
     """ Test assignment of integer and real numbers."""
-    nodes = cast("z = 1.8")
-    check(nodes[0], Assignment(left = "z", right = 1.8))
+    check(cast("z = 1.8")[0], Assignment(left = "z", right = 1.8))
 
 def test_string():
     """ Test assignment of single and double quoted strings."""
@@ -40,3 +40,16 @@ def test_identifier():
     nodes = cast("x = y; r = x")
     check(nodes[0], Assignment(left = 'x', right = 'y'))
     check(nodes[1], Assignment(left = 'r', right = 'x'))
+
+def test_operator():
+    """ Test assignment of operator"""
+    check(
+        cast("Vtot = V1PF+V1AZ;")[0], 
+        Assignment(
+            left = "Vtot", 
+            right = Operator(
+                op = "+",
+                operands = ["V1PF", "V1AZ"]
+            )
+        )
+    )
