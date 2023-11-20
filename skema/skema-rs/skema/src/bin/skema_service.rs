@@ -6,21 +6,6 @@ use std::env;
 use utoipa::OpenApi;
 use utoipa_swagger_ui::SwaggerUi;
 
-#[derive(Parser, Debug)]
-struct Cli {
-    /// Host
-    #[arg(long, default_value_t = String::from("localhost"))]
-    host: String,
-
-    /// Port
-    #[arg(short, long, default_value_t = 8080)]
-    port: u16,
-
-    /// Database host
-    #[arg(long, default_value_t = String::from("localhost"))]
-    db_host: String,
-}
-
 /// This endpoint can be used to check the health of the service.
 #[utoipa::path(
     responses(
@@ -59,6 +44,7 @@ async fn main() -> std::io::Result<()> {
         paths(
             skema::services::mathml::get_ast_graph,
             skema::services::mathml::get_math_exp_graph,
+            skema::services::mathml::get_latex,
             skema::services::mathml::get_acset,
             skema::services::mathml::get_content_mathml,
             skema::services::mathml::get_regnet,
@@ -129,19 +115,25 @@ async fn main() -> std::io::Result<()> {
     struct ApiDoc;
 
     let version_hash = env::var("APP_VERSION").unwrap_or("?????".to_string());
+    let host_env = env::var("SKEMA_RS_HOST").unwrap_or("0.0.0.0".to_string());
+    let port_env = env::var("SKEMA_RS_PORT").unwrap_or("8080".to_string());
+    let db_host = env::var("SKEMA_GRAPH_DB_HOST").unwrap_or("127.0.0.1".to_string());
+    let db_port = env::var("SKEMA_GRAPH_DB_PORT").unwrap_or("7687".to_string());
+
 
     let mut openapi = ApiDoc::openapi();
     openapi.info.version = version_hash.to_string();
-    let args = Cli::parse();
 
     HttpServer::new(move || {
         App::new()
             .app_data(Data::new(Config {
-                db_host: args.db_host.clone(),
+                db_host: db_host.clone(),
+                db_port: db_port.parse::<u16>().unwrap()
             }))
             .configure(gromet::configure())
             .service(skema::services::mathml::get_ast_graph)
             .service(skema::services::mathml::get_math_exp_graph)
+            .service(skema::services::mathml::get_latex)
             .service(skema::services::mathml::get_content_mathml)
             .service(skema::services::mathml::get_acset)
             .service(skema::services::mathml::get_regnet)
@@ -154,7 +146,7 @@ async fn main() -> std::io::Result<()> {
             .service(version)
             .service(SwaggerUi::new("/docs/{_:.*}").url("/api-doc/openapi.json", openapi.clone()))
     })
-    .bind((args.host, args.port))?
+    .bind((host_env, port_env.parse::<u16>().unwrap()))?
     .run()
     .await
 }

@@ -7,8 +7,7 @@ from skema.rest.proxies import SKEMA_GRAPH_DB_PROTO, SKEMA_GRAPH_DB_HOST, SKEMA_
 from skema.gromet.execution_engine.execution_engine import ExecutionEngine
 
 MEMGRAPH_CI_PROTO = SKEMA_GRAPH_DB_PROTO
-MEMGRAPH_CI_HOST = SKEMA_GRAPH_DB_HOST
-MEMGRAPH_CI_PORT = int(SKEMA_GRAPH_DB_PORT)
+
 
 @pytest.mark.ci_only
 def test_parameter_extraction():
