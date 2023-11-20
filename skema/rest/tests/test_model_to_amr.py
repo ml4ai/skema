@@ -19,7 +19,10 @@ CHIME_SIR_URL = (
 )
 
 def test_any_amr_chime_sir():
-    """Unit test for checking that Chime-SIR model produces any AMR"""
+    """
+    Unit test for checking that Chime-SIR model produces any AMR. This test zip contains 4 versions of CHIME SIR.
+    This will test if just the core dynamics works, the whole script, and also rewritten scripts work. 
+    """
     response = requests.get(CHIME_SIR_URL)
     zip_bytes = BytesIO(response.content)
 
