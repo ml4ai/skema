@@ -40,6 +40,8 @@ from skema.program_analysis.tree_sitter_parsers.build_parsers import(
 )
 
 MATLAB_VERSION='matlab_version_here'
+MODULE_NAME='module_name_here'
+INTERPRETER='matlab_to_cast'
 
 class MatlabToCast(object):
 
@@ -72,6 +74,7 @@ class MatlabToCast(object):
 
         # create CAST object 
         module = self.run(self.tree.root_node)
+        module.name = MODULE_NAME
         self.out_cast = CAST([module], "matlab")
 
     def log_visit(self, node: Node):
@@ -331,7 +334,7 @@ class MatlabToCast(object):
         operands=[self.visit(child) for child in get_keyword_children(node)]
         return Operator(
             source_language="matlab",
-            interpreter=None,
+            interpreter=INTERPRETER,
             version=MATLAB_VERSION,
             op = op,
             operands = operands,
@@ -362,7 +365,7 @@ class MatlabToCast(object):
             """ return an Operator representing the case test """
             return Operator(
                 source_language = "matlab",
-                interpreter = None,
+                interpreter = INTERPRETER,
                 version = MATLAB_VERSION,
                 op = op,
                 operands = operands,
