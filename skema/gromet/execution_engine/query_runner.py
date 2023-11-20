@@ -31,16 +31,14 @@ class QueryRunner:
             return None
         query = self.queries_map[query]
 
-        print(f"UNPROCESSED_QUERY={query}")
         # There are times we will want to limit the scope we are running queries in.
         # This is done be adding clauses to the cypher queries.
         if filename:
             query = query.replace("$FILENAME", filename)
 
-        if id:
+        if id is not None:
             query = query.replace("$ID", str(id))
 
-        print(f"PROCESSED_QUERY={query}")
         # In most cases, we only want the node objects itself. So we will just return a list of nodes.
         records,summary,keys = self.memgraph.execute_query(query, database_="memgraph")
         return neo4j_to_memgprah(records, n_or_m)
