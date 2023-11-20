@@ -25,7 +25,7 @@ from skema.utils.fold import dictionary_to_gromet_json, del_nulls
 from skema.rest.utils import fn_preprocessor
 from skema.rest.morae_proxy import post_model
 from skema.skema_py.server import System, fn_given_filepaths
-from skema.rest.proxies import SKEMA_RS_ADDESS
+from skema.rest.proxies import SKEMA_RS_ADDESS, SKEMA_GRAPH_DB_PROTO, SKEMA_GRAPH_DB_HOST, SKEMA_GRAPH_DB_PORT
 
 SKEMA_BIN = Path(__file__).resolve().parents[2] / "skema-rs" / "skema" / "src" / "bin"
 
@@ -119,8 +119,8 @@ class ExecutionEngine:
         gromet_collection = fn_preprocessor(gromet_collection)[0]
 
         # Upload to memgraph
-        self.model_id = asyncio.run(post_model(gromet_collection))
-
+        #self.model_id = asyncio.run(post_model(gromet_collection))
+        self.model_id = requests.post(f"{SKEMA_RS_ADDESS}/models", json=gromet_collection).json()
     def execute(
         self,
         module: bool = False,
@@ -321,24 +321,11 @@ class ExecutionEngine:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Parameter Extraction Script")
     parser.add_argument("source_path", type=str, help="File path to source to execute")
-    parser.add_argument(
-        "--protocol",
-        default="bolt://",
-        type=str,
-        help="Protocol serving the memgraph database"
-    )
-    parser.add_argument(
-        "--host",
-        default="localhost",
-        type=str,
-        help="Host serving the memgraph database",
-    )
-    parser.add_argument(
-        "--port", default=7687, type=int, help="Port serving the megraph database"
-    )
+
     args = parser.parse_args()
 
-    engine = ExecutionEngine(args.protocol, args.host, args.port, args.source_path)
+    protocol, host, port = (SKEMA_GRAPH_DB_PROTO, SKEMA_GRAPH_DB_HOST, SKEMA_GRAPH_DB_PORT)
+    engine = ExecutionEngine(protocol, host, port, args.source_path)
 
     print(engine.parameter_extraction())
     """ TODO: New arguments to add with function execution support

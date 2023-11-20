@@ -25,7 +25,7 @@ z = x+y
         source_path.write_text(input)
 
         output = ExecutionEngine(
-            host=MEMGRAPH_CI_HOST, port=MEMGRAPH_CI_PORT, source_path=source_path
+            protocol=MEMGRAPH_CI_PROTO, host=MEMGRAPH_CI_HOST, port=MEMGRAPH_CI_PORT, source_path=source_path
         ).parameter_extraction()
 
         # torch.tensor overrides the equality '==' operator, so the following is a valid check
