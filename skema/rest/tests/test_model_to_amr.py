@@ -28,7 +28,7 @@ def test_any_amr_chime_sir():
 
     # NOTE: For CI we are unable to use the LLM assisted functions due to API keys
     # So, we will instead mock the output for those functions instead
-    llm_mock_output = Dynamics(name=None, description=None, block=["L21-L31"])
+    llm_mock_output = [Dynamics(name=None, description=None, block=["L21-L31"])]
 
     line_begin = []
     line_end = []
