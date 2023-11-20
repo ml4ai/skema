@@ -1,7 +1,6 @@
 //! Pratt parsing module to construct S-expressions from presentation MathML.
 //! This is based on the nice tutorial at https://matklad.github.io/2020/04/13/simple-but-powerful-pratt-parsing.html
 
-//use crate::parsers::math_expression_tree::MathExpression::Differential;
 use crate::{
     ast::{
         operator::{Derivative, Operator},
@@ -11,7 +10,7 @@ use crate::{
 };
 use derive_new::new;
 use nom::error::Error;
-
+use regex::Regex;
 use std::{fmt, str::FromStr};
 
 #[cfg(test)]
@@ -45,6 +44,336 @@ impl fmt::Display for MathExpressionTree {
                 write!(f, ")")
             }
         }
+    }
+}
+
+/// Converts Unicode, Greek letters, their symbols, and English representations of Greek letters in an input string to their respective LaTeX expressions.
+fn unicode_to_latex(input: &str) -> String {
+    // Step 1: Handle English representations of Greek letters
+    let re_english_greek = Regex::new(r"Lambda|lambda|Alpha|alpha|Beta|beta|Gamma|gamma|Delta|delta|Epsilon|epsilon|Zeta|zeta|Eta|eta|Theta|theta|Iota|iota|Kappa|kappa|Lambda|lambda|Mu|mu|Nu|nu|Xi|xi|Omicron|omicron|Pi|pi|Rho|rho|Sigma|sigma|Tau|tau|Upsilon|upsilon|Phi|phi|Chi|chi|Psi|psi|Omega|omega").unwrap();
+    let replaced_english_greek =
+        re_english_greek.replace_all(input, |caps: &regex::Captures| match &caps[0] {
+            "Lambda" => "\\Lambda".to_string(),
+            "lambda" => "\\lambda".to_string(),
+            "Alpha" => "\\Alpha".to_string(),
+            "alpha" => "\\alpha".to_string(),
+            "Beta" => "\\Beta".to_string(),
+            "beta" => "\\beta".to_string(),
+            "Gamma" => "\\Gamma".to_string(),
+            "gamma" => "\\gamma".to_string(),
+            "Delta" => "\\Delta".to_string(),
+            "delta" => "\\delta".to_string(),
+            "Epsilon" => "\\Epsilon".to_string(),
+            "epsilon" => "\\epsilon".to_string(),
+            "Zeta" => "\\Zeta".to_string(),
+            "zeta" => "\\zeta".to_string(),
+            "Eta" => "\\Eta".to_string(),
+            "eta" => "\\eta".to_string(),
+            "Theta" => "\\Theta".to_string(),
+            "theta" => "\\theta".to_string(),
+            "Iota" => "\\Iota".to_string(),
+            "iota" => "\\iota".to_string(),
+            "Kappa" => "\\Kappa".to_string(),
+            "kappa" => "\\kappa".to_string(),
+            "Lambda" => "\\Lambda".to_string(),
+            "lambda" => "\\lambda".to_string(),
+            "Mu" => "\\Mu".to_string(),
+            "mu" => "\\mu".to_string(),
+            "Nu" => "\\Nu".to_string(),
+            "nu" => "\\nu".to_string(),
+            "Xi" => "\\Xi".to_string(),
+            "xi" => "\\xi".to_string(),
+            "Omicron" => "\\Omicron".to_string(),
+            "omicron" => "\\omicron".to_string(),
+            "Pi" => "\\Pi".to_string(),
+            "pi" => "\\pi".to_string(),
+            "Rho" => "\\Rho".to_string(),
+            "rho" => "\\rho".to_string(),
+            "Sigma" => "\\Sigma".to_string(),
+            "sigma" => "\\sigma".to_string(),
+            "Tau" => "\\Tau".to_string(),
+            "tau" => "\\tau".to_string(),
+            "Upsilon" => "\\Upsilon".to_string(),
+            "upsilon" => "\\upsilon".to_string(),
+            "Phi" => "\\Phi".to_string(),
+            "phi" => "\\phi".to_string(),
+            "Chi" => "\\Chi".to_string(),
+            "chi" => "\\chi".to_string(),
+            "Psi" => "\\Psi".to_string(),
+            "psi" => "\\psi".to_string(),
+            "Omega" => "\\Omega".to_string(),
+            "omega" => "\\omega".to_string(),
+            _ => caps[0].to_string(),
+        });
+
+    // Step 2: Handle Greek letters represented in Unicode
+    let re_unicode = Regex::new(r"&#x([0-9A-Fa-f]+);").unwrap();
+    let replaced_unicode =
+        re_unicode.replace_all(&replaced_english_greek, |caps: &regex::Captures| {
+            let unicode = u32::from_str_radix(&caps[1], 16).unwrap();
+            match unicode {
+                0x0391 => "\\Alpha".to_string(),
+                0x03B1 => "\\alpha".to_string(),
+                0x0392 => "\\Beta".to_string(),
+                0x03B2 => "\\beta".to_string(),
+                0x0393 => "\\Gamma".to_string(),
+                0x03B3 => "\\gamma".to_string(),
+                0x0394 => "\\Delta".to_string(),
+                0x03B4 => "\\delta".to_string(),
+                0x0395 => "\\Epsilon".to_string(),
+                0x03B5 => "\\epsilon".to_string(),
+                0x0396 => "\\Zeta".to_string(),
+                0x03B6 => "\\zeta".to_string(),
+                0x0397 => "\\Eta".to_string(),
+                0x03B7 => "\\eta".to_string(),
+                0x0398 => "\\Theta".to_string(),
+                0x03B8 => "\\theta".to_string(),
+                0x0399 => "\\Iota".to_string(),
+                0x03B9 => "\\iota".to_string(),
+                0x039A => "\\Kappa".to_string(),
+                0x03BA => "\\kappa".to_string(),
+                0x039B => "\\Lambda".to_string(),
+                0x03BB => "\\lambda".to_string(),
+                0x039C => "\\Mu".to_string(),
+                0x03BC => "\\mu".to_string(),
+                0x039D => "\\Nu".to_string(),
+                0x03BD => "\\nu".to_string(),
+                0x039E => "\\Xi".to_string(),
+                0x03BE => "\\xi".to_string(),
+                0x039F => "\\Omicron".to_string(),
+                0x03BF => "\\omicron".to_string(),
+                0x03A0 => "\\Pi".to_string(),
+                0x03C0 => "\\pi".to_string(),
+                0x03A1 => "\\Rho".to_string(),
+                0x03C1 => "\\rho".to_string(),
+                0x03A3 => "\\Sigma".to_string(),
+                0x03C3 => "\\sigma".to_string(),
+                0x03A4 => "\\Tau".to_string(),
+                0x03C4 => "\\tau".to_string(),
+                0x03A5 => "\\Upsilon".to_string(),
+                0x03C5 => "\\upsilon".to_string(),
+                0x03A6 => "\\Phi".to_string(),
+                0x03C6 => "\\phi".to_string(),
+                0x03A7 => "\\Chi".to_string(),
+                0x03C7 => "\\chi".to_string(),
+                0x03A8 => "\\Psi".to_string(),
+                0x03C8 => "\\psi".to_string(),
+                0x03A9 => "\\Omega".to_string(),
+                0x03C9 => "\\omega".to_string(),
+                _ => caps[0].to_string(),
+            }
+        });
+
+    // Step 3: Handle other Unicode representations
+    let re_other_unicode = Regex::new(r"&#x([0-9A-Fa-f]+);").unwrap();
+    let replaced_other_unicode =
+        re_other_unicode.replace_all(&replaced_unicode, |caps: &regex::Captures| {
+            format!(
+                "\\unicode{{U+{:X}}}",
+                u32::from_str_radix(&caps[1], 16).unwrap()
+            )
+        });
+
+    // Step 4: Handle Greek letter symbols
+    let re_greek_symbols = Regex::new(r"Λ|λ|Α|α|Β|β|Γ|γ|Δ|δ|Ε|ε|Ζ|ζ|Η|η|Θ|θ|Ι|ι|Κ|κ|Λ|λ|Μ|μ|Ν|ν|Ξ|ξ|Ο|ο|Π|π|Ρ|ρ|Σ|σ|ς|Τ|τ|Υ|υ|Φ|φ|Χ|χ|Ψ|ψ|Ω|ω").unwrap();
+    let replaced_greek_symbols =
+        re_greek_symbols.replace_all(&replaced_other_unicode, |caps: &regex::Captures| {
+            match &caps[0] {
+                "Λ" => "\\Lambda".to_string(),
+                "λ" => "\\lambda".to_string(),
+                "Α" => "\\Alpha".to_string(),
+                "α" => "\\alpha".to_string(),
+                "Β" => "\\Beta".to_string(),
+                "β" => "\\beta".to_string(),
+                "Γ" => "\\Gamma".to_string(),
+                "γ" => "\\gamma".to_string(),
+                "Δ" => "\\Delta".to_string(),
+                "δ" => "\\delta".to_string(),
+                "Ε" => "\\Epsilon".to_string(),
+                "ε" => "\\epsilon".to_string(),
+                "Ζ" => "\\Zeta".to_string(),
+                "ζ" => "\\zeta".to_string(),
+                "Η" => "\\Eta".to_string(),
+                "η" => "\\eta".to_string(),
+                "Θ" => "\\Theta".to_string(),
+                "θ" => "\\theta".to_string(),
+                "Ι" => "\\Iota".to_string(),
+                "ι" => "\\iota".to_string(),
+                "Κ" => "\\Kappa".to_string(),
+                "κ" => "\\kappa".to_string(),
+                "Λ" => "\\Lambda".to_string(),
+                "λ" => "\\lambda".to_string(),
+                "Μ" => "\\Mu".to_string(),
+                "μ" => "\\mu".to_string(),
+                "Ν" => "\\Nu".to_string(),
+                "ν" => "\\nu".to_string(),
+                "Ξ" => "\\Xi".to_string(),
+                "ξ" => "\\xi".to_string(),
+                "Ο" => "\\Omicron".to_string(),
+                "ο" => "\\omicron".to_string(),
+                "Π" => "\\Pi".to_string(),
+                "π" => "\\pi".to_string(),
+                "Ρ" => "\\Rho".to_string(),
+                "ρ" => "\\rho".to_string(),
+                "Σ" => "\\Sigma".to_string(),
+                "σ" => "\\sigma".to_string(),
+                "ς" => "\\varsigma".to_string(), // 处理 sigma 的 final form
+                "Τ" => "\\Tau".to_string(),
+                "τ" => "\\tau".to_string(),
+                "Υ" => "\\Upsilon".to_string(),
+                "υ" => "\\upsilon".to_string(),
+                "Φ" => "\\Phi".to_string(),
+                "φ" => "\\phi".to_string(),
+                "Χ" => "\\Chi".to_string(),
+                "χ" => "\\chi".to_string(),
+                "Ψ" => "\\Psi".to_string(),
+                "ψ" => "\\psi".to_string(),
+                "Ω" => "\\Omega".to_string(),
+                "ω" => "\\omega".to_string(),
+                _ => caps[0].to_string(),
+            }
+        });
+
+    replaced_greek_symbols.to_string()
+}
+
+fn is_unary_operator(op: &Operator) -> bool {
+    match op {
+        Operator::Sqrt
+        | Operator::Factorial
+        | Operator::Exp
+        | Operator::Power
+        | Operator::Grad
+        | Operator::Div
+        | Operator::Abs
+        | Operator::Derivative(_)
+        | Operator::Sin
+        | Operator::Cos
+        | Operator::Tan
+        | Operator::Sec
+        | Operator::Csc
+        | Operator::Cot
+        | Operator::Arcsin
+        | Operator::Arccos
+        | Operator::Arctan
+        | Operator::Arcsec
+        | Operator::Arccsc
+        | Operator::Arccot
+        | Operator::Mean => true,
+        _ => false,
+    }
+}
+
+// Process parentheses in an expression and update the LaTeX string.
+// If the expression is a unary operator, it is added to the LaTeX string as is.
+// If the expression is not a unary operator, it is wrapped in parentheses before being added to the LaTeX string.
+// If the expression is an atom, it is added to the LaTeX string directly.
+fn process_expression_parentheses(expression: &mut String, met: &MathExpressionTree) {
+    // Check if the rest vector is not empty and contains a MathExpressionTree::Cons variant.
+    if let MathExpressionTree::Cons(op, _) = met {
+        // Check if the operator is a unary operator.
+        if is_unary_operator(op) {
+            // If it is a unary operator, add it to the LaTeX string as is.
+            expression.push_str(&format!("{}", met.to_latex()));
+        } else {
+            // If it is not a unary operator, wrap it in parentheses before adding it to the LaTeX string.
+            expression.push_str(&format!("({})", met.to_latex()));
+        }
+    } else {
+        // If the expression is an atom, add it to the LaTeX string directly.
+        expression.push_str(&format!("{}", met.to_latex()));
+    }
+}
+
+/// Processes a MathExpression under the type of MathExpressionTree::Atom and appends
+/// the corresponding LaTeX representation to the provided String.
+fn process_math_expression(expr: &MathExpression, expression: &mut String) {
+    match expr {
+        // If it's a Ci variant, recursively process its content
+        MathExpression::Ci(x) => {
+            process_math_expression(&*x.content, expression);
+            if let Some(func_of_vec) = &x.func_of {
+                if func_of_vec.len() > 0 && func_of_vec[0].content.to_string().len() > 0 {
+                    expression.push_str("(");
+                    for (index, func_ci) in func_of_vec.iter().enumerate() {
+                        process_math_expression(&*func_ci.content, expression);
+                        if index < func_of_vec.len() - 1 {
+                            expression.push_str(",");
+                        }
+                    }
+                    expression.push_str(")");
+                }
+            }
+        }
+        MathExpression::Mi(Mi(id)) => {
+            expression.push_str(unicode_to_latex(&id.to_string()).as_str());
+        }
+        MathExpression::Mn(number) => {
+            expression.push_str(&number.to_string());
+        }
+        MathExpression::Msqrt(x) => {
+            expression.push_str("\\sqrt{");
+            process_math_expression(&*x, expression);
+            expression.push_str("}");
+        }
+        MathExpression::Mfrac(x1, x2) => {
+            expression.push_str("\\frac{");
+            process_math_expression(&*x1, expression);
+            expression.push_str("}{");
+            process_math_expression(&*x2, expression);
+            expression.push_str("}");
+        }
+        MathExpression::Msup(x1, x2) => {
+            process_math_expression(&*x1, expression);
+            expression.push_str("^{");
+            process_math_expression(&*x2, expression);
+            expression.push_str("}");
+        }
+        MathExpression::Msub(x1, x2) => {
+            process_math_expression(&*x1, expression);
+            expression.push_str("_{");
+            process_math_expression(&*x2, expression);
+            expression.push_str("}");
+        }
+        MathExpression::Msubsup(x1, x2, x3) => {
+            process_math_expression(&*x1, expression);
+            expression.push_str("_{");
+            process_math_expression(&*x2, expression);
+            expression.push_str("}^{");
+            process_math_expression(&*x3, expression);
+            expression.push_str("}");
+        }
+        MathExpression::Munder(x1, x2) => {
+            expression.push_str("\\underset{");
+            process_math_expression(&*x2, expression);
+            expression.push_str("}{");
+            process_math_expression(&*x1, expression);
+            expression.push_str("}");
+        }
+        MathExpression::Mover(x1, x2) => {
+            expression.push_str("\\overset{");
+            process_math_expression(&*x2, expression);
+            expression.push_str("}{");
+            process_math_expression(&*x1, expression);
+            expression.push_str("}");
+        }
+        MathExpression::Mtext(x) => {
+            expression.push_str(x);
+        }
+        MathExpression::Mspace(x) => {
+            expression.push_str(x);
+        }
+        MathExpression::AbsoluteSup(x1, x2) => {
+            expression.push_str("\\left| ");
+            process_math_expression(&*x1, expression);
+            expression.push_str(" \\right|_{");
+            process_math_expression(&*x2, expression);
+            expression.push_str("}");
+        }
+        MathExpression::Mrow(_) => {
+            panic!("All Mrows should have been removed by now!");
+        }
+        t => panic!("Unhandled MathExpression: {:?}", t),
     }
 }
 
@@ -135,6 +464,200 @@ impl MathExpressionTree {
                 }
                 let math_exp = format!("({})", component.join(&operation.to_string()));
                 expression.push_str(&math_exp);
+            }
+        }
+        expression
+    }
+
+    /// Translates a MathExpressionTree struct to a LaTeX expression.
+    pub fn to_latex(&self) -> String {
+        let mut expression = String::new();
+        match self {
+            MathExpressionTree::Atom(i) => {
+                process_math_expression(i, &mut expression);
+            }
+            MathExpressionTree::Cons(head, rest) => {
+                match head {
+                    Operator::Add => {
+                        for (index, r) in rest.iter().enumerate() {
+                            if let MathExpressionTree::Cons(op, _) = r {
+                                if is_unary_operator(op) {
+                                    expression.push_str(&format!("{}", r.to_latex()));
+                                } else if let Operator::Add = op {
+                                    expression.push_str(&format!("{}", r.to_latex()));
+                                } else {
+                                    expression.push_str(&format!("({})", r.to_latex()));
+                                }
+                            } else {
+                                expression.push_str(&format!("{}", r.to_latex()));
+                            }
+
+                            // Add "+" if it's not the last element
+                            if index < rest.len() - 1 {
+                                expression.push_str("+");
+                            }
+                        }
+                    }
+                    Operator::Subtract => {
+                        for (index, r) in rest.iter().enumerate() {
+                            process_expression_parentheses(&mut expression, r);
+                            // Add "-" if it's not the last element
+                            if index < rest.len() - 1 {
+                                expression.push_str("-");
+                            }
+                        }
+                    }
+                    Operator::Multiply => {
+                        for (index, r) in rest.iter().enumerate() {
+                            if let MathExpressionTree::Cons(op, _) = r {
+                                if is_unary_operator(op) {
+                                    expression.push_str(&format!("{}", r.to_latex()));
+                                } else if let Operator::Multiply = op {
+                                    expression.push_str(&format!("{}", r.to_latex()));
+                                } else if let Operator::Divide = op {
+                                    expression.push_str(&format!("{}", r.to_latex()));
+                                } else if let Operator::Dot = op {
+                                    expression.push_str(&format!("{}", r.to_latex()));
+                                } else {
+                                    expression.push_str(&format!("({})", r.to_latex()));
+                                }
+                            } else {
+                                expression.push_str(&format!("{}", r.to_latex()));
+                            }
+                            // Add "*" if it's not the last element
+                            if index < rest.len() - 1 {
+                                expression.push_str("*");
+                            }
+                        }
+                    }
+                    Operator::Equals => {
+                        expression.push_str(&format!("{}", rest[0].to_latex()));
+                        expression.push_str("=");
+                        expression.push_str(&format!("{}", rest[1].to_latex()));
+                    }
+                    Operator::Divide => {
+                        if let MathExpressionTree::Cons(op, _) = &rest[0] {
+                            if is_unary_operator(op) {
+                                expression.push_str(&format!("{}", &rest[0].to_latex()));
+                            } else if let Operator::Multiply = op {
+                                expression.push_str(&format!("{}", &rest[0].to_latex()));
+                            } else if let Operator::Divide = op {
+                                expression.push_str(&format!("{}", &rest[0].to_latex()));
+                            } else if let Operator::Dot = op {
+                                expression.push_str(&format!("{}", &rest[0].to_latex()));
+                            } else {
+                                expression.push_str(&format!("({})", &rest[0].to_latex()));
+                            }
+                        } else {
+                            expression.push_str(&format!("{}", &rest[0].to_latex()));
+                        }
+                        expression.push_str("/");
+                        process_expression_parentheses(&mut expression, &rest[1]);
+                    }
+                    Operator::Exp => {
+                        expression.push_str("\\mathrm{exp}");
+                        expression.push_str(&format!("{{{}}}", rest[0].to_latex()));
+                    }
+                    Operator::Sqrt => {
+                        expression.push_str("\\sqrt");
+                        expression.push_str(&format!("{{{}}}", rest[0].to_latex()));
+                    }
+                    Operator::Lparen => {
+                        expression.push_str("(");
+                        expression.push_str(&format!("{}", rest[0].to_latex()));
+                    }
+                    Operator::Rparen => {
+                        expression.push_str(")");
+                        expression.push_str(&format!("{}", rest[0].to_latex()));
+                    }
+                    Operator::Compose => {
+                        process_expression_parentheses(&mut expression, &rest[0]);
+                        expression.push_str("_");
+                        process_expression_parentheses(&mut expression, &rest[1]);
+                    }
+                    Operator::Factorial => {
+                        process_expression_parentheses(&mut expression, &rest[0]);
+                        expression.push_str("!");
+                    }
+                    Operator::Power => {
+                        process_expression_parentheses(&mut expression, &rest[0]);
+                        expression.push_str("^");
+                        expression.push_str(&format!("{{{}}}", rest[1].to_latex()));
+                    }
+                    Operator::Comma => {
+                        process_expression_parentheses(&mut expression, &rest[0]);
+                        expression.push_str(",");
+                        process_expression_parentheses(&mut expression, &rest[1]);
+                    }
+                    Operator::Grad => {
+                        expression.push_str("\\nabla{");
+                        process_expression_parentheses(&mut expression, &rest[0]);
+                        expression.push_str("}");
+                    }
+                    Operator::Dot => {
+                        process_expression_parentheses(&mut expression, &rest[0]);
+                        expression.push_str(" \\cdot ");
+                        process_expression_parentheses(&mut expression, &rest[1]);
+                    }
+                    Operator::Div => {
+                        expression.push_str("\\nabla \\cdot {");
+                        process_expression_parentheses(&mut expression, &rest[0]);
+                        expression.push_str("}");
+                    }
+                    Operator::Abs => {
+                        expression.push_str(&format!("\\left|{}\\right|", rest[0].to_latex()));
+                    }
+                    Operator::Derivative(d) => {
+                        expression.push_str("\\frac{d ");
+                        process_expression_parentheses(&mut expression, &rest[0]);
+                        expression.push_str("}{d");
+                        process_math_expression(&*d.bound_var.content, &mut expression);
+                        expression.push_str("}");
+                    }
+                    Operator::Sin => {
+                        expression.push_str(&format!("\\sin({})", rest[0].to_latex()));
+                    }
+                    Operator::Cos => {
+                        expression.push_str(&format!("\\cos({})", rest[0].to_latex()));
+                    }
+                    Operator::Tan => {
+                        expression.push_str(&format!("\\tan({})", rest[0].to_latex()));
+                    }
+                    Operator::Sec => {
+                        expression.push_str(&format!("\\sec({})", rest[0].to_latex()));
+                    }
+                    Operator::Csc => {
+                        expression.push_str(&format!("\\csc({})", rest[0].to_latex()));
+                    }
+                    Operator::Cot => {
+                        expression.push_str(&format!("\\cot({})", rest[0].to_latex()));
+                    }
+                    Operator::Arcsin => {
+                        expression.push_str(&format!("\\arcsin({})", rest[0].to_latex()));
+                    }
+                    Operator::Arccos => {
+                        expression.push_str(&format!("\\arccos({})", rest[0].to_latex()));
+                    }
+                    Operator::Arctan => {
+                        expression.push_str(&format!("\\arctan({})", rest[0].to_latex()));
+                    }
+                    Operator::Arcsec => {
+                        expression.push_str(&format!("\\arcsec({})", rest[0].to_latex()));
+                    }
+                    Operator::Arccsc => {
+                        expression.push_str(&format!("\\arccsc({})", rest[0].to_latex()));
+                    }
+                    Operator::Arccot => {
+                        expression.push_str(&format!("\\arccot({})", rest[0].to_latex()));
+                    }
+                    Operator::Mean => {
+                        expression.push_str(&format!("\\langle {} \\rangle", rest[0].to_latex()));
+                    }
+                    _ => {
+                        expression = "".to_string();
+                        return "Contain unsupported operators.".to_string();
+                    }
+                }
             }
         }
         expression
@@ -478,6 +1001,49 @@ fn infix_binding_power(op: &Operator) -> Option<(u8, u8)> {
         _ => return None,
     };
     Some(res)
+}
+
+/// Replaces Unicode representations in the input string with their corresponding symbols.
+pub fn replace_unicode_with_symbols(input: &str) -> String {
+    // Define a regex pattern to match Unicode representations
+    let re = Regex::new(r#"&#x([0-9A-Fa-f]+);"#).unwrap();
+
+    // Use replace_all to replace Unicode representations with corresponding symbols
+    let replaced_str = re.replace_all(input, |captures: &regex::Captures| {
+        // captures[0] contains the entire match, captures[1] contains the hexadecimal code
+        let hex_code = &captures[1];
+        // Convert hexadecimal code to u32 and then to char
+        let unicode_char = u32::from_str_radix(hex_code, 16)
+            .ok()
+            .and_then(std::char::from_u32);
+
+        // Replace with the Unicode character if conversion is successful, otherwise keep the original
+        unicode_char.map_or_else(|| captures[0].to_string(), |c| c.to_string())
+    });
+
+    replaced_str.to_string()
+}
+
+/// Preprocesses a MathML string for conversion to LaTeX format.
+///
+/// This function takes a MathML string as input and performs preprocessing steps to ensure a
+/// cleaner conversion to LaTeX. It removes newline characters, eliminates spaces between MathML
+/// elements, and replaces occurrences of "<mi>∇</mi>" with "<mo>∇</mo>" to enhance compatibility
+/// with LaTeX rendering. The resulting processed MathML string is then ready for conversion to LaTeX.
+pub fn preprocess_mathml_for_to_latex(input: &str) -> String {
+    // Remove all newline characters
+    let no_newlines = input.replace('\n', "");
+
+    // Remove spaces between MathML elements
+    let no_spaces = Regex::new(r#">\s*<"#)
+        .unwrap()
+        .replace_all(&no_newlines, "><")
+        .to_string();
+
+    // Replace <mi>∇</mi> with <mo>∇</mo>
+    let replaced_str = no_spaces.replace(r#"<mi>∇</mi>"#, "<mo>∇</mo>").to_string();
+
+    replaced_str
 }
 
 #[test]
@@ -1094,4 +1660,316 @@ fn test_mi_multiply() {
     let exp = input.parse::<MathExpressionTree>().unwrap();
     let s_exp = exp.to_string();
     println!("s_exp={:?}", s_exp);
+}
+
+#[test]
+fn test_unicode_conversion() {
+    let input1 = "&#x039B; is a Greek letter.";
+    let input2 = "&#x03bb; is another Greek letter.";
+    let input3 = "Λ and λ are Greek letters.";
+    let input4 = "Lambda and lambda are English representations of Greek letters.";
+
+    assert_eq!(unicode_to_latex(input1), "\\Lambda is a Greek letter.");
+    assert_eq!(
+        unicode_to_latex(input2),
+        "\\lambda is another Greek letter."
+    );
+    assert_eq!(
+        unicode_to_latex(input3),
+        "\\Lambda and \\lambda are Greek letters."
+    );
+    assert_eq!(
+        unicode_to_latex(input4),
+        "\\Lambda and \\lambda are English representations of Greek letters."
+    );
+}
+#[test]
+fn test_sexp2latex() {
+    let input = "
+    <math>
+        <mi>&#x03bb;</mi>
+        <mrow><mi>n</mi><mo>+</mo><mn>4</mn></mrow>
+        <mrow><mi>i</mi><mo>-</mo><mn>3</mn></mrow>
+        <msup><mi>H</mi><mrow><mi>m</mi><mo>-</mo><mn>2</mn></mrow></msup>
+    </math>
+    ";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    let latex_exp = exp.to_latex();
+    assert_eq!(latex_exp, "\\lambda*(n+4)*(i-3)*H^{m-2}");
+}
+
+#[test]
+fn test_sexp2latex_derivative() {
+    let input = "
+    <math>
+    <mfrac>
+        <mrow><mi>d</mi><mi>S</mi></mrow>
+        <mrow><mi>d</mi><mi>t</mi></mrow>
+        </mfrac>
+    </math>
+    ";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    let latex_exp = exp.to_latex();
+    assert_eq!(latex_exp, "\\frac{d S}{dt}");
+}
+
+#[test]
+fn test_equation_halfar_dome_to_latex() {
+    let input = "
+    <math>
+        <mfrac><mrow><mi>∂</mi><mi>H</mi></mrow><mrow><mi>∂</mi><mi>t</mi></mrow></mfrac>
+        <mo>=</mo>
+        <mo>&#x2207;</mo>
+        <mo>&#x22c5;</mo>
+        <mo>(</mo>
+        <mi>Γ</mi>
+        <msup><mi>H</mi><mrow><mi>n</mi><mo>+</mo><mn>2</mn></mrow></msup>
+        <mo>|</mo><mrow><mo>&#x2207;</mo><mi>H</mi></mrow>
+        <msup><mo>|</mo>
+        <mrow><mi>n</mi><mo>−</mo><mn>1</mn></mrow></msup>
+        <mo>&#x2207;</mo><mi>H</mi>
+        <mo>)</mo>
+    </math>
+    ";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    let latex_exp = exp.to_latex();
+    assert_eq!(
+        latex_exp,
+        "\\frac{d H}{dt}=\\nabla \\cdot {(\\Gamma*H^{n+2}*\\left|\\nabla{H}\\right|^{n-1}*\\nabla{H})}"
+    );
+}
+
+#[test]
+fn test_equation_halfar_dome_8_1_to_latex() {
+    let input = "
+    <math>
+      <mfrac>
+        <mrow>
+          <mi>&#x2202;</mi>
+          <mi>H</mi>
+        </mrow>
+        <mrow>
+          <mi>&#x2202;</mi>
+          <mi>t</mi>
+        </mrow>
+      </mfrac>
+      <mo>=</mo>
+      <mi>&#x2207;</mi>
+      <mo>&#x22C5;</mo>
+      <mo>(</mo>
+      <mi>&#x0393;</mi>
+      <msup>
+        <mi>H</mi>
+        <mrow>
+          <mi>n</mi>
+          <mo>+</mo>
+          <mn>2</mn>
+        </mrow>
+      </msup>
+      <mo>|</mo>
+      <mi>&#x2207;</mi>
+      <mi>H</mi>
+      <msup>
+        <mo>|</mo>
+        <mrow>
+          <mi>n</mi>
+          <mo>&#x2212;</mo>
+          <mn>1</mn>
+        </mrow>
+      </msup>
+      <mi>&#x2207;</mi>
+      <mi>H</mi>
+      <mo>)</mo>
+    </math>
+    ";
+    let modified_input1 = &replace_unicode_with_symbols(input).to_string();
+    let modified_input2 = &preprocess_mathml_for_to_latex(modified_input1).to_string();
+    let exp = modified_input2.parse::<MathExpressionTree>().unwrap();
+    let latex_exp = exp.to_latex();
+    assert_eq!(
+        latex_exp,
+        "\\frac{d H}{dt}=\\nabla \\cdot {(\\Gamma*H^{n+2}*\\left|\\nabla{H}\\right|^{n-1}*\\nabla{H})}"
+    );
+}
+
+#[test]
+fn test_equation_halfar_dome_8_2_to_latex() {
+    let input = "
+    <math>
+      <mi>&#x0393;</mi>
+      <mo>=</mo>
+      <mfrac>
+        <mn>2</mn>
+        <mrow>
+          <mi>n</mi>
+          <mo>+</mo>
+          <mn>2</mn>
+        </mrow>
+      </mfrac>
+      <mi>A</mi>
+      <mo>(</mo>
+      <mi>&#x03C1;</mi>
+      <mi>g</mi>
+      <msup>
+        <mo>)</mo>
+        <mi>n</mi>
+      </msup>
+    </math>
+    ";
+    let modified_input1 = &replace_unicode_with_symbols(input).to_string();
+    let modified_input2 = &preprocess_mathml_for_to_latex(modified_input1).to_string();
+    let exp = modified_input2.parse::<MathExpressionTree>().unwrap();
+    let latex_exp = exp.to_latex();
+    assert_eq!(latex_exp, "\\Gamma=2/(n+2)*A*(\\rho*g)^{n}");
+}
+
+#[test]
+fn test_equation_halfar_dome_8_3_to_latex() {
+    let input = "
+    <math>
+      <mi>H</mi>
+      <mo>(</mo>
+      <mi>t</mi>
+      <mo>,</mo>
+      <mi>r</mi>
+      <mo>)</mo>
+      <mo>=</mo>
+      <msub>
+        <mi>H</mi>
+        <mn>0</mn>
+      </msub>
+      <msup>
+        <mrow>
+          <mo>(</mo>
+          <mfrac>
+            <msub>
+              <mi>t</mi>
+              <mn>0</mn>
+            </msub>
+            <mi>t</mi>
+          </mfrac>
+          <mo>)</mo>
+        </mrow>
+        <mrow>
+          <mfrac>
+            <mn>1</mn>
+            <mn>9</mn>
+          </mfrac>
+        </mrow>
+      </msup>
+      <msup>
+        <mrow>
+          <mo>[</mo>
+          <mn>1</mn>
+          <mo>&#x2212;</mo>
+          <msup>
+            <mrow>
+              <mo>(</mo>
+              <msup>
+                <mrow>
+                  <mo>(</mo>
+                  <mfrac>
+                    <msub>
+                      <mi>t</mi>
+                      <mn>0</mn>
+                    </msub>
+                    <mi>t</mi>
+                  </mfrac>
+                  <mo>)</mo>
+                </mrow>
+                <mrow>
+                  <mfrac>
+                    <mn>1</mn>
+                    <mrow>
+                      <mn>18</mn>
+                    </mrow>
+                  </mfrac>
+                </mrow>
+              </msup>
+              <mfrac>
+                <mi>r</mi>
+                <msub>
+                  <mi>R</mi>
+                  <mn>0</mn>
+                </msub>
+              </mfrac>
+              <mo>)</mo>
+            </mrow>
+            <mrow>
+              <mfrac>
+                <mn>4</mn>
+                <mn>3</mn>
+              </mfrac>
+            </mrow>
+          </msup>
+          <mo>]</mo>
+        </mrow>
+        <mrow>
+          <mfrac>
+            <mn>3</mn>
+            <mn>7</mn>
+          </mfrac>
+        </mrow>
+      </msup>
+    </math>
+    ";
+    let modified_input1 = &replace_unicode_with_symbols(input).to_string();
+    let modified_input2 = &preprocess_mathml_for_to_latex(modified_input1).to_string();
+    let exp = modified_input2.parse::<MathExpressionTree>().unwrap();
+    let latex_exp = exp.to_latex();
+    assert_eq!(
+        latex_exp,
+        "H(t,r)=H_{0}*(t_{0}/t)^{1/9}*(1-((t_{0}/t)^{1/18}*r/R_{0})^{4/3})^{3/7}"
+    );
+}
+
+#[test]
+fn test_equation_halfar_dome_8_4_to_latex() {
+    let input = "
+    <math>
+      <msub>
+        <mi>t</mi>
+        <mn>0</mn>
+      </msub>
+      <mo>=</mo>
+      <mfrac>
+        <mn>1</mn>
+        <mrow>
+          <mn>18</mn>
+          <mi>&#x0393;</mi>
+        </mrow>
+      </mfrac>
+      <msup>
+        <mrow>
+          <mo>(</mo>
+          <mfrac>
+            <mn>7</mn>
+            <mn>4</mn>
+          </mfrac>
+          <mo>)</mo>
+        </mrow>
+        <mn>3</mn>
+      </msup>
+      <mfrac>
+        <msubsup>
+          <mi>R</mi>
+          <mn>0</mn>
+          <mn>4</mn>
+        </msubsup>
+        <msubsup>
+          <mi>H</mi>
+          <mn>0</mn>
+          <mn>7</mn>
+        </msubsup>
+      </mfrac>
+    </math>
+    ";
+    let modified_input1 = &replace_unicode_with_symbols(input).to_string();
+    let modified_input2 = &preprocess_mathml_for_to_latex(modified_input1).to_string();
+    let exp = modified_input2.parse::<MathExpressionTree>().unwrap();
+    let latex_exp = exp.to_latex();
+    assert_eq!(
+        latex_exp,
+        "t_{0}=1/(18*\\Gamma)*(7/4)^{3}*R_{0}^{4}/H_{0}^{7}"
+    );
 }

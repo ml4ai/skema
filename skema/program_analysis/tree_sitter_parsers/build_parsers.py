@@ -8,7 +8,7 @@ from typing import List
 from tree_sitter import Language, Parser
 
 INSTALLED_LANGUAGES_FILEPATH = (
-    Path(__file__).parent / "build" / "installed_languages.so"
+    Path(__file__).resolve().parent / "build" / "installed_languages.so"
 )
 LANGUAGES_YAML_FILEPATH = Path(__file__).parent / "languages.yaml"
 

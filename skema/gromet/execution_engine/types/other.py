@@ -129,3 +129,16 @@ class Range:
 
     def exec(input: int) -> range:
         return range(input)
+
+
+class Call:
+    source_language_name = {"CAST": "_call"}
+    inputs = [
+        Field("func_name", "string"),
+        Field("args","Any",variatic=True)
+    ]
+    outputs = [Field("call_output", "Any")]
+    shorthand = "_call"
+    documentation = ""
+
+    # TODO: exec

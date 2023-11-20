@@ -10,6 +10,7 @@ from skema.gromet.execution_engine.execution_engine import ExecutionEngine
 HOST = SKEMA_GRAPH_DB_HOST
 PORT = int(SKEMA_GRAPH_DB_PORT)
 PROTOCOL = SKEMA_GRAPH_DB_PROTO
+
 router = APIRouter()
 
 class EnrichmentReqest(BaseModel):

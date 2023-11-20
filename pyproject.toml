@@ -96,8 +96,10 @@ all = ["skema[core]", "skema[dev]", "skema[doc]", "skema[demo]", "skema[annotati
 "skema.isa" = "skema/isa"
 "skema.model_assembly" = "skema/model_assembly"
 "skema.program_analysis" = "skema/program_analysis"
+"skema.rest" = "skema/rest"
 "skema.skema_py" = "skema/skema_py"
 "skema.utils" = "skema/utils"
+
 # re-map skema/text_reading/python to skema.text_reading
 #"skema.text_reading" = "skema/text_reading/python"
 "skema.metal.model_linker" = "skema/metal/model_linker/skema_model_linker"
@@ -124,20 +126,26 @@ build-backend = "setuptools.build_meta"
 
 # pytest
 [tool.pytest.ini_options]
+markers = [
+    "ci_only: marks tests to only be run in CI (deselect with '-m \"not ci_only\"')"
+]
 minversion = "7.0"
 addopts = "-v --cov=skema --cov-report html:docs/coverage/python"
 testpaths = [
+    # NOTE: There are currently a couple of test ordering dependencies that should be maintained or could cause CI failures 
+    # 1. skema/img2mm/tests needs be run first to generate model files 
+    # 2. program_analysis/tests needs to be run before skema/gromet/execution_engine and any test that may build the python primitive map
     "skema/img2mml/tests",
     "skema/program_analysis/tests",
     "skema/program_analysis/comment_extractor/tests",
     "skema/program_analysis/tree_sitter_parsers/tests",
     "skema/program_analysis/CAST/matlab/tests",
-    "skema/rest/tests",
-    "skema/skema_py/tests",
-    "skema/gromet/execution_engine/tests",
     # TODO: Fix fortran tests
     #"skema/program_analysis/CAST/fortran/tests"
     #"skema/program_analysis/CAST/python/tests"
+    "skema/gromet/execution_engine/tests",
+    "skema/rest/tests",
+    "skema/skema_py/tests",
 ]
 
 # Configuration for Black.

@@ -9,10 +9,12 @@ from io import BytesIO
 from typing import List
 from pathlib import Path
 
-from fastapi import APIRouter, File, UploadFile
+from fastapi import APIRouter, File, UploadFile, FastAPI
 from starlette.responses import JSONResponse
 
 from skema.img2mml import eqn2mml
+from skema.img2mml.eqn2mml import image2mathml_db
+from skema.img2mml.api import get_mathml_from_bytes
 from skema.rest import schema, utils, llm_proxy
 from skema.rest.proxies import SKEMA_RS_ADDESS
 from skema.skema_py import server as code2fn
@@ -64,6 +66,46 @@ async def equations_to_amr(data: schema.EquationImagesToAMR):
             },
         )
     return res.json()
+
+
+# equation images -> mml -> latex
+@router.post("/images/equations-to-latex", summary="Equations (images) → MML → LaTeX")
+async def equations_to_latex(data: UploadFile):
+    """
+    Converts images of equations to LaTeX.
+
+    ### Python example
+
+    Endpoint for generating LaTeX from an input image.
+
+    ```
+    import requests
+    import json
+
+    files = {
+      "data": open("bayes-rule-white-bg.png", "rb"),
+    }
+    r = requests.post("http://0.0.0.0:8000/workflows/images/equations-to-latex", files=files)
+    print(json.loads(r.text))
+    ```
+    """
+    # Read image data
+    image_bytes = await data.read()
+
+    # pass image bytes to get_mathml_from_bytes function
+    mml_res = get_mathml_from_bytes(image_bytes, image2mathml_db)
+    proxy_url = f"{SKEMA_RS_ADDESS}/mathml/latex"
+    print(f"Proxying request to {proxy_url}")
+    response = requests.post(proxy_url, data=mml_res)
+    # Check the response
+    if response.status_code == 200:
+        # The request was successful
+        return response.text
+    else:
+        # The request failed
+        print(f"Error: {response.status_code}")
+        print(response.text)
+        return f"Error: {response.status_code} {response.text}"
 
 
 # tex equations -> pmml -> amr
@@ -190,31 +232,58 @@ async def llm_assisted_codebase_to_pn_amr(zip_file: UploadFile = File()):
     """
     # NOTE: Opening the zip file mutates the object and prevents it from being reopened.
     # Since llm_proxy also needs to open the zip file, we should send a copy instead.
-    linespan = await llm_proxy.get_lines_of_model(copy.deepcopy(zip_file))
-    lines = linespan.block[0].split("-")
-    line_begin = max(
-        int(lines[0][1:]) - 1, 0
-    )  # Normalizing the 1-index response from llm_proxy
-    line_end = int(lines[1][1:])
+    linespans = await llm_proxy.get_lines_of_model(copy.deepcopy(zip_file))
 
-    # Currently the llm_proxy only works on the first file in a zip_archive.
-    # So we are required to do the same when slicing the source code using its output.
+    line_begin = []
+    line_end = []
+    files = []
+    blobs = []
+    amrs = []
+    for linespan in linespans:
+        lines = linespan.block[0].split("-")
+        line_begin.append(
+            max(int(lines[0][1:]) - 1, 0)
+        )  # Normalizing the 1-index response from llm_proxy
+        line_end.append(int(lines[1][1:]))
+
+        # Currently the llm_proxy only works on the first file in a zip_archive.
+        # So we are required to do the same when slicing the source code using its output.
     with ZipFile(BytesIO(zip_file.file.read()), "r") as zip:
-        files = [zip.namelist()[0]]
-        blobs = [zip.open(files[0]).read().decode("utf-8")]
+        for file in zip.namelist():
+            file_obj = Path(file)
+            if file_obj.suffix in [".py"]:
+                files.append(file)
+                blobs.append(zip.open(file).read().decode("utf-8"))
 
     # The source code is a string, so to slice using the line spans, we must first convert it to a list.
     # Then we can convert it back to a string using .join
-    blobs[0] = "".join(blobs[0].splitlines(keepends=True)[line_begin:line_end])
+    for i in len(blobs):
+        if line_begin[i] == line_end[i]:
+            print("failed linespan")
+        else:
+            blobs[i] = "".join(blobs[i].splitlines(keepends=True)[line_begin:line_end])
+            amrs.append(
+                await code_snippets_to_pn_amr(
+                    code2fn.System(
+                        files=files,
+                        blobs=blobs,
+                        root_name=Path(zip_file.files[i]).stem,
+                        system_name=Path(zip_file.files[i]).stem,
+                    )
+                )
+            )
+    # we will return the amr with most states, in assumption it is the most "correct"
+    # by default it returns the first entry
+    amr = amrs[0]
+    for temp_amr in amrs:
+        try:
+            temp_len = len(temp_amr["model"]["states"])
+            amr_len = len(amr["model"]["states"])
+            if temp_len > amr_len:
+                amr = temp_amr
+        except:
+            continue
 
-    amr = await code_snippets_to_pn_amr(
-        code2fn.System(
-            files=files,
-            blobs=blobs,
-            root_name=Path(zip_file.filename).stem,
-            system_name=Path(zip_file.filename).stem,
-        )
-    )
     return amr
 
 
@@ -234,3 +303,6 @@ async def repo_to_rn_amr(zip_file: UploadFile = File()):
         )
     return res.json()
 """
+
+app = FastAPI()
+app.include_router(router)
