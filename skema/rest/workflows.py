@@ -246,7 +246,6 @@ async def llm_assisted_codebase_to_pn_amr(zip_file: UploadFile = File()):
         )  # Normalizing the 1-index response from llm_proxy
         line_end.append(int(lines[1][1:]))
 
-        # Currently the llm_proxy only works on the first file in a zip_archive.
         # So we are required to do the same when slicing the source code using its output.
     with ZipFile(BytesIO(zip_file.file.read()), "r") as zip:
         for file in zip.namelist():
