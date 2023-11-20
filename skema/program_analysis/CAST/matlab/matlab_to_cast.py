@@ -12,6 +12,8 @@ from skema.program_analysis.CAST2FN.model.cast import (
     FunctionDef,
     LiteralValue,
     Loop,
+    ModelBreak,
+    ModelContinue,
     ModelIf,
     ModelImport,
     ModelReturn,
@@ -19,8 +21,11 @@ from skema.program_analysis.CAST2FN.model.cast import (
     Name,
     Operator,
     RecordDef,
+    ScalarType,
     SourceCodeDataType,
     SourceRef,
+    StructureType,
+    ValueConstructor,
     Var,
     VarType,
 )
@@ -52,8 +57,8 @@ class MatlabToCast(object):
         # if a source file path is provided, read source from file
         if not source_path == "":
             path = Path(source_path)
-            self.source = path.read_text().strip()
             self.filename = path.name
+            self.source = path.read_text().strip()
         # otherwise copy the input source and flag the filename unused
         else:
             self.source = source
@@ -108,14 +113,13 @@ class MatlabToCast(object):
 #        elif node.type in [
 #            "for_statement",
 #            "iterator",
-#            "while_statement",
-#            "spread_operator"
+#            "while_statement"
 #        ]: return self.visit_loop(node)
         elif node.type in [
             "cell",
             "matrix"
         ]:   return self.visit_matrix(node)
-        elif node.type == "source_file":    # used?
+        elif node.type == "source_file":
             return self.visit_module(node)
         elif node.type in [
             "command_name",
@@ -206,7 +210,7 @@ class MatlabToCast(object):
             val = self.visit_name(node),
             type = self.variable_context.get_type(identifier) if
                 self.variable_context.is_variable(identifier) else "Unknown",
-            default_value = None,
+            default_value = "LiteralValue",
             source_refs = [self.node_helper.get_source_ref(node)],
         )
 
@@ -222,10 +226,9 @@ class MatlabToCast(object):
                     expr = conditional_node.children[i+1]
 
             return ModelIf(
-                # if
                 expr = self.visit(expr),
-                # then
                 body = self.get_block(conditional_node),
+                orelse = [],
                 source_refs=[self.node_helper.get_source_ref(conditional_node)]
             )
 
@@ -395,6 +398,7 @@ class MatlabToCast(object):
             return ModelIf(
                 expr = get_case_expression(case_node, identifier),
                 body = self.get_block(case_node),
+                orelse = [],
                 source_refs=[self.node_helper.get_source_ref(case_node)]
             )
         
