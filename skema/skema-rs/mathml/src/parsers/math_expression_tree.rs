@@ -3,7 +3,7 @@
 
 use crate::{
     ast::{
-        operator::{Derivative, Operator},
+        operator::{Derivative, Operator, PartialDerivative},
         Math, MathExpression, Mi, Mrow,
     },
     parsers::interpreted_mathml::interpreted_math,
@@ -415,6 +415,14 @@ impl MathExpressionTree {
                         content_mathml.push_str("<diff/>");
                         content_mathml.push_str(&format!("<bvar>{}</bar>", bound_var));
                     }
+                    Operator::PartialDerivative(PartialDerivative {
+                        order,
+                        var_index,
+                        bound_var,
+                    }) if (*order, *var_index) == (1_u8, 1_u8) => {
+                        content_mathml.push_str("<partialdiff/>");
+                        content_mathml.push_str(&format!("<bvar>{}</bar>", bound_var));
+                    }
                     _ => {}
                 }
                 for s in rest {
@@ -707,8 +715,6 @@ impl MathExpression {
                 }
                 tokens.push(MathExpression::Mo(Operator::Rparen));
             }
-            // Insert implicit division operators, and wrap numerators and denominators in
-            // parentheses for the Pratt parsing algorithm.
             MathExpression::Differential(x) => {
                 tokens.push(MathExpression::Mo(Operator::Lparen));
                 if x.diff == Box::new(MathExpression::Mo(Operator::Grad)) {
@@ -719,6 +725,8 @@ impl MathExpression {
                 x.func.flatten(tokens);
                 tokens.push(MathExpression::Mo(Operator::Rparen));
             }
+            // Insert implicit division operators, and wrap numerators and denominators in
+            // parentheses for the Pratt parsing algorithm.
             MathExpression::Mfrac(numerator, denominator) => {
                 tokens.push(MathExpression::Mo(Operator::Lparen));
                 numerator.flatten(tokens);
@@ -763,6 +771,14 @@ impl MathExpression {
                 tokens.push(MathExpression::Mo(Operator::Power));
                 tokens.push(MathExpression::Mo(Operator::Lparen));
                 superscript.flatten(tokens);
+                tokens.push(MathExpression::Mo(Operator::Rparen));
+            }
+            MathExpression::Absolute(operator, components) => {
+                tokens.push(MathExpression::Mo(Operator::Lparen));
+                tokens.push(MathExpression::Mo(Operator::Abs));
+                tokens.push(MathExpression::Mo(Operator::Lparen));
+                components.flatten(tokens);
+                tokens.push(MathExpression::Mo(Operator::Rparen));
                 tokens.push(MathExpression::Mo(Operator::Rparen));
             }
             MathExpression::Mover(base, over) => {
@@ -974,6 +990,7 @@ fn prefix_binding_power(op: &Operator) -> ((), u8) {
         Operator::Dot => ((), 25),
         Operator::Grad => ((), 25),
         Operator::Derivative(Derivative { .. }) => ((), 25),
+        Operator::PartialDerivative(PartialDerivative { .. }) => ((), 25),
         Operator::Div => ((), 25),
         Operator::Abs => ((), 25),
         _ => panic!("Bad operator: {:?}", op),
@@ -1197,6 +1214,7 @@ fn test_content_hackathon2_scenario1_eq3() {
     ";
     let ode = input.parse::<FirstOrderODE>().unwrap();
     let cmml = ode.to_cmml();
+    println!("cmml={:?}", cmml);
     assert_eq!(cmml, "<apply><eq/><apply><diff/><bvar>t</bar><ci>I</ci></apply><apply><minus/><apply><minus/><apply><times/><ci>δ</ci><ci>E</ci></apply><apply><times/><apply><times/><apply><minus/><cn>1</cn><ci>α</ci></apply><ci>γ</ci></apply><ci>I</ci></apply></apply><apply><times/><apply><times/><ci>α</ci><ci>ρ</ci></apply><ci>I</ci></apply></apply></apply>");
 }
 
@@ -1460,7 +1478,7 @@ fn test_one_dimensional_ebm() {
         <mo>(</mo><mi>A</mi><mo>+</mo><mi>B</mi><mi>T</mi><mo>(</mo><mi>ϕ</mi><mo>,</mo><mi>t</mi><mo>)</mo><mo>)</mo>
         <mo>+</mo>
         <mfrac>
-        <mn>1</mn>
+        <mn>D</mn>
         <mrow><mi>cos</mi><mi>ϕ</mi></mrow>
         </mfrac>
         <mfrac>
@@ -1478,7 +1496,47 @@ fn test_one_dimensional_ebm() {
     ";
     let exp = input.parse::<MathExpressionTree>().unwrap();
     let s_exp = exp.to_string();
-    println!("S-exp={:?}", s_exp);
+    assert_eq!(s_exp, "(= (* C (D(1, t) T)) (+ (- (* (- 1 α) S) (+ A (* B T))) (* (/ D (Cos ϕ)) (PD(1, ϕ) (* (Cos ϕ) (D(1, ϕ) T))))))");
+}
+
+#[test]
+fn test_derivative_with_func_comp_in_parenthesis() {
+    let input = "
+    <math>
+        <mfrac>
+        <mi>∂</mi>
+        <mrow><mi>∂</mi><mi>ϕ</mi></mrow>
+        </mfrac>
+        <mo>(</mo>
+        <mrow><mi>cos</mi><mi>ϕ</mi></mrow>
+        <mfrac>
+        <mrow><mi>∂</mi><mi>T</mi></mrow>
+        <mrow><mi>∂</mi><mi>ϕ</mi></mrow>
+        </mfrac>
+        <mo>)</mo>
+    </math>
+    ";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    let s_exp = exp.to_string();
+    assert_eq!(s_exp, "(PD(1, ϕ) (* (Cos ϕ) (D(1, ϕ) T)))");
+}
+
+#[test]
+fn test_derivative_with_func_inside_parenthesis() {
+    let input = "
+    <math>
+        <mfrac>
+        <mi>∂</mi>
+        <mrow><mi>∂</mi><mi>ϕ</mi></mrow>
+        </mfrac>
+        <mo>(</mo>
+        <mi>T</mi>
+        <mo>)</mo>
+    </math>
+    ";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    let s_exp = exp.to_string();
+    assert_eq!(s_exp, "(PD(1, ϕ) T)");
 }
 
 #[test]
@@ -1490,7 +1548,18 @@ fn test_absolute_value() {
     ";
     let exp = input.parse::<MathExpressionTree>().unwrap();
     let s_exp = exp.to_string();
-    assert_eq!(s_exp, "(Grad H)");
+    assert_eq!(s_exp, "(Abs (Grad H))");
+}
+#[test]
+fn test_another_absolute() {
+    let input = "
+    <math>
+        <mo>|</mo><mi>H</mi><mo>|</mo>
+    </math>
+    ";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    let s_exp = exp.to_string();
+    assert_eq!(s_exp, "(Abs H)");
 }
 
 #[test]
