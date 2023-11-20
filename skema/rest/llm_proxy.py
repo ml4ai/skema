@@ -67,7 +67,7 @@ async def get_lines_of_model(zip_file: UploadFile = File()) -> List[Dynamics]:
                 blobs.append(zip.open(file).read().decode("utf-8"))
 
     # iterate through each file 
-    for f in len(files):
+    for f in range(len(files)):
     # read in the code, for the prompt
         code = blobs[f]
         file = files[f]
