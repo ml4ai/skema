@@ -7,26 +7,22 @@ from skema.program_analysis.CAST2FN.model.cast import (
 
 def test_if():
     """ Test CAST from MATLAB 'if' conditional logic."""
-
     source = """
     if x == 5
         y = 6
     end
     """
-
     check(
         cast(source)[0],
         ModelIf(
-            # if
             expr = Operator(op = "==", operands = ["x", 5]),
-            # then
-            body = [Assignment(left="y", right = 6)]
+            body = [Assignment(left="y", right = 6)],
+            orelse = []
         )
     )
 
 def test_if_else():
     """  Test CAST from MATLAB 'if else' conditional logic."""
-
     source = """
     if x > 5
         y = 6
@@ -36,18 +32,14 @@ def test_if_else():
         foo = 'bar'
     end
     """
-
     check(
         cast(source)[0],
         ModelIf(
-            # if
             expr = Operator(op = ">", operands = ["x", 5]),
-            # then
             body = [
                 Assignment(left="y", right = 6),
                 Assignment(left="three", right = 3)
             ],
-            # else
             orelse = [
                 Assignment(left="y", right = "x"),
                 Assignment(left="foo", right = "'bar'")
@@ -58,7 +50,6 @@ def test_if_else():
 
 def test_if_elseif():
     """ Test CAST from MATLAB 'if elseif else' conditional logic."""
-
     source = """
     if x >= 5
         y = 6
@@ -69,22 +60,12 @@ def test_if_elseif():
     check(
         cast(source)[0],
         ModelIf(
-            # if
             expr = Operator(op = ">=", operands = ["x", 5]),
-            # then
-            body = [
-                Assignment(left="y", right = 6)
-            ],
-            # else
-            orelse = [
-                ModelIf(
-                    # if
-                    expr = Operator(op = "<=", operands = ["x", 0]),
-                    # then
-                    body = [
-                        Assignment(left="y", right = "x")
-                    ]   
-                )   
+            body = [Assignment(left="y", right = 6)],
+            orelse = [ModelIf(
+                expr = Operator(op = "<=", operands = ["x", 0]),
+                body = [Assignment(left="y", right = "x")],
+                orelse = [])
             ]
         )
     )
@@ -92,7 +73,6 @@ def test_if_elseif():
 
 def test_if_elseif_else():
     """ Test CAST from MATLAB 'if elseif else' conditional logic."""
-
     source = """
     if x > 5
         a = 6
@@ -102,28 +82,16 @@ def test_if_elseif_else():
         c = 0
     end
     """
-    
     check(
         cast(source)[0],
         ModelIf(
-            # if
             expr = Operator(op = ">", operands = ["x", 5]),
-            # then
-            body = [
-                Assignment(left="a", right = 6)
-            ],
-            # else
+            body = [Assignment(left="a", right = 6)],
             orelse = [
                 ModelIf(
-                    # if
                     expr = Operator(op = ">", operands = ["x", 0]),
-                    # then
-                    body = [
-                        Assignment(left="b", right = "x")
-                    ],
-                    orelse = [
-                        Assignment(left="c", right = 0)
-                    ]
+                    body = [Assignment(left="b", right = "x")],
+                    orelse = [Assignment(left="c", right = 0)]
                 )
             ]
         )
