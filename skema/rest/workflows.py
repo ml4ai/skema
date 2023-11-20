@@ -261,14 +261,12 @@ async def llm_assisted_codebase_to_pn_amr(zip_file: UploadFile = File()):
         if line_begin[i] == line_end[i]:
             print("failed linespan")
         else:
-            blobs[i] = "".join(blobs[i].splitlines(keepends=True)[line_begin:line_end])
+            blobs[i] = "".join(blobs[i].splitlines(keepends=True)[line_begin[i]:line_end[i]])
             amrs.append(
                 await code_snippets_to_pn_amr(
                     code2fn.System(
                         files=files,
                         blobs=blobs,
-                        root_name=Path(zip_file.files[i]).stem,
-                        system_name=Path(zip_file.files[i]).stem,
                     )
                 )
             )
