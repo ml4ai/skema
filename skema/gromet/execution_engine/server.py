@@ -69,7 +69,7 @@ def amr_enrichment(request: EnrichmentReqest):
         source_path = Path(temp) / request.filename
         source_path.write_text(request.source)
 
-        engine = ExecutionEngine(PROTOCOL, HOST, PORT, source_path)
+        engine = ExecutionEngine(PROTOCOL, HOST, PORT, str(source_path))
         engine.execute(module=True)
         
         return engine.enrich_amr(request.amr)

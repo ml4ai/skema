@@ -22,7 +22,7 @@ z = x+y
         source_path.write_text(input)
 
         output = ExecutionEngine(
-            protocol=SKEMA_GRAPH_DB_PROTO, host=SKEMA_GRAPH_DB_HOST, port=SKEMA_GRAPH_DB_PORT, source_path=source_path
+            protocol=SKEMA_GRAPH_DB_PROTO, host=SKEMA_GRAPH_DB_HOST, port=SKEMA_GRAPH_DB_PORT, source_path=str(source_path)
         ).parameter_extraction()
 
         # torch.tensor overrides the equality '==' operator, so the following is a valid check
