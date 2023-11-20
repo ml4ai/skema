@@ -504,7 +504,7 @@ fn infix_binding_power(op: &Operator) -> Option<(u8, u8)> {
     let res = match op {
         Operator::Equals => (2, 1),
         Operator::Add | Operator::Subtract => (5, 6),
-        Operator::Multiply | Operator::Divide => (7, 8),
+        Operator::Multiply | Operator::Divide => (8, 7),
         Operator::Compose => (14, 13),
         Operator::Power => (16, 15),
         Operator::Other(op) => panic!("Unhandled operator: {}!", op),
@@ -1174,6 +1174,52 @@ fn test_mi_multiply() {
         <mi>A</mi>
         <msup><mi>ρ</mi><mi>n</mi></msup>
         <msup><mi>g</mi><mi>n</mi></msup>
+    </math>
+    ";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    let s_exp = exp.to_string();
+    println!("s_exp={:?}", s_exp);
+}
+
+#[test]
+fn test_mfrac_msubsup() {
+    let input = "
+    <math>
+      <msub>
+        <mi>t</mi>
+        <mn>0</mn>
+      </msub>
+      <mo>=</mo>
+      <mfrac>
+        <mn>1</mn>
+        <mrow>
+          <mn>18</mn>
+          <mi>&#x0393;</mi>
+        </mrow>
+      </mfrac>
+      <msup>
+        <mrow>
+          <mo>(</mo>
+          <mfrac>
+            <mn>7</mn>
+            <mn>4</mn>
+          </mfrac>
+          <mo>)</mo>
+        </mrow>
+        <mn>3</mn>
+      </msup>
+      <mfrac>
+        <msubsup>
+          <mi>R</mi>
+          <mn>0</mn>
+          <mn>4</mn>
+        </msubsup>
+        <msubsup>
+          <mi>H</mi>
+          <mn>0</mn>
+          <mn>7</mn>
+        </msubsup>
+      </mfrac>
     </math>
     ";
     let exp = input.parse::<MathExpressionTree>().unwrap();
