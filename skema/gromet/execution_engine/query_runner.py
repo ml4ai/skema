@@ -1,19 +1,23 @@
 import yaml
 import traceback
 from pathlib import Path
-from gqlalchemy import Memgraph
+
+from neo4j import GraphDatabase
 
 QUERIES_PATH = Path(__file__).parent / "queries.yaml"
 
 
 class QueryRunner:
-    def __init__(self, host: str, port: str):
+    def __init__(self, protocol: str, host: str, port: str):
         # First set up the queries map
         self.queries_path = QUERIES_PATH
         self.queries_map = yaml.safe_load(self.queries_path.read_text())
 
         # Set up memgrpah instance
-        self.memgraph = Memgraph(host=host, port=port)
+        self.memgraph = GraphDatabase.driver(
+            uri=f"{protocol}{host}:{port}", auth=("", "")
+        )
+        self.memgraph.verify_connectivity()
 
     def run_query(
         self,
@@ -34,10 +38,33 @@ class QueryRunner:
         if filename:
             query = query.replace("$FILENAME", filename)
 
-        if id:
+        if id is not None:
             query = query.replace("$ID", str(id))
 
         # In most cases, we only want the node objects itself. So we will just return a list of nodes.
-        results = self.memgraph.execute_and_fetch(query)
-        
-        return [result[n_or_m] for result in results]
+        records, summary, keys = self.memgraph.execute_query(
+            query, database_="memgraph"
+        )
+        return neo4j_to_memgprah(records, n_or_m)
+
+
+def neo4j_to_memgprah(neo4j_output, n_or_m: str):
+    """Converts neo4j output format to memgraph output format"""
+
+    class DummyNode:
+        pass
+
+    results = []
+    for record in neo4j_output:
+        node_ptr = dict(record)[n_or_m]
+
+        dummy_node = DummyNode()
+        dummy_node._labels = list(node_ptr.labels)
+        dummy_node._id = node_ptr.element_id
+
+        for key, value in node_ptr._properties.items():
+            setattr(dummy_node, key, value)
+
+        results.append(dummy_node)
+
+    return results
