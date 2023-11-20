@@ -9,6 +9,13 @@ pub struct Derivative {
     pub var_index: u8,
     pub bound_var: Ci,
 }
+/// Partial derivative operator
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
+pub struct PartialDerivative {
+    pub order: u8,
+    pub var_index: u8,
+    pub bound_var: Ci,
+}
 
 #[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
 pub enum Operator {
@@ -31,6 +38,7 @@ pub enum Operator {
     Div,
     Abs,
     Derivative(Derivative),
+    PartialDerivative(PartialDerivative),
     Sin,
     Cos,
     Tan,
@@ -68,6 +76,13 @@ impl fmt::Display for Operator {
                 bound_var,
             }) => {
                 write!(f, "D({order}, {bound_var})")
+            }
+            Operator::PartialDerivative(PartialDerivative {
+                                     order,
+                                     var_index,
+                                     bound_var,
+                                 }) => {
+                write!(f, "PD({order}, {bound_var})")
             }
             Operator::Exp => write!(f, "exp"),
             Operator::Power => write!(f, "^"),
