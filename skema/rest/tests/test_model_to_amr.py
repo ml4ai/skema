@@ -28,7 +28,7 @@ def test_any_amr_chime_sir():
     dyn1 = Dynamics(name="CHIME_SIR-old.py", description=None, block=["L21-L31"])
     dyn2 = Dynamics(name="CHIME_SIR.py", description=None, block=["L101-L121"])
     dyn3 = Dynamics(name="CHIME_SIR_core.py", description=None, block=["L1-L9"])
-    dyn4 = Dynamics(name="CHIME_SIR_core.py", description=None, block=["L161-L201"])
+    dyn4 = Dynamics(name="CHIME_SIR_while_loop.py", description=None, block=["L161-L201"])
     llm_mock_output = [dyn1, dyn2, dyn3, dyn4]
 
     line_begin = []
