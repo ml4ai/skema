@@ -37,6 +37,11 @@ def check(result, expected = None):
         check(result.expr, expected.expr)
         check(result.body, expected.body)
         check(result.orelse, expected.orelse)
+    elif isinstance(result, Loop):
+        check(result.pre, expected.pre)
+        check(result.expr, expected.expr)
+        check(result.body, expected.body)
+        check(result.post, expected.post)
     elif isinstance(result, LiteralValue):
         check(result.value, expected)
     elif isinstance(result, Var):
