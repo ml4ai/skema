@@ -119,8 +119,8 @@ class ExecutionEngine:
         gromet_collection = fn_preprocessor(gromet_collection)[0]
 
         # Upload to memgraph
-        #self.model_id = asyncio.run(post_model(gromet_collection))
         self.model_id = requests.post(f"{SKEMA_RS_ADDESS}/models", json=gromet_collection).json()
+        print(f"MODEL_ID={self.model_id}")
     def execute(
         self,
         module: bool = False,
