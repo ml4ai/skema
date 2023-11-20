@@ -17,7 +17,7 @@ dependencies=[
     "networkx==2.8.8",
     "PyYAML",
     "tree-sitter",
-    "gqlalchemy>=1.5.0",
+    "neo4j>=4.4.3",
     "requests",
     "beautifulsoup4", # used to remove comments etc from pMML before sending to MORAE
     "typing_extensions", # see https://github.com/pydantic/pydantic/issues/5821#issuecomment-1559196859
@@ -126,9 +126,6 @@ build-backend = "setuptools.build_meta"
 
 # pytest
 [tool.pytest.ini_options]
-markers = [
-    "ci_only: marks tests to only be run in CI (deselect with '-m \"not ci_only\"')"
-]
 minversion = "7.0"
 addopts = "-v --cov=skema --cov-report html:docs/coverage/python"
 testpaths = [
