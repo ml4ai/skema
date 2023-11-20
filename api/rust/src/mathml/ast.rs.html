@@ -122,6 +122,7 @@
 <a href="#122" id="122">122</a>
 <a href="#123" id="123">123</a>
 <a href="#124" id="124">124</a>
+<a href="#125" id="125">125</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>derive_new::new;
 <span class="kw">use </span>std::fmt;
 
@@ -191,6 +192,7 @@
     </span>Ci(Ci),
     Differential(Differential),
     AbsoluteSup(Box&lt;MathExpression&gt;, Box&lt;MathExpression&gt;),
+    Absolute(Box&lt;MathExpression&gt;, Box&lt;MathExpression&gt;),
     <span class="comment">//Differential(Box&lt;MathExpression&gt;, Box&lt;MathExpression&gt;),
     </span><span class="attr">#[default]
     </span><span class="prelude-val">None</span>,

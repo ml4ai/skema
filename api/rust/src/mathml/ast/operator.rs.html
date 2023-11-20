@@ -93,6 +93,21 @@
 <a href="#93" id="93">93</a>
 <a href="#94" id="94">94</a>
 <a href="#95" id="95">95</a>
+<a href="#96" id="96">96</a>
+<a href="#97" id="97">97</a>
+<a href="#98" id="98">98</a>
+<a href="#99" id="99">99</a>
+<a href="#100" id="100">100</a>
+<a href="#101" id="101">101</a>
+<a href="#102" id="102">102</a>
+<a href="#103" id="103">103</a>
+<a href="#104" id="104">104</a>
+<a href="#105" id="105">105</a>
+<a href="#106" id="106">106</a>
+<a href="#107" id="107">107</a>
+<a href="#108" id="108">108</a>
+<a href="#109" id="109">109</a>
+<a href="#110" id="110">110</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::ast::Ci;
 <span class="kw">use </span>derive_new::new;
 <span class="kw">use </span>std::fmt;
@@ -100,6 +115,13 @@
 <span class="doccomment">/// Derivative operator, in line with Spivak notation: http://ceres-solver.org/spivak_notation.html
 </span><span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
 </span><span class="kw">pub struct </span>Derivative {
+    <span class="kw">pub </span>order: u8,
+    <span class="kw">pub </span>var_index: u8,
+    <span class="kw">pub </span>bound_var: Ci,
+}
+<span class="doccomment">/// Partial derivative operator
+</span><span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
+</span><span class="kw">pub struct </span>PartialDerivative {
     <span class="kw">pub </span>order: u8,
     <span class="kw">pub </span>var_index: u8,
     <span class="kw">pub </span>bound_var: Ci,
@@ -126,6 +148,7 @@
     Div,
     Abs,
     Derivative(Derivative),
+    PartialDerivative(PartialDerivative),
     Sin,
     Cos,
     Tan,
@@ -163,6 +186,13 @@
                 bound_var,
             }) =&gt; {
                 <span class="macro">write!</span>(f, <span class="string">&quot;D({order}, {bound_var})&quot;</span>)
+            }
+            Operator::PartialDerivative(PartialDerivative {
+                                     order,
+                                     var_index,
+                                     bound_var,
+                                 }) =&gt; {
+                <span class="macro">write!</span>(f, <span class="string">&quot;PD({order}, {bound_var})&quot;</span>)
             }
             Operator::Exp =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;exp&quot;</span>),
             Operator::Power =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;^&quot;</span>),
