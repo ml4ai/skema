@@ -14,9 +14,11 @@ class QueryRunner:
         self.queries_map = yaml.safe_load(self.queries_path.read_text())
 
         # Set up memgrpah instance
-        self.memgraph =  GraphDatabase.driver(uri=f"{protocol}{host}:{port}", auth=("", ""))
+        self.memgraph = GraphDatabase.driver(
+            uri=f"{protocol}{host}:{port}", auth=("", "")
+        )
         self.memgraph.verify_connectivity()
-    
+
     def run_query(
         self,
         query: str,
@@ -40,15 +42,18 @@ class QueryRunner:
             query = query.replace("$ID", str(id))
 
         # In most cases, we only want the node objects itself. So we will just return a list of nodes.
-        records,summary,keys = self.memgraph.execute_query(query, database_="memgraph")
+        records, summary, keys = self.memgraph.execute_query(
+            query, database_="memgraph"
+        )
         return neo4j_to_memgprah(records, n_or_m)
-  
+
 
 def neo4j_to_memgprah(neo4j_output, n_or_m: str):
     """Converts neo4j output format to memgraph output format"""
-    class DummyNode():
+
+    class DummyNode:
         pass
-    
+
     results = []
     for record in neo4j_output:
         node_ptr = dict(record)[n_or_m]
