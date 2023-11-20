@@ -8,14 +8,18 @@ use crate::{
         Math, MathExpression, Mi, Mrow,
     },
     parsers::interpreted_mathml::interpreted_math,
+    parsers::generic_mathml::{Span, IResult},
 };
 use derive_new::new;
 use nom::error::Error;
+use regex::Regex;
 
 use std::{fmt, str::FromStr};
 
 #[cfg(test)]
 use crate::parsers::first_order_ode::{first_order_ode, FirstOrderODE};
+///New whitespace handler before parsing
+
 
 /// An S-expression like structure to represent mathematical expressions.
 #[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
@@ -384,7 +388,19 @@ impl FromStr for MathExpressionTree {
     type Err = Error<String>;
 
     fn from_str(input: &str) -> Result<Self, Self::Err> {
-        let (_, math) = interpreted_math(input.into()).unwrap();
+        // Remove all newline characters
+        let no_newlines = input.replace('\n', "");
+        // Remove spaces between MathML elements
+        let no_spaces = //Regex::new(r#">\s*<"#)
+        Regex::new(r"\s+")
+            .unwrap()
+            .replace_all(&no_newlines, "")
+            .to_string();
+        let removed_newlines: &str = &no_spaces;
+        println!("{:?}", removed_newlines);
+
+        let (_, math) = interpreted_math(removed_newlines.into()).unwrap();
+        //let (_, math) = interpreted_math(input.into()).unwrap();
         Ok(MathExpressionTree::from(math))
     }
 }
@@ -1000,8 +1016,8 @@ fn test_another_absolute() {
 fn test_grad() {
     let input = "
     <math>
-        <mo>&#x2207;</mo><mi>H</mi>
-    </math>
+        <mi>&#x2207;</mi><mi>H</mi>
+        </math>
     ";
     let exp = input.parse::<MathExpressionTree>().unwrap();
     let s_exp = exp.to_string();
@@ -1163,4 +1179,32 @@ fn test_mi_multiply() {
     let exp = input.parse::<MathExpressionTree>().unwrap();
     let s_exp = exp.to_string();
     println!("s_exp={:?}", s_exp);
+}
+
+#[test]
+fn new_test_halfar_whitespace() {
+    let input = "
+    <math>
+  <mo>|</mo>
+  <mi>∇</mi>
+  <mi>H</mi>
+  <msup>
+    <mo>|</mo>
+    <mrow>
+      <mi>n</mi>
+      <mo>−</mo>
+      <mn>1</mn>
+    </mrow>
+  </msup>
+  <mi>∇</mi>
+  <mi>H</mi>
+  <mo>)</mo>
+</math>
+    ";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    let s_exp = exp.to_string();
+    assert_eq!(
+        s_exp,
+        "(Div (* (* (* Γ (^ H (+ n 2))) (^ (Abs (Grad H)) (- n 1))) (Grad H)))"
+    );
 }
