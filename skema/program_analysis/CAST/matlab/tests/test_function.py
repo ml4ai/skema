@@ -23,15 +23,11 @@ def test_definition():
             body = [
                 Assignment(
                     left = "both",
-                    right = Operator (
-                        op = "+",
-                        operands =  ["x", "y"]
-                    )
+                    right = Operator (op = "+", operands =  ["x", "y"])
                 )
             ]
         )
     )
-
 
 def test_call_with_literal_args():
     """ Test function call with literal arguments """
@@ -45,14 +41,8 @@ def test_call_with_operator_args():
         Call(
             func = "foo",
             arguments = [
-                Operator (
-                    op = "<",
-                    operands = ["x", "a"]
-                ),
-                Operator (
-                    op = "-",
-                    operands = [6]
-                ),
+                Operator(op = "<", operands = ["x", "a"]),
+                Operator(op = "-", operands = [6]),
             ]
         )
     )
@@ -65,14 +55,8 @@ def test_call_with_call_args():
         Call(
             func = "foo",
             arguments = [
-                Call (
-                    func = "bar",
-                    arguments = ["x"]
-                ),
-                Call (
-                    func = "baz",
-                    arguments = ["y"]
-                ),
+                Call (func = "bar", arguments = ["x"]),
+                Call (func = "baz", arguments = ["y"]),
             ]
         )
     )
@@ -81,13 +65,5 @@ def test_call_with_anonymous_call_arg():
     nodes = cast("foo{x}(y)")
     check(
         nodes[0],
-        Call(
-            func = Call (
-                func = "foo",
-                arguments = ["x"]
-            ),
-            arguments = ["y"]
-
-        )
+        Call(func = Call (func = "foo", arguments = ["x"]),arguments = ["y"])
     )
-

@@ -4,8 +4,6 @@ from skema.program_analysis.CAST2FN.model.cast import (
     Operator
 )
 
-# Test CAST from assignment
-
 def test_boolean():
     """ Test assignment of literal boolean types. """
     # we translate these MATLAB keywords into capitalized strings for Python
@@ -47,9 +45,6 @@ def test_operator():
         cast("Vtot = V1PF+V1AZ;")[0], 
         Assignment(
             left = "Vtot", 
-            right = Operator(
-                op = "+",
-                operands = ["V1PF", "V1AZ"]
-            )
+            right = Operator(op = "+",operands = ["V1PF", "V1AZ"])
         )
     )

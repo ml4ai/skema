@@ -1,8 +1,4 @@
 from skema.program_analysis.CAST.matlab.tests.utils import (check, cast)
-from skema.program_analysis.CAST2FN.model.cast import (
-    Assignment,
-    LiteralValue
-)
 
 # Test CAST using matrices
 def test_empty():

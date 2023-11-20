@@ -35,15 +35,9 @@ def test_spread_operator():
         cast("foo(:)")[0], 
         Call(
             func = "foo",
-            arguments = [
-                Operator(
-                    op = ":",
-                    operands = []
-                )
-            ]
+            arguments = [Operator(op = ":", operands = [])]
         )
     )
-
 
 def test_pemdas_add_multiply():
     """ Test PEMDAS compliance with addition and multiplication."""
@@ -53,10 +47,7 @@ def test_pemdas_add_multiply():
             op = "+",
             operands = [
                 "foo",
-                Operator(
-                    op = "*",
-                    operands = ["bar", "baz"]
-                ),
+                Operator(op = "*", operands = ["bar", "baz"])
             ]
         )
     )
@@ -68,10 +59,7 @@ def test_pemdas_multiply_parenthesis_add():
         Operator(
             op = "*",
             operands = [
-                Operator(
-                    op = "+",
-                    operands = ["foo", "bar"]
-                ),
+                Operator(op = "+", operands = ["foo", "bar"]),
                 "baz"
             ]
         )
