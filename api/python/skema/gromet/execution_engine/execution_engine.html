@@ -33,6 +33,7 @@ import asyncio
 import subprocess
 import json
 import asyncio
+import requests
 import traceback
 from ast import literal_eval
 from pathlib import Path
@@ -51,8 +52,14 @@ from skema.gromet.execution_engine.query_runner import QueryRunner
 from skema.gromet.execution_engine.symbol_table import SymbolTable
 from skema.utils.fold import dictionary_to_gromet_json, del_nulls
 from skema.rest.utils import fn_preprocessor
-
-SKEMA_BIN = Path(__file__).resolve().parents[2] / &#34;skema-rs&#34; / &#34;skema&#34; / &#34;src&#34; / &#34;bin&#34;
+from skema.rest.morae_proxy import post_model
+from skema.skema_py.server import System, fn_given_filepaths
+from skema.rest.proxies import (
+    SKEMA_RS_ADDESS,
+    SKEMA_GRAPH_DB_PROTO,
+    SKEMA_GRAPH_DB_HOST,
+    SKEMA_GRAPH_DB_PORT,
+)
 
 
 class Execute(torch.autograd.Function):
@@ -69,8 +76,8 @@ execute = Execute.apply
 
 
 class ExecutionEngine:
-    def __init__(self, host: str, port: str, source_path: str):
-        self.query_runner = QueryRunner(host, port)
+    def __init__(self, protocol: str, host: str, port: str, source_path: str):
+        self.query_runner = QueryRunner(protocol, host, port)
         self.symbol_table = SymbolTable()
         self.source_path = source_path
 
@@ -78,21 +85,8 @@ class ExecutionEngine:
         self.filename = Path(source_path).stem
 
         # Upload source to Memgraph instance
-        self.upload_source()
-
-    &#39;&#39;&#39; NOTE: Currently we are assuming the amr will be provided seperatly
-    def generate_amr(self, source_path: str):
-        &#34;&#34;&#34;Generate AMR for the source file&#34;&#34;&#34;
-        # Generate system from code
-        system = System(
-            files=[Path(source_path).name],
-            blobs=[Path(source_path).read_text()]
-        )
-
-        amr = asyncio.run(code_snippets_to_pn_amr(system))
-        print(amr.body)
-        exit()
-    &#39;&#39;&#39;
+        self.model_id = None
+        self.upload_source_remote()
 
     def enrich_amr(self, amr: Dict) -&gt; Dict:
         &#34;&#34;&#34;Enrich the AMR for a source file with initial parameter values&#34;&#34;&#34;
@@ -113,25 +107,21 @@ class ExecutionEngine:
 
         return amr
 
-    def upload_source(self):
+    def upload_source_remote(self):
         &#34;&#34;&#34;Ingest source file and upload Gromet to Memgraph&#34;&#34;&#34;
-
-        # Currently, the Gromet ingester writes the output JSON to the directory where the script is run from.
-        # Instead, we want to store it alongside the source so that we can upload it to Memgraph.
-        gromet_collection = process_file(self.source_path)
-        gromet_collection = fn_preprocessor(gromet_collection.to_dict())[0]
-        gromet_name = f&#34;{self.filename}--Gromet-FN-auto.json&#34;
-        gromet_path = Path(self.source_path).resolve().parent / gromet_name
-        gromet_path.write_text(dictionary_to_gromet_json(del_nulls(gromet_collection)))
-
-        # The Memgraph database state should be reset before running any queries.
-        # Unexpected nodes/edges can cause issues with execution.
-        self.query_runner.run_query(&#34;reset_state&#34;)
+        gromet_collection = asyncio.run(
+            fn_given_filepaths(
+                System(
+                    files=[self.source_path], blobs=[Path(self.source_path).read_text()]
+                )
+            )
+        )
+        gromet_collection = fn_preprocessor(gromet_collection)[0]
 
         # Upload to memgraph
-        subprocess.run(
-            [&#34;cargo&#34;, &#34;run&#34;, &#34;--bin&#34;, &#34;gromet2graphdb&#34;, str(gromet_path)], cwd=SKEMA_BIN
-        )
+        self.model_id = requests.post(
+            f&#34;{SKEMA_RS_ADDESS}/models&#34;, json=gromet_collection
+        ).json()
 
     def execute(
         self,
@@ -143,9 +133,13 @@ class ExecutionEngine:
         &#34;&#34;&#34;Run the execution engine at specified scope&#34;&#34;&#34;
         if module:
             module_list = self.query_runner.run_query(
-                &#34;module&#34;, n_or_m=&#34;n&#34;, filename=self.filename
+                &#34;module&#34;, n_or_m=&#34;n&#34;, id=self.model_id
             )
             self.visit(module_list[0])
+
+        # After execution, delete the model and close down the memgraph connection
+        response = requests.delete(f&#34;{SKEMA_RS_ADDESS}/models/{self.model_id}&#34;)
+        self.query_runner.memgraph.close()
 
     def parameter_extraction(self):
         &#34;&#34;&#34;Run the execution engine and extract initial values for each parameter&#34;&#34;&#34;
@@ -329,18 +323,15 @@ class ExecutionEngine:
 if __name__ == &#34;__main__&#34;:
     parser = argparse.ArgumentParser(description=&#34;Parameter Extraction Script&#34;)
     parser.add_argument(&#34;source_path&#34;, type=str, help=&#34;File path to source to execute&#34;)
-    parser.add_argument(
-        &#34;--host&#34;,
-        default=&#34;localhost&#34;,
-        type=str,
-        help=&#34;Host serving the memgraph database&#34;,
-    )
-    parser.add_argument(
-        &#34;--port&#34;, default=7687, type=int, help=&#34;Port serving the megraph database&#34;
-    )
+
     args = parser.parse_args()
 
-    engine = ExecutionEngine(args.host, args.port, args.source_path)
+    protocol, host, port = (
+        SKEMA_GRAPH_DB_PROTO,
+        SKEMA_GRAPH_DB_HOST,
+        SKEMA_GRAPH_DB_PORT,
+    )
+    engine = ExecutionEngine(protocol, host, port, args.source_path)
 
     print(engine.parameter_extraction())
     &#34;&#34;&#34; TODO: New arguments to add with function execution support
@@ -497,7 +488,7 @@ def forward(ctx, primitive: str, inputs: List[torch.Tensor]):
 </dd>
 <dt id="skema.gromet.execution_engine.execution_engine.ExecutionEngine"><code class="flex name class">
 <span>class <span class="ident">ExecutionEngine</span></span>
-<span>(</span><span>host: str, port: str, source_path: str)</span>
+<span>(</span><span>protocol: str, host: str, port: str, source_path: str)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -506,8 +497,8 @@ def forward(ctx, primitive: str, inputs: List[torch.Tensor]):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class ExecutionEngine:
-    def __init__(self, host: str, port: str, source_path: str):
-        self.query_runner = QueryRunner(host, port)
+    def __init__(self, protocol: str, host: str, port: str, source_path: str):
+        self.query_runner = QueryRunner(protocol, host, port)
         self.symbol_table = SymbolTable()
         self.source_path = source_path
 
@@ -515,21 +506,8 @@ def forward(ctx, primitive: str, inputs: List[torch.Tensor]):
         self.filename = Path(source_path).stem
 
         # Upload source to Memgraph instance
-        self.upload_source()
-
-    &#39;&#39;&#39; NOTE: Currently we are assuming the amr will be provided seperatly
-    def generate_amr(self, source_path: str):
-        &#34;&#34;&#34;Generate AMR for the source file&#34;&#34;&#34;
-        # Generate system from code
-        system = System(
-            files=[Path(source_path).name],
-            blobs=[Path(source_path).read_text()]
-        )
-
-        amr = asyncio.run(code_snippets_to_pn_amr(system))
-        print(amr.body)
-        exit()
-    &#39;&#39;&#39;
+        self.model_id = None
+        self.upload_source_remote()
 
     def enrich_amr(self, amr: Dict) -&gt; Dict:
         &#34;&#34;&#34;Enrich the AMR for a source file with initial parameter values&#34;&#34;&#34;
@@ -550,25 +528,21 @@ def forward(ctx, primitive: str, inputs: List[torch.Tensor]):
 
         return amr
 
-    def upload_source(self):
+    def upload_source_remote(self):
         &#34;&#34;&#34;Ingest source file and upload Gromet to Memgraph&#34;&#34;&#34;
-
-        # Currently, the Gromet ingester writes the output JSON to the directory where the script is run from.
-        # Instead, we want to store it alongside the source so that we can upload it to Memgraph.
-        gromet_collection = process_file(self.source_path)
-        gromet_collection = fn_preprocessor(gromet_collection.to_dict())[0]
-        gromet_name = f&#34;{self.filename}--Gromet-FN-auto.json&#34;
-        gromet_path = Path(self.source_path).resolve().parent / gromet_name
-        gromet_path.write_text(dictionary_to_gromet_json(del_nulls(gromet_collection)))
-
-        # The Memgraph database state should be reset before running any queries.
-        # Unexpected nodes/edges can cause issues with execution.
-        self.query_runner.run_query(&#34;reset_state&#34;)
+        gromet_collection = asyncio.run(
+            fn_given_filepaths(
+                System(
+                    files=[self.source_path], blobs=[Path(self.source_path).read_text()]
+                )
+            )
+        )
+        gromet_collection = fn_preprocessor(gromet_collection)[0]
 
         # Upload to memgraph
-        subprocess.run(
-            [&#34;cargo&#34;, &#34;run&#34;, &#34;--bin&#34;, &#34;gromet2graphdb&#34;, str(gromet_path)], cwd=SKEMA_BIN
-        )
+        self.model_id = requests.post(
+            f&#34;{SKEMA_RS_ADDESS}/models&#34;, json=gromet_collection
+        ).json()
 
     def execute(
         self,
@@ -580,9 +554,13 @@ def forward(ctx, primitive: str, inputs: List[torch.Tensor]):
         &#34;&#34;&#34;Run the execution engine at specified scope&#34;&#34;&#34;
         if module:
             module_list = self.query_runner.run_query(
-                &#34;module&#34;, n_or_m=&#34;n&#34;, filename=self.filename
+                &#34;module&#34;, n_or_m=&#34;n&#34;, id=self.model_id
             )
             self.visit(module_list[0])
+
+        # After execution, delete the model and close down the memgraph connection
+        response = requests.delete(f&#34;{SKEMA_RS_ADDESS}/models/{self.model_id}&#34;)
+        self.query_runner.memgraph.close()
 
     def parameter_extraction(self):
         &#34;&#34;&#34;Run the execution engine and extract initial values for each parameter&#34;&#34;&#34;
@@ -830,9 +808,13 @@ def is_node_type(node, node_type: str):
     &#34;&#34;&#34;Run the execution engine at specified scope&#34;&#34;&#34;
     if module:
         module_list = self.query_runner.run_query(
-            &#34;module&#34;, n_or_m=&#34;n&#34;, filename=self.filename
+            &#34;module&#34;, n_or_m=&#34;n&#34;, id=self.model_id
         )
-        self.visit(module_list[0])</code></pre>
+        self.visit(module_list[0])
+
+    # After execution, delete the model and close down the memgraph connection
+    response = requests.delete(f&#34;{SKEMA_RS_ADDESS}/models/{self.model_id}&#34;)
+    self.query_runner.memgraph.close()</code></pre>
 </details>
 </dd>
 <dt id="skema.gromet.execution_engine.execution_engine.ExecutionEngine.parameter_extraction"><code class="name flex">
@@ -854,8 +836,8 @@ def is_node_type(node, node_type: str):
     return self.symbol_table.get_initial_values()</code></pre>
 </details>
 </dd>
-<dt id="skema.gromet.execution_engine.execution_engine.ExecutionEngine.upload_source"><code class="name flex">
-<span>def <span class="ident">upload_source</span></span>(<span>self)</span>
+<dt id="skema.gromet.execution_engine.execution_engine.ExecutionEngine.upload_source_remote"><code class="name flex">
+<span>def <span class="ident">upload_source_remote</span></span>(<span>self)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Ingest source file and upload Gromet to Memgraph</p></div>
@@ -863,25 +845,21 @@ def is_node_type(node, node_type: str):
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def upload_source(self):
+<pre><code class="python">def upload_source_remote(self):
     &#34;&#34;&#34;Ingest source file and upload Gromet to Memgraph&#34;&#34;&#34;
-
-    # Currently, the Gromet ingester writes the output JSON to the directory where the script is run from.
-    # Instead, we want to store it alongside the source so that we can upload it to Memgraph.
-    gromet_collection = process_file(self.source_path)
-    gromet_collection = fn_preprocessor(gromet_collection.to_dict())[0]
-    gromet_name = f&#34;{self.filename}--Gromet-FN-auto.json&#34;
-    gromet_path = Path(self.source_path).resolve().parent / gromet_name
-    gromet_path.write_text(dictionary_to_gromet_json(del_nulls(gromet_collection)))
-
-    # The Memgraph database state should be reset before running any queries.
-    # Unexpected nodes/edges can cause issues with execution.
-    self.query_runner.run_query(&#34;reset_state&#34;)
+    gromet_collection = asyncio.run(
+        fn_given_filepaths(
+            System(
+                files=[self.source_path], blobs=[Path(self.source_path).read_text()]
+            )
+        )
+    )
+    gromet_collection = fn_preprocessor(gromet_collection)[0]
 
     # Upload to memgraph
-    subprocess.run(
-        [&#34;cargo&#34;, &#34;run&#34;, &#34;--bin&#34;, &#34;gromet2graphdb&#34;, str(gromet_path)], cwd=SKEMA_BIN
-    )</code></pre>
+    self.model_id = requests.post(
+        f&#34;{SKEMA_RS_ADDESS}/models&#34;, json=gromet_collection
+    ).json()</code></pre>
 </details>
 </dd>
 <dt id="skema.gromet.execution_engine.execution_engine.ExecutionEngine.visit"><code class="name flex">
@@ -1152,7 +1130,7 @@ def is_node_type(node, node_type: str):
 <li><code><a title="skema.gromet.execution_engine.execution_engine.ExecutionEngine.execute" href="#skema.gromet.execution_engine.execution_engine.ExecutionEngine.execute">execute</a></code></li>
 <li><code><a title="skema.gromet.execution_engine.execution_engine.ExecutionEngine.is_node_type" href="#skema.gromet.execution_engine.execution_engine.ExecutionEngine.is_node_type">is_node_type</a></code></li>
 <li><code><a title="skema.gromet.execution_engine.execution_engine.ExecutionEngine.parameter_extraction" href="#skema.gromet.execution_engine.execution_engine.ExecutionEngine.parameter_extraction">parameter_extraction</a></code></li>
-<li><code><a title="skema.gromet.execution_engine.execution_engine.ExecutionEngine.upload_source" href="#skema.gromet.execution_engine.execution_engine.ExecutionEngine.upload_source">upload_source</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.execution_engine.ExecutionEngine.upload_source_remote" href="#skema.gromet.execution_engine.execution_engine.ExecutionEngine.upload_source_remote">upload_source_remote</a></code></li>
 <li><code><a title="skema.gromet.execution_engine.execution_engine.ExecutionEngine.visit" href="#skema.gromet.execution_engine.execution_engine.ExecutionEngine.visit">visit</a></code></li>
 <li><code><a title="skema.gromet.execution_engine.execution_engine.ExecutionEngine.visit_expression" href="#skema.gromet.execution_engine.execution_engine.ExecutionEngine.visit_expression">visit_expression</a></code></li>
 <li><code><a title="skema.gromet.execution_engine.execution_engine.ExecutionEngine.visit_function" href="#skema.gromet.execution_engine.execution_engine.ExecutionEngine.visit_function">visit_function</a></code></li>

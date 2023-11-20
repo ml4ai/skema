@@ -30,19 +30,23 @@
 <pre><code class="python">import yaml
 import traceback
 from pathlib import Path
-from gqlalchemy import Memgraph
+
+from neo4j import GraphDatabase
 
 QUERIES_PATH = Path(__file__).parent / &#34;queries.yaml&#34;
 
 
 class QueryRunner:
-    def __init__(self, host: str, port: str):
+    def __init__(self, protocol: str, host: str, port: str):
         # First set up the queries map
         self.queries_path = QUERIES_PATH
         self.queries_map = yaml.safe_load(self.queries_path.read_text())
 
         # Set up memgrpah instance
-        self.memgraph = Memgraph(host=host, port=port)
+        self.memgraph = GraphDatabase.driver(
+            uri=f&#34;{protocol}{host}:{port}&#34;, auth=(&#34;&#34;, &#34;&#34;)
+        )
+        self.memgraph.verify_connectivity()
 
     def run_query(
         self,
@@ -63,13 +67,36 @@ class QueryRunner:
         if filename:
             query = query.replace(&#34;$FILENAME&#34;, filename)
 
-        if id:
+        if id is not None:
             query = query.replace(&#34;$ID&#34;, str(id))
 
         # In most cases, we only want the node objects itself. So we will just return a list of nodes.
-        results = self.memgraph.execute_and_fetch(query)
-        
-        return [result[n_or_m] for result in results]</code></pre>
+        records, summary, keys = self.memgraph.execute_query(
+            query, database_=&#34;memgraph&#34;
+        )
+        return neo4j_to_memgprah(records, n_or_m)
+
+
+def neo4j_to_memgprah(neo4j_output, n_or_m: str):
+    &#34;&#34;&#34;Converts neo4j output format to memgraph output format&#34;&#34;&#34;
+
+    class DummyNode:
+        pass
+
+    results = []
+    for record in neo4j_output:
+        node_ptr = dict(record)[n_or_m]
+
+        dummy_node = DummyNode()
+        dummy_node._labels = list(node_ptr.labels)
+        dummy_node._id = node_ptr.element_id
+
+        for key, value in node_ptr._properties.items():
+            setattr(dummy_node, key, value)
+
+        results.append(dummy_node)
+
+    return results</code></pre>
 </details>
 </section>
 <section>
@@ -77,13 +104,47 @@ class QueryRunner:
 <section>
 </section>
 <section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="skema.gromet.execution_engine.query_runner.neo4j_to_memgprah"><code class="name flex">
+<span>def <span class="ident">neo4j_to_memgprah</span></span>(<span>neo4j_output, n_or_m: str)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Converts neo4j output format to memgraph output format</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def neo4j_to_memgprah(neo4j_output, n_or_m: str):
+    &#34;&#34;&#34;Converts neo4j output format to memgraph output format&#34;&#34;&#34;
+
+    class DummyNode:
+        pass
+
+    results = []
+    for record in neo4j_output:
+        node_ptr = dict(record)[n_or_m]
+
+        dummy_node = DummyNode()
+        dummy_node._labels = list(node_ptr.labels)
+        dummy_node._id = node_ptr.element_id
+
+        for key, value in node_ptr._properties.items():
+            setattr(dummy_node, key, value)
+
+        results.append(dummy_node)
+
+    return results</code></pre>
+</details>
+</dd>
+</dl>
 </section>
 <section>
 <h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
 <dt id="skema.gromet.execution_engine.query_runner.QueryRunner"><code class="flex name class">
 <span>class <span class="ident">QueryRunner</span></span>
-<span>(</span><span>host: str, port: str)</span>
+<span>(</span><span>protocol: str, host: str, port: str)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -92,13 +153,16 @@ class QueryRunner:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class QueryRunner:
-    def __init__(self, host: str, port: str):
+    def __init__(self, protocol: str, host: str, port: str):
         # First set up the queries map
         self.queries_path = QUERIES_PATH
         self.queries_map = yaml.safe_load(self.queries_path.read_text())
 
         # Set up memgrpah instance
-        self.memgraph = Memgraph(host=host, port=port)
+        self.memgraph = GraphDatabase.driver(
+            uri=f&#34;{protocol}{host}:{port}&#34;, auth=(&#34;&#34;, &#34;&#34;)
+        )
+        self.memgraph.verify_connectivity()
 
     def run_query(
         self,
@@ -119,13 +183,14 @@ class QueryRunner:
         if filename:
             query = query.replace(&#34;$FILENAME&#34;, filename)
 
-        if id:
+        if id is not None:
             query = query.replace(&#34;$ID&#34;, str(id))
 
         # In most cases, we only want the node objects itself. So we will just return a list of nodes.
-        results = self.memgraph.execute_and_fetch(query)
-        
-        return [result[n_or_m] for result in results]</code></pre>
+        records, summary, keys = self.memgraph.execute_query(
+            query, database_=&#34;memgraph&#34;
+        )
+        return neo4j_to_memgprah(records, n_or_m)</code></pre>
 </details>
 <h3>Methods</h3>
 <dl>
@@ -157,13 +222,14 @@ class QueryRunner:
     if filename:
         query = query.replace(&#34;$FILENAME&#34;, filename)
 
-    if id:
+    if id is not None:
         query = query.replace(&#34;$ID&#34;, str(id))
 
     # In most cases, we only want the node objects itself. So we will just return a list of nodes.
-    results = self.memgraph.execute_and_fetch(query)
-    
-    return [result[n_or_m] for result in results]</code></pre>
+    records, summary, keys = self.memgraph.execute_query(
+        query, database_=&#34;memgraph&#34;
+    )
+    return neo4j_to_memgprah(records, n_or_m)</code></pre>
 </details>
 </dd>
 </dl>
@@ -180,6 +246,11 @@ class QueryRunner:
 <li><h3>Super-module</h3>
 <ul>
 <li><code><a title="skema.gromet.execution_engine" href="index.html">skema.gromet.execution_engine</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="skema.gromet.execution_engine.query_runner.neo4j_to_memgprah" href="#skema.gromet.execution_engine.query_runner.neo4j_to_memgprah">neo4j_to_memgprah</a></code></li>
 </ul>
 </li>
 <li><h3><a href="#header-classes">Classes</a></h3>
