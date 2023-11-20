@@ -4,6 +4,7 @@ import asyncio
 import subprocess
 import json
 import asyncio
+import requests
 import traceback
 from ast import literal_eval
 from pathlib import Path
@@ -24,6 +25,7 @@ from skema.utils.fold import dictionary_to_gromet_json, del_nulls
 from skema.rest.utils import fn_preprocessor
 from skema.rest.morae_proxy import post_model
 from skema.skema_py.server import System, fn_given_filepaths
+from skema.rest.proxies import SKEMA_RS_ADDESS
 
 SKEMA_BIN = Path(__file__).resolve().parents[2] / "skema-rs" / "skema" / "src" / "bin"
 
@@ -131,12 +133,12 @@ class ExecutionEngine:
             module_list = self.query_runner.run_query(
                 "module", n_or_m="n", id=self.model_id
             )
-            print(module_list)
             self.visit(module_list[0])
 
         # After execution, delete the model and close down the memgraph connection
-        self.query_runner.run_query("delete_model", id=self.model_id)
+        response = requests.delete(f"{SKEMA_RS_ADDESS}/models/{self.model_id}")
         self.query_runner.memgraph.close()
+    
     def parameter_extraction(self):
         """Run the execution engine and extract initial values for each parameter"""
 
@@ -320,6 +322,12 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Parameter Extraction Script")
     parser.add_argument("source_path", type=str, help="File path to source to execute")
     parser.add_argument(
+        "--protocol",
+        default="bolt://",
+        type=str,
+        help="Protocol serving the memgraph database"
+    )
+    parser.add_argument(
         "--host",
         default="localhost",
         type=str,
@@ -330,7 +338,7 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    engine = ExecutionEngine(args.host, args.port, args.source_path)
+    engine = ExecutionEngine(args.protocol, args.host, args.port, args.source_path)
 
     print(engine.parameter_extraction())
     """ TODO: New arguments to add with function execution support

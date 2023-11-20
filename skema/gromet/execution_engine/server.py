@@ -5,11 +5,11 @@ from pathlib import Path
 from fastapi import APIRouter, FastAPI
 from pydantic import BaseModel, Field
 
-from skema.rest.proxies import SKEMA_GRAPH_DB_HOST, SKEMA_GRAPH_DB_PORT
+from skema.rest.proxies import SKEMA_GRAPH_DB_HOST, SKEMA_GRAPH_DB_PORT, SKEMA_GRAPH_DB_PROTO
 from skema.gromet.execution_engine.execution_engine import ExecutionEngine
 HOST = SKEMA_GRAPH_DB_HOST
 PORT = int(SKEMA_GRAPH_DB_PORT)
-
+PROTOCOL = SKEMA_GRAPH_DB_PROTO
 router = APIRouter()
 
 class EnrichmentReqest(BaseModel):
@@ -68,7 +68,7 @@ def amr_enrichment(request: EnrichmentReqest):
         source_path = Path(temp) / request.filename
         source_path.write_text(request.source)
 
-        engine = ExecutionEngine(HOST, PORT, source_path)
+        engine = ExecutionEngine(PROTOCOL, HOST, PORT, source_path)
         engine.execute(module=True)
         
         return engine.enrich_amr(request.amr)
