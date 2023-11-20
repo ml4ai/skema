@@ -61,7 +61,7 @@ def matlab_to_cast(
     """
     
 
-    out_cast = MatlabToCast(input_path).out_cast
+    out_cast = MatlabToCast(source_path = input_path).out_cast
 
     file_name = os.path.basename(input_path)
     if agraph:

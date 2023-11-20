@@ -1,0 +1,449 @@
+{
+    "header": {
+        "name": "mathml model",
+        "schema": "https://github.com/DARPA-ASKEM/Model-Representations/blob/main/petrinet/petrinet_schema.json",
+        "schema_name": "PetriNet",
+        "description": "This is a model from code",
+        "model_version": "0.1"
+    },
+    "model": {
+        "states": [
+            {
+                "id": "A",
+                "name": "A"
+            },
+            {
+                "id": "D",
+                "name": "D"
+            },
+            {
+                "id": "E",
+                "name": "E"
+            },
+            {
+                "id": "H",
+                "name": "H"
+            },
+            {
+                "id": "I",
+                "name": "I"
+            },
+            {
+                "id": "R",
+                "name": "R"
+            },
+            {
+                "id": "S",
+                "name": "S"
+            },
+            {
+                "id": "T",
+                "name": "T"
+            }
+        ],
+        "transitions": [
+            {
+                "id": "t0",
+                "input": [
+                    "I",
+                    "S"
+                ],
+                "output": [
+                    "I",
+                    "I"
+                ]
+            },
+            {
+                "id": "t1",
+                "input": [
+                    "D",
+                    "S"
+                ],
+                "output": [
+                    "I",
+                    "D"
+                ]
+            },
+            {
+                "id": "t10",
+                "input": [
+                    "I"
+                ],
+                "output": [
+                    "H"
+                ]
+            },
+            {
+                "id": "t11",
+                "input": [
+                    "D"
+                ],
+                "output": [
+                    "H"
+                ]
+            },
+            {
+                "id": "t12",
+                "input": [
+                    "A"
+                ],
+                "output": [
+                    "H"
+                ]
+            },
+            {
+                "id": "t13",
+                "input": [
+                    "R"
+                ],
+                "output": [
+                    "H"
+                ]
+            },
+            {
+                "id": "t14",
+                "input": [
+                    "T"
+                ],
+                "output": [
+                    "H"
+                ]
+            },
+            {
+                "id": "t15",
+                "input": [
+                    "T"
+                ],
+                "output": [
+                    "E"
+                ]
+            },
+            {
+                "id": "t2",
+                "input": [
+                    "A",
+                    "S"
+                ],
+                "output": [
+                    "I",
+                    "A"
+                ]
+            },
+            {
+                "id": "t3",
+                "input": [
+                    "R",
+                    "S"
+                ],
+                "output": [
+                    "I",
+                    "R"
+                ]
+            },
+            {
+                "id": "t4",
+                "input": [
+                    "I"
+                ],
+                "output": [
+                    "D"
+                ]
+            },
+            {
+                "id": "t5",
+                "input": [
+                    "I"
+                ],
+                "output": [
+                    "A"
+                ]
+            },
+            {
+                "id": "t6",
+                "input": [
+                    "D"
+                ],
+                "output": [
+                    "R"
+                ]
+            },
+            {
+                "id": "t7",
+                "input": [
+                    "A"
+                ],
+                "output": [
+                    "R"
+                ]
+            },
+            {
+                "id": "t8",
+                "input": [
+                    "A"
+                ],
+                "output": [
+                    "T"
+                ]
+            },
+            {
+                "id": "t9",
+                "input": [
+                    "R"
+                ],
+                "output": [
+                    "T"
+                ]
+            }
+        ]
+    },
+    "semantics": {
+        "ode": {
+            "rates": [
+                {
+                    "target": "t0",
+                    "expression": "alpha*I*S",
+                    "expression_mathml": "<apply><times/><ci>I</ci><ci>S</ci><ci>alpha</ci></apply>"
+                },
+                {
+                    "target": "t1",
+                    "expression": "beta*D*S",
+                    "expression_mathml": "<apply><times/><ci>D</ci><ci>S</ci><ci>beta</ci></apply>"
+                },
+                {
+                    "target": "t2",
+                    "expression": "gamma*A*S",
+                    "expression_mathml": "<apply><times/><ci>A</ci><ci>S</ci><ci>gamma</ci></apply>"
+                },
+                {
+                    "target": "t3",
+                    "expression": "delta*R*S",
+                    "expression_mathml": "<apply><times/><ci>R</ci><ci>S</ci><ci>delta</ci></apply>"
+                },
+                {
+                    "target": "t4",
+                    "expression": "epsilon*I*",
+                    "expression_mathml": "<apply><times/><ci>epsilon</ci><ci>I</ci></apply>"
+                },
+                {
+                    "target": "t5",
+                    "expression": "zeta*I*",
+                    "expression_mathml": "<apply><times/><ci>zeta</ci><ci>I</ci></apply>"
+                },
+                {
+                    "target": "t6",
+                    "expression": "eta*D*",
+                    "expression_mathml": "<apply><times/><ci>eta</ci><ci>D</ci></apply>"
+                },
+                {
+                    "target": "t7",
+                    "expression": "theta*A*",
+                    "expression_mathml": "<apply><times/><ci>theta</ci><ci>A</ci></apply>"
+                },
+                {
+                    "target": "t8",
+                    "expression": "mu*A*",
+                    "expression_mathml": "<apply><times/><ci>mu</ci><ci>A</ci></apply>"
+                },
+                {
+                    "target": "t9",
+                    "expression": "nu*R*",
+                    "expression_mathml": "<apply><times/><ci>nu</ci><ci>R</ci></apply>"
+                },
+                {
+                    "target": "t10",
+                    "expression": "lamb*I*",
+                    "expression_mathml": "<apply><times/><ci>lamb</ci><ci>I</ci></apply>"
+                },
+                {
+                    "target": "t11",
+                    "expression": "rho*D*",
+                    "expression_mathml": "<apply><times/><ci>rho</ci><ci>D</ci></apply>"
+                },
+                {
+                    "target": "t12",
+                    "expression": "kappa*A*",
+                    "expression_mathml": "<apply><times/><ci>kappa</ci><ci>A</ci></apply>"
+                },
+                {
+                    "target": "t13",
+                    "expression": "xi*R*",
+                    "expression_mathml": "<apply><times/><ci>xi</ci><ci>R</ci></apply>"
+                },
+                {
+                    "target": "t14",
+                    "expression": "sigma*T*",
+                    "expression_mathml": "<apply><times/><ci>sigma</ci><ci>T</ci></apply>"
+                },
+                {
+                    "target": "t15",
+                    "expression": "tau*T*",
+                    "expression_mathml": "<apply><times/><ci>tau</ci><ci>T</ci></apply>"
+                }
+            ],
+            "initials": [
+                {
+                    "target": "S",
+                    "expression": "S0",
+                    "expression_mathml": ""
+                },
+                {
+                    "target": "I",
+                    "expression": "I0",
+                    "expression_mathml": ""
+                },
+                {
+                    "target": "D",
+                    "expression": "D0",
+                    "expression_mathml": ""
+                },
+                {
+                    "target": "A",
+                    "expression": "A0",
+                    "expression_mathml": ""
+                },
+                {
+                    "target": "R",
+                    "expression": "R0",
+                    "expression_mathml": ""
+                },
+                {
+                    "target": "T",
+                    "expression": "T0",
+                    "expression_mathml": ""
+                },
+                {
+                    "target": "H",
+                    "expression": "H0",
+                    "expression_mathml": ""
+                },
+                {
+                    "target": "E",
+                    "expression": "E0",
+                    "expression_mathml": ""
+                }
+            ],
+            "parameters": [
+                {
+                    "id": "A0",
+                    "name": "A0",
+                    "description": "The total A population at timestep 0"
+                },
+                {
+                    "id": "D0",
+                    "name": "D0",
+                    "description": "The total D population at timestep 0"
+                },
+                {
+                    "id": "E0",
+                    "name": "E0",
+                    "description": "The total E population at timestep 0"
+                },
+                {
+                    "id": "H0",
+                    "name": "H0",
+                    "description": "The total H population at timestep 0"
+                },
+                {
+                    "id": "I0",
+                    "name": "I0",
+                    "description": "The total I population at timestep 0"
+                },
+                {
+                    "id": "R0",
+                    "name": "R0",
+                    "description": "The total R population at timestep 0"
+                },
+                {
+                    "id": "S0",
+                    "name": "S0",
+                    "description": "The total S population at timestep 0"
+                },
+                {
+                    "id": "T0",
+                    "name": "T0",
+                    "description": "The total T population at timestep 0"
+                },
+                {
+                    "id": "alpha",
+                    "name": "alpha",
+                    "description": "alpha rate"
+                },
+                {
+                    "id": "beta",
+                    "name": "beta",
+                    "description": "beta rate"
+                },
+                {
+                    "id": "delta",
+                    "name": "delta",
+                    "description": "delta rate"
+                },
+                {
+                    "id": "epsilon",
+                    "name": "epsilon",
+                    "description": "epsilon rate"
+                },
+                {
+                    "id": "eta",
+                    "name": "eta",
+                    "description": "eta rate"
+                },
+                {
+                    "id": "gamma",
+                    "name": "gamma",
+                    "description": "gamma rate"
+                },
+                {
+                    "id": "kappa",
+                    "name": "kappa",
+                    "description": "kappa rate"
+                },
+                {
+                    "id": "lamb",
+                    "name": "lamb",
+                    "description": "lamb rate"
+                },
+                {
+                    "id": "mu",
+                    "name": "mu",
+                    "description": "mu rate"
+                },
+                {
+                    "id": "nu",
+                    "name": "nu",
+                    "description": "nu rate"
+                },
+                {
+                    "id": "rho",
+                    "name": "rho",
+                    "description": "rho rate"
+                },
+                {
+                    "id": "sigma",
+                    "name": "sigma",
+                    "description": "sigma rate"
+                },
+                {
+                    "id": "tau",
+                    "name": "tau",
+                    "description": "tau rate"
+                },
+                {
+                    "id": "theta",
+                    "name": "theta",
+                    "description": "theta rate"
+                },
+                {
+                    "id": "xi",
+                    "name": "xi",
+                    "description": "xi rate"
+                },
+                {
+                    "id": "zeta",
+                    "name": "zeta",
+                    "description": "zeta rate"
+                }
+            ]
+        }
+    }
+}

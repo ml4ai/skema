@@ -5,6 +5,8 @@ FROM  python:3.8-bullseye
 # Install prerequisites
 # ======================
 ARG DEBIAN_FRONTEND=noninteractive
+ARG NODE_MAJOR=18
+
 RUN apt-get update &&\
     apt-get -y --no-install-recommends install \
         tree \
@@ -12,11 +14,16 @@ RUN apt-get update &&\
         build-essential \
         graphviz \
         libgraphviz-dev \
-        python3-venv 
+        python3-venv \
+        gnupg \
+        ca-certificates \
+        curl
 
 # Node needed for img2mml
-RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - &&\
-apt-get install -y nodejs
+RUN mkdir -p /etc/apt/keyrings
+RUN curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg
+RUN echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list
+RUN apt-get update && apt-get -y install nodejs
 
 # The two commands below are to reduce the size of the Docker image
 RUN apt-get clean &&\

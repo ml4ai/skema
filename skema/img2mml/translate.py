@@ -9,10 +9,11 @@ from skema.img2mml.models.encoders.cnn_encoder import CNN_Encoder
 from skema.img2mml.models.encoders.xfmer_encoder import Transformer_Encoder
 from skema.img2mml.models.decoders.xfmer_decoder import Transformer_Decoder
 import io
-from typing import List
+from typing import List, Union
 import logging
 import re
 from skema.img2mml.models.image2mml_xfmer import Image2MathML_Xfmer
+from xml.etree import ElementTree as ET
 
 # Set logging level to INFO
 logging.basicConfig(level=logging.INFO)
@@ -58,7 +59,7 @@ def remove_eqn_number(image: Image.Image, threshold: float = 0.1) -> Image.Image
 
 
 def calculate_scale_factor(
-    image: Image.Image, target_width: int, target_height: int
+        image: Image.Image, target_width: int, target_height: int
 ) -> float:
     """
     Calculate the scale factor to normalize the input image to the target width and height while preserving the
@@ -151,7 +152,7 @@ def set_random_seed(seed: int) -> None:
 
 
 def define_model(
-    config: dict, vocab: List[str], device: torch.device, model_type="xfmer"
+        config: dict, vocab: List[str], device: torch.device, model_type="xfmer"
 ) -> Image2MathML_Xfmer:
     """
     Defining the model
@@ -206,6 +207,149 @@ def define_model(
     return model
 
 
+def merge_mn_elements(input_mathml: str) -> str:
+    """
+    Merge consecutive <mn> elements in the <mrow> structure of MathML.
+
+    Args:
+        input_mathml (str): Input MathML string.
+
+    Returns:
+        str: MathML string with consecutive <mn> elements merged.
+    """
+    input_mathml = input_mathml.replace("&#x", "###")  # keep the unicode representation
+    root = ET.fromstring(input_mathml)
+
+    def merge_mn_in_mrow(mrow: ET.Element) -> List[ET.Element]:
+        """
+        Merge consecutive <mn> elements within a given <mrow>.
+
+        Args:
+            mrow (ET.Element): <mrow> element.
+
+        Returns:
+            List[ET.Element]: List of merged elements.
+        """
+        merged_elements = []
+        current_number = None
+
+        for child in mrow:
+            if child.tag == 'mn':
+                if current_number is None:
+                    current_number = int(child.text)
+                else:
+                    current_number = current_number * 10 + int(child.text)
+            else:
+                if current_number is not None:
+                    merged_elements.append(ET.Element('mn'))
+                    merged_elements[-1].text = str(current_number)
+                    current_number = None
+                merged_elements.append(child)
+
+        if current_number is not None:
+            merged_elements.append(ET.Element('mn'))
+            merged_elements[-1].text = str(current_number)
+
+        return merged_elements
+
+    def process_element(element: ET.Element) -> None:
+        """
+        Recursively process each element in the MathML structure.
+
+        Args:
+            element (ET.Element): Current element to process.
+        """
+        if element.tag == 'mrow':
+            element[:] = merge_mn_in_mrow(element)
+            for child in element:
+                process_element(child)
+        else:
+            for child in element:
+                process_element(child)
+
+    process_element(root)
+    modified_xml_string = ET.tostring(root, encoding="utf-8", method="xml").decode('utf-8')
+    modified_xml_string = modified_xml_string.replace("###", "&#x")
+
+    return modified_xml_string
+
+
+def process_mtext(xml_string: str) -> str:
+    """
+    Process the input MathML string by merging consecutive <mi> elements and replacing specific <mrow> structures.
+
+    Args:
+        xml_string (str): The input MathML string.
+
+    Returns:
+        str: The modified MathML string.
+    """
+    xml_string = xml_string.replace("&#x", "###")  # keep the unicode representation
+    root = ET.fromstring(xml_string)
+
+    def merge_mi_elements(elements):
+        """
+        Merge consecutive <mi> elements into an <mtext> element.
+
+        Args:
+            elements (list): List of consecutive <mi> elements.
+
+        Returns:
+            Element: The merged <mtext> element.
+        """
+        merged_text = "".join([elem.text for elem in elements])
+        mtext = ET.Element("mtext")
+        mtext.text = merged_text
+        return mtext
+
+    # Replace specific <mrow> structures with <mtext>
+    for mrow in root.findall(".//mrow"):
+        mi_count = sum(1 for child in mrow if child.tag == "mi")
+        non_mi_count = sum(1 for child in mrow if child.tag != "mi")
+
+        if mi_count >= 3 and non_mi_count == 0:
+            mi_elements = [child for child in mrow if child.tag == "mi"]
+            mtext = merge_mi_elements(mi_elements)
+            mrow.clear()
+            mrow.tag = "to_be_removed"
+            mrow.append(mtext)
+
+    mi_count = 0
+    consecutive_mi_elements = []
+    new_children = []
+
+    # Merge consecutive <mi> elements
+    for child in root:
+        if child.tag == "mi":
+            mi_count += 1
+            consecutive_mi_elements.append(child)
+        else:
+            if mi_count >= 5:
+                mtext = merge_mi_elements(consecutive_mi_elements)
+                new_children.append(mtext)
+            else:
+                new_children.extend(consecutive_mi_elements)
+            mi_count = 0
+            consecutive_mi_elements = []
+            new_children.append(child)
+
+    if mi_count >= 5:
+        mtext = merge_mi_elements(consecutive_mi_elements)
+        new_children.append(mtext)
+    else:
+        new_children.extend(consecutive_mi_elements)
+
+    root.clear()
+    root.extend(new_children)
+
+    modified_xml_string = ET.tostring(root, encoding="utf-8", method="xml").decode('utf-8')
+    modified_xml_string = modified_xml_string.replace("<to_be_removed>", "")
+    modified_xml_string = modified_xml_string.replace("</to_be_removed>", "")
+    modified_xml_string = modified_xml_string.replace("###", "&#x")
+
+    return modified_xml_string
+
+
 def add_semicolon_to_unicode(string: str) -> str:
     """
     Checks if the string contains Unicode starting with '&#x' and adds a semicolon ';' after each occurrence if missing.
@@ -249,11 +393,11 @@ def remove_spaces_between_tags(mathml_string: str) -> str:
 
 
 def render_mml(
-    model: Image2MathML_Xfmer,
-    vocab_itos: dict,
-    vocab_stoi: dict,
-    img: torch.Tensor,
-    device: torch.device,
+        model: Image2MathML_Xfmer,
+        vocab_itos: dict,
+        vocab_stoi: dict,
+        img: torch.Tensor,
+        device: torch.device,
 ) -> str:
     """
     Perform sequence prediction for an input image to translate it into MathML contents.
@@ -287,27 +431,11 @@ def render_mml(
             pred.append(vocab_itos[str(p)])
 
         pred_seq = " ".join(pred[1:-1])
-        return add_semicolon_to_unicode(remove_spaces_between_tags(pred_seq))
 
-
-# def render_mml(
-#     model: Image2MathML_Xfmer,
-#     vocab_itos: dict,
-#     vocab_stoi: dict,
-#     imagetensor: torch.Tensor,
-#     device: torch.device,
-# ) -> str:
-#     """
-#     Render MathML for an input image using the provided model.
-#
-#     Args:
-#         model (Image2MathML_Xfmer): The image-to-MathML model.
-#         vocab_itos (dict): The vocabulary lookup dictionary (index to symbol).
-#         vocab_stoi (dict): The vocabulary lookup dictionary (symbol to index).
-#         imagetensor (torch.Tensor): The input image as a tensor.
-#         device (torch.device): The device (GPU or CPU) to be used for computation.
-#
-#     Returns:
-#         str: The generated MathML string.
-#     """
-#     return evaluate(model, vocab_itos, vocab_stoi, imagetensor, device)
+        try:
+            res = add_semicolon_to_unicode(remove_spaces_between_tags(pred_seq))
+            res = merge_mn_elements(res)
+            res = process_mtext(res)
+            return res
+        except:
+            return res

@@ -1,7 +1,8 @@
 //! Program for inserting GroMEt models into a database from the command line.
 
 use clap::Parser;
-
+use std::env;
+use skema::config::Config;
 use skema::{
     database::{execute_query, parse_gromet_queries},
     ModuleCollection,
@@ -42,6 +43,15 @@ fn main() {
         fs::write("debug.txt", full_query.clone()).expect("Unable to write file");
     }
 
-    execute_query(&full_query, &args.db_host).unwrap(); // The properties need to have quotes!!
+    let db_host = env::var("DB_HOST").unwrap_or("127.0.0.1".to_string());
+    let db_port = env::var("DB_PORT").unwrap_or("7687".to_string());
+
+    let config = Config {
+        // NOTE: db_host is protocol + host
+        db_host: db_host.clone(),
+        db_port: db_port.parse::<u16>().unwrap(),
+    };
+
+    execute_query(&full_query, config.clone()).unwrap(); // The properties need to have quotes!!
                                                         // writing output to file, since too long for std out now.
 }

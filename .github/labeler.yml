@@ -1,3 +1,4 @@
+# see https://github.com/actions/labeler
 documentation:
 - any: ["docs/**"]
 #  all: ["!docs/changes.md"]
@@ -6,17 +7,30 @@ integration:
 - any: ["skema/rest/**"]
 
 CI:
-- any: [".github/**"]
+- any: [".github/**", ".github/workflows/**"]
+
+docker:
+- any:
+  - "Dockerfile.skema-py"
+  - "Dockerfile.skema-py.dockerignore"
+  - "Dockerfile.skema-rs"
+  - "Dockerfile.skema-rs.dockerignore"
 
 tests:
 - any:
-  - "skema/rest/tests/**"
+  - "skema/gromet/execution_engine/tests/**"
+  - "skema/img2mml/tests/**"
   - "skema/program_analysis/tests/**"
   - "skema/program_analysis/comment_extractor/tests/**"
-  - "skema/img2mml/tests/**"
-  - "skema/text_reading/scala/src/test/**"
+  - "skema/program_analysis/tree_sitter_parsers/tests/**"
+  - "skema/program_analysis/CAST/matlab/tests/**"
+  - "skema/program_analysis/CAST/fortran/tests/**"
+  - "skema/program_analysis/CAST/python/tests/**"
+  - "skema/rest/tests/**"
+  - "skema/skema_py/tests/**"
   - "skema/skema-rs/mathml/tests/**"
   - "skema/skema-rs/skema/tests/**"
+  - "skema/text_reading/scala/src/test/**"
 
 Code2FN:
 - any: ["skema/gromet/**", "skema/program_analysis/**"]
@@ -27,8 +41,16 @@ Equations:
 lang/Fortran:
 - any: ["skema/program_analysis/CAST/fortran/**"]
 
+lang/MATLAB:
+- any: ["skema/program_analysis/CAST/matlab/**"]
+
 lang/Python:
-- any: ["skema/program_analysis/CAST/pythonAST/**"]
+- any: 
+  - "skema/program_analysis/CAST/pythonAST/**"
+  - "skema/program_analysis/CAST/python/**"
+
+lang/Rust:
+- any: ["skema/skema-rs/**"]
 
 MORAE:
 - any: ["skema/skema-rs/**"]

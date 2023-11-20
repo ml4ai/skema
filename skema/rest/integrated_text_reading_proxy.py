@@ -470,7 +470,11 @@ async def integrated_pdf_extractions(
     # Call COSMOS on the pdfs
     cosmos_data = list()
     for pdf in pdfs:
-        cosmos_data.append(cosmos_client(pdf.filename, pdf.file))
+        if pdf.filename.endswith("json"):
+            json_data = json.load(pdf.file)
+        else:
+            json_data = cosmos_client(pdf.filename, pdf.file)
+        cosmos_data.append(json_data)
 
     # Get the plain text version from cosmos, passed through to MIT pipeline
     plain_texts = ['\n'.join(block['content'] for block in c) for c in cosmos_data]
@@ -669,6 +673,43 @@ def quantitative_eval() -> TextReadingEvaluationResults:
 
     # Read the SKEMA extractions
     extractions = AttributeCollection.from_json(Path(__file__).parents[0] / "data" / "extractions_sidarthe_skema.json")
+
+    return compute_text_reading_evaluation(gt_data, extractions)
+
+
+@router.post("/eval", response_model=TextReadingEvaluationResults, status_code=200)
+def quantitative_eval(extractions_file: UploadFile, gt_annotations: UploadFile):
+    """
+    # Gets performance metrics of a set of text extractions againts a ground truth annotations file.
+
+    ## Example:
+    ```python
+    files = {
+        "extractions_file": ("paper_variable_extractions.json", open("paper_variable_extractions.json", 'rb')),
+        "gt_annotations": ("paper_gt_annotations.json", open("paper_gt_annotations.json", 'rb')),
+    }
+
+    response = requests.post(f"{endpoint}/text-reading/eval", files=files)
+    ```
+
+    """
+
+    gt_data = json.load(gt_annotations.file)
+
+    # Support both Attribute Collections serialized and within the envelop of this rest API
+    extractions_json = json.load(extractions_file.file)
+    try:
+        extractions = AttributeCollection.from_json(extractions_json)
+    except KeyError:
+        extractions_file.file.seek(0)
+        service_output = json.load(extractions_file.file)
+        collections = list()
+        for collection in service_output['outputs']:
+            collection = AttributeCollection.from_json(collection['data'])
+            collections.append(collection)
+
+        extractions = AttributeCollection(
+            attributes=list(it.chain.from_iterable(c.attributes for c in collections)))
 
     return compute_text_reading_evaluation(gt_data, extractions)
 
