@@ -1,8 +1,7 @@
 """ all the tokens from the Waterloo model syntax tree """
 
 """ Waterloo model syntax keywords """
-# commented out words are not used for CAST parsing.
-SYNTAX_KEYWORDS = [
+KEYWORDS = [
     # keywords we currently support
     'arguments',
     'assignment',
@@ -31,6 +30,7 @@ SYNTAX_KEYWORDS = [
     'if',
     'if_statement',
     'matrix',
+    'module'
     'not_operator',
     'number',
     'otherwise',
@@ -38,6 +38,7 @@ SYNTAX_KEYWORDS = [
     'parenthesis',
     'postfix_operator',
     'row',
+    'source_file',
     'spread_operator',
     'string',
     'string_content',
@@ -59,12 +60,6 @@ SYNTAX_KEYWORDS = [
     'range',
     'while',
     'while_statement'
-]
-
-""" Keywords used by CAST but not found in the Waterloo model """
-OTHER_KEYWORDS = [
-    'source_file',
-    'module'
 ]
 
 """ anything not a keyword """
@@ -99,9 +94,6 @@ OTHER_TOKENS = [
     '}',
     '~'
 ]
-
-""" all keywords """
-KEYWORDS = SYNTAX_KEYWORDS + OTHER_KEYWORDS
 
 """ all tokens """
 TOKENS = KEYWORDS + OTHER_TOKENS
