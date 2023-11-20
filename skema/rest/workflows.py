@@ -257,7 +257,7 @@ async def llm_assisted_codebase_to_pn_amr(zip_file: UploadFile = File()):
 
     # The source code is a string, so to slice using the line spans, we must first convert it to a list.
     # Then we can convert it back to a string using .join
-    for i in len(blobs):
+    for i in range(len(blobs)):
         if line_begin[i] == line_end[i]:
             print("failed linespan")
         else:
