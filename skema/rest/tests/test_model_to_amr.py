@@ -42,6 +42,7 @@ def test_any_amr_chime_sir():
             )
         ]
     print(f"SKEMA_RS_ADDESS:\t{SKEMA_RS_ADDESS}")
+
     amr = asyncio.run(
         code_snippets_to_pn_amr(
             System(
@@ -52,3 +53,4 @@ def test_any_amr_chime_sir():
     )
     # For this test, we are just checking that AMR was generated without crashing. We are not checking for accuracy.
     assert "model" in amr, f"'model' should be in AMR response, but got {amr}"
+
