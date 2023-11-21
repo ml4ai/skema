@@ -738,7 +738,26 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                 func_of: None,
             })
         }),
-        //map(gradient, MathExpression::Mo),
+        map(
+            grad_func,
+            |(
+                op,
+                Ci {
+                    r#type,
+                    content,
+                    func_of,
+                },
+            )| {
+                MathExpression::Differential(Differential {
+                    diff: Box::new(MathExpression::Mo(op)),
+                    func: Box::new(MathExpression::Ci(Ci {
+                        r#type,
+                        content,
+                        func_of,
+                    })),
+                })
+            },
+        ),
         absolute,
         map(operator, MathExpression::Mo),
         map(gradient, MathExpression::Mo),

@@ -26,6 +26,7 @@ use crate::FunctionType;
 use crate::{Files, Grounding, ModuleCollection, Provenance, TextExtraction, ValueMeta};
 use crate::{FunctionNet, GrometBox, ValueL};
 use rsmgclient::{ConnectParams, Connection, MgError};
+use crate::config::Config;
 
 #[derive(Debug, Clone)]
 pub struct MetadataNode {
@@ -86,12 +87,9 @@ pub struct ConstructorArgs {
     pub box_counter: usize, // this is the index of the box if called inside another function, 0 if not
 }
 
-pub fn execute_query(query: &str, host: &str) -> Result<(), MgError> {
+pub fn execute_query(query: &str, config: Config) -> Result<(), MgError> {
     // Connect to Memgraph.
-    let connect_params = ConnectParams {
-        host: Some(host.to_string()),
-        ..Default::default()
-    };
+    let connect_params = config.db_connection();
     let mut connection = Connection::connect(&connect_params)?;
 
     // Create simple graph.

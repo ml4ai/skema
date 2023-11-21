@@ -6,9 +6,22 @@ on:
   pull_request:
     branches: [main]
 
+env:
+  # used by both Python and Rust services
+  # to connect to Memgraph.
+  # used by skema-rs services
+  SKEMA_GRAPH_DB_HOST: "127.0.0.1"
+  SKEMA_GRAPH_DB_PORT: "7687"
+  SKEMA_RS_HOST: "127.0.0.1"
+  SKEMA_RS_PORT: "8001"
+  # used by Python services.
+  # unfortunately, there doesn't seem to be a way
+  # to reference SKEMA_RS_PORT in SKEMA_RS_ADDESS ...
+  SKEMA_RS_ADDESS: "http://127.0.0.1:8001"
+
 jobs:
   docs:
-    name: "Run tests and generate project documenation"
+    name: "Run tests and generate project documentation"
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -112,10 +125,21 @@ jobs:
     #     sbt clean coverage test
     #     sbt coverageReport
     #     sbt coverageAggregate
-    # code coverage (Python)
-    - name: "Code coverage reports for Python components"
+    - name: "Launch skema-rs in background for testing"
+      working-directory: ./skema/skema-rs
       run: |
-        pytest
+        echo "skema-rs REST service: $SKEMA_RS_HOST:$SKEMA_RS_PORT"
+        cargo build --release --bin skema_service
+        ./target/release/skema_service &
+        echo "results for ${SKEMA_RS_HOST}:${SKEMA_RS_PORT}/version: `curl -s ${SKEMA_RS_HOST}:${SKEMA_RS_PORT}/version`"
+    # test & code coverage (Python)
+    - name: "Unit tests and code coverage reports for Python components"
+      # env:
+      #   SKEMA_GRAPH_DB_HOST: "bolt://127.0.0.1"
+      run: |
+        echo "SKEMA_RS_ADDESS: $SKEMA_RS_ADDESS"
+        python -c "import requests; print(requests.get('$SKEMA_RS_ADDESS/version').text)"
+        SKEMA_RS_ADDRESS=$SKEMA_RS_ADDESS pytest -vvv
 
     - name: "Code2fn model coverage reports"
       run: python skema/program_analysis/model_coverage_report/model_coverage_report.py $GITHUB_WORKSPACE/docs/coverage/code2fn_coverage/ all
