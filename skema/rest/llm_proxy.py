@@ -66,6 +66,30 @@ async def get_lines_of_model(zip_file: UploadFile = File()) -> List[Dynamics]:
                 files.append(file)
                 blobs.append(zip.open(file).read().decode("utf-8"))
 
+    # this is the formatting instructions
+    response_schemas = [
+        ResponseSchema(name="model_function", description="The name of the function that contains the model dynamics")
+    ]
+
+    # for structured output parsing, converts schema to langhchain object
+    output_parser = StructuredOutputParser.from_response_schemas(response_schemas)
+
+    # for structured output parsing, makes the instructions to be passed as a variable to prompt template
+    format_instructions = output_parser.get_format_instructions()
+
+    # low temp as is not generative
+    temperature = 0.0
+
+    # initialize the models
+    openai = ChatOpenAI(
+        temperature=temperature,
+        model_name='gpt-3.5-turbo',
+        openai_api_key=SKEMA_OPENAI_KEY
+    )
+
+    template="You are a assistant that answers questions about code."
+    system_message_prompt = SystemMessagePromptTemplate.from_template(template)
+
     # iterate through each file 
     for f in range(len(files)):
     # read in the code, for the prompt
@@ -77,30 +101,7 @@ async def get_lines_of_model(zip_file: UploadFile = File()) -> List[Dynamics]:
                 "blobs": [code],
             }
 
-        # this is the formatting instructions
-        response_schemas = [
-            ResponseSchema(name="model_function", description="The name of the function that contains the model dynamics")
-        ]
-
-        # for structured output parsing, converts schema to langhchain object
-        output_parser = StructuredOutputParser.from_response_schemas(response_schemas)
-
-        # for structured output parsing, makes the instructions to be passed as a variable to prompt template
-        format_instructions = output_parser.get_format_instructions()
-
-        # low temp as is not generative
-        temperature = 0.0
-
-        # initialize the models
-        openai = ChatOpenAI(
-            temperature=temperature,
-            model_name='gpt-3.5-turbo',
-            openai_api_key=SKEMA_OPENAI_KEY
-        )
-
         # construct the prompts
-        template="You are a assistant that answers questions about code."
-        system_message_prompt = SystemMessagePromptTemplate.from_template(template)
         human_template="Find the function that contains the model dynamics in {code} \n{format_instructions}"
         human_message_prompt = HumanMessagePromptTemplate.from_template(human_template)
 
