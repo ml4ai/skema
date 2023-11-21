@@ -72,7 +72,7 @@ pub fn module_id2mathml_MET_ast(module_id: i64, host: &str) -> Vec<FirstOrderODE
     let graph = subgraph2petgraph(module_id, host); // makes petgraph of graph
 
     let core_id = find_pn_dynamics(module_id, host); // gives back list of function nodes that might contain the dynamics
-    //let _line_span = get_line_span(core_id[0], graph); // get's the line span of function id
+                                                     //let _line_span = get_line_span(core_id[0], graph); // get's the line span of function id
 
     //println!("\n{:?}", line_span);
     if core_id.len() == 0 {
@@ -93,7 +93,7 @@ pub fn module_id2mathml_MET_ast(module_id: i64, host: &str) -> Vec<FirstOrderODE
         core_dynamics_ast.push(fo_eq);
     } else {
         (core_dynamics_ast, _metadata_map_ast) =
-        subgrapg2_core_dyn_MET_ast(core_id[0], host).unwrap();
+            subgrapg2_core_dyn_MET_ast(core_id[0], host).unwrap();
     }
 
     //println!("function_core_id: {:?}", core_id[0].clone());
@@ -102,7 +102,7 @@ pub fn module_id2mathml_MET_ast(module_id: i64, host: &str) -> Vec<FirstOrderODE
 
     // 5. pass id to subgrapg2_core_dyn to get core dynamics
     //let (core_dynamics_ast, _metadata_map_ast) =
-        //subgrapg2_core_dyn_MET_ast(core_id[0], host).unwrap();
+    //subgrapg2_core_dyn_MET_ast(core_id[0], host).unwrap();
 
     core_dynamics_ast
 }

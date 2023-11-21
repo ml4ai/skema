@@ -797,7 +797,7 @@ fn create_function_net_lib(gromet: &ModuleCollection, mut start: u32) -> Vec<Str
     // also dedup if edge prop is different
     for (i, edge) in edges_clone.iter().enumerate().rev() {
         if i != 0 {
-            if edge.src == edges_clone[i-1].src && edge.tgt == edges_clone[i-1].tgt {
+            if edge.src == edges_clone[i - 1].src && edge.tgt == edges_clone[i - 1].tgt {
                 edges.remove(i);
             }
         }
@@ -1166,7 +1166,14 @@ fn create_function_net(gromet: &ModuleCollection, mut start: u32) -> Vec<String>
                 }
             }
             FunctionType::Imported => {
-                create_import(gromet, &mut nodes, &mut edges, &mut meta_nodes, &mut start, c_args.clone());
+                create_import(
+                    gromet,
+                    &mut nodes,
+                    &mut edges,
+                    &mut meta_nodes,
+                    &mut start,
+                    c_args.clone(),
+                );
                 start += 1;
                 // now to implement wiring
                 import_wiring(
@@ -1179,7 +1186,7 @@ fn create_function_net(gromet: &ModuleCollection, mut start: u32) -> Vec<String>
                 );
             }
             FunctionType::ImportedMethod => {
-                // basically seems like these are just functions to me. 
+                // basically seems like these are just functions to me.
                 c_args.att_idx = boxf.contents.unwrap() as usize;
                 c_args.att_box = gromet.modules[0].attributes[c_args.att_idx - 1].clone();
                 create_function(
@@ -1303,7 +1310,7 @@ fn create_function_net(gromet: &ModuleCollection, mut start: u32) -> Vec<String>
     // also dedup if edge prop is different
     for (i, edge) in edges_clone.iter().enumerate().rev() {
         if i != 0 {
-            if edge.src == edges_clone[i-1].src && edge.tgt == edges_clone[i-1].tgt {
+            if edge.src == edges_clone[i - 1].src && edge.tgt == edges_clone[i - 1].tgt {
                 edges.remove(i);
             }
         }
@@ -1338,7 +1345,7 @@ pub fn create_import(
     c_args: ConstructorArgs,
 ) {
     let eboxf = gromet.modules[0].clone();
-    let mut sboxf = gromet.modules[0].r#fn.clone(); 
+    let mut sboxf = gromet.modules[0].r#fn.clone();
     if c_args.att_idx != 0 {
         sboxf = gromet.modules[0].attributes[c_args.att_idx - 1].clone();
     }

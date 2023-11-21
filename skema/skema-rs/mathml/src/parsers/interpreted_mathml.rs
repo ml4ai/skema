@@ -548,7 +548,7 @@ pub fn grad_func(input: Span) -> IResult<(Operator, Ci)> {
 pub fn absolute_with_msup(input: Span) -> IResult<MathExpression> {
     let (s, sup) = ws(map(
         ws(delimited(
-            ws(tuple((stag!("mo"), tag("|"),etag!("mo")))),
+            ws(tuple((stag!("mo"), tag("|"), etag!("mo")))),
             //ws(tag("<mo>|</mo>")),
             ws(tuple((
                 //math_expression,

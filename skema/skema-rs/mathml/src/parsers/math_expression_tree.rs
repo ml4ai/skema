@@ -7,8 +7,8 @@ use crate::{
         operator::{Derivative, Operator, PartialDerivative},
         Math, MathExpression, Mi, Mrow,
     },
+    parsers::generic_mathml::{IResult, Span},
     parsers::interpreted_mathml::interpreted_math,
-    parsers::generic_mathml::{Span, IResult},
 };
 use derive_new::new;
 use nom::error::Error;
@@ -19,7 +19,6 @@ use std::{fmt, str::FromStr};
 #[cfg(test)]
 use crate::parsers::first_order_ode::{first_order_ode, FirstOrderODE};
 ///New whitespace handler before parsing
-
 
 /// An S-expression like structure to represent mathematical expressions.
 #[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
@@ -388,19 +387,7 @@ impl FromStr for MathExpressionTree {
     type Err = Error<String>;
 
     fn from_str(input: &str) -> Result<Self, Self::Err> {
-        // Remove all newline characters
-        let no_newlines = input.replace('\n', "");
-        // Remove spaces between MathML elements
-        let no_spaces = //Regex::new(r#">\s*<"#)
-        Regex::new(r"\s+")
-            .unwrap()
-            .replace_all(&no_newlines, "")
-            .to_string();
-        let removed_newlines: &str = &no_spaces;
-        println!("{:?}", removed_newlines);
-
-        let (_, math) = interpreted_math(removed_newlines.into()).unwrap();
-        //let (_, math) = interpreted_math(input.into()).unwrap();
+        let (_, math) = interpreted_math(input.into()).unwrap();
         Ok(MathExpressionTree::from(math))
     }
 }
@@ -502,9 +489,11 @@ fn postfix_binding_power(op: &Operator) -> Option<(u8, ())> {
 /// Table of binding powers for infix operators.
 fn infix_binding_power(op: &Operator) -> Option<(u8, u8)> {
     let res = match op {
-        Operator::Equals => (2, 1),
-        Operator::Add | Operator::Subtract => (5, 6),
-        Operator::Multiply | Operator::Divide => (8, 7),
+        Operator::Equals => (1, 2),
+        Operator::Add => (3, 4),
+        Operator::Subtract => (5, 6),
+        Operator::Multiply => (7, 8),
+        Operator::Divide => (9, 10),
         Operator::Compose => (14, 13),
         Operator::Power => (16, 15),
         Operator::Other(op) => panic!("Unhandled operator: {}!", op),
@@ -622,7 +611,7 @@ fn test_content_hackathon2_scenario1_eq1() {
         with_respect_to: _,
         rhs,
     } = first_order_ode(input.into()).unwrap().1;
-    assert_eq!(cmml, "<apply><eq/><apply><diff/><bvar>t</bar><ci>S</ci></apply><apply><divide/><apply><times/><apply><times/><apply><minus/><ci>β</ci></apply><ci>I</ci></apply><ci>S</ci></apply><ci>N</ci></apply></apply>");
+    assert_eq!(cmml, "<apply><eq/><apply><diff/><bvar>t</bar><ci>S</ci></apply><apply><times/><apply><times/><apply><minus/><ci>β</ci></apply><ci>I</ci></apply><apply><divide/><ci>S</ci><ci>N</ci></apply></apply></apply>");
 }
 
 #[test]
@@ -642,8 +631,11 @@ fn test_content_hackathon2_scenario1_eq2() {
     </math>
     ";
     let ode = input.parse::<FirstOrderODE>().unwrap();
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    let s_exp = exp.to_string();
+    assert_eq!(s_exp, "(= (D(1, t) E) (- (* (* β I) (/ S N)) (* δ E)))");
     let cmml = ode.to_cmml();
-    assert_eq!(cmml, "<apply><eq/><apply><diff/><bvar>t</bar><ci>E</ci></apply><apply><minus/><apply><divide/><apply><times/><apply><times/><ci>β</ci><ci>I</ci></apply><ci>S</ci></apply><ci>N</ci></apply><apply><times/><ci>δ</ci><ci>E</ci></apply></apply></apply>");
+    assert_eq!(cmml, "<apply><eq/><apply><diff/><bvar>t</bar><ci>E</ci></apply><apply><minus/><apply><times/><apply><times/><ci>β</ci><ci>I</ci></apply><apply><divide/><ci>S</ci><ci>N</ci></apply></apply><apply><times/><ci>δ</ci><ci>E</ci></apply></apply></apply>");
 }
 
 #[test]
@@ -664,7 +656,6 @@ fn test_content_hackathon2_scenario1_eq3() {
     ";
     let ode = input.parse::<FirstOrderODE>().unwrap();
     let cmml = ode.to_cmml();
-    println!("cmml={:?}", cmml);
     assert_eq!(cmml, "<apply><eq/><apply><diff/><bvar>t</bar><ci>I</ci></apply><apply><minus/><apply><minus/><apply><times/><ci>δ</ci><ci>E</ci></apply><apply><times/><apply><times/><apply><minus/><cn>1</cn><ci>α</ci></apply><ci>γ</ci></apply><ci>I</ci></apply></apply><apply><times/><apply><times/><ci>α</ci><ci>ρ</ci></apply><ci>I</ci></apply></apply></apply>");
 }
 
@@ -724,7 +715,7 @@ fn test_content_hackathon2_scenario1_eq6() {
     ";
     let ode = input.parse::<FirstOrderODE>().unwrap();
     let cmml = ode.to_cmml();
-    assert_eq!(cmml, "<apply><eq/><apply><diff/><bvar>t</bar><ci>S</ci></apply><apply><plus/><apply><divide/><apply><times/><apply><times/><apply><minus/><ci>β</ci></apply><ci>I</ci></apply><ci>S</ci></apply><ci>N</ci></apply><apply><times/><ci>ϵ</ci><ci>R</ci></apply></apply></apply>");
+    assert_eq!(cmml,"<apply><eq/><apply><diff/><bvar>t</bar><ci>S</ci></apply><apply><plus/><apply><times/><apply><times/><apply><minus/><ci>β</ci></apply><ci>I</ci></apply><apply><divide/><ci>S</ci><ci>N</ci></apply></apply><apply><times/><ci>ϵ</ci><ci>R</ci></apply></apply></apply>");
 }
 
 #[test]
@@ -803,8 +794,10 @@ fn test_expression3() {
     ";
     let exp = input.parse::<MathExpressionTree>().unwrap();
     println!("exp={:?}", exp);
+    let s_exp = exp.to_string();
+    assert_eq!(s_exp, "(- (* (* β I) (/ S N)) (* δ E))");
     let math = exp.to_infix_expression();
-    assert_eq!(math, "((((β*I)*S)/N)-(δ*E))")
+    assert_eq!(math, "(((β*I)*(S/N))-(δ*E))")
 }
 
 #[test]
@@ -1223,34 +1216,7 @@ fn test_mfrac_msubsup() {
     </math>
     ";
     let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", exp);
     let s_exp = exp.to_string();
     println!("s_exp={:?}", s_exp);
-}
-
-#[test]
-fn new_test_halfar_whitespace() {
-    let input = "
-    <math>
-  <mo>|</mo>
-  <mi>∇</mi>
-  <mi>H</mi>
-  <msup>
-    <mo>|</mo>
-    <mrow>
-      <mi>n</mi>
-      <mo>−</mo>
-      <mn>1</mn>
-    </mrow>
-  </msup>
-  <mi>∇</mi>
-  <mi>H</mi>
-  <mo>)</mo>
-</math>
-    ";
-    let exp = input.parse::<MathExpressionTree>().unwrap();
-    let s_exp = exp.to_string();
-    assert_eq!(
-        s_exp,
-        "(Div (* (* (* Γ (^ H (+ n 2))) (^ (Abs (Grad H)) (- n 1))) (Grad H)))"
-    );
 }
