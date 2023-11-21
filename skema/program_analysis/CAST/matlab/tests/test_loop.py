@@ -1,6 +1,7 @@
 from skema.program_analysis.CAST.matlab.tests.utils import (check, cast)
 from skema.program_analysis.CAST2FN.model.cast import (
     Assignment,
+    Call,
     Loop,
     Operator
 )
@@ -34,6 +35,10 @@ def test_while():
                 Assignment(
                     left = "k",
                     right = Operator(op = "+", operands = ["k",2])
+                ),
+                Call(
+                    func = "disp",
+                    arguments = ["k"]
                 )
             ],
             post = []

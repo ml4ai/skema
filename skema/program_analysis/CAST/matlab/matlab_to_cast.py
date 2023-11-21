@@ -271,7 +271,7 @@ class MatlabToCast(object):
         """ Translate Tree-sitter while loop node into CAST Loop node """
         return Loop (
             pre = [],
-            expr = None,
+            expr = self.visit(get_keyword_children(node)[1]),
             body = self.get_block(node),
             post = [],
             source_refs = [self.node_helper.get_source_ref(node)]
