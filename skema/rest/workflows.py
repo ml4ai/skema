@@ -264,8 +264,8 @@ async def llm_assisted_codebase_to_pn_amr(zip_file: UploadFile = File()):
             amrs.append(
                 await code_snippets_to_pn_amr(
                     code2fn.System(
-                        files=files[i],
-                        blobs=blobs[i],
+                        files=[files[i]],
+                        blobs=[blobs[i]],
                     )
                 )
             )
