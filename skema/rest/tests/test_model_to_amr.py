@@ -65,8 +65,8 @@ def test_any_amr_chime_sir():
                 asyncio.run(
                     code_snippets_to_pn_amr(
                         System(
-                            files=files,
-                            blobs=blobs,
+                            files=files[i],
+                            blobs=blobs[i],
                         )
                     )
                 )
