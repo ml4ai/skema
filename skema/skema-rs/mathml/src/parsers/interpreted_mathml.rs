@@ -761,9 +761,7 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
         absolute,
         map(operator, MathExpression::Mo),
         map(gradient, MathExpression::Mo),
-        superscript,
-        over_term,
-        alt((mn, msub, msqrt, mfrac)),
+        alt((mn, msub, superscript, msqrt, mfrac, over_term)),
         map(mrow, MathExpression::Mrow),
         msubsup,
     )))(input)

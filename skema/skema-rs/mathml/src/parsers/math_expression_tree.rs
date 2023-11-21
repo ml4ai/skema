@@ -912,8 +912,8 @@ impl FromStr for MathExpressionTree {
     fn from_str(input: &str) -> Result<Self, Self::Err> {
         let modified_input1 = replace_unicode_with_symbols(input);
         let modified_input2 = preprocess_mathml_for_to_latex(&modified_input1).to_string();
-        let modified_input3:&str = &modified_input2;
-        let (_, math) = interpreted_math( modified_input3.into()).unwrap();
+        let modified_input3: &str = &modified_input2;
+        let (_, math) = interpreted_math(modified_input3.into()).unwrap();
         Ok(MathExpressionTree::from(math))
     }
 }
@@ -1068,7 +1068,9 @@ pub fn preprocess_mathml_for_to_latex(input: &str) -> String {
     let new_no_spaces = no_spaces.replace(" ", "");
 
     // Replace <mi>∇</mi> with <mo>∇</mo>
-    let replaced_str = new_no_spaces.replace(r#"<mi>∇</mi>"#, "<mo>∇</mo>").to_string();
+    let replaced_str = new_no_spaces
+        .replace(r#"<mi>∇</mi>"#, "<mo>∇</mo>")
+        .to_string();
 
     replaced_str
 }
