@@ -913,7 +913,6 @@ impl FromStr for MathExpressionTree {
         let modified_input1 = replace_unicode_with_symbols(input);
         let modified_input2 = preprocess_mathml_for_to_latex(&modified_input1).to_string();
         let modified_input3:&str = &modified_input2;
-        //let exp = modified_input2.parse::<MathExpressionTree>().unwrap();
         let (_, math) = interpreted_math( modified_input3.into()).unwrap();
         Ok(MathExpressionTree::from(math))
     }
@@ -2066,27 +2065,48 @@ fn test_equation_halfar_dome_8_4_to_latex() {
 fn new_test_halfar_whitespace() {
     let input = "
     <math>
-  <mo>|</mo>
-  <mi>∇</mi>
-  <mi>H</mi>
-  <msup>
-    <mo>|</mo>
-    <mrow>
-      <mi>n</mi>
-      <mo>−</mo>
-      <mn>1</mn>
-    </mrow>
-  </msup>
-  <mi>∇</mi>
-  <mi>H</mi>
-  <mo>)</mo>
-</math>
+      <msub>
+        <mi>t</mi>
+        <mn>0</mn>
+      </msub>
+      <mo>=</mo>
+      <mfrac>
+        <mn>1</mn>
+        <mrow>
+          <mn>18</mn>
+          <mi>&#x0393;</mi>
+        </mrow>
+      </mfrac>
+      <msup>
+        <mrow>
+          <mo>(</mo>
+          <mfrac>
+            <mn>7</mn>
+            <mn>4</mn>
+          </mfrac>
+          <mo>)</mo>
+        </mrow>
+        <mn>3</mn>
+      </msup>
+      <mfrac>
+        <msubsup>
+          <mi>R</mi>
+          <mn>0</mn>
+          <mn>4</mn>
+        </msubsup>
+        <msubsup>
+          <mi>H</mi>
+          <mn>0</mn>
+          <mn>7</mn>
+        </msubsup>
+      </mfrac>
+    </math>
     ";
     let exp = input.parse::<MathExpressionTree>().unwrap();
     let s_exp = exp.to_string();
     println!("s_exp={:?}", s_exp);
     assert_eq!(
         s_exp,
-        "(Div (* (* (* Γ (^ H (+ n 2))) (^ (Abs (Grad H)) (- n 1))) (Grad H)))"
+        "(= t_{0} (* (* (/ 1 (* 18 Γ)) (^ (/ 7 4) 3)) (/ R_{0}^{4} H_{0}^{7})))"
     );
 }
