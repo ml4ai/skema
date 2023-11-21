@@ -110,11 +110,12 @@ class MatlabToCast(object):
         ]:return self.visit_identifier(node)
         elif node.type == "if_statement":
             return self.visit_if_statement(node)
-#        elif node.type in [
-#            "for_statement",
-#            "iterator",
-#            "while_statement"
-#        ]: return self.visit_loop(node)
+        elif node.type == "iterator":
+            return self.visit_iterator(node)
+        elif node.type == "for_statement":
+            return self.visit_loop_for(node)
+        elif node.type == "while_statement":
+            return self.visit_loop_while(node)
         elif node.type in [
             "cell",
             "matrix"
@@ -139,6 +140,8 @@ class MatlabToCast(object):
         ]: return self.visit_operator(node)
         elif node.type == "string":
            return self.visit_string(node)
+        elif node.type == "range":
+           return self.visit_range(node)
         elif node.type == "switch_statement":
             return self.visit_switch_statement(node)
         else:
@@ -248,12 +251,31 @@ class MatlabToCast(object):
 
         return first
 
-    # General loop translator for all MATLAB loop types
-    # def visit_loop(self, node) -> Loop:
-    #     """ Translate Tree-sitter for_loop node into CAST Loop node """
-    #     return Loop (
-    #         source_refs = [self.node_helper.get_source_ref(node)]
-    #     )
+    def visit_iterator(self, node):
+        return None
+
+    def visit_range(self, node):
+        return None
+
+    def visit_loop_for(self, node) -> Loop:
+        """ Translate Tree-sitter for loop node into CAST Loop node """
+        return Loop (
+            pre = [],
+            expr = None,
+            body = self.get_block(node),
+            post = [],
+            source_refs = [self.node_helper.get_source_ref(node)]
+        )
+
+    def visit_loop_while(self, node) -> Loop:
+        """ Translate Tree-sitter while loop node into CAST Loop node """
+        return Loop (
+            pre = [],
+            expr = None,
+            body = self.get_block(node),
+            post = [],
+            source_refs = [self.node_helper.get_source_ref(node)]
+        )
 
     def visit_matrix(self, node):
         """ Translate the Tree-sitter cell node into a List """
