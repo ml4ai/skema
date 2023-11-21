@@ -17,7 +17,8 @@ RUN apt-get update &&\
         python3-venv \
         gnupg \
         ca-certificates \
-        curl
+        curl \
+        cmake
 
 # Node needed for img2mml
 RUN mkdir -p /etc/apt/keyrings
