@@ -104,6 +104,7 @@
 <a href="#104" id="104">104</a>
 <a href="#105" id="105">105</a>
 <a href="#106" id="106">106</a>
+<a href="#107" id="107">107</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>clap::Parser;
 
 <span class="kw">use </span>mathml::mml2pn::get_mathml_asts_from_file;
@@ -113,13 +114,14 @@
 </span><span class="kw">use </span>std::env;
 <span class="kw">use </span>skema::config::Config;
 <span class="kw">use </span>mathml::acset::{PetriNet, RegNet};
+<span class="kw">use </span>mathml::parsers::decapodes_serialization::{
+    to_wiring_diagram, DecapodesCollection, WiringDiagram,
+};
 <span class="kw">use </span>mathml::parsers::first_order_ode::get_FirstOrderODE_vec_from_file;
 <span class="kw">use </span>mathml::parsers::math_expression_tree::MathExpressionTree;
-<span class="kw">use </span>mathml::parsers::decapodes_serialization::{to_wiring_diagram, WiringDiagram, DecapodesCollection};
 <span class="kw">use </span>skema::model_extraction::{module_id2mathml_MET_ast, subgraph2_core_dyn_ast};
-<span class="kw">use </span>std::io::{BufRead, BufReader};
 <span class="kw">use </span>std::fs::File;
-
+<span class="kw">use </span>std::io::{BufRead, BufReader};
 
 <span class="attr">#[derive(Parser, Debug)]
 </span><span class="kw">struct </span>Cli {

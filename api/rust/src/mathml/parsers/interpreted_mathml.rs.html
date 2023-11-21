@@ -769,6 +769,25 @@
 <a href="#769" id="769">769</a>
 <a href="#770" id="770">770</a>
 <a href="#771" id="771">771</a>
+<a href="#772" id="772">772</a>
+<a href="#773" id="773">773</a>
+<a href="#774" id="774">774</a>
+<a href="#775" id="775">775</a>
+<a href="#776" id="776">776</a>
+<a href="#777" id="777">777</a>
+<a href="#778" id="778">778</a>
+<a href="#779" id="779">779</a>
+<a href="#780" id="780">780</a>
+<a href="#781" id="781">781</a>
+<a href="#782" id="782">782</a>
+<a href="#783" id="783">783</a>
+<a href="#784" id="784">784</a>
+<a href="#785" id="785">785</a>
+<a href="#786" id="786">786</a>
+<a href="#787" id="787">787</a>
+<a href="#788" id="788">788</a>
+<a href="#789" id="789">789</a>
+<a href="#790" id="790">790</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! This module contains parsers that perform some amount of preliminary domain-specific
 //! interpretation of presentation MathML (e.g., globbing S(t) to an identifier S of type
 //! &#39;function&#39;). This is in contrast to the `generic_mathml.rs` module that contains parsers that
@@ -800,9 +819,7 @@
 </span><span class="kw">pub fn </span>operator(input: Span) -&gt; IResult&lt;Operator&gt; {
     <span class="kw">let </span>(s, op) = ws(delimited(
         <span class="macro">stag!</span>(<span class="string">&quot;mo&quot;</span>),
-        alt((
-            add, subtract, multiply, equals, lparen, rparen, mean, grad, dot,
-        )),
+        alt((add, subtract, multiply, equals, lparen, rparen, mean, dot)),
         <span class="macro">etag!</span>(<span class="string">&quot;mo&quot;</span>),
     ))(input)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((s, op))
@@ -938,7 +955,7 @@
         <span class="prelude-val">Ok</span>((s, ()))
     } <span class="kw">else if let </span><span class="string">&quot;&amp;#x2202;&quot; </span>= x.as_ref() {
         <span class="prelude-val">Ok</span>((s, ()))
-    }<span class="kw">else </span>{
+    } <span class="kw">else </span>{
         <span class="prelude-val">Err</span>(nom::Err::Error(ParseError::new(
             <span class="string">&quot;Unable to identify Mi(&#39;∂&#39;)&quot;</span>.to_string(),
             input,
@@ -1304,7 +1321,10 @@
 }
 
 <span class="kw">pub fn </span>gradient(input: Span) -&gt; IResult&lt;Operator&gt; {
-    <span class="kw">let </span>(s, op) = ws(delimited(<span class="macro">stag!</span>(<span class="string">&quot;mo&quot;</span>), grad, <span class="macro">etag!</span>(<span class="string">&quot;mo&quot;</span>)))(input)<span class="question-mark">?</span>;
+    <span class="kw">let </span>(s, op) = ws(alt((
+        delimited(<span class="macro">stag!</span>(<span class="string">&quot;mo&quot;</span>), grad, <span class="macro">etag!</span>(<span class="string">&quot;mo&quot;</span>)),
+        delimited(<span class="macro">stag!</span>(<span class="string">&quot;mi&quot;</span>), grad, <span class="macro">etag!</span>(<span class="string">&quot;mi&quot;</span>)),
+    )))(input)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((s, op))
 }
 
@@ -1318,13 +1338,14 @@
 </span><span class="kw">pub fn </span>absolute_with_msup(input: Span) -&gt; IResult&lt;MathExpression&gt; {
     <span class="kw">let </span>(s, sup) = ws(map(
         ws(delimited(
-            tag(<span class="string">&quot;&lt;mo&gt;|&lt;/mo&gt;&quot;</span>),
-            tuple((
+            ws(tuple((<span class="macro">stag!</span>(<span class="string">&quot;mo&quot;</span>), tag(<span class="string">&quot;|&quot;</span>), <span class="macro">etag!</span>(<span class="string">&quot;mo&quot;</span>)))),
+            <span class="comment">//ws(tag(&quot;&lt;mo&gt;|&lt;/mo&gt;&quot;)),
+            </span>ws(tuple((
                 <span class="comment">//math_expression,
-                </span>map(many0(math_expression), |z| Mrow(z)),
-                preceded(tag(<span class="string">&quot;&lt;msup&gt;&lt;mo&gt;|&lt;/mo&gt;&quot;</span>), math_expression),
-            )),
-            tag(<span class="string">&quot;&lt;/msup&gt;&quot;</span>),
+                </span>map(ws(many0(math_expression)), |z| Mrow(z)),
+                preceded(ws(tag(<span class="string">&quot;&lt;msup&gt;&lt;mo&gt;|&lt;/mo&gt;&quot;</span>)), ws(math_expression)),
+            ))),
+            ws(tag(<span class="string">&quot;&lt;/msup&gt;&quot;</span>)),
         )),
         |(x, y)| MathExpression::AbsoluteSup(Box::new(MathExpression::Mrow(x)), Box::new(y)),
     ))(input)<span class="question-mark">?</span>;
@@ -1352,8 +1373,28 @@
 </span><span class="kw">pub fn </span>math_expression(input: Span) -&gt; IResult&lt;MathExpression&gt; {
     ws(alt((
         map(div, MathExpression::Mo),
-        absolute_with_msup,
-        paren_as_msup,
+        ws(absolute_with_msup),
+        ws(paren_as_msup),
+        map(
+            grad_func,
+            |(
+                op,
+                Ci {
+                    r#type,
+                    content,
+                    func_of,
+                },
+            )| {
+                MathExpression::Differential(Differential {
+                    diff: Box::new(MathExpression::Mo(op)),
+                    func: Box::new(MathExpression::Ci(Ci {
+                        r#type,
+                        content,
+                        func_of,
+                    })),
+                })
+            },
+        ),
         map(
             first_order_derivative_leibniz_notation,
             |(
@@ -1507,13 +1548,10 @@
                 })
             },
         ),
-        <span class="comment">//map(gradient, MathExpression::Mo),
-        </span>absolute,
+        absolute,
         map(operator, MathExpression::Mo),
-        mn,
-        superscript,
-        over_term,
-        alt((msub, msqrt, mfrac)),
+        map(gradient, MathExpression::Mo),
+        alt((mn, msub, superscript, msqrt, mfrac, over_term)),
         map(mrow, MathExpression::Mrow),
         msubsup,
     )))(input)
@@ -1526,13 +1564,13 @@
         opt(xml_declaration),
         alt((
             ws(delimited(
-                tag(<span class="string">&quot;&lt;math&gt;&quot;</span>),
-                many0(math_expression),
+                ws(tag(<span class="string">&quot;&lt;math&gt;&quot;</span>)),
+                ws(many0(math_expression)),
                 ws(tag(<span class="string">&quot;&lt;mo&gt;,&lt;/mo&gt;&lt;/math&gt;&quot;</span>)),
             )),
             ws(delimited(
-                tag(<span class="string">&quot;&lt;math&gt;&quot;</span>),
-                many0(math_expression),
+                ws(tag(<span class="string">&quot;&lt;math&gt;&quot;</span>)),
+                ws(many0(math_expression)),
                 ws(tag(<span class="string">&quot;&lt;mo&gt;.&lt;/mo&gt;&lt;/math&gt;&quot;</span>)),
             )),
             <span class="macro">elem_many0!</span>(<span class="string">&quot;math&quot;</span>),

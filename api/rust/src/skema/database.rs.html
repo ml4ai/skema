@@ -5450,6 +5450,13 @@
 <a href="#5450" id="5450">5450</a>
 <a href="#5451" id="5451">5451</a>
 <a href="#5452" id="5452">5452</a>
+<a href="#5453" id="5453">5453</a>
+<a href="#5454" id="5454">5454</a>
+<a href="#5455" id="5455">5455</a>
+<a href="#5456" id="5456">5456</a>
+<a href="#5457" id="5457">5457</a>
+<a href="#5458" id="5458">5458</a>
+<a href="#5459" id="5459">5459</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Interface to the graph database we are using for persisting GroMEt objects and performing
 //! queries on them. We currently use MemgraphDB, an in-memory graph database.
 
@@ -6247,7 +6254,7 @@ There being a second function call of the same function which contains an expres
     <span class="comment">// also dedup if edge prop is different
     </span><span class="kw">for </span>(i, edge) <span class="kw">in </span>edges_clone.iter().enumerate().rev() {
         <span class="kw">if </span>i != <span class="number">0 </span>{
-            <span class="kw">if </span>edge.src == edges_clone[i-<span class="number">1</span>].src &amp;&amp; edge.tgt == edges_clone[i-<span class="number">1</span>].tgt {
+            <span class="kw">if </span>edge.src == edges_clone[i - <span class="number">1</span>].src &amp;&amp; edge.tgt == edges_clone[i - <span class="number">1</span>].tgt {
                 edges.remove(i);
             }
         }
@@ -6616,7 +6623,14 @@ There being a second function call of the same function which contains an expres
                 }
             }
             FunctionType::Imported =&gt; {
-                create_import(gromet, <span class="kw-2">&amp;mut </span>nodes, <span class="kw-2">&amp;mut </span>edges, <span class="kw-2">&amp;mut </span>meta_nodes, <span class="kw-2">&amp;mut </span>start, c_args.clone());
+                create_import(
+                    gromet,
+                    <span class="kw-2">&amp;mut </span>nodes,
+                    <span class="kw-2">&amp;mut </span>edges,
+                    <span class="kw-2">&amp;mut </span>meta_nodes,
+                    <span class="kw-2">&amp;mut </span>start,
+                    c_args.clone(),
+                );
                 start += <span class="number">1</span>;
                 <span class="comment">// now to implement wiring
                 </span>import_wiring(
@@ -6629,7 +6643,7 @@ There being a second function call of the same function which contains an expres
                 );
             }
             FunctionType::ImportedMethod =&gt; {
-                <span class="comment">// basically seems like these are just functions to me. 
+                <span class="comment">// basically seems like these are just functions to me.
                 </span>c_args.att_idx = boxf.contents.unwrap() <span class="kw">as </span>usize;
                 c_args.att_box = gromet.modules[<span class="number">0</span>].attributes[c_args.att_idx - <span class="number">1</span>].clone();
                 create_function(
@@ -6753,7 +6767,7 @@ There being a second function call of the same function which contains an expres
     <span class="comment">// also dedup if edge prop is different
     </span><span class="kw">for </span>(i, edge) <span class="kw">in </span>edges_clone.iter().enumerate().rev() {
         <span class="kw">if </span>i != <span class="number">0 </span>{
-            <span class="kw">if </span>edge.src == edges_clone[i-<span class="number">1</span>].src &amp;&amp; edge.tgt == edges_clone[i-<span class="number">1</span>].tgt {
+            <span class="kw">if </span>edge.src == edges_clone[i - <span class="number">1</span>].src &amp;&amp; edge.tgt == edges_clone[i - <span class="number">1</span>].tgt {
                 edges.remove(i);
             }
         }
@@ -6788,7 +6802,7 @@ There being a second function call of the same function which contains an expres
     </span>c_args: ConstructorArgs,
 ) {
     <span class="kw">let </span>eboxf = gromet.modules[<span class="number">0</span>].clone();
-    <span class="kw">let </span><span class="kw-2">mut </span>sboxf = gromet.modules[<span class="number">0</span>].r#fn.clone(); 
+    <span class="kw">let </span><span class="kw-2">mut </span>sboxf = gromet.modules[<span class="number">0</span>].r#fn.clone();
     <span class="kw">if </span>c_args.att_idx != <span class="number">0 </span>{
         sboxf = gromet.modules[<span class="number">0</span>].attributes[c_args.att_idx - <span class="number">1</span>].clone();
     }
