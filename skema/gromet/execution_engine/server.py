@@ -10,6 +10,10 @@ from skema.gromet.execution_engine.execution_engine import ExecutionEngine
 HOST = SKEMA_GRAPH_DB_HOST
 PORT = int(SKEMA_GRAPH_DB_PORT)
 PROTOCOL = SKEMA_GRAPH_DB_PROTO
+print("LOGGING: Lanuching execution engine REST service")
+print(f"LOGGING: SKEMA_GRAPH_DB_PROTOCOL {PROTOCOL}")
+print(f"LOGGING: SKEMA_GRAPH_DB_HOST {HOST}")
+print(f"LOGGING: SKEMA_GRAPH_DB_PORT {PORT}")
 
 router = APIRouter()
 
