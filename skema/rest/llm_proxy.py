@@ -146,6 +146,7 @@ async def get_lines_of_model(zip_file: UploadFile = File()) -> List[Dynamics]:
 
         output = Dynamics(name=file, description=description, block=block)
         outputs.append(output)
+        block = []
 
     return outputs
 
