@@ -2093,25 +2093,6 @@
 <a href="#2093" id="2093">2093</a>
 <a href="#2094" id="2094">2094</a>
 <a href="#2095" id="2095">2095</a>
-<a href="#2096" id="2096">2096</a>
-<a href="#2097" id="2097">2097</a>
-<a href="#2098" id="2098">2098</a>
-<a href="#2099" id="2099">2099</a>
-<a href="#2100" id="2100">2100</a>
-<a href="#2101" id="2101">2101</a>
-<a href="#2102" id="2102">2102</a>
-<a href="#2103" id="2103">2103</a>
-<a href="#2104" id="2104">2104</a>
-<a href="#2105" id="2105">2105</a>
-<a href="#2106" id="2106">2106</a>
-<a href="#2107" id="2107">2107</a>
-<a href="#2108" id="2108">2108</a>
-<a href="#2109" id="2109">2109</a>
-<a href="#2110" id="2110">2110</a>
-<a href="#2111" id="2111">2111</a>
-<a href="#2112" id="2112">2112</a>
-<a href="#2113" id="2113">2113</a>
-<a href="#2114" id="2114">2114</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Pratt parsing module to construct S-expressions from presentation MathML.
 //! This is based on the nice tutorial at https://matklad.github.io/2020/04/13/simple-but-powerful-pratt-parsing.html
 
@@ -2661,23 +2642,8 @@
                         expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, rest[<span class="number">1</span>].to_latex()));
                     }
                     Operator::Divide =&gt; {
-                        <span class="kw">if let </span>MathExpressionTree::Cons(op, <span class="kw">_</span>) = <span class="kw-2">&amp;</span>rest[<span class="number">0</span>] {
-                            <span class="kw">if </span>is_unary_operator(op) {
-                                expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="kw-2">&amp;</span>rest[<span class="number">0</span>].to_latex()));
-                            } <span class="kw">else if let </span>Operator::Multiply = op {
-                                expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="kw-2">&amp;</span>rest[<span class="number">0</span>].to_latex()));
-                            } <span class="kw">else if let </span>Operator::Divide = op {
-                                expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="kw-2">&amp;</span>rest[<span class="number">0</span>].to_latex()));
-                            } <span class="kw">else if let </span>Operator::Dot = op {
-                                expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="kw-2">&amp;</span>rest[<span class="number">0</span>].to_latex()));
-                            } <span class="kw">else </span>{
-                                expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;({})&quot;</span>, <span class="kw-2">&amp;</span>rest[<span class="number">0</span>].to_latex()));
-                            }
-                        } <span class="kw">else </span>{
-                            expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="kw-2">&amp;</span>rest[<span class="number">0</span>].to_latex()));
-                        }
-                        expression.push_str(<span class="string">&quot;/&quot;</span>);
-                        process_expression_parentheses(<span class="kw-2">&amp;mut </span>expression, <span class="kw-2">&amp;</span>rest[<span class="number">1</span>]);
+                        expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;\\frac{{{}}}&quot;</span>, <span class="kw-2">&amp;</span>rest[<span class="number">0</span>].to_latex()));
+                        expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{{{}}}&quot;</span>, <span class="kw-2">&amp;</span>rest[<span class="number">1</span>].to_latex()));
                     }
                     Operator::Exp =&gt; {
                         expression.push_str(<span class="string">&quot;\\mathrm{exp}&quot;</span>);
@@ -4019,7 +3985,7 @@
     <span class="kw">let </span>modified_input2 = <span class="kw-2">&amp;</span>preprocess_mathml_for_to_latex(modified_input1).to_string();
     <span class="kw">let </span>exp = modified_input2.parse::&lt;MathExpressionTree&gt;().unwrap();
     <span class="kw">let </span>latex_exp = exp.to_latex();
-    <span class="macro">assert_eq!</span>(latex_exp, <span class="string">&quot;\\Gamma=2/(n+2)*A*(\\rho*g)^{n}&quot;</span>);
+    <span class="macro">assert_eq!</span>(latex_exp, <span class="string">&quot;\\Gamma=\\frac{2}{n+2}*A*(\\rho*g)^{n}&quot;</span>);
 }
 
 <span class="attr">#[test]
@@ -4118,7 +4084,7 @@
     <span class="kw">let </span>latex_exp = exp.to_latex();
     <span class="macro">assert_eq!</span>(
         latex_exp,
-        <span class="string">&quot;H(t,r)=H_{0}*(t_{0}/t)^{1/9}*(1-((t_{0}/t)^{1/18}*r/R_{0})^{4/3})^{3/7}&quot;
+        <span class="string">&quot;H(t,r)=H_{0}*(\\frac{t_{0}}{t})^{\\frac{1}{9}}*(1-((\\frac{t_{0}}{t})^{\\frac{1}{18}}*\\frac{r}{R_{0}})^{\\frac{4}{3}})^{\\frac{3}{7}}&quot;
     </span>);
 }
 
@@ -4163,17 +4129,13 @@
       &lt;/mfrac&gt;
     &lt;/math&gt;
     &quot;</span>;
-    <span class="kw">let </span>exp = input.parse::&lt;MathExpressionTree&gt;().unwrap();
-    <span class="macro">println!</span>(<span class="string">&quot;exp={:?}&quot;</span>, exp);
-    <span class="kw">let </span>s_exp = exp.to_string();
-    <span class="macro">println!</span>(<span class="string">&quot;s_exp={:?}&quot;</span>, s_exp);
     <span class="kw">let </span>modified_input1 = <span class="kw-2">&amp;</span>replace_unicode_with_symbols(input).to_string();
     <span class="kw">let </span>modified_input2 = <span class="kw-2">&amp;</span>preprocess_mathml_for_to_latex(modified_input1).to_string();
     <span class="kw">let </span>exp = modified_input2.parse::&lt;MathExpressionTree&gt;().unwrap();
     <span class="kw">let </span>latex_exp = exp.to_latex();
     <span class="macro">assert_eq!</span>(
         latex_exp,
-        <span class="string">&quot;t_{0}=1/(18*\\Gamma)*(7/4)^{3}*R_{0}^{4}/H_{0}^{7}&quot;
+        <span class="string">&quot;t_{0}=\\frac{1}{18*\\Gamma}*(\\frac{7}{4})^{3}*\\frac{R_{0}^{4}}{H_{0}^{7}}&quot;
     </span>);
 }
 
