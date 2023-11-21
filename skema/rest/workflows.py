@@ -256,30 +256,37 @@ async def llm_assisted_codebase_to_pn_amr(zip_file: UploadFile = File()):
 
     # The source code is a string, so to slice using the line spans, we must first convert it to a list.
     # Then we can convert it back to a string using .join
+    logging = []
     for i in range(len(blobs)):
         if line_begin[i] == line_end[i]:
             print("failed linespan")
         else:
             blobs[i] = "".join(blobs[i].splitlines(keepends=True)[line_begin[i]:line_end[i]])
-            amrs.append(
-                await code_snippets_to_pn_amr(
-                    code2fn.System(
-                        files=[files[i]],
-                        blobs=[blobs[i]],
+            try:
+                amrs.append(
+                    await code_snippets_to_pn_amr(
+                        code2fn.System(
+                            files=[files[i]],
+                            blobs=[blobs[i]],
+                        )
                     )
                 )
-            )
+            except:
+                logging.append(f"{files[i]} failed to parse an AMR from the dynamics")
     # we will return the amr with most states, in assumption it is the most "correct"
     # by default it returns the first entry
-    amr = amrs[0]
-    for temp_amr in amrs:
-        try:
-            temp_len = len(temp_amr["model"]["states"])
-            amr_len = len(amr["model"]["states"])
-            if temp_len > amr_len:
-                amr = temp_amr
-        except:
-            continue
+    try:
+        amr = amrs[0]
+        for temp_amr in amrs:
+            try:
+                temp_len = len(temp_amr["model"]["states"])
+                amr_len = len(amr["model"]["states"])
+                if temp_len > amr_len:
+                    amr = temp_amr
+            except:
+                continue
+    except:
+        amr = logging
 
     return amr
 

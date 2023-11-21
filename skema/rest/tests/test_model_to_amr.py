@@ -56,21 +56,25 @@ def test_any_amr_chime_sir():
 
     # The source code is a string, so to slice using the line spans, we must first convert it to a list.
     # Then we can convert it back to a string using .join
+    logging = []
     for i in range(len(blobs)):
         if line_begin[i] == line_end[i]:
             print("failed linespan")
         else:
             blobs[i] = "".join(blobs[i].splitlines(keepends=True)[line_begin[i]:line_end[i]])
-            amrs.append(
-                asyncio.run(
-                    code_snippets_to_pn_amr(
-                        System(
-                            files=[files[i]],
-                            blobs=[blobs[i]],
+            try:
+                amrs.append(
+                    asyncio.run(
+                        code_snippets_to_pn_amr(
+                            System(
+                                files=[files[i]],
+                                blobs=[blobs[i]],
+                            )
                         )
                     )
                 )
-            )
+            except:
+                logging.append(f"{files[i]} failed to parse an AMR from the dynamics")
     # we will return the amr with most states, in assumption it is the most "correct"
     # by default it returns the first entry
     amr = amrs[0]
