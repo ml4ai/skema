@@ -4,6 +4,7 @@ End-to-end skema workflows
 """
 import copy
 import requests
+import time
 from zipfile import ZipFile
 from io import BytesIO
 from typing import List
@@ -246,7 +247,6 @@ async def llm_assisted_codebase_to_pn_amr(zip_file: UploadFile = File()):
         )  # Normalizing the 1-index response from llm_proxy
         line_end.append(int(lines[1][1:]))
 
-        # Currently the llm_proxy only works on the first file in a zip_archive.
         # So we are required to do the same when slicing the source code using its output.
     with ZipFile(BytesIO(zip_file.file.read()), "r") as zip:
         for file in zip.namelist():
@@ -257,32 +257,38 @@ async def llm_assisted_codebase_to_pn_amr(zip_file: UploadFile = File()):
 
     # The source code is a string, so to slice using the line spans, we must first convert it to a list.
     # Then we can convert it back to a string using .join
-    for i in len(blobs):
+    logging = []
+    for i in range(len(blobs)):
         if line_begin[i] == line_end[i]:
             print("failed linespan")
         else:
-            blobs[i] = "".join(blobs[i].splitlines(keepends=True)[line_begin:line_end])
-            amrs.append(
-                await code_snippets_to_pn_amr(
-                    code2fn.System(
-                        files=files,
-                        blobs=blobs,
-                        root_name=Path(zip_file.files[i]).stem,
-                        system_name=Path(zip_file.files[i]).stem,
+            blobs[i] = "".join(blobs[i].splitlines(keepends=True)[line_begin[i]:line_end[i]])
+            try:
+                time.sleep(0.5)
+                amrs.append(
+                    await code_snippets_to_pn_amr(
+                        code2fn.System(
+                            files=[files[i]],
+                            blobs=[blobs[i]],
+                        )
                     )
                 )
-            )
+            except:
+                logging.append(f"{files[i]} failed to parse an AMR from the dynamics")
     # we will return the amr with most states, in assumption it is the most "correct"
     # by default it returns the first entry
-    amr = amrs[0]
-    for temp_amr in amrs:
-        try:
-            temp_len = len(temp_amr["model"]["states"])
-            amr_len = len(amr["model"]["states"])
-            if temp_len > amr_len:
-                amr = temp_amr
-        except:
-            continue
+    try:
+        amr = amrs[0]
+        for temp_amr in amrs:
+            try:
+                temp_len = len(temp_amr["model"]["states"])
+                amr_len = len(amr["model"]["states"])
+                if temp_len > amr_len:
+                    amr = temp_amr
+            except:
+                continue
+    except:
+        amr = logging
 
     return amr
 
