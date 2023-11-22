@@ -16,6 +16,7 @@ from pathlib import Path
 from pydantic import BaseModel, Field
 from typing import List, Optional
 from skema.rest.proxies import SKEMA_OPENAI_KEY
+import time
 
 router = APIRouter()
 
@@ -122,6 +123,7 @@ async def get_lines_of_model(zip_file: UploadFile = File()) -> List[Dynamics]:
 
             # Get the FN from it
             url = "https://api.askem.lum.ai/code2fn/fn-given-filepaths"
+            time.sleep(0.5)
             response_zip = requests.post(url, json=single_snippet_payload)
 
             # get metadata entry for function

@@ -13,6 +13,7 @@ from skema.rest.workflows import (
 from skema.rest.llm_proxy import Dynamics
 from skema.rest.proxies import SKEMA_RS_ADDESS
 from skema.skema_py.server import System
+import time
 
 CHIME_SIR_URL = (
     "https://artifacts.askem.lum.ai/askem/data/models/zip-archives/CHIME-SIR-model.zip"
@@ -63,6 +64,7 @@ def test_any_amr_chime_sir():
         else:
             blobs[i] = "".join(blobs[i].splitlines(keepends=True)[line_begin[i]:line_end[i]])
             try:
+                time.sleep(0.5)
                 amrs.append(
                     asyncio.run(
                         code_snippets_to_pn_amr(
