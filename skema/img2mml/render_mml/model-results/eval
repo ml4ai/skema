@@ -9,13 +9,11 @@ from multiprocessing import Pool
 import numpy as np
 import pylatexenc.latex2text as l2t
 import pylatexenc.latexwalker as lw
-from sacrebleu import BLEU, corpus_bleu
-from sacrebleu.tokenizers import tokenizer_13a as t13a
+from sacrebleu import corpus_bleu
 
 from util import get_bins, load_json
 
 script_directory = os.path.dirname(os.path.abspath(__file__))
-tokenizer = t13a.Tokenizer13a()
 
 
 def save_test_results(results):
@@ -73,7 +71,7 @@ def process_batch(batch):
             {
                 "bleu": cur_bleu_score,
                 "valid_latex": 1 if is_latex_valid(prediction) else 0,
-                "length": len(tokenizer(ground_truth).split(" ")),
+                "length": len((ground_truth).split(" ")),
             }
         )
     print(f"Finished processing batch of {len(batch)} results")
