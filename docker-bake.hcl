@@ -28,7 +28,11 @@ function "check_suffix" {
 # ----------------------------------------------------------------------------------------------------------------------
 
 group "prod" {
-  targets = ["skema-py", "skema-rs", "skema-text-reading"]
+  targets = ["skema-py", "skema-rs"]
+}
+
+group "tr" {
+  targets = ["skema-text-reading"]
 }
 
 group "default" {

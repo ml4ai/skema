@@ -35,38 +35,6 @@ jobs:
       - name: Show Generated Tag
         run: echo ${{ steps.generate.outputs.tag }}
 
-  make-dockerfile:
-    name: Create skema-text-reading Dockerfile
-    runs-on: ubuntu-22.04
-    needs:
-      - tag-generator
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.workflow_run.head_branch }}
-
-      - name: Setup JDK (w/ SBT)
-        uses: actions/setup-java@v3
-        with:
-          distribution: temurin
-          java-version: 11
-
-      - name: Generate Text Reading app and its Dockerfile
-        working-directory: ./skema/text_reading/scala
-        env:
-          APP_VERSION: steps.generate.outputs.tag
-        run: |
-          sbt "webapp/docker:stage"
-
-      - name: Push to main
-        run: |
-          cd ${{ GITHUB_WORKSPACE }}
-          git config user.name github-actions
-          git config user.email github-actions@github.com
-          git commit -am "generated text-reading"
-          git push
-
   bake:
     needs:
       - tag-generator
