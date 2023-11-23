@@ -65,9 +65,7 @@ def test_any_amr_chime_sir():
             blobs[i] = "".join(blobs[i].splitlines(keepends=True)[line_begin[i]:line_end[i]])
             try:
                 time.sleep(0.5)
-                print(f"start: {time.time()}")
-                amrs.append(
-                    asyncio.run(
+                code_snippet_response = asyncio.run(
                         code_snippets_to_pn_amr(
                             System(
                                 files=[files[i]],
@@ -75,8 +73,11 @@ def test_any_amr_chime_sir():
                             )
                         )
                     )
-                )
-                print(f"end: {time.time()}")
+                if "model" in code_snippet_response:
+                    amrs.append(code_snippet_response)
+                else:
+                    print("snippets failure")
+                    logging.append(f"{files[i]} failed to parse an AMR from the dynamics")
             except:
                 print("except hit")
                 logging.append(f"{files[i]} failed to parse an AMR from the dynamics")
