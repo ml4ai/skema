@@ -3,6 +3,7 @@ from abc import ABC
 from collections import defaultdict
 from typing import Iterable, Dict, List, Any, Tuple, Optional, Union
 
+import pandas as pd
 import torch
 from askem_extractions.data_model import Attribute, AnchoredEntity, AttributeCollection, AttributeType
 from sentence_transformers import SentenceTransformer, util
@@ -67,6 +68,45 @@ class Linker(ABC):
 
 
 class AMRLinker(Linker, ABC):
+
+    def link_model_to_manual_annotations(self, data: Dict[str, Any], candidates: List[Dict[str, Any]]) -> pd.DataFrame:
+        """
+            Similarly to linking a model to text extractions. This will link it to ground truth extractions
+            Used mostly for debugging
+        """
+
+        # Make a copy of the amr to avoid mutating the original model
+        data = {**data}
+
+        # Filter out the targets from the annotations
+        targets = defaultdict(list)
+        for candidate in candidates:
+            if candidate['type'] == "Highlight" and candidate['color'] == "#f9cd59": # This color is an anchored extraction
+                key = candidate["text"]
+                targets[key].append(candidate)
+
+
+        walker = self._build_walker(data)
+
+        to_link = list(walker.walk())
+        sources = self._generate_linking_sources(to_link)
+
+        pairs = self._align_texts(list(sources.keys()), list(targets.keys()), threshold=self._threshold)
+
+        linked_targets = list()
+        for s_key, t_key in pairs:
+            source = sources[s_key]
+            target = targets[t_key]
+
+            # Get the AMR ID of the source and add it to the target extractions
+            for t in target:
+                t['amr_element_id'] = source['id']
+                linked_targets.append(t)
+
+        # Serialize the attribute collection to json, after alignment
+        data["metadata"] = linked_targets
+
+        return data
 
     def link_model_to_text_extractions(self, data: Dict[str, Any], extractions: AttributeCollection) -> Dict[str, Any]:
 

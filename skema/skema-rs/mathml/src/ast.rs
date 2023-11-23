@@ -34,7 +34,13 @@ pub struct Ci {
     pub func_of: Option<Vec<Ci>>,
 }
 
-/// The MathExpression enum represents the corresponding element type in MathML 3
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
+pub struct Differential {
+    pub diff: Box<MathExpression>,
+    pub func: Box<MathExpression>,
+}
+
+/// The MathExpression enum is not faithful to the corresponding element type in MathML 3
 /// (https://www.w3.org/TR/MathML3/appendixa.html#parsing_MathExpression)
 #[derive(Debug, PartialOrd, Ord, PartialEq, Eq, Clone, Hash, Default, new)]
 pub enum MathExpression {
@@ -59,6 +65,10 @@ pub enum MathExpression {
     MoLine(String),
     //GroupTuple(Vec<MathExpression>),
     Ci(Ci),
+    Differential(Differential),
+    AbsoluteSup(Box<MathExpression>, Box<MathExpression>),
+    Absolute(Box<MathExpression>, Box<MathExpression>),
+    //Differential(Box<MathExpression>, Box<MathExpression>),
     #[default]
     None,
 }
@@ -79,6 +89,9 @@ impl fmt::Display for MathExpression {
             MathExpression::Msub(base, subscript) => {
                 write!(f, "{base}_{{{subscript}}}")
             }
+            MathExpression::Msubsup(base, subscript,superscript)=>{
+                write!(f, "{base}_{{{subscript}}}^{{{superscript}}}")
+            }
             MathExpression::Mo(op) => {
                 write!(f, "{}", op)
             }
@@ -87,6 +100,14 @@ impl fmt::Display for MathExpression {
                     write!(f, "{}", e)?;
                 }
                 Ok(())
+            }
+            MathExpression::Differential(Differential { diff, func }) => {
+                write!(f, "{diff}")?;
+                write!(f, "{func}")
+            }
+            MathExpression::AbsoluteSup(base, superscript) => {
+                write!(f, "{:?}", base)?;
+                write!(f, "{superscript:?}")
             }
             expression => write!(f, "{expression:?}"),
         }

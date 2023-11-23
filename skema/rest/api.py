@@ -1,15 +1,21 @@
+import os
+from typing import Dict
+
 from fastapi import FastAPI, Response, status
 from fastapi.responses import PlainTextResponse
-import os
+
 from skema.rest import (
     schema,
     workflows,
+    proxies,
     integrated_text_reading_proxy,
     morae_proxy,
     metal_proxy,
+    llm_proxy,
 )
 from skema.img2mml import eqn2mml
 from skema.skema_py import server as code2fn
+from skema.gromet.execution_engine import server as execution_engine
 from skema.program_analysis.comment_extractor import server as comment_service
 
 VERSION: str = os.environ.get("APP_VERSION", "????")
@@ -105,9 +111,20 @@ app.include_router(
 )
 
 app.include_router(
+    execution_engine.router,
+    prefix="/execution_engine",
+    tags=["execution_engine"],
+)
+app.include_router(
     morae_proxy.router,
     prefix="/morae",
     tags=["morae", "skema-rs"],
+)
+
+app.include_router(
+    llm_proxy.router,
+    prefix="/morae",
+    tags=["morae"],
 )
 
 app.include_router(
@@ -176,3 +193,21 @@ async def healthcheck(response: Response) -> schema.HealthStatus:
         text_reading=text_reading_status,
         metal=metal_status
     )
+
+@app.get("/environment_variables", tags=["core"], summary="Values of environment variables")
+async def environment_variables() -> Dict:
+    return {
+        "SKEMA_GRAPH_DB_PROTO": proxies.SKEMA_GRAPH_DB_PROTO,
+        "SKEMA_GRAPH_DB_HOST": proxies.SKEMA_GRAPH_DB_HOST,
+        "SKEMA_GRAPH_DB_PORT": proxies.SKEMA_GRAPH_DB_PORT,
+        "SKEMA_RS_ADDRESS": proxies.SKEMA_RS_ADDESS,
+        
+        "SKEMA_MATHJAX_PROTOCOL": proxies.SKEMA_MATHJAX_PROTOCOL,
+        "SKEMA_MATHJAX_HOST": proxies.SKEMA_MATHJAX_HOST,
+        "SKEMA_MATHJAX_PORT": proxies.SKEMA_MATHJAX_PORT,
+        "SKEMA_MATHJAX_ADDRESS": proxies.SKEMA_MATHJAX_ADDRESS,
+
+        "MIT_TR_ADDRESS": proxies.MIT_TR_ADDRESS,
+        "SKEMA_TR_ADDRESS": proxies.SKEMA_TR_ADDRESS,
+        "COSMOS_ADDRESS": proxies.COSMOS_ADDRESS
+    }

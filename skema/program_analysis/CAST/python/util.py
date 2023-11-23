@@ -20,3 +20,36 @@ def generate_dummy_source_refs(node: AstNode) -> AstNode:
 
     return node
 
+def get_op(operator):
+    ops = {
+        '+': 'ast.Add',
+        '-': 'ast.Sub',
+        '*': 'ast.Mult',
+        '/': 'ast.Div',
+        # ast.UAdd: 'ast.UAdd',
+        # ast.USub: 'ast.USub',
+        # ast.FloorDiv: 'ast.FloorDiv',
+        # ast.Mod: 'ast.Mod',
+        # ast.Pow: 'ast.Pow',
+        # ast.LShift: 'ast.LShift',
+        # ast.RShift: 'ast.RShift',
+        # ast.BitOr: 'ast.BitOr',
+        # ast.BitAnd: 'ast.BitAnd',
+        # ast.BitXor: 'ast.BitXor',
+        # ast.And: 'ast.And',
+        # ast.Or: 'ast.Or',
+        # ast.Eq: 'ast.Eq',
+        # ast.NotEq: 'ast.NotEq',
+        # ast.Lt: 'ast.Lt',
+        # ast.LtE: 'ast.LtE',
+        # ast.Gt: 'ast.Gt',
+        # ast.GtE: 'ast.GtE',
+        # ast.In: 'ast.In',
+        # ast.NotIn: 'ast.NotIn',
+        # ast.Not: 'ast.Not',
+        # ast.Invert: 'ast.Invert',
+    }
+    if operator in ops.keys():
+        return ops[operator]
+    else:
+        raise NotImplementedError(f"python tree sitter util.py: Operator {operator} isn't in the operations table")

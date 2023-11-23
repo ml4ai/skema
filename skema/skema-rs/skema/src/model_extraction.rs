@@ -1,5 +1,5 @@
 use mathml::ast::{operator::Operator, Math};
-
+use crate::config::Config;
 pub use mathml::mml2pn::{ACSet, Term};
 use petgraph::prelude::*;
 use rsmgclient::{ConnectParams, Connection, MgError, Node, Relationship, Value};
@@ -66,32 +66,53 @@ pub fn get_line_span(
 }
 
 #[allow(non_snake_case)]
-pub fn module_id2mathml_MET_ast(module_id: i64, host: &str) -> Vec<FirstOrderODE> {
-    let graph = subgraph2petgraph(module_id, host); // makes petgraph of graph
+pub fn module_id2mathml_MET_ast(module_id: i64, config: Config) -> Vec<FirstOrderODE> {
+    let mut core_dynamics_ast = Vec::<FirstOrderODE>::new();
+    let mut _metadata_map_ast = HashMap::new();
+    let graph = subgraph2petgraph(module_id, config.clone()); // makes petgraph of graph
 
-    let core_id = find_pn_dynamics(module_id, host); // gives back list of function nodes that might contain the dynamics
-
-    let _line_span = get_line_span(core_id[0], graph); // get's the line span of function id
+    let core_id = find_pn_dynamics(module_id, config.clone()); // gives back list of function nodes that might contain the dynamics
+    //let _line_span = get_line_span(core_id[0], graph); // get's the line span of function id
 
     //println!("\n{:?}", line_span);
+    if core_id.len() == 0 {
+        let deriv = Ci {
+            r#type: Some(Function),
+            content: Box::new(MathExpression::Mi(Mi("temp".to_string()))),
+            func_of: None,
+        };
+        let operate = Operator::Subtract;
+        let rhs_arg = MathExpressionTree::Atom(MathExpression::Mi(Mi("temp".to_string())));
+        let rhs = MathExpressionTree::Cons(operate, [rhs_arg].to_vec());
+        let fo_eq = FirstOrderODE {
+            lhs_var: deriv.clone(),
+            func_of: [deriv.clone()].to_vec(), // just place holders for construction
+            with_respect_to: deriv.clone(),    // just place holders for construction
+            rhs: rhs,
+        };
+        core_dynamics_ast.push(fo_eq);
+    } else {
+        (core_dynamics_ast, _metadata_map_ast) =
+        subgrapg2_core_dyn_MET_ast(core_id[0], config.clone()).unwrap();
+    }
 
     //println!("function_core_id: {:?}", core_id[0].clone());
     //println!("module_id: {:?}\n", module_id.clone());
     // 4.5 now to check if of those expressions, if they are arithmetric in nature
 
     // 5. pass id to subgrapg2_core_dyn to get core dynamics
-    let (core_dynamics_ast, _metadata_map_ast) =
-        subgrapg2_core_dyn_MET_ast(core_id[0], host).unwrap();
+    //let (core_dynamics_ast, _metadata_map_ast) =
+    //subgrapg2_core_dyn_MET_ast(core_id[0], host).unwrap();
 
     core_dynamics_ast
 }
 
-pub fn module_id2mathml_ast(module_id: i64, host: &str) -> Vec<Math> {
-    let graph = subgraph2petgraph(module_id, host); // makes petgraph of graph
+pub fn module_id2mathml_ast(module_id: i64, config: Config) -> Vec<Math> {
+    let _graph = subgraph2petgraph(module_id, config.clone()); // makes petgraph of graph
 
-    let core_id = find_pn_dynamics(module_id, host); // gives back list of function nodes that might contain the dynamics
+    let core_id = find_pn_dynamics(module_id, config.clone()); // gives back list of function nodes that might contain the dynamics
 
-    let _line_span = get_line_span(core_id[0], graph); // get's the line span of function id
+    //let _line_span = get_line_span(core_id[0], graph); // get's the line span of function id
 
     //println!("\n{:?}", line_span);
 
@@ -100,7 +121,7 @@ pub fn module_id2mathml_ast(module_id: i64, host: &str) -> Vec<Math> {
     // 4.5 now to check if of those expressions, if they are arithmetric in nature
 
     // 5. pass id to subgrapg2_core_dyn to get core dynamics
-    let (core_dynamics_ast, _metadata_map_ast) = subgraph2_core_dyn_ast(core_id[0], host).unwrap();
+    let (core_dynamics_ast, _metadata_map_ast) = subgraph2_core_dyn_ast(core_id[0], config.clone()).unwrap();
 
     //println!("\ncore_dynamics_ast[0]: {:?}", core_dynamics_ast[0].clone());
 
@@ -119,8 +140,8 @@ pub fn module_id2mathml_ast(module_id: i64, host: &str) -> Vec<Math> {
 // this function finds the core dynamics and returns a vector of
 // node id's that meet the criteria for identification
 #[allow(clippy::if_same_then_else)]
-pub fn find_pn_dynamics(module_id: i64, host: &str) -> Vec<i64> {
-    let graph = subgraph2petgraph(module_id, host);
+pub fn find_pn_dynamics(module_id: i64, config: Config) -> Vec<i64> {
+    let graph = subgraph2petgraph(module_id, config.clone());
     // 1. find each function node
     let mut function_nodes = Vec::<NodeIndex>::new();
     for node in graph.node_indices() {
@@ -133,7 +154,7 @@ pub fn find_pn_dynamics(module_id: i64, host: &str) -> Vec<i64> {
     let mut functions = Vec::<petgraph::Graph<rsmgclient::Node, rsmgclient::Relationship>>::new();
     for i in 0..function_nodes.len() {
         // grab the subgraph of the given expression
-        functions.push(subgraph2petgraph(graph[function_nodes[i]].id, host));
+        functions.push(subgraph2petgraph(graph[function_nodes[i]].id, config.clone()));
     }
     // get a sense of the number of expressions in each function
     let mut func_counter = 0;
@@ -178,10 +199,10 @@ pub fn find_pn_dynamics(module_id: i64, host: &str) -> Vec<i64> {
 #[allow(non_snake_case)]
 pub fn subgrapg2_core_dyn_MET_ast(
     root_node_id: i64,
-    host: &str,
+    config: Config,
 ) -> Result<(Vec<FirstOrderODE>, HashMap<String, rsmgclient::Node>), MgError> {
     // get the petgraph of the subgraph
-    let graph = subgraph2petgraph(root_node_id, host);
+    let graph = subgraph2petgraph(root_node_id, config.clone());
 
     /* MAKE THIS A FUNCTION THAT TAKES IN A PETGRAPH */
     // create the metadata rust rep
@@ -205,7 +226,6 @@ pub fn subgrapg2_core_dyn_MET_ast(
     for node in graph.node_indices() {
         if graph[node].labels == ["Expression"] {
             expression_nodes.push(node);
-            // println!("Expression Nodes: {:?}", graph[node].clone().id);
         }
     }
 
@@ -213,7 +233,7 @@ pub fn subgrapg2_core_dyn_MET_ast(
     let mut expressions = Vec::<petgraph::Graph<rsmgclient::Node, rsmgclient::Relationship>>::new();
     for i in 0..expression_nodes.len() {
         // grab the subgraph of the given expression
-        expressions.push(subgraph2petgraph(graph[expression_nodes[i]].id, host));
+        expressions.push(subgraph2petgraph(graph[expression_nodes[i]].id, config.clone()));
     }
 
     // initialize vector to collect all expression wiring graphs
@@ -221,7 +241,7 @@ pub fn subgrapg2_core_dyn_MET_ast(
         Vec::<petgraph::Graph<rsmgclient::Node, rsmgclient::Relationship>>::new();
     for i in 0..expression_nodes.len() {
         // grab the wiring subgraph of the given expression
-        expressions_wiring.push(subgraph_wiring(graph[expression_nodes[i]].id, host).unwrap());
+        expressions_wiring.push(subgraph_wiring(graph[expression_nodes[i]].id, config.clone()).unwrap());
     }
 
     // now to trim off the un-named filler nodes and filler expressions
@@ -239,13 +259,16 @@ pub fn subgrapg2_core_dyn_MET_ast(
 
     for expr in trimmed_expressions_wiring.clone() {
         let mut root_node = Vec::<NodeIndex>::new();
+        let mut primitive_counter = 0;
         for node_index in expr.clone().node_indices() {
             if expr[node_index].labels == ["Opo"] {
                 root_node.push(node_index);
+            } else if expr[node_index].labels == ["Primitive"] {
+                primitive_counter += 1;
             }
         }
-        if root_node.len() >= 2 {
-            // println!("More than one Opo! Skipping Expression!");
+        if root_node.len() >= 2 || primitive_counter == 0 {
+            //println!("More than one Opo! Skipping Expression!");
         } else {
             core_dynamics.push(tree_2_MET_ast(expr.clone(), root_node[0]).unwrap());
         }
@@ -256,10 +279,10 @@ pub fn subgrapg2_core_dyn_MET_ast(
 
 pub fn subgraph2_core_dyn_ast(
     root_node_id: i64,
-    host: &str,
+    config: Config,
 ) -> Result<(Vec<Vec<MathExpression>>, HashMap<String, rsmgclient::Node>), MgError> {
     // get the petgraph of the subgraph
-    let graph = subgraph2petgraph(root_node_id, host);
+    let graph = subgraph2petgraph(root_node_id, config.clone());
 
     /* MAKE THIS A FUNCTION THAT TAKES IN A PETGRAPH */
     // create the metadata rust rep
@@ -295,7 +318,7 @@ pub fn subgraph2_core_dyn_ast(
             "These are the nodes for expressions: {:?}",
             graph[expression_nodes[i]].id.clone()
         );*/
-        expressions.push(subgraph2petgraph(graph[expression_nodes[i]].id, host));
+        expressions.push(subgraph2petgraph(graph[expression_nodes[i]].id, config.clone()));
     }
 
     // initialize vector to collect all expression wiring graphs
@@ -303,7 +326,7 @@ pub fn subgraph2_core_dyn_ast(
         Vec::<petgraph::Graph<rsmgclient::Node, rsmgclient::Relationship>>::new();
     for i in 0..expression_nodes.len() {
         // grab the wiring subgraph of the given expression
-        expressions_wiring.push(subgraph_wiring(graph[expression_nodes[i]].id, host).unwrap());
+        expressions_wiring.push(subgraph_wiring(graph[expression_nodes[i]].id, config.clone()).unwrap());
     }
 
     // now to trim off the un-named filler nodes and filler expressions
@@ -434,9 +457,15 @@ pub fn get_args_MET(
 
     // fix order of args
     let mut ordered_args = args.clone();
+    //println!("ordered_args: {:?}", ordered_args.clone());
+    //println!("ordered_args[0]: {:?}", ordered_args[0]);
+    //println!("ordered_args.len(): {:?}", ordered_args.len());
+    //println!("arg_order: {:?}", arg_order.clone());
     for (i, ind) in arg_order.iter().enumerate() {
         // the ind'th element of order_args is the ith element of the unordered args
-        let _temp = std::mem::replace(&mut ordered_args[*ind as usize], args[i].clone());
+        if ordered_args.len() > *ind as usize {
+            let _temp = std::mem::replace(&mut ordered_args[*ind as usize], args[i].clone());
+        }
     }
 
     ordered_args
@@ -1009,11 +1038,14 @@ fn trim_un_named(
 
 fn subgraph_wiring(
     module_id: i64,
-    host: &str,
+    config: Config,
 ) -> Result<petgraph::Graph<rsmgclient::Node, rsmgclient::Relationship>, MgError> {
     // Connect to Memgraph.
+    // FIXME: refactor using a util method 
+    // that constructs ConnectParams uniformly everwhere
     let connect_params = ConnectParams {
-        host: Some(host.to_string()),
+        port: config.clone().db_port,
+        host: Some(config.db_host.clone()),
         ..Default::default()
     };
     let mut connection = Connection::connect(&connect_params)?;
@@ -1103,9 +1135,9 @@ fn subgraph_wiring(
 
 fn subgraph2petgraph(
     module_id: i64,
-    host: &str,
+    config: Config,
 ) -> petgraph::Graph<rsmgclient::Node, rsmgclient::Relationship> {
-    let (x, y) = get_subgraph(module_id, host).unwrap();
+    let (x, y) = get_subgraph(module_id, config.clone()).unwrap();
 
     // Create a petgraph graph
     let mut graph: petgraph::Graph<rsmgclient::Node, rsmgclient::Relationship> = Graph::new();
@@ -1136,14 +1168,11 @@ fn subgraph2petgraph(
     graph
 }
 
-pub fn get_subgraph(module_id: i64, host: &str) -> Result<(Vec<Node>, Vec<Relationship>), MgError> {
+pub fn get_subgraph(module_id: i64, config: Config) -> Result<(Vec<Node>, Vec<Relationship>), MgError> {
     // construct the query that will delete the module with a given unique identifier
 
     // Connect to Memgraph.
-    let connect_params = ConnectParams {
-        host: Some(host.to_string()),
-        ..Default::default()
-    };
+    let connect_params = config.db_connection();
     let mut connection = Connection::connect(&connect_params)?;
 
     // create query for nodes
