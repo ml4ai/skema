@@ -65,8 +65,7 @@ def test_any_amr_chime_sir():
             blobs[i] = "".join(blobs[i].splitlines(keepends=True)[line_begin[i]:line_end[i]])
             try:
                 time.sleep(0.5)
-                amrs.append(
-                    asyncio.run(
+                code_snippet_response = asyncio.run(
                         code_snippets_to_pn_amr(
                             System(
                                 files=[files[i]],
@@ -74,12 +73,19 @@ def test_any_amr_chime_sir():
                             )
                         )
                     )
-                )
+                if "model" in code_snippet_response:
+                    amrs.append(code_snippet_response)
+                else:
+                    print("snippets failure")
+                    logging.append(f"{files[i]} failed to parse an AMR from the dynamics")
             except:
+                print("except hit")
                 logging.append(f"{files[i]} failed to parse an AMR from the dynamics")
     # we will return the amr with most states, in assumption it is the most "correct"
     # by default it returns the first entry
+    print(f"amrs: {amrs}\n")
     amr = amrs[0]
+    print(f"initial amr: {amr}\n")
     for temp_amr in amrs:
         try:
             temp_len = len(temp_amr["model"]["states"])
@@ -88,7 +94,7 @@ def test_any_amr_chime_sir():
                 amr = temp_amr
         except:
             continue
-
+    print(f"final amr: {amr}\n")
     # For this test, we are just checking that AMR was generated without crashing. We are not checking for accuracy.
     assert "model" in amr, f"'model' should be in AMR response, but got {amr}"
 

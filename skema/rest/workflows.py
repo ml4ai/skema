@@ -233,7 +233,9 @@ async def llm_assisted_codebase_to_pn_amr(zip_file: UploadFile = File()):
     """
     # NOTE: Opening the zip file mutates the object and prevents it from being reopened.
     # Since llm_proxy also needs to open the zip file, we should send a copy instead.
+    print(f"Time call linespan: {time.time()}")
     linespans = await llm_proxy.get_lines_of_model(copy.deepcopy(zip_file))
+    print(f"Time response linespan: {time.time()}")
 
     line_begin = []
     line_end = []
@@ -265,18 +267,25 @@ async def llm_assisted_codebase_to_pn_amr(zip_file: UploadFile = File()):
             blobs[i] = "".join(blobs[i].splitlines(keepends=True)[line_begin[i]:line_end[i]])
             try:
                 time.sleep(0.5)
-                amrs.append(
-                    await code_snippets_to_pn_amr(
+                print(f"Time call code-snippets: {time.time()}")
+                code_snippet_response = await code_snippets_to_pn_amr(
                         code2fn.System(
                             files=[files[i]],
                             blobs=[blobs[i]],
                         )
                     )
-                )
+                print(f"Time response code-snippets: {time.time()}")
+                if "model" in code_snippet_response:
+                    amrs.append(code_snippet_response)
+                else:
+                    print("snippets failure")
+                    logging.append(f"{files[i]} failed to parse an AMR from the dynamics")
             except:
+                print("Hit except to snippets failure")
                 logging.append(f"{files[i]} failed to parse an AMR from the dynamics")
     # we will return the amr with most states, in assumption it is the most "correct"
     # by default it returns the first entry
+    print(f"{amrs}")
     try:
         amr = amrs[0]
         for temp_amr in amrs:
