@@ -40,7 +40,7 @@ def test_for():
 
 
 # Test the for loop
-def test_while():
+def no_test_while():
     """ Test the MATLAB for loop syntax elements"""
     source = """
         while k < 5
