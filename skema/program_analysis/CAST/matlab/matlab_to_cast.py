@@ -259,7 +259,17 @@ class MatlabToCast(object):
 
     def visit_loop_for(self, node) -> Loop:
         """ Translate Tree-sitter for loop node into CAST Loop node """
+        itr = get_first_child_by_type(node, "iterator")
+        itr_identifier = get_first_child_by_type(itr, "identifier")
+        itr_range = get_first_child_by_type(itr, "range")
+        limits = get_keyword_children(itr_range)
+        start = self.visit(limits[0])
+        end = self.visit(limits[1])
+
+
         return Loop (
+            # pre = [Assignment(left = iterator_identifier, right = start)],
+            # expr = Operator(op = "<", operands = [iterator_identifier, end]),
             pre = [],
             expr = None,
             body = self.get_block(node),

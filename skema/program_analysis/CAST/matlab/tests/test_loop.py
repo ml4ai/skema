@@ -7,7 +7,7 @@ from skema.program_analysis.CAST2FN.model.cast import (
 )
 
 # Test the for loop
-def no_test_for():
+def test_for():
     """ Test the MATLAB for loop syntax elements"""
     source = """
         for n = 1:10
@@ -15,10 +15,32 @@ def no_test_for():
         end
     """
     nodes = cast(source)
-    check(nodes[0], Loop())
+    check(nodes[0], 
+        Loop(
+            # pre = [Assignment(left = "n", right = 1)],
+            # expr = Operator(op = "<", operands = ["n", 10]),
+            pre = [],
+            expr = None,
+            body = [
+                Assignment(
+                    left = "x",
+                    right = Call(
+                        func = "do_something",
+                        arguments = ["n"]
+                    )
+                ),
+                Call(
+                    func = "disp",
+                    arguments = ["k"]
+                )
+            ],
+            post = []
+        )
+    )
+
 
 # Test the for loop
-def test_while():
+def no_test_while():
     """ Test the MATLAB for loop syntax elements"""
     source = """
         while k < 5
