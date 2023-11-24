@@ -175,16 +175,27 @@
                 <h1 id="building-skema-images">Building <code>skema</code> images<a class="headerlink" href="#building-skema-images" title="Permanent link"></a></h1>
 <p>We publish all project images publicly to Docker Hub.  If you'd like to build images locally to test features, see the instructions below.</p>
 <h2 id="lumaiaskem-skema-py"><code>lumai/askem-skema-py</code><a class="headerlink" href="#lumaiaskem-skema-py" title="Permanent link"></a></h2>
-<pre><code class="language-bash">BUILDER_KIT=1 docker build --no-cache -f &quot;Dockerfile.skema-py&quot; -t &quot;lumai/askem-skema-py:local&quot; .
+<pre><code class="language-bash">TAG=local
+BUILDER_KIT=1 docker build --no-cache -f &quot;Dockerfile.skema-py&quot; -t &quot;lumai/askem-skema-py:$TAG&quot; .
 </code></pre>
 <p>Published images: <a href="https://hub.docker.com/r/lumai/askem-skema-py"><code>lumai/askem-skema-py</code></a></p>
 <h2 id="lumaiaskem-skema-rs"><code>lumai/askem-skema-rs</code><a class="headerlink" href="#lumaiaskem-skema-rs" title="Permanent link"></a></h2>
-<pre><code class="language-bash">BUILDER_KIT=1 docker build --no-cache -f &quot;Dockerfile.skema-rs&quot; -t &quot;lumai/askem-skema-rs:local&quot; .
+<pre><code class="language-bash">TAG=local
+BUILDER_KIT=1 docker build --no-cache -f &quot;Dockerfile.skema-rs&quot; -t &quot;lumai/askem-skema-rs:$TAG&quot; .
 </code></pre>
 <p>Published images: <a href="https://hub.docker.com/r/lumai/askem-skema-rs"><code>lumai/askem-skema-rs</code></a></p>
 <h2 id="lumaiaskem-skema-text-reading"><code>lumai/askem-skema-text-reading</code><a class="headerlink" href="#lumaiaskem-skema-text-reading" title="Permanent link"></a></h2>
-<pre><code class="language-bash">cd skema/text_reading/scala
-docker build -f &quot;Dockerfile&quot; -t &quot;lumai/askem-skema-text-reading:local&quot; .
+<p>???+ note "Dependencies for Dockerfile generation"</p>
+<pre><code>The Dockerfile file for our text reading image is generated using [`sbt`](https://www.scala-sbt.org/download.html)
+</code></pre>
+<pre><code class="language-bash">TAG=local
+cd skema/text_reading/scala
+# generate dockerfile
+sbt &quot;webapp/docker:stage&quot;
+# build image
+# NOTE: the current image is only compatible with amd64
+cd webapp/target/docker/stage
+BUILDER_KIT=1 docker build --no-cache --platform &quot;linux/amd64&quot; -t &quot;lumai/askem-skema-text-reading:$TAG&quot; .
 </code></pre>
 <p>Published images: <a href="https://hub.docker.com/r/lumai/askem-skema-text-reading"><code>lumai/askem-skema-text-reading</code></a></p>
               
