@@ -32,6 +32,7 @@ cd skema/text_reading/scala
 # generate dockerfile
 sbt "webapp/docker:stage"
 # build image
+# NOTE: the current image is only compatible with amd64
 cd webapp/target/docker/stage
 BUILDER_KIT=1 docker build --no-cache --platform "linux/amd64" -t "lumai/askem-skema-text-reading:$TAG" .
 ```
