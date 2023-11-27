@@ -81,6 +81,6 @@ def amr_enrichment(request: EnrichmentReqest):
 app = FastAPI()
 app.include_router(
     router,
-    prefix="/execution_engine",
-    tags=["execution_engine"],
+    prefix="/execution-engine",
+    tags=["execution-engine"],
 )
