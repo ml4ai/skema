@@ -86,9 +86,11 @@ jobs:
     - name: Get installed package path
       id: package_path
       run: |
-        package_path=$(python -c "import site; from pathlib import Path; print(next(iter(site.getsitepackages())) / 'skema' / 'program_analysis' / 'tree_sitter_parsers' / 'build' / 'installed_languages.so')")
+        package_path=$(python -c "import site; from pathlib import Path; print((Path(next(iter(site.getsitepackages()))) / 'skema' / 'program_analysis' / 'tree_sitter_parsers' / 'build' / 'installed_languages.so').resolve())")
         echo "::set-output name=package_path::$package_path"
       shell: bash
+
+
 
     # Install tree-sitter parser (for Python component unit tests)
     - name: Install tree-sitter parsers
