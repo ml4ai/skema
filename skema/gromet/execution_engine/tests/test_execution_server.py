@@ -22,7 +22,7 @@ def test_enrich_amr():
         "filename": "source.py"
     }
 
-    response=client.post("/execution_engine/amr-enrichment", json=request)
+    response=client.post("/execution-engine/amr-enrichment", json=request)
     parameters = response.json()["semantics"]["ode"]["parameters"]
     assert parameters == [
         {"name": "a", "value": 1},
