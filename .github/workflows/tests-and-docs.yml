@@ -87,6 +87,9 @@ jobs:
       working-directory: .
       run: python skema/program_analysis/tree_sitter_parsers/build_parsers.py --all
       
+    - name: TESTING
+      run: python skema/program_analysis/tree_sitter_parsers/sample_script.py
+    
     # docs (API)
     # generate python docs using pdoc
     - name: "Create documentation for Python components (API docs)"
