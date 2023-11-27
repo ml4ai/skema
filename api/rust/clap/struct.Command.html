@@ -513,7 +513,7 @@ terminal’s width will be used.  See <a href="struct.Command.html#method.term_w
     </span>]);
 <span class="macro">assert!</span>(res.is_err());
 <span class="macro">assert_eq!</span>(res.unwrap_err().kind(), ErrorKind::UnknownArgument);</code></pre></div>
-<p>You can create a custom version flag with <a href="enum.ArgAction.html#variant.Help" title="variant clap::ArgAction::Help"><code>ArgAction::Help</code></a>, <a href="enum.ArgAction.html#variant.HelpShort" title="variant clap::ArgAction::HelpShort"><code>ArgAction::HelpShort</code></a>, or
+<p>You can create a custom help flag with <a href="enum.ArgAction.html#variant.Help" title="variant clap::ArgAction::Help"><code>ArgAction::Help</code></a>, <a href="enum.ArgAction.html#variant.HelpShort" title="variant clap::ArgAction::HelpShort"><code>ArgAction::HelpShort</code></a>, or
 <a href="enum.ArgAction.html#variant.HelpLong" title="variant clap::ArgAction::HelpLong"><code>ArgAction::HelpLong</code></a></p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">let </span><span class="kw-2">mut </span>cmd = Command::new(<span class="string">&quot;myprog&quot;</span>)

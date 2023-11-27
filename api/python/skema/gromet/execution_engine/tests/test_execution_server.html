@@ -51,7 +51,7 @@ def test_enrich_amr():
         &#34;filename&#34;: &#34;source.py&#34;
     }
 
-    response=client.post(&#34;/execution_engine/amr-enrichment&#34;, json=request)
+    response=client.post(&#34;/execution-engine/amr-enrichment&#34;, json=request)
     parameters = response.json()[&#34;semantics&#34;][&#34;ode&#34;][&#34;parameters&#34;]
     assert parameters == [
         {&#34;name&#34;: &#34;a&#34;, &#34;value&#34;: 1},
@@ -94,7 +94,7 @@ def test_enrich_amr():
         &#34;filename&#34;: &#34;source.py&#34;
     }
 
-    response=client.post(&#34;/execution_engine/amr-enrichment&#34;, json=request)
+    response=client.post(&#34;/execution-engine/amr-enrichment&#34;, json=request)
     parameters = response.json()[&#34;semantics&#34;][&#34;ode&#34;][&#34;parameters&#34;]
     assert parameters == [
         {&#34;name&#34;: &#34;a&#34;, &#34;value&#34;: 1},
