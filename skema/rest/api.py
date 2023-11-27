@@ -194,7 +194,7 @@ async def healthcheck(response: Response) -> schema.HealthStatus:
         metal=metal_status
     )
 
-@app.get("/environment-variables", tags=["core"], summary="Values of environment variables", included_in_schema=False)
+@app.get("/environment-variables", tags=["core"], summary="Values of environment variables", include_in_schema=False)
 async def environment_variables() -> Dict:
     return {
         "SKEMA_GRAPH_DB_PROTO": proxies.SKEMA_GRAPH_DB_PROTO,
