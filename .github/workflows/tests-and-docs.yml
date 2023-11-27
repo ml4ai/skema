@@ -96,7 +96,14 @@ jobs:
       run: |
         python skema/program_analysis/tree_sitter_parsers/build_parsers.py --all
         cp skema/program_analysis/tree_sitter_parsers/build/installed_languages.so ${{ steps.package_path.outputs.package_path }}
-    
+  
+    - name: TESTING
+      run: |
+        echo ${{ steps.package_path.outputs.package_path }}
+        if test -f "${{ steps.package_path.outputs.package_path }}"; then
+          echo "Exists"
+        fi
+        
     # docs (API)
     # generate python docs using pdoc
     - name: "Create documentation for Python components (API docs)"
