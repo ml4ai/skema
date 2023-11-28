@@ -15,7 +15,7 @@ use mathml::parsers::math_expression_tree::MathExpressionTree;
 use skema::model_extraction::{module_id2mathml_MET_ast, subgraph2_core_dyn_ast};
 use std::fs::File;
 use std::io::{BufRead, BufReader};
-use neo4rs::{query, Graph, Node};
+use neo4rs::{query, Graph, Node, UnboundedRelation, Relation};
 use tokio::task;
 use tokio::runtime::Builder;
 use std::sync::Arc;
@@ -28,6 +28,22 @@ struct Cli {
 
     #[arg(short, long)]
     model_id: Option<i64>,
+}
+
+pub async fn module_query(config: Config) -> Vec<i64> {
+    // Connect to Memgraph.
+
+    let graph = Arc::new(config.graphdb_connection().await);
+
+    let mut ids = Vec::<i64>::new();
+    let mut result = graph.execute(
+        query("MATCH (n:Module) RETURN n")).await.unwrap();
+    while let Ok(Some(row)) = result.next().await {
+        let node: Node = row.get("n").unwrap();
+        ids.push(node.id());
+    }
+
+    ids
 }
 
 #[tokio::main]
@@ -62,17 +78,21 @@ async fn main() {
             db_host: db_host.clone(),
             db_port: db_port.parse::<u16>().unwrap(),
         };
-        println!("outside spawn");
-        let graph = Arc::new(config.graphdb_connection().await);
-        println!("got past graph");
-        let mut result = graph.execute(
-            query("MATCH (n:Metadata) RETURN n")).await.unwrap();
-        println!("got here");
 
+        let response = module_query(config.clone()).await;
+        println!("{:?}", response.clone());
+
+        let mut ids = Vec::<i64>::new();
+        let graph = Arc::new(config.graphdb_connection().await);
+        let mut result = graph.execute(
+            query("MATCH (n:Module) RETURN n")).await.unwrap();
+        println!("got here");
         while let Ok(Some(row)) = result.next().await {
-            println!("{:?}", row.get::<Node>("n").unwrap());
+            let node: Node = row.get("n").unwrap();
+            ids.push(node.id());
+            println!("{:?}", node.id());
         }
-        println!("got past everything");
+        println!("{:?}", ids.clone());
         //let math_content = module_id2mathml_MET_ast(module_id, config.clone());
 
         let input_src = "../../data/mml2pn_inputs/testing_eqns/sidarthe_mml.txt";

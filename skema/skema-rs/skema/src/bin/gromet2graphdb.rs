@@ -43,7 +43,7 @@ fn main() {
         fs::write("debug.txt", full_query.clone()).expect("Unable to write file");
     }
 
-    let db_protocol = env::var("SKEMA_GRAPH_DB_PROTO").unwrap_or("bolt://".to_string());
+    let db_protocol = env::var("SKEMA_GRAPH_DB_PROTO").unwrap_or("bolt+s://".to_string());
     let db_host = env::var("SKEMA_GRAPH_DB_HOST").unwrap_or("127.0.0.1".to_string());
     let db_port = env::var("SKEMA_GRAPH_DB_PORT").unwrap_or("7687".to_string());
 

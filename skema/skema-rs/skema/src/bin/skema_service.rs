@@ -26,9 +26,10 @@ pub async fn ping() -> HttpResponse {
 #[get("/version")]
 pub async fn version() -> HttpResponse {
     let end_version = env::var("APP_VERSION").unwrap_or("?????".to_string());
+    let test = "test_string".to_string();
     HttpResponse::Ok()
         .content_type(ContentType::plaintext())
-        .body(end_version)
+        .body(test)
 }
 
 #[actix_web::main]

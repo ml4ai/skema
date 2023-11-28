@@ -2,8 +2,9 @@ use std::env;
 use neo4rs::*;
 // NOTE: this is deprecated
 use rsmgclient::{ConnectParams};
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Config {
     // NOTE: do not specify procotol (ex. "bolt://") as part of db_host
     pub db_protocol: String,
@@ -15,7 +16,7 @@ impl Default for Config {
   fn default() -> Self {
       // Default initialization using ENV vars and standard values when unset
       Config {
-          db_protocol: env::var("SKEMA_GRAPH_DB_PROTO").unwrap_or("bolt://".to_string()),
+          db_protocol: env::var("SKEMA_GRAPH_DB_PROTO").unwrap_or("bolt+s://".to_string()),
           db_host: env::var("SKEMA_GRAPH_DB_HOST").unwrap_or("127.0.0.1".to_string()),
           db_port: env::var("SKEMA_GRAPH_DB_PORT").unwrap_or("7687".to_string()).parse::<u16>().unwrap(),
       }
@@ -24,7 +25,7 @@ impl Default for Config {
 
 impl Config {
 
-    fn new() -> Self {
+    pub fn new() -> Self {
       Default::default()
     }
 
