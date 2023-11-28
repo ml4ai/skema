@@ -1050,12 +1050,7 @@ pub fn preprocess_mathml_for_to_latex(input: &str) -> String {
         .replace_all(&no_newlines, "><")
         .to_string();
 
-    let new_no_spaces = no_spaces.replace(" ", "");
-
-    // Replace <mi>∇</mi> with <mo>∇</mo>
-    let replaced_str = new_no_spaces
-        .replace(r#"<mi>∇</mi>"#, "<mo>∇</mo>")
-        .to_string();
+    let replaced_str = no_spaces.to_string();
 
     replaced_str
 }
@@ -2091,7 +2086,6 @@ fn new_test_halfar_whitespace() {
     ";
     let exp = input.parse::<MathExpressionTree>().unwrap();
     let s_exp = exp.to_string();
-    println!("s_exp={:?}", s_exp);
     assert_eq!(
         s_exp,
         "(= t_{0} (* (* (/ 1 (* 18 Γ)) (^ (/ 7 4) 3)) (/ R_{0}^{4} H_{0}^{7})))"
@@ -2099,51 +2093,9 @@ fn new_test_halfar_whitespace() {
 }
 
 #[test]
-fn new_test_halfar_whitespace() {
-    let input = "
-    <math>
-      <msub>
-        <mi>t</mi>
-        <mn>0</mn>
-      </msub>
-      <mo>=</mo>
-      <mfrac>
-        <mn>1</mn>
-        <mrow>
-          <mn>18</mn>
-          <mi>&#x0393;</mi>
-        </mrow>
-      </mfrac>
-      <msup>
-        <mrow>
-          <mo>(</mo>
-          <mfrac>
-            <mn>7</mn>
-            <mn>4</mn>
-          </mfrac>
-          <mo>)</mo>
-        </mrow>
-        <mn>3</mn>
-      </msup>
-      <mfrac>
-        <msubsup>
-          <mi>R</mi>
-          <mn>0</mn>
-          <mn>4</mn>
-        </msubsup>
-        <msubsup>
-          <mi>H</mi>
-          <mn>0</mn>
-          <mn>7</mn>
-        </msubsup>
-      </mfrac>
-    </math>
-    ";
+fn test_equation_with_mtext() {
+    let input = "<math><msub><mrow><mi mathvariant=\"script\">L</mi></mrow><mrow><mtext>reg</mtext></mrow></msub><mo>=</mo><msub><mrow><mi mathvariant=\"script\">L</mi></mrow><mrow><mi>d</mi><mn>1</mn></mrow></msub><mo>+</mo><msub><mrow><mi mathvariant=\"script\">L</mi></mrow><mrow><mi>d</mi><mn>2</mn></mrow></msub></math>";
     let exp = input.parse::<MathExpressionTree>().unwrap();
     let s_exp = exp.to_string();
-    println!("s_exp={:?}", s_exp);
-    assert_eq!(
-        s_exp,
-        "(= t_{0} (* (* (/ 1 (* 18 Γ)) (^ (/ 7 4) 3)) (/ R_{0}^{4} H_{0}^{7})))"
-    );
+    assert_eq!(s_exp, "(= L_{reg} (+ L_{d1} L_{d2}))");
 }
