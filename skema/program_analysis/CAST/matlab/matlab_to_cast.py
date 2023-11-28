@@ -270,7 +270,7 @@ class MatlabToCast(object):
             # expr = Operator(op = "<", operands = [iterator_identifier, end]),
             pre = [],
             expr = [], #None,
-            body = [], self.get_block(node),
+            body = [], 
             post = [],
             source_refs = [self.node_helper.get_source_ref(node)]
         )
