@@ -4,6 +4,7 @@ End-to-end skema workflows
 """
 import copy
 import requests
+import time
 from zipfile import ZipFile
 from io import BytesIO
 from typing import List
@@ -232,7 +233,9 @@ async def llm_assisted_codebase_to_pn_amr(zip_file: UploadFile = File()):
     """
     # NOTE: Opening the zip file mutates the object and prevents it from being reopened.
     # Since llm_proxy also needs to open the zip file, we should send a copy instead.
+    print(f"Time call linespan: {time.time()}")
     linespans = await llm_proxy.get_lines_of_model(copy.deepcopy(zip_file))
+    print(f"Time response linespan: {time.time()}")
 
     line_begin = []
     line_end = []
@@ -246,7 +249,6 @@ async def llm_assisted_codebase_to_pn_amr(zip_file: UploadFile = File()):
         )  # Normalizing the 1-index response from llm_proxy
         line_end.append(int(lines[1][1:]))
 
-        # Currently the llm_proxy only works on the first file in a zip_archive.
         # So we are required to do the same when slicing the source code using its output.
     with ZipFile(BytesIO(zip_file.file.read()), "r") as zip:
         for file in zip.namelist():
@@ -257,32 +259,45 @@ async def llm_assisted_codebase_to_pn_amr(zip_file: UploadFile = File()):
 
     # The source code is a string, so to slice using the line spans, we must first convert it to a list.
     # Then we can convert it back to a string using .join
+    logging = []
     for i in range(len(blobs)):
         if line_begin[i] == line_end[i]:
             print("failed linespan")
         else:
-            blobs[i] = "".join(blobs[i].splitlines(keepends=True)[line_begin:line_end])
-            amrs.append(
-                await code_snippets_to_pn_amr(
-                    code2fn.System(
-                        files=files,
-                        blobs=blobs,
-                        root_name=Path(zip_file.files[i]).stem,
-                        system_name=Path(zip_file.files[i]).stem,
+            blobs[i] = "".join(blobs[i].splitlines(keepends=True)[line_begin[i]:line_end[i]])
+            try:
+                time.sleep(0.5)
+                print(f"Time call code-snippets: {time.time()}")
+                code_snippet_response = await code_snippets_to_pn_amr(
+                        code2fn.System(
+                            files=[files[i]],
+                            blobs=[blobs[i]],
+                        )
                     )
-                )
-            )
+                print(f"Time response code-snippets: {time.time()}")
+                if "model" in code_snippet_response:
+                    amrs.append(code_snippet_response)
+                else:
+                    print("snippets failure")
+                    logging.append(f"{files[i]} failed to parse an AMR from the dynamics")
+            except:
+                print("Hit except to snippets failure")
+                logging.append(f"{files[i]} failed to parse an AMR from the dynamics")
     # we will return the amr with most states, in assumption it is the most "correct"
     # by default it returns the first entry
-    amr = amrs[0]
-    for temp_amr in amrs:
-        try:
-            temp_len = len(temp_amr["model"]["states"])
-            amr_len = len(amr["model"]["states"])
-            if temp_len > amr_len:
-                amr = temp_amr
-        except:
-            continue
+    print(f"{amrs}")
+    try:
+        amr = amrs[0]
+        for temp_amr in amrs:
+            try:
+                temp_len = len(temp_amr["model"]["states"])
+                amr_len = len(amr["model"]["states"])
+                if temp_len > amr_len:
+                    amr = temp_amr
+            except:
+                continue
+    except:
+        amr = logging
 
     return amr
 

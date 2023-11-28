@@ -4,6 +4,7 @@ from skema.program_analysis.CAST2FN.model.cast import (
     Assignment,
     AstNode,
     Call,
+    FunctionDef,
     LiteralValue,
     Loop,
     Operator,
@@ -28,6 +29,10 @@ def check(result, expected = None):
     elif isinstance(result, Call):
         check(result.func, expected.func)
         check(result.arguments, expected.arguments)
+    elif isinstance(result, FunctionDef):
+        check(result.name, expected.name)
+        check(result.func_args, expected.func_args)
+        check(result.body, expected.body)
     elif isinstance(result, ModelIf):
         check(result.expr, expected.expr)
         check(result.body, expected.body)
