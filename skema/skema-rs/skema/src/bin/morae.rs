@@ -44,10 +44,12 @@ fn main() {
             module_id = new_args.model_id.unwrap();
         }
 
+        let db_protocol = env::var("SKEMA_GRAPH_DB_PROTO").unwrap_or("bolt://".to_string());
         let db_host = env::var("SKEMA_GRAPH_DB_HOST").unwrap_or("127.0.0.1".to_string());
         let db_port = env::var("SKEMA_GRAPH_DB_PORT").unwrap_or("7687".to_string());
 
         let config = Config {
+            db_protocol: db_protocol.clone(),
             db_host: db_host.clone(),
             db_port: db_port.parse::<u16>().unwrap(),
         };

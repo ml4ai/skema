@@ -215,6 +215,7 @@ pub fn module_query(config: Config) -> Result<Vec<i64>, MgError> {
 #[get("/models")]
 pub async fn get_model_ids(config: web::Data<Config>) -> HttpResponse {
     let config1 = Config {
+        db_protocol: config.db_protocol.clone(),
         db_host: config.db_host.clone(),
         db_port: config.db_port.clone(),
     };
@@ -235,6 +236,7 @@ pub async fn post_model(
     config: web::Data<Config>,
 ) -> HttpResponse {
     let config1 = Config {
+        db_protocol: config.db_protocol.clone(),
         db_host: config.db_host.clone(),
         db_port: config.db_port.clone(),
     };
@@ -252,6 +254,7 @@ pub async fn post_model(
 pub async fn delete_model(path: web::Path<i64>, config: web::Data<Config>) -> HttpResponse {
     let id = path.into_inner();
     let config1 = Config {
+        db_protocol: config.db_protocol.clone(),
         db_host: config.db_host.clone(),
         db_port: config.db_port.clone(),
     };
@@ -268,6 +271,7 @@ pub async fn delete_model(path: web::Path<i64>, config: web::Data<Config>) -> Ht
 #[get("/models/{id}/named_opos")]
 pub async fn get_named_opos(path: web::Path<i64>, config: web::Data<Config>) -> HttpResponse {
     let config1 = Config {
+        db_protocol: config.db_protocol.clone(),
         db_host: config.db_host.clone(),
         db_port: config.db_port.clone(),
     };
@@ -284,6 +288,7 @@ pub async fn get_named_opos(path: web::Path<i64>, config: web::Data<Config>) -> 
 #[get("/models/{id}/named_ports")]
 pub async fn get_named_ports(path: web::Path<i64>, config: web::Data<Config>) -> HttpResponse {
     let config1 = Config {
+        db_protocol: config.db_protocol.clone(),
         db_host: config.db_host.clone(),
         db_port: config.db_port.clone(),
     };
@@ -300,6 +305,7 @@ pub async fn get_named_ports(path: web::Path<i64>, config: web::Data<Config>) ->
 #[get("/models/{id}/named_opis")]
 pub async fn get_named_opis(path: web::Path<i64>, config: web::Data<Config>) -> HttpResponse {
     let config1 = Config {
+        db_protocol: config.db_protocol.clone(),
         db_host: config.db_host.clone(),
         db_port: config.db_port.clone(),
     };
@@ -316,6 +322,7 @@ pub async fn get_named_opis(path: web::Path<i64>, config: web::Data<Config>) -> 
 #[get("/models/{id}/subgraph")]
 pub async fn get_subgraph(path: web::Path<i64>, config: web::Data<Config>) -> HttpResponse {
     let config1 = Config {
+        db_protocol: config.db_protocol.clone(),
         db_host: config.db_host.clone(),
         db_port: config.db_port.clone(),
     };
@@ -336,6 +343,7 @@ pub async fn get_subgraph(path: web::Path<i64>, config: web::Data<Config>) -> Ht
 #[get("/models/{id}/RN")]
 pub async fn get_model_RN(path: web::Path<i64>, config: web::Data<Config>) -> HttpResponse {
     let config1 = Config {
+        db_protocol: config.db_protocol.clone(),
         db_host: config.db_host.clone(),
         db_port: config.db_port.clone(),
     };
@@ -360,6 +368,7 @@ pub async fn model2PN(
     config: web::Data<Config>,
 ) -> HttpResponse {
     let config1 = Config {
+        db_protocol: config.db_protocol.clone(),
         db_host: config.db_host.clone(),
         db_port: config.db_port.clone(),
     };
@@ -385,6 +394,7 @@ pub async fn model2RN(
     config: web::Data<Config>,
 ) -> HttpResponse {
     let config1 = Config {
+        db_protocol: config.db_protocol.clone(),
         db_host: config.db_host.clone(),
         db_port: config.db_port.clone(),
     };
