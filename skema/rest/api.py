@@ -190,7 +190,7 @@ async def healthcheck(response: Response) -> schema.HealthStatus:
         mathjax=mathjax_status,
         eqn2mml=eqn2mml_status,
         code2fn=code2fn_status,
-        text_reading=text_reading_status,
+        integrated_text_reading=text_reading_status,
         metal=metal_status
     )
 
