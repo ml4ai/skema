@@ -15,6 +15,10 @@ use mathml::parsers::math_expression_tree::MathExpressionTree;
 use skema::model_extraction::{module_id2mathml_MET_ast, subgraph2_core_dyn_ast};
 use std::fs::File;
 use std::io::{BufRead, BufReader};
+use neo4rs::{query, Graph, Node};
+use tokio::task;
+use tokio::runtime::Builder;
+use std::sync::Arc;
 
 #[derive(Parser, Debug)]
 struct Cli {
@@ -26,7 +30,8 @@ struct Cli {
     model_id: Option<i64>,
 }
 
-fn main() {
+#[tokio::main]
+async fn main() {
     // setup command line argument on if the core dynamics has been found manually or needs to be found automatically
     /*
     Command line args;
@@ -44,17 +49,31 @@ fn main() {
             module_id = new_args.model_id.unwrap();
         }
 
-        let db_protocol = env::var("SKEMA_GRAPH_DB_PROTO").unwrap_or("bolt://".to_string());
-        let db_host = env::var("SKEMA_GRAPH_DB_HOST").unwrap_or("127.0.0.1".to_string());
-        let db_port = env::var("SKEMA_GRAPH_DB_PORT").unwrap_or("7687".to_string());
+        /*let db_protocol = env::var("SKEMA_GRAPH_DB_PROTO").unwrap_or("bolt+s://".to_string());
+        let db_host = env::var("SKEMA_GRAPH_DB_HOST").unwrap_or("graphdb-bolt.askem.lum.ai".to_string());
+        let db_port = env::var("SKEMA_GRAPH_DB_PORT").unwrap_or("443".to_string());*/
+    
+        let db_protocol = env::var("SKEMA_GRAPH_DB_PROTO").unwrap_or("bolt+s://".to_string());
+        let db_host = env::var("SKEMA_GRAPH_DB_HOST").unwrap_or("graphdb-bolt.askem.lum.ai".to_string());
+        let db_port = env::var("SKEMA_GRAPH_DB_PORT").unwrap_or("443".to_string());
 
         let config = Config {
             db_protocol: db_protocol.clone(),
             db_host: db_host.clone(),
             db_port: db_port.parse::<u16>().unwrap(),
         };
+        println!("outside spawn");
+        let graph = Arc::new(config.graphdb_connection().await);
+        println!("got past graph");
+        let mut result = graph.execute(
+            query("MATCH (n:Metadata) RETURN n")).await.unwrap();
+        println!("got here");
 
-        let math_content = module_id2mathml_MET_ast(module_id, config.clone());
+        while let Ok(Some(row)) = result.next().await {
+            println!("{:?}", row.get::<Node>("n").unwrap());
+        }
+        println!("got past everything");
+        //let math_content = module_id2mathml_MET_ast(module_id, config.clone());
 
         let input_src = "../../data/mml2pn_inputs/testing_eqns/sidarthe_mml.txt";
 
@@ -80,16 +99,16 @@ fn main() {
         println!("{:?}", wiring_vec.clone());
         println!("decapode collection: {:?}", decapodescollection.clone());
         */
-        let odes = get_FirstOrderODE_vec_from_file(input_src.clone());
+        //let odes = get_FirstOrderODE_vec_from_file(input_src.clone());
 
         //println!("\nmath_content: {:?}", math_content);
         //println!("\nmathml_ast: {:?}", odes);
 
-        println!(
-            "\nAMR from mathml: {}\n",
-            serde_json::to_string(&PetriNet::from(odes)).unwrap()
-        );
-        println!("\nAMR from code: {:?}", PetriNet::from(math_content));
+        //println!(
+        //    "\nAMR from mathml: {}\n",
+        //    serde_json::to_string(&PetriNet::from(odes)).unwrap()
+        //);
+        //println!("\nAMR from code: {:?}", PetriNet::from(math_content));
     }
     // This is the graph id for the top level function for the core dynamics for our test case.
 }

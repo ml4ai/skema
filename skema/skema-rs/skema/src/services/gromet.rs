@@ -187,6 +187,16 @@ pub fn module_query(config: Config) -> Result<Vec<i64>, MgError> {
     let connect_params = config.db_connection();
     let mut connection = Connection::connect(&connect_params)?;
 
+    /*    let graph = config.graphdb_connection();
+
+    let mut result = graph.execute(
+        query("MATCH (n:Module) RETURN collect(id(n));")).await.unwrap();
+
+    // Check that the first value of the first record is a list
+    let mut ids = Vec::<i64>::new();
+    while let Ok(Some(row)) = result.next().await {
+        
+    } */
     // Run Query.
     connection.execute("MATCH (n:Module) RETURN collect(id(n));", None)?;
 

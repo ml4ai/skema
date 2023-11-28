@@ -6,7 +6,6 @@ use crate::{
         operator::{Derivative, Operator, PartialDerivative},
         Math, MathExpression, Mi, Mrow,
     },
-    parsers::generic_mathml::{IResult, Span},
     parsers::interpreted_mathml::interpreted_math,
 };
 use derive_new::new;
@@ -277,14 +276,14 @@ fn process_expression_parentheses(expression: &mut String, met: &MathExpressionT
         // Check if the operator is a unary operator.
         if is_unary_operator(op) {
             // If it is a unary operator, add it to the LaTeX string as is.
-            expression.push_str(&format!("{}", met.to_latex()));
+            expression.push_str(&met.to_latex().to_string());
         } else {
             // If it is not a unary operator, wrap it in parentheses before adding it to the LaTeX string.
             expression.push_str(&format!("({})", met.to_latex()));
         }
     } else {
         // If the expression is an atom, add it to the LaTeX string directly.
-        expression.push_str(&format!("{}", met.to_latex()));
+        expression.push_str(&met.to_latex().to_string());
     }
 }
 
@@ -294,17 +293,17 @@ fn process_math_expression(expr: &MathExpression, expression: &mut String) {
     match expr {
         // If it's a Ci variant, recursively process its content
         MathExpression::Ci(x) => {
-            process_math_expression(&*x.content, expression);
+            process_math_expression(&x.content, expression);
             if let Some(func_of_vec) = &x.func_of {
-                if func_of_vec.len() > 0 && func_of_vec[0].content.to_string().len() > 0 {
-                    expression.push_str("(");
+                if !func_of_vec.is_empty() && !func_of_vec[0].content.to_string().is_empty() {
+                    expression.push('(');
                     for (index, func_ci) in func_of_vec.iter().enumerate() {
-                        process_math_expression(&*func_ci.content, expression);
+                        process_math_expression(&func_ci.content, expression);
                         if index < func_of_vec.len() - 1 {
-                            expression.push_str(",");
+                            expression.push(',');
                         }
                     }
-                    expression.push_str(")");
+                    expression.push(')');
                 }
             }
         }
@@ -316,49 +315,49 @@ fn process_math_expression(expr: &MathExpression, expression: &mut String) {
         }
         MathExpression::Msqrt(x) => {
             expression.push_str("\\sqrt{");
-            process_math_expression(&*x, expression);
-            expression.push_str("}");
+            process_math_expression(x, expression);
+            expression.push('}');
         }
         MathExpression::Mfrac(x1, x2) => {
             expression.push_str("\\frac{");
-            process_math_expression(&*x1, expression);
+            process_math_expression(x1, expression);
             expression.push_str("}{");
-            process_math_expression(&*x2, expression);
-            expression.push_str("}");
+            process_math_expression(x2, expression);
+            expression.push('}');
         }
         MathExpression::Msup(x1, x2) => {
-            process_math_expression(&*x1, expression);
+            process_math_expression(x1, expression);
             expression.push_str("^{");
-            process_math_expression(&*x2, expression);
-            expression.push_str("}");
+            process_math_expression(x2, expression);
+            expression.push('}');
         }
         MathExpression::Msub(x1, x2) => {
-            process_math_expression(&*x1, expression);
+            process_math_expression(x1, expression);
             expression.push_str("_{");
-            process_math_expression(&*x2, expression);
-            expression.push_str("}");
+            process_math_expression(x2, expression);
+            expression.push('}');
         }
         MathExpression::Msubsup(x1, x2, x3) => {
-            process_math_expression(&*x1, expression);
+            process_math_expression(x1, expression);
             expression.push_str("_{");
-            process_math_expression(&*x2, expression);
+            process_math_expression(x2, expression);
             expression.push_str("}^{");
-            process_math_expression(&*x3, expression);
-            expression.push_str("}");
+            process_math_expression(x3, expression);
+            expression.push('}');
         }
         MathExpression::Munder(x1, x2) => {
             expression.push_str("\\underset{");
-            process_math_expression(&*x2, expression);
+            process_math_expression(x2, expression);
             expression.push_str("}{");
-            process_math_expression(&*x1, expression);
-            expression.push_str("}");
+            process_math_expression(x1, expression);
+            expression.push('}');
         }
         MathExpression::Mover(x1, x2) => {
             expression.push_str("\\overset{");
-            process_math_expression(&*x2, expression);
+            process_math_expression(x2, expression);
             expression.push_str("}{");
-            process_math_expression(&*x1, expression);
-            expression.push_str("}");
+            process_math_expression(x1, expression);
+            expression.push('}');
         }
         MathExpression::Mtext(x) => {
             expression.push_str(x);
@@ -368,10 +367,10 @@ fn process_math_expression(expr: &MathExpression, expression: &mut String) {
         }
         MathExpression::AbsoluteSup(x1, x2) => {
             expression.push_str("\\left| ");
-            process_math_expression(&*x1, expression);
+            process_math_expression(x1, expression);
             expression.push_str(" \\right|_{");
-            process_math_expression(&*x2, expression);
-            expression.push_str("}");
+            process_math_expression(x2, expression);
+            expression.push('}');
         }
         MathExpression::Mrow(_) => {
             panic!("All Mrows should have been removed by now!");
@@ -493,19 +492,19 @@ impl MathExpressionTree {
                         for (index, r) in rest.iter().enumerate() {
                             if let MathExpressionTree::Cons(op, _) = r {
                                 if is_unary_operator(op) {
-                                    expression.push_str(&format!("{}", r.to_latex()));
+                                    expression.push_str(&r.to_latex().to_string());
                                 } else if let Operator::Add = op {
-                                    expression.push_str(&format!("{}", r.to_latex()));
+                                    expression.push_str(&r.to_latex().to_string());
                                 } else {
                                     expression.push_str(&format!("({})", r.to_latex()));
                                 }
                             } else {
-                                expression.push_str(&format!("{}", r.to_latex()));
+                                expression.push_str(&r.to_latex().to_string());
                             }
 
                             // Add "+" if it's not the last element
                             if index < rest.len() - 1 {
-                                expression.push_str("+");
+                                expression.push('+');
                             }
                         }
                     }
@@ -514,7 +513,7 @@ impl MathExpressionTree {
                             process_expression_parentheses(&mut expression, r);
                             // Add "-" if it's not the last element
                             if index < rest.len() - 1 {
-                                expression.push_str("-");
+                                expression.push('-');
                             }
                         }
                     }
@@ -522,29 +521,29 @@ impl MathExpressionTree {
                         for (index, r) in rest.iter().enumerate() {
                             if let MathExpressionTree::Cons(op, _) = r {
                                 if is_unary_operator(op) {
-                                    expression.push_str(&format!("{}", r.to_latex()));
+                                    expression.push_str(&r.to_latex().to_string());
                                 } else if let Operator::Multiply = op {
-                                    expression.push_str(&format!("{}", r.to_latex()));
+                                    expression.push_str(&r.to_latex().to_string());
                                 } else if let Operator::Divide = op {
-                                    expression.push_str(&format!("{}", r.to_latex()));
+                                    expression.push_str(&r.to_latex().to_string());
                                 } else if let Operator::Dot = op {
-                                    expression.push_str(&format!("{}", r.to_latex()));
+                                    expression.push_str(&r.to_latex().to_string());
                                 } else {
                                     expression.push_str(&format!("({})", r.to_latex()));
                                 }
                             } else {
-                                expression.push_str(&format!("{}", r.to_latex()));
+                                expression.push_str(&r.to_latex().to_string());
                             }
                             // Add "*" if it's not the last element
                             if index < rest.len() - 1 {
-                                expression.push_str("*");
+                                expression.push('*');
                             }
                         }
                     }
                     Operator::Equals => {
-                        expression.push_str(&format!("{}", rest[0].to_latex()));
-                        expression.push_str("=");
-                        expression.push_str(&format!("{}", rest[1].to_latex()));
+                        expression.push_str(&rest[0].to_latex().to_string());
+                        expression.push('=');
+                        expression.push_str(&rest[1].to_latex().to_string());
                     }
                     Operator::Divide => {
                         expression.push_str(&format!("\\frac{{{}}}", &rest[0].to_latex()));
@@ -559,36 +558,36 @@ impl MathExpressionTree {
                         expression.push_str(&format!("{{{}}}", rest[0].to_latex()));
                     }
                     Operator::Lparen => {
-                        expression.push_str("(");
-                        expression.push_str(&format!("{}", rest[0].to_latex()));
+                        expression.push('(');
+                        expression.push_str(&rest[0].to_latex().to_string());
                     }
                     Operator::Rparen => {
-                        expression.push_str(")");
-                        expression.push_str(&format!("{}", rest[0].to_latex()));
+                        expression.push(')');
+                        expression.push_str(&rest[0].to_latex().to_string());
                     }
                     Operator::Compose => {
                         process_expression_parentheses(&mut expression, &rest[0]);
-                        expression.push_str("_");
+                        expression.push('_');
                         process_expression_parentheses(&mut expression, &rest[1]);
                     }
                     Operator::Factorial => {
                         process_expression_parentheses(&mut expression, &rest[0]);
-                        expression.push_str("!");
+                        expression.push('!');
                     }
                     Operator::Power => {
                         process_expression_parentheses(&mut expression, &rest[0]);
-                        expression.push_str("^");
+                        expression.push('^');
                         expression.push_str(&format!("{{{}}}", rest[1].to_latex()));
                     }
                     Operator::Comma => {
                         process_expression_parentheses(&mut expression, &rest[0]);
-                        expression.push_str(",");
+                        expression.push(',');
                         process_expression_parentheses(&mut expression, &rest[1]);
                     }
                     Operator::Grad => {
                         expression.push_str("\\nabla{");
                         process_expression_parentheses(&mut expression, &rest[0]);
-                        expression.push_str("}");
+                        expression.push('}');
                     }
                     Operator::Dot => {
                         process_expression_parentheses(&mut expression, &rest[0]);
@@ -598,7 +597,7 @@ impl MathExpressionTree {
                     Operator::Div => {
                         expression.push_str("\\nabla \\cdot {");
                         process_expression_parentheses(&mut expression, &rest[0]);
-                        expression.push_str("}");
+                        expression.push('}');
                     }
                     Operator::Abs => {
                         expression.push_str(&format!("\\left|{}\\right|", rest[0].to_latex()));
@@ -607,8 +606,8 @@ impl MathExpressionTree {
                         expression.push_str("\\frac{d ");
                         process_expression_parentheses(&mut expression, &rest[0]);
                         expression.push_str("}{d");
-                        process_math_expression(&*d.bound_var.content, &mut expression);
-                        expression.push_str("}");
+                        process_math_expression(&d.bound_var.content, &mut expression);
+                        expression.push('}');
                     }
                     Operator::Sin => {
                         expression.push_str(&format!("\\sin({})", rest[0].to_latex()));
@@ -761,7 +760,7 @@ impl MathExpression {
                 superscript.flatten(tokens);
                 tokens.push(MathExpression::Mo(Operator::Rparen));
             }
-            MathExpression::Absolute(operator, components) => {
+            MathExpression::Absolute(_operator, components) => {
                 tokens.push(MathExpression::Mo(Operator::Lparen));
                 tokens.push(MathExpression::Mo(Operator::Abs));
                 tokens.push(MathExpression::Mo(Operator::Lparen));
@@ -868,7 +867,7 @@ fn expr(input: Vec<MathExpression>) -> MathExpressionTree {
     let mut result: MathExpressionTree = expr_bp(&mut lexer, 0);
     let mut math_vec: Vec<MathExpressionTree> = vec![];
     while lexer.next() != Token::Eof {
-        let mut math_result = expr_bp(&mut lexer, 0);
+        let math_result = expr_bp(&mut lexer, 0);
         math_vec.push(math_result.clone());
     }
 
@@ -915,8 +914,7 @@ fn insert_multiple_between_paren(lexer: &mut Lexer) {
             if let Token::Op(Operator::Lparen) = token {
                 if let Token::Op(Operator::Rparen) = **next_token {
                     new_tokens.push(Token::Op(Operator::Multiply).clone());
-                } else {
-                }
+                } 
             }
         }
     }
@@ -1045,19 +1043,19 @@ pub fn preprocess_mathml_for_to_latex(input: &str) -> String {
     let no_newlines = input.replace('\n', "");
 
     // Remove spaces between MathML elements
-    let no_spaces = Regex::new(r#">\s*<"#)
+    let no_spaces = Regex::new(r">\s*<")
         .unwrap()
         .replace_all(&no_newlines, "><")
         .to_string();
 
-    let new_no_spaces = no_spaces.replace(" ", "");
+    let new_no_spaces = no_spaces.replace(' ', "");
 
     // Replace <mi>∇</mi> with <mo>∇</mo>
-    let replaced_str = new_no_spaces
-        .replace(r#"<mi>∇</mi>"#, "<mo>∇</mo>")
-        .to_string();
+    
 
-    replaced_str
+    new_no_spaces
+        .replace(r#"<mi>∇</mi>"#, "<mo>∇</mo>")
+        .to_string()
 }
 
 #[test]
@@ -1167,7 +1165,7 @@ fn test_content_hackathon2_scenario1_eq1() {
         lhs_var: _,
         func_of: _,
         with_respect_to: _,
-        rhs,
+        rhs: _,
     } = first_order_ode(input.into()).unwrap().1;
     assert_eq!(cmml, "<apply><eq/><apply><diff/><bvar>t</bar><ci>S</ci></apply><apply><times/><apply><times/><apply><minus/><ci>β</ci></apply><ci>I</ci></apply><apply><divide/><ci>S</ci><ci>N</ci></apply></apply></apply>");
 }

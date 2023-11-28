@@ -21,7 +21,7 @@ use nom::{
     bytes::complete::tag,
     combinator::{map, opt, value},
     multi::{many0, many1, separated_list1},
-    sequence::{delimited, pair, preceded, separated_pair, tuple},
+    sequence::{delimited, pair, preceded, tuple},
 };
 
 /// Function to parse operators. This function differs from the one in parsers::generic_mathml by
@@ -525,7 +525,7 @@ pub fn absolute(input: Span) -> IResult<MathExpression> {
 
 /// Example: Divergence
 pub fn div(input: Span) -> IResult<Operator> {
-    let (s, op) = ws(pair(gradient, ws(delimited(stag!("mo"), dot, etag!("mo")))))(input)?;
+    let (s, _op) = ws(pair(gradient, ws(delimited(stag!("mo"), dot, etag!("mo")))))(input)?;
     let div = Operator::Div;
     Ok((s, div))
 }
@@ -552,7 +552,7 @@ pub fn absolute_with_msup(input: Span) -> IResult<MathExpression> {
             //ws(tag("<mo>|</mo>")),
             ws(tuple((
                 //math_expression,
-                map(ws(many0(math_expression)), |z| Mrow(z)),
+                map(ws(many0(math_expression)), Mrow),
                 preceded(ws(tag("<msup><mo>|</mo>")), ws(math_expression)),
             ))),
             ws(tag("</msup>")),
@@ -568,7 +568,7 @@ pub fn paren_as_msup(input: Span) -> IResult<MathExpression> {
         ws(delimited(
             tag("<mo>(</mo>"),
             tuple((
-                map(many0(math_expression), |z| Mrow(z)),
+                map(many0(math_expression), Mrow),
                 preceded(tag("<msup><mo>)</mo>"), math_expression),
             )),
             tag("</msup>"),

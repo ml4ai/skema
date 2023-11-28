@@ -367,7 +367,7 @@ impl From<Vec<FirstOrderODE>> for PetriNet {
 
         // now to trim off terms that are for euler methods, dyn_state != exp_state && parameters.len() != 0
         for term in dirty_terms.iter() {
-            if term.dyn_state != term.exp_states[0] || term.parameters.len() != 0 {
+            if term.dyn_state != term.exp_states[0] || !term.parameters.is_empty() {
                 terms.push(term.clone());
             }
         }

@@ -34,8 +34,11 @@ impl Config {
     pub async fn graphdb_connection(&self) -> Graph {
       let uri = self.create_graphdb_uri();
       println!("skema-rs:memgraph uri:\t{addr}", addr=uri);
-      let graph_config = ConfigBuilder::default()
+      let graph_config = ConfigBuilder::new()
        .uri(uri)
+       .user("".to_string())
+       .password("".to_string())
+       .db("memgraph".to_string())
        .fetch_size(200)
        .max_connections(16)
        .build()
