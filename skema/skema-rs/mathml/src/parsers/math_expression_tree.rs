@@ -373,8 +373,10 @@ fn process_math_expression(expr: &MathExpression, expression: &mut String) {
             process_math_expression(&*x2, expression);
             expression.push_str("}");
         }
-        MathExpression::Mrow(_) => {
-            panic!("All Mrows should have been removed by now!");
+        MathExpression::Mrow(vec_me) => {
+            for me in vec_me.0.iter() {
+                process_math_expression(me, expression);
+            }
         }
         t => panic!("Unhandled MathExpression: {:?}", t),
     }
@@ -2098,4 +2100,5 @@ fn test_equation_with_mtext() {
     let exp = input.parse::<MathExpressionTree>().unwrap();
     let s_exp = exp.to_string();
     assert_eq!(s_exp, "(= L_{reg} (+ L_{d1} L_{d2}))");
+    assert_eq!(exp.to_latex(), "L_{reg}=L_{d1}+L_{d2}");
 }
