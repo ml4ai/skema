@@ -67,7 +67,7 @@ class TS2CAST(object):
 
         # Start visiting
         self.out_cast = self.generate_cast()
-        #print(self.out_cast[0].to_json_str())
+        print(self.out_cast[0].to_json_str())
         
     def generate_cast(self) -> List[CAST]:
         '''Interface for generating CAST.'''
@@ -341,9 +341,13 @@ class TS2CAST(object):
         )
 
     def visit_keyword_statement(self, node):
-        # Currently, the only keyword_identifier produced by tree-sitter is Return
-        # However, there may be other instances
-
+        # NOTE: RETURN is not the only Fortran keyword. GO TO and CONTINUE are also considered keywords.
+        # TODO: Handle GO TO and CONTINUE
+        identifier = self.node_helper.get_identifier(node).lower()
+        if node.type == "keyword_statement":
+            if "continue" in identifier or "go to" in identifier:
+                return None
+            
         # In Fortran the return statement doesn't return a value (there is the obsolete "alternative return")
         # We keep track of values that need to be returned in the variable context
         return_values = self.variable_context.context_return_values[
@@ -625,9 +629,17 @@ class TS2CAST(object):
             if isinstance(orelse, ModelIf):
                 orelse = [orelse]
 
+        body = []
+        for child in node.children[body_start_index:body_stop_index]:
+            child_cast = self.visit(child)
+            if isinstance(child_cast, AstNode):
+                body.append(child_cast)
+            elif isinstance(child_cast, List):
+                body.extend(child_cast)
+    
         return ModelIf(
             expr=self.visit(node.children[1]),
-            body=[self.visit(child) for child in node.children[body_start_index:body_stop_index]],
+            body=body,
             orelse=orelse if orelse else [],
         )
 
@@ -800,11 +812,13 @@ class TS2CAST(object):
             type_map = {
                 "integer": "Integer",
                 "real": "AbstractFloat",
+                "double precision": None,
                 "complex": None,
                 "logical": "Boolean",
                 "character": "String",
             }
-            variable_type = type_map[self.node_helper.get_identifier(intrinsic_type_node)]
+            # NOTE: Identifiers are case sensitive, so we always need to make sure we are comparing to the lower() version
+            variable_type = type_map[self.node_helper.get_identifier(intrinsic_type_node).lower()]
         elif derived_type_node:
             variable_type = self.node_helper.get_identifier(
                 get_first_child_by_type(derived_type_node, "type_name", recurse=True),
@@ -1160,3 +1174,4 @@ class TS2CAST(object):
             return self.variable_context.get_node(func_name)
 
         return self.variable_context.add_variable(func_name, "function", None)
+

@@ -62,7 +62,7 @@ def process_file_system(
                 cast = python_to_cast(full_file, cast_obj=True)
             elif full_file.endswith(".m"):
                 cast = matlab_to_cast(full_file, cast_obj=True)
-            elif full_file.endswith(".F") or full_file.endswith(".f95"):
+            elif full_file.endswith(".f") or full_file.endswith(".F") or full_file.endswith(".f95") or full_file.endswith(".f90") or full_file.endswith(".F90"):
                 cast = fortran_to_cast(full_file, cast_obj=True)
             else:
                 print(f"File extension not supported for {full_file}")
