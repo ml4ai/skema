@@ -1,26 +1,214 @@
-Traceback (most recent call last):
-  File "skema/program_analysis/model_coverage_report/model_coverage_report.py", line 76, in generate_data_product
-    output = func_timeout(10, data_product_function, args=args, kwargs=kwargs)
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/func_timeout/dafunc.py", line 108, in func_timeout
-    raise_exception(exception)
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/func_timeout/py3_raise.py", line 7, in raise_exception
-    raise exception[0] from None
-  File "skema/program_analysis/model_coverage_report/model_coverage_report.py", line 108, in generate_cast
-    cast = fortran_to_cast(source_path, cast_obj=True)
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/fortran2cast.py", line 64, in fortran_to_cast
-    out_cast = TS2CAST(path).out_cast
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST/fortran/ts2cast.py", line 51, in __init__
-    self.source = preprocess(self.path)
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST/fortran/preprocessor/preprocess.py", line 92, in preprocess
-    source = convert_to_free_form(source)
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST/fortran/preprocessor/preprocess.py", line 198, in convert_to_free_form
-    if validate_parse_tree(source):
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST/fortran/preprocessor/preprocess.py", line 190, in validate_parse_tree
-    language = Language(INSTALLED_LANGUAGES_FILEPATH, "fortran")
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/tree_sitter/__init__.py", line 131, in __init__
-    self.lib = cdll.LoadLibrary(library_path)
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/ctypes/__init__.py", line 451, in LoadLibrary
-    return self._dlltype(name)
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/ctypes/__init__.py", line 373, in __init__
-    self._handle = _dlopen(self._name, mode)
-OSError: /opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/tree_sitter_parsers/build/installed_languages.so: cannot open shared object file: No such file or directory
+{
+    "nodes": [
+        {
+            "body": [
+                {
+                    "body": [
+                        {
+                            "default_value": null,
+                            "node_type": "Var",
+                            "source_refs": [
+                                {
+                                    "col_end": 20,
+                                    "col_start": 17,
+                                    "node_type": "SourceRef",
+                                    "row_end": 16,
+                                    "row_start": 16,
+                                    "source_file_name": "vtsetup.F"
+                                }
+                            ],
+                            "type": "Integer",
+                            "val": {
+                                "id": 1,
+                                "name": "ier",
+                                "node_type": "Name",
+                                "source_refs": [
+                                    {
+                                        "col_end": 20,
+                                        "col_start": 17,
+                                        "node_type": "SourceRef",
+                                        "row_end": 16,
+                                        "row_start": 16,
+                                        "source_file_name": "vtsetup.F"
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "default_value": null,
+                            "node_type": "Var",
+                            "source_refs": [
+                                {
+                                    "col_end": 25,
+                                    "col_start": 21,
+                                    "node_type": "SourceRef",
+                                    "row_end": 16,
+                                    "row_start": 16,
+                                    "source_file_name": "vtsetup.F"
+                                }
+                            ],
+                            "type": "Integer",
+                            "val": {
+                                "id": 2,
+                                "name": "code",
+                                "node_type": "Name",
+                                "source_refs": [
+                                    {
+                                        "col_end": 25,
+                                        "col_start": 21,
+                                        "node_type": "SourceRef",
+                                        "row_end": 16,
+                                        "row_start": 16,
+                                        "source_file_name": "vtsetup.F"
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "default_value": null,
+                            "node_type": "Var",
+                            "source_refs": [
+                                {
+                                    "col_end": 32,
+                                    "col_start": 27,
+                                    "node_type": "SourceRef",
+                                    "row_end": 17,
+                                    "row_start": 17,
+                                    "source_file_name": "vtsetup.F"
+                                }
+                            ],
+                            "type": "String",
+                            "val": {
+                                "id": 3,
+                                "name": "state",
+                                "node_type": "Name",
+                                "source_refs": [
+                                    {
+                                        "col_end": 32,
+                                        "col_start": 27,
+                                        "node_type": "SourceRef",
+                                        "row_end": 17,
+                                        "row_start": 17,
+                                        "source_file_name": "vtsetup.F"
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "default_value": null,
+                            "node_type": "Var",
+                            "source_refs": [
+                                {
+                                    "col_end": 41,
+                                    "col_start": 33,
+                                    "node_type": "SourceRef",
+                                    "row_end": 17,
+                                    "row_start": 17,
+                                    "source_file_name": "vtsetup.F"
+                                }
+                            ],
+                            "type": "String",
+                            "val": {
+                                "id": 4,
+                                "name": "activity",
+                                "node_type": "Name",
+                                "source_refs": [
+                                    {
+                                        "col_end": 41,
+                                        "col_start": 33,
+                                        "node_type": "SourceRef",
+                                        "row_end": 17,
+                                        "row_start": 17,
+                                        "source_file_name": "vtsetup.F"
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "id": 0,
+                            "name": "vtsetup",
+                            "node_type": "Name",
+                            "source_refs": [
+                                {
+                                    "col_end": 24,
+                                    "col_start": 17,
+                                    "node_type": "SourceRef",
+                                    "row_end": 7,
+                                    "row_start": 7,
+                                    "source_file_name": "vtsetup.F"
+                                }
+                            ]
+                        },
+                        {
+                            "node_type": "ModelReturn",
+                            "source_refs": [
+                                {
+                                    "col_end": 28,
+                                    "col_start": 6,
+                                    "node_type": "SourceRef",
+                                    "row_end": 19,
+                                    "row_start": 7,
+                                    "source_file_name": "vtsetup.F"
+                                }
+                            ],
+                            "value": {
+                                "id": 0,
+                                "name": "vtsetup",
+                                "node_type": "Name",
+                                "source_refs": [
+                                    {
+                                        "col_end": 24,
+                                        "col_start": 17,
+                                        "node_type": "SourceRef",
+                                        "row_end": 7,
+                                        "row_start": 7,
+                                        "source_file_name": "vtsetup.F"
+                                    }
+                                ]
+                            }
+                        }
+                    ],
+                    "func_args": [],
+                    "name": {
+                        "id": 0,
+                        "name": "vtsetup",
+                        "node_type": "Name",
+                        "source_refs": [
+                            {
+                                "col_end": 24,
+                                "col_start": 17,
+                                "node_type": "SourceRef",
+                                "row_end": 7,
+                                "row_start": 7,
+                                "source_file_name": "vtsetup.F"
+                            }
+                        ]
+                    },
+                    "node_type": "FunctionDef",
+                    "source_refs": [
+                        {
+                            "col_end": 28,
+                            "col_start": 6,
+                            "node_type": "SourceRef",
+                            "row_end": 19,
+                            "row_start": 7,
+                            "source_file_name": "vtsetup.F"
+                        }
+                    ]
+                }
+            ],
+            "name": null,
+            "node_type": "Module",
+            "source_refs": [
+                {
+                    "col_end": 28,
+                    "col_start": 0,
+                    "node_type": "SourceRef",
+                    "row_end": 19,
+                    "row_start": 0,
+                    "source_file_name": "vtsetup.F"
+                }
+            ]
+        }
+    ]
+}

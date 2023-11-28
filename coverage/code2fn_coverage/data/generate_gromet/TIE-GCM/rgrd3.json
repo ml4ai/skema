@@ -13,18 +13,18 @@ Traceback (most recent call last):
     cast = fortran_to_cast(full_file, cast_obj=True)
   File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/fortran2cast.py", line 64, in fortran_to_cast
     out_cast = TS2CAST(path).out_cast
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST/fortran/ts2cast.py", line 51, in __init__
-    self.source = preprocess(self.path)
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST/fortran/preprocessor/preprocess.py", line 92, in preprocess
-    source = convert_to_free_form(source)
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST/fortran/preprocessor/preprocess.py", line 198, in convert_to_free_form
-    if validate_parse_tree(source):
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST/fortran/preprocessor/preprocess.py", line 190, in validate_parse_tree
-    language = Language(INSTALLED_LANGUAGES_FILEPATH, "fortran")
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/tree_sitter/__init__.py", line 131, in __init__
-    self.lib = cdll.LoadLibrary(library_path)
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/ctypes/__init__.py", line 451, in LoadLibrary
-    return self._dlltype(name)
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/ctypes/__init__.py", line 373, in __init__
-    self._handle = _dlopen(self._name, mode)
-OSError: /opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/tree_sitter_parsers/build/installed_languages.so: cannot open shared object file: No such file or directory
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST/fortran/ts2cast.py", line 69, in __init__
+    self.out_cast = self.generate_cast()
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST/fortran/ts2cast.py", line 74, in generate_cast
+    modules = self.run(self.root_node)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST/fortran/ts2cast.py", line 86, in run
+    modules.append(self.visit(context))
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST/fortran/ts2cast.py", line 111, in visit
+    return self.visit_module(node)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST/fortran/ts2cast.py", line 160, in visit_module
+    child_cast = self.visit(child)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST/fortran/ts2cast.py", line 123, in visit
+    return self.visit_assignment_statement(node)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST/fortran/ts2cast.py", line 667, in visit_assignment_statement
+    left, _, right = node.children
+ValueError: too many values to unpack (expected 3)

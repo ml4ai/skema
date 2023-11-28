@@ -9,22 +9,48 @@ Traceback (most recent call last):
     gromet_collection = process_file(source_path)
   File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/single_file_ingester.py", line 26, in process_file
     gromet_collection = process_file_system(
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/multi_file_ingester.py", line 66, in process_file_system
-    cast = fortran_to_cast(full_file, cast_obj=True)
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/fortran2cast.py", line 64, in fortran_to_cast
-    out_cast = TS2CAST(path).out_cast
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST/fortran/ts2cast.py", line 51, in __init__
-    self.source = preprocess(self.path)
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST/fortran/preprocessor/preprocess.py", line 92, in preprocess
-    source = convert_to_free_form(source)
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST/fortran/preprocessor/preprocess.py", line 198, in convert_to_free_form
-    if validate_parse_tree(source):
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST/fortran/preprocessor/preprocess.py", line 190, in validate_parse_tree
-    language = Language(INSTALLED_LANGUAGES_FILEPATH, "fortran")
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/tree_sitter/__init__.py", line 131, in __init__
-    self.lib = cdll.LoadLibrary(library_path)
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/ctypes/__init__.py", line 451, in LoadLibrary
-    return self._dlltype(name)
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/ctypes/__init__.py", line 373, in __init__
-    self._handle = _dlopen(self._name, mode)
-OSError: /opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/tree_sitter_parsers/build/installed_languages.so: cannot open shared object file: No such file or directory
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/multi_file_ingester.py", line 81, in process_file_system
+    generated_gromet = ann_cast_pipeline(
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/utils/script_functions.py", line 268, in ann_cast_pipeline
+    ToGrometPass(pipeline_state)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/to_gromet_pass.py", line 276, in __init__
+    self.visit(node, parent_gromet_fn=None, parent_cast_node=None)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/to_gromet_pass.py", line 634, in visit
+    raise e
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/to_gromet_pass.py", line 629, in visit
+    return self._visit(node, parent_gromet_fn, parent_cast_node)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/functools.py", line 912, in _method
+    return method.__get__(obj, cls)(*args, **kwargs)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/to_gromet_pass.py", line 4277, in visit_module
+    self.visit_node_list(node.body, new_gromet, node)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/to_gromet_pass.py", line 642, in visit_node_list
+    return [
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/to_gromet_pass.py", line 643, in <listcomp>
+    self.visit(node, parent_gromet_fn, parent_cast_node)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/to_gromet_pass.py", line 634, in visit
+    raise e
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/to_gromet_pass.py", line 629, in visit
+    return self._visit(node, parent_gromet_fn, parent_cast_node)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/functools.py", line 912, in _method
+    return method.__get__(obj, cls)(*args, **kwargs)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/to_gromet_pass.py", line 3185, in visit_function_def
+    self.handle_function_def(
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/to_gromet_pass.py", line 2975, in handle_function_def
+    self.visit(n, new_gromet_fn, node)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/to_gromet_pass.py", line 634, in visit
+    raise e
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/to_gromet_pass.py", line 629, in visit
+    return self._visit(node, parent_gromet_fn, parent_cast_node)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/functools.py", line 912, in _method
+    return method.__get__(obj, cls)(*args, **kwargs)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/to_gromet_pass.py", line 4087, in visit_model_if
+    gromet_bc.body_if = self.if_create_body(
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/to_gromet_pass.py", line 3833, in if_create_body
+    self.handle_function_def(
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/to_gromet_pass.py", line 2984, in handle_function_def
+    self.wire_return_node(n.value, new_gromet_fn)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/to_gromet_pass.py", line 2915, in wire_return_node
+    self.pack_return_tuple(node, gromet_fn)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/to_gromet_pass.py", line 2887, in pack_return_tuple
+    last_pof = len(gromet_fn.pof)
+TypeError: object of type 'NoneType' has no len()

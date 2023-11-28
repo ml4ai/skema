@@ -9,22 +9,52 @@ Traceback (most recent call last):
     gromet_collection = process_file(source_path)
   File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/single_file_ingester.py", line 26, in process_file
     gromet_collection = process_file_system(
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/multi_file_ingester.py", line 66, in process_file_system
-    cast = fortran_to_cast(full_file, cast_obj=True)
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/fortran2cast.py", line 64, in fortran_to_cast
-    out_cast = TS2CAST(path).out_cast
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST/fortran/ts2cast.py", line 51, in __init__
-    self.source = preprocess(self.path)
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST/fortran/preprocessor/preprocess.py", line 92, in preprocess
-    source = convert_to_free_form(source)
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST/fortran/preprocessor/preprocess.py", line 198, in convert_to_free_form
-    if validate_parse_tree(source):
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST/fortran/preprocessor/preprocess.py", line 190, in validate_parse_tree
-    language = Language(INSTALLED_LANGUAGES_FILEPATH, "fortran")
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/tree_sitter/__init__.py", line 131, in __init__
-    self.lib = cdll.LoadLibrary(library_path)
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/ctypes/__init__.py", line 451, in LoadLibrary
-    return self._dlltype(name)
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/ctypes/__init__.py", line 373, in __init__
-    self._handle = _dlopen(self._name, mode)
-OSError: /opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/tree_sitter_parsers/build/installed_languages.so: cannot open shared object file: No such file or directory
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/multi_file_ingester.py", line 81, in process_file_system
+    generated_gromet = ann_cast_pipeline(
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/utils/script_functions.py", line 234, in ann_cast_pipeline
+    pipeline_state = visitor.generate_annotated_cast(grfn_2_2)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/cast_to_annotated_cast.py", line 58, in generate_annotated_cast
+    annotated_cast.append(self.visit(node))
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/cast_to_annotated_cast.py", line 67, in visit
+    return self._visit(node)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/functools.py", line 912, in _method
+    return method.__get__(obj, cls)(*args, **kwargs)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/cast_to_annotated_cast.py", line 183, in visit_module
+    body = self.visit_node_list(node.body)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/cast_to_annotated_cast.py", line 51, in visit_node_list
+    return [self.visit(node) for node in node_list]
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/cast_to_annotated_cast.py", line 51, in <listcomp>
+    return [self.visit(node) for node in node_list]
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/cast_to_annotated_cast.py", line 67, in visit
+    return self._visit(node)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/functools.py", line 912, in _method
+    return method.__get__(obj, cls)(*args, **kwargs)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/cast_to_annotated_cast.py", line 110, in visit_function_def
+    body = self.visit_node_list(node.body)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/cast_to_annotated_cast.py", line 51, in visit_node_list
+    return [self.visit(node) for node in node_list]
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/cast_to_annotated_cast.py", line 51, in <listcomp>
+    return [self.visit(node) for node in node_list]
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/cast_to_annotated_cast.py", line 67, in visit
+    return self._visit(node)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/functools.py", line 912, in _method
+    return method.__get__(obj, cls)(*args, **kwargs)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/cast_to_annotated_cast.py", line 173, in visit_model_if
+    orelse = self.visit_node_list(node.orelse)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/cast_to_annotated_cast.py", line 51, in visit_node_list
+    return [self.visit(node) for node in node_list]
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/cast_to_annotated_cast.py", line 51, in <listcomp>
+    return [self.visit(node) for node in node_list]
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/cast_to_annotated_cast.py", line 67, in visit
+    return self._visit(node)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/functools.py", line 912, in _method
+    return method.__get__(obj, cls)(*args, **kwargs)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/cast_to_annotated_cast.py", line 171, in visit_model_if
+    expr = self.visit(node.expr)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/cast_to_annotated_cast.py", line 67, in visit
+    return self._visit(node)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/functools.py", line 912, in _method
+    return method.__get__(obj, cls)(*args, **kwargs)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/cast_to_annotated_cast.py", line 71, in _visit
+    raise NameError(f"Unrecognized node type: {type(node)}")
+NameError: Unrecognized node type: <class 'NoneType'>
