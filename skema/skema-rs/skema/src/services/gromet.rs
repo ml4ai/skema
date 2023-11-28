@@ -71,76 +71,48 @@ pub async fn delete_module(module_id: i64, config: Config) -> Result<(), Error> 
     Ok(())
 }
 
-pub fn named_opi_query(module_id: i64, config: Config) -> Result<Vec<String>, MgError> {
+pub async fn named_opi_query(module_id: i64, config: Config) -> Result<Vec<String>, Error> {
     // construct the query that will delete the module with a given unique identifier
 
-    // Connect to Memgraph.
-    let connect_params = config.db_connection();
-    let mut connection = Connection::connect(&connect_params)?;
-
-    // create query
-    let query = format!(
-        "MATCH (n)-[r:Contains|Port_Of|Wire*1..5]->(m) WHERE id(n) = {}
-        \nwith DISTINCT m\nmatch (m:Opi) where not m.name = 'un-named'\nreturn collect(m.name)",
-        module_id
-    );
-
-    // Run Query.
-    connection.execute(&query, None)?;
-
-    // Check that the first value of the first record is a list
     let mut port_names = Vec::<String>::new();
-    if let Value::List(xs) = &connection.fetchall()?[0].values[0] {
-        port_names = xs
-            .iter()
-            .filter_map(|x| match x {
-                Value::String(x) => Some(x.clone()),
-                _ => None,
-            })
-            .collect();
+
+    // Connect to Memgraph.
+    let graph = Arc::new(config.graphdb_connection().await);
+    let mut result = graph.execute(
+        query("MATCH (n)-[r:Contains|Port_Of|Wire*1..7]->(m) WHERE id(n) = $id
+        \nwith DISTINCT m\nmatch (m:Opi) where not m.name = 'un-named'\nreturn m").param("id", module_id)).await?;
+    while let Ok(Some(row)) = result.next().await {
+        let node: Node = row.get("m").unwrap();
+        let name: String = node.get("name").unwrap();
+        port_names.push(name.clone());
     }
-    connection.commit()?;
 
     Ok(port_names)
 }
 
-pub fn named_opo_query(module_id: i64, config: Config) -> Result<Vec<String>, MgError> {
+pub async fn named_opo_query(module_id: i64, config: Config) -> Result<Vec<String>, Error> {
     // construct the query that will delete the module with a given unique identifier
 
-    // Connect to Memgraph.
-    let connect_params = config.db_connection();
-    let mut connection = Connection::connect(&connect_params)?;
-
-    // create query
-    let query = format!(
-        "MATCH (n)-[r:Contains|Port_Of|Wire*1..5]->(m) WHERE id(n) = {}
-        \nwith DISTINCT m\nmatch (m:Opo) where not m.name = 'un-named'\nreturn collect(m.name)",
-        module_id
-    );
-
-    // Run Query.
-    connection.execute(&query, None)?;
-
-    // Check that the first value of the first record is a list
     let mut port_names = Vec::<String>::new();
-    if let Value::List(xs) = &connection.fetchall()?[0].values[0] {
-        port_names = xs
-            .iter()
-            .filter_map(|x| match x {
-                Value::String(x) => Some(x.clone()),
-                _ => None,
-            })
-            .collect();
+
+    // Connect to Memgraph.
+    let graph = Arc::new(config.graphdb_connection().await);
+    let mut result = graph.execute(
+        query("MATCH (n)-[r:Contains|Port_Of|Wire*1..5]->(m) WHERE id(n) = $id
+        \nwith DISTINCT m\nmatch (m:Opo) where not m.name = 'un-named'\nreturn m").param("id", module_id)).await?;
+    while let Ok(Some(row)) = result.next().await {
+        let node: Node = row.get("m").unwrap();
+        let name: String = node.get("name").unwrap();
+        port_names.push(name.clone());
     }
-    connection.commit()?;
 
     Ok(port_names)
 }
 
-pub fn named_port_query(module_id: i64, config: Config) -> Result<HashMap<&'static str, Vec<String>>, MgError> {
+pub async fn named_port_query(module_id: i64, config: Config) -> Result<HashMap<&'static str, Vec<String>>, Error> {
     let mut result = HashMap::<&str, Vec<String>>::new();
-    let opis = named_opi_query(module_id, config.clone());
-    let opos = named_opo_query(module_id, config.clone());
+    let opis = named_opi_query(module_id, config.clone()).await;
+    let opos = named_opo_query(module_id, config.clone()).await;
     result.insert("opis", opis.unwrap());
     result.insert("opos", opos.unwrap());
     Ok(result)
@@ -268,7 +240,7 @@ pub async fn get_named_opos(path: web::Path<i64>, config: web::Data<Config>) -> 
         db_port: config.db_port.clone(),
         db_protocol: config.db_protocol.clone(),
     };
-    let response = named_opo_query(path.into_inner(), config1).unwrap();
+    let response = named_opo_query(path.into_inner(), config1).await.unwrap();
     HttpResponse::Ok().json(web::Json(response))
 }
 
@@ -285,7 +257,7 @@ pub async fn get_named_ports(path: web::Path<i64>, config: web::Data<Config>) ->
         db_port: config.db_port.clone(),
         db_protocol: config.db_protocol.clone(),
     };
-    let response = named_port_query(path.into_inner(), config1).unwrap();
+    let response = named_port_query(path.into_inner(), config1).await.unwrap();
     HttpResponse::Ok().json(web::Json(response))
 }
 
@@ -302,7 +274,7 @@ pub async fn get_named_opis(path: web::Path<i64>, config: web::Data<Config>) -> 
         db_port: config.db_port.clone(),
         db_protocol: config.db_protocol.clone(),
     };
-    let response = named_opi_query(path.into_inner(), config1).unwrap();
+    let response = named_opi_query(path.into_inner(), config1).await.unwrap();
     HttpResponse::Ok().json(web::Json(response))
 }
 
