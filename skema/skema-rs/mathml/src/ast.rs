@@ -67,6 +67,7 @@ pub enum MathExpression {
     Ci(Ci),
     Differential(Differential),
     AbsoluteSup(Box<MathExpression>, Box<MathExpression>),
+    Absolute(Box<MathExpression>, Box<MathExpression>),
     //Differential(Box<MathExpression>, Box<MathExpression>),
     #[default]
     None,
@@ -87,6 +88,9 @@ impl fmt::Display for MathExpression {
             }
             MathExpression::Msub(base, subscript) => {
                 write!(f, "{base}_{{{subscript}}}")
+            }
+            MathExpression::Msubsup(base, subscript,superscript)=>{
+                write!(f, "{base}_{{{subscript}}}^{{{superscript}}}")
             }
             MathExpression::Mo(op) => {
                 write!(f, "{}", op)

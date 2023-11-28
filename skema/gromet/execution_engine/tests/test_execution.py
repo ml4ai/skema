@@ -3,10 +3,8 @@ import torch
 from pathlib import Path
 from tempfile import TemporaryDirectory, TemporaryFile
 
+from skema.rest.proxies import SKEMA_GRAPH_DB_PROTO, SKEMA_GRAPH_DB_HOST, SKEMA_GRAPH_DB_PORT
 from skema.gromet.execution_engine.execution_engine import ExecutionEngine
-
-MEMGRAPH_CI_HOST = "localhost"
-MEMGRAPH_CI_PORT = 7687
 
 
 @pytest.mark.ci_only
@@ -24,7 +22,7 @@ z = x+y
         source_path.write_text(input)
 
         output = ExecutionEngine(
-            host=MEMGRAPH_CI_HOST, port=MEMGRAPH_CI_PORT, source_path=source_path
+            protocol=SKEMA_GRAPH_DB_PROTO, host=SKEMA_GRAPH_DB_HOST, port=SKEMA_GRAPH_DB_PORT, source_path=str(source_path)
         ).parameter_extraction()
 
         # torch.tensor overrides the equality '==' operator, so the following is a valid check

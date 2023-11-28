@@ -1,35 +1,50 @@
-from skema.program_analysis.CAST.matlab.matlab_to_cast import MatlabToCast
+from skema.program_analysis.CAST.matlab.tests.utils import (check, cast)
 from skema.program_analysis.CAST2FN.model.cast import (
     Assignment,
-    LiteralValue,
-    Name,
-    Var
+    Operator
 )
 
-# Test the CAST returned by processing the simplest MATLAB assignment
+def test_boolean():
+    """ Test assignment of literal boolean types. """
+    # we translate these MATLAB keywords into capitalized strings for Python
+    nodes = cast("x = true; y = false")
+    check(nodes[0], Assignment(left = "x", right = "True"))
+    check(nodes[1], Assignment(left = "y", right = "False"))
 
-def test_assignment():
-    """ Tests parser assignment CAST """
+def test_number_zero_integer():
+    """ Test assignment of integer and real numbers."""
+    check(cast("x = 0")[0], Assignment(left = "x", right = 0))
 
-    source = 'x = 5;'
-    
-    cast = MatlabToCast(source = source).out_cast
+def test_number_zero_real():
+    """ Test assignment of integer and real numbers."""
+    check(cast("y = 0.0")[0], Assignment(left = "y", right = 0.0))
 
-    # there should only be one CAST object in the cast output list
-    assert len(cast) == 1  
+def test_number_nonzero():
+    """ Test assignment of integer and real numbers."""
+    check(cast("z = 1.8")[0], Assignment(left = "z", right = 1.8))
 
-    # The root of the CAST should be assignment
-    node = cast[0].nodes[0].body[0]
-    assert isinstance(node, Assignment)
+def test_string():
+    """ Test assignment of single and double quoted strings."""
+    source = """
+    x = 'single'
+    y = "double"
+    """
+    nodes = cast(source)
+    check(nodes[0], Assignment(left = "x", right = "'single'"))
+    check(nodes[1], Assignment(left = "y", right = "\"double\""))
 
-    # Left branch of an assignment node is the variable
-    left = node.left
-    assert isinstance(left, Var)
-    assert isinstance(left.val, Name)
-    assert left.val.name == "x"
+def test_identifier():
+    """ Test assignment of identifiers."""
+    nodes = cast("x = y; r = x")
+    check(nodes[0], Assignment(left = 'x', right = 'y'))
+    check(nodes[1], Assignment(left = 'r', right = 'x'))
 
-    # Right branch of this assignment is an Integer literal
-    right = node.right
-    assert isinstance(right, LiteralValue)
-    assert right.value_type == "Integer"
-    assert right.value == "5"
+def test_operator():
+    """ Test assignment of operator"""
+    check(
+        cast("Vtot = V1PF+V1AZ;")[0], 
+        Assignment(
+            left = "Vtot", 
+            right = Operator(op = "+",operands = ["V1PF", "V1AZ"])
+        )
+    )
