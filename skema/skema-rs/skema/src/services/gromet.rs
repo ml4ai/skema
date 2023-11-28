@@ -1,6 +1,6 @@
 //! REST API endpoints related to CRUD operations and other queries on GroMEt objects.
 use crate::config::Config;
-use crate::database::{execute_query, parse_gromet_queries};
+use crate::database::{parse_gromet_queries, run_queries};
 use crate::model_extraction::module_id2mathml_MET_ast;
 use crate::model_extraction::module_id2mathml_ast;
 use crate::ModuleCollection;
@@ -13,7 +13,7 @@ use std::collections::HashMap;
 use utoipa;
 use neo4rs;
 use std::sync::Arc;
-use neo4rs::{query, Graph, Node, Row};
+use neo4rs::{query, Graph, Node, Row, Error};
 use tokio::task;
 
 pub fn configure() -> impl FnOnce(&mut ServiceConfig) {
@@ -49,31 +49,25 @@ pub async fn model_to_PN(gromet: ModuleCollection, config: Config) -> Result<Pet
     Ok(PetriNet::from(mathml_ast))
 }
 
-pub async fn push_model_to_db(gromet: ModuleCollection, config: Config) -> Result<i64, MgError> {
+pub async fn push_model_to_db(gromet: ModuleCollection, config: Config) -> Result<i64, Error> {
     // parse gromet into vec of queries
     let queries = parse_gromet_queries(gromet);
 
     // need to make the whole query list one line, individual executions are treated as different graphs for each execution.
-    let mut full_query = queries[0].clone();
-    for i in 1..(queries.len()) {
-        full_query.push('\n');
-        let temp_str = &queries[i].clone();
-        full_query.push_str(temp_str);
-    }
-    execute_query(&full_query, config.clone())?;
-    let model_ids = module_query(config.clone()).await;
+    run_queries(queries, config.clone()).await?;
+    let model_ids = module_query(config.clone()).await?;
     let last_model_id = model_ids[model_ids.len() - 1];
     Ok(last_model_id)
 }
 
-pub fn delete_module(module_id: i64, config: Config) -> Result<(), MgError> {
+pub async fn delete_module(module_id: i64, config: Config) -> Result<(), Error> {
     // construct the query that will delete the module with a given unique identifier
 
     let query = format!(
-        "MATCH (n)-[r:Contains|Port_Of|Wire*1..5]->(m) WHERE id(n) = {}\nDETACH DELETE n,m",
+        "MATCH (n)-[r:Contains|Port_Of|Wire|Metadata*1..7]->(m) WHERE id(n) = {}\nDETACH DELETE n,m",
         module_id
     );
-    execute_query(&query, config.clone())?;
+    run_queries(vec![query], config.clone()).await?;
     Ok(())
 }
 
@@ -187,44 +181,20 @@ pub fn get_subgraph_query(module_id: i64, config: Config) -> Result<Vec<String>,
 }
 
 
-pub async fn module_query(config: Config) -> Vec<i64> {
+pub async fn module_query(config: Config) -> Result<Vec<i64>, Error> {
     
     let mut ids = Vec::<i64>::new();
     // Connect to Memgraph.
     
     let graph = Arc::new(config.graphdb_connection().await);
     let mut result = graph.execute(
-        query("MATCH (n:Module) RETURN n")).await.unwrap();
+        query("MATCH (n:Module) RETURN n")).await?;
     while let Ok(Some(row)) = result.next().await {
         let node: Node = row.get("n").unwrap();
         ids.push(node.id());
     }
 
-    ids
-}
-
-pub fn memgraph_status(config: Config) -> Result<String, MgError> {
-    let connect_params = config.db_connection();
-    let mut connection_result = Connection::connect(&connect_params);
-
-    let mut status_response = "".to_string();
-
-    match connection_result {
-        Ok(connection) => {
-            // Check if connection is established.
-            let status = connection.status();
-    
-            if status != ConnectionStatus::Ready {
-                status_response = format!("Connection failed with status: {:?}", status);
-            } else {
-                status_response = format!("Connection established with status: {:?}", status);
-            }
-        },
-        Err(err) => {status_response = format!("Error in connection result: {:?}", err);},
-    }
-    
-
-    Ok(status_response)
+    Ok(ids)
 }
 
 /// This retrieves the model IDs.
@@ -242,25 +212,8 @@ pub async fn get_model_ids(config: web::Data<Config>) -> HttpResponse {
         db_port: config.db_port.clone(),
         db_protocol: config.db_protocol.clone(),
     };
-    let response = module_query(config1.clone()).await;
-    HttpResponse::Ok().json(web::Json(config1.clone()))
-}
-
-/// This checks the status of memgraph from rust.
-#[utoipa::path(
-    responses(
-        (status = 200, description = "Successfully retrieved status")
-    )
-)]
-#[get("/memgraph_status")]
-pub async fn get_memgraph_status(config: web::Data<Config>) -> HttpResponse {
-    let config1 = Config {
-        db_host: config.db_host.clone(),
-        db_port: config.db_port.clone(),
-        db_protocol: config.db_protocol.clone(),
-    };
-    let response = memgraph_status(config1).unwrap();
-    HttpResponse::Ok().json(web::Json(response))
+    let response = module_query(config1.clone()).await.unwrap();
+    HttpResponse::Ok().json(web::Json(response.clone()))
 }
 
 /// Pushes a gromet JSON to the Memgraph database
@@ -298,7 +251,7 @@ pub async fn delete_model(path: web::Path<i64>, config: web::Data<Config>) -> Ht
         db_port: config.db_port.clone(),
         db_protocol: config.db_protocol.clone(),
     };
-    delete_module(id, config1).unwrap();
+    delete_module(id, config1).await.unwrap();
     HttpResponse::Ok().body("Model deleted")
 }
 

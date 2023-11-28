@@ -27,6 +27,7 @@ use crate::{Files, Grounding, ModuleCollection, Provenance, TextExtraction, Valu
 use crate::{FunctionNet, GrometBox, ValueL};
 use rsmgclient::{ConnectParams, Connection, MgError};
 use crate::config::Config;
+use neo4rs::{Query, Error, query};
 
 #[derive(Debug, Clone)]
 pub struct MetadataNode {
@@ -87,7 +88,27 @@ pub struct ConstructorArgs {
     pub box_counter: usize, // this is the index of the box if called inside another function, 0 if not
 }
 
-pub fn execute_query(query: &str, config: Config) -> Result<(), MgError> {
+pub async fn run_queries(queries: Vec<String>, config: Config) -> Result<(), neo4rs::Error> {
+    // convert vector of string queries into single string
+    let mut full_query = queries[0].clone();
+    if queries.len() > 1 {
+        for i in 1..(queries.len()) {
+            full_query.push('\n');
+            let temp_str = &queries[i].clone();
+            full_query.push_str(temp_str);
+        }
+    }
+
+    // start up the graph and transaction session
+    let graph = config.graphdb_connection().await;
+    graph.run(query(&full_query[..])).await?;
+
+    Ok(())
+}
+
+// This function is only for CREATE based cypher commands that have no return, unfortunately these are run commands 
+// in the new neo4rs, but were called execture commands back in memgraph, so they have opposite conventions
+/*pub fn execute_query(query: &str, config: Config) -> Result<(), MgError> {
     // Connect to Memgraph.
     let connect_params = config.db_connection();
     let mut connection = Connection::connect(&connect_params)?;
@@ -98,7 +119,7 @@ pub fn execute_query(query: &str, config: Config) -> Result<(), MgError> {
     connection.commit()?;
 
     Ok(())
-}
+}*/
 // this will create a deserialized metadata node
 fn create_metadata_node(gromet: &ModuleCollection, metadata_idx: u32) -> Vec<MetadataNode> {
     // grabs the deserialized metadata

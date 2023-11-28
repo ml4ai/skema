@@ -27,8 +27,8 @@ async def get_models() -> List[int]:
 
 
 @router.get("/ping", summary="Status of MORAE service")
-async def healthcheck() -> int:
-    return requests.get(f"{SKEMA_RS_ADDESS}/ping").status_code
+async def healthcheck() -> str:
+    return requests.get(f"{SKEMA_RS_ADDESS}/ping").text
 
 
 @router.get("/version", summary="Status of MORAE service")

@@ -4,10 +4,11 @@ use clap::Parser;
 use std::env;
 use skema::config::Config;
 use skema::{
-    database::{execute_query, parse_gromet_queries},
+    database::{run_queries, parse_gromet_queries},
     ModuleCollection,
 };
 use std::fs;
+use tokio;
 
 #[derive(Parser, Debug)]
 struct Cli {
@@ -19,7 +20,8 @@ struct Cli {
     db_host: String,
 }
 
-fn main() {
+#[tokio::main]
+async fn main() {
     // debug outputs
     let debug = true;
     // take in gromet location and deserialize
@@ -44,8 +46,8 @@ fn main() {
     }
 
     let db_protocol = env::var("SKEMA_GRAPH_DB_PROTO").unwrap_or("bolt+s://".to_string());
-    let db_host = env::var("SKEMA_GRAPH_DB_HOST").unwrap_or("127.0.0.1".to_string());
-    let db_port = env::var("SKEMA_GRAPH_DB_PORT").unwrap_or("7687".to_string());
+    let db_host = env::var("SKEMA_GRAPH_DB_HOST").unwrap_or("graphdb-bolt.askem.lum.ai".to_string());
+    let db_port = env::var("SKEMA_GRAPH_DB_PORT").unwrap_or("443".to_string());
 
     let config = Config {
         db_protocol: db_protocol.clone(),
@@ -53,6 +55,7 @@ fn main() {
         db_port: db_port.parse::<u16>().unwrap(),
     };
 
-    execute_query(&full_query, config.clone()).unwrap(); // The properties need to have quotes!!
-                                                        // writing output to file, since too long for std out now.
+    run_queries(queries, config.clone()).await.unwrap(); // The properties need to have quotes!!
+                                                            // writing output to file, since too long for std out now.
+
 }
