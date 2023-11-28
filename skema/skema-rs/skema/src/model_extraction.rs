@@ -102,7 +102,7 @@ pub fn module_id2mathml_MET_ast(module_id: i64, config: Config) -> Vec<FirstOrde
 
     // 5. pass id to subgrapg2_core_dyn to get core dynamics
     //let (core_dynamics_ast, _metadata_map_ast) =
-        //subgrapg2_core_dyn_MET_ast(core_id[0], host).unwrap();
+    //subgrapg2_core_dyn_MET_ast(core_id[0], host).unwrap();
 
     core_dynamics_ast
 }

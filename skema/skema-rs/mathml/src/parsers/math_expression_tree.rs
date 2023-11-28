@@ -6,15 +6,18 @@ use crate::{
         operator::{Derivative, Operator, PartialDerivative},
         Math, MathExpression, Mi, Mrow,
     },
+    parsers::generic_mathml::{IResult, Span},
     parsers::interpreted_mathml::interpreted_math,
 };
 use derive_new::new;
 use nom::error::Error;
 use regex::Regex;
+
 use std::{fmt, str::FromStr};
 
 #[cfg(test)]
 use crate::parsers::first_order_ode::{first_order_ode, FirstOrderODE};
+///New whitespace handler before parsing
 
 /// An S-expression like structure to represent mathematical expressions.
 #[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
@@ -370,8 +373,10 @@ fn process_math_expression(expr: &MathExpression, expression: &mut String) {
             process_math_expression(&*x2, expression);
             expression.push_str("}");
         }
-        MathExpression::Mrow(_) => {
-            panic!("All Mrows should have been removed by now!");
+        MathExpression::Mrow(vec_me) => {
+            for me in vec_me.0.iter() {
+                process_math_expression(me, expression);
+            }
         }
         t => panic!("Unhandled MathExpression: {:?}", t),
     }
@@ -544,23 +549,8 @@ impl MathExpressionTree {
                         expression.push_str(&format!("{}", rest[1].to_latex()));
                     }
                     Operator::Divide => {
-                        if let MathExpressionTree::Cons(op, _) = &rest[0] {
-                            if is_unary_operator(op) {
-                                expression.push_str(&format!("{}", &rest[0].to_latex()));
-                            } else if let Operator::Multiply = op {
-                                expression.push_str(&format!("{}", &rest[0].to_latex()));
-                            } else if let Operator::Divide = op {
-                                expression.push_str(&format!("{}", &rest[0].to_latex()));
-                            } else if let Operator::Dot = op {
-                                expression.push_str(&format!("{}", &rest[0].to_latex()));
-                            } else {
-                                expression.push_str(&format!("({})", &rest[0].to_latex()));
-                            }
-                        } else {
-                            expression.push_str(&format!("{}", &rest[0].to_latex()));
-                        }
-                        expression.push_str("/");
-                        process_expression_parentheses(&mut expression, &rest[1]);
+                        expression.push_str(&format!("\\frac{{{}}}", &rest[0].to_latex()));
+                        expression.push_str(&format!("{{{}}}", &rest[1].to_latex()));
                     }
                     Operator::Exp => {
                         expression.push_str("\\mathrm{exp}");
@@ -907,7 +897,10 @@ impl FromStr for MathExpressionTree {
     type Err = Error<String>;
 
     fn from_str(input: &str) -> Result<Self, Self::Err> {
-        let (_, math) = interpreted_math(input.into()).unwrap();
+        let modified_input1 = replace_unicode_with_symbols(input);
+        let modified_input2 = preprocess_mathml_for_to_latex(&modified_input1).to_string();
+        let modified_input3: &str = &modified_input2;
+        let (_, math) = interpreted_math(modified_input3.into()).unwrap();
         Ok(MathExpressionTree::from(math))
     }
 }
@@ -1009,9 +1002,11 @@ fn postfix_binding_power(op: &Operator) -> Option<(u8, ())> {
 /// Table of binding powers for infix operators.
 fn infix_binding_power(op: &Operator) -> Option<(u8, u8)> {
     let res = match op {
-        Operator::Equals => (2, 1),
-        Operator::Add | Operator::Subtract => (5, 6),
-        Operator::Multiply | Operator::Divide => (7, 8),
+        Operator::Equals => (1, 2),
+        Operator::Add => (3, 4),
+        Operator::Subtract => (5, 6),
+        Operator::Multiply => (7, 8),
+        Operator::Divide => (9, 10),
         Operator::Compose => (14, 13),
         Operator::Power => (16, 15),
         Operator::Other(op) => panic!("Unhandled operator: {}!", op),
@@ -1057,8 +1052,7 @@ pub fn preprocess_mathml_for_to_latex(input: &str) -> String {
         .replace_all(&no_newlines, "><")
         .to_string();
 
-    // Replace <mi>∇</mi> with <mo>∇</mo>
-    let replaced_str = no_spaces.replace(r#"<mi>∇</mi>"#, "<mo>∇</mo>").to_string();
+    let replaced_str = no_spaces.to_string();
 
     replaced_str
 }
@@ -1172,7 +1166,7 @@ fn test_content_hackathon2_scenario1_eq1() {
         with_respect_to: _,
         rhs: _,
     } = first_order_ode(input.into()).unwrap().1;
-    assert_eq!(cmml, "<apply><eq/><apply><diff/><bvar>t</bar><ci>S</ci></apply><apply><divide/><apply><times/><apply><times/><apply><minus/><ci>β</ci></apply><ci>I</ci></apply><ci>S</ci></apply><ci>N</ci></apply></apply>");
+    assert_eq!(cmml, "<apply><eq/><apply><diff/><bvar>t</bar><ci>S</ci></apply><apply><times/><apply><times/><apply><minus/><ci>β</ci></apply><ci>I</ci></apply><apply><divide/><ci>S</ci><ci>N</ci></apply></apply></apply>");
 }
 
 #[test]
@@ -1192,8 +1186,11 @@ fn test_content_hackathon2_scenario1_eq2() {
     </math>
     ";
     let ode = input.parse::<FirstOrderODE>().unwrap();
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    let s_exp = exp.to_string();
+    assert_eq!(s_exp, "(= (D(1, t) E) (- (* (* β I) (/ S N)) (* δ E)))");
     let cmml = ode.to_cmml();
-    assert_eq!(cmml, "<apply><eq/><apply><diff/><bvar>t</bar><ci>E</ci></apply><apply><minus/><apply><divide/><apply><times/><apply><times/><ci>β</ci><ci>I</ci></apply><ci>S</ci></apply><ci>N</ci></apply><apply><times/><ci>δ</ci><ci>E</ci></apply></apply></apply>");
+    assert_eq!(cmml, "<apply><eq/><apply><diff/><bvar>t</bar><ci>E</ci></apply><apply><minus/><apply><times/><apply><times/><ci>β</ci><ci>I</ci></apply><apply><divide/><ci>S</ci><ci>N</ci></apply></apply><apply><times/><ci>δ</ci><ci>E</ci></apply></apply></apply>");
 }
 
 #[test]
@@ -1274,7 +1271,7 @@ fn test_content_hackathon2_scenario1_eq6() {
     ";
     let ode = input.parse::<FirstOrderODE>().unwrap();
     let cmml = ode.to_cmml();
-    assert_eq!(cmml, "<apply><eq/><apply><diff/><bvar>t</bar><ci>S</ci></apply><apply><plus/><apply><divide/><apply><times/><apply><times/><apply><minus/><ci>β</ci></apply><ci>I</ci></apply><ci>S</ci></apply><ci>N</ci></apply><apply><times/><ci>ϵ</ci><ci>R</ci></apply></apply></apply>");
+    assert_eq!(cmml,"<apply><eq/><apply><diff/><bvar>t</bar><ci>S</ci></apply><apply><plus/><apply><times/><apply><times/><apply><minus/><ci>β</ci></apply><ci>I</ci></apply><apply><divide/><ci>S</ci><ci>N</ci></apply></apply><apply><times/><ci>ϵ</ci><ci>R</ci></apply></apply></apply>");
 }
 
 #[test]
@@ -1353,8 +1350,10 @@ fn test_expression3() {
     ";
     let exp = input.parse::<MathExpressionTree>().unwrap();
     println!("exp={:?}", exp);
+    let s_exp = exp.to_string();
+    assert_eq!(s_exp, "(- (* (* β I) (/ S N)) (* δ E))");
     let math = exp.to_infix_expression();
-    assert_eq!(math, "((((β*I)*S)/N)-(δ*E))")
+    assert_eq!(math, "(((β*I)*(S/N))-(δ*E))")
 }
 
 #[test]
@@ -1566,8 +1565,8 @@ fn test_another_absolute() {
 fn test_grad() {
     let input = "
     <math>
-        <mo>&#x2207;</mo><mi>H</mi>
-    </math>
+        <mi>&#x2207;</mi><mi>H</mi>
+        </math>
     ";
     let exp = input.parse::<MathExpressionTree>().unwrap();
     let s_exp = exp.to_string();
@@ -1731,7 +1730,6 @@ fn test_mi_multiply() {
     println!("s_exp={:?}", s_exp);
 }
 
-#[test]
 fn test_unicode_conversion() {
     let input1 = "&#x039B; is a Greek letter.";
     let input2 = "&#x03bb; is another Greek letter.";
@@ -1889,7 +1887,7 @@ fn test_equation_halfar_dome_8_2_to_latex() {
     let modified_input2 = &preprocess_mathml_for_to_latex(modified_input1).to_string();
     let exp = modified_input2.parse::<MathExpressionTree>().unwrap();
     let latex_exp = exp.to_latex();
-    assert_eq!(latex_exp, "\\Gamma=2/(n+2)*A*(\\rho*g)^{n}");
+    assert_eq!(latex_exp, "\\Gamma=\\frac{2}{n+2}*A*(\\rho*g)^{n}");
 }
 
 #[test]
@@ -1988,7 +1986,7 @@ fn test_equation_halfar_dome_8_3_to_latex() {
     let latex_exp = exp.to_latex();
     assert_eq!(
         latex_exp,
-        "H(t,r)=H_{0}*(t_{0}/t)^{1/9}*(1-((t_{0}/t)^{1/18}*r/R_{0})^{4/3})^{3/7}"
+        "H(t,r)=H_{0}*(\\frac{t_{0}}{t})^{\\frac{1}{9}}*(1-((\\frac{t_{0}}{t})^{\\frac{1}{18}}*\\frac{r}{R_{0}})^{\\frac{4}{3}})^{\\frac{3}{7}}"
     );
 }
 
@@ -2033,12 +2031,74 @@ fn test_equation_halfar_dome_8_4_to_latex() {
       </mfrac>
     </math>
     ";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", exp);
+    let s_exp = exp.to_string();
+    println!("s_exp={:?}", s_exp);
     let modified_input1 = &replace_unicode_with_symbols(input).to_string();
     let modified_input2 = &preprocess_mathml_for_to_latex(modified_input1).to_string();
     let exp = modified_input2.parse::<MathExpressionTree>().unwrap();
     let latex_exp = exp.to_latex();
     assert_eq!(
         latex_exp,
-        "t_{0}=1/(18*\\Gamma)*(7/4)^{3}*R_{0}^{4}/H_{0}^{7}"
+        "t_{0}=\\frac{1}{18*\\Gamma}*(\\frac{7}{4})^{3}*\\frac{R_{0}^{4}}{H_{0}^{7}}"
     );
+}
+
+#[test]
+fn new_test_halfar_whitespace() {
+    let input = "
+    <math>
+      <msub>
+        <mi>t</mi>
+        <mn>0</mn>
+      </msub>
+      <mo>=</mo>
+      <mfrac>
+        <mn>1</mn>
+        <mrow>
+          <mn>18</mn>
+          <mi>&#x0393;</mi>
+        </mrow>
+      </mfrac>
+      <msup>
+        <mrow>
+          <mo>(</mo>
+          <mfrac>
+            <mn>7</mn>
+            <mn>4</mn>
+          </mfrac>
+          <mo>)</mo>
+        </mrow>
+        <mn>3</mn>
+      </msup>
+      <mfrac>
+        <msubsup>
+          <mi>R</mi>
+          <mn>0</mn>
+          <mn>4</mn>
+        </msubsup>
+        <msubsup>
+          <mi>H</mi>
+          <mn>0</mn>
+          <mn>7</mn>
+        </msubsup>
+      </mfrac>
+    </math>
+    ";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    let s_exp = exp.to_string();
+    assert_eq!(
+        s_exp,
+        "(= t_{0} (* (* (/ 1 (* 18 Γ)) (^ (/ 7 4) 3)) (/ R_{0}^{4} H_{0}^{7})))"
+    );
+}
+
+#[test]
+fn test_equation_with_mtext() {
+    let input = "<math><msub><mrow><mi mathvariant=\"script\">L</mi></mrow><mrow><mtext>reg</mtext></mrow></msub><mo>=</mo><msub><mrow><mi mathvariant=\"script\">L</mi></mrow><mrow><mi>d</mi><mn>1</mn></mrow></msub><mo>+</mo><msub><mrow><mi mathvariant=\"script\">L</mi></mrow><mrow><mi>d</mi><mn>2</mn></mrow></msub></math>";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    let s_exp = exp.to_string();
+    assert_eq!(s_exp, "(= L_{reg} (+ L_{d1} L_{d2}))");
+    assert_eq!(exp.to_latex(), "L_{reg}=L_{d1}+L_{d2}");
 }

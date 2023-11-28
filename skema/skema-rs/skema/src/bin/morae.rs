@@ -6,14 +6,15 @@ pub use mathml::mml2pn::{ACSet, Term};
 // new imports
 use std::env;
 use skema::config::Config;
-use mathml::acset::{PetriNet};
+use mathml::acset::{PetriNet, RegNet};
+use mathml::parsers::decapodes_serialization::{
+    to_wiring_diagram, DecapodesCollection, WiringDiagram,
+};
 use mathml::parsers::first_order_ode::get_FirstOrderODE_vec_from_file;
-
-
-use skema::model_extraction::{module_id2mathml_MET_ast};
-
-
-
+use mathml::parsers::math_expression_tree::MathExpressionTree;
+use skema::model_extraction::{module_id2mathml_MET_ast, subgraph2_core_dyn_ast};
+use std::fs::File;
+use std::io::{BufRead, BufReader};
 
 #[derive(Parser, Debug)]
 struct Cli {
