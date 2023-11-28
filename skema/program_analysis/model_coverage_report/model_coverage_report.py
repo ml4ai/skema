@@ -140,15 +140,12 @@ def generate_gromet_preprocess_logs(gromet_collection: Dict) -> str:
 def process_single_model(html: HTML_Instance, output_dir: str, model_name: str):
     """Generate an HTML report for a single model"""
     html.add_model(model_name)
-    """
+    
     if model_name in MODEL_YAML:
         model_url = MODEL_YAML[model_name]["zip_archive"]
         response = requests.get(model_url)
-    else:
-        pass
-    """
-    #zip = ZipFile(BytesIO(response.content))
-    zip = ZipFile("cism.zip", "r")
+
+    zip = ZipFile(BytesIO(response.content))
     with TemporaryDirectory() as temp:
         # We need to write all the files to the temporary directory before processing
         # This is because some steps may require additional files, such as include directories in Fortran
