@@ -1,5 +1,6 @@
 import json
 import os.path
+import time
 from pathlib import Path
 from typing import Any, Dict, List, Union
 
@@ -60,14 +61,14 @@ class TS2CAST(object):
         )
         self.tree = parser.parse(bytes(self.source, "utf8"))
         self.root_node = remove_comments(self.tree.root_node)
-        #print(self.root_node.sexp())
+        
         # Walking data
         self.variable_context = VariableContext()
         self.node_helper = NodeHelper(self.source, self.source_file_name)
 
         # Start visiting
         self.out_cast = self.generate_cast()
-        print(self.out_cast[0].to_json_str())
+        #print(self.out_cast[0].to_json_str())
         
     def generate_cast(self) -> List[CAST]:
         '''Interface for generating CAST.'''
@@ -299,7 +300,16 @@ class TS2CAST(object):
         # Pull relevent nodes
         # A subroutine and function won't neccessarily have an arguments node.
         # So we should be careful about trying to access it.
-        function_node = get_children_by_types(node, ["unary_expression", "subroutine", "identifier",])[0]
+
+        function_node = get_children_by_types(node, ["unary_expression", "subroutine", "identifier", "derived_type_member_expression"])[0]
+
+        if function_node.type == "derived_type_member_expression":
+            func = Attribute(
+                value=None,
+                attr=None
+            )
+            return None
+        
         arguments_node = get_first_child_by_type(node, "argument_list")
         
         # If this is a unary expression (+foo()) the identifier will be nested.
@@ -346,7 +356,7 @@ class TS2CAST(object):
         identifier = self.node_helper.get_identifier(node).lower()
         if node.type == "keyword_statement":
             if "continue" in identifier or "go to" in identifier:
-                return None
+                return self._visit_no_op(node)
             
         # In Fortran the return statement doesn't return a value (there is the obsolete "alternative return")
         # We keep track of values that need to be returned in the variable context
@@ -1026,10 +1036,13 @@ class TS2CAST(object):
             # Instead, we should visit the identifier node which will add it to the variable context automatically if it doesn't exist.
             value = self.visit(get_first_child_by_type(node, "identifier", recurse=True))
 
-        attr = self.node_helper.get_identifier(
-            get_first_child_by_type(node, "type_member", recurse=True)
-        )
-
+        # NOTE: Attribue should be a Name node, NOT a string or Var node
+        #attr = self.node_helper.get_identifier(
+        #    get_first_child_by_type(node, "type_member", recurse=True)
+        #)
+        #print(self.node_helper.get_identifier(get_first_child_by_type(node, "type_member", recurse=True)))
+        attr = self.visit_name(get_first_child_by_type(node, "type_member"))
+    
         return Attribute(
             value=value,
             attr=attr,
@@ -1167,6 +1180,15 @@ class TS2CAST(object):
             if child_cast:
                 return child_cast
 
+    def _visit_no_op(self, node):
+        """For unsupported idioms, we can generate a no op instruction so that the body is not empty"""
+        return Call(
+            func=self.get_gromet_function_node("no_op"),
+            source_language=None,
+            source_language_version=None,
+            arguments=[]
+        )
+    
     def get_gromet_function_node(self, func_name: str) -> Name:
         # Idealy, we would be able to create a dummy node and just call the name visitor.
         # However, tree-sitter does not allow you to create or modify nodes, so we have to recreate the logic here.
@@ -1174,4 +1196,3 @@ class TS2CAST(object):
             return self.variable_context.get_node(func_name)
 
         return self.variable_context.add_variable(func_name, "function", None)
-
