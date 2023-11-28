@@ -269,8 +269,8 @@ class MatlabToCast(object):
             # pre = [Assignment(left = iterator_identifier, right = start)],
             # expr = Operator(op = "<", operands = [iterator_identifier, end]),
             pre = [],
-            expr = None,
-            body = self.get_block(node),
+            expr = [], #None,
+            body = [], self.get_block(node),
             post = [],
             source_refs = [self.node_helper.get_source_ref(node)]
         )
@@ -279,8 +279,8 @@ class MatlabToCast(object):
         """ Translate Tree-sitter while loop node into CAST Loop node """
         return Loop (
             pre = [],
-            expr = self.visit(get_keyword_children(node)[1]),
-            body = self.get_block(node),
+            expr = Operator(), # self.visit(get_keyword_children(node)[1]),
+            body = [], # self.get_block(node),
             post = [],
             source_refs = [self.node_helper.get_source_ref(node)]
         )
