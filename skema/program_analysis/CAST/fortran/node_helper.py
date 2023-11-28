@@ -38,7 +38,11 @@ class NodeHelper():
         self.source = source
         self.source_file_name = source_file_name
 
-
+        # get_identifier optimization variables
+        self.source_lines = source.splitlines(keepends=True)
+        self.line_lengths = [len(line) for line in self.source_lines]
+        self.line_length_sums = [sum(self.line_lengths[:i+1]) for i in range(len(self.source_lines))]
+        
     def get_source_ref(self, node: Node) -> SourceRef:
         """Given a node and file name, return a CAST SourceRef object."""
         row_start, col_start = node.start_point
@@ -51,9 +55,11 @@ class NodeHelper():
         start_line, start_column = node.start_point
         end_line, end_column = node.end_point
 
-        lines = self.source.splitlines(True)
-        start_index = sum(len(lines[i]) for i in range(start_line)) + start_column
-        end_index = start_index + sum(len(lines[i]) for i in range(start_line, end_line)) + end_column - 2
+        start_index = self.line_length_sums[start_line-1] + start_column
+        if start_line == end_line:
+            end_index = start_index + (end_column-start_column)
+        else:
+            end_index = self.line_length_sums[end_line] + end_column
 
         return self.source[start_index:end_index]
 
