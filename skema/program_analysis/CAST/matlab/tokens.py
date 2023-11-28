@@ -53,6 +53,7 @@ KEYWORDS = [
     'for',
     'for_statement',
     'iterator',
+    'range',
     'while',
     'while_statement'
 
@@ -61,7 +62,6 @@ KEYWORDS = [
     'lambda',
     'line_continuation',
     'multioutput_variable',
-    'range',
 ]
 
 """ anything not a keyword """
