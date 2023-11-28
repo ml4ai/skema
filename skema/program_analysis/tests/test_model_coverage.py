@@ -29,7 +29,7 @@ ALL_MODELS = {
 REPORTS_FILE_PATH = os.getenv("GITHUB_WORKSPACE")
 LINE_COVERAGE_FILE_NAME = "line_coverage.json"
 
-TEST_COVERAGE_LOCATION = os.path.join(REPORTS_FILE_PATH, LINE_COVERAGE_FILE_NAME)
+TEST_COVERAGE_LOCATION = os.path.join(REPORTS_FILE_PATH, "reports", LINE_COVERAGE_FILE_NAME)
 
 
 def load_line_coverage_information():
