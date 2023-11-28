@@ -25,8 +25,8 @@ ALL_MODELS = {
     "TIE-GCM": [10316, 209076]
 }
 
-REPORTS_FILE_PATH = "/Users/ferra/Desktop/Work_Repos/skema/reports"
-# os.getenv("GITHUB_WORKSPACE")
+# REPORTS_FILE_PATH = "/Users/ferra/Desktop/Work_Repos/skema/reports"
+REPORTS_FILE_PATH = os.getenv("GITHUB_WORKSPACE")
 LINE_COVERAGE_FILE_NAME = "line_coverage.json"
 
 TEST_COVERAGE_LOCATION = os.path.join(REPORTS_FILE_PATH, LINE_COVERAGE_FILE_NAME)
@@ -42,17 +42,16 @@ def load_line_coverage_information():
 def test_all_models():
     """
         Tests the coverage of every model we have support for
+        Also checks to make sure that we've covered every model that we currently support
     """
     coverage_models = load_line_coverage_information()
+    models_visited = 0
     for model in ALL_MODELS.keys():
         baseline_supported_lines, baseline_total_lines = ALL_MODELS[model]
         current_supported_lines, current_total_lines = coverage_models[model]
         assert current_supported_lines >= baseline_supported_lines, f"model {model} supported line count has decreased"
         assert current_total_lines >= baseline_total_lines, f"model {model} total line count has decreased"
+        models_visited += 1
 
-    return True
-
-def main():
-    test_all_models()
-
-main()
+    # In case the coverage report generation doesn't give us all the models back, we use this assertion to check that
+    assert models_visited == len(ALL_MODELS.keys()), f"test_all_models didn't test all {len(ALL_MODELS.keys())} models, only tested {models_visited} models"

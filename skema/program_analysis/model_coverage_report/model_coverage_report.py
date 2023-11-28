@@ -257,11 +257,14 @@ def process_single_model(html: HTML_Instance, output_dir: str, model_name: str):
                 True,
                 full_gromet_relative_path,
             )
+        
+        # Added return statement in order to output 
         return (supported_lines, total_lines)
 
 
 def process_all_models(html: HTML_Instance, output_dir: str):
-    """Generate an HTML report for all models in models.yaml"""
+    """Generate an HTML report for all models in models.yaml
+    Also, output a dictionary containing line coverage information for all models in models.yaml"""
     model_line_coverage = {}
     for model_name in MODEL_YAML:
         supported, total = process_single_model(html, output_dir, model_name)
@@ -289,6 +292,11 @@ def main():
     output_dir = str(Path(args.output_dir).resolve()) 
 
     html = HTML_Instance()
+    
+    # model_line_coverage is a dictionary that contains line coverage information
+    # for each model that was generated
+    # its primary use is to be output as a JSON file that our regression tests can then take a look at
+    # in order to determine if we've lost model coverage
     model_line_coverage = {}
     if args.mode == "all":
         model_line_coverage = process_all_models(html, output_dir)
