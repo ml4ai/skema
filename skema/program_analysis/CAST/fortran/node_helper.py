@@ -48,26 +48,14 @@ class NodeHelper():
 
     def get_identifier(self, node: Node) -> str:
         """Given a node, return the identifier it represents. ie. The code between node.start_point and node.end_point"""
-        line_num = 0
-        column_num = 0
-        in_identifier = False
-        identifier = ""
-        for i, char in enumerate(self.source):
-            if line_num == node.start_point[0] and column_num == node.start_point[1]:
-                in_identifier = True
-            elif line_num == node.end_point[0] and column_num == node.end_point[1]:
-                break
+        start_line, start_column = node.start_point
+        end_line, end_column = node.end_point
 
-            if char == "\n":
-                line_num += 1
-                column_num = 0
-            else:
-                column_num += 1
+        lines = self.source.splitlines(True)
+        start_index = sum(len(lines[i]) for i in range(start_line)) + start_column
+        end_index = start_index + sum(len(lines[i]) for i in range(start_line, end_line)) + end_column - 2
 
-            if in_identifier:
-                identifier += char
-
-        return identifier
+        return self.source[start_index:end_index]
 
 def remove_comments(node: Node):
     """Remove comment nodes from tree-sitter parse tree"""
