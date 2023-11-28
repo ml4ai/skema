@@ -127,6 +127,8 @@ jobs:
         # NOTE: dynet throws an UnsatisfiedLinkError on ARM64 even with a platform compatible JRE.. :(
         platforms: linux/amd64
         provenance: false
+        no-cache: true
+        pull: true
         push: ${{ github.event_name != 'pull_request' }}
         # references `tags` step in steps for current job
         tags: ${{ steps.tags.outputs.tags }}

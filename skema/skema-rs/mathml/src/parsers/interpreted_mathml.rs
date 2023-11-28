@@ -29,9 +29,7 @@ use nom::{
 pub fn operator(input: Span) -> IResult<Operator> {
     let (s, op) = ws(delimited(
         stag!("mo"),
-        alt((
-            add, subtract, multiply, equals, lparen, rparen, mean, grad, dot,
-        )),
+        alt((add, subtract, multiply, equals, lparen, rparen, mean, dot)),
         etag!("mo"),
     ))(input)?;
     Ok((s, op))
@@ -167,7 +165,7 @@ fn partial(input: Span) -> IResult<()> {
         Ok((s, ()))
     } else if let "&#x2202;" = x.as_ref() {
         Ok((s, ()))
-    }else {
+    } else {
         Err(nom::Err::Error(ParseError::new(
             "Unable to identify Mi('∂')".to_string(),
             input,
@@ -533,7 +531,10 @@ pub fn div(input: Span) -> IResult<Operator> {
 }
 
 pub fn gradient(input: Span) -> IResult<Operator> {
-    let (s, op) = ws(delimited(stag!("mo"), grad, etag!("mo")))(input)?;
+    let (s, op) = ws(alt((
+        delimited(stag!("mo"), grad, etag!("mo")),
+        delimited(stag!("mi"), grad, etag!("mi")),
+    )))(input)?;
     Ok((s, op))
 }
 
@@ -547,13 +548,14 @@ pub fn grad_func(input: Span) -> IResult<(Operator, Ci)> {
 pub fn absolute_with_msup(input: Span) -> IResult<MathExpression> {
     let (s, sup) = ws(map(
         ws(delimited(
-            tag("<mo>|</mo>"),
-            tuple((
+            ws(tuple((stag!("mo"), tag("|"), etag!("mo")))),
+            //ws(tag("<mo>|</mo>")),
+            ws(tuple((
                 //math_expression,
-                map(many0(math_expression), |z| Mrow(z)),
-                preceded(tag("<msup><mo>|</mo>"), math_expression),
-            )),
-            tag("</msup>"),
+                map(ws(many0(math_expression)), |z| Mrow(z)),
+                preceded(ws(tag("<msup><mo>|</mo>")), ws(math_expression)),
+            ))),
+            ws(tag("</msup>")),
         )),
         |(x, y)| MathExpression::AbsoluteSup(Box::new(MathExpression::Mrow(x)), Box::new(y)),
     ))(input)?;
@@ -581,8 +583,28 @@ pub fn paren_as_msup(input: Span) -> IResult<MathExpression> {
 pub fn math_expression(input: Span) -> IResult<MathExpression> {
     ws(alt((
         map(div, MathExpression::Mo),
-        absolute_with_msup,
-        paren_as_msup,
+        ws(absolute_with_msup),
+        ws(paren_as_msup),
+        map(
+            grad_func,
+            |(
+                op,
+                Ci {
+                    r#type,
+                    content,
+                    func_of,
+                },
+            )| {
+                MathExpression::Differential(Differential {
+                    diff: Box::new(MathExpression::Mo(op)),
+                    func: Box::new(MathExpression::Ci(Ci {
+                        r#type,
+                        content,
+                        func_of,
+                    })),
+                })
+            },
+        ),
         map(
             first_order_derivative_leibniz_notation,
             |(
@@ -736,13 +758,10 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                 })
             },
         ),
-        //map(gradient, MathExpression::Mo),
         absolute,
         map(operator, MathExpression::Mo),
-        mn,
-        superscript,
-        over_term,
-        alt((msub, msqrt, mfrac)),
+        map(gradient, MathExpression::Mo),
+        alt((mn, msub, superscript, msqrt, mfrac, over_term)),
         map(mrow, MathExpression::Mrow),
         msubsup,
     )))(input)
@@ -755,13 +774,13 @@ pub fn interpreted_math(input: Span) -> IResult<Math> {
         opt(xml_declaration),
         alt((
             ws(delimited(
-                tag("<math>"),
-                many0(math_expression),
+                ws(tag("<math>")),
+                ws(many0(math_expression)),
                 ws(tag("<mo>,</mo></math>")),
             )),
             ws(delimited(
-                tag("<math>"),
-                many0(math_expression),
+                ws(tag("<math>")),
+                ws(many0(math_expression)),
                 ws(tag("<mo>.</mo></math>")),
             )),
             elem_many0!("math"),

@@ -41,11 +41,11 @@ jobs:
     steps:
     # Setup docker
     - name: Set up QEMU
-      uses: docker/setup-qemu-action@v2
+      uses: docker/setup-qemu-action@v3
     # for multi-arch builds (ex. ARM 64)
     - name: Set up Docker Buildx
       id: buildx
-      uses: docker/setup-buildx-action@v2
+      uses: docker/setup-buildx-action@v3
     # - name: Prepare buildx builder
     #   run: |
     #     docker buildx create --use --name "multiarch-builder" --platform linux/amd64,linux/arm64 --driver "docker-container"
@@ -60,7 +60,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
     - name: Login to DockerHub
-      uses: docker/login-action@v2 
+      uses: docker/login-action@v3 
       with:
         username: ${{ secrets.LUM_ASKEM_DOCKERHUB_USERNAME }}
         password: ${{ secrets.LUM_ASKEM_DOCKERHUB_TOKEN }}
@@ -97,12 +97,14 @@ jobs:
 
     - name: Build and push image
       # see https://github.com/docker/build-push-action
-      uses: docker/build-push-action@v4
+      uses: docker/build-push-action@v5
       with:
         context: .
         file: "Dockerfile.skema-py"
         platforms: linux/amd64
         #platforms: linux/amd64,linux/arm64
+        no-cache: true
+        pull: true
         push: ${{ github.event_name != 'pull_request' }}
         # references `tags` step in steps for current job
         tags: ${{ steps.tags.outputs.tags }}
@@ -117,11 +119,11 @@ jobs:
     steps:
     # Setup docker
     - name: Set up QEMU
-      uses: docker/setup-qemu-action@v2
+      uses: docker/setup-qemu-action@v3
     # for multi-arch builds (ex. ARM 64)
     - name: Set up Docker Buildx
       id: buildx
-      uses: docker/setup-buildx-action@v2
+      uses: docker/setup-buildx-action@v3
     # - name: Prepare buildx builder
     #   run: |
     #     docker buildx create --use --name "multiarch-builder" --platform linux/amd64,linux/arm64 --driver "docker-container"
@@ -169,55 +171,17 @@ jobs:
 
     - name: Build and push image
       # see https://github.com/docker/build-push-action
-      uses: docker/build-push-action@v4
+      uses: docker/build-push-action@v5
       with:
         context: .
         file: "Dockerfile.skema-rs"
         platforms: linux/amd64
         #platforms: linux/amd64,linux/arm64
+        no-cache: true
+        pull: true
         push: ${{ github.event_name != 'pull_request' }}
         # references `tags` step in steps for current job
         tags: ${{ steps.tags.outputs.tags }}
         build-args: |
           #APP_VERSION=${{needs.app_version.outputs.app_version}}
           APP_VERSION=${{needs.app_version.outputs.commit}}
-
-  text_reading:
-    name: "docker image for text reading component"
-    needs: [app_version]
-    runs-on: ubuntu-latest
-    steps:
-    # Setup docker
-    - name: Set up QEMU
-      uses: docker/setup-qemu-action@v2
-    # for multi-arch builds (ex. ARM 64)
-    - name: Set up Docker Buildx
-      id: buildx
-      uses: docker/setup-buildx-action@v2
-      with:
-        buildkitd-flags: --debug
-    # - name: Prepare buildx builder
-    #   run: |
-    #     docker buildx create --use --name "multiarch-builder" --platform linux/amd64,linux/arm64 --driver "docker-container"
-    - name: Inspect builder
-      run: |
-        echo "Name:      ${{ steps.buildx.outputs.name }}"
-        echo "Endpoint:  ${{ steps.buildx.outputs.endpoint }}"
-        echo "Status:    ${{ steps.buildx.outputs.status }}"
-        echo "Flags:     ${{ steps.buildx.outputs.flags }}"
-        echo "Platforms: ${{ steps.buildx.outputs.platforms }}"
-    # Checkout code
-    - name: Checkout code
-      uses: actions/checkout@v3
-    - name: Login to DockerHub
-      uses: docker/login-action@v2 
-      with:
-        username: ${{ secrets.LUM_ASKEM_DOCKERHUB_USERNAME }}
-        password: ${{ secrets.LUM_ASKEM_DOCKERHUB_TOKEN }}
-    # - name: "Free disk space"
-    #   run: |
-    #     sudo apt clean
-    #     sudo rm -rf /usr/share/dotnet
-    #     sudo rm -rf /opt/ghc
-    #     sudo rm -rf "/usr/local/share/boost"
-    #     sudo rm -rf "$AGENT_TOOLSDIRECTORY"
