@@ -547,23 +547,8 @@ impl MathExpressionTree {
                         expression.push_str(&format!("{}", rest[1].to_latex()));
                     }
                     Operator::Divide => {
-                        if let MathExpressionTree::Cons(op, _) = &rest[0] {
-                            if is_unary_operator(op) {
-                                expression.push_str(&format!("{}", &rest[0].to_latex()));
-                            } else if let Operator::Multiply = op {
-                                expression.push_str(&format!("{}", &rest[0].to_latex()));
-                            } else if let Operator::Divide = op {
-                                expression.push_str(&format!("{}", &rest[0].to_latex()));
-                            } else if let Operator::Dot = op {
-                                expression.push_str(&format!("{}", &rest[0].to_latex()));
-                            } else {
-                                expression.push_str(&format!("({})", &rest[0].to_latex()));
-                            }
-                        } else {
-                            expression.push_str(&format!("{}", &rest[0].to_latex()));
-                        }
-                        expression.push_str("/");
-                        process_expression_parentheses(&mut expression, &rest[1]);
+                        expression.push_str(&format!("\\frac{{{}}}", &rest[0].to_latex()));
+                        expression.push_str(&format!("{{{}}}", &rest[1].to_latex()));
                     }
                     Operator::Exp => {
                         expression.push_str("\\mathrm{exp}");
@@ -1905,7 +1890,7 @@ fn test_equation_halfar_dome_8_2_to_latex() {
     let modified_input2 = &preprocess_mathml_for_to_latex(modified_input1).to_string();
     let exp = modified_input2.parse::<MathExpressionTree>().unwrap();
     let latex_exp = exp.to_latex();
-    assert_eq!(latex_exp, "\\Gamma=2/(n+2)*A*(\\rho*g)^{n}");
+    assert_eq!(latex_exp, "\\Gamma=\\frac{2}{n+2}*A*(\\rho*g)^{n}");
 }
 
 #[test]
@@ -2004,7 +1989,7 @@ fn test_equation_halfar_dome_8_3_to_latex() {
     let latex_exp = exp.to_latex();
     assert_eq!(
         latex_exp,
-        "H(t,r)=H_{0}*(t_{0}/t)^{1/9}*(1-((t_{0}/t)^{1/18}*r/R_{0})^{4/3})^{3/7}"
+        "H(t,r)=H_{0}*(\\frac{t_{0}}{t})^{\\frac{1}{9}}*(1-((\\frac{t_{0}}{t})^{\\frac{1}{18}}*\\frac{r}{R_{0}})^{\\frac{4}{3}})^{\\frac{3}{7}}"
     );
 }
 
@@ -2059,7 +2044,57 @@ fn test_equation_halfar_dome_8_4_to_latex() {
     let latex_exp = exp.to_latex();
     assert_eq!(
         latex_exp,
-        "t_{0}=1/(18*\\Gamma)*(7/4)^{3}*R_{0}^{4}/H_{0}^{7}"
+        "t_{0}=\\frac{1}{18*\\Gamma}*(\\frac{7}{4})^{3}*\\frac{R_{0}^{4}}{H_{0}^{7}}"
+    );
+}
+
+#[test]
+fn new_test_halfar_whitespace() {
+    let input = "
+    <math>
+      <msub>
+        <mi>t</mi>
+        <mn>0</mn>
+      </msub>
+      <mo>=</mo>
+      <mfrac>
+        <mn>1</mn>
+        <mrow>
+          <mn>18</mn>
+          <mi>&#x0393;</mi>
+        </mrow>
+      </mfrac>
+      <msup>
+        <mrow>
+          <mo>(</mo>
+          <mfrac>
+            <mn>7</mn>
+            <mn>4</mn>
+          </mfrac>
+          <mo>)</mo>
+        </mrow>
+        <mn>3</mn>
+      </msup>
+      <mfrac>
+        <msubsup>
+          <mi>R</mi>
+          <mn>0</mn>
+          <mn>4</mn>
+        </msubsup>
+        <msubsup>
+          <mi>H</mi>
+          <mn>0</mn>
+          <mn>7</mn>
+        </msubsup>
+      </mfrac>
+    </math>
+    ";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    let s_exp = exp.to_string();
+    println!("s_exp={:?}", s_exp);
+    assert_eq!(
+        s_exp,
+        "(= t_{0} (* (* (/ 1 (* 18 Γ)) (^ (/ 7 4) 3)) (/ R_{0}^{4} H_{0}^{7})))"
     );
 }
 
