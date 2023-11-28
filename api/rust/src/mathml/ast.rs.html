@@ -126,6 +126,7 @@
 <a href="#126" id="126">126</a>
 <a href="#127" id="127">127</a>
 <a href="#128" id="128">128</a>
+<a href="#129" id="129">129</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>derive_new::new;
 <span class="kw">use </span>std::fmt;
 
@@ -217,7 +218,7 @@
             MathExpression::Msub(base, subscript) =&gt; {
                 <span class="macro">write!</span>(f, <span class="string">&quot;{base}_{{{subscript}}}&quot;</span>)
             }
-            MathExpression::Msubsup(base, subscript,superscript)=&gt;{
+            MathExpression::Msubsup(base, subscript, superscript) =&gt; {
                 <span class="macro">write!</span>(f, <span class="string">&quot;{base}_{{{subscript}}}^{{{superscript}}}&quot;</span>)
             }
             MathExpression::Mo(op) =&gt; {
@@ -237,6 +238,7 @@
                 <span class="macro">write!</span>(f, <span class="string">&quot;{:?}&quot;</span>, base)<span class="question-mark">?</span>;
                 <span class="macro">write!</span>(f, <span class="string">&quot;{superscript:?}&quot;</span>)
             }
+            MathExpression::Mtext(text) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, text),
             expression =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{expression:?}&quot;</span>),
         }
     }

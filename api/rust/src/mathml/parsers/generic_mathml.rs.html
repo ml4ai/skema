@@ -639,7 +639,6 @@
 <a href="#639" id="639">639</a>
 <a href="#640" id="640">640</a>
 <a href="#641" id="641">641</a>
-<a href="#642" id="642">642</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::ast::{
     operator::Operator,
     Math, MathExpression,
@@ -874,7 +873,6 @@
     <span class="kw">let </span>(s, op) = value(Operator::Grad, alt((ws(tag(<span class="string">&quot;∇&quot;</span>)), ws(tag(<span class="string">&quot;&amp;#x2207;&quot;</span>)))))(input)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((s, op))
 }
-
 <span class="kw">pub fn </span>dot(input: Span) -&gt; IResult&lt;Operator&gt; {
     <span class="kw">let </span>(s, op) = value(Operator::Dot, alt((ws(tag(<span class="string">&quot;⋅&quot;</span>)), ws(tag(<span class="string">&quot;&amp;#x22c5;&quot;</span>)))))(input)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((s, op))
@@ -972,7 +970,7 @@
 }
 
 <span class="comment">//Text
-</span><span class="kw">fn </span>mtext(input: Span) -&gt; IResult&lt;MathExpression&gt; {
+</span><span class="kw">pub fn </span>mtext(input: Span) -&gt; IResult&lt;MathExpression&gt; {
     <span class="kw">let </span>(s, element) = <span class="macro">elem0!</span>(<span class="string">&quot;mtext&quot;</span>)(input)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((s, Mtext(element.trim().to_string())))
 }

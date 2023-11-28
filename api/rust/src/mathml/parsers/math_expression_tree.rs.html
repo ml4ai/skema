@@ -2093,6 +2093,15 @@
 <a href="#2093" id="2093">2093</a>
 <a href="#2094" id="2094">2094</a>
 <a href="#2095" id="2095">2095</a>
+<a href="#2096" id="2096">2096</a>
+<a href="#2097" id="2097">2097</a>
+<a href="#2098" id="2098">2098</a>
+<a href="#2099" id="2099">2099</a>
+<a href="#2100" id="2100">2100</a>
+<a href="#2101" id="2101">2101</a>
+<a href="#2102" id="2102">2102</a>
+<a href="#2103" id="2103">2103</a>
+<a href="#2104" id="2104">2104</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Pratt parsing module to construct S-expressions from presentation MathML.
 //! This is based on the nice tutorial at https://matklad.github.io/2020/04/13/simple-but-powerful-pratt-parsing.html
 
@@ -2468,8 +2477,10 @@
             process_math_expression(<span class="kw-2">&amp;*</span>x2, expression);
             expression.push_str(<span class="string">&quot;}&quot;</span>);
         }
-        MathExpression::Mrow(<span class="kw">_</span>) =&gt; {
-            <span class="macro">panic!</span>(<span class="string">&quot;All Mrows should have been removed by now!&quot;</span>);
+        MathExpression::Mrow(vec_me) =&gt; {
+            <span class="kw">for </span>me <span class="kw">in </span>vec_me.<span class="number">0</span>.iter() {
+                process_math_expression(me, expression);
+            }
         }
         t =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unhandled MathExpression: {:?}&quot;</span>, t),
     }
@@ -3145,12 +3156,7 @@
         .replace_all(<span class="kw-2">&amp;</span>no_newlines, <span class="string">&quot;&gt;&lt;&quot;</span>)
         .to_string();
 
-    <span class="kw">let </span>new_no_spaces = no_spaces.replace(<span class="string">&quot; &quot;</span>, <span class="string">&quot;&quot;</span>);
-
-    <span class="comment">// Replace &lt;mi&gt;∇&lt;/mi&gt; with &lt;mo&gt;∇&lt;/mo&gt;
-    </span><span class="kw">let </span>replaced_str = new_no_spaces
-        .replace(<span class="string">r#&quot;&lt;mi&gt;∇&lt;/mi&gt;&quot;#</span>, <span class="string">&quot;&lt;mo&gt;∇&lt;/mo&gt;&quot;</span>)
-        .to_string();
+    <span class="kw">let </span>replaced_str = no_spaces.to_string();
 
     replaced_str
 }
@@ -4129,6 +4135,10 @@
       &lt;/mfrac&gt;
     &lt;/math&gt;
     &quot;</span>;
+    <span class="kw">let </span>exp = input.parse::&lt;MathExpressionTree&gt;().unwrap();
+    <span class="macro">println!</span>(<span class="string">&quot;exp={:?}&quot;</span>, exp);
+    <span class="kw">let </span>s_exp = exp.to_string();
+    <span class="macro">println!</span>(<span class="string">&quot;s_exp={:?}&quot;</span>, s_exp);
     <span class="kw">let </span>modified_input1 = <span class="kw-2">&amp;</span>replace_unicode_with_symbols(input).to_string();
     <span class="kw">let </span>modified_input2 = <span class="kw-2">&amp;</span>preprocess_mathml_for_to_latex(modified_input1).to_string();
     <span class="kw">let </span>exp = modified_input2.parse::&lt;MathExpressionTree&gt;().unwrap();
@@ -4182,10 +4192,18 @@
     &quot;</span>;
     <span class="kw">let </span>exp = input.parse::&lt;MathExpressionTree&gt;().unwrap();
     <span class="kw">let </span>s_exp = exp.to_string();
-    <span class="macro">println!</span>(<span class="string">&quot;s_exp={:?}&quot;</span>, s_exp);
     <span class="macro">assert_eq!</span>(
         s_exp,
         <span class="string">&quot;(= t_{0} (* (* (/ 1 (* 18 Γ)) (^ (/ 7 4) 3)) (/ R_{0}^{4} H_{0}^{7})))&quot;
     </span>);
+}
+
+<span class="attr">#[test]
+</span><span class="kw">fn </span>test_equation_with_mtext() {
+    <span class="kw">let </span>input = <span class="string">&quot;&lt;math&gt;&lt;msub&gt;&lt;mrow&gt;&lt;mi mathvariant=\&quot;script\&quot;&gt;L&lt;/mi&gt;&lt;/mrow&gt;&lt;mrow&gt;&lt;mtext&gt;reg&lt;/mtext&gt;&lt;/mrow&gt;&lt;/msub&gt;&lt;mo&gt;=&lt;/mo&gt;&lt;msub&gt;&lt;mrow&gt;&lt;mi mathvariant=\&quot;script\&quot;&gt;L&lt;/mi&gt;&lt;/mrow&gt;&lt;mrow&gt;&lt;mi&gt;d&lt;/mi&gt;&lt;mn&gt;1&lt;/mn&gt;&lt;/mrow&gt;&lt;/msub&gt;&lt;mo&gt;+&lt;/mo&gt;&lt;msub&gt;&lt;mrow&gt;&lt;mi mathvariant=\&quot;script\&quot;&gt;L&lt;/mi&gt;&lt;/mrow&gt;&lt;mrow&gt;&lt;mi&gt;d&lt;/mi&gt;&lt;mn&gt;2&lt;/mn&gt;&lt;/mrow&gt;&lt;/msub&gt;&lt;/math&gt;&quot;</span>;
+    <span class="kw">let </span>exp = input.parse::&lt;MathExpressionTree&gt;().unwrap();
+    <span class="kw">let </span>s_exp = exp.to_string();
+    <span class="macro">assert_eq!</span>(s_exp, <span class="string">&quot;(= L_{reg} (+ L_{d1} L_{d2}))&quot;</span>);
+    <span class="macro">assert_eq!</span>(exp.to_latex(), <span class="string">&quot;L_{reg}=L_{d1}+L_{d2}&quot;</span>);
 }
 </code></pre></div></section></main></body></html>
