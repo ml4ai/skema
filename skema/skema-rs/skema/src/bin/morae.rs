@@ -57,7 +57,7 @@ async fn main() {
     let new_args = Cli::parse();
 
     //let mut module_id = 883;
-    let mut module_id = 2399;
+    let mut module_id = 2431;
     // now to prototype an algorithm to find the function that contains the core dynamics
 
     if new_args.arg == *"auto" {
@@ -93,9 +93,11 @@ async fn main() {
             println!("{:?}", node.id());
         }
         println!("{:?}", ids.clone());
-        //let math_content = module_id2mathml_MET_ast(module_id, config.clone());
+        let math_content = module_id2mathml_MET_ast(ids[1], config.clone()).await;
+        println!("{:?}", math_content.clone());
+        println!("\nAMR from code: {:?}", PetriNet::from(math_content));
 
-        let input_src = "../../data/mml2pn_inputs/testing_eqns/sidarthe_mml.txt";
+        //let input_src = "../../data/mml2pn_inputs/testing_eqns/sidarthe_mml.txt";
 
         // This does get a panic with a message, so need to figure out how to forward it
         //let _mathml_ast = get_mathml_asts_from_file(input_src.clone());
