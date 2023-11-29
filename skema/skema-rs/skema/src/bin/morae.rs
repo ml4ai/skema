@@ -80,17 +80,14 @@ async fn main() {
         };
 
         let response = module_query(config.clone()).await;
-        println!("{:?}", response.clone());
 
         let mut ids = Vec::<i64>::new();
         let graph = Arc::new(config.graphdb_connection().await);
         let mut result = graph.execute(
             query("MATCH (n:Module) RETURN n")).await.unwrap();
-        println!("got here");
         while let Ok(Some(row)) = result.next().await {
             let node: Node = row.get("n").unwrap();
             ids.push(node.id());
-            println!("{:?}", node.id());
         }
         println!("{:?}", ids.clone());
         let math_content = module_id2mathml_MET_ast(ids[1], config.clone()).await;

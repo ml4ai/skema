@@ -152,13 +152,13 @@ pub async fn find_pn_dynamics(module_id: i64, config: Config) -> Vec<i64> {
                 expression_counter += 1;
             }
             if func[node].labels()[0] == "Primitive".to_string() {
-                if func[node].get::<String>("name").unwrap() == *"'ast.Mult'" {
+                if func[node].get::<String>("name").unwrap() == *"ast.Mult" {
                     primitive_counter += 1;
-                } else if func[node].get::<String>("name").unwrap() == *"'ast.Add'" {
+                } else if func[node].get::<String>("name").unwrap() == *"ast.Add" {
                     primitive_counter += 1;
-                } else if func[node].get::<String>("name").unwrap() == *"'ast.Sub'" {
+                } else if func[node].get::<String>("name").unwrap() == *"ast.Sub" {
                     primitive_counter += 1;
-                } else if func[node].get::<String>("name").unwrap() == *"'ast.USub'" {
+                } else if func[node].get::<String>("name").unwrap() == *"ast.USub" {
                     primitive_counter += 1;
                 }
             }
@@ -313,10 +313,10 @@ fn tree_2_MET_ast(
         // This is very bespoke right now
         // this check is for if it's leibniz notation or not, will need to expand as more cases are creating,
         // currently we convert to leibniz form
-        if deriv_name[1..2].to_string() == "d" {
+        if deriv_name[0..1].to_string() == "d" {
             let deriv = Ci {
                 r#type: Some(Function),
-                content: Box::new(MathExpression::Mi(Mi(deriv_name[2..3].to_string()))),
+                content: Box::new(MathExpression::Mi(Mi(deriv_name[1..2].to_string()))),
                 func_of: None,
             };
             lhs.push(deriv);
@@ -324,7 +324,7 @@ fn tree_2_MET_ast(
             // step_impl = true; this will be used for step implementaion for later
             let deriv = Ci {
                 r#type: Some(Function),
-                content: Box::new(MathExpression::Mi(Mi(deriv_name[1..2].to_string()))),
+                content: Box::new(MathExpression::Mi(Mi(deriv_name[0..1].to_string()))),
                 func_of: None,
             };
             lhs.push(deriv);
@@ -374,8 +374,7 @@ pub fn get_args_MET(
         } else {
             // asummption it is atomic
             let temp_string = graph[node].get::<String>("name").unwrap().clone();
-            let arg2 = MathExpressionTree::Atom(MathExpression::Mi(Mi(graph[node].get::<String>("name").unwrap()[1..(temp_string.len() - 1_usize)]
-                .to_string())));
+            let arg2 = MathExpressionTree::Atom(MathExpression::Mi(Mi(temp_string.clone())));
             args.push(arg2.clone());
         }
 
@@ -412,15 +411,15 @@ pub fn get_operator_MET(
     root_node: NodeIndex,
 ) -> Operator {
     let mut op = Vec::<Operator>::new();
-    if graph[root_node].get::<String>("name").unwrap() == *"'ast.Mult'" {
+    if graph[root_node].get::<String>("name").unwrap() == *"ast.Mult" {
         op.push(Operator::Multiply);
-    } else if graph[root_node].get::<String>("name").unwrap() == *"'ast.Add'" {
+    } else if graph[root_node].get::<String>("name").unwrap() == *"ast.Add" {
         op.push(Operator::Add);
-    } else if graph[root_node].get::<String>("name").unwrap() == *"'ast.Sub'" {
+    } else if graph[root_node].get::<String>("name").unwrap() == *"ast.Sub" {
         op.push(Operator::Subtract);
-    } else if graph[root_node].get::<String>("name").unwrap() == *"'ast.USub'" {
+    } else if graph[root_node].get::<String>("name").unwrap() == *"ast.USub" {
         op.push(Operator::Subtract);
-    } else if graph[root_node].get::<String>("name").unwrap() == *"'ast.Div'" {
+    } else if graph[root_node].get::<String>("name").unwrap() == *"ast.Div" {
         op.push(Operator::Divide);
     } else {
         op.push(Operator::Other(
@@ -444,15 +443,15 @@ fn tree_2_ast(
         // This is very bespoke right now
         // this check is for if it's leibniz notation or not, will need to expand as more cases are creating,
         // currently we convert to leibniz form
-        if deriv_name[1..2].to_string() == "d" {
+        if deriv_name[0..1].to_string() == "d" {
             let deriv = MathExpression::Mfrac(
                 Box::new(MathExpression::Mrow(Mrow(vec![
+                    MathExpression::Mi(Mi(deriv_name[0..1].to_string())),
                     MathExpression::Mi(Mi(deriv_name[1..2].to_string())),
-                    MathExpression::Mi(Mi(deriv_name[2..3].to_string())),
                 ]))),
                 Box::new(MathExpression::Mrow(Mrow(vec![
+                    MathExpression::Mi(Mi(deriv_name[2..3].to_string())),
                     MathExpression::Mi(Mi(deriv_name[3..4].to_string())),
-                    MathExpression::Mi(Mi(deriv_name[4..5].to_string())),
                 ]))),
             );
             math_vec.push(deriv);
@@ -461,7 +460,7 @@ fn tree_2_ast(
             let deriv = MathExpression::Mfrac(
                 Box::new(MathExpression::Mrow(Mrow(vec![
                     MathExpression::Mi(Mi("d".to_string())),
-                    MathExpression::Mi(Mi(deriv_name[1..2].to_string())),
+                    MathExpression::Mi(Mi(deriv_name[0..1].to_string())),
                 ]))),
                 Box::new(MathExpression::Mrow(Mrow(vec![
                     MathExpression::Mi(Mi("d".to_string())),
@@ -479,11 +478,11 @@ fn tree_2_ast(
         // this only distributing if the multiplication is the first operator
         for node in graph.neighbors_directed(root_node, Outgoing) {
             if graph[node].labels()[0].clone() == "Primitive".to_string()
-                && graph[node].get::<String>("name").unwrap() != *"'ast.USub'"
+                && graph[node].get::<String>("name").unwrap() != *"ast.USub"
             {
                 first_op.push(get_operator(&graph, node));
                 let mut arg1 = get_args(&graph, node);
-                if graph[node].get::<String>("name").unwrap() == *"'ast.Mult'" {
+                if graph[node].get::<String>("name").unwrap() == *"ast.Mult" {
                     let arg1_mult = is_multiple_terms(arg1[0].clone());
                     let arg2_mult = is_multiple_terms(arg1[1].clone());
                     if arg1_mult {
@@ -506,13 +505,13 @@ fn tree_2_ast(
                     let mut usub_exist1 = false;
                     let mut usub_idx = Vec::<i32>::new();
                     for (i, ent) in arg1[0].clone().iter().enumerate() {
-                        if *ent == MathExpression::Mo(Operator::Other("'ast.USub'".to_string())) {
+                        if *ent == MathExpression::Mo(Operator::Other("ast.USub".to_string())) {
                             usub_exist0 = true;
                             usub_idx.push(i.try_into().unwrap());
                         }
                     }
                     for (i, ent) in arg1[1].clone().iter().enumerate() {
-                        if *ent == MathExpression::Mo(Operator::Other("'ast.USub'".to_string())) {
+                        if *ent == MathExpression::Mo(Operator::Other("ast.USub".to_string())) {
                             usub_exist1 = true;
                             usub_idx.push(i.try_into().unwrap());
                         }
@@ -557,7 +556,7 @@ fn tree_2_ast(
         // (including only one, if at the end of the vec)
         // we then remove it and the one of the addition operators next to it
         if step_impl {
-            let ref_name = deriv_name[1..2].to_string();
+            let ref_name = deriv_name[0..1].to_string();
             for (idx, obj) in math_vec.clone().iter().enumerate() {
                 if *obj == MathExpression::Mi(Mi(ref_name.clone())) {
                     // find each index of the state variable on the rhs
@@ -675,7 +674,7 @@ fn distribute_args(
 
     // check if need to swap operator signs
     /* Is this running properly, not removing Mo(Other("'USub'")) in I equation in SIR */
-    if arg1[0] == Mo(Operator::Other("'USub'".to_string())) {
+    if arg1[0] == Mo(Operator::Other("USub".to_string())) {
         println!("USub dist happens"); // This is never running
         println!("Entry 1"); // operator starts at begining of arg2
         if arg2_term_ind[0] == 0 {
@@ -852,19 +851,19 @@ fn get_args(
 
     for (i, node) in graph.neighbors_directed(root_node, Outgoing).enumerate() {
         if graph[node].labels()[0].clone() == "Primitive".to_string()
-            && graph[node].get::<String>("name").unwrap() == *"'USub'"
+            && graph[node].get::<String>("name").unwrap() == *"USub"
         {
             op.push(get_operator(graph, node));
             for node1 in graph.neighbors_directed(node, Outgoing) {
                 let temp_mi = MathExpression::Mi(Mi(graph[node1].get::<String>("name").unwrap()
-                    [1..(graph[node1].get::<String>("name").unwrap().len() - 1_usize)]
+                    [0..(graph[node1].get::<String>("name").unwrap().len() - 1_usize)]
                     .to_string()));
                 args[i].push(op[0].clone());
                 args[i].push(temp_mi.clone());
             }
         } else if graph[node].labels()[0] == "Opi".to_string() || graph[node].labels()[0] == "Literal".to_string() {
             let temp_mi = MathExpression::Mi(Mi(graph[node].get::<String>("name").unwrap()
-                [1..(graph[node].get::<String>("name").unwrap().len() - 1_usize)]
+                [0..(graph[node].get::<String>("name").unwrap().len() - 1_usize)]
                 .to_string()));
             args[i].push(temp_mi.clone());
         } else {
@@ -886,13 +885,13 @@ fn get_operator(
     root_node: NodeIndex,
 ) -> MathExpression {
     let mut op = Vec::<MathExpression>::new();
-    if graph[root_node].get::<String>("name").unwrap() == *"'ast.Mult'" {
+    if graph[root_node].get::<String>("name").unwrap() == *"ast.Mult" {
         op.push(Mo(Operator::Multiply));
-    } else if graph[root_node].get::<String>("name").unwrap() == *"'ast.Add'" {
+    } else if graph[root_node].get::<String>("name").unwrap() == *"ast.Add" {
         op.push(Mo(Operator::Add));
-    } else if graph[root_node].get::<String>("name").unwrap() == *"'ast.Sub'" {
+    } else if graph[root_node].get::<String>("name").unwrap() == *"ast.Sub" {
         op.push(Mo(Operator::Subtract));
-    } else if graph[root_node].get::<String>("name").unwrap() == *"'ast.Div'" {
+    } else if graph[root_node].get::<String>("name").unwrap() == *"ast.Div" {
         op.push(Mo(Operator::Divide));
     } else {
         op.push(Mo(Operator::Other(
@@ -918,7 +917,7 @@ async fn trim_un_named(
 
     // iterate over the graph and add a new edge to bypass the un-named nodes
     for node_index in graph.node_indices() {
-        if graph[node_index].get::<String>("name").unwrap().clone() == *"'un-named'" {
+        if graph[node_index].get::<String>("name").unwrap().clone() == *"un-named" {
             let mut bypass = Vec::<NodeIndex>::new();
             for node1 in graph.neighbors_directed(node_index, Incoming) {
                 bypass.push(node1);
@@ -931,13 +930,15 @@ async fn trim_un_named(
 
                 // annoyingly have to pull the edge/Relation to insert into graph
                 let mut edge_list = Vec::<neo4rs::Relation>::new();
+                let query_string = format!("MATCH (n)-[r:Wire]->(m) WHERE id(n) = {} AND id(m) = {} RETURN r", graph[bypass[0]].id(), graph[node_index].id());
                 let mut result = graph_call.execute(
-                    query("MATCH (n)-[r:Wire]->(m) WHERE id(n) = $sid AND id(m) = $eid RETURN r").params([("sid", graph[bypass[0]].id()),("eid", graph[bypass[1]].id()),])).await.unwrap();
+                    query(&query_string[..])).await.unwrap();
                 while let Ok(Some(row)) = result.next().await {
                     let edge: neo4rs::Relation = row.get("r").unwrap();
                     edge_list.push(edge);
                 }
                 // add the bypass edge
+                // seems like it's not working...
                 for edge in edge_list {
                     graph.add_edge(
                         bypass[0],
@@ -954,12 +955,15 @@ async fn trim_un_named(
                 for (i, _ent) in bypass[0..end_node_idx].iter().enumerate() {
                     // this iterates over all but the last entry in the bypass vec
                     let mut edge_list = Vec::<neo4rs::Relation>::new();
+                    let query_string = format!("MATCH (n)-[r:Wire]->(m) WHERE id(n) = {} AND id(m) = {} RETURN r", graph[bypass[i]].id(), graph[node_index].id());
                     let mut result = graph_call.execute(
-                        query("MATCH (n)-[r:Wire]->(m) WHERE id(n) = $sid AND id(m) = $eid RETURN r").params([("sid", graph[bypass[i]].id()),("eid", graph[bypass[end_node_idx]].id()),])).await.unwrap();
+                        query(&query_string[..])).await.unwrap();
                     while let Ok(Some(row)) = result.next().await {
                         let edge: neo4rs::Relation = row.get("r").unwrap();
                         edge_list.push(edge);
                     }
+
+                    // seems like it's not working...
                     for edge in edge_list {
                         graph.add_edge(
                             bypass[i],
@@ -974,8 +978,8 @@ async fn trim_un_named(
 
     // now we perform a filter_map to remove the un-named nodes and only the bypass edge will remain to connect the nodes
     // we also remove the unpack node if it is present here as well
-    for node_index in graph.node_indices() {
-        if graph[node_index].get::<String>("name").unwrap().clone() == *"'un-named'" || graph[node_index].get::<String>("name").unwrap().clone() == *"'unpack'" {
+    for node_index in graph.node_indices().rev() {
+        if graph[node_index].get::<String>("name").unwrap().clone() == *"un-named" || graph[node_index].get::<String>("name").unwrap().clone() == *"unpack" {
             graph.remove_node(node_index);
         }
     }
