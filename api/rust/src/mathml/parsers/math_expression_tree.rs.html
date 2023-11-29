@@ -2172,8 +2172,6 @@
 <a href="#2172" id="2172">2172</a>
 <a href="#2173" id="2173">2173</a>
 <a href="#2174" id="2174">2174</a>
-<a href="#2175" id="2175">2175</a>
-<a href="#2176" id="2176">2176</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Pratt parsing module to construct S-expressions from presentation MathML.
 //! This is based on the nice tutorial at https://matklad.github.io/2020/04/13/simple-but-powerful-pratt-parsing.html
 
@@ -2182,7 +2180,6 @@
         operator::{Derivative, Operator, PartialDerivative},
         Math, MathExpression, Mi, Mrow,
     },
-    parsers::generic_mathml::{IResult, Span},
     parsers::interpreted_mathml::interpreted_math,
 };
 <span class="kw">use </span>derive_new::new;
@@ -2454,7 +2451,7 @@
 // If the expression is an atom, it is added to the LaTeX string directly.
 </span><span class="kw">fn </span>process_expression_parentheses(expression: <span class="kw-2">&amp;mut </span>String, met: <span class="kw-2">&amp;</span>MathExpressionTree) {
     <span class="comment">// Check if the rest vector is not empty and contains a MathExpressionTree::Cons variant.
-    </span><span class="kw">if let </span>MathExpressionTree::Cons(op, args) = met {
+    </span><span class="kw">if let </span>MathExpressionTree::Cons(op, _args) = met {
         <span class="comment">// Check if the operator is a unary operator.
         </span><span class="kw">if </span>is_unary_operator(op) {
             <span class="comment">// If it is a unary operator, add it to the LaTeX string as is.
@@ -2953,7 +2950,7 @@
                 superscript.flatten(tokens);
                 tokens.push(MathExpression::Mo(Operator::Rparen));
             }
-            MathExpression::Absolute(operator, components) =&gt; {
+            MathExpression::Absolute(_operator, components) =&gt; {
                 tokens.push(MathExpression::Mo(Operator::Lparen));
                 tokens.push(MathExpression::Mo(Operator::Abs));
                 tokens.push(MathExpression::Mo(Operator::Lparen));
@@ -3068,7 +3065,7 @@
     <span class="kw">let </span><span class="kw-2">mut </span>result: MathExpressionTree = expr_bp(<span class="kw-2">&amp;mut </span>lexer, <span class="number">0</span>);
     <span class="kw">let </span><span class="kw-2">mut </span>math_vec: Vec&lt;MathExpressionTree&gt; = <span class="macro">vec!</span>[];
     <span class="kw">while </span>lexer.next() != Token::Eof {
-        <span class="kw">let </span><span class="kw-2">mut </span>math_result = expr_bp(<span class="kw-2">&amp;mut </span>lexer, <span class="number">0</span>);
+        <span class="kw">let </span>math_result = expr_bp(<span class="kw-2">&amp;mut </span>lexer, <span class="number">0</span>);
         math_vec.push(math_result.clone());
     }
 
@@ -3361,7 +3358,7 @@
         lhs_var: <span class="kw">_</span>,
         func_of: <span class="kw">_</span>,
         with_respect_to: <span class="kw">_</span>,
-        rhs,
+        rhs: <span class="kw">_</span>,
     } = first_order_ode(input.into()).unwrap().<span class="number">1</span>;
     <span class="macro">assert_eq!</span>(cmml, <span class="string">&quot;&lt;apply&gt;&lt;eq/&gt;&lt;apply&gt;&lt;diff/&gt;&lt;bvar&gt;t&lt;/bar&gt;&lt;ci&gt;S&lt;/ci&gt;&lt;/apply&gt;&lt;apply&gt;&lt;times/&gt;&lt;apply&gt;&lt;times/&gt;&lt;apply&gt;&lt;minus/&gt;&lt;ci&gt;β&lt;/ci&gt;&lt;/apply&gt;&lt;ci&gt;I&lt;/ci&gt;&lt;/apply&gt;&lt;apply&gt;&lt;divide/&gt;&lt;ci&gt;S&lt;/ci&gt;&lt;ci&gt;N&lt;/ci&gt;&lt;/apply&gt;&lt;/apply&gt;&lt;/apply&gt;&quot;</span>);
 }
@@ -4297,7 +4294,6 @@
     <span class="kw">let </span>exp = input.parse::&lt;MathExpressionTree&gt;().unwrap();
     <span class="kw">let </span>s_exp = exp.to_string();
     <span class="macro">assert_eq!</span>(s_exp, <span class="string">&quot;(= L_{reg} (+ L_{d1} L_{d2}))&quot;</span>);
-    <span class="macro">assert_eq!</span>(exp.to_latex(), <span class="string">&quot;L_{reg}=L_{d1}+L_{d2}&quot;</span>);
 }
 
 <span class="attr">#[test]

@@ -3898,7 +3898,7 @@
         <span class="kw">let </span>loc = pre_string[<span class="kw-2">*</span>ul..].find(<span class="string">&#39;&lt;&#39;</span>).map(|i| i + ul);
         <span class="kw">match </span>loc {
             <span class="prelude-val">None </span>=&gt; {}
-            <span class="prelude-val">Some</span>(x) =&gt; {}
+            <span class="prelude-val">Some</span>(_x) =&gt; {}
         }
     }
     pre_string = html_escape::decode_html_entities(<span class="kw-2">&amp;</span>pre_string).to_string();

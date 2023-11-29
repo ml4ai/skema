@@ -182,16 +182,16 @@
             Operator::Factorial =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;!&quot;</span>),
             Operator::Derivative(Derivative {
                 order,
-                var_index,
+                var_index: <span class="kw">_</span>,
                 bound_var,
             }) =&gt; {
                 <span class="macro">write!</span>(f, <span class="string">&quot;D({order}, {bound_var})&quot;</span>)
             }
             Operator::PartialDerivative(PartialDerivative {
-                                     order,
-                                     var_index,
-                                     bound_var,
-                                 }) =&gt; {
+                order,
+                var_index: <span class="kw">_</span>,
+                bound_var,
+            }) =&gt; {
                 <span class="macro">write!</span>(f, <span class="string">&quot;PD({order}, {bound_var})&quot;</span>)
             }
             Operator::Exp =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;exp&quot;</span>),

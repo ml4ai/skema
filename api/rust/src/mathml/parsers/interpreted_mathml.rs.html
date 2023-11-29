@@ -826,7 +826,7 @@
     bytes::complete::tag,
     combinator::{map, opt, value},
     multi::{many0, many1, separated_list1},
-    sequence::{delimited, pair, preceded, separated_pair, tuple},
+    sequence::{delimited, pair, preceded, tuple},
 };
 
 <span class="doccomment">/// Function to parse operators. This function differs from the one in parsers::generic_mathml by
@@ -1330,7 +1330,7 @@
 
 <span class="doccomment">/// Example: Divergence
 </span><span class="kw">pub fn </span>div(input: Span) -&gt; IResult&lt;Operator&gt; {
-    <span class="kw">let </span>(s, op) = ws(pair(gradient, ws(delimited(<span class="macro">stag!</span>(<span class="string">&quot;mo&quot;</span>), dot, <span class="macro">etag!</span>(<span class="string">&quot;mo&quot;</span>)))))(input)<span class="question-mark">?</span>;
+    <span class="kw">let </span>(s, _op) = ws(pair(gradient, ws(delimited(<span class="macro">stag!</span>(<span class="string">&quot;mo&quot;</span>), dot, <span class="macro">etag!</span>(<span class="string">&quot;mo&quot;</span>)))))(input)<span class="question-mark">?</span>;
     <span class="kw">let </span>div = Operator::Div;
     <span class="prelude-val">Ok</span>((s, div))
 }
