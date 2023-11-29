@@ -11,7 +11,7 @@ use crate::{
     },
     parsers::generic_mathml::{
         add, attribute, dot, elem_many0, equals, etag, grad, lparen, mean, mi, mn, msqrt, msub,
-        msubsup, multiply, rparen, stag, subtract, tag_parser, ws, xml_declaration, IResult,
+        msubsup, mtext, multiply, rparen, stag, subtract, tag_parser, ws, xml_declaration, IResult,
         ParseError, Span,
     },
 };
@@ -761,7 +761,7 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
         absolute,
         map(operator, MathExpression::Mo),
         map(gradient, MathExpression::Mo),
-        alt((mn, msub, superscript, msqrt, mfrac, over_term)),
+        alt((mn, msub, superscript, msqrt, mfrac, mtext, over_term)),
         map(mrow, MathExpression::Mrow),
         msubsup,
     )))(input)

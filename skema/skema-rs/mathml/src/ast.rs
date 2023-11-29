@@ -109,6 +109,7 @@ impl fmt::Display for MathExpression {
                 write!(f, "{:?}", base)?;
                 write!(f, "{superscript:?}")
             }
+            MathExpression::Mtext(text) => write!(f, "{}", text),
             expression => write!(f, "{expression:?}"),
         }
     }
