@@ -53,17 +53,16 @@ def test_while():
         Loop(
             pre = [],
             expr = Operator(), # Operator(op = "<", operands = ["k",5]),
-            body = [],
-#            body = [
-#                Assignment(
-#                    left = "k",
-#                    right = Operator(op = "+", operands = ["k",2])
-#                ),
-#                Call(
-#                    func = "disp",
-#                    arguments = ["k"]
-#                )
-#            ],
+            body = [
+                Assignment(
+                    left = "k",
+                    right = Operator(op = "+", operands = ["k",2])
+                ),
+                Call(
+                    func = "disp",
+                    arguments = ["k"]
+                )
+            ],
             post = []
         )
     )
