@@ -24,8 +24,7 @@ pub fn configure() -> impl FnOnce(&mut ServiceConfig) {
             .service(get_named_opos)
             .service(get_named_opis)
             .service(get_named_ports)
-            .service(get_model_ids)
-            .service(get_subgraph);
+            .service(get_model_ids);
     }
 }
 #[allow(non_snake_case)]
@@ -33,8 +32,8 @@ pub async fn model_to_RN(gromet: ModuleCollection, config: Config) -> Result<Reg
     let module_id = push_model_to_db(gromet, config.clone()).await; // pushes model to db and gets id
     let ref_module_id1 = module_id.as_ref();
     let ref_module_id2 = module_id.as_ref();
-    let mathml_ast = module_id2mathml_ast(*ref_module_id1.unwrap(), config.clone()); // turns model into mathml ast equations
-    let _del_response = delete_module(*ref_module_id2.unwrap(), config.clone()); // deletes model from db
+    let mathml_ast = module_id2mathml_ast(*ref_module_id1.unwrap(), config.clone()).await; // turns model into mathml ast equations
+    let _del_response = delete_module(*ref_module_id2.unwrap(), config.clone()).await; // deletes model from db
     Ok(RegNet::from(mathml_ast))
 }
 
@@ -44,8 +43,8 @@ pub async fn model_to_PN(gromet: ModuleCollection, config: Config) -> Result<Pet
     let module_id = push_model_to_db(gromet, config.clone()).await; // pushes model to db and gets id
     let ref_module_id1 = module_id.as_ref();
     let ref_module_id2 = module_id.as_ref();
-    let mathml_ast = module_id2mathml_MET_ast(*ref_module_id1.unwrap(), config.clone()); // turns model into mathml ast equations
-    let _del_response = delete_module(*ref_module_id2.unwrap(), config.clone()); // deletes model from db
+    let mathml_ast = module_id2mathml_MET_ast(*ref_module_id1.unwrap(), config.clone()).await; // turns model into mathml ast equations
+    let _del_response = delete_module(*ref_module_id2.unwrap(), config.clone()).await; // deletes model from db
     Ok(PetriNet::from(mathml_ast))
 }
 
@@ -117,41 +116,6 @@ pub async fn named_port_query(module_id: i64, config: Config) -> Result<HashMap<
     result.insert("opos", opos.unwrap());
     Ok(result)
 }
-
-pub fn get_subgraph_query(module_id: i64, config: Config) -> Result<Vec<String>, MgError> {
-    // Connect to Memgraph.
-    let connect_params = config.db_connection();
-    let mut connection = Connection::connect(&connect_params)?;
-
-    // create query1
-    let query1 = format!(
-        "MATCH p = (n)-[r*]->(m) WHERE id(n) = {}
-    \nWITH reduce(output = [], n IN nodes(p) | output + n ) AS nodes1
-    \nUNWIND nodes1 AS nodes2
-    \nWITH DISTINCT nodes2
-    \nRETURN collect(nodes2);",
-        module_id
-    );
-
-    // Run Query1.
-    connection.execute(&query1, None)?;
-
-    // Check that the first value of the first record is a list
-    let mut node_list = Vec::<String>::new();
-    if let Value::List(xs) = &connection.fetchall()?[0].values[0] {
-        node_list = xs
-            .iter()
-            .filter_map(|x| match x {
-                Value::String(x) => Some(x.clone()),
-                _ => None,
-            })
-            .collect();
-    }
-    connection.commit()?;
-
-    Ok(node_list)
-}
-
 
 pub async fn module_query(config: Config) -> Result<Vec<i64>, Error> {
     
@@ -278,23 +242,6 @@ pub async fn get_named_opis(path: web::Path<i64>, config: web::Data<Config>) -> 
     HttpResponse::Ok().json(web::Json(response))
 }
 
-/// This retrieves a subgraph based on model id.
-#[utoipa::path(
-    responses(
-        (status = 200, description = "Successfully retrieved subgraph")
-    )
-)]
-#[get("/models/{id}/subgraph")]
-pub async fn get_subgraph(path: web::Path<i64>, config: web::Data<Config>) -> HttpResponse {
-    let config1 = Config {
-        db_host: config.db_host.clone(),
-        db_port: config.db_port.clone(),
-        db_protocol: config.db_protocol.clone(),
-    };
-    let response = get_subgraph_query(path.into_inner(), config1).unwrap();
-    HttpResponse::Ok().json(web::Json(response))
-}
-
 /// This retrieves a RegNet AMR based on model id.
 #[allow(non_snake_case)]
 #[utoipa::path(
@@ -312,7 +259,7 @@ pub async fn get_model_RN(path: web::Path<i64>, config: web::Data<Config>) -> Ht
         db_port: config.db_port.clone(),
         db_protocol: config.db_protocol.clone(),
     };
-    let mathml_ast = module_id2mathml_ast(path.into_inner(), config1);
+    let mathml_ast = module_id2mathml_ast(path.into_inner(), config1).await;
     HttpResponse::Ok().json(web::Json(RegNet::from(mathml_ast)))
 }
 

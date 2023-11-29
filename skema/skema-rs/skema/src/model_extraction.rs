@@ -2,7 +2,7 @@ use mathml::ast::{operator::Operator, Math};
 use crate::config::Config;
 pub use mathml::mml2pn::{ACSet, Term};
 use petgraph::prelude::*;
-use rsmgclient::{ConnectParams, Connection, MgError, Node, Relationship, Value};
+use rsmgclient::{ConnectParams, Connection, MgError, Value};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::string::ToString;
@@ -15,6 +15,9 @@ use mathml::ast::{MathExpression, Mi, Mrow};
 use mathml::parsers::first_order_ode::{flatten_mults, FirstOrderODE};
 use mathml::parsers::math_expression_tree::MathExpressionTree;
 use mathml::petri_net::recognizers::is_add_or_subtract_operator;
+use neo4rs;
+use std::sync::Arc;
+use neo4rs::{query, Node, Row, Error};
 
 // struct for returning line spans
 #[derive(Debug, Default, PartialEq, Eq, PartialOrd, Ord, Clone, Serialize, Deserialize)]
@@ -26,38 +29,21 @@ pub struct LineSpan {
 // this function returns the line numbers of the function node id provided
 pub fn get_line_span(
     node_id: i64,
-    graph: petgraph::Graph<rsmgclient::Node, rsmgclient::Relationship>,
+    graph: petgraph::Graph<neo4rs::Node, neo4rs::Relation>,
 ) -> LineSpan {
     // extract line numbers of function which contains the dynamics
     let mut line_nums = Vec::<i64>::new();
     for node in graph.node_indices() {
-        if graph[node].id == node_id {
+        if graph[node].id() == node_id {
             for n_node in graph.neighbors_directed(node, Outgoing) {
-                if graph[n_node].labels == ["Metadata"] {
-                    match &graph[n_node].properties["line_begin"] {
-                        Value::List(x) => match x[0] {
-                            Value::Int(y) => {
-                                //println!("line_begin: {:?}", y);
-                                line_nums.push(y);
-                            }
-                            _ => println!("error metadata type"),
-                        },
-                        _ => println!("error metadata type"),
-                    }
-                    match &graph[n_node].clone().properties["line_end"] {
-                        Value::List(x) => match x[0] {
-                            Value::Int(y) => {
-                                //println!("line_end: {:?}", y);
-                                line_nums.push(y);
-                            }
-                            _ => println!("error metadata type"),
-                        },
-                        _ => println!("error metadata type"),
+                if graph[n_node].labels()[0] == "Metadata".to_string() {
+                        //println!("line_begin: {:?}", y);
+                        line_nums.push(graph[n_node].get::<i64>("line_begin").unwrap());
+                        line_nums.push(graph[n_node].get::<i64>("line_end").unwrap());
                     }
                 }
             }
         }
-    }
 
     LineSpan {
         line_begin: line_nums[0],
@@ -66,12 +52,11 @@ pub fn get_line_span(
 }
 
 #[allow(non_snake_case)]
-pub fn module_id2mathml_MET_ast(module_id: i64, config: Config) -> Vec<FirstOrderODE> {
+pub async fn module_id2mathml_MET_ast(module_id: i64, config: Config) -> Vec<FirstOrderODE> {
     let mut core_dynamics_ast = Vec::<FirstOrderODE>::new();
-    let mut _metadata_map_ast = HashMap::new();
-    let graph = subgraph2petgraph(module_id, config.clone()); // makes petgraph of graph
+    //let graph = subgraph2petgraph(module_id, config.clone()).await; // makes petgraph of graph
 
-    let core_id = find_pn_dynamics(module_id, config.clone()); // gives back list of function nodes that might contain the dynamics
+    let core_id = find_pn_dynamics(module_id, config.clone()).await; // gives back list of function nodes that might contain the dynamics
     //let _line_span = get_line_span(core_id[0], graph); // get's the line span of function id
 
     //println!("\n{:?}", line_span);
@@ -92,8 +77,8 @@ pub fn module_id2mathml_MET_ast(module_id: i64, config: Config) -> Vec<FirstOrde
         };
         core_dynamics_ast.push(fo_eq);
     } else {
-        (core_dynamics_ast, _metadata_map_ast) =
-        subgrapg2_core_dyn_MET_ast(core_id[0], config.clone()).unwrap();
+        core_dynamics_ast =
+        subgrapg2_core_dyn_MET_ast(core_id[0], config.clone()).await.unwrap();
     }
 
     //println!("function_core_id: {:?}", core_id[0].clone());
@@ -107,10 +92,10 @@ pub fn module_id2mathml_MET_ast(module_id: i64, config: Config) -> Vec<FirstOrde
     core_dynamics_ast
 }
 
-pub fn module_id2mathml_ast(module_id: i64, config: Config) -> Vec<Math> {
-    let _graph = subgraph2petgraph(module_id, config.clone()); // makes petgraph of graph
+pub async fn module_id2mathml_ast(module_id: i64, config: Config) -> Vec<Math> {
+    //let _graph = subgraph2petgraph(module_id, config.clone()).await; // makes petgraph of graph
 
-    let core_id = find_pn_dynamics(module_id, config.clone()); // gives back list of function nodes that might contain the dynamics
+    let core_id = find_pn_dynamics(module_id, config.clone()).await; // gives back list of function nodes that might contain the dynamics
 
     //let _line_span = get_line_span(core_id[0], graph); // get's the line span of function id
 
@@ -121,7 +106,7 @@ pub fn module_id2mathml_ast(module_id: i64, config: Config) -> Vec<Math> {
     // 4.5 now to check if of those expressions, if they are arithmetric in nature
 
     // 5. pass id to subgrapg2_core_dyn to get core dynamics
-    let (core_dynamics_ast, _metadata_map_ast) = subgraph2_core_dyn_ast(core_id[0], config.clone()).unwrap();
+    let core_dynamics_ast = subgraph2_core_dyn_ast(core_id[0], config.clone()).await.unwrap();
 
     //println!("\ncore_dynamics_ast[0]: {:?}", core_dynamics_ast[0].clone());
 
@@ -140,40 +125,40 @@ pub fn module_id2mathml_ast(module_id: i64, config: Config) -> Vec<Math> {
 // this function finds the core dynamics and returns a vector of
 // node id's that meet the criteria for identification
 #[allow(clippy::if_same_then_else)]
-pub fn find_pn_dynamics(module_id: i64, config: Config) -> Vec<i64> {
-    let graph = subgraph2petgraph(module_id, config.clone());
+pub async fn find_pn_dynamics(module_id: i64, config: Config) -> Vec<i64> {
+    let graph = subgraph2petgraph(module_id, config.clone()).await;
     // 1. find each function node
     let mut function_nodes = Vec::<NodeIndex>::new();
     for node in graph.node_indices() {
-        if graph[node].labels == ["Function"] {
+        if graph[node].labels()[0] == "Function".to_string() {
             function_nodes.push(node);
         }
     }
     // 2. check and make sure only expressions in function
     // 3. check number of expressions and decide off that
-    let mut functions = Vec::<petgraph::Graph<rsmgclient::Node, rsmgclient::Relationship>>::new();
+    let mut functions = Vec::<petgraph::Graph<neo4rs::Node, neo4rs::Relation>>::new();
     for i in 0..function_nodes.len() {
         // grab the subgraph of the given expression
-        functions.push(subgraph2petgraph(graph[function_nodes[i]].id, config.clone()));
+        functions.push(subgraph2petgraph(graph[function_nodes[i]].id(), config.clone()).await);
     }
     // get a sense of the number of expressions in each function
     let mut func_counter = 0;
     let mut core_func = Vec::<usize>::new();
-    for func in functions.clone() {
+    for func in &functions {
         let mut expression_counter = 0;
         let mut primitive_counter = 0;
         for node in func.node_indices() {
-            if func[node].labels == ["Expression"] {
+            if func[node].labels()[0] == "Expression".to_string() {
                 expression_counter += 1;
             }
-            if func[node].labels == ["Primitive"] {
-                if func[node].properties["name"].to_string() == *"'ast.Mult'" {
+            if func[node].labels()[0] == "Primitive".to_string() {
+                if func[node].get::<String>("name").unwrap() == *"'ast.Mult'" {
                     primitive_counter += 1;
-                } else if func[node].properties["name"].to_string() == *"'ast.Add'" {
+                } else if func[node].get::<String>("name").unwrap() == *"'ast.Add'" {
                     primitive_counter += 1;
-                } else if func[node].properties["name"].to_string() == *"'ast.Sub'" {
+                } else if func[node].get::<String>("name").unwrap() == *"'ast.Sub'" {
                     primitive_counter += 1;
-                } else if func[node].properties["name"].to_string() == *"'ast.USub'" {
+                } else if func[node].get::<String>("name").unwrap() == *"'ast.USub'" {
                     primitive_counter += 1;
                 }
             }
@@ -186,9 +171,9 @@ pub fn find_pn_dynamics(module_id: i64, config: Config) -> Vec<i64> {
     // 4. get the id of functions with enough expressions
     let mut core_id = Vec::<i64>::new();
     for c_func in core_func.iter() {
-        for node in functions[*c_func].clone().node_indices() {
-            if functions[*c_func][node].labels == ["Function"] {
-                core_id.push(functions[*c_func][node].id);
+        for node in functions[*c_func].node_indices() {
+            if functions[*c_func][node].labels()[0] == "Function".to_string() {
+                core_id.push(functions[*c_func][node].id());
             }
         }
     }
@@ -197,181 +182,132 @@ pub fn find_pn_dynamics(module_id: i64, config: Config) -> Vec<i64> {
 }
 
 #[allow(non_snake_case)]
-pub fn subgrapg2_core_dyn_MET_ast(
+pub async fn subgrapg2_core_dyn_MET_ast(
     root_node_id: i64,
     config: Config,
-) -> Result<(Vec<FirstOrderODE>, HashMap<String, rsmgclient::Node>), MgError> {
+) -> Result<Vec<FirstOrderODE>, Error> {
     // get the petgraph of the subgraph
-    let graph = subgraph2petgraph(root_node_id, config.clone());
-
-    /* MAKE THIS A FUNCTION THAT TAKES IN A PETGRAPH */
-    // create the metadata rust rep
-    // this will be a map of the name of the node and the metadata node it's attached to with the mapping to our standard metadata struct
-    // grab metadata nodes
-    let mut metadata_map = HashMap::new();
-    for node in graph.node_indices() {
-        if graph[node].labels == ["Metadata"] {
-            for neighbor_node in graph.neighbors_directed(node, Incoming) {
-                // NOTE: these names have slightly off formating, the key is: "'name'"
-                metadata_map.insert(
-                    graph[neighbor_node].properties["name"].to_string().clone(),
-                    graph[node].clone(),
-                );
-            }
-        }
-    }
+    let graph = subgraph2petgraph(root_node_id, config.clone()).await;
 
     // find all the expressions
     let mut expression_nodes = Vec::<NodeIndex>::new();
     for node in graph.node_indices() {
-        if graph[node].labels == ["Expression"] {
+        if graph[node].labels()[0] == "Expression".to_string() {
             expression_nodes.push(node);
         }
     }
 
-    // initialize vector to collect all expressions
-    let mut expressions = Vec::<petgraph::Graph<rsmgclient::Node, rsmgclient::Relationship>>::new();
-    for i in 0..expression_nodes.len() {
-        // grab the subgraph of the given expression
-        expressions.push(subgraph2petgraph(graph[expression_nodes[i]].id, config.clone()));
-    }
-
-    // initialize vector to collect all expression wiring graphs
-    let mut expressions_wiring =
-        Vec::<petgraph::Graph<rsmgclient::Node, rsmgclient::Relationship>>::new();
-    for i in 0..expression_nodes.len() {
-        // grab the wiring subgraph of the given expression
-        expressions_wiring.push(subgraph_wiring(graph[expression_nodes[i]].id, config.clone()).unwrap());
-    }
-
-    // now to trim off the un-named filler nodes and filler expressions
-    let mut trimmed_expressions_wiring =
-        Vec::<petgraph::Graph<rsmgclient::Node, rsmgclient::Relationship>>::new();
-    for i in 0..expressions_wiring.clone().len() {
-        let (nodes1, _edges1) = expressions_wiring[i].clone().into_nodes_edges();
-        if nodes1.len() > 3 {
-            trimmed_expressions_wiring.push(trim_un_named(expressions_wiring[i].clone()));
-        }
-    }
-
-    // this is the actual convertion
     let mut core_dynamics = Vec::<FirstOrderODE>::new();
 
-    for expr in trimmed_expressions_wiring.clone() {
-        let mut root_node = Vec::<NodeIndex>::new();
-        let mut primitive_counter = 0;
-        for node_index in expr.clone().node_indices() {
-            if expr[node_index].labels == ["Opo"] {
-                root_node.push(node_index);
-            } else if expr[node_index].labels == ["Primitive"] {
-                primitive_counter += 1;
+    // initialize vector to collect all expression wiring graphs
+    for i in 0..expression_nodes.len() {
+        // grab the wiring subgraph of the given expression
+        let mut sub_w = subgraph_wiring(graph[expression_nodes[i]].id(), config.clone()).await.unwrap();
+        if sub_w.node_count().clone() > 3 {
+            let mut expr = trim_un_named(&mut sub_w, config.clone()).await;
+            let mut root_node = Vec::<NodeIndex>::new();
+            for node_index in expr.node_indices() {
+                if expr[node_index].labels()[0].clone() == "Opo".to_string() {
+                    root_node.push(node_index);
+                }
             }
-        }
-        if root_node.len() >= 2 || primitive_counter == 0 {
-            //println!("More than one Opo! Skipping Expression!");
-        } else {
-            core_dynamics.push(tree_2_MET_ast(expr.clone(), root_node[0]).unwrap());
+            if root_node.len() >= 2 {
+                // println!("More than one Opo! Skipping Expression!");
+            } else {
+                core_dynamics.push(tree_2_MET_ast(expr, root_node[0]).unwrap());
+            }
         }
     }
 
-    Ok((core_dynamics, metadata_map))
+    Ok(core_dynamics)
 }
 
-pub fn subgraph2_core_dyn_ast(
+pub async fn subgraph2_core_dyn_ast(
     root_node_id: i64,
     config: Config,
-) -> Result<(Vec<Vec<MathExpression>>, HashMap<String, rsmgclient::Node>), MgError> {
+) -> Result<Vec<Vec<MathExpression>>, Error> {
     // get the petgraph of the subgraph
-    let graph = subgraph2petgraph(root_node_id, config.clone());
+    let graph = subgraph2petgraph(root_node_id, config.clone()).await;
 
     /* MAKE THIS A FUNCTION THAT TAKES IN A PETGRAPH */
     // create the metadata rust rep
     // this will be a map of the name of the node and the metadata node it's attached to with the mapping to our standard metadata struct
     // grab metadata nodes
-    let mut metadata_map = HashMap::new();
-    for node in graph.node_indices() {
-        if graph[node].labels == ["Metadata"] {
-            for neighbor_node in graph.neighbors_directed(node, Incoming) {
-                // NOTE: these names have slightly off formating, the key is: "'name'"
-                metadata_map.insert(
-                    graph[neighbor_node].properties["name"].to_string().clone(),
-                    graph[node].clone(),
-                );
-            }
-        }
-    }
 
     // find all the expressions
     let mut expression_nodes = Vec::<NodeIndex>::new();
     for node in graph.node_indices() {
-        if graph[node].labels == ["Expression"] {
+        if graph[node].labels()[0] == "Expression".to_string() {
             expression_nodes.push(node);
             // println!("Expression Nodes: {:?}", graph[node].clone().id);
         }
     }
 
-    // initialize vector to collect all expressions
-    let mut expressions = Vec::<petgraph::Graph<rsmgclient::Node, rsmgclient::Relationship>>::new();
-    for i in 0..expression_nodes.len() {
-        // grab the subgraph of the given expression
-        /*println!(
-            "These are the nodes for expressions: {:?}",
-            graph[expression_nodes[i]].id.clone()
-        );*/
-        expressions.push(subgraph2petgraph(graph[expression_nodes[i]].id, config.clone()));
-    }
+    let mut core_dynamics = Vec::<Vec<MathExpression>>::new();
 
     // initialize vector to collect all expression wiring graphs
-    let mut expressions_wiring =
-        Vec::<petgraph::Graph<rsmgclient::Node, rsmgclient::Relationship>>::new();
     for i in 0..expression_nodes.len() {
         // grab the wiring subgraph of the given expression
-        expressions_wiring.push(subgraph_wiring(graph[expression_nodes[i]].id, config.clone()).unwrap());
+        let mut sub_w = subgraph_wiring(graph[expression_nodes[i]].id(), config.clone()).await.unwrap();
+        if sub_w.node_count().clone() > 3 {
+            let mut expr = trim_un_named(&mut sub_w, config.clone()).await;
+            let mut root_node = Vec::<NodeIndex>::new();
+            for node_index in expr.node_indices() {
+                if expr[node_index].labels()[0].clone() == "Opo".to_string() {
+                    root_node.push(node_index);
+                }
+            }
+            if root_node.len() >= 2 {
+                // println!("More than one Opo! Skipping Expression!");
+            } else {
+                core_dynamics.push(tree_2_ast(expr, root_node[0]).unwrap());
+            }
+        }
     }
 
     // now to trim off the un-named filler nodes and filler expressions
-    let mut trimmed_expressions_wiring =
-        Vec::<petgraph::Graph<rsmgclient::Node, rsmgclient::Relationship>>::new();
-    for i in 0..expressions_wiring.clone().len() {
-        let (nodes1, _edges1) = expressions_wiring[i].clone().into_nodes_edges();
-        if nodes1.len() > 3 {
+    /*let mut trimmed_expressions_wiring =
+        Vec::<&mut petgraph::Graph<neo4rs::Node, neo4rs::Relation>>::new();
+    for i in 0..expressions_wiring2.len() {
+        let nodes1 = expressions_wiring2[i].node_count().clone();
+        if nodes1 > 3 {
             //println!("\n{:?}\n", nodes1.clone());
             // SINCE THE POF'S ARE THE SOURCE OF THE STATE VARIABLES, NOT THE OPI'S. THEY'RE NOT BEING WIRED IN PROPERLY
-            trimmed_expressions_wiring.push(trim_un_named(expressions_wiring[i].clone()));
+            trimmed_expressions_wiring.push(trim_un_named(&mut expressions_wiring[i]));
         }
     }
 
     // this is the actual convertion
     let mut core_dynamics = Vec::<Vec<MathExpression>>::new();
 
-    for expr in trimmed_expressions_wiring.clone() {
+    for expr in trimmed_expressions_wiring {
         let mut root_node = Vec::<NodeIndex>::new();
-        for node_index in expr.clone().node_indices() {
-            if expr[node_index].labels == ["Opo"] {
+        for node_index in expr.node_indices() {
+            if expr[node_index].labels()[0] == "Opo".to_string() {
                 root_node.push(node_index);
             }
         }
         if root_node.len() >= 2 {
             // println!("More than one Opo! Skipping Expression!");
         } else {
-            core_dynamics.push(tree_2_ast(expr.clone(), root_node[0]).unwrap());
+            core_dynamics.push(tree_2_ast(expr, root_node[0]).unwrap());
         }
-    }
+    }*/
 
-    Ok((core_dynamics, metadata_map))
+    Ok(core_dynamics)
 }
 
 #[allow(non_snake_case)]
 fn tree_2_MET_ast(
-    graph: petgraph::Graph<rsmgclient::Node, rsmgclient::Relationship>,
+    graph: &mut petgraph::Graph<neo4rs::Node, neo4rs::Relation>,
     root_node: NodeIndex,
-) -> Result<FirstOrderODE, MgError> {
+) -> Result<FirstOrderODE, Error> {
     let mut fo_eq_vec = Vec::<FirstOrderODE>::new();
     let _math_vec = Vec::<MathExpressionTree>::new();
     let mut lhs = Vec::<Ci>::new();
-    if graph[root_node].labels == ["Opo"] {
+    if graph[root_node].labels()[0] == "Opo".to_string() {
         // we first construct the derivative of the first node
-        let deriv_name: &str = &graph[root_node].properties["name"].to_string();
+        let deriv_name: &str = &graph[root_node].get::<String>("name").unwrap();
         // this will let us know if additional trimming is needed to handle the code implementation of the equations
         // let mut step_impl = false; this will be used for step implementaion for later
         // This is very bespoke right now
@@ -394,9 +330,9 @@ fn tree_2_MET_ast(
             lhs.push(deriv);
         }
         for node in graph.neighbors_directed(root_node, Outgoing) {
-            if graph[node].labels == ["Primitive"] {
-                let operate = get_operator_MET(graph.clone(), node); // output -> Operator
-                let rhs_arg = get_args_MET(graph.clone(), node); // output -> Vec<MathExpressionTree>
+            if graph[node].labels()[0].clone() == "Primitive".to_string() {
+                let operate = get_operator_MET(&graph, node); // output -> Operator
+                let rhs_arg = get_args_MET(&graph, node); // output -> Vec<MathExpressionTree>
                 let rhs = MathExpressionTree::Cons(operate, rhs_arg); // MathExpressionTree
                 let rhs_flat = flatten_mults(rhs.clone());
                 let fo_eq = FirstOrderODE {
@@ -417,7 +353,7 @@ fn tree_2_MET_ast(
 
 #[allow(non_snake_case)]
 pub fn get_args_MET(
-    graph: petgraph::Graph<rsmgclient::Node, rsmgclient::Relationship>,
+    graph: &petgraph::Graph<neo4rs::Node, neo4rs::Relation>,
     root_node: NodeIndex,
 ) -> Vec<MathExpressionTree> {
     let mut args = Vec::<MathExpressionTree>::new();
@@ -430,30 +366,27 @@ pub fn get_args_MET(
     // construct vecs
     for node in graph.neighbors_directed(root_node, Outgoing) {
         // first need to check for operator
-        if graph[node].labels == ["Primitive"] {
-            let operate = get_operator_MET(graph.clone(), node); // output -> Operator
-            let rhs_arg = get_args_MET(graph.clone(), node); // output -> Vec<MathExpressionTree>
+        if graph[node].labels()[0].clone() == "Primitive".to_string() {
+            let operate = get_operator_MET(graph, node); // output -> Operator
+            let rhs_arg = get_args_MET(graph, node); // output -> Vec<MathExpressionTree>
             let rhs = MathExpressionTree::Cons(operate, rhs_arg); // MathExpressionTree
             args.push(rhs.clone());
         } else {
             // asummption it is atomic
-            let temp_string = graph[node].properties["name"].to_string().clone();
-            let arg2 = MathExpressionTree::Atom(MathExpression::Mi(Mi(graph[node].properties
-                ["name"]
-                .to_string()[1..(temp_string.len() - 1_usize)]
+            let temp_string = graph[node].get::<String>("name").unwrap().clone();
+            let arg2 = MathExpressionTree::Atom(MathExpression::Mi(Mi(graph[node].get::<String>("name").unwrap()[1..(temp_string.len() - 1_usize)]
                 .to_string())));
             args.push(arg2.clone());
         }
+
+        // ATTENTION: NEEDS MORE WORK TO GET SETUP FOR neo4rs GRAPHS!!!!! 
         // construct order of args
-        if let rsmgclient::Value::Int(x) = graph
+        let x = graph
             .edge_weight(graph.find_edge(root_node, node).unwrap())
             .unwrap()
-            .clone()
-            .properties["index"]
-        {
-            arg_order.push(x);
-        }
-    }
+            .get::<i64>("index").unwrap();
+        arg_order.push(x);
+    }   // ^^^^ ATTENTION: NEEDS MORE WORK TO GET SETUP FOR neo4rs GRAPHS!!!!! ^^^^^
 
     // fix order of args
     let mut ordered_args = args.clone();
@@ -475,37 +408,37 @@ pub fn get_args_MET(
 #[allow(non_snake_case)]
 #[allow(clippy::if_same_then_else)]
 pub fn get_operator_MET(
-    graph: petgraph::Graph<rsmgclient::Node, rsmgclient::Relationship>,
+    graph: &petgraph::Graph<neo4rs::Node, neo4rs::Relation>,
     root_node: NodeIndex,
 ) -> Operator {
     let mut op = Vec::<Operator>::new();
-    if graph[root_node].properties["name"].to_string() == *"'ast.Mult'" {
+    if graph[root_node].get::<String>("name").unwrap() == *"'ast.Mult'" {
         op.push(Operator::Multiply);
-    } else if graph[root_node].properties["name"].to_string() == *"'ast.Add'" {
+    } else if graph[root_node].get::<String>("name").unwrap() == *"'ast.Add'" {
         op.push(Operator::Add);
-    } else if graph[root_node].properties["name"].to_string() == *"'ast.Sub'" {
+    } else if graph[root_node].get::<String>("name").unwrap() == *"'ast.Sub'" {
         op.push(Operator::Subtract);
-    } else if graph[root_node].properties["name"].to_string() == *"'ast.USub'" {
+    } else if graph[root_node].get::<String>("name").unwrap() == *"'ast.USub'" {
         op.push(Operator::Subtract);
-    } else if graph[root_node].properties["name"].to_string() == *"'ast.Div'" {
+    } else if graph[root_node].get::<String>("name").unwrap() == *"'ast.Div'" {
         op.push(Operator::Divide);
     } else {
         op.push(Operator::Other(
-            graph[root_node].properties["name"].to_string(),
+            graph[root_node].get::<String>("name").unwrap(),
         ));
     }
     op[0].clone()
 }
 
 fn tree_2_ast(
-    graph: petgraph::Graph<rsmgclient::Node, rsmgclient::Relationship>,
+    graph: &mut petgraph::Graph<neo4rs::Node, neo4rs::Relation>,
     root_node: NodeIndex,
-) -> Result<Vec<MathExpression>, MgError> {
+) -> Result<Vec<MathExpression>, Error> {
     let mut math_vec = Vec::<MathExpression>::new();
 
-    if graph[root_node].labels == ["Opo"] {
+    if graph[root_node].labels()[0] == "Opo".to_string() {
         // we first construct the derivative of the first node
-        let deriv_name: &str = &graph[root_node].properties["name"].to_string();
+        let deriv_name: &str = &graph[root_node].get::<String>("name").unwrap();
         // this will let us know if additional trimming is needed to handle the code implementation of the equations
         let mut step_impl = false;
         // This is very bespoke right now
@@ -545,12 +478,12 @@ fn tree_2_ast(
 
         // this only distributing if the multiplication is the first operator
         for node in graph.neighbors_directed(root_node, Outgoing) {
-            if graph[node].labels == ["Primitive"]
-                && graph[node].properties["name"].to_string() != *"'ast.USub'"
+            if graph[node].labels()[0].clone() == "Primitive".to_string()
+                && graph[node].get::<String>("name").unwrap() != *"'ast.USub'"
             {
-                first_op.push(get_operator(graph.clone(), node));
-                let mut arg1 = get_args(graph.clone(), node);
-                if graph[node].properties["name"].to_string() == *"'ast.Mult'" {
+                first_op.push(get_operator(&graph, node));
+                let mut arg1 = get_args(&graph, node);
+                if graph[node].get::<String>("name").unwrap() == *"'ast.Mult'" {
                     let arg1_mult = is_multiple_terms(arg1[0].clone());
                     let arg2_mult = is_multiple_terms(arg1[1].clone());
                     if arg1_mult {
@@ -908,7 +841,7 @@ fn distribute_args(
 
 // this will get the arguments for an operator/primitive of the graph, assumes it's binary
 fn get_args(
-    graph: petgraph::Graph<rsmgclient::Node, rsmgclient::Relationship>,
+    graph: &petgraph::Graph<neo4rs::Node, neo4rs::Relation>,
     root_node: NodeIndex,
 ) -> Vec<Vec<MathExpression>> {
     let mut op = Vec::<MathExpression>::new();
@@ -918,29 +851,27 @@ fn get_args(
     let mut args = vec![temp_op; 2];
 
     for (i, node) in graph.neighbors_directed(root_node, Outgoing).enumerate() {
-        if graph[node].labels == ["Primitive"]
-            && graph[node].properties["name"].to_string() == *"'USub'"
+        if graph[node].labels()[0].clone() == "Primitive".to_string()
+            && graph[node].get::<String>("name").unwrap() == *"'USub'"
         {
-            op.push(get_operator(graph.clone(), node));
+            op.push(get_operator(graph, node));
             for node1 in graph.neighbors_directed(node, Outgoing) {
-                let temp_mi = MathExpression::Mi(Mi(graph.clone()[node1].properties["name"]
-                    .to_string()
-                    [1..(graph.clone()[node1].properties["name"].to_string().len() - 1_usize)]
+                let temp_mi = MathExpression::Mi(Mi(graph[node1].get::<String>("name").unwrap()
+                    [1..(graph[node1].get::<String>("name").unwrap().len() - 1_usize)]
                     .to_string()));
                 args[i].push(op[0].clone());
                 args[i].push(temp_mi.clone());
             }
-        } else if graph[node].labels == ["Opi"] || graph[node].labels == ["Literal"] {
-            let temp_mi = MathExpression::Mi(Mi(graph.clone()[node].properties["name"]
-                .to_string()
-                [1..(graph.clone()[node].properties["name"].to_string().len() - 1_usize)]
+        } else if graph[node].labels()[0] == "Opi".to_string() || graph[node].labels()[0] == "Literal".to_string() {
+            let temp_mi = MathExpression::Mi(Mi(graph[node].get::<String>("name").unwrap()
+                [1..(graph[node].get::<String>("name").unwrap().len() - 1_usize)]
                 .to_string()));
             args[i].push(temp_mi.clone());
         } else {
-            let n_args = get_args(graph.clone(), node);
+            let n_args = get_args(graph, node);
             let mut temp_vec = Vec::<MathExpression>::new();
             temp_vec.extend_from_slice(&n_args[0]);
-            temp_vec.push(get_operator(graph.clone(), node));
+            temp_vec.push(get_operator(graph, node));
             temp_vec.extend_from_slice(&n_args[1]);
             args[i].extend_from_slice(&temp_vec.clone());
         }
@@ -951,36 +882,43 @@ fn get_args(
 
 // this gets the operator from the node name
 fn get_operator(
-    graph: petgraph::Graph<rsmgclient::Node, rsmgclient::Relationship>,
+    graph: &petgraph::Graph<neo4rs::Node, neo4rs::Relation>,
     root_node: NodeIndex,
 ) -> MathExpression {
     let mut op = Vec::<MathExpression>::new();
-    if graph[root_node].properties["name"].to_string() == *"'ast.Mult'" {
+    if graph[root_node].get::<String>("name").unwrap() == *"'ast.Mult'" {
         op.push(Mo(Operator::Multiply));
-    } else if graph[root_node].properties["name"].to_string() == *"'ast.Add'" {
+    } else if graph[root_node].get::<String>("name").unwrap() == *"'ast.Add'" {
         op.push(Mo(Operator::Add));
-    } else if graph[root_node].properties["name"].to_string() == *"'ast.Sub'" {
+    } else if graph[root_node].get::<String>("name").unwrap() == *"'ast.Sub'" {
         op.push(Mo(Operator::Subtract));
-    } else if graph[root_node].properties["name"].to_string() == *"'ast.Div'" {
+    } else if graph[root_node].get::<String>("name").unwrap() == *"'ast.Div'" {
         op.push(Mo(Operator::Divide));
     } else {
         op.push(Mo(Operator::Other(
-            graph[root_node].properties["name"].to_string(),
+            graph[root_node].get::<String>("name").unwrap(),
         )));
     }
     op[0].clone()
 }
 
 // this currently only works for un-named nodes that are not chained or have multiple incoming/outgoing edges
-fn trim_un_named(
-    graph: petgraph::Graph<rsmgclient::Node, rsmgclient::Relationship>,
-) -> petgraph::Graph<rsmgclient::Node, rsmgclient::Relationship> {
+async fn trim_un_named(
+    graph: & mut petgraph::Graph<neo4rs::Node, neo4rs::Relation>, config: Config
+) -> & mut petgraph::Graph<neo4rs::Node, neo4rs::Relation> {
     // first create a cloned version of the graph we can modify while iterating over it.
-    let mut bypass_graph = graph.clone();
+    //let mut graph = *graph;
+
+    //let mut bypass_graph = graph.clone();
+    // This may require filter mapping it over entirely?
+
+    
+
+    let graph_call = Arc::new(config.graphdb_connection().await);
 
     // iterate over the graph and add a new edge to bypass the un-named nodes
     for node_index in graph.node_indices() {
-        if graph[node_index].properties["name"].to_string() == *"'un-named'" {
+        if graph[node_index].get::<String>("name").unwrap().clone() == *"'un-named'" {
             let mut bypass = Vec::<NodeIndex>::new();
             for node1 in graph.neighbors_directed(node_index, Incoming) {
                 bypass.push(node1);
@@ -990,14 +928,23 @@ fn trim_un_named(
             }
             // one incoming one outgoing
             if bypass.len() == 2 {
-                bypass_graph.add_edge(
-                    bypass[0],
-                    bypass[1],
-                    graph
-                        .edge_weight(graph.find_edge(bypass[0], node_index).unwrap())
-                        .unwrap()
-                        .clone(),
-                );
+
+                // annoyingly have to pull the edge/Relation to insert into graph
+                let mut edge_list = Vec::<neo4rs::Relation>::new();
+                let mut result = graph_call.execute(
+                    query("MATCH (n)-[r:Wire]->(m) WHERE id(n) = $sid AND id(m) = $eid RETURN r").params([("sid", graph[bypass[0]].id()),("eid", graph[bypass[1]].id()),])).await.unwrap();
+                while let Ok(Some(row)) = result.next().await {
+                    let edge: neo4rs::Relation = row.get("r").unwrap();
+                    edge_list.push(edge);
+                }
+                // add the bypass edge
+                for edge in edge_list {
+                    graph.add_edge(
+                        bypass[0],
+                        bypass[1],
+                        edge
+                    );
+                }
             } else if bypass.len() > 2 {
                 // this operates on the assumption that there maybe multiple references to the port
                 // (incoming arrows) but only one outgoing arrow, this seems to be the case based on
@@ -1006,14 +953,20 @@ fn trim_un_named(
                 let end_node_idx = bypass.len() - 1;
                 for (i, _ent) in bypass[0..end_node_idx].iter().enumerate() {
                     // this iterates over all but the last entry in the bypass vec
-                    bypass_graph.add_edge(
-                        bypass[i],
-                        bypass[end_node_idx],
-                        graph
-                            .edge_weight(graph.find_edge(bypass[i], node_index).unwrap())
-                            .unwrap()
-                            .clone(),
-                    );
+                    let mut edge_list = Vec::<neo4rs::Relation>::new();
+                    let mut result = graph_call.execute(
+                        query("MATCH (n)-[r:Wire]->(m) WHERE id(n) = $sid AND id(m) = $eid RETURN r").params([("sid", graph[bypass[i]].id()),("eid", graph[bypass[end_node_idx]].id()),])).await.unwrap();
+                    while let Ok(Some(row)) = result.next().await {
+                        let edge: neo4rs::Relation = row.get("r").unwrap();
+                        edge_list.push(edge);
+                    }
+                    for edge in edge_list {
+                        graph.add_edge(
+                            bypass[i],
+                            bypass[end_node_idx],
+                            edge
+                        );
+                    }
                 }
             }
         }
@@ -1021,26 +974,63 @@ fn trim_un_named(
 
     // now we perform a filter_map to remove the un-named nodes and only the bypass edge will remain to connect the nodes
     // we also remove the unpack node if it is present here as well
+    for node_index in graph.node_indices() {
+        if graph[node_index].get::<String>("name").unwrap().clone() == *"'un-named'" || graph[node_index].get::<String>("name").unwrap().clone() == *"'unpack'" {
+            graph.remove_node(node_index);
+        }
+    }
 
-    bypass_graph.filter_map(
+    /*graph.filter_map(
         |node_index, _edge_index| {
-            if !(bypass_graph[node_index].properties["name"].to_string() == *"'un-named'"
-                || bypass_graph[node_index].properties["name"].to_string() == *"'unpack'")
+            if !(graph[node_index].get::<String>("name").unwrap() == *"'un-named'"
+                || graph[node_index].get::<String>("name").unwrap() == *"'unpack'")
             {
-                Some(graph[node_index].clone())
+                Some(graph[node_index])
             } else {
                 None
             }
         },
-        |_node_index, edge_index| Some(edge_index.clone()),
-    )
+        |_node_index, edge_index| Some(*edge_index),
+    )*/
+    graph
 }
 
-fn subgraph_wiring(
+async fn subgraph_wiring(
     module_id: i64,
     config: Config,
-) -> Result<petgraph::Graph<rsmgclient::Node, rsmgclient::Relationship>, MgError> {
+) -> Result<petgraph::Graph<neo4rs::Node, neo4rs::Relation>, Error> {
+    
+    let mut node_list = Vec::<neo4rs::Node>::new();
+    let mut edge_list = Vec::<neo4rs::Relation>::new();
+
     // Connect to Memgraph.
+    let graph = Arc::new(config.graphdb_connection().await);
+    // node query
+    let mut result1 = graph.execute(
+        query("MATCH (n)-[*]->(m) WHERE id(n) = $id
+        MATCH q = (l)<-[r:Wire]-(m)
+        WITH reduce(output = [], m IN nodes(q) | output + m ) AS nodes1
+        UNWIND nodes1 AS nodes2
+        WITH DISTINCT nodes2
+        return nodes2").param("id", module_id)).await?;
+    while let Ok(Some(row)) = result1.next().await {
+        let node: neo4rs::Node = row.get("nodes2").unwrap();
+        node_list.push(node);
+    }
+    // edge query
+    let mut result2 = graph.execute(
+        query("MATCH (n)-[*]->(m) WHERE id(n) = $id
+        MATCH q = (l)<-[r:Wire]-(m)
+        WITH reduce(output = [], m IN relationships(q) | output + m ) AS edges1
+        UNWIND edges1 AS edges2
+        WITH DISTINCT edges2
+        return edges2").param("id", module_id)).await?;
+    while let Ok(Some(row)) = result2.next().await {
+        let edge: neo4rs::Relation = row.get("edges2").unwrap();
+        edge_list.push(edge);
+    }
+
+    /*// Connect to Memgraph.
     // FIXME: refactor using a util method 
     // that constructs ConnectParams uniformly everwhere
     let connect_params = ConnectParams {
@@ -1106,6 +1096,8 @@ fn subgraph_wiring(
 
     // Create a petgraph graph
     let mut graph: petgraph::Graph<rsmgclient::Node, rsmgclient::Relationship> = Graph::new();
+    */
+    let mut graph: petgraph::Graph<neo4rs::Node, neo4rs::Relation> = Graph::new();
 
     // Add nodes to the petgraph graph and collect their indexes
     let mut nodes = Vec::<NodeIndex>::new();
@@ -1118,12 +1110,12 @@ fn subgraph_wiring(
     for edge in edge_list {
         let mut src = Vec::<NodeIndex>::new();
         let mut tgt = Vec::<NodeIndex>::new();
-        for node_idx in nodes.clone() {
-            if graph[node_idx].id == edge.start_id {
-                src.push(node_idx);
+        for node_idx in &nodes {
+            if graph[*node_idx].id() == edge.start_node_id() {
+                src.push(*node_idx);
             }
-            if graph[node_idx].id == edge.end_id {
-                tgt.push(node_idx);
+            if graph[*node_idx].id() == edge.end_node_id() {
+                tgt.push(*node_idx);
             }
         }
         if (src.len() + tgt.len()) == 2 {
@@ -1133,14 +1125,14 @@ fn subgraph_wiring(
     Ok(graph)
 }
 
-fn subgraph2petgraph(
+async fn subgraph2petgraph(
     module_id: i64,
     config: Config,
-) -> petgraph::Graph<rsmgclient::Node, rsmgclient::Relationship> {
-    let (x, y) = get_subgraph(module_id, config.clone()).unwrap();
+) -> petgraph::Graph<neo4rs::Node, neo4rs::Relation> {
+    let (x, y) = get_subgraph(module_id, config.clone()).await.unwrap();
 
     // Create a petgraph graph
-    let mut graph: petgraph::Graph<rsmgclient::Node, rsmgclient::Relationship> = Graph::new();
+    let mut graph: petgraph::Graph<neo4rs::Node, neo4rs::Relation> = Graph::new();
 
     // Add nodes to the petgraph graph and collect their indexes
     let mut nodes = Vec::<NodeIndex>::new();
@@ -1153,12 +1145,12 @@ fn subgraph2petgraph(
     for edge in y {
         let mut src = Vec::<NodeIndex>::new();
         let mut tgt = Vec::<NodeIndex>::new();
-        for node_idx in nodes.clone() {
-            if graph[node_idx].id == edge.start_id {
-                src.push(node_idx);
+        for node_idx in &nodes {
+            if graph[*node_idx].id() == edge.start_node_id() {
+                src.push(*node_idx);
             }
-            if graph[node_idx].id == edge.end_id {
-                tgt.push(node_idx);
+            if graph[*node_idx].id() == edge.end_node_id() {
+                tgt.push(*node_idx);
             }
         }
         if (src.len() + tgt.len()) == 2 {
@@ -1168,10 +1160,38 @@ fn subgraph2petgraph(
     graph
 }
 
-pub fn get_subgraph(module_id: i64, config: Config) -> Result<(Vec<Node>, Vec<Relationship>), MgError> {
+pub async fn get_subgraph(module_id: i64, config: Config) -> Result<(Vec<neo4rs::Node>, Vec<neo4rs::Relation>), Error> {
     // construct the query that will delete the module with a given unique identifier
 
+    let mut node_list = Vec::<neo4rs::Node>::new();
+    let mut edge_list = Vec::<neo4rs::Relation>::new();
+
     // Connect to Memgraph.
+    let graph = Arc::new(config.graphdb_connection().await);
+    // node query
+    let mut result1 = graph.execute(
+        query("MATCH p = (n)-[r*]->(m) WHERE id(n) = $id
+        WITH reduce(output = [], n IN nodes(p) | output + n ) AS nodes1
+        UNWIND nodes1 AS nodes2
+        WITH DISTINCT nodes2
+        return nodes2").param("id", module_id)).await?;
+    while let Ok(Some(row)) = result1.next().await {
+        let node: neo4rs::Node = row.get("nodes2").unwrap();
+        node_list.push(node);
+    }
+    // edge query
+    let mut result2 = graph.execute(
+        query("MATCH p = (n)-[r*]->(m) WHERE id(n) = $id
+        WITH reduce(output = [], n IN relationships(p) | output + n ) AS edges1
+        UNWIND edges1 AS edges2
+        WITH DISTINCT edges2
+        return edges2").param("id", module_id)).await?;
+    while let Ok(Some(row)) = result2.next().await {
+        let edge: neo4rs::Relation = row.get("edges2").unwrap();
+        edge_list.push(edge);
+    }
+
+    /*// Connect to Memgraph.
     let connect_params = config.db_connection();
     let mut connection = Connection::connect(&connect_params)?;
 
@@ -1225,7 +1245,23 @@ pub fn get_subgraph(module_id: i64, config: Config) -> Result<(Vec<Node>, Vec<Re
             })
             .collect();
     }
-    connection.commit()?;
+    connection.commit()?;*/
 
     Ok((node_list, edge_list))
 }
+
+/*pub async fn get_wire_relation(start_node_id: i64, end_node_id: i64, config: Config) -> Result<neo4rs::Relation, Error> {
+
+    let mut edge_list = Vec::<neo4rs::Relation>::new();
+
+    let graph = Arc::new(config.graphdb_connection().await);
+
+    let mut result = graph.execute(
+        query("MATCH (n)-[r:Wire]->(m) WHERE id(n) = $sid AND id(m) = $eid RETURN r").params([("sid", start_node_id),("eid", end_node_id),])).await?;
+    while let Ok(Some(row)) = result.next().await {
+        let edge: neo4rs::Relation = row.get("r").unwrap();
+        edge_list.push(edge);
+    }
+    
+    Ok(edge_list[0])
+}*/

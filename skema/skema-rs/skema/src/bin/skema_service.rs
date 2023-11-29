@@ -56,7 +56,6 @@ async fn main() -> std::io::Result<()> {
             gromet::get_named_opos,
             gromet::get_named_opis,
             gromet::get_named_ports,
-            gromet::get_subgraph,
             gromet::get_model_RN,
             gromet::model2PN,
             gromet::model2RN,
