@@ -6,7 +6,6 @@ use crate::{
         operator::{Derivative, Operator, PartialDerivative},
         Math, MathExpression, Mi, Mrow,
     },
-    parsers::generic_mathml::{IResult, Span},
     parsers::interpreted_mathml::interpreted_math,
 };
 use derive_new::new;
@@ -278,7 +277,7 @@ fn is_unary_operator(op: &Operator) -> bool {
 // If the expression is an atom, it is added to the LaTeX string directly.
 fn process_expression_parentheses(expression: &mut String, met: &MathExpressionTree) {
     // Check if the rest vector is not empty and contains a MathExpressionTree::Cons variant.
-    if let MathExpressionTree::Cons(op, _) = met {
+    if let MathExpressionTree::Cons(op, _args) = met {
         // Check if the operator is a unary operator.
         if is_unary_operator(op) {
             // If it is a unary operator, add it to the LaTeX string as is.
@@ -520,11 +519,17 @@ impl MathExpressionTree {
                         }
                     }
                     Operator::Subtract => {
-                        for (index, r) in rest.iter().enumerate() {
-                            process_expression_parentheses(&mut expression, r);
-                            // Add "-" if it's not the last element
-                            if index < rest.len() - 1 {
-                                expression.push_str("-");
+                        // Handle unary minus
+                        if rest.len() == 1 {
+                            expression.push_str("-");
+                            process_expression_parentheses(&mut expression, &rest[0]);
+                        } else {
+                            for (index, r) in rest.iter().enumerate() {
+                                process_expression_parentheses(&mut expression, r);
+                                // Add "-" if it's not the last element
+                                if index < rest.len() - 1 {
+                                    expression.push_str("-");
+                                }
                             }
                         }
                     }
@@ -771,7 +776,7 @@ impl MathExpression {
                 superscript.flatten(tokens);
                 tokens.push(MathExpression::Mo(Operator::Rparen));
             }
-            MathExpression::Absolute(operator, components) => {
+            MathExpression::Absolute(_operator, components) => {
                 tokens.push(MathExpression::Mo(Operator::Lparen));
                 tokens.push(MathExpression::Mo(Operator::Abs));
                 tokens.push(MathExpression::Mo(Operator::Lparen));
@@ -886,7 +891,7 @@ fn expr(input: Vec<MathExpression>) -> MathExpressionTree {
     let mut result: MathExpressionTree = expr_bp(&mut lexer, 0);
     let mut math_vec: Vec<MathExpressionTree> = vec![];
     while lexer.next() != Token::Eof {
-        let mut math_result = expr_bp(&mut lexer, 0);
+        let math_result = expr_bp(&mut lexer, 0);
         math_vec.push(math_result.clone());
     }
 
@@ -1179,7 +1184,7 @@ fn test_content_hackathon2_scenario1_eq1() {
         lhs_var: _,
         func_of: _,
         with_respect_to: _,
-        rhs,
+        rhs: _,
     } = first_order_ode(input.into()).unwrap().1;
     assert_eq!(cmml, "<apply><eq/><apply><diff/><bvar>t</bar><ci>S</ci></apply><apply><times/><apply><times/><apply><minus/><ci>β</ci></apply><ci>I</ci></apply><apply><divide/><ci>S</ci><ci>N</ci></apply></apply></apply>");
 }
@@ -2129,6 +2134,7 @@ fn new_msqrt_test_function() {
     let exp = input.parse::<MathExpressionTree>().unwrap();
     let s_exp = exp.to_string();
     assert_eq!(s_exp, "(√ (* (* 4 a) c))");
+    assert_eq!(exp.to_latex(), "\\sqrt{4*a*c}");
 }
 #[test]
 fn new_quadratic_equation() {
@@ -2164,4 +2170,5 @@ fn new_quadratic_equation() {
         s_exp,
         "(= x (/ (- (- b) (√ (- (^ b 2) (* (* 4 a) c)))) (* 2 a)))"
     );
+    assert_eq!(exp.to_latex(), "x=\\frac{(-b)-\\sqrt{b^{2}-(4*a*c)}}{2*a}");
 }
