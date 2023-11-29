@@ -2165,6 +2165,15 @@
 <a href="#2165" id="2165">2165</a>
 <a href="#2166" id="2166">2166</a>
 <a href="#2167" id="2167">2167</a>
+<a href="#2168" id="2168">2168</a>
+<a href="#2169" id="2169">2169</a>
+<a href="#2170" id="2170">2170</a>
+<a href="#2171" id="2171">2171</a>
+<a href="#2172" id="2172">2172</a>
+<a href="#2173" id="2173">2173</a>
+<a href="#2174" id="2174">2174</a>
+<a href="#2175" id="2175">2175</a>
+<a href="#2176" id="2176">2176</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Pratt parsing module to construct S-expressions from presentation MathML.
 //! This is based on the nice tutorial at https://matklad.github.io/2020/04/13/simple-but-powerful-pratt-parsing.html
 
@@ -2445,7 +2454,7 @@
 // If the expression is an atom, it is added to the LaTeX string directly.
 </span><span class="kw">fn </span>process_expression_parentheses(expression: <span class="kw-2">&amp;mut </span>String, met: <span class="kw-2">&amp;</span>MathExpressionTree) {
     <span class="comment">// Check if the rest vector is not empty and contains a MathExpressionTree::Cons variant.
-    </span><span class="kw">if let </span>MathExpressionTree::Cons(op, <span class="kw">_</span>) = met {
+    </span><span class="kw">if let </span>MathExpressionTree::Cons(op, args) = met {
         <span class="comment">// Check if the operator is a unary operator.
         </span><span class="kw">if </span>is_unary_operator(op) {
             <span class="comment">// If it is a unary operator, add it to the LaTeX string as is.
@@ -2687,11 +2696,17 @@
                         }
                     }
                     Operator::Subtract =&gt; {
-                        <span class="kw">for </span>(index, r) <span class="kw">in </span>rest.iter().enumerate() {
-                            process_expression_parentheses(<span class="kw-2">&amp;mut </span>expression, r);
-                            <span class="comment">// Add &quot;-&quot; if it&#39;s not the last element
-                            </span><span class="kw">if </span>index &lt; rest.len() - <span class="number">1 </span>{
-                                expression.push_str(<span class="string">&quot;-&quot;</span>);
+                        <span class="comment">// Handle unary minus
+                        </span><span class="kw">if </span>rest.len() == <span class="number">1 </span>{
+                            expression.push_str(<span class="string">&quot;-&quot;</span>);
+                            process_expression_parentheses(<span class="kw-2">&amp;mut </span>expression, <span class="kw-2">&amp;</span>rest[<span class="number">0</span>]);
+                        } <span class="kw">else </span>{
+                            <span class="kw">for </span>(index, r) <span class="kw">in </span>rest.iter().enumerate() {
+                                process_expression_parentheses(<span class="kw-2">&amp;mut </span>expression, r);
+                                <span class="comment">// Add &quot;-&quot; if it&#39;s not the last element
+                                </span><span class="kw">if </span>index &lt; rest.len() - <span class="number">1 </span>{
+                                    expression.push_str(<span class="string">&quot;-&quot;</span>);
+                                }
                             }
                         }
                     }
@@ -4282,6 +4297,7 @@
     <span class="kw">let </span>exp = input.parse::&lt;MathExpressionTree&gt;().unwrap();
     <span class="kw">let </span>s_exp = exp.to_string();
     <span class="macro">assert_eq!</span>(s_exp, <span class="string">&quot;(= L_{reg} (+ L_{d1} L_{d2}))&quot;</span>);
+    <span class="macro">assert_eq!</span>(exp.to_latex(), <span class="string">&quot;L_{reg}=L_{d1}+L_{d2}&quot;</span>);
 }
 
 <span class="attr">#[test]
@@ -4296,6 +4312,7 @@
     <span class="kw">let </span>exp = input.parse::&lt;MathExpressionTree&gt;().unwrap();
     <span class="kw">let </span>s_exp = exp.to_string();
     <span class="macro">assert_eq!</span>(s_exp, <span class="string">&quot;(√ (* (* 4 a) c))&quot;</span>);
+    <span class="macro">assert_eq!</span>(exp.to_latex(), <span class="string">&quot;\\sqrt{4*a*c}&quot;</span>);
 }
 <span class="attr">#[test]
 </span><span class="kw">fn </span>new_quadratic_equation() {
@@ -4331,5 +4348,6 @@
         s_exp,
         <span class="string">&quot;(= x (/ (- (- b) (√ (- (^ b 2) (* (* 4 a) c)))) (* 2 a)))&quot;
     </span>);
+    <span class="macro">assert_eq!</span>(exp.to_latex(), <span class="string">&quot;x=\\frac{(-b)-\\sqrt{b^{2}-(4*a*c)}}{2*a}&quot;</span>);
 }
 </code></pre></div></section></main></body></html>
