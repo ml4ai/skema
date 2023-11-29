@@ -278,7 +278,7 @@ fn is_unary_operator(op: &Operator) -> bool {
 // If the expression is an atom, it is added to the LaTeX string directly.
 fn process_expression_parentheses(expression: &mut String, met: &MathExpressionTree) {
     // Check if the rest vector is not empty and contains a MathExpressionTree::Cons variant.
-    if let MathExpressionTree::Cons(op, _) = met {
+    if let MathExpressionTree::Cons(op, _args) = met {
         // Check if the operator is a unary operator.
         if is_unary_operator(op) {
             // If it is a unary operator, add it to the LaTeX string as is.
@@ -520,11 +520,17 @@ impl MathExpressionTree {
                         }
                     }
                     Operator::Subtract => {
-                        for (index, r) in rest.iter().enumerate() {
-                            process_expression_parentheses(&mut expression, r);
-                            // Add "-" if it's not the last element
-                            if index < rest.len() - 1 {
-                                expression.push('-');
+                        // Handle unary minus
+                        if rest.len() == 1 {
+                            expression.push('-');
+                            process_expression_parentheses(&mut expression, &rest[0]);
+                        } else {
+                            for (index, r) in rest.iter().enumerate() {
+                                process_expression_parentheses(&mut expression, r);
+                                // Add "-" if it's not the last element
+                                if index < rest.len() - 1 {
+                                    expression.push('-');
+                                }
                             }
                         }
                     }
@@ -2114,6 +2120,7 @@ fn test_equation_with_mtext() {
     let exp = input.parse::<MathExpressionTree>().unwrap();
     let s_exp = exp.to_string();
     assert_eq!(s_exp, "(= L_{reg} (+ L_{d1} L_{d2}))");
+    assert_eq!(exp.to_latex(), "L_{reg}=L_{d1}+L_{d2}");
 }
 
 #[test]
@@ -2128,6 +2135,7 @@ fn new_msqrt_test_function() {
     let exp = input.parse::<MathExpressionTree>().unwrap();
     let s_exp = exp.to_string();
     assert_eq!(s_exp, "(√ (* (* 4 a) c))");
+    assert_eq!(exp.to_latex(), "\\sqrt{4*a*c}");
 }
 #[test]
 fn new_quadratic_equation() {
@@ -2163,4 +2171,5 @@ fn new_quadratic_equation() {
         s_exp,
         "(= x (/ (- (- b) (√ (- (^ b 2) (* (* 4 a) c)))) (* 2 a)))"
     );
+    assert_eq!(exp.to_latex(), "x=\\frac{(-b)-\\sqrt{b^{2}-(4*a*c)}}{2*a}");
 }
