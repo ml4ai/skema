@@ -286,12 +286,21 @@ def process_single_model(html: HTML_Instance, output_dir: str, model_name: str):
                 True,
                 full_gromet_relative_path,
             )
+        
+        # Added return statement in order to output 
+        return (supported_lines, total_lines)
 
 
 def process_all_models(html: HTML_Instance, output_dir: str):
-    &#34;&#34;&#34;Generate an HTML report for all models in models.yaml&#34;&#34;&#34;
+    &#34;&#34;&#34;Generate an HTML report for all models in models.yaml
+    Also, output a dictionary containing line coverage information for all models in models.yaml&#34;&#34;&#34;
+    model_line_coverage = {}
     for model_name in MODEL_YAML:
-        process_single_model(html, output_dir, model_name)
+        supported, total = process_single_model(html, output_dir, model_name)
+        model_line_coverage[model_name] = (supported, total)
+
+    return model_line_coverage
+
 
 def main():
 
@@ -312,16 +321,26 @@ def main():
     output_dir = str(Path(args.output_dir).resolve()) 
 
     html = HTML_Instance()
+    
+    # model_line_coverage is a dictionary that contains line coverage information
+    # for each model that was generated
+    # its primary use is to be output as a JSON file that our regression tests can then take a look at
+    # in order to determine if we&#39;ve lost model coverage
+    model_line_coverage = {}
     if args.mode == &#34;all&#34;:
-        process_all_models(html, output_dir)
+        model_line_coverage = process_all_models(html, output_dir)
     elif args.mode == &#34;single&#34;:
-        process_single_model(html, output_dir, args.model_name)
+        supported, total = process_single_model(html, output_dir, args.model_name)
+        model_line_coverage[args.model_name] = (supported, total)
 
     # DataTables have to be initialized after all models are generated
     html.add_data_table_script()
     
     output_path = Path(output_dir) / &#34;report.html&#34;
     output_path.write_text(html.soup.prettify())
+
+    json_output_path = Path(output_dir) / &#34;line_coverage.json&#34;
+    json_output_path.write_text(json.dumps(model_line_coverage))
 
 
 if __name__ == &#34;__main__&#34;:
@@ -507,31 +526,47 @@ if __name__ == &#34;__main__&#34;:
     output_dir = str(Path(args.output_dir).resolve()) 
 
     html = HTML_Instance()
+    
+    # model_line_coverage is a dictionary that contains line coverage information
+    # for each model that was generated
+    # its primary use is to be output as a JSON file that our regression tests can then take a look at
+    # in order to determine if we&#39;ve lost model coverage
+    model_line_coverage = {}
     if args.mode == &#34;all&#34;:
-        process_all_models(html, output_dir)
+        model_line_coverage = process_all_models(html, output_dir)
     elif args.mode == &#34;single&#34;:
-        process_single_model(html, output_dir, args.model_name)
+        supported, total = process_single_model(html, output_dir, args.model_name)
+        model_line_coverage[args.model_name] = (supported, total)
 
     # DataTables have to be initialized after all models are generated
     html.add_data_table_script()
     
     output_path = Path(output_dir) / &#34;report.html&#34;
-    output_path.write_text(html.soup.prettify())</code></pre>
+    output_path.write_text(html.soup.prettify())
+
+    json_output_path = Path(output_dir) / &#34;line_coverage.json&#34;
+    json_output_path.write_text(json.dumps(model_line_coverage))</code></pre>
 </details>
 </dd>
 <dt id="skema.program_analysis.model_coverage_report.model_coverage_report.process_all_models"><code class="name flex">
 <span>def <span class="ident">process_all_models</span></span>(<span>html: <a title="skema.program_analysis.model_coverage_report.html_builder.HTML_Instance" href="html_builder.html#skema.program_analysis.model_coverage_report.html_builder.HTML_Instance">HTML_Instance</a>, output_dir: str)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Generate an HTML report for all models in models.yaml</p></div>
+<div class="desc"><p>Generate an HTML report for all models in models.yaml
+Also, output a dictionary containing line coverage information for all models in models.yaml</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def process_all_models(html: HTML_Instance, output_dir: str):
-    &#34;&#34;&#34;Generate an HTML report for all models in models.yaml&#34;&#34;&#34;
+    &#34;&#34;&#34;Generate an HTML report for all models in models.yaml
+    Also, output a dictionary containing line coverage information for all models in models.yaml&#34;&#34;&#34;
+    model_line_coverage = {}
     for model_name in MODEL_YAML:
-        process_single_model(html, output_dir, model_name)</code></pre>
+        supported, total = process_single_model(html, output_dir, model_name)
+        model_line_coverage[model_name] = (supported, total)
+
+    return model_line_coverage</code></pre>
 </details>
 </dd>
 <dt id="skema.program_analysis.model_coverage_report.model_coverage_report.process_single_model"><code class="name flex">
@@ -662,7 +697,10 @@ if __name__ == &#34;__main__&#34;:
                 total_lines,
                 True,
                 full_gromet_relative_path,
-            )</code></pre>
+            )
+        
+        # Added return statement in order to output 
+        return (supported_lines, total_lines)</code></pre>
 </details>
 </dd>
 </dl>
