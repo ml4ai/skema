@@ -378,8 +378,10 @@ fn process_math_expression(expr: &MathExpression, expression: &mut String) {
             process_math_expression(&*x2, expression);
             expression.push_str("}");
         }
-        MathExpression::Mrow(_) => {
-            panic!("All Mrows should have been removed by now!");
+        MathExpression::Mrow(vec_me) => {
+            for me in vec_me.0.iter() {
+                process_math_expression(me, expression);
+            }
         }
         t => panic!("Unhandled MathExpression: {:?}", t),
     }
