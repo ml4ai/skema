@@ -1051,14 +1051,14 @@ pub fn preprocess_mathml_for_to_latex(input: &str) -> String {
         .replace_all(&no_newlines, "><")
         .to_string();
 
-        let new_no_spaces = no_spaces.replace(" ", "");
+    let new_no_spaces = no_spaces.replace(' ', "");
 
-        // Replace <mi>∇</mi> with <mo>∇</mo>
-        let replaced_str = new_no_spaces
-            .replace(r#"<mi>∇</mi>"#, "<mo>∇</mo>")
-            .to_string();
+    // Replace <mi>∇</mi> with <mo>∇</mo>
     
-        replaced_str
+
+    new_no_spaces
+        .replace(r#"<mi>∇</mi>"#, "<mo>∇</mo>")
+        .to_string()
 }
 
 #[test]

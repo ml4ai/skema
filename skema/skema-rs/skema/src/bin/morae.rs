@@ -85,7 +85,8 @@ async fn main() {
             ids.push(node.id());
         }
         println!("{:?}", ids.clone());
-        let math_content = module_id2mathml_MET_ast(ids[(ids.len()-1) as usize], config.clone()).await;
+        let math_content =
+            module_id2mathml_MET_ast(ids[ids.len() - 1], config.clone()).await;
         println!("{:?}", math_content.clone());
         println!("\nAMR from code: {:?}", PetriNet::from(math_content));
 
