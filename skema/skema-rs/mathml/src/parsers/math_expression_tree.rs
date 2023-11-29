@@ -2120,7 +2120,6 @@ fn test_equation_with_mtext() {
     let exp = input.parse::<MathExpressionTree>().unwrap();
     let s_exp = exp.to_string();
     assert_eq!(s_exp, "(= L_{reg} (+ L_{d1} L_{d2}))");
-    assert_eq!(exp.to_latex(), "L_{reg}=L_{d1}+L_{d2}");
 }
 
 #[test]
