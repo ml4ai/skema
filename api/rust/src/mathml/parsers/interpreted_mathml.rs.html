@@ -788,6 +788,21 @@
 <a href="#788" id="788">788</a>
 <a href="#789" id="789">789</a>
 <a href="#790" id="790">790</a>
+<a href="#791" id="791">791</a>
+<a href="#792" id="792">792</a>
+<a href="#793" id="793">793</a>
+<a href="#794" id="794">794</a>
+<a href="#795" id="795">795</a>
+<a href="#796" id="796">796</a>
+<a href="#797" id="797">797</a>
+<a href="#798" id="798">798</a>
+<a href="#799" id="799">799</a>
+<a href="#800" id="800">800</a>
+<a href="#801" id="801">801</a>
+<a href="#802" id="802">802</a>
+<a href="#803" id="803">803</a>
+<a href="#804" id="804">804</a>
+<a href="#805" id="805">805</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! This module contains parsers that perform some amount of preliminary domain-specific
 //! interpretation of presentation MathML (e.g., globbing S(t) to an identifier S of type
 //! &#39;function&#39;). This is in contrast to the `generic_mathml.rs` module that contains parsers that
@@ -800,8 +815,8 @@
         Ci, Differential, Math, MathExpression, Mi, Mrow, Type,
     },
     parsers::generic_mathml::{
-        add, attribute, dot, elem_many0, equals, etag, grad, lparen, mean, mi, mn, msqrt, msub,
-        msubsup, mtext, multiply, rparen, stag, subtract, tag_parser, ws, xml_declaration, IResult,
+        add, attribute, dot, elem_many0, equals, etag, grad, lparen, mean, mi, mn, msub, msubsup,
+        mtext, multiply, rparen, stag, subtract, tag_parser, ws, xml_declaration, IResult,
         ParseError, Span,
     },
 };
@@ -1368,13 +1383,26 @@
     <span class="prelude-val">Ok</span>((s, sup))
 }
 
+<span class="doccomment">/// Parser for multiple elements in square root
+</span><span class="kw">pub fn </span>sqrt(input: Span) -&gt; IResult&lt;MathExpression&gt; {
+    <span class="kw">let </span>(s, elements) = ws(delimited(
+        <span class="macro">stag!</span>(<span class="string">&quot;msqrt&quot;</span>),
+        many0(math_expression),
+        <span class="macro">etag!</span>(<span class="string">&quot;msqrt&quot;</span>),
+    ))(input)<span class="question-mark">?</span>;
+    <span class="prelude-val">Ok</span>((
+        s,
+        MathExpression::Msqrt(Box::new(MathExpression::Mrow(Mrow(elements)))),
+    ))
+}
+
 <span class="doccomment">/// Parser for math expressions. This varies from the one in the generic_mathml module, since it
 /// assumes that expressions such as S(t) are actually univariate functions.
 </span><span class="kw">pub fn </span>math_expression(input: Span) -&gt; IResult&lt;MathExpression&gt; {
     ws(alt((
         map(div, MathExpression::Mo),
-        ws(absolute_with_msup),
-        ws(paren_as_msup),
+        alt((ws(absolute_with_msup), ws(paren_as_msup))),
+        sqrt,
         map(
             grad_func,
             |(
@@ -1549,9 +1577,11 @@
             },
         ),
         absolute,
-        map(operator, MathExpression::Mo),
-        map(gradient, MathExpression::Mo),
-        alt((mn, msub, superscript, msqrt, mfrac, mtext, over_term)),
+        alt((
+            map(operator, MathExpression::Mo),
+            map(gradient, MathExpression::Mo),
+        )),
+        alt((mn, msub, superscript, mfrac, mtext, over_term)),
         map(mrow, MathExpression::Mrow),
         msubsup,
     )))(input)
