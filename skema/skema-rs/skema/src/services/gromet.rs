@@ -2,7 +2,6 @@
 use crate::config::Config;
 use crate::database::{parse_gromet_queries, run_queries};
 use crate::model_extraction::module_id2mathml_MET_ast;
-use crate::model_extraction::module_id2mathml_ast;
 use crate::ModuleCollection;
 use actix_web::web::ServiceConfig;
 use actix_web::{delete, get, post, put, web, HttpResponse};
@@ -31,7 +30,7 @@ pub async fn model_to_RN(gromet: ModuleCollection, config: Config) -> Result<Reg
     let module_id = push_model_to_db(gromet, config.clone()).await; // pushes model to db and gets id
     let ref_module_id1 = module_id.as_ref();
     let ref_module_id2 = module_id.as_ref();
-    let mathml_ast = module_id2mathml_ast(*ref_module_id1.unwrap(), config.clone()).await; // turns model into mathml ast equations
+    let mathml_ast = module_id2mathml_MET_ast(*ref_module_id1.unwrap(), config.clone()).await; // turns model into mathml ast equations
     let _del_response = delete_module(*ref_module_id2.unwrap(), config.clone()).await; // deletes model from db
     Ok(RegNet::from(mathml_ast))
 }
@@ -273,7 +272,7 @@ pub async fn get_model_RN(path: web::Path<i64>, config: web::Data<Config>) -> Ht
         db_port: config.db_port,
         db_protocol: config.db_protocol.clone(),
     };
-    let mathml_ast = module_id2mathml_ast(path.into_inner(), config1).await;
+    let mathml_ast = module_id2mathml_MET_ast(path.into_inner(), config1).await;
     HttpResponse::Ok().json(web::Json(RegNet::from(mathml_ast)))
 }
 

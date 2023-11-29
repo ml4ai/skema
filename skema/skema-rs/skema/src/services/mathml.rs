@@ -173,8 +173,24 @@ pub async fn get_acset(payload: web::Json<Vec<String>>) -> HttpResponse {
 )]
 #[put("/mathml/regnet")]
 pub async fn get_regnet(payload: web::Json<Vec<String>>) -> HttpResponse {
-    let asts: Vec<Math> = payload.iter().map(|x| x.parse::<Math>().unwrap()).collect();
-    HttpResponse::Ok().json(web::Json(RegNet::from(asts)))
+    let asts_result: Result<Vec<_>, _> = payload
+        .iter()
+        .map(|x| first_order_ode(x.as_str().into()))
+        .collect();
+
+    match asts_result {
+        Ok(asts) => {
+            let mut flattened_asts = Vec::<FirstOrderODE>::new();
+            for (_, mut eq) in asts {
+                eq.rhs = flatten_mults(eq.rhs.clone());
+                flattened_asts.push(eq.clone());
+            }
+            HttpResponse::Ok().json(web::Json(RegNet::from(flattened_asts)))
+        }
+        Err(err) => HttpResponse::BadRequest()
+            .content_type("text/plain")
+            .body(err.to_string()),
+    }
 }
 
 /// Return a JSON representation of an AMR constructed from an array of MathML strings and a string
@@ -204,15 +220,9 @@ pub async fn get_amr(payload: web::Json<AMRmathml>) -> HttpResponse {
                 eq.rhs = flatten_mults(eq.rhs.clone());
                 flattened_asts.push(eq.clone());
             }
-            let asts: Vec<Math> = payload
-                .mathml
-                .clone()
-                .iter()
-                .map(|x| x.parse::<Math>().unwrap())
-                .collect();
             let model_type = payload.model.clone();
             if model_type == *"regnet" {
-                HttpResponse::Ok().json(web::Json(RegNet::from(asts)))
+                HttpResponse::Ok().json(web::Json(RegNet::from(flattened_asts)))
             } else if model_type == *"petrinet" {
                 HttpResponse::Ok().json(web::Json(PetriNet::from(flattened_asts)))
             } else {

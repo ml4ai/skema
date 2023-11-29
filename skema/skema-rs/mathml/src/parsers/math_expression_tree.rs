@@ -1054,7 +1054,6 @@ pub fn preprocess_mathml_for_to_latex(input: &str) -> String {
     let new_no_spaces = no_spaces.replace(' ', "");
 
     // Replace <mi>∇</mi> with <mo>∇</mo>
-    
 
     new_no_spaces
         .replace(r#"<mi>∇</mi>"#, "<mo>∇</mo>")
