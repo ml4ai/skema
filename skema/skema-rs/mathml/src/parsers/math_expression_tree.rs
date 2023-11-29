@@ -37,7 +37,12 @@ impl fmt::Display for MathExpressionTree {
             MathExpressionTree::Atom(MathExpression::Mo(Operator::Derivative(x))) => {
                 write!(f, "{:?}", x)
             }
-            MathExpressionTree::Atom(i) => write!(f, "{}", i),
+            MathExpressionTree::Atom(MathExpression::Msqrt(x)) => {
+                write!(f, "{}", x)
+            }
+            MathExpressionTree::Atom(i) => {
+                write!(f, "{}", i)
+            }
             MathExpressionTree::Cons(head, rest) => {
                 write!(f, "({}", head)?;
                 for s in rest {
@@ -454,6 +459,9 @@ impl MathExpressionTree {
                 MathExpression::Mn(number) => {
                     expression.push_str(&number.to_string());
                 }
+                MathExpression::Mtext(text) => {
+                    expression.push_str(&text.to_string());
+                }
                 MathExpression::Mrow(_) => {
                     panic!("All Mrows should have been removed by now!");
                 }
@@ -771,6 +779,14 @@ impl MathExpression {
                 tokens.push(MathExpression::Mo(Operator::Rparen));
                 tokens.push(MathExpression::Mo(Operator::Rparen));
             }
+            MathExpression::Msqrt(components) => {
+                tokens.push(MathExpression::Mo(Operator::Lparen));
+                tokens.push(MathExpression::Mo(Operator::Sqrt));
+                tokens.push(MathExpression::Mo(Operator::Lparen));
+                components.flatten(tokens);
+                tokens.push(MathExpression::Mo(Operator::Rparen));
+                tokens.push(MathExpression::Mo(Operator::Rparen));
+            }
             MathExpression::Mover(base, over) => {
                 if MathExpression::Mo(Operator::Mean) == **over {
                     tokens.push(MathExpression::Mo(Operator::Mean));
@@ -985,6 +1001,7 @@ fn prefix_binding_power(op: &Operator) -> ((), u8) {
         Operator::PartialDerivative(PartialDerivative { .. }) => ((), 25),
         Operator::Div => ((), 25),
         Operator::Abs => ((), 25),
+        Operator::Sqrt => ((), 25),
         _ => panic!("Bad operator: {:?}", op),
     }
 }
@@ -1051,13 +1068,7 @@ pub fn preprocess_mathml_for_to_latex(input: &str) -> String {
         .replace_all(&no_newlines, "><")
         .to_string();
 
-    let new_no_spaces = no_spaces.replace(' ', "");
-
-    // Replace <mi>∇</mi> with <mo>∇</mo>
-
-    new_no_spaces
-        .replace(r#"<mi>∇</mi>"#, "<mo>∇</mo>")
-        .to_string()
+    no_spaces.to_string()
 }
 
 #[test]
@@ -2094,5 +2105,62 @@ fn new_test_halfar_whitespace() {
     assert_eq!(
         s_exp,
         "(= t_{0} (* (* (/ 1 (* 18 Γ)) (^ (/ 7 4) 3)) (/ R_{0}^{4} H_{0}^{7})))"
+    );
+}
+
+#[test]
+fn test_equation_with_mtext() {
+    let input = "<math><msub><mrow><mi mathvariant=\"script\">L</mi></mrow><mrow><mtext>reg</mtext></mrow></msub><mo>=</mo><msub><mrow><mi mathvariant=\"script\">L</mi></mrow><mrow><mi>d</mi><mn>1</mn></mrow></msub><mo>+</mo><msub><mrow><mi mathvariant=\"script\">L</mi></mrow><mrow><mi>d</mi><mn>2</mn></mrow></msub></math>";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    let s_exp = exp.to_string();
+    assert_eq!(s_exp, "(= L_{reg} (+ L_{d1} L_{d2}))");
+}
+
+#[test]
+fn new_msqrt_test_function() {
+    let input = "<math>
+        <msqrt>
+        <mn>4</mn>
+        <mi>a</mi>
+        <mi>c</mi>
+</msqrt>
+</math>";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    let s_exp = exp.to_string();
+    assert_eq!(s_exp, "(√ (* (* 4 a) c))");
+}
+#[test]
+fn new_quadratic_equation() {
+    let input = "<math>
+  <mi>x</mi>
+  <mo>=</mo>
+  <mfrac>
+    <mrow>
+      <mo>&#x2212;</mo>
+      <mi>b</mi>
+      <mo>&#x2212;</mo>
+      <msqrt>
+        <msup>
+          <mi>b</mi>
+          <mn>2</mn>
+        </msup>
+        <mo>&#x2212;</mo>
+        <mn>4</mn>
+        <mi>a</mi>
+        <mi>c</mi>
+      </msqrt>
+    </mrow>
+    <mrow>
+      <mn>2</mn>
+      <mi>a</mi>
+    </mrow>
+  </mfrac>
+</math>";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    let s_exp = exp.to_string();
+    println!("s_exp={:?}", s_exp);
+    assert_eq!(
+        s_exp,
+        "(= x (/ (- (- b) (√ (- (^ b 2) (* (* 4 a) c)))) (* 2 a)))"
     );
 }
