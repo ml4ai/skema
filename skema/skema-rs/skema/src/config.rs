@@ -1,6 +1,5 @@
 use neo4rs::*;
 use std::env;
-// NOTE: this is deprecated
 
 use serde::{Deserialize, Serialize};
 
