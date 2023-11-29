@@ -1,23 +1,15 @@
 use clap::Parser;
 
-use mathml::mml2pn::get_mathml_asts_from_file;
 pub use mathml::mml2pn::{ACSet, Term};
 
 // new imports
-use std::env;
+use mathml::acset::PetriNet;
+
+use neo4rs::{query, Node};
 use skema::config::Config;
-use mathml::acset::{PetriNet, RegNet};
-use mathml::parsers::decapodes_serialization::{
-    to_wiring_diagram, DecapodesCollection, WiringDiagram,
-};
-use mathml::parsers::first_order_ode::get_FirstOrderODE_vec_from_file;
-use mathml::parsers::math_expression_tree::MathExpressionTree;
-use skema::model_extraction::{module_id2mathml_MET_ast, subgraph2_core_dyn_ast};
-use std::fs::File;
-use std::io::{BufRead, BufReader};
-use neo4rs::{query, Graph, Node, UnboundedRelation, Relation};
-use tokio::task;
-use tokio::runtime::Builder;
+use skema::model_extraction::module_id2mathml_MET_ast;
+use std::env;
+
 use std::sync::Arc;
 
 #[derive(Parser, Debug)]
@@ -36,8 +28,10 @@ pub async fn module_query(config: Config) -> Vec<i64> {
     let graph = Arc::new(config.graphdb_connection().await);
 
     let mut ids = Vec::<i64>::new();
-    let mut result = graph.execute(
-        query("MATCH (n:Module) RETURN n")).await.unwrap();
+    let mut result = graph
+        .execute(query("MATCH (n:Module) RETURN n"))
+        .await
+        .unwrap();
     while let Ok(Some(row)) = result.next().await {
         let node: Node = row.get("n").unwrap();
         ids.push(node.id());
@@ -46,6 +40,8 @@ pub async fn module_query(config: Config) -> Vec<i64> {
     ids
 }
 
+#[allow(unused_variables)]
+#[allow(unused_assignments)]
 #[tokio::main]
 async fn main() {
     // setup command line argument on if the core dynamics has been found manually or needs to be found automatically
@@ -65,12 +61,9 @@ async fn main() {
             module_id = new_args.model_id.unwrap();
         }
 
-        /*let db_protocol = env::var("SKEMA_GRAPH_DB_PROTO").unwrap_or("bolt+s://".to_string());
-        let db_host = env::var("SKEMA_GRAPH_DB_HOST").unwrap_or("graphdb-bolt.askem.lum.ai".to_string());
-        let db_port = env::var("SKEMA_GRAPH_DB_PORT").unwrap_or("443".to_string());*/
-    
         let db_protocol = env::var("SKEMA_GRAPH_DB_PROTO").unwrap_or("bolt+s://".to_string());
-        let db_host = env::var("SKEMA_GRAPH_DB_HOST").unwrap_or("graphdb-bolt.askem.lum.ai".to_string());
+        let db_host =
+            env::var("SKEMA_GRAPH_DB_HOST").unwrap_or("graphdb-bolt.askem.lum.ai".to_string());
         let db_port = env::var("SKEMA_GRAPH_DB_PORT").unwrap_or("443".to_string());
 
         let config = Config {
@@ -79,18 +72,20 @@ async fn main() {
             db_port: db_port.parse::<u16>().unwrap(),
         };
 
-        let response = module_query(config.clone()).await;
+        let _response = module_query(config.clone()).await;
 
         let mut ids = Vec::<i64>::new();
         let graph = Arc::new(config.graphdb_connection().await);
-        let mut result = graph.execute(
-            query("MATCH (n:Module) RETURN n")).await.unwrap();
+        let mut result = graph
+            .execute(query("MATCH (n:Module) RETURN n"))
+            .await
+            .unwrap();
         while let Ok(Some(row)) = result.next().await {
             let node: Node = row.get("n").unwrap();
             ids.push(node.id());
         }
         println!("{:?}", ids.clone());
-        let math_content = module_id2mathml_MET_ast(ids[1], config.clone()).await;
+        let math_content = module_id2mathml_MET_ast(ids[(ids.len()-1) as usize], config.clone()).await;
         println!("{:?}", math_content.clone());
         println!("\nAMR from code: {:?}", PetriNet::from(math_content));
 

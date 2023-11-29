@@ -1,14 +1,13 @@
 //! Program for inserting GroMEt models into a database from the command line.
 
 use clap::Parser;
-use std::env;
 use skema::config::Config;
 use skema::{
-    database::{run_queries, parse_gromet_queries},
+    database::{parse_gromet_queries, run_queries},
     ModuleCollection,
 };
+use std::env;
 use std::fs;
-use tokio;
 
 #[derive(Parser, Debug)]
 struct Cli {
@@ -35,9 +34,9 @@ async fn main() {
 
     // need to make the whole query list one line, individual executions are treated as different graphs for each execution.
     let mut full_query = queries[0].clone();
-    for i in 1..(queries.len()) {
+    for que in queries.iter().skip(1) {
         full_query.push('\n');
-        let temp_str = &queries[i].clone();
+        let temp_str = que;
         full_query.push_str(temp_str);
     }
 
@@ -46,7 +45,8 @@ async fn main() {
     }
 
     let db_protocol = env::var("SKEMA_GRAPH_DB_PROTO").unwrap_or("bolt+s://".to_string());
-    let db_host = env::var("SKEMA_GRAPH_DB_HOST").unwrap_or("graphdb-bolt.askem.lum.ai".to_string());
+    let db_host =
+        env::var("SKEMA_GRAPH_DB_HOST").unwrap_or("graphdb-bolt.askem.lum.ai".to_string());
     let db_port = env::var("SKEMA_GRAPH_DB_PORT").unwrap_or("443".to_string());
 
     let config = Config {
@@ -56,6 +56,5 @@ async fn main() {
     };
 
     run_queries(queries, config.clone()).await.unwrap(); // The properties need to have quotes!!
-                                                            // writing output to file, since too long for std out now.
-
+                                                         // writing output to file, since too long for std out now.
 }

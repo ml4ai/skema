@@ -89,7 +89,7 @@ impl fmt::Display for MathExpression {
             MathExpression::Msub(base, subscript) => {
                 write!(f, "{base}_{{{subscript}}}")
             }
-            MathExpression::Msubsup(base, subscript,superscript)=>{
+            MathExpression::Msubsup(base, subscript, superscript) => {
                 write!(f, "{base}_{{{subscript}}}^{{{superscript}}}")
             }
             MathExpression::Mo(op) => {

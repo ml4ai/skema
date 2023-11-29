@@ -14,7 +14,7 @@ router = APIRouter()
 
 
 # FIXME: make GrometFunctionModuleCollection a pydantic model via code gen
-@router.post("/model", summary="Pushes gromet (function network) to the graph database")
+@router.post("/model", summary="Pushes gromet (function network) to the graph database", include_in_schema=False)
 async def post_model(gromet: Dict[Text, Any]):
     return requests.post(f"{SKEMA_RS_ADDESS}/models", json=gromet).json()
 

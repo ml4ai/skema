@@ -5,7 +5,9 @@ use mathml::parsers::decapodes_serialization::{
 use mathml::parsers::first_order_ode::flatten_mults;
 use mathml::parsers::generic_mathml::math;
 use mathml::parsers::math_expression_tree::MathExpressionTree;
-use mathml::parsers::math_expression_tree::{replace_unicode_with_symbols, preprocess_mathml_for_to_latex};
+use mathml::parsers::math_expression_tree::{
+    preprocess_mathml_for_to_latex, replace_unicode_with_symbols,
+};
 
 use mathml::{
     acset::{AMRmathml, PetriNet, RegNet},

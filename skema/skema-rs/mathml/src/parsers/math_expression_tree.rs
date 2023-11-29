@@ -50,6 +50,7 @@ impl fmt::Display for MathExpressionTree {
 }
 
 /// Converts Unicode, Greek letters, their symbols, and English representations of Greek letters in an input string to their respective LaTeX expressions.
+#[allow(unreachable_patterns)] // Lambda in this twice?
 fn unicode_to_latex(input: &str) -> String {
     // Step 1: Handle English representations of Greek letters
     let re_english_greek = Regex::new(r"Lambda|lambda|Alpha|alpha|Beta|beta|Gamma|gamma|Delta|delta|Epsilon|epsilon|Zeta|zeta|Eta|eta|Theta|theta|Iota|iota|Kappa|kappa|Lambda|lambda|Mu|mu|Nu|nu|Xi|xi|Omicron|omicron|Pi|pi|Rho|rho|Sigma|sigma|Tau|tau|Upsilon|upsilon|Phi|phi|Chi|chi|Psi|psi|Omega|omega").unwrap();
@@ -914,7 +915,7 @@ fn insert_multiple_between_paren(lexer: &mut Lexer) {
             if let Token::Op(Operator::Lparen) = token {
                 if let Token::Op(Operator::Rparen) = **next_token {
                     new_tokens.push(Token::Op(Operator::Multiply).clone());
-                } 
+                }
             }
         }
     }
@@ -1051,7 +1052,6 @@ pub fn preprocess_mathml_for_to_latex(input: &str) -> String {
     let new_no_spaces = no_spaces.replace(' ', "");
 
     // Replace <mi>∇</mi> with <mo>∇</mo>
-    
 
     new_no_spaces
         .replace(r#"<mi>∇</mi>"#, "<mo>∇</mo>")
@@ -1730,7 +1730,7 @@ fn test_mi_multiply() {
     let s_exp = exp.to_string();
     println!("s_exp={:?}", s_exp);
 }
-
+#[allow(dead_code)] // used in tests I believe
 fn test_unicode_conversion() {
     let input1 = "&#x039B; is a Greek letter.";
     let input2 = "&#x03bb; is another Greek letter.";

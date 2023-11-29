@@ -7,14 +7,14 @@ use crate::ModuleCollection;
 use actix_web::web::ServiceConfig;
 use actix_web::{delete, get, post, put, web, HttpResponse};
 use mathml::acset::{PetriNet, RegNet};
-use mathml::mml2pn::ACSet;
-use rsmgclient::{ConnectParams, Connection, MgError, Value, ConnectionStatus};
-use std::collections::HashMap;
-use utoipa;
+
 use neo4rs;
+use neo4rs::{query, Error, Node};
+use rsmgclient::MgError;
+use std::collections::HashMap;
 use std::sync::Arc;
-use neo4rs::{query, Graph, Node, Row, Error};
-use tokio::task;
+
+use utoipa;
 
 pub fn configure() -> impl FnOnce(&mut ServiceConfig) {
     |config: &mut ServiceConfig| {
@@ -77,9 +77,15 @@ pub async fn named_opi_query(module_id: i64, config: Config) -> Result<Vec<Strin
 
     // Connect to Memgraph.
     let graph = Arc::new(config.graphdb_connection().await);
-    let mut result = graph.execute(
-        query("MATCH (n)-[r:Contains|Port_Of|Wire*1..7]->(m) WHERE id(n) = $id
-        \nwith DISTINCT m\nmatch (m:Opi) where not m.name = 'un-named'\nreturn m").param("id", module_id)).await?;
+    let mut result = graph
+        .execute(
+            query(
+                "MATCH (n)-[r:Contains|Port_Of|Wire*1..7]->(m) WHERE id(n) = $id
+        \nwith DISTINCT m\nmatch (m:Opi) where not m.name = 'un-named'\nreturn m",
+            )
+            .param("id", module_id),
+        )
+        .await?;
     while let Ok(Some(row)) = result.next().await {
         let node: Node = row.get("m").unwrap();
         let name: String = node.get("name").unwrap();
@@ -96,9 +102,15 @@ pub async fn named_opo_query(module_id: i64, config: Config) -> Result<Vec<Strin
 
     // Connect to Memgraph.
     let graph = Arc::new(config.graphdb_connection().await);
-    let mut result = graph.execute(
-        query("MATCH (n)-[r:Contains|Port_Of|Wire*1..5]->(m) WHERE id(n) = $id
-        \nwith DISTINCT m\nmatch (m:Opo) where not m.name = 'un-named'\nreturn m").param("id", module_id)).await?;
+    let mut result = graph
+        .execute(
+            query(
+                "MATCH (n)-[r:Contains|Port_Of|Wire*1..5]->(m) WHERE id(n) = $id
+        \nwith DISTINCT m\nmatch (m:Opo) where not m.name = 'un-named'\nreturn m",
+            )
+            .param("id", module_id),
+        )
+        .await?;
     while let Ok(Some(row)) = result.next().await {
         let node: Node = row.get("m").unwrap();
         let name: String = node.get("name").unwrap();
@@ -108,7 +120,10 @@ pub async fn named_opo_query(module_id: i64, config: Config) -> Result<Vec<Strin
     Ok(port_names)
 }
 
-pub async fn named_port_query(module_id: i64, config: Config) -> Result<HashMap<&'static str, Vec<String>>, Error> {
+pub async fn named_port_query(
+    module_id: i64,
+    config: Config,
+) -> Result<HashMap<&'static str, Vec<String>>, Error> {
     let mut result = HashMap::<&str, Vec<String>>::new();
     let opis = named_opi_query(module_id, config.clone()).await;
     let opos = named_opo_query(module_id, config.clone()).await;
@@ -118,13 +133,11 @@ pub async fn named_port_query(module_id: i64, config: Config) -> Result<HashMap<
 }
 
 pub async fn module_query(config: Config) -> Result<Vec<i64>, Error> {
-    
     let mut ids = Vec::<i64>::new();
     // Connect to Memgraph.
-    
+
     let graph = Arc::new(config.graphdb_connection().await);
-    let mut result = graph.execute(
-        query("MATCH (n:Module) RETURN n")).await?;
+    let mut result = graph.execute(query("MATCH (n:Module) RETURN n")).await?;
     while let Ok(Some(row)) = result.next().await {
         let node: Node = row.get("n").unwrap();
         ids.push(node.id());
@@ -145,7 +158,7 @@ pub async fn module_query(config: Config) -> Result<Vec<i64>, Error> {
 pub async fn get_model_ids(config: web::Data<Config>) -> HttpResponse {
     let config1 = Config {
         db_host: config.db_host.clone(),
-        db_port: config.db_port.clone(),
+        db_port: config.db_port,
         db_protocol: config.db_protocol.clone(),
     };
     let response = module_query(config1.clone()).await.unwrap();
@@ -166,10 +179,12 @@ pub async fn post_model(
 ) -> HttpResponse {
     let config1 = Config {
         db_host: config.db_host.clone(),
-        db_port: config.db_port.clone(),
+        db_port: config.db_port,
         db_protocol: config.db_protocol.clone(),
     };
-    let model_id = push_model_to_db(payload.into_inner(), config1).await.unwrap();
+    let model_id = push_model_to_db(payload.into_inner(), config1)
+        .await
+        .unwrap();
     HttpResponse::Ok().json(web::Json(model_id))
 }
 
@@ -184,7 +199,7 @@ pub async fn delete_model(path: web::Path<i64>, config: web::Data<Config>) -> Ht
     let id = path.into_inner();
     let config1 = Config {
         db_host: config.db_host.clone(),
-        db_port: config.db_port.clone(),
+        db_port: config.db_port,
         db_protocol: config.db_protocol.clone(),
     };
     delete_module(id, config1).await.unwrap();
@@ -201,7 +216,7 @@ pub async fn delete_model(path: web::Path<i64>, config: web::Data<Config>) -> Ht
 pub async fn get_named_opos(path: web::Path<i64>, config: web::Data<Config>) -> HttpResponse {
     let config1 = Config {
         db_host: config.db_host.clone(),
-        db_port: config.db_port.clone(),
+        db_port: config.db_port,
         db_protocol: config.db_protocol.clone(),
     };
     let response = named_opo_query(path.into_inner(), config1).await.unwrap();
@@ -218,7 +233,7 @@ pub async fn get_named_opos(path: web::Path<i64>, config: web::Data<Config>) -> 
 pub async fn get_named_ports(path: web::Path<i64>, config: web::Data<Config>) -> HttpResponse {
     let config1 = Config {
         db_host: config.db_host.clone(),
-        db_port: config.db_port.clone(),
+        db_port: config.db_port,
         db_protocol: config.db_protocol.clone(),
     };
     let response = named_port_query(path.into_inner(), config1).await.unwrap();
@@ -235,7 +250,7 @@ pub async fn get_named_ports(path: web::Path<i64>, config: web::Data<Config>) ->
 pub async fn get_named_opis(path: web::Path<i64>, config: web::Data<Config>) -> HttpResponse {
     let config1 = Config {
         db_host: config.db_host.clone(),
-        db_port: config.db_port.clone(),
+        db_port: config.db_port,
         db_protocol: config.db_protocol.clone(),
     };
     let response = named_opi_query(path.into_inner(), config1).await.unwrap();
@@ -256,7 +271,7 @@ pub async fn get_named_opis(path: web::Path<i64>, config: web::Data<Config>) -> 
 pub async fn get_model_RN(path: web::Path<i64>, config: web::Data<Config>) -> HttpResponse {
     let config1 = Config {
         db_host: config.db_host.clone(),
-        db_port: config.db_port.clone(),
+        db_port: config.db_port,
         db_protocol: config.db_protocol.clone(),
     };
     let mathml_ast = module_id2mathml_ast(path.into_inner(), config1).await;
@@ -281,7 +296,7 @@ pub async fn model2PN(
 ) -> HttpResponse {
     let config1 = Config {
         db_host: config.db_host.clone(),
-        db_port: config.db_port.clone(),
+        db_port: config.db_port,
         db_protocol: config.db_protocol.clone(),
     };
     HttpResponse::Ok().json(web::Json(
@@ -307,7 +322,7 @@ pub async fn model2RN(
 ) -> HttpResponse {
     let config1 = Config {
         db_host: config.db_host.clone(),
-        db_port: config.db_port.clone(),
+        db_port: config.db_port,
         db_protocol: config.db_protocol.clone(),
     };
     HttpResponse::Ok().json(web::Json(

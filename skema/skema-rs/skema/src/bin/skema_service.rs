@@ -1,5 +1,4 @@
 use actix_web::{get, http::header::ContentType, web::Data, App, HttpResponse, HttpServer};
-use clap::Parser;
 use skema::config::Config;
 use skema::services::gromet;
 use std::env;
@@ -120,7 +119,6 @@ async fn main() -> std::io::Result<()> {
     let db_host = env::var("SKEMA_GRAPH_DB_HOST").unwrap_or("127.0.0.1".to_string());
     let db_port = env::var("SKEMA_GRAPH_DB_PORT").unwrap_or("7687".to_string());
 
-
     let mut openapi = ApiDoc::openapi();
     openapi.info.version = version_hash.to_string();
 
@@ -129,7 +127,7 @@ async fn main() -> std::io::Result<()> {
             .app_data(Data::new(Config {
                 db_protocol: db_protocol.clone(),
                 db_host: db_host.clone(),
-                db_port: db_port.parse::<u16>().unwrap()
+                db_port: db_port.parse::<u16>().unwrap(),
             }))
             .configure(gromet::configure())
             .service(skema::services::mathml::get_ast_graph)

@@ -78,10 +78,10 @@ impl fmt::Display for Operator {
                 write!(f, "D({order}, {bound_var})")
             }
             Operator::PartialDerivative(PartialDerivative {
-                                     order,
-                                     var_index: _,
-                                     bound_var,
-                                 }) => {
+                order,
+                var_index: _,
+                bound_var,
+            }) => {
                 write!(f, "PD({order}, {bound_var})")
             }
             Operator::Exp => write!(f, "exp"),
