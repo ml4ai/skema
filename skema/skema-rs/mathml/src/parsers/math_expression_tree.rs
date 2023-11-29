@@ -1067,9 +1067,7 @@ pub fn preprocess_mathml_for_to_latex(input: &str) -> String {
         .replace_all(&no_newlines, "><")
         .to_string();
 
-    let replaced_str = no_spaces.to_string();
-
-    replaced_str
+    no_spaces.to_string()
 }
 
 #[test]

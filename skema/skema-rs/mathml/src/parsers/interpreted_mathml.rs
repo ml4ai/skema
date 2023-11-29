@@ -10,8 +10,8 @@ use crate::{
         Ci, Differential, Math, MathExpression, Mi, Mrow, Type,
     },
     parsers::generic_mathml::{
-        add, attribute, dot, elem_many0, equals, etag, grad, lparen, mean, mi, mn, msub,
-        msubsup, mtext, multiply, rparen, stag, subtract, tag_parser, ws, xml_declaration, IResult,
+        add, attribute, dot, elem_many0, equals, etag, grad, lparen, mean, mi, mn, msub, msubsup,
+        mtext, multiply, rparen, stag, subtract, tag_parser, ws, xml_declaration, IResult,
         ParseError, Span,
     },
 };
