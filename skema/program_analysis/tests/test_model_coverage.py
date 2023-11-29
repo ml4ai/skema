@@ -4,8 +4,8 @@ import os
 
 # Dictionary that maps
 # "model" : [supported lines, total lines]
-# Last updated: November 22nd, 2023
-# (Initial Update)
+# Last updated: November 29th, 2023
+# (Updated TIE-GCM to a smaller line count, to address potential timeout issues on the GitHub CI)
 ALL_MODELS = {
     "CHIME-penn-full": [1080, 1080], 
     "CHIME-SIR": [633, 633], 
@@ -22,7 +22,7 @@ ALL_MODELS = {
     "ABM-REINA": [2622, 7078], 
     "Cornell-COVID19-sim-Frazier": [7250, 8725], 
     "ABM-Covasim": [14734, 31042], 
-    "TIE-GCM": [10316, 209076]
+    "TIE-GCM": [6336, 209076]
 }
 
 # REPORTS_FILE_PATH = "/Users/ferra/Desktop/Work_Repos/skema/reports"
