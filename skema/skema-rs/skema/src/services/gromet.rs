@@ -10,7 +10,6 @@ use mathml::acset::{PetriNet, RegNet};
 
 use neo4rs;
 use neo4rs::{query, Error, Node};
-use rsmgclient::MgError;
 use std::collections::HashMap;
 use std::sync::Arc;
 
@@ -28,7 +27,7 @@ pub fn configure() -> impl FnOnce(&mut ServiceConfig) {
     }
 }
 #[allow(non_snake_case)]
-pub async fn model_to_RN(gromet: ModuleCollection, config: Config) -> Result<RegNet, MgError> {
+pub async fn model_to_RN(gromet: ModuleCollection, config: Config) -> Result<RegNet, Error> {
     let module_id = push_model_to_db(gromet, config.clone()).await; // pushes model to db and gets id
     let ref_module_id1 = module_id.as_ref();
     let ref_module_id2 = module_id.as_ref();
@@ -39,7 +38,7 @@ pub async fn model_to_RN(gromet: ModuleCollection, config: Config) -> Result<Reg
 
 // this is updated to mathexpressiontrees
 #[allow(non_snake_case)]
-pub async fn model_to_PN(gromet: ModuleCollection, config: Config) -> Result<PetriNet, MgError> {
+pub async fn model_to_PN(gromet: ModuleCollection, config: Config) -> Result<PetriNet, Error> {
     let module_id = push_model_to_db(gromet, config.clone()).await; // pushes model to db and gets id
     let ref_module_id1 = module_id.as_ref();
     let ref_module_id2 = module_id.as_ref();
