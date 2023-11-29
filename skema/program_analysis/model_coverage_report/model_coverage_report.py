@@ -257,12 +257,21 @@ def process_single_model(html: HTML_Instance, output_dir: str, model_name: str):
                 True,
                 full_gromet_relative_path,
             )
+        
+        # Added return statement in order to output 
+        return (supported_lines, total_lines)
 
 
 def process_all_models(html: HTML_Instance, output_dir: str):
-    """Generate an HTML report for all models in models.yaml"""
+    """Generate an HTML report for all models in models.yaml
+    Also, output a dictionary containing line coverage information for all models in models.yaml"""
+    model_line_coverage = {}
     for model_name in MODEL_YAML:
-        process_single_model(html, output_dir, model_name)
+        supported, total = process_single_model(html, output_dir, model_name)
+        model_line_coverage[model_name] = (supported, total)
+
+    return model_line_coverage
+
 
 def main():
 
@@ -283,16 +292,26 @@ def main():
     output_dir = str(Path(args.output_dir).resolve()) 
 
     html = HTML_Instance()
+    
+    # model_line_coverage is a dictionary that contains line coverage information
+    # for each model that was generated
+    # its primary use is to be output as a JSON file that our regression tests can then take a look at
+    # in order to determine if we've lost model coverage
+    model_line_coverage = {}
     if args.mode == "all":
-        process_all_models(html, output_dir)
+        model_line_coverage = process_all_models(html, output_dir)
     elif args.mode == "single":
-        process_single_model(html, output_dir, args.model_name)
+        supported, total = process_single_model(html, output_dir, args.model_name)
+        model_line_coverage[args.model_name] = (supported, total)
 
     # DataTables have to be initialized after all models are generated
     html.add_data_table_script()
     
     output_path = Path(output_dir) / "report.html"
     output_path.write_text(html.soup.prettify())
+
+    json_output_path = Path(output_dir) / "line_coverage.json"
+    json_output_path.write_text(json.dumps(model_line_coverage))
 
 
 if __name__ == "__main__":
