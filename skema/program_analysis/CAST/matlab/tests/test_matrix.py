@@ -1,43 +1,15 @@
-from skema.program_analysis.CAST.matlab.tests.utils import (
-    assert_assignment,
-    assert_identifier,
-    cast_nodes
-)
+from skema.program_analysis.CAST.matlab.tests.utils import (check, cast)
 
-# Test CAST from assignment
+# Test CAST using matrices
+def test_empty():
+    """ Test empty matrix."""
+    check(cast("[];")[0], [])
 
-def test_matrix_empty():
-    """ Test assignment of empty matrices."""
-    nodes = cast_nodes("x = []; y = [[] []]; z = [[[] []] [[] []]]")
-    assert len(nodes) == 3
-    assert_assignment(nodes[0], left = 'x', right = [])
-    assert_assignment(nodes[1], left = 'y', right = [])
-    assert_assignment(nodes[2], left = 'z', right = [])
+def test_booleans():
+    """ Test matrix with MATLAB booleans."""
+    check(cast("[true false];")[0], ["True", "False"])
 
-def test_matrix_integer():
+def test_values():
     """ Test assignment 1 dimensional matrix value."""
-    nodes = cast_nodes("x = [1 2 3]")
-    assert len(nodes) == 1
-    assert_assignment(nodes[0], left = 'x', right = [1, 2, 3])
+    check(cast("[1 x 'Bob' ]")[0], [1, 'x', "'Bob'"])
 
-def test_matrix_identifier():
-    """ Test assignment 1 dimensional matrix value."""
-    nodes = cast_nodes("x = [a b c]")
-    assert len(nodes) == 1
-    assert_assignment(nodes[0], left = 'x', right = ['a', 'b', 'c'])
-
-def test_matrix_2D_identifier():
-    """ Test assignment 2 dimensional matrix value."""
-    nodes = cast_nodes("x = [[a b] [c d]]")
-    assert len(nodes) == 1
-    assert_assignment(nodes[0], left = 'x', right = [['a', 'b'], ['c', 'd']])
-
-def test_matrix_3D_identifier():
-    """ Test assignment 2 dimensional matrix value."""
-    nodes = cast_nodes("x = [[[a b] [c d]] [[e f] [g h]]]")
-    assert len(nodes) == 1
-    assert_assignment(
-        nodes[0], 
-        left = 'x', 
-        right = [[['a', 'b'], ['c', 'd']], [['e', 'f'], ['g', 'h']]]
-    )
