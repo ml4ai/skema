@@ -552,7 +552,7 @@ pub fn absolute_with_msup(input: Span) -> IResult<MathExpression> {
             //ws(tag("<mo>|</mo>")),
             ws(tuple((
                 //math_expression,
-                map(ws(many0(math_expression)), |z| Mrow(z)),
+                map(ws(many0(math_expression)), Mrow),
                 preceded(ws(tag("<msup><mo>|</mo>")), ws(math_expression)),
             ))),
             ws(tag("</msup>")),
@@ -568,7 +568,7 @@ pub fn paren_as_msup(input: Span) -> IResult<MathExpression> {
         ws(delimited(
             tag("<mo>(</mo>"),
             tuple((
-                map(many0(math_expression), |z| Mrow(z)),
+                map(many0(math_expression), Mrow),
                 preceded(tag("<msup><mo>)</mo>"), math_expression),
             )),
             tag("</msup>"),
