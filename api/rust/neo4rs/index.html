@@ -1,0 +1,653 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Neo4j driver compatible with neo4j 4.x versions"><title>neo4rs - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../static.files/rustdoc-fa3bb1812debf86c.css"><meta name="rustdoc-vars" data-root-path="../" data-static-root-path="../static.files/" data-current-crate="neo4rs" data-themes="" data-resource-suffix="" data-rustdoc-version="1.74.0 (79e9716c9 2023-11-13)" data-channel="1.74.0" data-search-js="search-8be46b629f5f14a8.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../crates.js"></script><script defer src="../static.files/main-c5bd66d33317d69f.js"></script><noscript><link rel="stylesheet" href="../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="logo-container" href="../neo4rs/index.html"><img class="rust-logo" src="../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a></nav><nav class="sidebar"><a class="logo-container" href="../neo4rs/index.html"><img class="rust-logo" src="../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><h2 class="location"><a href="#">Crate neo4rs</a></h2><div class="sidebar-elems"><ul class="block"><li class="version">Version 0.6.2</li><li><a id="all-types" href="all.html">All Items</a></li></ul><section><ul class="block"><li><a href="#structs">Structs</a></li><li><a href="#enums">Enums</a></li><li><a href="#functions">Functions</a></li><li><a href="#types">Type Aliases</a></li></ul></section></div></nav><main><div class="width-limiter"><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="main-heading"><h1>Crate <a class="mod" href="#">neo4rs</a><button id="copy-path" title="Copy item path to clipboard"><img src="../static.files/clipboard-7571035ce49a181d.svg" width="19" height="18" alt="Copy item path"></button></h1><span class="out-of-band"><a class="src" href="../src/neo4rs/lib.rs.html#1-774">source</a> · <button id="toggle-all-docs" title="collapse all docs">[<span>&#x2212;</span>]</button></span></div><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Neo4j driver compatible with neo4j 4.x versions</p>
+<ul>
+<li>An implementation of the <a href="https://7687.org/">bolt protocol</a> to interact with Neo4j server</li>
+<li>async/await apis using <a href="https://github.com/tokio-rs/tokio">tokio</a></li>
+<li>Supports bolt 4.2 specification</li>
+<li>tested with Neo4j versions: 4.0, 4.1, 4.2</li>
+</ul>
+<h2 id="examples"><a href="#examples">Examples</a></h2>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>neo4rs::<span class="kw-2">*</span>;
+<span class="kw">use </span>std::sync::Arc;
+<span class="kw">use </span>std::sync::atomic::{AtomicU32, Ordering};
+<span class="kw">use </span>futures::stream::<span class="kw-2">*</span>;
+<span class="kw">use </span>uuid::Uuid;
+
+<span class="attr">#[tokio::main]
+</span><span class="kw">async fn </span>main() {
+   <span class="kw">let </span>uri = <span class="string">&quot;127.0.0.1:7687&quot;</span>;
+   <span class="kw">let </span>user = <span class="string">&quot;neo4j&quot;</span>;
+   <span class="kw">let </span>pass = <span class="string">&quot;neo&quot;</span>;
+   <span class="kw">let </span>id = Uuid::new_v4().to_string();
+
+   <span class="kw">let </span>graph = Arc::new(Graph::new(uri, user, pass).<span class="kw">await</span>.unwrap());
+   <span class="kw">let </span><span class="kw-2">mut </span>result = graph.run(
+     query(<span class="string">&quot;CREATE (p:Person {id: $id})&quot;</span>).param(<span class="string">&quot;id&quot;</span>, id.clone())
+   ).<span class="kw">await</span>.unwrap();
+
+   <span class="kw">let </span><span class="kw-2">mut </span>handles = Vec::new();
+   <span class="kw">let </span><span class="kw-2">mut </span>count = Arc::new(AtomicU32::new(<span class="number">0</span>));
+   <span class="kw">for _ in </span><span class="number">1</span>..=<span class="number">42 </span>{
+       <span class="kw">let </span>graph = graph.clone();
+       <span class="kw">let </span>id = id.clone();
+       <span class="kw">let </span>count = count.clone();
+       <span class="kw">let </span>handle = tokio::spawn(<span class="kw">async move </span>{
+           <span class="kw">let </span><span class="kw-2">mut </span>result = graph.execute(
+             query(<span class="string">&quot;MATCH (p:Person {id: $id}) RETURN p&quot;</span>).param(<span class="string">&quot;id&quot;</span>, id)
+           ).<span class="kw">await</span>.unwrap();
+           <span class="kw">while let </span><span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(row)) = result.next().<span class="kw">await </span>{
+               count.fetch_add(<span class="number">1</span>, Ordering::Relaxed);
+           }
+       });
+       handles.push(handle);
+   }
+
+   futures::future::join_all(handles).<span class="kw">await</span>;
+   <span class="macro">assert_eq!</span>(count.load(Ordering::Relaxed), <span class="number">42</span>);
+}</code></pre></div>
+<h3 id="configurations"><a href="#configurations">Configurations</a></h3>
+<p>Use the config builder to override the default configurations like</p>
+<ul>
+<li><code>fetch_size</code> - number of rows to fetch in batches (default is 200)</li>
+<li><code>max_connections</code> - maximum size of the connection pool (default is 16)</li>
+<li><code>db</code> - the database to connect to (default is <code>neo4j</code>)</li>
+</ul>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>neo4rs::<span class="kw-2">*</span>;
+<span class="kw">use </span>futures::stream::<span class="kw-2">*</span>;
+
+<span class="attr">#[tokio::main]
+</span><span class="kw">async fn </span>main() {
+   <span class="kw">let </span>config = ConfigBuilder::default()
+       .uri(<span class="string">&quot;127.0.0.1:7687&quot;</span>)
+       .user(<span class="string">&quot;neo4j&quot;</span>)
+       .password(<span class="string">&quot;neo&quot;</span>)
+       .db(<span class="string">&quot;neo4j&quot;</span>)
+       .fetch_size(<span class="number">500</span>)
+       .max_connections(<span class="number">10</span>)
+       .build()
+       .unwrap();
+   <span class="kw">let </span>graph = Graph::connect(config).<span class="kw">await</span>.unwrap();
+   <span class="kw">let </span><span class="kw-2">mut </span>result = graph.execute(query(<span class="string">&quot;RETURN 1&quot;</span>)).<span class="kw">await</span>.unwrap();
+   <span class="kw">let </span>row = result.next().<span class="kw">await</span>.unwrap().unwrap();
+   <span class="kw">let </span>value: i64 = row.get(<span class="string">&quot;1&quot;</span>).unwrap();
+   <span class="macro">assert_eq!</span>(<span class="number">1</span>, value);
+   <span class="macro">assert!</span>(result.next().<span class="kw">await</span>.unwrap().is_none());
+}</code></pre></div>
+<h3 id="nodes"><a href="#nodes">Nodes</a></h3>
+<p>A simple example to create a node and consume the created node from the row stream.</p>
+<ul>
+<li><a href="struct.Graph.html#method.run" title="method neo4rs::Graph::run"><code>Graph::run</code></a> just returns <a href="type.Result.html" title="type neo4rs::Result"><code>errors::Result</code></a><code>&lt;()&gt;</code>, usually used for write only queries.</li>
+<li><a href="struct.Graph.html#method.execute" title="method neo4rs::Graph::execute"><code>Graph::execute</code></a> returns <a href="type.Result.html" title="type neo4rs::Result"><code>errors::Result</code></a><code>&lt;</code><a href="struct.RowStream.html" title="struct neo4rs::RowStream"><code>RowStream</code></a><code>&gt;</code></li>
+</ul>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>neo4rs::<span class="kw-2">*</span>;
+<span class="kw">use </span>futures::stream::<span class="kw-2">*</span>;
+
+<span class="attr">#[tokio::main]
+</span><span class="kw">async fn </span>main() {
+   <span class="kw">let </span>uri = <span class="string">&quot;127.0.0.1:7687&quot;</span>;
+   <span class="kw">let </span>user = <span class="string">&quot;neo4j&quot;</span>;
+   <span class="kw">let </span>pass = <span class="string">&quot;neo&quot;</span>;
+   <span class="kw">let </span>graph = Graph::new(uri, user, pass).<span class="kw">await</span>.unwrap();
+
+   <span class="macro">assert!</span>(graph.run(query(<span class="string">&quot;RETURN 1&quot;</span>)).<span class="kw">await</span>.is_ok());
+
+   <span class="kw">let </span><span class="kw-2">mut </span>result = graph.execute(
+     query( <span class="string">&quot;CREATE (friend:Person {name: $name}) RETURN friend&quot;</span>)
+    .param(<span class="string">&quot;name&quot;</span>, <span class="string">&quot;Mr Mark&quot;</span>)
+   ).<span class="kw">await</span>.unwrap();
+
+   <span class="kw">while let </span><span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(row)) = result.next().<span class="kw">await </span>{
+        <span class="kw">let </span>node: Node = row.get(<span class="string">&quot;friend&quot;</span>).unwrap();
+        <span class="kw">let </span>id = node.id();
+        <span class="kw">let </span>labels = node.labels();
+        <span class="kw">let </span>name: String = node.get(<span class="string">&quot;name&quot;</span>).unwrap();
+        <span class="macro">assert_eq!</span>(name, <span class="string">&quot;Mr Mark&quot;</span>);
+        <span class="macro">assert_eq!</span>(labels, <span class="macro">vec!</span>[<span class="string">&quot;Person&quot;</span>]);
+        <span class="macro">assert!</span>(id &gt; <span class="number">0</span>);
+    }
+}</code></pre></div>
+<h3 id="transactions"><a href="#transactions">Transactions</a></h3>
+<p>Start a new transaction using <a href="struct.Graph.html#method.start_txn" title="method neo4rs::Graph::start_txn"><code>Graph::start_txn</code></a>, which will return a handle <a href="struct.Txn.html" title="struct neo4rs::Txn"><code>Txn</code></a> that can
+be used to <a href="struct.Txn.html#method.commit" title="method neo4rs::Txn::commit"><code>Txn::commit</code></a> or <a href="struct.Txn.html#method.rollback" title="method neo4rs::Txn::rollback"><code>Txn::rollback</code></a> the transaction.</p>
+<p>Note that the handle takes a connection from the connection pool, which will be released once
+the Txn is dropped</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>neo4rs::<span class="kw-2">*</span>;
+<span class="kw">use </span>futures::stream::<span class="kw-2">*</span>;
+<span class="kw">use </span>uuid::Uuid;
+
+<span class="attr">#[tokio::main]
+</span><span class="kw">async fn </span>main() {
+   <span class="kw">let </span>uri = <span class="string">&quot;127.0.0.1:7687&quot;</span>;
+   <span class="kw">let </span>user = <span class="string">&quot;neo4j&quot;</span>;
+   <span class="kw">let </span>pass = <span class="string">&quot;neo&quot;</span>;
+   <span class="kw">let </span>graph = Graph::new(uri, user, pass).<span class="kw">await</span>.unwrap();
+   <span class="kw">let </span>txn = graph.start_txn().<span class="kw">await</span>.unwrap();
+   <span class="kw">let </span>id = Uuid::new_v4().to_string();
+   <span class="kw">let </span>result = txn.run_queries(<span class="macro">vec!</span>[
+           query(<span class="string">&quot;CREATE (p:Person {id: $id})&quot;</span>).param(<span class="string">&quot;id&quot;</span>, id.clone()),
+           query(<span class="string">&quot;CREATE (p:Person {id: $id})&quot;</span>).param(<span class="string">&quot;id&quot;</span>, id.clone())
+    ]).<span class="kw">await</span>;
+
+   <span class="macro">assert!</span>(result.is_ok());
+   txn.commit().<span class="kw">await</span>.unwrap();
+   <span class="kw">let </span><span class="kw-2">mut </span>result = graph
+       .execute(query(<span class="string">&quot;MATCH (p:Person) WHERE p.id = $id RETURN p.id&quot;</span>).param(<span class="string">&quot;id&quot;</span>, id.clone()))
+       .<span class="kw">await
+       </span>.unwrap();
+}
+</code></pre></div>
+<h4 id="streams-within-a-transaction"><a href="#streams-within-a-transaction">Streams within a transaction</a></h4>
+<p>Each <a href="struct.RowStream.html" title="struct neo4rs::RowStream"><code>RowStream</code></a> returned by various execute within the same transaction are well isolated,
+so you can consume the stream anytime within the transaction using <a href="struct.RowStream.html#method.next" title="method neo4rs::RowStream::next"><code>RowStream::next</code></a></p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>neo4rs::<span class="kw-2">*</span>;
+<span class="kw">use </span>futures::stream::<span class="kw-2">*</span>;
+<span class="kw">use </span>uuid::Uuid;
+
+<span class="attr">#[tokio::main]
+</span><span class="kw">async fn </span>main() {
+   <span class="kw">let </span>config = ConfigBuilder::default()
+       .uri(<span class="string">&quot;127.0.0.1:7687&quot;</span>)
+       .user(<span class="string">&quot;neo4j&quot;</span>)
+       .password(<span class="string">&quot;neo&quot;</span>)
+       .fetch_size(<span class="number">1</span>)
+       .build()
+       .unwrap();
+   <span class="kw">let </span>graph = Graph::connect(config).<span class="kw">await</span>.unwrap();
+   <span class="kw">let </span>name = Uuid::new_v4().to_string();
+   <span class="kw">let </span>txn = graph.start_txn().<span class="kw">await</span>.unwrap();
+
+   txn.run_queries(<span class="macro">vec!</span>[
+       query(<span class="string">&quot;CREATE (p { name: $name })&quot;</span>).param(<span class="string">&quot;name&quot;</span>, name.clone()),
+       query(<span class="string">&quot;CREATE (p { name: $name })&quot;</span>).param(<span class="string">&quot;name&quot;</span>, name.clone()),
+   ])
+   .<span class="kw">await
+   </span>.unwrap();
+
+
+   <span class="comment">//start stream_one
+   </span><span class="kw">let </span><span class="kw-2">mut </span>stream_one = txn
+       .execute(query(<span class="string">&quot;MATCH (p {name: $name}) RETURN p&quot;</span>).param(<span class="string">&quot;name&quot;</span>, name.clone()))
+       .<span class="kw">await
+       </span>.unwrap();
+   <span class="kw">let </span>row = stream_one.next().<span class="kw">await</span>.unwrap().unwrap();
+   <span class="macro">assert_eq!</span>(row.get::&lt;Node&gt;(<span class="string">&quot;p&quot;</span>).unwrap().get::&lt;String&gt;(<span class="string">&quot;name&quot;</span>).unwrap(), name.clone());
+
+   <span class="comment">//start stream_two
+   </span><span class="kw">let </span><span class="kw-2">mut </span>stream_two = txn.execute(query(<span class="string">&quot;RETURN 1&quot;</span>)).<span class="kw">await</span>.unwrap();
+   <span class="kw">let </span>row = stream_two.next().<span class="kw">await</span>.unwrap().unwrap();
+   <span class="macro">assert_eq!</span>(row.get::&lt;i64&gt;(<span class="string">&quot;1&quot;</span>).unwrap(), <span class="number">1</span>);
+
+   <span class="comment">//stream_one is still active here
+   </span><span class="kw">let </span>row = stream_one.next().<span class="kw">await</span>.unwrap().unwrap();
+   <span class="macro">assert_eq!</span>(row.get::&lt;Node&gt;(<span class="string">&quot;p&quot;</span>).unwrap().get::&lt;String&gt;(<span class="string">&quot;name&quot;</span>).unwrap(), name.clone());
+
+   <span class="comment">//stream_one completes
+   </span><span class="macro">assert!</span>(stream_one.next().<span class="kw">await</span>.unwrap().is_none());
+   <span class="comment">//stream_two completes
+   </span><span class="macro">assert!</span>(stream_two.next().<span class="kw">await</span>.unwrap().is_none());
+   txn.commit().<span class="kw">await</span>.unwrap();
+}
+</code></pre></div>
+<h4 id="rollback-a-transaction"><a href="#rollback-a-transaction">Rollback a transaction</a></h4>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>neo4rs::<span class="kw-2">*</span>;
+<span class="kw">use </span>futures::stream::<span class="kw-2">*</span>;
+<span class="kw">use </span>uuid::Uuid;
+
+<span class="attr">#[tokio::main]
+</span><span class="kw">async fn </span>main() {
+   <span class="kw">let </span>uri = <span class="string">&quot;127.0.0.1:7687&quot;</span>;
+   <span class="kw">let </span>user = <span class="string">&quot;neo4j&quot;</span>;
+   <span class="kw">let </span>pass = <span class="string">&quot;neo&quot;</span>;
+   <span class="kw">let </span>graph = Graph::new(uri, user, pass).<span class="kw">await</span>.unwrap();
+
+   <span class="kw">let </span>txn = graph.start_txn().<span class="kw">await</span>.unwrap();
+   <span class="kw">let </span>id = Uuid::new_v4().to_string();
+   <span class="comment">// create a node
+   </span>txn.run(query(<span class="string">&quot;CREATE (p:Person {id: $id})&quot;</span>).param(<span class="string">&quot;id&quot;</span>, id.clone()))
+       .<span class="kw">await
+       </span>.unwrap();
+   <span class="comment">// rollback the changes
+   </span>txn.rollback().<span class="kw">await</span>.unwrap();
+
+   <span class="comment">// changes not updated in the database
+   </span><span class="kw">let </span><span class="kw-2">mut </span>result = graph
+       .execute(query(<span class="string">&quot;MATCH (p:Person) WHERE p.id = $id RETURN p.id&quot;</span>).param(<span class="string">&quot;id&quot;</span>, id.clone()))
+       .<span class="kw">await
+       </span>.unwrap();
+   <span class="macro">assert!</span>(result.next().<span class="kw">await</span>.unwrap().is_none());
+}
+</code></pre></div>
+<h4 id="txn-vs-graph"><a href="#txn-vs-graph">Txn vs Graph</a></h4>
+<p>Everytime you execute a query using <a href="struct.Graph.html#method.run" title="method neo4rs::Graph::run"><code>Graph::run</code></a> or <a href="struct.Graph.html#method.execute" title="method neo4rs::Graph::execute"><code>Graph::execute</code></a>, a new connection is
+taken from the pool and released immediately.</p>
+<p>However, when you execute a query on a transaction using <a href="struct.Txn.html#method.run" title="method neo4rs::Txn::run"><code>Txn::run</code></a> or <a href="struct.Txn.html#method.execute" title="method neo4rs::Txn::execute"><code>Txn::execute</code></a> the
+same connection will be reused, the underlying connection will be released to the pool in a
+clean state only after you commit/rollback the transaction and the <a href="struct.Txn.html" title="struct neo4rs::Txn"><code>Txn</code></a> handle is dropped.</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>neo4rs::<span class="kw-2">*</span>;
+<span class="kw">use </span>futures::stream::<span class="kw-2">*</span>;
+<span class="kw">use </span>uuid::Uuid;
+
+<span class="attr">#[tokio::main]
+</span><span class="kw">async fn </span>main() {
+   <span class="kw">let </span>uri = <span class="string">&quot;127.0.0.1:7687&quot;</span>;
+   <span class="kw">let </span>user = <span class="string">&quot;neo4j&quot;</span>;
+   <span class="kw">let </span>pass = <span class="string">&quot;neo&quot;</span>;
+   <span class="kw">let </span>graph = Graph::new(uri, user, pass).<span class="kw">await</span>.unwrap();
+   <span class="kw">let </span>txn = graph.start_txn().<span class="kw">await</span>.unwrap();
+   <span class="kw">let </span>id = Uuid::new_v4().to_string();
+   txn.run(query(<span class="string">&quot;CREATE (p:Person {id: $id})&quot;</span>).param(<span class="string">&quot;id&quot;</span>, id.clone()))
+       .<span class="kw">await
+       </span>.unwrap();
+   txn.run(query(<span class="string">&quot;CREATE (p:Person {id: $id})&quot;</span>).param(<span class="string">&quot;id&quot;</span>, id.clone()))
+       .<span class="kw">await
+       </span>.unwrap();
+   <span class="comment">// graph.execute(..) will not see the changes done above as the txn is not committed yet
+   </span><span class="kw">let </span><span class="kw-2">mut </span>result = graph
+       .execute(query(<span class="string">&quot;MATCH (p:Person) WHERE p.id = $id RETURN p.id&quot;</span>).param(<span class="string">&quot;id&quot;</span>, id.clone()))
+       .<span class="kw">await
+       </span>.unwrap();
+   <span class="macro">assert!</span>(result.next().<span class="kw">await</span>.unwrap().is_none());
+   txn.commit().<span class="kw">await</span>.unwrap();
+
+   <span class="comment">//changes are now seen as the transaction is committed.
+   </span><span class="kw">let </span><span class="kw-2">mut </span>result = graph
+       .execute(query(<span class="string">&quot;MATCH (p:Person) WHERE p.id = $id RETURN p.id&quot;</span>).param(<span class="string">&quot;id&quot;</span>, id.clone()))
+       .<span class="kw">await
+       </span>.unwrap();
+   <span class="macro">assert!</span>(result.next().<span class="kw">await</span>.unwrap().is_some());
+   <span class="macro">assert!</span>(result.next().<span class="kw">await</span>.unwrap().is_some());
+   <span class="macro">assert!</span>(result.next().<span class="kw">await</span>.unwrap().is_none());
+}
+</code></pre></div>
+<h3 id="relationships"><a href="#relationships">Relationships</a></h3>
+<p>Bounded Relationship between nodes are created using cypher queries and the same can be parsed
+from the <a href="struct.RowStream.html" title="struct neo4rs::RowStream"><code>RowStream</code></a></p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>neo4rs::<span class="kw-2">*</span>;
+<span class="kw">use </span>futures::stream::<span class="kw-2">*</span>;
+
+<span class="attr">#[tokio::main]
+</span><span class="kw">async fn </span>main() {
+   <span class="kw">let </span>uri = <span class="string">&quot;127.0.0.1:7687&quot;</span>;
+   <span class="kw">let </span>user = <span class="string">&quot;neo4j&quot;</span>;
+   <span class="kw">let </span>pass = <span class="string">&quot;neo&quot;</span>;
+   <span class="kw">let </span>graph = Graph::new(uri, user, pass).<span class="kw">await</span>.unwrap();
+   <span class="kw">let </span><span class="kw-2">mut </span>result = graph.execute(
+       query(<span class="string">&quot;CREATE (p:Person { name: &#39;Oliver Stone&#39; })-[r:WORKS_AT {as: &#39;Engineer&#39;}]-&gt;(neo) RETURN r&quot;</span>)
+   ).<span class="kw">await</span>.unwrap();
+
+   <span class="kw">let </span>row = result.next().<span class="kw">await</span>.unwrap().unwrap();
+   <span class="kw">let </span>relation: Relation = row.get(<span class="string">&quot;r&quot;</span>).unwrap();
+   <span class="macro">assert!</span>(relation.id() &gt; -<span class="number">1</span>);
+   <span class="macro">assert!</span>(relation.start_node_id() &gt; -<span class="number">1</span>);
+   <span class="macro">assert!</span>(relation.end_node_id() &gt; -<span class="number">1</span>);
+   <span class="macro">assert_eq!</span>(relation.typ(), <span class="string">&quot;WORKS_AT&quot;</span>);
+   <span class="macro">assert_eq!</span>(relation.get::&lt;String&gt;(<span class="string">&quot;as&quot;</span>).unwrap(), <span class="string">&quot;Engineer&quot;</span>);
+}</code></pre></div>
+<p>Similar to bounded relation, an unbounded relation can also be created/parsed.</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>neo4rs::<span class="kw-2">*</span>;
+<span class="kw">use </span>futures::stream::<span class="kw-2">*</span>;
+
+<span class="attr">#[tokio::main]
+</span><span class="kw">async fn </span>main() {
+   <span class="kw">let </span>uri = <span class="string">&quot;127.0.0.1:7687&quot;</span>;
+   <span class="kw">let </span>user = <span class="string">&quot;neo4j&quot;</span>;
+   <span class="kw">let </span>pass = <span class="string">&quot;neo&quot;</span>;
+   <span class="kw">let </span>graph = Graph::new(uri, user, pass).<span class="kw">await</span>.unwrap();
+   <span class="kw">let </span><span class="kw-2">mut </span>result = graph.execute(
+       query(<span class="string">&quot;MERGE (p1:Person { name: &#39;Oliver Stone&#39; })-[r:RELATED {as: &#39;friend&#39;}]-(p2: Person {name: &#39;Mark&#39;}) RETURN r&quot;</span>)
+   ).<span class="kw">await</span>.unwrap();
+   <span class="kw">let </span>row = result.next().<span class="kw">await</span>.unwrap().unwrap();
+   <span class="kw">let </span>relation: Relation = row.get(<span class="string">&quot;r&quot;</span>).unwrap();
+   <span class="macro">assert!</span>(relation.id() &gt; -<span class="number">1</span>);
+   <span class="macro">assert!</span>(relation.start_node_id() &gt; -<span class="number">1</span>);
+   <span class="macro">assert!</span>(relation.end_node_id() &gt; -<span class="number">1</span>);
+   <span class="macro">assert_eq!</span>(relation.typ(), <span class="string">&quot;RELATED&quot;</span>);
+   <span class="macro">assert_eq!</span>(relation.get::&lt;String&gt;(<span class="string">&quot;as&quot;</span>).unwrap(), <span class="string">&quot;friend&quot;</span>);
+}
+</code></pre></div>
+<h3 id="points"><a href="#points">Points</a></h3>
+<p>A 2d or 3d point can be represented with the types  <a href="struct.Point2D.html" title="struct neo4rs::Point2D"><code>Point2D</code></a> and <a href="struct.Point3D.html" title="struct neo4rs::Point3D"><code>Point3D</code></a></p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>neo4rs::<span class="kw-2">*</span>;
+<span class="kw">use </span>futures::stream::<span class="kw-2">*</span>;
+<span class="kw">use </span>uuid::Uuid;
+
+<span class="attr">#[tokio::main]
+</span><span class="kw">async fn </span>main() {
+   <span class="kw">let </span>uri = <span class="string">&quot;127.0.0.1:7687&quot;</span>;
+   <span class="kw">let </span>user = <span class="string">&quot;neo4j&quot;</span>;
+   <span class="kw">let </span>pass = <span class="string">&quot;neo&quot;</span>;
+   <span class="kw">let </span>graph = Graph::new(uri, user, pass).<span class="kw">await</span>.unwrap();
+
+   <span class="kw">let </span><span class="kw-2">mut </span>result = graph
+       .execute(query(
+           <span class="string">&quot;WITH point({ x: 2.3, y: 4.5, crs: &#39;cartesian&#39; }) AS p1,
+            point({ x: 1.1, y: 5.4, crs: &#39;cartesian&#39; }) AS p2 RETURN point.distance(p1,p2) AS dist, p1, p2&quot;</span>,
+       ))
+       .<span class="kw">await
+       </span>.unwrap();
+   <span class="kw">let </span>row = result.next().<span class="kw">await</span>.unwrap().unwrap();
+   <span class="kw">let </span>dist: f64 = row.get(<span class="string">&quot;dist&quot;</span>).unwrap();
+   <span class="kw">let </span>p1: Point2D = row.get(<span class="string">&quot;p1&quot;</span>).unwrap();
+   <span class="kw">let </span>p2: Point2D = row.get(<span class="string">&quot;p2&quot;</span>).unwrap();
+   <span class="macro">assert_eq!</span>(<span class="number">1.5</span>, dist);
+   <span class="macro">assert_eq!</span>(p1.sr_id(), <span class="number">7203</span>);
+   <span class="macro">assert_eq!</span>(p1.x(), <span class="number">2.3</span>);
+   <span class="macro">assert_eq!</span>(p1.y(), <span class="number">4.5</span>);
+   <span class="macro">assert_eq!</span>(p2.sr_id(), <span class="number">7203</span>);
+   <span class="macro">assert_eq!</span>(p2.x(), <span class="number">1.1</span>);
+   <span class="macro">assert_eq!</span>(p2.y(), <span class="number">5.4</span>);
+   <span class="macro">assert!</span>(result.next().<span class="kw">await</span>.unwrap().is_none());
+
+   <span class="kw">let </span><span class="kw-2">mut </span>result = graph
+       .execute(query(
+           <span class="string">&quot;RETURN point({ longitude: 56.7, latitude: 12.78, height: 8 }) AS point&quot;</span>,
+       ))
+       .<span class="kw">await
+       </span>.unwrap();
+   <span class="kw">let </span>row = result.next().<span class="kw">await</span>.unwrap().unwrap();
+   <span class="kw">let </span>point: Point3D = row.get(<span class="string">&quot;point&quot;</span>).unwrap();
+   <span class="macro">assert_eq!</span>(point.sr_id(), <span class="number">4979</span>);
+   <span class="macro">assert_eq!</span>(point.x(), <span class="number">56.7</span>);
+   <span class="macro">assert_eq!</span>(point.y(), <span class="number">12.78</span>);
+   <span class="macro">assert_eq!</span>(point.z(), <span class="number">8.0</span>);
+   <span class="macro">assert!</span>(result.next().<span class="kw">await</span>.unwrap().is_none());
+
+}
+</code></pre></div>
+<h3 id="raw-bytes"><a href="#raw-bytes">Raw bytes</a></h3>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>neo4rs::<span class="kw-2">*</span>;
+<span class="kw">use </span>futures::stream::<span class="kw-2">*</span>;
+<span class="kw">use </span>uuid::Uuid;
+
+<span class="attr">#[tokio::main]
+</span><span class="kw">async fn </span>main() {
+   <span class="kw">let </span>uri = <span class="string">&quot;127.0.0.1:7687&quot;</span>;
+   <span class="kw">let </span>user = <span class="string">&quot;neo4j&quot;</span>;
+   <span class="kw">let </span>pass = <span class="string">&quot;neo&quot;</span>;
+   <span class="kw">let </span>graph = Graph::new(uri, user, pass).<span class="kw">await</span>.unwrap();
+   <span class="kw">let </span>bytes = <span class="string">b&quot;Hello, Neo4j!&quot;</span>;
+   <span class="kw">let </span><span class="kw-2">mut </span>result = graph
+       .execute(query(<span class="string">&quot;RETURN $b as output&quot;</span>).param(<span class="string">&quot;b&quot;</span>, bytes.as_ref()))
+       .<span class="kw">await
+       </span>.unwrap();
+   <span class="kw">let </span>row = result.next().<span class="kw">await</span>.unwrap().unwrap();
+   <span class="kw">let </span>b: Vec&lt;u8&gt; = row.get(<span class="string">&quot;output&quot;</span>).unwrap();
+   <span class="macro">assert_eq!</span>(b, bytes);
+   <span class="macro">assert!</span>(result.next().<span class="kw">await</span>.unwrap().is_none());
+}
+</code></pre></div>
+<h3 id="durations"><a href="#durations">Durations</a></h3>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>neo4rs::<span class="kw-2">*</span>;
+<span class="kw">use </span>futures::stream::<span class="kw-2">*</span>;
+<span class="kw">use </span>uuid::Uuid;
+
+<span class="attr">#[tokio::main]
+</span><span class="kw">async fn </span>main() {
+   <span class="kw">let </span>uri = <span class="string">&quot;127.0.0.1:7687&quot;</span>;
+   <span class="kw">let </span>user = <span class="string">&quot;neo4j&quot;</span>;
+   <span class="kw">let </span>pass = <span class="string">&quot;neo&quot;</span>;
+   <span class="kw">let </span>graph = Graph::new(uri, user, pass).<span class="kw">await</span>.unwrap();
+   <span class="kw">let </span>duration = std::time::Duration::new(<span class="number">5259600</span>, <span class="number">7</span>);
+   <span class="kw">let </span><span class="kw-2">mut </span>result = graph
+       .execute(query(<span class="string">&quot;RETURN $d as output&quot;</span>).param(<span class="string">&quot;d&quot;</span>, duration))
+       .<span class="kw">await
+       </span>.unwrap();
+   <span class="kw">let </span>row = result.next().<span class="kw">await</span>.unwrap().unwrap();
+   <span class="kw">let </span>d: std::time::Duration = row.get(<span class="string">&quot;output&quot;</span>).unwrap();
+   <span class="macro">assert_eq!</span>(d.as_secs(), <span class="number">5259600</span>);
+   <span class="macro">assert_eq!</span>(d.subsec_nanos(), <span class="number">7</span>);
+   <span class="macro">assert!</span>(result.next().<span class="kw">await</span>.unwrap().is_none());
+}
+</code></pre></div>
+<h3 id="date"><a href="#date">Date</a></h3>
+<p>See <a href="https://docs.rs/chrono/0.4.19/chrono/naive/struct.NaiveDate.html">NaiveDate</a> for date abstraction, it captures the date without time component.</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>neo4rs::<span class="kw-2">*</span>;
+<span class="kw">use </span>futures::stream::<span class="kw-2">*</span>;
+<span class="kw">use </span>uuid::Uuid;
+
+<span class="attr">#[tokio::main]
+</span><span class="kw">async fn </span>main() {
+   <span class="kw">let </span>uri = <span class="string">&quot;127.0.0.1:7687&quot;</span>;
+   <span class="kw">let </span>user = <span class="string">&quot;neo4j&quot;</span>;
+   <span class="kw">let </span>pass = <span class="string">&quot;neo&quot;</span>;
+   <span class="kw">let </span>graph = Graph::new(uri, user, pass).<span class="kw">await</span>.unwrap();
+   <span class="kw">let </span>date = chrono::NaiveDate::from_ymd_opt(<span class="number">1985</span>, <span class="number">2</span>, <span class="number">5</span>).unwrap();
+   <span class="kw">let </span><span class="kw-2">mut </span>result = graph
+       .execute(query(<span class="string">&quot;RETURN $d as output&quot;</span>).param(<span class="string">&quot;d&quot;</span>, date))
+       .<span class="kw">await
+       </span>.unwrap();
+   <span class="kw">let </span>row = result.next().<span class="kw">await</span>.unwrap().unwrap();
+   <span class="kw">let </span>d: chrono::NaiveDate = row.get(<span class="string">&quot;output&quot;</span>).unwrap();
+   <span class="macro">assert_eq!</span>(d.to_string(), <span class="string">&quot;1985-02-05&quot;</span>);
+   <span class="macro">assert!</span>(result.next().<span class="kw">await</span>.unwrap().is_none());
+}</code></pre></div>
+<h3 id="time"><a href="#time">Time</a></h3>
+<ul>
+<li><a href="https://docs.rs/chrono/0.4.19/chrono/naive/struct.NaiveTime.html">NaiveTime</a> captures only the time of the day</li>
+<li><code>tuple</code>(<a href="https://docs.rs/chrono/0.4.19/chrono/naive/struct.NaiveTime.html">NaiveTime</a>, <code>Option</code>&lt;<a href="https://docs.rs/chrono/0.4.19/chrono/offset/struct.FixedOffset.html">FixedOffset</a>&gt;) captures the time of the day along with the
+offset</li>
+</ul>
+<h4 id="time-as-param"><a href="#time-as-param">Time as param</a></h4>
+<p>Pass a time as a parameter to the query:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>neo4rs::<span class="kw-2">*</span>;
+<span class="kw">use </span>futures::stream::<span class="kw-2">*</span>;
+<span class="kw">use </span>uuid::Uuid;
+
+<span class="attr">#[tokio::main]
+</span><span class="kw">async fn </span>main() {
+   <span class="kw">let </span>uri = <span class="string">&quot;127.0.0.1:7687&quot;</span>;
+   <span class="kw">let </span>user = <span class="string">&quot;neo4j&quot;</span>;
+   <span class="kw">let </span>pass = <span class="string">&quot;neo&quot;</span>;
+   <span class="kw">let </span>graph = Graph::new(uri, user, pass).<span class="kw">await</span>.unwrap();
+
+   <span class="comment">//send time without offset as param
+   </span><span class="kw">let </span>time = chrono::NaiveTime::from_hms_nano_opt(<span class="number">11</span>, <span class="number">15</span>, <span class="number">30</span>, <span class="number">200</span>).unwrap();
+   <span class="kw">let </span><span class="kw-2">mut </span>result = graph.execute(query(<span class="string">&quot;RETURN $d as output&quot;</span>).param(<span class="string">&quot;d&quot;</span>, time)).<span class="kw">await</span>.unwrap();
+   <span class="kw">let </span>row = result.next().<span class="kw">await</span>.unwrap().unwrap();
+   <span class="kw">let </span>t: (chrono::NaiveTime, <span class="prelude-ty">Option</span>&lt;chrono::FixedOffset&gt;) = row.get(<span class="string">&quot;output&quot;</span>).unwrap();
+   <span class="macro">assert_eq!</span>(t.<span class="number">0</span>.to_string(), <span class="string">&quot;11:15:30.000000200&quot;</span>);
+   <span class="macro">assert_eq!</span>(t.<span class="number">1</span>, <span class="prelude-val">None</span>);
+   <span class="macro">assert!</span>(result.next().<span class="kw">await</span>.unwrap().is_none());
+
+
+   <span class="comment">//send time with offset as param
+   </span><span class="kw">let </span>time = chrono::NaiveTime::from_hms_nano_opt(<span class="number">11</span>, <span class="number">15</span>, <span class="number">30</span>, <span class="number">200</span>).unwrap();
+   <span class="kw">let </span>offset = chrono::FixedOffset::east_opt(<span class="number">3 </span>* <span class="number">3600</span>).unwrap();
+   <span class="kw">let </span><span class="kw-2">mut </span>result = graph
+       .execute(query(<span class="string">&quot;RETURN $d as output&quot;</span>).param(<span class="string">&quot;d&quot;</span>, (time, offset)))
+       .<span class="kw">await
+       </span>.unwrap();
+   <span class="kw">let </span>row = result.next().<span class="kw">await</span>.unwrap().unwrap();
+   <span class="kw">let </span>t: (chrono::NaiveTime, <span class="prelude-ty">Option</span>&lt;chrono::FixedOffset&gt;) = row.get(<span class="string">&quot;output&quot;</span>).unwrap();
+   <span class="macro">assert_eq!</span>(t.<span class="number">0</span>.to_string(), <span class="string">&quot;11:15:30.000000200&quot;</span>);
+   <span class="macro">assert_eq!</span>(t.<span class="number">1</span>, <span class="prelude-val">Some</span>(offset));
+   <span class="macro">assert!</span>(result.next().<span class="kw">await</span>.unwrap().is_none());
+}</code></pre></div>
+<h4 id="parsing-time-from-result"><a href="#parsing-time-from-result">Parsing time from result</a></h4>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>neo4rs::<span class="kw-2">*</span>;
+<span class="kw">use </span>futures::stream::<span class="kw-2">*</span>;
+<span class="kw">use </span>uuid::Uuid;
+
+<span class="attr">#[tokio::main]
+</span><span class="kw">async fn </span>main() {
+   <span class="kw">let </span>uri = <span class="string">&quot;127.0.0.1:7687&quot;</span>;
+   <span class="kw">let </span>user = <span class="string">&quot;neo4j&quot;</span>;
+   <span class="kw">let </span>pass = <span class="string">&quot;neo&quot;</span>;
+   <span class="kw">let </span>graph = Graph::new(uri, user, pass).<span class="kw">await</span>.unwrap();
+
+   <span class="comment">//Parse time without offset
+   </span><span class="kw">let </span><span class="kw-2">mut </span>result = graph
+       .execute(query(
+           <span class="string">&quot; WITH time({hour:10, minute:15, second:30, nanosecond: 200}) AS t RETURN t&quot;</span>,
+       ))
+       .<span class="kw">await
+       </span>.unwrap();
+   <span class="kw">let </span>row = result.next().<span class="kw">await</span>.unwrap().unwrap();
+   <span class="kw">let </span>t: (chrono::NaiveTime, <span class="prelude-ty">Option</span>&lt;chrono::FixedOffset&gt;) = row.get(<span class="string">&quot;t&quot;</span>).unwrap();
+   <span class="macro">assert_eq!</span>(t.<span class="number">0</span>.to_string(), <span class="string">&quot;10:15:30.000000200&quot;</span>);
+   <span class="macro">assert_eq!</span>(t.<span class="number">1</span>, <span class="prelude-val">None</span>);
+   <span class="macro">assert!</span>(result.next().<span class="kw">await</span>.unwrap().is_none());
+
+   <span class="comment">//Parse time with timezone information
+   </span><span class="kw">let </span><span class="kw-2">mut </span>result = graph
+       .execute(query(
+           <span class="string">&quot; WITH time({hour:10, minute:15, second:33, nanosecond: 200, timezone: &#39;+01:00&#39;}) AS t RETURN t&quot;</span>,
+       ))
+       .<span class="kw">await
+       </span>.unwrap();
+   <span class="kw">let </span>row = result.next().<span class="kw">await</span>.unwrap().unwrap();
+   <span class="kw">let </span>t: (chrono::NaiveTime, <span class="prelude-ty">Option</span>&lt;chrono::FixedOffset&gt;) = row.get(<span class="string">&quot;t&quot;</span>).unwrap();
+   <span class="macro">assert_eq!</span>(t.<span class="number">0</span>.to_string(), <span class="string">&quot;10:15:33.000000200&quot;</span>);
+   <span class="macro">assert_eq!</span>(t.<span class="number">1</span>, <span class="prelude-val">Some</span>(chrono::FixedOffset::east_opt(<span class="number">1 </span>* <span class="number">3600</span>).unwrap()));
+   <span class="macro">assert!</span>(result.next().<span class="kw">await</span>.unwrap().is_none());
+}
+</code></pre></div>
+<h3 id="datetime"><a href="#datetime">DateTime</a></h3>
+<ul>
+<li><a href="https://docs.rs/chrono/0.4.19/chrono/struct.DateTime.html">DateTime</a> captures the date and time with offset</li>
+<li><a href="https://docs.rs/chrono/0.4.19/chrono/struct.NaiveDateTime.html">NaiveDateTime</a> captures the date time without offset</li>
+<li><code>tuple</code>(<a href="https://docs.rs/chrono/0.4.19/chrono/struct.NaiveDateTime.html">NaiveDateTime</a>, String)  captures the date/time and the time zone id</li>
+</ul>
+<h4 id="datetime-as-param"><a href="#datetime-as-param">DateTime as param</a></h4>
+<p>Pass a DateTime as parameter to the query:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>neo4rs::<span class="kw-2">*</span>;
+<span class="kw">use </span>futures::stream::<span class="kw-2">*</span>;
+<span class="kw">use </span>uuid::Uuid;
+
+<span class="attr">#[tokio::main]
+</span><span class="kw">async fn </span>main() {
+   <span class="kw">let </span>uri = <span class="string">&quot;127.0.0.1:7687&quot;</span>;
+   <span class="kw">let </span>user = <span class="string">&quot;neo4j&quot;</span>;
+   <span class="kw">let </span>pass = <span class="string">&quot;neo&quot;</span>;
+   <span class="kw">let </span>graph = Graph::new(uri, user, pass).<span class="kw">await</span>.unwrap();
+
+   <span class="comment">//send datetime as parameter in the query
+   </span><span class="kw">let </span>datetime = chrono::DateTime::parse_from_rfc2822(<span class="string">&quot;Tue, 01 Jul 2003 10:52:37 +0200&quot;</span>).unwrap();
+
+   <span class="kw">let </span><span class="kw-2">mut </span>result = graph
+       .execute(query(<span class="string">&quot;RETURN $d as output&quot;</span>).param(<span class="string">&quot;d&quot;</span>, datetime))
+       .<span class="kw">await
+       </span>.unwrap();
+   <span class="kw">let </span>row = result.next().<span class="kw">await</span>.unwrap().unwrap();
+   <span class="kw">let </span>t: chrono::DateTime&lt;chrono::FixedOffset&gt; = row.get(<span class="string">&quot;output&quot;</span>).unwrap();
+   <span class="macro">assert_eq!</span>(t.to_string(), <span class="string">&quot;2003-07-01 10:52:37 +02:00&quot;</span>);
+   <span class="macro">assert!</span>(result.next().<span class="kw">await</span>.unwrap().is_none());
+
+   <span class="comment">//send NaiveDateTime as parameter in the query
+   </span><span class="kw">let </span>localdatetime = chrono::NaiveDateTime::parse_from_str(<span class="string">&quot;2015-07-01 08:55:59.123&quot;</span>, <span class="string">&quot;%Y-%m-%d %H:%M:%S%.f&quot;</span>).unwrap();
+
+   <span class="kw">let </span><span class="kw-2">mut </span>result = graph
+       .execute(query(<span class="string">&quot;RETURN $d as output&quot;</span>).param(<span class="string">&quot;d&quot;</span>, localdatetime))
+       .<span class="kw">await
+       </span>.unwrap();
+   <span class="kw">let </span>row = result.next().<span class="kw">await</span>.unwrap().unwrap();
+   <span class="kw">let </span>t: chrono::NaiveDateTime = row.get(<span class="string">&quot;output&quot;</span>).unwrap();
+   <span class="macro">assert_eq!</span>(t.to_string(), <span class="string">&quot;2015-07-01 08:55:59.123&quot;</span>);
+   <span class="macro">assert!</span>(result.next().<span class="kw">await</span>.unwrap().is_none());
+
+   <span class="comment">//send NaiveDateTime with timezone id as parameter in the query
+   </span><span class="kw">let </span>datetime = chrono::NaiveDateTime::parse_from_str(<span class="string">&quot;2015-07-03 08:55:59.555&quot;</span>, <span class="string">&quot;%Y-%m-%d %H:%M:%S%.f&quot;</span>).unwrap();
+   <span class="kw">let </span>timezone =  <span class="string">&quot;Europe/Paris&quot;</span>;
+
+   <span class="kw">let </span><span class="kw-2">mut </span>result = graph
+       .execute(query(<span class="string">&quot;RETURN $d as output&quot;</span>).param(<span class="string">&quot;d&quot;</span>, (datetime, timezone)))
+       .<span class="kw">await
+       </span>.unwrap();
+   <span class="kw">let </span>row = result.next().<span class="kw">await</span>.unwrap().unwrap();
+   <span class="kw">let </span>(time, zone): (chrono::NaiveDateTime, String) = row.get(<span class="string">&quot;output&quot;</span>).unwrap();
+   <span class="macro">assert_eq!</span>(time.to_string(), <span class="string">&quot;2015-07-03 08:55:59.555&quot;</span>);
+   <span class="macro">assert_eq!</span>(zone, <span class="string">&quot;Europe/Paris&quot;</span>);
+   <span class="macro">assert!</span>(result.next().<span class="kw">await</span>.unwrap().is_none());
+
+}</code></pre></div>
+<h4 id="parsing-datetime-from-result"><a href="#parsing-datetime-from-result">Parsing DateTime from result</a></h4>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>neo4rs::<span class="kw-2">*</span>;
+<span class="kw">use </span>futures::stream::<span class="kw-2">*</span>;
+<span class="kw">use </span>uuid::Uuid;
+
+<span class="attr">#[tokio::main]
+</span><span class="kw">async fn </span>main() {
+   <span class="kw">let </span>uri = <span class="string">&quot;127.0.0.1:7687&quot;</span>;
+   <span class="kw">let </span>user = <span class="string">&quot;neo4j&quot;</span>;
+   <span class="kw">let </span>pass = <span class="string">&quot;neo&quot;</span>;
+   <span class="kw">let </span>graph = Graph::new(uri, user, pass).<span class="kw">await</span>.unwrap();
+
+   <span class="comment">//Parse NaiveDateTime from result
+   </span><span class="kw">let </span><span class="kw-2">mut </span>result = graph
+       .execute(query(
+           <span class="string">&quot;WITH localdatetime(&#39;2015-06-24T12:50:35.556&#39;) AS t RETURN t&quot;</span>,
+       ))
+       .<span class="kw">await
+       </span>.unwrap();
+   <span class="kw">let </span>row = result.next().<span class="kw">await</span>.unwrap().unwrap();
+   <span class="kw">let </span>t: chrono::NaiveDateTime = row.get(<span class="string">&quot;t&quot;</span>).unwrap();
+   <span class="macro">assert_eq!</span>(t.to_string(), <span class="string">&quot;2015-06-24 12:50:35.556&quot;</span>);
+   <span class="macro">assert!</span>(result.next().<span class="kw">await</span>.unwrap().is_none());
+
+   <span class="comment">//Parse DateTime from result
+   </span><span class="kw">let </span><span class="kw-2">mut </span>result = graph
+       .execute(query(
+           <span class="string">&quot;WITH datetime(&#39;2015-06-24T12:50:35.777+0100&#39;) AS t RETURN t&quot;</span>,
+       ))
+       .<span class="kw">await
+       </span>.unwrap();
+   <span class="kw">let </span>row = result.next().<span class="kw">await</span>.unwrap().unwrap();
+   <span class="kw">let </span>t: chrono::DateTime&lt;chrono::FixedOffset&gt; = row.get(<span class="string">&quot;t&quot;</span>).unwrap();
+   <span class="macro">assert_eq!</span>(t.to_string(), <span class="string">&quot;2015-06-24 12:50:35.777 +01:00&quot;</span>);
+   <span class="macro">assert!</span>(result.next().<span class="kw">await</span>.unwrap().is_none());
+
+
+   <span class="comment">//Parse NaiveDateTime with zone id from result
+   </span><span class="kw">let </span><span class="kw-2">mut </span>result = graph
+       .execute(query(
+           <span class="string">&quot;WITH datetime({ year:1984, month:11, day:11, hour:12, minute:31, second:14, nanosecond: 645876123, timezone:&#39;Europe/Stockholm&#39; }) AS d return d&quot;</span>,
+       ))
+       .<span class="kw">await
+       </span>.unwrap();
+   <span class="kw">let </span>row = result.next().<span class="kw">await</span>.unwrap().unwrap();
+   <span class="kw">let </span>(datetime, zone_id): (chrono::NaiveDateTime, String) = row.get(<span class="string">&quot;d&quot;</span>).unwrap();
+   <span class="macro">assert_eq!</span>(datetime.to_string(), <span class="string">&quot;1984-11-11 12:31:14.645876123&quot;</span>);
+   <span class="macro">assert_eq!</span>(zone_id, <span class="string">&quot;Europe/Stockholm&quot;</span>);
+   <span class="macro">assert!</span>(result.next().<span class="kw">await</span>.unwrap().is_none());
+
+}
+</code></pre></div>
+<h3 id="path"><a href="#path">Path</a></h3>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>neo4rs::<span class="kw-2">*</span>;
+<span class="kw">use </span>futures::stream::<span class="kw-2">*</span>;
+<span class="kw">use </span>uuid::Uuid;
+
+<span class="attr">#[tokio::main]
+</span><span class="kw">async fn </span>main() {
+   <span class="kw">let </span>uri = <span class="string">&quot;127.0.0.1:7687&quot;</span>;
+   <span class="kw">let </span>user = <span class="string">&quot;neo4j&quot;</span>;
+   <span class="kw">let </span>pass = <span class="string">&quot;neo&quot;</span>;
+   <span class="kw">let </span>graph = Graph::new(uri, user, pass).<span class="kw">await</span>.unwrap();
+   <span class="kw">let </span>name = Uuid::new_v4().to_string();
+   graph.run(
+     query(<span class="string">&quot;CREATE (p:Person { name: $name })-[r:WORKS_AT]-&gt;(n:Company { name: &#39;Neo&#39;})&quot;</span>).param(<span class="string">&quot;name&quot;</span>, name.clone()),
+   ).<span class="kw">await</span>.unwrap();
+
+   <span class="kw">let </span><span class="kw-2">mut </span>result = graph.execute(
+      query(<span class="string">&quot;MATCH p = (person:Person { name: $name })-[r:WORKS_AT]-&gt;(c:Company) RETURN p&quot;</span>).param(<span class="string">&quot;name&quot;</span>, name),
+   ).<span class="kw">await</span>.unwrap();
+
+   <span class="kw">let </span>row = result.next().<span class="kw">await</span>.unwrap().unwrap();
+   <span class="kw">let </span>path: Path = row.get(<span class="string">&quot;p&quot;</span>).unwrap();
+   <span class="macro">assert_eq!</span>(path.ids().len(), <span class="number">2</span>);
+   <span class="macro">assert_eq!</span>(path.nodes().len(), <span class="number">2</span>);
+   <span class="macro">assert_eq!</span>(path.rels().len(), <span class="number">1</span>);
+   <span class="macro">assert!</span>(result.next().<span class="kw">await</span>.unwrap().is_none());
+}</code></pre></div>
+</div></details><h2 id="structs" class="small-section-header"><a href="#structs">Structs</a></h2><ul class="item-table"><li><div class="item-name"><a class="struct" href="struct.Config.html" title="struct neo4rs::Config">Config</a></div><div class="desc docblock-short">The configuration used to connect to the database, see <a href="struct.Graph.html#method.connect" title="associated function neo4rs::Graph::connect"><code>crate::Graph::connect</code></a>.</div></li><li><div class="item-name"><a class="struct" href="struct.ConfigBuilder.html" title="struct neo4rs::ConfigBuilder">ConfigBuilder</a></div><div class="desc docblock-short">A builder to override default configurations and build the <a href="struct.Config.html" title="struct neo4rs::Config"><code>Config</code></a>.</div></li><li><div class="item-name"><a class="struct" href="struct.Graph.html" title="struct neo4rs::Graph">Graph</a></div><div class="desc docblock-short">A neo4j database abstraction</div></li><li><div class="item-name"><a class="struct" href="struct.Node.html" title="struct neo4rs::Node">Node</a></div><div class="desc docblock-short">Snapshot of a node within a graph database</div></li><li><div class="item-name"><a class="struct" href="struct.Path.html" title="struct neo4rs::Path">Path</a></div><div class="desc docblock-short">Alternating sequence of nodes and relationships</div></li><li><div class="item-name"><a class="struct" href="struct.Point2D.html" title="struct neo4rs::Point2D">Point2D</a></div><div class="desc docblock-short">Represents a single location in 2-dimensional space</div></li><li><div class="item-name"><a class="struct" href="struct.Point3D.html" title="struct neo4rs::Point3D">Point3D</a></div><div class="desc docblock-short">Represents a single location in 3-dimensional space</div></li><li><div class="item-name"><a class="struct" href="struct.Query.html" title="struct neo4rs::Query">Query</a></div><div class="desc docblock-short">Abstracts a cypher query that is sent to neo4j server.</div></li><li><div class="item-name"><a class="struct" href="struct.Relation.html" title="struct neo4rs::Relation">Relation</a></div><div class="desc docblock-short">Snapshot of a relationship within a graph database</div></li><li><div class="item-name"><a class="struct" href="struct.Row.html" title="struct neo4rs::Row">Row</a></div><div class="desc docblock-short">Represents a row returned as a result of executing a query.</div></li><li><div class="item-name"><a class="struct" href="struct.RowStream.html" title="struct neo4rs::RowStream">RowStream</a></div><div class="desc docblock-short">An abstraction over a stream of rows, this is returned as a result of <a href="struct.Graph.html#method.execute" title="method neo4rs::Graph::execute"><code>crate::Graph::execute</code></a> or
+<a href="struct.Txn.html#method.execute" title="method neo4rs::Txn::execute"><code>crate::Txn::execute</code></a> operations</div></li><li><div class="item-name"><a class="struct" href="struct.Txn.html" title="struct neo4rs::Txn">Txn</a></div><div class="desc docblock-short">A handle which is used to control a transaction, created as a result of <a href="struct.Graph.html#method.start_txn" title="method neo4rs::Graph::start_txn"><code>crate::Graph::start_txn</code></a></div></li><li><div class="item-name"><a class="struct" href="struct.UnboundedRelation.html" title="struct neo4rs::UnboundedRelation">UnboundedRelation</a></div><div class="desc docblock-short">Relationship detail without start or end node information</div></li></ul><h2 id="enums" class="small-section-header"><a href="#enums">Enums</a></h2><ul class="item-table"><li><div class="item-name"><a class="enum" href="enum.Error.html" title="enum neo4rs::Error">Error</a></div></li><li><div class="item-name"><a class="enum" href="enum.Version.html" title="enum neo4rs::Version">Version</a></div></li></ul><h2 id="functions" class="small-section-header"><a href="#functions">Functions</a></h2><ul class="item-table"><li><div class="item-name"><a class="fn" href="fn.query.html" title="fn neo4rs::query">query</a></div><div class="desc docblock-short">Returns a <a href="struct.Query.html" title="struct neo4rs::Query"><code>Query</code></a> which provides methods like <a href="struct.Query.html#method.param" title="method neo4rs::Query::param"><code>Query::param</code></a> to add parameters to the query</div></li><li><div class="item-name"><a class="fn" href="fn.unexpected.html" title="fn neo4rs::unexpected">unexpected</a></div></li></ul><h2 id="types" class="small-section-header"><a href="#types">Type Aliases</a></h2><ul class="item-table"><li><div class="item-name"><a class="type" href="type.Result.html" title="type neo4rs::Result">Result</a></div></li></ul></section></div></main></body></html>

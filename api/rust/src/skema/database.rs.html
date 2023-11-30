@@ -5457,6 +5457,16 @@
 <a href="#5457" id="5457">5457</a>
 <a href="#5458" id="5458">5458</a>
 <a href="#5459" id="5459">5459</a>
+<a href="#5460" id="5460">5460</a>
+<a href="#5461" id="5461">5461</a>
+<a href="#5462" id="5462">5462</a>
+<a href="#5463" id="5463">5463</a>
+<a href="#5464" id="5464">5464</a>
+<a href="#5465" id="5465">5465</a>
+<a href="#5466" id="5466">5466</a>
+<a href="#5467" id="5467">5467</a>
+<a href="#5468" id="5468">5468</a>
+<a href="#5469" id="5469">5469</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Interface to the graph database we are using for persisting GroMEt objects and performing
 //! queries on them. We currently use MemgraphDB, an in-memory graph database.
 
@@ -5481,11 +5491,11 @@ There being a second function call of the same function which contains an expres
 /* 3/20/23
    - &#39;+&#39; at the top level main are getting duplicate wires to the top level literals
 */
-</span><span class="kw">use </span><span class="kw">crate</span>::FunctionType;
+</span><span class="kw">use </span><span class="kw">crate</span>::config::Config;
+<span class="kw">use </span><span class="kw">crate</span>::FunctionType;
 <span class="kw">use crate</span>::{Files, Grounding, ModuleCollection, Provenance, TextExtraction, ValueMeta};
 <span class="kw">use crate</span>::{FunctionNet, GrometBox, ValueL};
-<span class="kw">use </span>rsmgclient::{ConnectParams, Connection, MgError};
-<span class="kw">use </span><span class="kw">crate</span>::config::Config;
+<span class="kw">use </span>neo4rs::query;
 
 <span class="attr">#[derive(Debug, Clone)]
 </span><span class="kw">pub struct </span>MetadataNode {
@@ -5546,19 +5556,39 @@ There being a second function call of the same function which contains an expres
     </span><span class="kw">pub </span>box_counter: usize, <span class="comment">// this is the index of the box if called inside another function, 0 if not
 </span>}
 
-<span class="kw">pub fn </span>execute_query(query: <span class="kw-2">&amp;</span>str, config: Config) -&gt; <span class="prelude-ty">Result</span>&lt;(), MgError&gt; {
-    <span class="comment">// Connect to Memgraph.
-    </span><span class="kw">let </span>connect_params = config.db_connection();
-    <span class="kw">let </span><span class="kw-2">mut </span>connection = Connection::connect(<span class="kw-2">&amp;</span>connect_params)<span class="question-mark">?</span>;
+<span class="kw">pub async fn </span>run_queries(queries: Vec&lt;String&gt;, config: Config) -&gt; <span class="prelude-ty">Result</span>&lt;(), neo4rs::Error&gt; {
+    <span class="comment">// convert vector of string queries into single string
+    </span><span class="kw">let </span><span class="kw-2">mut </span>full_query = queries[<span class="number">0</span>].clone();
+    <span class="kw">if </span>queries.len() &gt; <span class="number">1 </span>{
+        <span class="kw">for </span>que <span class="kw">in </span>queries.iter().skip(<span class="number">1</span>) {
+            full_query.push(<span class="string">&#39;\n&#39;</span>);
+            <span class="kw">let </span>temp_str = que;
+            full_query.push_str(temp_str);
+        }
+    }
 
-    <span class="comment">// Create simple graph.
-    </span>connection.execute_without_results(query)<span class="question-mark">?</span>;
-
-    connection.commit()<span class="question-mark">?</span>;
+    <span class="comment">// start up the graph and transaction session
+    </span><span class="kw">let </span>graph = config.graphdb_connection().<span class="kw">await</span>;
+    graph.run(query(<span class="kw-2">&amp;</span>full_query[..])).<span class="kw">await</span><span class="question-mark">?</span>;
 
     <span class="prelude-val">Ok</span>(())
 }
-<span class="comment">// this will create a deserialized metadata node
+
+<span class="comment">// This function is only for CREATE based cypher commands that have no return, unfortunately these are run commands
+// in the new neo4rs, but were called execture commands back in memgraph, so they have opposite conventions
+/*pub fn execute_query(query: &amp;str, config: Config) -&gt; Result&lt;(), MgError&gt; {
+    // Connect to Memgraph.
+    let connect_params = config.db_connection();
+    let mut connection = Connection::connect(&amp;connect_params)?;
+
+    // Create simple graph.
+    connection.execute_without_results(query)?;
+
+    connection.commit()?;
+
+    Ok(())
+}*/
+// this will create a deserialized metadata node
 </span><span class="kw">fn </span>create_metadata_node(gromet: <span class="kw-2">&amp;</span>ModuleCollection, metadata_idx: u32) -&gt; Vec&lt;MetadataNode&gt; {
     <span class="comment">// grabs the deserialized metadata
     </span><span class="kw">let </span>_metadata = gromet.modules[<span class="number">0</span>].metadata_collection.as_ref().unwrap()
@@ -6253,10 +6283,8 @@ There being a second function call of the same function which contains an expres
     <span class="kw">let </span>edges_clone = edges.clone();
     <span class="comment">// also dedup if edge prop is different
     </span><span class="kw">for </span>(i, edge) <span class="kw">in </span>edges_clone.iter().enumerate().rev() {
-        <span class="kw">if </span>i != <span class="number">0 </span>{
-            <span class="kw">if </span>edge.src == edges_clone[i - <span class="number">1</span>].src &amp;&amp; edge.tgt == edges_clone[i - <span class="number">1</span>].tgt {
-                edges.remove(i);
-            }
+        <span class="kw">if </span>i != <span class="number">0 </span>&amp;&amp; edge.src == edges_clone[i - <span class="number">1</span>].src &amp;&amp; edge.tgt == edges_clone[i - <span class="number">1</span>].tgt {
+            edges.remove(i);
         }
     }
     <span class="kw">let </span>fin_edges = edges.len();
@@ -6766,10 +6794,8 @@ There being a second function call of the same function which contains an expres
     <span class="kw">let </span>edges_clone = edges.clone();
     <span class="comment">// also dedup if edge prop is different
     </span><span class="kw">for </span>(i, edge) <span class="kw">in </span>edges_clone.iter().enumerate().rev() {
-        <span class="kw">if </span>i != <span class="number">0 </span>{
-            <span class="kw">if </span>edge.src == edges_clone[i - <span class="number">1</span>].src &amp;&amp; edge.tgt == edges_clone[i - <span class="number">1</span>].tgt {
-                edges.remove(i);
-            }
+        <span class="kw">if </span>i != <span class="number">0 </span>&amp;&amp; edge.src == edges_clone[i - <span class="number">1</span>].src &amp;&amp; edge.tgt == edges_clone[i - <span class="number">1</span>].tgt {
+            edges.remove(i);
         }
     }
     <span class="kw">let </span>fin_edges = edges.len();
@@ -7333,7 +7359,7 @@ There being a second function call of the same function which contains an expres
     <span class="kw">let </span>body_if_box = function_net.bc.as_ref().unwrap()[cond_counter <span class="kw">as </span>usize]
         .body_if
         .unwrap();
-    <span class="kw">let </span><span class="kw-2">mut </span>body_else_box = body_if_box.clone();
+    <span class="kw">let </span><span class="kw-2">mut </span>body_else_box = body_if_box;
     <span class="kw">let </span><span class="kw-2">mut </span>else_exists = <span class="bool-val">false</span>;
     <span class="kw">if </span>function_net.bc.as_ref().unwrap()[cond_counter <span class="kw">as </span>usize]
         .body_else
@@ -7755,20 +7781,19 @@ There being a second function call of the same function which contains an expres
                 }
             }
         }
-        <span class="kw">if </span>opo_final_idx != i {
-            <span class="kw">if </span>cond_src_tgt.len() == <span class="number">2 </span>{
-                <span class="kw">let </span>e14 = Edge {
-                    src: cond_src_tgt[<span class="number">0</span>].clone(),
-                    tgt: cond_src_tgt[<span class="number">1</span>].clone(),
-                    e_type: String::from(<span class="string">&quot;Wire&quot;</span>),
-                    prop: <span class="prelude-val">None</span>,
-                };
-                edges.push(e14);
-            }
+        <span class="kw">if </span>opo_final_idx != i &amp;&amp; cond_src_tgt.len() == <span class="number">2 </span>{
+            <span class="kw">let </span>e14 = Edge {
+                src: cond_src_tgt[<span class="number">0</span>].clone(),
+                tgt: cond_src_tgt[<span class="number">1</span>].clone(),
+                e_type: String::from(<span class="string">&quot;Wire&quot;</span>),
+                prop: <span class="prelude-val">None</span>,
+            };
+            edges.push(e14);
         }
     }
 }
-<span class="kw">pub fn </span>create_for_loop(
+<span class="attr">#[allow(unused_assignments)] </span><span class="comment">// I initialize some counters outside the loop
+</span><span class="kw">pub fn </span>create_for_loop(
     gromet: <span class="kw-2">&amp;</span>ModuleCollection, <span class="comment">// needed still for metadata unfortunately
     </span>nodes: <span class="kw-2">&amp;mut </span>Vec&lt;Node&gt;,
     edges: <span class="kw-2">&amp;mut </span>Vec&lt;Edge&gt;,
@@ -8367,21 +8392,20 @@ There being a second function call of the same function which contains an expres
                 }
             }
         }
-        <span class="kw">if </span>opo_final_idx != i {
-            <span class="kw">if </span>cond_src_tgt.len() == <span class="number">2 </span>{
-                <span class="kw">let </span>e14 = Edge {
-                    src: cond_src_tgt[<span class="number">0</span>].clone(),
-                    tgt: cond_src_tgt[<span class="number">1</span>].clone(),
-                    e_type: String::from(<span class="string">&quot;Wire&quot;</span>),
-                    prop: <span class="prelude-val">None</span>,
-                };
-                edges.push(e14);
-            }
+        <span class="kw">if </span>opo_final_idx != i &amp;&amp; cond_src_tgt.len() == <span class="number">2 </span>{
+            <span class="kw">let </span>e14 = Edge {
+                src: cond_src_tgt[<span class="number">0</span>].clone(),
+                tgt: cond_src_tgt[<span class="number">1</span>].clone(),
+                e_type: String::from(<span class="string">&quot;Wire&quot;</span>),
+                prop: <span class="prelude-val">None</span>,
+            };
+            edges.push(e14);
         }
     }
 }
 
-<span class="kw">pub fn </span>create_while_loop(
+<span class="attr">#[allow(unused_assignments)] </span><span class="comment">// I initialize some counters outside the loop
+</span><span class="kw">pub fn </span>create_while_loop(
     gromet: <span class="kw-2">&amp;</span>ModuleCollection, <span class="comment">// needed still for metadata unfortunately
     </span>nodes: <span class="kw-2">&amp;mut </span>Vec&lt;Node&gt;,
     edges: <span class="kw-2">&amp;mut </span>Vec&lt;Edge&gt;,
@@ -8860,16 +8884,14 @@ There being a second function call of the same function which contains an expres
                 }
             }
         }
-        <span class="kw">if </span>opo_final_idx != i {
-            <span class="kw">if </span>cond_src_tgt.len() == <span class="number">2 </span>{
-                <span class="kw">let </span>e14 = Edge {
-                    src: cond_src_tgt[<span class="number">0</span>].clone(),
-                    tgt: cond_src_tgt[<span class="number">1</span>].clone(),
-                    e_type: String::from(<span class="string">&quot;Wire&quot;</span>),
-                    prop: <span class="prelude-val">None</span>,
-                };
-                edges.push(e14);
-            }
+        <span class="kw">if </span>opo_final_idx != i &amp;&amp; cond_src_tgt.len() == <span class="number">2 </span>{
+            <span class="kw">let </span>e14 = Edge {
+                src: cond_src_tgt[<span class="number">0</span>].clone(),
+                tgt: cond_src_tgt[<span class="number">1</span>].clone(),
+                e_type: String::from(<span class="string">&quot;Wire&quot;</span>),
+                prop: <span class="prelude-val">None</span>,
+            };
+            edges.push(e14);
         }
     }
 }
@@ -9038,16 +9060,12 @@ There being a second function call of the same function which contains an expres
                 <span class="comment">// complicated logic to pull names from unpack pof&#39;s for these opi&#39;s
                 </span><span class="kw">let </span><span class="kw-2">mut </span>unpack_box: usize = <span class="number">0</span>;
                 <span class="kw">for </span>(i, bf) <span class="kw">in </span>parent_att_box.bf.clone().unwrap().iter().enumerate() {
-                    <span class="kw">match </span>bf.function_type {
-                        FunctionType::Abstract =&gt; {
-                            <span class="kw">if </span>bf.name.is_some()
-                                &amp;&amp; <span class="kw-2">*</span>bf.name.as_ref().unwrap() == String::from(<span class="string">&quot;unpack&quot;</span>)
-                            {
-                                unpack_box = i + <span class="number">1</span>; <span class="comment">// base 1 in gromet
-                            </span>}
-                        }
-                        <span class="kw">_ </span>=&gt; {}
-                    }
+                    <span class="kw">if </span>bf.function_type == FunctionType::Abstract
+                        &amp;&amp; bf.name.is_some()
+                        &amp;&amp; <span class="kw-2">*</span>bf.name.as_ref().unwrap() == String::from(<span class="string">&quot;unpack&quot;</span>)
+                    {
+                        unpack_box = i + <span class="number">1</span>; <span class="comment">// base 1 in gromet
+                    </span>}
                 }
                 <span class="kw">if </span>unpack_box != <span class="number">0 </span>{
                     <span class="kw">let </span><span class="kw-2">mut </span>port_named = <span class="bool-val">false</span>;
@@ -9485,7 +9503,8 @@ There being a second function call of the same function which contains an expres
     <span class="kw-2">*</span>start += <span class="number">1</span>;
 }
 
-<span class="kw">pub fn </span>create_att_primitive(
+<span class="attr">#[allow(unused_assignments)] </span><span class="comment">// I initialize some counters outside the loop
+</span><span class="kw">pub fn </span>create_att_primitive(
     gromet: <span class="kw-2">&amp;</span>ModuleCollection, <span class="comment">// needed still for metadata unfortunately
     </span>nodes: <span class="kw-2">&amp;mut </span>Vec&lt;Node&gt;,
     edges: <span class="kw-2">&amp;mut </span>Vec&lt;Edge&gt;,
@@ -9562,6 +9581,7 @@ There being a second function call of the same function which contains an expres
 
 <span class="comment">// This constructs abtract nodes (Primarily packs and unpacks)
 // I continue to treat these as a Primitive nodes to simplify the wiring.
+</span><span class="attr">#[allow(unused_assignments)] </span><span class="comment">// I initialize some counters outside the loop
 </span><span class="kw">pub fn </span>create_att_abstract(
     gromet: <span class="kw-2">&amp;</span>ModuleCollection, <span class="comment">// needed still for metadata unfortunately
     </span>nodes: <span class="kw-2">&amp;mut </span>Vec&lt;Node&gt;,
@@ -9810,7 +9830,7 @@ There being a second function call of the same function which contains an expres
 // wfopi: pif -&gt; opi
 </span><span class="kw">pub fn </span>wfopi_wiring(
     eboxf: FunctionNet,
-    nodes: <span class="kw-2">&amp;mut </span>Vec&lt;Node&gt;,
+    nodes: <span class="kw-2">&amp;mut </span>[Node],
     edges: <span class="kw-2">&amp;mut </span>Vec&lt;Edge&gt;,
     idx: u32,
     bf_counter: u8,
@@ -9875,7 +9895,7 @@ There being a second function call of the same function which contains an expres
 
 <span class="kw">pub fn </span>wfopo_wiring(
     eboxf: FunctionNet,
-    nodes: <span class="kw-2">&amp;mut </span>Vec&lt;Node&gt;,
+    nodes: <span class="kw-2">&amp;mut </span>[Node],
     edges: <span class="kw-2">&amp;mut </span>Vec&lt;Edge&gt;,
     idx: u32,
     bf_counter: u8,
@@ -9940,7 +9960,7 @@ There being a second function call of the same function which contains an expres
 // ports the wires point to.
 </span><span class="kw">pub fn </span>wff_wiring(
     eboxf: FunctionNet,
-    nodes: <span class="kw-2">&amp;mut </span>Vec&lt;Node&gt;,
+    nodes: <span class="kw-2">&amp;mut </span>[Node],
     edges: <span class="kw-2">&amp;mut </span>Vec&lt;Edge&gt;,
     idx: u32,       <span class="comment">// att_idx
     </span>bf_counter: u8, <span class="comment">// bf_counter
@@ -10030,7 +10050,7 @@ There being a second function call of the same function which contains an expres
 
 <span class="kw">pub fn </span>wopio_wiring(
     eboxf: FunctionNet,
-    nodes: <span class="kw-2">&amp;mut </span>Vec&lt;Node&gt;,
+    nodes: <span class="kw-2">&amp;mut </span>[Node],
     edges: <span class="kw-2">&amp;mut </span>Vec&lt;Edge&gt;,
     idx: usize,
     bf_counter: usize,
@@ -10093,7 +10113,7 @@ There being a second function call of the same function which contains an expres
 
 <span class="kw">pub fn </span>internal_wiring(
     eboxf: FunctionNet,
-    nodes: <span class="kw-2">&amp;mut </span>Vec&lt;Node&gt;,
+    nodes: <span class="kw-2">&amp;mut </span>[Node],
     edges: <span class="kw-2">&amp;mut </span>Vec&lt;Edge&gt;,
     idx: usize,
     bf_counter: usize,
@@ -10110,7 +10130,7 @@ There being a second function call of the same function which contains an expres
     </span><span class="kw">if </span>eboxf.wfopi.is_some() {
         wfopi_wiring(
             eboxf.clone(),
-            <span class="kw-2">&amp;mut </span>nodes.clone(),
+            <span class="kw-2">&amp;mut </span>nodes.to_owned(),
             edges,
             idx <span class="kw">as </span>u32,
             bf_counter <span class="kw">as </span>u8,
@@ -10121,7 +10141,7 @@ There being a second function call of the same function which contains an expres
     </span><span class="kw">if </span>eboxf.wfopo.is_some() {
         wfopo_wiring(
             eboxf.clone(),
-            <span class="kw-2">&amp;mut </span>nodes.clone(),
+            <span class="kw-2">&amp;mut </span>nodes.to_owned(),
             edges,
             idx <span class="kw">as </span>u32,
             bf_counter <span class="kw">as </span>u8,
@@ -10132,7 +10152,7 @@ There being a second function call of the same function which contains an expres
     </span><span class="kw">if </span>eboxf.wff.is_some() {
         wff_wiring(
             eboxf.clone(),
-            <span class="kw-2">&amp;mut </span>nodes.clone(),
+            <span class="kw-2">&amp;mut </span>nodes.to_owned(),
             edges,
             idx <span class="kw">as </span>u32,
             bf_counter <span class="kw">as </span>u8,
@@ -10149,7 +10169,7 @@ There being a second function call of the same function which contains an expres
 // needs to handle top level and function level wiring that uses the function net at the call of the import.
 </span><span class="kw">pub fn </span>import_wiring(
     gromet: <span class="kw-2">&amp;</span>ModuleCollection,
-    nodes: <span class="kw-2">&amp;mut </span>Vec&lt;Node&gt;,
+    nodes: <span class="kw-2">&amp;mut </span>[Node],
     edges: <span class="kw-2">&amp;mut </span>Vec&lt;Edge&gt;,
     idx: usize,
     bf_counter: usize,
@@ -10333,7 +10353,7 @@ There being a second function call of the same function which contains an expres
 
 <span class="kw">pub fn </span>cross_att_wiring(
     eboxf: FunctionNet, <span class="comment">// This is the current attribute
-    </span>nodes: <span class="kw-2">&amp;mut </span>Vec&lt;Node&gt;,
+    </span>nodes: <span class="kw-2">&amp;mut </span>[Node],
     edges: <span class="kw-2">&amp;mut </span>Vec&lt;Edge&gt;,
     idx: usize,        <span class="comment">// this +1 is the current attribute index
     </span>bf_counter: usize, <span class="comment">// this is the current box
@@ -10349,7 +10369,7 @@ There being a second function call of the same function which contains an expres
     </span><span class="kw">if </span>eboxf.wfopi.is_some() {
         wfopi_cross_att_wiring(
             eboxf.clone(),
-            <span class="kw-2">&amp;mut </span>nodes.clone(),
+            <span class="kw-2">&amp;mut </span>nodes.to_owned(),
             edges,
             idx <span class="kw">as </span>u32,
             bf_counter <span class="kw">as </span>u8,
@@ -10360,7 +10380,7 @@ There being a second function call of the same function which contains an expres
     </span><span class="kw">if </span>eboxf.wfopo.is_some() {
         wfopo_cross_att_wiring(
             eboxf.clone(),
-            <span class="kw-2">&amp;mut </span>nodes.clone(),
+            <span class="kw-2">&amp;mut </span>nodes.to_owned(),
             edges,
             idx <span class="kw">as </span>u32,
             bf_counter <span class="kw">as </span>u8,
@@ -10371,7 +10391,7 @@ There being a second function call of the same function which contains an expres
     </span><span class="kw">if </span>eboxf.wff.is_some() {
         wff_cross_att_wiring(
             eboxf,
-            <span class="kw-2">&amp;mut </span>nodes.clone(),
+            <span class="kw-2">&amp;mut </span>nodes.to_owned(),
             edges,
             idx <span class="kw">as </span>u32,
             bf_counter <span class="kw">as </span>u8,
@@ -10382,7 +10402,7 @@ There being a second function call of the same function which contains an expres
 // opi(sub)-&gt;opi(fun)
 </span><span class="kw">pub fn </span>wfopi_cross_att_wiring(
     eboxf: FunctionNet, <span class="comment">// This is the current attribute
-    </span>nodes: <span class="kw-2">&amp;mut </span>Vec&lt;Node&gt;,
+    </span>nodes: <span class="kw-2">&amp;mut </span>[Node],
     edges: <span class="kw-2">&amp;mut </span>Vec&lt;Edge&gt;,
     idx: u32,       <span class="comment">// this is the current attribute index
     </span>bf_counter: u8, <span class="comment">// this is the current box
@@ -10467,7 +10487,7 @@ There being a second function call of the same function which contains an expres
 // opo(fun)-&gt;opo(sub)
 </span><span class="kw">pub fn </span>wfopo_cross_att_wiring(
     eboxf: FunctionNet, <span class="comment">// This is the current attribute
-    </span>nodes: <span class="kw-2">&amp;mut </span>Vec&lt;Node&gt;,
+    </span>nodes: <span class="kw-2">&amp;mut </span>[Node],
     edges: <span class="kw-2">&amp;mut </span>Vec&lt;Edge&gt;,
     idx: u32,       <span class="comment">// this +1 is the current attribute index
     </span>bf_counter: u8, <span class="comment">// this is the current box
@@ -10552,7 +10572,7 @@ There being a second function call of the same function which contains an expres
 </span><span class="attr">#[allow(unused_assignments)]
 </span><span class="kw">pub fn </span>wff_cross_att_wiring(
     eboxf: FunctionNet, <span class="comment">// This is the current attribute, should be the function if in a function
-    </span>nodes: <span class="kw-2">&amp;mut </span>Vec&lt;Node&gt;,
+    </span>nodes: <span class="kw-2">&amp;mut </span>[Node],
     edges: <span class="kw-2">&amp;mut </span>Vec&lt;Edge&gt;,
     idx: u32,       <span class="comment">// this +1 is the current attribute index
     </span>bf_counter: u8, <span class="comment">// this is the current box
@@ -10697,7 +10717,7 @@ There being a second function call of the same function which contains an expres
                     <span class="comment">// now we perform a conditional for naming the opi&#39;s based on
                     // the primitives pof names, we have the primitive, the opi node id
                     // and the tgt_opo_idx which is the pof idx for the name
-                    </span><span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..nodes.clone().len() {
+                    </span><span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..nodes.to_owned().len() {
                         <span class="kw">if </span>nodes[i].node_id.clone() == wff_src_tgt[<span class="number">0</span>].clone()
                             &amp;&amp; eboxf.pof.as_ref().unwrap()[(tgt_idx - <span class="number">1</span>) <span class="kw">as </span>usize]
                                 .name
@@ -10793,7 +10813,7 @@ There being a second function call of the same function which contains an expres
     }
 }
 <span class="comment">// external wiring is the wiring between boxes at the module level
-</span><span class="kw">pub fn </span>external_wiring(gromet: <span class="kw-2">&amp;</span>ModuleCollection, nodes: <span class="kw-2">&amp;mut </span>Vec&lt;Node&gt;, edges: <span class="kw-2">&amp;mut </span>Vec&lt;Edge&gt;) {
+</span><span class="kw">pub fn </span>external_wiring(gromet: <span class="kw-2">&amp;</span>ModuleCollection, nodes: <span class="kw-2">&amp;mut </span>[Node], edges: <span class="kw-2">&amp;mut </span>Vec&lt;Edge&gt;) {
     <span class="kw">if </span>gromet.modules[<span class="number">0</span>].r#fn.wff.as_ref().is_some() {
         <span class="kw">for </span>wire <span class="kw">in </span>gromet.modules[<span class="number">0</span>].r#fn.wff.as_ref().unwrap().iter() {
             <span class="kw">let </span>src_idx = wire.src; <span class="comment">// pif wire connects to

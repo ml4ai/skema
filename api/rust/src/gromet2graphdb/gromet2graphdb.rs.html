@@ -55,15 +55,18 @@
 <a href="#55" id="55">55</a>
 <a href="#56" id="56">56</a>
 <a href="#57" id="57">57</a>
+<a href="#58" id="58">58</a>
+<a href="#59" id="59">59</a>
+<a href="#60" id="60">60</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Program for inserting GroMEt models into a database from the command line.
 
 </span><span class="kw">use </span>clap::Parser;
-<span class="kw">use </span>std::env;
 <span class="kw">use </span>skema::config::Config;
 <span class="kw">use </span>skema::{
-    database::{execute_query, parse_gromet_queries},
+    database::{parse_gromet_queries, run_queries},
     ModuleCollection,
 };
+<span class="kw">use </span>std::env;
 <span class="kw">use </span>std::fs;
 
 <span class="attr">#[derive(Parser, Debug)]
@@ -76,7 +79,8 @@
     </span>db_host: String,
 }
 
-<span class="kw">fn </span>main() {
+<span class="attr">#[tokio::main]
+</span><span class="kw">async fn </span>main() {
     <span class="comment">// debug outputs
     </span><span class="kw">let </span>debug = <span class="bool-val">true</span>;
     <span class="comment">// take in gromet location and deserialize
@@ -90,9 +94,9 @@
 
     <span class="comment">// need to make the whole query list one line, individual executions are treated as different graphs for each execution.
     </span><span class="kw">let </span><span class="kw-2">mut </span>full_query = queries[<span class="number">0</span>].clone();
-    <span class="kw">for </span>i <span class="kw">in </span><span class="number">1</span>..(queries.len()) {
+    <span class="kw">for </span>que <span class="kw">in </span>queries.iter().skip(<span class="number">1</span>) {
         full_query.push(<span class="string">&#39;\n&#39;</span>);
-        <span class="kw">let </span>temp_str = <span class="kw-2">&amp;</span>queries[i].clone();
+        <span class="kw">let </span>temp_str = que;
         full_query.push_str(temp_str);
     }
 
@@ -100,16 +104,18 @@
         fs::write(<span class="string">&quot;debug.txt&quot;</span>, full_query.clone()).expect(<span class="string">&quot;Unable to write file&quot;</span>);
     }
 
-    <span class="kw">let </span>db_host = env::var(<span class="string">&quot;DB_HOST&quot;</span>).unwrap_or(<span class="string">&quot;127.0.0.1&quot;</span>.to_string());
-    <span class="kw">let </span>db_port = env::var(<span class="string">&quot;DB_PORT&quot;</span>).unwrap_or(<span class="string">&quot;7687&quot;</span>.to_string());
+    <span class="kw">let </span>db_protocol = env::var(<span class="string">&quot;SKEMA_GRAPH_DB_PROTO&quot;</span>).unwrap_or(<span class="string">&quot;bolt+s://&quot;</span>.to_string());
+    <span class="kw">let </span>db_host =
+        env::var(<span class="string">&quot;SKEMA_GRAPH_DB_HOST&quot;</span>).unwrap_or(<span class="string">&quot;graphdb-bolt.askem.lum.ai&quot;</span>.to_string());
+    <span class="kw">let </span>db_port = env::var(<span class="string">&quot;SKEMA_GRAPH_DB_PORT&quot;</span>).unwrap_or(<span class="string">&quot;443&quot;</span>.to_string());
 
     <span class="kw">let </span>config = Config {
-        <span class="comment">// NOTE: db_host is protocol + host
-        </span>db_host: db_host.clone(),
+        db_protocol: db_protocol.clone(),
+        db_host: db_host.clone(),
         db_port: db_port.parse::&lt;u16&gt;().unwrap(),
     };
 
-    execute_query(<span class="kw-2">&amp;</span>full_query, config.clone()).unwrap(); <span class="comment">// The properties need to have quotes!!
-                                                        // writing output to file, since too long for std out now.
+    run_queries(queries, config.clone()).<span class="kw">await</span>.unwrap(); <span class="comment">// The properties need to have quotes!!
+                                                         // writing output to file, since too long for std out now.
 </span>}
 </code></pre></div></section></main></body></html>

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["Error","Version"],"fn":["query","unexpected"],"struct":["Config","ConfigBuilder","Graph","Node","Path","Point2D","Point3D","Query","Relation","Row","RowStream","Txn","UnboundedRelation"],"type":["Result"]};

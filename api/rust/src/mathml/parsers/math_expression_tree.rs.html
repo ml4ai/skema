@@ -2229,6 +2229,7 @@
 }
 
 <span class="doccomment">/// Converts Unicode, Greek letters, their symbols, and English representations of Greek letters in an input string to their respective LaTeX expressions.
+</span><span class="attr">#[allow(unreachable_patterns)] </span><span class="comment">// Lambda in this twice?
 </span><span class="kw">fn </span>unicode_to_latex(input: <span class="kw-2">&amp;</span>str) -&gt; String {
     <span class="comment">// Step 1: Handle English representations of Greek letters
     </span><span class="kw">let </span>re_english_greek = Regex::new(<span class="string">r&quot;Lambda|lambda|Alpha|alpha|Beta|beta|Gamma|gamma|Delta|delta|Epsilon|epsilon|Zeta|zeta|Eta|eta|Theta|theta|Iota|iota|Kappa|kappa|Lambda|lambda|Mu|mu|Nu|nu|Xi|xi|Omicron|omicron|Pi|pi|Rho|rho|Sigma|sigma|Tau|tau|Upsilon|upsilon|Phi|phi|Chi|chi|Psi|psi|Omega|omega&quot;</span>).unwrap();
@@ -2455,14 +2456,14 @@
         <span class="comment">// Check if the operator is a unary operator.
         </span><span class="kw">if </span>is_unary_operator(op) {
             <span class="comment">// If it is a unary operator, add it to the LaTeX string as is.
-            </span>expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, met.to_latex()));
+            </span>expression.push_str(<span class="kw-2">&amp;</span>met.to_latex().to_string());
         } <span class="kw">else </span>{
             <span class="comment">// If it is not a unary operator, wrap it in parentheses before adding it to the LaTeX string.
             </span>expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;({})&quot;</span>, met.to_latex()));
         }
     } <span class="kw">else </span>{
         <span class="comment">// If the expression is an atom, add it to the LaTeX string directly.
-        </span>expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, met.to_latex()));
+        </span>expression.push_str(<span class="kw-2">&amp;</span>met.to_latex().to_string());
     }
 }
 
@@ -2472,17 +2473,17 @@
     <span class="kw">match </span>expr {
         <span class="comment">// If it&#39;s a Ci variant, recursively process its content
         </span>MathExpression::Ci(x) =&gt; {
-            process_math_expression(<span class="kw-2">&amp;*</span>x.content, expression);
+            process_math_expression(<span class="kw-2">&amp;</span>x.content, expression);
             <span class="kw">if let </span><span class="prelude-val">Some</span>(func_of_vec) = <span class="kw-2">&amp;</span>x.func_of {
-                <span class="kw">if </span>func_of_vec.len() &gt; <span class="number">0 </span>&amp;&amp; func_of_vec[<span class="number">0</span>].content.to_string().len() &gt; <span class="number">0 </span>{
-                    expression.push_str(<span class="string">&quot;(&quot;</span>);
+                <span class="kw">if </span>!func_of_vec.is_empty() &amp;&amp; !func_of_vec[<span class="number">0</span>].content.to_string().is_empty() {
+                    expression.push(<span class="string">&#39;(&#39;</span>);
                     <span class="kw">for </span>(index, func_ci) <span class="kw">in </span>func_of_vec.iter().enumerate() {
-                        process_math_expression(<span class="kw-2">&amp;*</span>func_ci.content, expression);
+                        process_math_expression(<span class="kw-2">&amp;</span>func_ci.content, expression);
                         <span class="kw">if </span>index &lt; func_of_vec.len() - <span class="number">1 </span>{
-                            expression.push_str(<span class="string">&quot;,&quot;</span>);
+                            expression.push(<span class="string">&#39;,&#39;</span>);
                         }
                     }
-                    expression.push_str(<span class="string">&quot;)&quot;</span>);
+                    expression.push(<span class="string">&#39;)&#39;</span>);
                 }
             }
         }
@@ -2494,49 +2495,49 @@
         }
         MathExpression::Msqrt(x) =&gt; {
             expression.push_str(<span class="string">&quot;\\sqrt{&quot;</span>);
-            process_math_expression(<span class="kw-2">&amp;*</span>x, expression);
-            expression.push_str(<span class="string">&quot;}&quot;</span>);
+            process_math_expression(x, expression);
+            expression.push(<span class="string">&#39;}&#39;</span>);
         }
         MathExpression::Mfrac(x1, x2) =&gt; {
             expression.push_str(<span class="string">&quot;\\frac{&quot;</span>);
-            process_math_expression(<span class="kw-2">&amp;*</span>x1, expression);
+            process_math_expression(x1, expression);
             expression.push_str(<span class="string">&quot;}{&quot;</span>);
-            process_math_expression(<span class="kw-2">&amp;*</span>x2, expression);
-            expression.push_str(<span class="string">&quot;}&quot;</span>);
+            process_math_expression(x2, expression);
+            expression.push(<span class="string">&#39;}&#39;</span>);
         }
         MathExpression::Msup(x1, x2) =&gt; {
-            process_math_expression(<span class="kw-2">&amp;*</span>x1, expression);
+            process_math_expression(x1, expression);
             expression.push_str(<span class="string">&quot;^{&quot;</span>);
-            process_math_expression(<span class="kw-2">&amp;*</span>x2, expression);
-            expression.push_str(<span class="string">&quot;}&quot;</span>);
+            process_math_expression(x2, expression);
+            expression.push(<span class="string">&#39;}&#39;</span>);
         }
         MathExpression::Msub(x1, x2) =&gt; {
-            process_math_expression(<span class="kw-2">&amp;*</span>x1, expression);
+            process_math_expression(x1, expression);
             expression.push_str(<span class="string">&quot;_{&quot;</span>);
-            process_math_expression(<span class="kw-2">&amp;*</span>x2, expression);
-            expression.push_str(<span class="string">&quot;}&quot;</span>);
+            process_math_expression(x2, expression);
+            expression.push(<span class="string">&#39;}&#39;</span>);
         }
         MathExpression::Msubsup(x1, x2, x3) =&gt; {
-            process_math_expression(<span class="kw-2">&amp;*</span>x1, expression);
+            process_math_expression(x1, expression);
             expression.push_str(<span class="string">&quot;_{&quot;</span>);
-            process_math_expression(<span class="kw-2">&amp;*</span>x2, expression);
+            process_math_expression(x2, expression);
             expression.push_str(<span class="string">&quot;}^{&quot;</span>);
-            process_math_expression(<span class="kw-2">&amp;*</span>x3, expression);
-            expression.push_str(<span class="string">&quot;}&quot;</span>);
+            process_math_expression(x3, expression);
+            expression.push(<span class="string">&#39;}&#39;</span>);
         }
         MathExpression::Munder(x1, x2) =&gt; {
             expression.push_str(<span class="string">&quot;\\underset{&quot;</span>);
-            process_math_expression(<span class="kw-2">&amp;*</span>x2, expression);
+            process_math_expression(x2, expression);
             expression.push_str(<span class="string">&quot;}{&quot;</span>);
-            process_math_expression(<span class="kw-2">&amp;*</span>x1, expression);
-            expression.push_str(<span class="string">&quot;}&quot;</span>);
+            process_math_expression(x1, expression);
+            expression.push(<span class="string">&#39;}&#39;</span>);
         }
         MathExpression::Mover(x1, x2) =&gt; {
             expression.push_str(<span class="string">&quot;\\overset{&quot;</span>);
-            process_math_expression(<span class="kw-2">&amp;*</span>x2, expression);
+            process_math_expression(x2, expression);
             expression.push_str(<span class="string">&quot;}{&quot;</span>);
-            process_math_expression(<span class="kw-2">&amp;*</span>x1, expression);
-            expression.push_str(<span class="string">&quot;}&quot;</span>);
+            process_math_expression(x1, expression);
+            expression.push(<span class="string">&#39;}&#39;</span>);
         }
         MathExpression::Mtext(x) =&gt; {
             expression.push_str(x);
@@ -2546,10 +2547,10 @@
         }
         MathExpression::AbsoluteSup(x1, x2) =&gt; {
             expression.push_str(<span class="string">&quot;\\left| &quot;</span>);
-            process_math_expression(<span class="kw-2">&amp;*</span>x1, expression);
+            process_math_expression(x1, expression);
             expression.push_str(<span class="string">&quot; \\right|_{&quot;</span>);
-            process_math_expression(<span class="kw-2">&amp;*</span>x2, expression);
-            expression.push_str(<span class="string">&quot;}&quot;</span>);
+            process_math_expression(x2, expression);
+            expression.push(<span class="string">&#39;}&#39;</span>);
         }
         MathExpression::Mrow(vec_me) =&gt; {
             <span class="kw">for </span>me <span class="kw">in </span>vec_me.<span class="number">0</span>.iter() {
@@ -2676,33 +2677,33 @@
                         <span class="kw">for </span>(index, r) <span class="kw">in </span>rest.iter().enumerate() {
                             <span class="kw">if let </span>MathExpressionTree::Cons(op, <span class="kw">_</span>) = r {
                                 <span class="kw">if </span>is_unary_operator(op) {
-                                    expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, r.to_latex()));
+                                    expression.push_str(<span class="kw-2">&amp;</span>r.to_latex().to_string());
                                 } <span class="kw">else if let </span>Operator::Add = op {
-                                    expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, r.to_latex()));
+                                    expression.push_str(<span class="kw-2">&amp;</span>r.to_latex().to_string());
                                 } <span class="kw">else </span>{
                                     expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;({})&quot;</span>, r.to_latex()));
                                 }
                             } <span class="kw">else </span>{
-                                expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, r.to_latex()));
+                                expression.push_str(<span class="kw-2">&amp;</span>r.to_latex().to_string());
                             }
 
                             <span class="comment">// Add &quot;+&quot; if it&#39;s not the last element
                             </span><span class="kw">if </span>index &lt; rest.len() - <span class="number">1 </span>{
-                                expression.push_str(<span class="string">&quot;+&quot;</span>);
+                                expression.push(<span class="string">&#39;+&#39;</span>);
                             }
                         }
                     }
                     Operator::Subtract =&gt; {
                         <span class="comment">// Handle unary minus
                         </span><span class="kw">if </span>rest.len() == <span class="number">1 </span>{
-                            expression.push_str(<span class="string">&quot;-&quot;</span>);
+                            expression.push(<span class="string">&#39;-&#39;</span>);
                             process_expression_parentheses(<span class="kw-2">&amp;mut </span>expression, <span class="kw-2">&amp;</span>rest[<span class="number">0</span>]);
                         } <span class="kw">else </span>{
                             <span class="kw">for </span>(index, r) <span class="kw">in </span>rest.iter().enumerate() {
                                 process_expression_parentheses(<span class="kw-2">&amp;mut </span>expression, r);
                                 <span class="comment">// Add &quot;-&quot; if it&#39;s not the last element
                                 </span><span class="kw">if </span>index &lt; rest.len() - <span class="number">1 </span>{
-                                    expression.push_str(<span class="string">&quot;-&quot;</span>);
+                                    expression.push(<span class="string">&#39;-&#39;</span>);
                                 }
                             }
                         }
@@ -2711,29 +2712,29 @@
                         <span class="kw">for </span>(index, r) <span class="kw">in </span>rest.iter().enumerate() {
                             <span class="kw">if let </span>MathExpressionTree::Cons(op, <span class="kw">_</span>) = r {
                                 <span class="kw">if </span>is_unary_operator(op) {
-                                    expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, r.to_latex()));
+                                    expression.push_str(<span class="kw-2">&amp;</span>r.to_latex().to_string());
                                 } <span class="kw">else if let </span>Operator::Multiply = op {
-                                    expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, r.to_latex()));
+                                    expression.push_str(<span class="kw-2">&amp;</span>r.to_latex().to_string());
                                 } <span class="kw">else if let </span>Operator::Divide = op {
-                                    expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, r.to_latex()));
+                                    expression.push_str(<span class="kw-2">&amp;</span>r.to_latex().to_string());
                                 } <span class="kw">else if let </span>Operator::Dot = op {
-                                    expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, r.to_latex()));
+                                    expression.push_str(<span class="kw-2">&amp;</span>r.to_latex().to_string());
                                 } <span class="kw">else </span>{
                                     expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;({})&quot;</span>, r.to_latex()));
                                 }
                             } <span class="kw">else </span>{
-                                expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, r.to_latex()));
+                                expression.push_str(<span class="kw-2">&amp;</span>r.to_latex().to_string());
                             }
                             <span class="comment">// Add &quot;*&quot; if it&#39;s not the last element
                             </span><span class="kw">if </span>index &lt; rest.len() - <span class="number">1 </span>{
-                                expression.push_str(<span class="string">&quot;*&quot;</span>);
+                                expression.push(<span class="string">&#39;*&#39;</span>);
                             }
                         }
                     }
                     Operator::Equals =&gt; {
-                        expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, rest[<span class="number">0</span>].to_latex()));
-                        expression.push_str(<span class="string">&quot;=&quot;</span>);
-                        expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, rest[<span class="number">1</span>].to_latex()));
+                        expression.push_str(<span class="kw-2">&amp;</span>rest[<span class="number">0</span>].to_latex().to_string());
+                        expression.push(<span class="string">&#39;=&#39;</span>);
+                        expression.push_str(<span class="kw-2">&amp;</span>rest[<span class="number">1</span>].to_latex().to_string());
                     }
                     Operator::Divide =&gt; {
                         expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;\\frac{{{}}}&quot;</span>, <span class="kw-2">&amp;</span>rest[<span class="number">0</span>].to_latex()));
@@ -2748,36 +2749,36 @@
                         expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{{{}}}&quot;</span>, rest[<span class="number">0</span>].to_latex()));
                     }
                     Operator::Lparen =&gt; {
-                        expression.push_str(<span class="string">&quot;(&quot;</span>);
-                        expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, rest[<span class="number">0</span>].to_latex()));
+                        expression.push(<span class="string">&#39;(&#39;</span>);
+                        expression.push_str(<span class="kw-2">&amp;</span>rest[<span class="number">0</span>].to_latex().to_string());
                     }
                     Operator::Rparen =&gt; {
-                        expression.push_str(<span class="string">&quot;)&quot;</span>);
-                        expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, rest[<span class="number">0</span>].to_latex()));
+                        expression.push(<span class="string">&#39;)&#39;</span>);
+                        expression.push_str(<span class="kw-2">&amp;</span>rest[<span class="number">0</span>].to_latex().to_string());
                     }
                     Operator::Compose =&gt; {
                         process_expression_parentheses(<span class="kw-2">&amp;mut </span>expression, <span class="kw-2">&amp;</span>rest[<span class="number">0</span>]);
-                        expression.push_str(<span class="string">&quot;_&quot;</span>);
+                        expression.push(<span class="string">&#39;_&#39;</span>);
                         process_expression_parentheses(<span class="kw-2">&amp;mut </span>expression, <span class="kw-2">&amp;</span>rest[<span class="number">1</span>]);
                     }
                     Operator::Factorial =&gt; {
                         process_expression_parentheses(<span class="kw-2">&amp;mut </span>expression, <span class="kw-2">&amp;</span>rest[<span class="number">0</span>]);
-                        expression.push_str(<span class="string">&quot;!&quot;</span>);
+                        expression.push(<span class="string">&#39;!&#39;</span>);
                     }
                     Operator::Power =&gt; {
                         process_expression_parentheses(<span class="kw-2">&amp;mut </span>expression, <span class="kw-2">&amp;</span>rest[<span class="number">0</span>]);
-                        expression.push_str(<span class="string">&quot;^&quot;</span>);
+                        expression.push(<span class="string">&#39;^&#39;</span>);
                         expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{{{}}}&quot;</span>, rest[<span class="number">1</span>].to_latex()));
                     }
                     Operator::Comma =&gt; {
                         process_expression_parentheses(<span class="kw-2">&amp;mut </span>expression, <span class="kw-2">&amp;</span>rest[<span class="number">0</span>]);
-                        expression.push_str(<span class="string">&quot;,&quot;</span>);
+                        expression.push(<span class="string">&#39;,&#39;</span>);
                         process_expression_parentheses(<span class="kw-2">&amp;mut </span>expression, <span class="kw-2">&amp;</span>rest[<span class="number">1</span>]);
                     }
                     Operator::Grad =&gt; {
                         expression.push_str(<span class="string">&quot;\\nabla{&quot;</span>);
                         process_expression_parentheses(<span class="kw-2">&amp;mut </span>expression, <span class="kw-2">&amp;</span>rest[<span class="number">0</span>]);
-                        expression.push_str(<span class="string">&quot;}&quot;</span>);
+                        expression.push(<span class="string">&#39;}&#39;</span>);
                     }
                     Operator::Dot =&gt; {
                         process_expression_parentheses(<span class="kw-2">&amp;mut </span>expression, <span class="kw-2">&amp;</span>rest[<span class="number">0</span>]);
@@ -2787,7 +2788,7 @@
                     Operator::Div =&gt; {
                         expression.push_str(<span class="string">&quot;\\nabla \\cdot {&quot;</span>);
                         process_expression_parentheses(<span class="kw-2">&amp;mut </span>expression, <span class="kw-2">&amp;</span>rest[<span class="number">0</span>]);
-                        expression.push_str(<span class="string">&quot;}&quot;</span>);
+                        expression.push(<span class="string">&#39;}&#39;</span>);
                     }
                     Operator::Abs =&gt; {
                         expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;\\left|{}\\right|&quot;</span>, rest[<span class="number">0</span>].to_latex()));
@@ -2796,8 +2797,8 @@
                         expression.push_str(<span class="string">&quot;\\frac{d &quot;</span>);
                         process_expression_parentheses(<span class="kw-2">&amp;mut </span>expression, <span class="kw-2">&amp;</span>rest[<span class="number">0</span>]);
                         expression.push_str(<span class="string">&quot;}{d&quot;</span>);
-                        process_math_expression(<span class="kw-2">&amp;*</span>d.bound_var.content, <span class="kw-2">&amp;mut </span>expression);
-                        expression.push_str(<span class="string">&quot;}&quot;</span>);
+                        process_math_expression(<span class="kw-2">&amp;</span>d.bound_var.content, <span class="kw-2">&amp;mut </span>expression);
+                        expression.push(<span class="string">&#39;}&#39;</span>);
                     }
                     Operator::Sin =&gt; {
                         expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;\\sin({})&quot;</span>, rest[<span class="number">0</span>].to_latex()));
@@ -3112,7 +3113,6 @@
             <span class="kw">if let </span>Token::Op(Operator::Lparen) = token {
                 <span class="kw">if let </span>Token::Op(Operator::Rparen) = <span class="kw-2">**</span>next_token {
                     new_tokens.push(Token::Op(Operator::Multiply).clone());
-                } <span class="kw">else </span>{
                 }
             }
         }
@@ -3243,7 +3243,7 @@
     </span><span class="kw">let </span>no_newlines = input.replace(<span class="string">&#39;\n&#39;</span>, <span class="string">&quot;&quot;</span>);
 
     <span class="comment">// Remove spaces between MathML elements
-    </span><span class="kw">let </span>no_spaces = Regex::new(<span class="string">r#&quot;&gt;\s*&lt;&quot;#</span>)
+    </span><span class="kw">let </span>no_spaces = Regex::new(<span class="string">r&quot;&gt;\s*&lt;&quot;</span>)
         .unwrap()
         .replace_all(<span class="kw-2">&amp;</span>no_newlines, <span class="string">&quot;&gt;&lt;&quot;</span>)
         .to_string();
@@ -3923,8 +3923,8 @@
     <span class="kw">let </span>s_exp = exp.to_string();
     <span class="macro">println!</span>(<span class="string">&quot;s_exp={:?}&quot;</span>, s_exp);
 }
-
-<span class="kw">fn </span>test_unicode_conversion() {
+<span class="attr">#[allow(dead_code)] </span><span class="comment">// used in tests I believe
+</span><span class="kw">fn </span>test_unicode_conversion() {
     <span class="kw">let </span>input1 = <span class="string">&quot;&amp;#x039B; is a Greek letter.&quot;</span>;
     <span class="kw">let </span>input2 = <span class="string">&quot;&amp;#x03bb; is another Greek letter.&quot;</span>;
     <span class="kw">let </span>input3 = <span class="string">&quot;Λ and λ are Greek letters.&quot;</span>;

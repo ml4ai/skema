@@ -226,7 +226,7 @@ future panics, or if called within an asynchronous execution context.</p>
 <h5 id="notes"><a href="#notes">Notes</a></h5>
 <p>Since this function internally calls <a href="../runtime/struct.Runtime.html#method.block_on" title="method tokio::runtime::Runtime::block_on"><code>Runtime::block_on</code></a>, and drives
 futures in the local task set inside that call to <code>block_on</code>, the local
-futures may not use <a href="fn@crate::task::block_in_place">in-place blocking</a>. If a blocking call needs to be
+futures may not use <a href="fn.block_in_place.html" title="fn tokio::task::block_in_place">in-place blocking</a>. If a blocking call needs to be
 issued from a local task, the <a href="fn.spawn_blocking.html" title="fn tokio::task::spawn_blocking"><code>spawn_blocking</code></a> API may be used instead.</p>
 <p>For example, this will panic:</p>
 

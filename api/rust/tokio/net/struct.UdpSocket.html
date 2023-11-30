@@ -302,7 +302,7 @@ This method will fail if the socket is not connected.</p>
 encountered error is returned.</p>
 <h5 id="cancel-safety-2"><a href="#cancel-safety-2">Cancel safety</a></h5>
 <p>This method is cancel safe. If <code>send</code> is used as the event in a
-<a href="crate::select"><code>tokio::select!</code></a> statement and some other branch
+<a href="../macro.select.html" title="macro tokio::select"><code>tokio::select!</code></a> statement and some other branch
 completes first, then it is guaranteed that the message was not sent.</p>
 <h5 id="examples-3"><a href="#examples-3">Examples</a></h5>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>tokio::io;
@@ -453,7 +453,7 @@ supplied buffer, excess bytes may be discarded.</p>
 This method will fail if the socket is not connected.</p>
 <h5 id="cancel-safety-4"><a href="#cancel-safety-4">Cancel safety</a></h5>
 <p>This method is cancel safe. If <code>recv</code> is used as the event in a
-<a href="crate::select"><code>tokio::select!</code></a> statement and some other branch
+<a href="../macro.select.html" title="macro tokio::select"><code>tokio::select!</code></a> statement and some other branch
 completes first, it is guaranteed that no messages were received on this
 socket.</p>
 
@@ -699,7 +699,7 @@ will only send data to the first address yielded by <code>addr</code>.</p>
 not match that returned from <a href="trait.ToSocketAddrs.html" title="trait tokio::net::ToSocketAddrs"><code>ToSocketAddrs</code></a>.</p>
 <h5 id="cancel-safety-5"><a href="#cancel-safety-5">Cancel safety</a></h5>
 <p>This method is cancel safe. If <code>send_to</code> is used as the event in a
-<a href="crate::select"><code>tokio::select!</code></a> statement and some other branch
+<a href="../macro.select.html" title="macro tokio::select"><code>tokio::select!</code></a> statement and some other branch
 completes first, then it is guaranteed that the message was not sent.</p>
 <h5 id="example-5"><a href="#example-5">Example</a></h5>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>tokio::net::UdpSocket;
@@ -776,7 +776,7 @@ size to hold the message bytes. If a message is too long to fit in the
 supplied buffer, excess bytes may be discarded.</p>
 <h5 id="cancel-safety-6"><a href="#cancel-safety-6">Cancel safety</a></h5>
 <p>This method is cancel safe. If <code>recv_from</code> is used as the event in a
-<a href="crate::select"><code>tokio::select!</code></a> statement and some other branch
+<a href="../macro.select.html" title="macro tokio::select"><code>tokio::select!</code></a> statement and some other branch
 completes first, it is guaranteed that no messages were received on this
 socket.</p>
 <h5 id="example-7"><a href="#example-7">Example</a></h5>

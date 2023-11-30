@@ -1357,7 +1357,7 @@
             <span class="comment">//ws(tag(&quot;&lt;mo&gt;|&lt;/mo&gt;&quot;)),
             </span>ws(tuple((
                 <span class="comment">//math_expression,
-                </span>map(ws(many0(math_expression)), |z| Mrow(z)),
+                </span>map(ws(many0(math_expression)), Mrow),
                 preceded(ws(tag(<span class="string">&quot;&lt;msup&gt;&lt;mo&gt;|&lt;/mo&gt;&quot;</span>)), ws(math_expression)),
             ))),
             ws(tag(<span class="string">&quot;&lt;/msup&gt;&quot;</span>)),
@@ -1373,7 +1373,7 @@
         ws(delimited(
             tag(<span class="string">&quot;&lt;mo&gt;(&lt;/mo&gt;&quot;</span>),
             tuple((
-                map(many0(math_expression), |z| Mrow(z)),
+                map(many0(math_expression), Mrow),
                 preceded(tag(<span class="string">&quot;&lt;msup&gt;&lt;mo&gt;)&lt;/mo&gt;&quot;</span>), math_expression),
             )),
             tag(<span class="string">&quot;&lt;/msup&gt;&quot;</span>),

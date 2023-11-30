@@ -224,6 +224,18 @@
 <a href="#224" id="224">224</a>
 <a href="#225" id="225">225</a>
 <a href="#226" id="226">226</a>
+<a href="#227" id="227">227</a>
+<a href="#228" id="228">228</a>
+<a href="#229" id="229">229</a>
+<a href="#230" id="230">230</a>
+<a href="#231" id="231">231</a>
+<a href="#232" id="232">232</a>
+<a href="#233" id="233">233</a>
+<a href="#234" id="234">234</a>
+<a href="#235" id="235">235</a>
+<a href="#236" id="236">236</a>
+<a href="#237" id="237">237</a>
+<a href="#238" id="238">238</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>actix_web::{post, put, web, HttpResponse};
 <span class="kw">use </span>mathml::parsers::decapodes_serialization::{
     to_wiring_diagram, DecapodesCollection, WiringDiagram,
@@ -231,7 +243,9 @@
 <span class="kw">use </span>mathml::parsers::first_order_ode::flatten_mults;
 <span class="kw">use </span>mathml::parsers::generic_mathml::math;
 <span class="kw">use </span>mathml::parsers::math_expression_tree::MathExpressionTree;
-<span class="kw">use </span>mathml::parsers::math_expression_tree::{replace_unicode_with_symbols, preprocess_mathml_for_to_latex};
+<span class="kw">use </span>mathml::parsers::math_expression_tree::{
+    preprocess_mathml_for_to_latex, replace_unicode_with_symbols,
+};
 
 <span class="kw">use </span>mathml::{
     acset::{AMRmathml, PetriNet, RegNet},
@@ -397,8 +411,24 @@
 )]
 #[put(<span class="string">&quot;/mathml/regnet&quot;</span>)]
 </span><span class="kw">pub async fn </span>get_regnet(payload: web::Json&lt;Vec&lt;String&gt;&gt;) -&gt; HttpResponse {
-    <span class="kw">let </span>asts: Vec&lt;Math&gt; = payload.iter().map(|x| x.parse::&lt;Math&gt;().unwrap()).collect();
-    HttpResponse::Ok().json(web::Json(RegNet::from(asts)))
+    <span class="kw">let </span>asts_result: <span class="prelude-ty">Result</span>&lt;Vec&lt;<span class="kw">_</span>&gt;, <span class="kw">_</span>&gt; = payload
+        .iter()
+        .map(|x| first_order_ode(x.as_str().into()))
+        .collect();
+
+    <span class="kw">match </span>asts_result {
+        <span class="prelude-val">Ok</span>(asts) =&gt; {
+            <span class="kw">let </span><span class="kw-2">mut </span>flattened_asts = Vec::&lt;FirstOrderODE&gt;::new();
+            <span class="kw">for </span>(<span class="kw">_</span>, <span class="kw-2">mut </span>eq) <span class="kw">in </span>asts {
+                eq.rhs = flatten_mults(eq.rhs.clone());
+                flattened_asts.push(eq.clone());
+            }
+            HttpResponse::Ok().json(web::Json(RegNet::from(flattened_asts)))
+        }
+        <span class="prelude-val">Err</span>(err) =&gt; HttpResponse::BadRequest()
+            .content_type(<span class="string">&quot;text/plain&quot;</span>)
+            .body(err.to_string()),
+    }
 }
 
 <span class="doccomment">/// Return a JSON representation of an AMR constructed from an array of MathML strings and a string
@@ -428,15 +458,9 @@
                 eq.rhs = flatten_mults(eq.rhs.clone());
                 flattened_asts.push(eq.clone());
             }
-            <span class="kw">let </span>asts: Vec&lt;Math&gt; = payload
-                .mathml
-                .clone()
-                .iter()
-                .map(|x| x.parse::&lt;Math&gt;().unwrap())
-                .collect();
             <span class="kw">let </span>model_type = payload.model.clone();
             <span class="kw">if </span>model_type == <span class="kw-2">*</span><span class="string">&quot;regnet&quot; </span>{
-                HttpResponse::Ok().json(web::Json(RegNet::from(asts)))
+                HttpResponse::Ok().json(web::Json(RegNet::from(flattened_asts)))
             } <span class="kw">else if </span>model_type == <span class="kw-2">*</span><span class="string">&quot;petrinet&quot; </span>{
                 HttpResponse::Ok().json(web::Json(PetriNet::from(flattened_asts)))
             } <span class="kw">else </span>{

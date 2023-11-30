@@ -105,23 +105,54 @@
 <a href="#105" id="105">105</a>
 <a href="#106" id="106">106</a>
 <a href="#107" id="107">107</a>
+<a href="#108" id="108">108</a>
+<a href="#109" id="109">109</a>
+<a href="#110" id="110">110</a>
+<a href="#111" id="111">111</a>
+<a href="#112" id="112">112</a>
+<a href="#113" id="113">113</a>
+<a href="#114" id="114">114</a>
+<a href="#115" id="115">115</a>
+<a href="#116" id="116">116</a>
+<a href="#117" id="117">117</a>
+<a href="#118" id="118">118</a>
+<a href="#119" id="119">119</a>
+<a href="#120" id="120">120</a>
+<a href="#121" id="121">121</a>
+<a href="#122" id="122">122</a>
+<a href="#123" id="123">123</a>
+<a href="#124" id="124">124</a>
+<a href="#125" id="125">125</a>
+<a href="#126" id="126">126</a>
+<a href="#127" id="127">127</a>
+<a href="#128" id="128">128</a>
+<a href="#129" id="129">129</a>
+<a href="#130" id="130">130</a>
+<a href="#131" id="131">131</a>
+<a href="#132" id="132">132</a>
+<a href="#133" id="133">133</a>
+<a href="#134" id="134">134</a>
+<a href="#135" id="135">135</a>
+<a href="#136" id="136">136</a>
+<a href="#137" id="137">137</a>
+<a href="#138" id="138">138</a>
+<a href="#139" id="139">139</a>
+<a href="#140" id="140">140</a>
+<a href="#141" id="141">141</a>
+<a href="#142" id="142">142</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>clap::Parser;
 
-<span class="kw">use </span>mathml::mml2pn::get_mathml_asts_from_file;
 <span class="kw">pub use </span>mathml::mml2pn::{ACSet, Term};
 
 <span class="comment">// new imports
-</span><span class="kw">use </span>std::env;
+</span><span class="kw">use </span>mathml::acset::PetriNet;
+
+<span class="kw">use </span>neo4rs::{query, Node};
 <span class="kw">use </span>skema::config::Config;
-<span class="kw">use </span>mathml::acset::{PetriNet, RegNet};
-<span class="kw">use </span>mathml::parsers::decapodes_serialization::{
-    to_wiring_diagram, DecapodesCollection, WiringDiagram,
-};
-<span class="kw">use </span>mathml::parsers::first_order_ode::get_FirstOrderODE_vec_from_file;
-<span class="kw">use </span>mathml::parsers::math_expression_tree::MathExpressionTree;
-<span class="kw">use </span>skema::model_extraction::{module_id2mathml_MET_ast, subgraph2_core_dyn_ast};
-<span class="kw">use </span>std::fs::File;
-<span class="kw">use </span>std::io::{BufRead, BufReader};
+<span class="kw">use </span>skema::model_extraction::module_id2mathml_MET_ast;
+<span class="kw">use </span>std::env;
+
+<span class="kw">use </span>std::sync::Arc;
 
 <span class="attr">#[derive(Parser, Debug)]
 </span><span class="kw">struct </span>Cli {
@@ -133,7 +164,28 @@
     </span>model_id: <span class="prelude-ty">Option</span>&lt;i64&gt;,
 }
 
-<span class="kw">fn </span>main() {
+<span class="kw">pub async fn </span>module_query(config: Config) -&gt; Vec&lt;i64&gt; {
+    <span class="comment">// Connect to Memgraph.
+
+    </span><span class="kw">let </span>graph = Arc::new(config.graphdb_connection().<span class="kw">await</span>);
+
+    <span class="kw">let </span><span class="kw-2">mut </span>ids = Vec::&lt;i64&gt;::new();
+    <span class="kw">let </span><span class="kw-2">mut </span>result = graph
+        .execute(query(<span class="string">&quot;MATCH (n:Module) RETURN n&quot;</span>))
+        .<span class="kw">await
+        </span>.unwrap();
+    <span class="kw">while let </span><span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(row)) = result.next().<span class="kw">await </span>{
+        <span class="kw">let </span>node: Node = row.get(<span class="string">&quot;n&quot;</span>).unwrap();
+        ids.push(node.id());
+    }
+
+    ids
+}
+
+<span class="attr">#[allow(unused_variables)]
+#[allow(unused_assignments)]
+#[tokio::main]
+</span><span class="kw">async fn </span>main() {
     <span class="comment">// setup command line argument on if the core dynamics has been found manually or needs to be found automatically
     /*
     Command line args;
@@ -143,7 +195,7 @@
     </span><span class="kw">let </span>new_args = Cli::parse();
 
     <span class="comment">//let mut module_id = 883;
-    </span><span class="kw">let </span><span class="kw-2">mut </span>module_id = <span class="number">2399</span>;
+    </span><span class="kw">let </span><span class="kw-2">mut </span>module_id = <span class="number">2431</span>;
     <span class="comment">// now to prototype an algorithm to find the function that contains the core dynamics
 
     </span><span class="kw">if </span>new_args.arg == <span class="kw-2">*</span><span class="string">&quot;auto&quot; </span>{
@@ -151,19 +203,37 @@
             module_id = new_args.model_id.unwrap();
         }
 
-        <span class="kw">let </span>db_host = env::var(<span class="string">&quot;SKEMA_GRAPH_DB_HOST&quot;</span>).unwrap_or(<span class="string">&quot;127.0.0.1&quot;</span>.to_string());
-        <span class="kw">let </span>db_port = env::var(<span class="string">&quot;SKEMA_GRAPH_DB_PORT&quot;</span>).unwrap_or(<span class="string">&quot;7687&quot;</span>.to_string());
+        <span class="kw">let </span>db_protocol = env::var(<span class="string">&quot;SKEMA_GRAPH_DB_PROTO&quot;</span>).unwrap_or(<span class="string">&quot;bolt+s://&quot;</span>.to_string());
+        <span class="kw">let </span>db_host =
+            env::var(<span class="string">&quot;SKEMA_GRAPH_DB_HOST&quot;</span>).unwrap_or(<span class="string">&quot;graphdb-bolt.askem.lum.ai&quot;</span>.to_string());
+        <span class="kw">let </span>db_port = env::var(<span class="string">&quot;SKEMA_GRAPH_DB_PORT&quot;</span>).unwrap_or(<span class="string">&quot;443&quot;</span>.to_string());
 
         <span class="kw">let </span>config = Config {
+            db_protocol: db_protocol.clone(),
             db_host: db_host.clone(),
             db_port: db_port.parse::&lt;u16&gt;().unwrap(),
         };
 
-        <span class="kw">let </span>math_content = module_id2mathml_MET_ast(module_id, config.clone());
+        <span class="kw">let </span>_response = module_query(config.clone()).<span class="kw">await</span>;
 
-        <span class="kw">let </span>input_src = <span class="string">&quot;../../data/mml2pn_inputs/testing_eqns/sidarthe_mml.txt&quot;</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>ids = Vec::&lt;i64&gt;::new();
+        <span class="kw">let </span>graph = Arc::new(config.graphdb_connection().<span class="kw">await</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>result = graph
+            .execute(query(<span class="string">&quot;MATCH (n:Module) RETURN n&quot;</span>))
+            .<span class="kw">await
+            </span>.unwrap();
+        <span class="kw">while let </span><span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(row)) = result.next().<span class="kw">await </span>{
+            <span class="kw">let </span>node: Node = row.get(<span class="string">&quot;n&quot;</span>).unwrap();
+            ids.push(node.id());
+        }
+        <span class="macro">println!</span>(<span class="string">&quot;{:?}&quot;</span>, ids.clone());
+        <span class="kw">let </span>math_content = module_id2mathml_MET_ast(ids[ids.len() - <span class="number">1</span>], config.clone()).<span class="kw">await</span>;
+        <span class="macro">println!</span>(<span class="string">&quot;{:?}&quot;</span>, math_content.clone());
+        <span class="macro">println!</span>(<span class="string">&quot;\nAMR from code: {:?}&quot;</span>, PetriNet::from(math_content));
 
-        <span class="comment">// This does get a panic with a message, so need to figure out how to forward it
+        <span class="comment">//let input_src = &quot;../../data/mml2pn_inputs/testing_eqns/sidarthe_mml.txt&quot;;
+
+        // This does get a panic with a message, so need to figure out how to forward it
         //let _mathml_ast = get_mathml_asts_from_file(input_src.clone());
 
         /*let f = File::open(input_src.clone()).unwrap();
@@ -185,17 +255,17 @@
         println!(&quot;{:?}&quot;, wiring_vec.clone());
         println!(&quot;decapode collection: {:?}&quot;, decapodescollection.clone());
         */
-        </span><span class="kw">let </span>odes = get_FirstOrderODE_vec_from_file(input_src.clone());
+        //let odes = get_FirstOrderODE_vec_from_file(input_src.clone());
 
-        <span class="comment">//println!(&quot;\nmath_content: {:?}&quot;, math_content);
+        //println!(&quot;\nmath_content: {:?}&quot;, math_content);
         //println!(&quot;\nmathml_ast: {:?}&quot;, odes);
 
-        </span><span class="macro">println!</span>(
-            <span class="string">&quot;\nAMR from mathml: {}\n&quot;</span>,
-            serde_json::to_string(<span class="kw-2">&amp;</span>PetriNet::from(odes)).unwrap()
-        );
-        <span class="macro">println!</span>(<span class="string">&quot;\nAMR from code: {:?}&quot;</span>, PetriNet::from(math_content));
-    }
+        //println!(
+        //    &quot;\nAMR from mathml: {}\n&quot;,
+        //    serde_json::to_string(&amp;PetriNet::from(odes)).unwrap()
+        //);
+        //println!(&quot;\nAMR from code: {:?}&quot;, PetriNet::from(math_content));
+    </span>}
     <span class="comment">// This is the graph id for the top level function for the core dynamics for our test case.
 </span>}
 

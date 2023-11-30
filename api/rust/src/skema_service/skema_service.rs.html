@@ -149,9 +149,7 @@
 <a href="#149" id="149">149</a>
 <a href="#150" id="150">150</a>
 <a href="#151" id="151">151</a>
-<a href="#152" id="152">152</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>actix_web::{get, http::header::ContentType, web::Data, App, HttpResponse, HttpServer};
-<span class="kw">use </span>clap::Parser;
 <span class="kw">use </span>skema::config::Config;
 <span class="kw">use </span>skema::services::gromet;
 <span class="kw">use </span>std::env;
@@ -208,7 +206,6 @@
             gromet::get_named_opos,
             gromet::get_named_opis,
             gromet::get_named_ports,
-            gromet::get_subgraph,
             gromet::get_model_RN,
             gromet::model2PN,
             gromet::model2RN,
@@ -269,9 +266,9 @@
     <span class="kw">let </span>version_hash = env::var(<span class="string">&quot;APP_VERSION&quot;</span>).unwrap_or(<span class="string">&quot;?????&quot;</span>.to_string());
     <span class="kw">let </span>host_env = env::var(<span class="string">&quot;SKEMA_RS_HOST&quot;</span>).unwrap_or(<span class="string">&quot;0.0.0.0&quot;</span>.to_string());
     <span class="kw">let </span>port_env = env::var(<span class="string">&quot;SKEMA_RS_PORT&quot;</span>).unwrap_or(<span class="string">&quot;8080&quot;</span>.to_string());
+    <span class="kw">let </span>db_protocol = env::var(<span class="string">&quot;SKEMA_GRAPH_DB_PROTO&quot;</span>).unwrap_or(<span class="string">&quot;bolt+s://&quot;</span>.to_string());
     <span class="kw">let </span>db_host = env::var(<span class="string">&quot;SKEMA_GRAPH_DB_HOST&quot;</span>).unwrap_or(<span class="string">&quot;127.0.0.1&quot;</span>.to_string());
     <span class="kw">let </span>db_port = env::var(<span class="string">&quot;SKEMA_GRAPH_DB_PORT&quot;</span>).unwrap_or(<span class="string">&quot;7687&quot;</span>.to_string());
-
 
     <span class="kw">let </span><span class="kw-2">mut </span>openapi = ApiDoc::openapi();
     openapi.info.version = version_hash.to_string();
@@ -279,8 +276,9 @@
     HttpServer::new(<span class="kw">move </span>|| {
         App::new()
             .app_data(Data::new(Config {
+                db_protocol: db_protocol.clone(),
                 db_host: db_host.clone(),
-                db_port: db_port.parse::&lt;u16&gt;().unwrap()
+                db_port: db_port.parse::&lt;u16&gt;().unwrap(),
             }))
             .configure(gromet::configure())
             .service(skema::services::mathml::get_ast_graph)

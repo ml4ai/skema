@@ -2717,6 +2717,8 @@
 <a href="#2717" id="2717">2717</a>
 <a href="#2718" id="2718">2718</a>
 <a href="#2719" id="2719">2719</a>
+<a href="#2720" id="2720">2720</a>
+<a href="#2721" id="2721">2721</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
     ast::{
         operator::Operator,
@@ -3098,6 +3100,7 @@
 
     <span class="doccomment">/// 1) distribute variables and terms over multiplications, e.g., a*(b+c) =&gt; a*b+a*c
     /// 2) distribute variables and terms over divisions, e.g., a/(b+c)/(e+f) =&gt; a/(be+bf+ce+cf)
+    </span><span class="attr">#[allow(dead_code)] </span><span class="comment">// used in tests I believe
     </span><span class="kw">fn </span>distribute_expr(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
         <span class="kw">if let </span>Expr::Expression { ops, args, .. } = <span class="self">self </span>{
             <span class="kw">let </span><span class="kw-2">mut </span>ops_copy = ops.clone();
@@ -3743,7 +3746,8 @@
         }
     }
 
-    <span class="kw">fn </span>distribute_expr(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+    <span class="attr">#[allow(dead_code)] </span><span class="comment">// used in tests I believe
+    </span><span class="kw">fn </span>distribute_expr(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
         <span class="kw">for </span>arg <span class="kw">in </span><span class="kw-2">&amp;mut </span><span class="self">self</span>.args {
             <span class="kw">if let </span>Expr::Expression { .. } = arg {
                 arg.distribute_expr();
