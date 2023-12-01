@@ -6,12 +6,12 @@
 
 use crate::{
     ast::{
-        operator::{Derivative, Operator},
+        operator::{Derivative, Operator, PartialDerivative},
         Ci, Differential, Math, MathExpression, Mi, Mrow, Type,
     },
     parsers::generic_mathml::{
-        add, attribute, dot, elem_many0, equals, etag, grad, lparen, mean, mi, mn, msqrt, msub,
-        msubsup, multiply, rparen, stag, subtract, tag_parser, ws, xml_declaration, IResult,
+        add, attribute, dot, elem_many0, equals, etag, grad, lparen, mean, mi, mn, msub, msubsup,
+        mtext, multiply, rparen, stag, subtract, tag_parser, ws, xml_declaration, IResult,
         ParseError, Span,
     },
 };
@@ -21,7 +21,7 @@ use nom::{
     bytes::complete::tag,
     combinator::{map, opt, value},
     multi::{many0, many1, separated_list1},
-    sequence::{delimited, pair, preceded, separated_pair, tuple},
+    sequence::{delimited, pair, preceded, tuple},
 };
 
 /// Function to parse operators. This function differs from the one in parsers::generic_mathml by
@@ -29,9 +29,7 @@ use nom::{
 pub fn operator(input: Span) -> IResult<Operator> {
     let (s, op) = ws(delimited(
         stag!("mo"),
-        alt((
-            add, subtract, multiply, equals, lparen, rparen, mean, grad, dot,
-        )),
+        alt((add, subtract, multiply, equals, lparen, rparen, mean, dot)),
         etag!("mo"),
     ))(input)?;
     Ok((s, op))
@@ -165,6 +163,8 @@ fn partial(input: Span) -> IResult<()> {
     let (s, Mi(x)) = mi(input)?;
     if let "∂" = x.as_ref() {
         Ok((s, ()))
+    } else if let "&#x2202;" = x.as_ref() {
+        Ok((s, ()))
     } else {
         Err(nom::Err::Error(ParseError::new(
             "Unable to identify Mi('∂')".to_string(),
@@ -210,21 +210,57 @@ pub fn ci_unknown(input: Span) -> IResult<Ci> {
     ))
 }
 
+/// Parse first order derivative where the function of derivative is within a parenthesis
+/// e.g. d/dt ( S(t)* I(t) )
 pub fn first_order_with_func_in_parenthesis(input: Span) -> IResult<(Derivative, Mrow)> {
-    let (s, _) = tuple((stag!("mfrac"), alt((d, partial))))(input)?;
+    let (s, _) = pair(stag!("mfrac"), d)(input)?;
     let (s, with_respect_to) = delimited(
-        tuple((stag!("mrow"), alt((d, partial)))),
+        tuple((stag!("mrow"), d)),
         mi,
         pair(etag!("mrow"), etag!("mfrac")),
     )(s)?;
-
-    let (s, _) = tuple((stag!("mo"), tag("("), etag!("mo")))(s)?;
-    let (s, func) = many0(math_expression)(s)?;
-    let (s, _) = tuple((stag!("mo"), tag(")"), etag!("mo")))(s)?;
+    let (s, mut func) = ws(preceded(
+        tuple((stag!("mo"), lparen, etag!("mo"))),
+        many0(math_expression),
+    ))(s)?;
+    let Some(_) = func.pop() else { todo!() };
     Ok((
         s,
         (
             Derivative::new(
+                1,
+                1,
+                Ci::new(
+                    Some(Type::Real),
+                    Box::new(MathExpression::Mi(with_respect_to)),
+                    None,
+                ),
+            ),
+            Mrow(func),
+        ),
+    ))
+}
+
+/// Parse first order partial derivative where the function of derivative is within a parenthesis
+/// e.g. ∂/∂t ( S(t)* I(t) )
+pub fn first_order_partial_with_func_in_parenthesis(
+    input: Span,
+) -> IResult<(PartialDerivative, Mrow)> {
+    let (s, _) = pair(stag!("mfrac"), partial)(input)?;
+    let (s, with_respect_to) = delimited(
+        tuple((stag!("mrow"), partial)),
+        mi,
+        pair(etag!("mrow"), etag!("mfrac")),
+    )(s)?;
+    let (s, mut func) = ws(preceded(
+        tuple((stag!("mo"), lparen, etag!("mo"))),
+        many0(math_expression),
+    ))(s)?;
+    let Some(_) = func.pop() else { todo!() };
+    Ok((
+        s,
+        (
+            PartialDerivative::new(
                 1,
                 1,
                 Ci::new(
@@ -290,6 +326,81 @@ pub fn first_order_derivative_leibniz_notation(input: Span) -> IResult<(Derivati
                     s,
                     (
                         Derivative::new(
+                            1,
+                            1,
+                            Ci::new(
+                                Some(Type::Real),
+                                Box::new(MathExpression::Mi(with_respect_to)),
+                                None,
+                            ),
+                        ),
+                        func,
+                    ),
+                ));
+            }
+        }
+    }
+
+    Err(nom::Err::Error(ParseError::new(
+        "Unable to match  function_of  with with_respect_to".to_string(),
+        input,
+    )))
+}
+
+/// Parse a first-order partial ordinary derivative written in Leibniz notation.
+pub fn first_order_partial_derivative_leibniz_notation(
+    input: Span,
+) -> IResult<(PartialDerivative, Ci)> {
+    let (s, _) = tuple((stag!("mfrac"), stag!("mrow"), partial))(input)?;
+    let (s, func) = ws(alt((
+        ci_univariate_func,
+        map(
+            ci_unknown,
+            |Ci {
+                 content, func_of, ..
+             }| {
+                Ci {
+                    r#type: Some(Type::Function),
+                    content,
+                    func_of,
+                }
+            },
+        ),
+        ci_subscript_func,
+    )))(s)?;
+    let (s, with_respect_to) = delimited(
+        tuple((etag!("mrow"), stag!("mrow"), partial)),
+        mi,
+        pair(etag!("mrow"), etag!("mfrac")),
+    )(s)?;
+
+    if let Some(ref ci_vec) = func.func_of {
+        for (indx, bvar) in ci_vec.iter().enumerate() {
+            if Some(bvar.content.clone())
+                == Some(Box::new(MathExpression::Mi(with_respect_to.clone())))
+            {
+                return Ok((
+                    s,
+                    (
+                        PartialDerivative::new(
+                            1,
+                            (indx + 1) as u8,
+                            Ci::new(
+                                Some(Type::Real),
+                                Box::new(MathExpression::Mi(with_respect_to)),
+                                None,
+                            ),
+                        ),
+                        func,
+                    ),
+                ));
+            } else if Some(bvar.content.clone())
+                == Some(Box::new(MathExpression::Mi(Mi("".to_string()))))
+            {
+                return Ok((
+                    s,
+                    (
+                        PartialDerivative::new(
                             1,
                             1,
                             Ci::new(
@@ -398,24 +509,32 @@ pub fn mrow(input: Span) -> IResult<Mrow> {
 }
 
 ///Absolute value
-pub fn absolute(input: Span) -> IResult<Mrow> {
+pub fn absolute(input: Span) -> IResult<MathExpression> {
     let (s, elements) = ws(delimited(
         tag("<mo>|</mo>"),
         many0(math_expression),
         tag("<mo>|</mo>"),
     ))(input)?;
-    Ok((s, Mrow(elements)))
+    let components = MathExpression::Absolute(
+        Box::new(MathExpression::Mo(Operator::Abs)),
+        Box::new(MathExpression::Mrow(Mrow(elements))),
+    );
+
+    Ok((s, components))
 }
 
 /// Example: Divergence
 pub fn div(input: Span) -> IResult<Operator> {
-    let (s, op) = ws(pair(gradient, ws(delimited(stag!("mo"), dot, etag!("mo")))))(input)?;
+    let (s, _op) = ws(pair(gradient, ws(delimited(stag!("mo"), dot, etag!("mo")))))(input)?;
     let div = Operator::Div;
     Ok((s, div))
 }
 
 pub fn gradient(input: Span) -> IResult<Operator> {
-    let (s, op) = ws(delimited(stag!("mo"), grad, etag!("mo")))(input)?;
+    let (s, op) = ws(alt((
+        delimited(stag!("mo"), grad, etag!("mo")),
+        delimited(stag!("mi"), grad, etag!("mi")),
+    )))(input)?;
     Ok((s, op))
 }
 
@@ -429,13 +548,14 @@ pub fn grad_func(input: Span) -> IResult<(Operator, Ci)> {
 pub fn absolute_with_msup(input: Span) -> IResult<MathExpression> {
     let (s, sup) = ws(map(
         ws(delimited(
-            tag("<mo>|</mo>"),
-            tuple((
+            ws(tuple((stag!("mo"), tag("|"), etag!("mo")))),
+            //ws(tag("<mo>|</mo>")),
+            ws(tuple((
                 //math_expression,
-                map(many0(math_expression), |z| Mrow(z)),
-                preceded(tag("<msup><mo>|</mo>"), math_expression),
-            )),
-            tag("</msup>"),
+                map(ws(many0(math_expression)), Mrow),
+                preceded(ws(tag("<msup><mo>|</mo>")), ws(math_expression)),
+            ))),
+            ws(tag("</msup>")),
         )),
         |(x, y)| MathExpression::AbsoluteSup(Box::new(MathExpression::Mrow(x)), Box::new(y)),
     ))(input)?;
@@ -448,7 +568,7 @@ pub fn paren_as_msup(input: Span) -> IResult<MathExpression> {
         ws(delimited(
             tag("<mo>(</mo>"),
             tuple((
-                map(many0(math_expression), |z| Mrow(z)),
+                map(many0(math_expression), Mrow),
                 preceded(tag("<msup><mo>)</mo>"), math_expression),
             )),
             tag("</msup>"),
@@ -458,13 +578,46 @@ pub fn paren_as_msup(input: Span) -> IResult<MathExpression> {
     Ok((s, sup))
 }
 
+/// Parser for multiple elements in square root
+pub fn sqrt(input: Span) -> IResult<MathExpression> {
+    let (s, elements) = ws(delimited(
+        stag!("msqrt"),
+        many0(math_expression),
+        etag!("msqrt"),
+    ))(input)?;
+    Ok((
+        s,
+        MathExpression::Msqrt(Box::new(MathExpression::Mrow(Mrow(elements)))),
+    ))
+}
+
 /// Parser for math expressions. This varies from the one in the generic_mathml module, since it
 /// assumes that expressions such as S(t) are actually univariate functions.
 pub fn math_expression(input: Span) -> IResult<MathExpression> {
     ws(alt((
         map(div, MathExpression::Mo),
-        absolute_with_msup,
-        paren_as_msup,
+        alt((ws(absolute_with_msup), ws(paren_as_msup))),
+        sqrt,
+        map(
+            grad_func,
+            |(
+                op,
+                Ci {
+                    r#type,
+                    content,
+                    func_of,
+                },
+            )| {
+                MathExpression::Differential(Differential {
+                    diff: Box::new(MathExpression::Mo(op)),
+                    func: Box::new(MathExpression::Ci(Ci {
+                        r#type,
+                        content,
+                        func_of,
+                    })),
+                })
+            },
+        ),
         map(
             first_order_derivative_leibniz_notation,
             |(
@@ -494,6 +647,36 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
             },
         ),
         map(
+            first_order_partial_derivative_leibniz_notation,
+            |(
+                PartialDerivative {
+                    order,
+                    var_index,
+                    bound_var,
+                },
+                Ci {
+                    r#type,
+                    content,
+                    func_of,
+                },
+            )| {
+                MathExpression::Differential(Differential {
+                    diff: Box::new(MathExpression::Mo(Operator::PartialDerivative(
+                        PartialDerivative {
+                            order,
+                            var_index,
+                            bound_var,
+                        },
+                    ))),
+                    func: Box::new(MathExpression::Ci(Ci {
+                        r#type,
+                        content,
+                        func_of,
+                    })),
+                })
+            },
+        ),
+        map(
             ci_univariate_with_bounds,
             |Ci {
                  content, func_of, ..
@@ -502,6 +685,48 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                     r#type: Some(Type::Real),
                     content,
                     func_of,
+                })
+            },
+        ),
+        map(
+            first_order_with_func_in_parenthesis,
+            |(
+                Derivative {
+                    order,
+                    var_index,
+                    bound_var,
+                },
+                comp,
+            )| {
+                MathExpression::Differential(Differential {
+                    diff: Box::new(MathExpression::Mo(Operator::Derivative(Derivative {
+                        order,
+                        var_index,
+                        bound_var,
+                    }))),
+                    func: Box::new(MathExpression::Mrow(comp)),
+                })
+            },
+        ),
+        map(
+            first_order_partial_with_func_in_parenthesis,
+            |(
+                PartialDerivative {
+                    order,
+                    var_index,
+                    bound_var,
+                },
+                comp,
+            )| {
+                MathExpression::Differential(Differential {
+                    diff: Box::new(MathExpression::Mo(Operator::PartialDerivative(
+                        PartialDerivative {
+                            order,
+                            var_index,
+                            bound_var,
+                        },
+                    ))),
+                    func: Box::new(MathExpression::Mrow(comp)),
                 })
             },
         ),
@@ -527,26 +752,6 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
             })
         }),
         map(
-            first_order_with_func_in_parenthesis,
-            |(
-                Derivative {
-                    order,
-                    var_index,
-                    bound_var,
-                },
-                y,
-            )| {
-                MathExpression::Differential(Differential {
-                    diff: Box::new(MathExpression::Mo(Operator::Derivative(Derivative {
-                        order,
-                        var_index,
-                        bound_var,
-                    }))),
-                    func: Box::new(MathExpression::Mrow(y)),
-                })
-            },
-        ),
-        map(
             grad_func,
             |(
                 op,
@@ -566,15 +771,12 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                 })
             },
         ),
-        //map(gradient, MathExpression::Mo),
-        map(absolute, MathExpression::Mrow),
-        map(operator, MathExpression::Mo),
-        mn,
-        superscript,
-        over_term,
-        msub,
-        msqrt,
-        mfrac,
+        absolute,
+        alt((
+            map(operator, MathExpression::Mo),
+            map(gradient, MathExpression::Mo),
+        )),
+        alt((mn, msub, superscript, mfrac, mtext, over_term)),
         map(mrow, MathExpression::Mrow),
         msubsup,
     )))(input)
@@ -587,13 +789,13 @@ pub fn interpreted_math(input: Span) -> IResult<Math> {
         opt(xml_declaration),
         alt((
             ws(delimited(
-                tag("<math>"),
-                many0(math_expression),
+                ws(tag("<math>")),
+                ws(many0(math_expression)),
                 ws(tag("<mo>,</mo></math>")),
             )),
             ws(delimited(
-                tag("<math>"),
-                many0(math_expression),
+                ws(tag("<math>")),
+                ws(many0(math_expression)),
                 ws(tag("<mo>.</mo></math>")),
             )),
             elem_many0!("math"),

@@ -1,14 +1,20 @@
-use actix_web::{put, web, HttpResponse};
+use actix_web::{post, put, web, HttpResponse};
+use mathml::parsers::decapodes_serialization::{
+    to_wiring_diagram, DecapodesCollection, WiringDiagram,
+};
 use mathml::parsers::first_order_ode::flatten_mults;
 use mathml::parsers::generic_mathml::math;
+use mathml::parsers::math_expression_tree::MathExpressionTree;
+use mathml::parsers::math_expression_tree::{
+    preprocess_mathml_for_to_latex, replace_unicode_with_symbols,
+};
+
 use mathml::{
     acset::{AMRmathml, PetriNet, RegNet},
     ast::Math,
     expression::{preprocess_content, wrap_math},
     parsers::first_order_ode::{first_order_ode, FirstOrderODE},
 };
-use mathml::parsers::math_expression_tree::MathExpressionTree;
-use mathml::parsers::decapodes_serialization::{to_wiring_diagram, WiringDiagram, DecapodesCollection};
 use petgraph::dot::{Config, Dot};
 use utoipa;
 
@@ -60,6 +66,25 @@ pub async fn get_math_exp_graph(payload: String) -> String {
     dot_representation.to_string()
 }
 
+/// Parse a presentation MathML representation of an equation and
+/// return the corresponding LaTeX representation
+#[utoipa::path(
+    request_body = String,
+        responses(
+        (
+            status = 200,
+            body = String
+        )
+    )
+)]
+#[post("/mathml/latex")]
+pub async fn get_latex(payload: String) -> String {
+    let modified_input1 = &replace_unicode_with_symbols(&payload).to_string();
+    let modified_input2 = &preprocess_mathml_for_to_latex(modified_input1).to_string();
+    let exp = modified_input2.parse::<MathExpressionTree>().unwrap();
+    exp.to_latex()
+}
+
 /// Parse presentation MathML and return a content MathML representation. Currently limited to
 /// first-order ODEs.
 #[utoipa::path(
@@ -90,13 +115,16 @@ pub async fn get_content_mathml(payload: String) -> String {
 )]
 #[put("/mathml/decapodes")]
 pub async fn get_decapodes(payload: web::Json<Vec<String>>) -> HttpResponse {
-    let met_vec: Vec<MathExpressionTree> = payload.iter().map(|x| x.parse::<MathExpressionTree>().unwrap()).collect();
+    let met_vec: Vec<MathExpressionTree> = payload
+        .iter()
+        .map(|x| x.parse::<MathExpressionTree>().unwrap())
+        .collect();
     let mut deca_vec = Vec::<WiringDiagram>::new();
     for term in met_vec.iter() {
         deca_vec.push(to_wiring_diagram(term));
     }
     let decapodes_collection = DecapodesCollection {
-        decapodes: deca_vec.clone()
+        decapodes: deca_vec.clone(),
     };
     HttpResponse::Ok().json(web::Json(decapodes_collection))
 }
@@ -145,8 +173,24 @@ pub async fn get_acset(payload: web::Json<Vec<String>>) -> HttpResponse {
 )]
 #[put("/mathml/regnet")]
 pub async fn get_regnet(payload: web::Json<Vec<String>>) -> HttpResponse {
-    let asts: Vec<Math> = payload.iter().map(|x| x.parse::<Math>().unwrap()).collect();
-    HttpResponse::Ok().json(web::Json(RegNet::from(asts)))
+    let asts_result: Result<Vec<_>, _> = payload
+        .iter()
+        .map(|x| first_order_ode(x.as_str().into()))
+        .collect();
+
+    match asts_result {
+        Ok(asts) => {
+            let mut flattened_asts = Vec::<FirstOrderODE>::new();
+            for (_, mut eq) in asts {
+                eq.rhs = flatten_mults(eq.rhs.clone());
+                flattened_asts.push(eq.clone());
+            }
+            HttpResponse::Ok().json(web::Json(RegNet::from(flattened_asts)))
+        }
+        Err(err) => HttpResponse::BadRequest()
+            .content_type("text/plain")
+            .body(err.to_string()),
+    }
 }
 
 /// Return a JSON representation of an AMR constructed from an array of MathML strings and a string
@@ -176,15 +220,9 @@ pub async fn get_amr(payload: web::Json<AMRmathml>) -> HttpResponse {
                 eq.rhs = flatten_mults(eq.rhs.clone());
                 flattened_asts.push(eq.clone());
             }
-            let asts: Vec<Math> = payload
-                .mathml
-                .clone()
-                .iter()
-                .map(|x| x.parse::<Math>().unwrap())
-                .collect();
             let model_type = payload.model.clone();
             if model_type == *"regnet" {
-                HttpResponse::Ok().json(web::Json(RegNet::from(asts)))
+                HttpResponse::Ok().json(web::Json(RegNet::from(flattened_asts)))
             } else if model_type == *"petrinet" {
                 HttpResponse::Ok().json(web::Json(PetriNet::from(flattened_asts)))
             } else {

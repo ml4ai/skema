@@ -76,6 +76,7 @@ pub struct Edge {
 
 pub fn execute_query(query: &str, host: &str) -> Result<(), MgError> {
     // Connect to Memgraph.
+    // FIXME: don't use this anymore!
     let connect_params = ConnectParams {
         host: Some(host.to_string()),
         ..Default::default()

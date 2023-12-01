@@ -2,6 +2,7 @@ import argparse
 import os
 import yaml
 import subprocess
+import site
 from pathlib import Path
 from typing import List
 
@@ -58,6 +59,12 @@ def build_parsers(languages: List[str]) -> None:
     os.chdir(wd)
 
 
+def copy_to_site_packages():
+    """Copy the .so file to the skema site package"""
+    copy_path = Path(site.getsitepackages()[0]) / "skema" / "program_analysis" / "tree_sitter_parsers" / "build" / "installed_languages.so"  
+    copy_path.parent.mkdir(parents=True, exist_ok=True)
+    copy_path.write_bytes(INSTALLED_LANGUAGES_FILEPATH.read_bytes())
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
@@ -75,3 +82,4 @@ if __name__ == "__main__":
         selected_languages = [language for language, value in vars(args).items() if value]
     
     build_parsers(selected_languages)
+    copy_to_site_packages()
