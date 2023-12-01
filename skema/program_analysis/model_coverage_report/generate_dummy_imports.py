@@ -1,15 +1,14 @@
-import os
+from pathlib import Path
 import re
-import shutil
 import argparse
 
 def process_file(file_path):
     # Extract the file name without extension
-    file_name = os.path.splitext(os.path.basename(file_path))[0]
+    file_name = Path(file_path).stem
 
     # Create a directory named include_$NAME_OF_FILE
-    include_dir = os.path.join(os.path.dirname(file_path), f"include_{file_name}")
-    os.makedirs(include_dir, exist_ok=True)
+    include_dir = Path(file_path).parent / f"include_{file_name}"
+    include_dir.mkdir(parents=True, exist_ok=True)
 
     # Read the file to find #include directives
     with open(file_path, 'r') as file:
@@ -20,30 +19,23 @@ def process_file(file_path):
 
         # Create blank dummy files for each include
         for include_file in include_matches:
-            include_file_path = os.path.join(include_dir, *include_file.split('/'))
-            os.makedirs(os.path.dirname(include_file_path), exist_ok=True)
-            with open(include_file_path, 'w'):
-                pass
+            include_file_path = include_dir / Path(*include_file.split('/'))
+            include_file_path.parent.mkdir(parents=True, exist_ok=True)
+            include_file_path.touch()
 
 def process_directory(directory_path):
     # Walk through the directory and process each file
-    for root, dirs, files in os.walk(directory_path):
-        for file_name in files:
-            if file_name.endswith(('.c', '.cpp', '.h', '.hpp', ".f", ".F", ".f90", ".F90")):
-                file_path = os.path.join(root, file_name)
-                process_file(file_path)
+    for file_path in Path(directory_path).rglob('*'):
+        if file_path.suffix.lower() in {'.c', '.cpp', '.h', '.hpp', '.f', '.F', '.f90', '.F90'}:
+            process_file(file_path)
 
 def main():
-    parser = argparse.ArgumentParser(description='Process C/C++ files and create include directories with dummy files.')
+    parser = argparse.ArgumentParser(description='Process gcc files and create include directories with dummy files.')
     parser.add_argument('target_directory', metavar='TARGET_DIRECTORY', type=str,
-                        help='The path to the target directory containing C/C++ source files')
-
+                        help='The path to the target directory containing the gcc source files')
     args = parser.parse_args()
 
-    # Process the specified directory
     process_directory(args.target_directory)
-
-    print("Script execution completed.")
 
 if __name__ == "__main__":
     main()
