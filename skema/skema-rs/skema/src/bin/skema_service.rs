@@ -1,5 +1,4 @@
 use actix_web::{get, http::header::ContentType, web::Data, App, HttpResponse, HttpServer};
-use clap::Parser;
 use skema::config::Config;
 use skema::services::gromet;
 use std::env;
@@ -56,7 +55,6 @@ async fn main() -> std::io::Result<()> {
             gromet::get_named_opos,
             gromet::get_named_opis,
             gromet::get_named_ports,
-            gromet::get_subgraph,
             gromet::get_model_RN,
             gromet::model2PN,
             gromet::model2RN,
@@ -117,9 +115,9 @@ async fn main() -> std::io::Result<()> {
     let version_hash = env::var("APP_VERSION").unwrap_or("?????".to_string());
     let host_env = env::var("SKEMA_RS_HOST").unwrap_or("0.0.0.0".to_string());
     let port_env = env::var("SKEMA_RS_PORT").unwrap_or("8080".to_string());
+    let db_protocol = env::var("SKEMA_GRAPH_DB_PROTO").unwrap_or("bolt+s://".to_string());
     let db_host = env::var("SKEMA_GRAPH_DB_HOST").unwrap_or("127.0.0.1".to_string());
     let db_port = env::var("SKEMA_GRAPH_DB_PORT").unwrap_or("7687".to_string());
-
 
     let mut openapi = ApiDoc::openapi();
     openapi.info.version = version_hash.to_string();
@@ -127,8 +125,9 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(move || {
         App::new()
             .app_data(Data::new(Config {
+                db_protocol: db_protocol.clone(),
                 db_host: db_host.clone(),
-                db_port: db_port.parse::<u16>().unwrap()
+                db_port: db_port.parse::<u16>().unwrap(),
             }))
             .configure(gromet::configure())
             .service(skema::services::mathml::get_ast_graph)

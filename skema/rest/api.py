@@ -112,8 +112,8 @@ app.include_router(
 
 app.include_router(
     execution_engine.router,
-    prefix="/execution_engine",
-    tags=["execution_engine"],
+    prefix="/execution-engine",
+    tags=["execution-engine"],
 )
 app.include_router(
     morae_proxy.router,
@@ -190,11 +190,11 @@ async def healthcheck(response: Response) -> schema.HealthStatus:
         mathjax=mathjax_status,
         eqn2mml=eqn2mml_status,
         code2fn=code2fn_status,
-        text_reading=text_reading_status,
+        integrated_text_reading=text_reading_status,
         metal=metal_status
     )
 
-@app.get("/environment_variables", tags=["core"], summary="Values of environment variables")
+@app.get("/environment-variables", tags=["core"], summary="Values of environment variables", include_in_schema=False)
 async def environment_variables() -> Dict:
     return {
         "SKEMA_GRAPH_DB_PROTO": proxies.SKEMA_GRAPH_DB_PROTO,

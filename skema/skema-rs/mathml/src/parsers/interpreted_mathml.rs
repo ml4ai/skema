@@ -10,8 +10,8 @@ use crate::{
         Ci, Differential, Math, MathExpression, Mi, Mrow, Type,
     },
     parsers::generic_mathml::{
-        add, attribute, dot, elem_many0, equals, etag, grad, lparen, mean, mi, mn, msqrt, msub,
-        msubsup, multiply, rparen, stag, subtract, tag_parser, ws, xml_declaration, IResult,
+        add, attribute, dot, elem_many0, equals, etag, grad, lparen, mean, mi, mn, msub, msubsup,
+        mtext, multiply, rparen, stag, subtract, tag_parser, ws, xml_declaration, IResult,
         ParseError, Span,
     },
 };
@@ -21,7 +21,7 @@ use nom::{
     bytes::complete::tag,
     combinator::{map, opt, value},
     multi::{many0, many1, separated_list1},
-    sequence::{delimited, pair, preceded, separated_pair, tuple},
+    sequence::{delimited, pair, preceded, tuple},
 };
 
 /// Function to parse operators. This function differs from the one in parsers::generic_mathml by
@@ -525,7 +525,7 @@ pub fn absolute(input: Span) -> IResult<MathExpression> {
 
 /// Example: Divergence
 pub fn div(input: Span) -> IResult<Operator> {
-    let (s, op) = ws(pair(gradient, ws(delimited(stag!("mo"), dot, etag!("mo")))))(input)?;
+    let (s, _op) = ws(pair(gradient, ws(delimited(stag!("mo"), dot, etag!("mo")))))(input)?;
     let div = Operator::Div;
     Ok((s, div))
 }
@@ -552,7 +552,7 @@ pub fn absolute_with_msup(input: Span) -> IResult<MathExpression> {
             //ws(tag("<mo>|</mo>")),
             ws(tuple((
                 //math_expression,
-                map(ws(many0(math_expression)), |z| Mrow(z)),
+                map(ws(many0(math_expression)), Mrow),
                 preceded(ws(tag("<msup><mo>|</mo>")), ws(math_expression)),
             ))),
             ws(tag("</msup>")),
@@ -568,7 +568,7 @@ pub fn paren_as_msup(input: Span) -> IResult<MathExpression> {
         ws(delimited(
             tag("<mo>(</mo>"),
             tuple((
-                map(many0(math_expression), |z| Mrow(z)),
+                map(many0(math_expression), Mrow),
                 preceded(tag("<msup><mo>)</mo>"), math_expression),
             )),
             tag("</msup>"),
@@ -578,13 +578,26 @@ pub fn paren_as_msup(input: Span) -> IResult<MathExpression> {
     Ok((s, sup))
 }
 
+/// Parser for multiple elements in square root
+pub fn sqrt(input: Span) -> IResult<MathExpression> {
+    let (s, elements) = ws(delimited(
+        stag!("msqrt"),
+        many0(math_expression),
+        etag!("msqrt"),
+    ))(input)?;
+    Ok((
+        s,
+        MathExpression::Msqrt(Box::new(MathExpression::Mrow(Mrow(elements)))),
+    ))
+}
+
 /// Parser for math expressions. This varies from the one in the generic_mathml module, since it
 /// assumes that expressions such as S(t) are actually univariate functions.
 pub fn math_expression(input: Span) -> IResult<MathExpression> {
     ws(alt((
         map(div, MathExpression::Mo),
-        ws(absolute_with_msup),
-        ws(paren_as_msup),
+        alt((ws(absolute_with_msup), ws(paren_as_msup))),
+        sqrt,
         map(
             grad_func,
             |(
@@ -759,9 +772,11 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
             },
         ),
         absolute,
-        map(operator, MathExpression::Mo),
-        map(gradient, MathExpression::Mo),
-        alt((mn, msub, superscript, msqrt, mfrac, over_term)),
+        alt((
+            map(operator, MathExpression::Mo),
+            map(gradient, MathExpression::Mo),
+        )),
+        alt((mn, msub, superscript, mfrac, mtext, over_term)),
         map(mrow, MathExpression::Mrow),
         msubsup,
     )))(input)
