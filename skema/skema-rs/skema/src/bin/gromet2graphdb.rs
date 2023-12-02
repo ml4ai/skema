@@ -1,12 +1,12 @@
 //! Program for inserting GroMEt models into a database from the command line.
 
 use clap::Parser;
-use std::env;
 use skema::config::Config;
 use skema::{
-    database::{execute_query, parse_gromet_queries},
+    database::{parse_gromet_queries, run_queries},
     ModuleCollection,
 };
+use std::env;
 use std::fs;
 
 #[derive(Parser, Debug)]
@@ -19,7 +19,8 @@ struct Cli {
     db_host: String,
 }
 
-fn main() {
+#[tokio::main]
+async fn main() {
     // debug outputs
     let debug = true;
     // take in gromet location and deserialize
@@ -33,9 +34,9 @@ fn main() {
 
     // need to make the whole query list one line, individual executions are treated as different graphs for each execution.
     let mut full_query = queries[0].clone();
-    for i in 1..(queries.len()) {
+    for que in queries.iter().skip(1) {
         full_query.push('\n');
-        let temp_str = &queries[i].clone();
+        let temp_str = que;
         full_query.push_str(temp_str);
     }
 
@@ -43,15 +44,17 @@ fn main() {
         fs::write("debug.txt", full_query.clone()).expect("Unable to write file");
     }
 
-    let db_host = env::var("DB_HOST").unwrap_or("127.0.0.1".to_string());
-    let db_port = env::var("DB_PORT").unwrap_or("7687".to_string());
+    let db_protocol = env::var("SKEMA_GRAPH_DB_PROTO").unwrap_or("bolt+s://".to_string());
+    let db_host =
+        env::var("SKEMA_GRAPH_DB_HOST").unwrap_or("graphdb-bolt.askem.lum.ai".to_string());
+    let db_port = env::var("SKEMA_GRAPH_DB_PORT").unwrap_or("443".to_string());
 
     let config = Config {
-        // NOTE: db_host is protocol + host
+        db_protocol: db_protocol.clone(),
         db_host: db_host.clone(),
         db_port: db_port.parse::<u16>().unwrap(),
     };
 
-    execute_query(&full_query, config.clone()).unwrap(); // The properties need to have quotes!!
-                                                        // writing output to file, since too long for std out now.
+    run_queries(queries, config.clone()).await.unwrap(); // The properties need to have quotes!!
+                                                         // writing output to file, since too long for std out now.
 }

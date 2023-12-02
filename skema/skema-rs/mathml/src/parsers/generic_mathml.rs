@@ -232,7 +232,6 @@ pub fn grad(input: Span) -> IResult<Operator> {
     let (s, op) = value(Operator::Grad, alt((ws(tag("∇")), ws(tag("&#x2207;")))))(input)?;
     Ok((s, op))
 }
-
 pub fn dot(input: Span) -> IResult<Operator> {
     let (s, op) = value(Operator::Dot, alt((ws(tag("⋅")), ws(tag("&#x22c5;")))))(input)?;
     Ok((s, op))
@@ -330,7 +329,7 @@ pub fn msubsup(input: Span) -> IResult<MathExpression> {
 }
 
 //Text
-fn mtext(input: Span) -> IResult<MathExpression> {
+pub fn mtext(input: Span) -> IResult<MathExpression> {
     let (s, element) = elem0!("mtext")(input)?;
     Ok((s, Mtext(element.trim().to_string())))
 }
