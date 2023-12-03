@@ -41,7 +41,7 @@ var srcIndex = JSON.parse('{\
 "crypto_common":["",[],["lib.rs"]],\
 "deadpool":["",[["managed",[],["builder.rs","config.rs","dropguard.rs","errors.rs","hooks.rs","metrics.rs","mod.rs","reexports.rs","sync.rs"]],["unmanaged",[],["config.rs","errors.rs","mod.rs"]]],["lib.rs"]],\
 "deadpool_runtime":["",[],["lib.rs"]],\
-"deranged":["",[],["lib.rs","traits.rs"]],\
+"deranged":["",[],["lib.rs","traits.rs","unsafe_wrapper.rs"]],\
 "derive_more":["",[],["add_assign_like.rs","add_helpers.rs","add_like.rs","as_mut.rs","as_ref.rs","constructor.rs","deref.rs","deref_mut.rs","display.rs","error.rs","from.rs","from_str.rs","index.rs","index_mut.rs","into.rs","into_iterator.rs","is_variant.rs","lib.rs","mul_assign_like.rs","mul_helpers.rs","mul_like.rs","not_like.rs","parsing.rs","sum_like.rs","try_into.rs","unwrap.rs","utils.rs"]],\
 "derive_new":["",[],["lib.rs"]],\
 "digest":["",[["core_api",[],["ct_variable.rs","rt_variable.rs","wrapper.rs","xof_reader.rs"]]],["core_api.rs","digest.rs","lib.rs"]],\
