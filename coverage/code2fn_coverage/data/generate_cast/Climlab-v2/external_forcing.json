@@ -1,0 +1,1428 @@
+{
+    "nodes": [
+        {
+            "body": [
+                {
+                    "alias": null,
+                    "all": false,
+                    "name": "__future__",
+                    "node_type": "ModelImport",
+                    "source_refs": [
+                        {
+                            "col_end": 64,
+                            "col_start": 0,
+                            "node_type": "SourceRef",
+                            "row_end": 1,
+                            "row_start": 1,
+                            "source_file_name": "external_forcing"
+                        }
+                    ],
+                    "symbol": "absolute_import"
+                },
+                {
+                    "alias": null,
+                    "all": false,
+                    "name": "__future__",
+                    "node_type": "ModelImport",
+                    "source_refs": [
+                        {
+                            "col_end": 64,
+                            "col_start": 0,
+                            "node_type": "SourceRef",
+                            "row_end": 1,
+                            "row_start": 1,
+                            "source_file_name": "external_forcing"
+                        }
+                    ],
+                    "symbol": "division"
+                },
+                {
+                    "alias": null,
+                    "all": false,
+                    "name": "__future__",
+                    "node_type": "ModelImport",
+                    "source_refs": [
+                        {
+                            "col_end": 64,
+                            "col_start": 0,
+                            "node_type": "SourceRef",
+                            "row_end": 1,
+                            "row_start": 1,
+                            "source_file_name": "external_forcing"
+                        }
+                    ],
+                    "symbol": "print_function"
+                },
+                {
+                    "alias": null,
+                    "all": false,
+                    "name": "time_dependent_process",
+                    "node_type": "ModelImport",
+                    "source_refs": [
+                        {
+                            "col_end": 56,
+                            "col_start": 0,
+                            "node_type": "SourceRef",
+                            "row_end": 2,
+                            "row_start": 2,
+                            "source_file_name": "external_forcing"
+                        }
+                    ],
+                    "symbol": "TimeDependentProcess"
+                },
+                {
+                    "bases": [
+                        {
+                            "id": 0,
+                            "name": "TimeDependentProcess",
+                            "node_type": "Name",
+                            "source_refs": [
+                                {
+                                    "col_end": 42,
+                                    "col_start": 22,
+                                    "node_type": "SourceRef",
+                                    "row_end": 4,
+                                    "row_start": 4,
+                                    "source_file_name": "external_forcing"
+                                }
+                            ]
+                        }
+                    ],
+                    "fields": [
+                        {
+                            "default_value": null,
+                            "node_type": "Var",
+                            "source_refs": [
+                                {
+                                    "col_end": 31,
+                                    "col_start": 8,
+                                    "node_type": "SourceRef",
+                                    "row_end": 18,
+                                    "row_start": 18,
+                                    "source_file_name": "external_forcing"
+                                }
+                            ],
+                            "type": "float",
+                            "val": {
+                                "id": 22,
+                                "name": "forcing_tendencies",
+                                "node_type": "Name",
+                                "source_refs": [
+                                    {
+                                        "col_end": 31,
+                                        "col_start": 8,
+                                        "node_type": "SourceRef",
+                                        "row_end": 18,
+                                        "row_start": 18,
+                                        "source_file_name": "external_forcing"
+                                    }
+                                ]
+                            }
+                        }
+                    ],
+                    "funcs": [
+                        {
+                            "body": [
+                                {
+                                    "arguments": [
+                                        {
+                                            "id": -1,
+                                            "name": "kwargs",
+                                            "node_type": "Name",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 55,
+                                                    "col_start": 8,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 17,
+                                                    "row_start": 17,
+                                                    "source_file_name": "external_forcing"
+                                                }
+                                            ]
+                                        }
+                                    ],
+                                    "func": {
+                                        "attr": {
+                                            "id": 6,
+                                            "name": "__init__",
+                                            "node_type": "Name",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 45,
+                                                    "col_start": 8,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 17,
+                                                    "row_start": 17,
+                                                    "source_file_name": "external_forcing"
+                                                }
+                                            ]
+                                        },
+                                        "node_type": "Attribute",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 45,
+                                                "col_start": 8,
+                                                "node_type": "SourceRef",
+                                                "row_end": 17,
+                                                "row_start": 17,
+                                                "source_file_name": "external_forcing"
+                                            }
+                                        ],
+                                        "value": {
+                                            "arguments": [
+                                                {
+                                                    "id": 4,
+                                                    "name": "ExternalForcing",
+                                                    "node_type": "Name",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 29,
+                                                            "col_start": 14,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 17,
+                                                            "row_start": 17,
+                                                            "source_file_name": "external_forcing"
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "id": 3,
+                                                    "name": "self",
+                                                    "node_type": "Name",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 35,
+                                                            "col_start": 31,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 17,
+                                                            "row_start": 17,
+                                                            "source_file_name": "external_forcing"
+                                                        }
+                                                    ]
+                                                }
+                                            ],
+                                            "func": {
+                                                "id": 5,
+                                                "name": "super",
+                                                "node_type": "Name",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 36,
+                                                        "col_start": 8,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 17,
+                                                        "row_start": 17,
+                                                        "source_file_name": "external_forcing"
+                                                    }
+                                                ]
+                                            },
+                                            "node_type": "Call",
+                                            "source_language": null,
+                                            "source_language_version": null,
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 36,
+                                                    "col_start": 8,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 17,
+                                                    "row_start": 17,
+                                                    "source_file_name": "external_forcing"
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "node_type": "Call",
+                                    "source_language": null,
+                                    "source_language_version": null,
+                                    "source_refs": [
+                                        {
+                                            "col_end": 55,
+                                            "col_start": 8,
+                                            "node_type": "SourceRef",
+                                            "row_end": 17,
+                                            "row_start": 17,
+                                            "source_file_name": "external_forcing"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "left": {
+                                        "attr": {
+                                            "id": 7,
+                                            "name": "forcing_tendencies",
+                                            "node_type": "Name",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 31,
+                                                    "col_start": 8,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 18,
+                                                    "row_start": 18,
+                                                    "source_file_name": "external_forcing"
+                                                }
+                                            ]
+                                        },
+                                        "node_type": "Attribute",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 31,
+                                                "col_start": 8,
+                                                "node_type": "SourceRef",
+                                                "row_end": 18,
+                                                "row_start": 18,
+                                                "source_file_name": "external_forcing"
+                                            }
+                                        ],
+                                        "value": {
+                                            "id": 3,
+                                            "name": "self",
+                                            "node_type": "Name",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 12,
+                                                    "col_start": 8,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 18,
+                                                    "row_start": 18,
+                                                    "source_file_name": "external_forcing"
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "node_type": "Assignment",
+                                    "right": {
+                                        "node_type": "LiteralValue",
+                                        "source_code_data_type": [
+                                            "Python",
+                                            "3.8",
+                                            "<class 'dict'>"
+                                        ],
+                                        "source_refs": [
+                                            {
+                                                "col_end": 36,
+                                                "col_start": 34,
+                                                "node_type": "SourceRef",
+                                                "row_end": 18,
+                                                "row_start": 18,
+                                                "source_file_name": "external_forcing"
+                                            }
+                                        ],
+                                        "value": "[]",
+                                        "value_type": "Map"
+                                    },
+                                    "source_refs": [
+                                        {
+                                            "col_end": 36,
+                                            "col_start": 8,
+                                            "node_type": "SourceRef",
+                                            "row_end": 18,
+                                            "row_start": 18,
+                                            "source_file_name": "external_forcing"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "body": [
+                                        {
+                                            "left": {
+                                                "default_value": null,
+                                                "node_type": "Var",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 63,
+                                                        "col_start": 12,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 20,
+                                                        "row_start": 20,
+                                                        "source_file_name": "external_forcing"
+                                                    }
+                                                ],
+                                                "type": "Any",
+                                                "val": {
+                                                    "attr": {
+                                                        "id": 7,
+                                                        "name": "forcing_tendencies",
+                                                        "node_type": "Name",
+                                                        "source_refs": [
+                                                            {
+                                                                "col_end": 35,
+                                                                "col_start": 12,
+                                                                "node_type": "SourceRef",
+                                                                "row_end": 20,
+                                                                "row_start": 20,
+                                                                "source_file_name": "external_forcing"
+                                                            }
+                                                        ]
+                                                    },
+                                                    "node_type": "Attribute",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 35,
+                                                            "col_start": 12,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 20,
+                                                            "row_start": 20,
+                                                            "source_file_name": "external_forcing"
+                                                        }
+                                                    ],
+                                                    "value": {
+                                                        "id": 3,
+                                                        "name": "self",
+                                                        "node_type": "Name",
+                                                        "source_refs": [
+                                                            {
+                                                                "col_end": 16,
+                                                                "col_start": 12,
+                                                                "node_type": "SourceRef",
+                                                                "row_end": 20,
+                                                                "row_start": 20,
+                                                                "source_file_name": "external_forcing"
+                                                            }
+                                                        ]
+                                                    }
+                                                }
+                                            },
+                                            "node_type": "Assignment",
+                                            "right": {
+                                                "arguments": [
+                                                    {
+                                                        "attr": {
+                                                            "id": 7,
+                                                            "name": "forcing_tendencies",
+                                                            "node_type": "Name",
+                                                            "source_refs": [
+                                                                {
+                                                                    "col_end": 35,
+                                                                    "col_start": 12,
+                                                                    "node_type": "SourceRef",
+                                                                    "row_end": 20,
+                                                                    "row_start": 20,
+                                                                    "source_file_name": "external_forcing"
+                                                                }
+                                                            ]
+                                                        },
+                                                        "node_type": "Attribute",
+                                                        "source_refs": [
+                                                            {
+                                                                "col_end": 35,
+                                                                "col_start": 12,
+                                                                "node_type": "SourceRef",
+                                                                "row_end": 20,
+                                                                "row_start": 20,
+                                                                "source_file_name": "external_forcing"
+                                                            }
+                                                        ],
+                                                        "value": {
+                                                            "id": 3,
+                                                            "name": "self",
+                                                            "node_type": "Name",
+                                                            "source_refs": [
+                                                                {
+                                                                    "col_end": 16,
+                                                                    "col_start": 12,
+                                                                    "node_type": "SourceRef",
+                                                                    "row_end": 20,
+                                                                    "row_start": 20,
+                                                                    "source_file_name": "external_forcing"
+                                                                }
+                                                            ]
+                                                        }
+                                                    },
+                                                    {
+                                                        "id": 8,
+                                                        "name": "var",
+                                                        "node_type": "Name",
+                                                        "source_refs": [
+                                                            {
+                                                                "col_end": 39,
+                                                                "col_start": 36,
+                                                                "node_type": "SourceRef",
+                                                                "row_end": 20,
+                                                                "row_start": 20,
+                                                                "source_file_name": "external_forcing"
+                                                            }
+                                                        ]
+                                                    },
+                                                    {
+                                                        "interpreter": "Python",
+                                                        "node_type": "Operator",
+                                                        "op": "ast.Mult",
+                                                        "operands": [
+                                                            {
+                                                                "node_type": "LiteralValue",
+                                                                "source_code_data_type": [
+                                                                    "Python",
+                                                                    "3.8",
+                                                                    "<class 'float'>"
+                                                                ],
+                                                                "source_refs": [
+                                                                    {
+                                                                        "col_end": 45,
+                                                                        "col_start": 43,
+                                                                        "node_type": "SourceRef",
+                                                                        "row_end": 20,
+                                                                        "row_start": 20,
+                                                                        "source_file_name": "external_forcing"
+                                                                    }
+                                                                ],
+                                                                "value": 0.0,
+                                                                "value_type": "AbstractFloat"
+                                                            },
+                                                            {
+                                                                "arguments": [
+                                                                    {
+                                                                        "attr": {
+                                                                            "id": 9,
+                                                                            "name": "state",
+                                                                            "node_type": "Name",
+                                                                            "source_refs": [
+                                                                                {
+                                                                                    "col_end": 58,
+                                                                                    "col_start": 48,
+                                                                                    "node_type": "SourceRef",
+                                                                                    "row_end": 20,
+                                                                                    "row_start": 20,
+                                                                                    "source_file_name": "external_forcing"
+                                                                                }
+                                                                            ]
+                                                                        },
+                                                                        "node_type": "Attribute",
+                                                                        "source_refs": [
+                                                                            {
+                                                                                "col_end": 58,
+                                                                                "col_start": 48,
+                                                                                "node_type": "SourceRef",
+                                                                                "row_end": 20,
+                                                                                "row_start": 20,
+                                                                                "source_file_name": "external_forcing"
+                                                                            }
+                                                                        ],
+                                                                        "value": {
+                                                                            "id": 3,
+                                                                            "name": "self",
+                                                                            "node_type": "Name",
+                                                                            "source_refs": [
+                                                                                {
+                                                                                    "col_end": 52,
+                                                                                    "col_start": 48,
+                                                                                    "node_type": "SourceRef",
+                                                                                    "row_end": 20,
+                                                                                    "row_start": 20,
+                                                                                    "source_file_name": "external_forcing"
+                                                                                }
+                                                                            ]
+                                                                        }
+                                                                    },
+                                                                    {
+                                                                        "id": 8,
+                                                                        "name": "var",
+                                                                        "node_type": "Name",
+                                                                        "source_refs": [
+                                                                            {
+                                                                                "col_end": 62,
+                                                                                "col_start": 59,
+                                                                                "node_type": "SourceRef",
+                                                                                "row_end": 20,
+                                                                                "row_start": 20,
+                                                                                "source_file_name": "external_forcing"
+                                                                            }
+                                                                        ]
+                                                                    }
+                                                                ],
+                                                                "func": {
+                                                                    "id": 10,
+                                                                    "name": "_get",
+                                                                    "node_type": "Name",
+                                                                    "source_refs": [
+                                                                        {
+                                                                            "col_end": 63,
+                                                                            "col_start": 48,
+                                                                            "node_type": "SourceRef",
+                                                                            "row_end": 20,
+                                                                            "row_start": 20,
+                                                                            "source_file_name": "external_forcing"
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                "node_type": "Call",
+                                                                "source_language": null,
+                                                                "source_language_version": null,
+                                                                "source_refs": [
+                                                                    {
+                                                                        "col_end": 63,
+                                                                        "col_start": 48,
+                                                                        "node_type": "SourceRef",
+                                                                        "row_end": 20,
+                                                                        "row_start": 20,
+                                                                        "source_file_name": "external_forcing"
+                                                                    }
+                                                                ]
+                                                            }
+                                                        ],
+                                                        "source_language": "Python",
+                                                        "source_refs": [
+                                                            {
+                                                                "col_end": 63,
+                                                                "col_start": 43,
+                                                                "node_type": "SourceRef",
+                                                                "row_end": 20,
+                                                                "row_start": 20,
+                                                                "source_file_name": "external_forcing"
+                                                            }
+                                                        ],
+                                                        "version": "3.8.18"
+                                                    }
+                                                ],
+                                                "func": {
+                                                    "id": 11,
+                                                    "name": "_set",
+                                                    "node_type": "Name",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 63,
+                                                            "col_start": 12,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 20,
+                                                            "row_start": 20,
+                                                            "source_file_name": "external_forcing"
+                                                        }
+                                                    ]
+                                                },
+                                                "node_type": "Call",
+                                                "source_language": null,
+                                                "source_language_version": null,
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 63,
+                                                        "col_start": 12,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 20,
+                                                        "row_start": 20,
+                                                        "source_file_name": "external_forcing"
+                                                    }
+                                                ]
+                                            },
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 63,
+                                                    "col_start": 12,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 20,
+                                                    "row_start": 20,
+                                                    "source_file_name": "external_forcing"
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "left": {
+                                                "node_type": "LiteralValue",
+                                                "source_code_data_type": [
+                                                    "Python",
+                                                    "3.8",
+                                                    "Tuple"
+                                                ],
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 63,
+                                                        "col_start": 8,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 20,
+                                                        "row_start": 19,
+                                                        "source_file_name": "external_forcing"
+                                                    }
+                                                ],
+                                                "value": [
+                                                    {
+                                                        "default_value": null,
+                                                        "node_type": "Var",
+                                                        "source_refs": [
+                                                            {
+                                                                "col_end": 15,
+                                                                "col_start": 12,
+                                                                "node_type": "SourceRef",
+                                                                "row_end": 19,
+                                                                "row_start": 19,
+                                                                "source_file_name": "external_forcing"
+                                                            }
+                                                        ],
+                                                        "type": "float",
+                                                        "val": {
+                                                            "id": 8,
+                                                            "name": "var",
+                                                            "node_type": "Name",
+                                                            "source_refs": [
+                                                                {
+                                                                    "col_end": 15,
+                                                                    "col_start": 12,
+                                                                    "node_type": "SourceRef",
+                                                                    "row_end": 19,
+                                                                    "row_start": 19,
+                                                                    "source_file_name": "external_forcing"
+                                                                }
+                                                            ]
+                                                        }
+                                                    },
+                                                    {
+                                                        "default_value": null,
+                                                        "node_type": "Var",
+                                                        "source_refs": [
+                                                            {
+                                                                "col_end": 63,
+                                                                "col_start": 8,
+                                                                "node_type": "SourceRef",
+                                                                "row_end": 20,
+                                                                "row_start": 19,
+                                                                "source_file_name": "external_forcing"
+                                                            }
+                                                        ],
+                                                        "type": "iterator",
+                                                        "val": {
+                                                            "id": 12,
+                                                            "name": "generated_iter_1",
+                                                            "node_type": "Name",
+                                                            "source_refs": [
+                                                                {
+                                                                    "col_end": 63,
+                                                                    "col_start": 8,
+                                                                    "node_type": "SourceRef",
+                                                                    "row_end": 20,
+                                                                    "row_start": 19,
+                                                                    "source_file_name": "external_forcing"
+                                                                }
+                                                            ]
+                                                        }
+                                                    },
+                                                    {
+                                                        "default_value": null,
+                                                        "node_type": "Var",
+                                                        "source_refs": [
+                                                            {
+                                                                "col_end": 63,
+                                                                "col_start": 8,
+                                                                "node_type": "SourceRef",
+                                                                "row_end": 20,
+                                                                "row_start": 19,
+                                                                "source_file_name": "external_forcing"
+                                                            }
+                                                        ],
+                                                        "type": "boolean",
+                                                        "val": {
+                                                            "id": 15,
+                                                            "name": "sc_2",
+                                                            "node_type": "Name",
+                                                            "source_refs": [
+                                                                {
+                                                                    "col_end": 63,
+                                                                    "col_start": 8,
+                                                                    "node_type": "SourceRef",
+                                                                    "row_end": 20,
+                                                                    "row_start": 19,
+                                                                    "source_file_name": "external_forcing"
+                                                                }
+                                                            ]
+                                                        }
+                                                    }
+                                                ],
+                                                "value_type": "Tuple"
+                                            },
+                                            "node_type": "Assignment",
+                                            "right": {
+                                                "arguments": [
+                                                    {
+                                                        "default_value": null,
+                                                        "node_type": "Var",
+                                                        "source_refs": [
+                                                            {
+                                                                "col_end": 63,
+                                                                "col_start": 8,
+                                                                "node_type": "SourceRef",
+                                                                "row_end": 20,
+                                                                "row_start": 19,
+                                                                "source_file_name": "external_forcing"
+                                                            }
+                                                        ],
+                                                        "type": "iterator",
+                                                        "val": {
+                                                            "id": 12,
+                                                            "name": "generated_iter_1",
+                                                            "node_type": "Name",
+                                                            "source_refs": [
+                                                                {
+                                                                    "col_end": 63,
+                                                                    "col_start": 8,
+                                                                    "node_type": "SourceRef",
+                                                                    "row_end": 20,
+                                                                    "row_start": 19,
+                                                                    "source_file_name": "external_forcing"
+                                                                }
+                                                            ]
+                                                        }
+                                                    }
+                                                ],
+                                                "func": {
+                                                    "id": 14,
+                                                    "name": "next",
+                                                    "node_type": "Name",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 63,
+                                                            "col_start": 8,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 20,
+                                                            "row_start": 19,
+                                                            "source_file_name": "external_forcing"
+                                                        }
+                                                    ]
+                                                },
+                                                "node_type": "Call",
+                                                "source_language": null,
+                                                "source_language_version": null,
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 63,
+                                                        "col_start": 8,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 20,
+                                                        "row_start": 19,
+                                                        "source_file_name": "external_forcing"
+                                                    }
+                                                ]
+                                            },
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 63,
+                                                    "col_start": 8,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 20,
+                                                    "row_start": 19,
+                                                    "source_file_name": "external_forcing"
+                                                }
+                                            ]
+                                        }
+                                    ],
+                                    "expr": {
+                                        "interpreter": "Python",
+                                        "node_type": "Operator",
+                                        "op": "ast.Eq",
+                                        "operands": [
+                                            {
+                                                "default_value": null,
+                                                "node_type": "Var",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 63,
+                                                        "col_start": 8,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 20,
+                                                        "row_start": 19,
+                                                        "source_file_name": "external_forcing"
+                                                    }
+                                                ],
+                                                "type": "boolean",
+                                                "val": {
+                                                    "id": 15,
+                                                    "name": "sc_2",
+                                                    "node_type": "Name",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 63,
+                                                            "col_start": 8,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 20,
+                                                            "row_start": 19,
+                                                            "source_file_name": "external_forcing"
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            {
+                                                "node_type": "LiteralValue",
+                                                "source_code_data_type": [
+                                                    "Python",
+                                                    "3.8",
+                                                    "boolean"
+                                                ],
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 63,
+                                                        "col_start": 8,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 20,
+                                                        "row_start": 19,
+                                                        "source_file_name": "external_forcing"
+                                                    }
+                                                ],
+                                                "value": false,
+                                                "value_type": "Boolean"
+                                            }
+                                        ],
+                                        "source_language": "Python",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 63,
+                                                "col_start": 8,
+                                                "node_type": "SourceRef",
+                                                "row_end": 20,
+                                                "row_start": 19,
+                                                "source_file_name": "external_forcing"
+                                            }
+                                        ],
+                                        "version": "3.8.18"
+                                    },
+                                    "node_type": "Loop",
+                                    "post": [],
+                                    "pre": [
+                                        {
+                                            "left": {
+                                                "default_value": null,
+                                                "node_type": "Var",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 63,
+                                                        "col_start": 8,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 20,
+                                                        "row_start": 19,
+                                                        "source_file_name": "external_forcing"
+                                                    }
+                                                ],
+                                                "type": "iterator",
+                                                "val": {
+                                                    "id": 12,
+                                                    "name": "generated_iter_1",
+                                                    "node_type": "Name",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 63,
+                                                            "col_start": 8,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 20,
+                                                            "row_start": 19,
+                                                            "source_file_name": "external_forcing"
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "node_type": "Assignment",
+                                            "right": {
+                                                "arguments": [
+                                                    {
+                                                        "attr": {
+                                                            "id": 9,
+                                                            "name": "state",
+                                                            "node_type": "Name",
+                                                            "source_refs": [
+                                                                {
+                                                                    "col_end": 29,
+                                                                    "col_start": 19,
+                                                                    "node_type": "SourceRef",
+                                                                    "row_end": 19,
+                                                                    "row_start": 19,
+                                                                    "source_file_name": "external_forcing"
+                                                                }
+                                                            ]
+                                                        },
+                                                        "node_type": "Attribute",
+                                                        "source_refs": [
+                                                            {
+                                                                "col_end": 29,
+                                                                "col_start": 19,
+                                                                "node_type": "SourceRef",
+                                                                "row_end": 19,
+                                                                "row_start": 19,
+                                                                "source_file_name": "external_forcing"
+                                                            }
+                                                        ],
+                                                        "value": {
+                                                            "id": 3,
+                                                            "name": "self",
+                                                            "node_type": "Name",
+                                                            "source_refs": [
+                                                                {
+                                                                    "col_end": 23,
+                                                                    "col_start": 19,
+                                                                    "node_type": "SourceRef",
+                                                                    "row_end": 19,
+                                                                    "row_start": 19,
+                                                                    "source_file_name": "external_forcing"
+                                                                }
+                                                            ]
+                                                        }
+                                                    }
+                                                ],
+                                                "func": {
+                                                    "id": 13,
+                                                    "name": "iter",
+                                                    "node_type": "Name",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 63,
+                                                            "col_start": 8,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 20,
+                                                            "row_start": 19,
+                                                            "source_file_name": "external_forcing"
+                                                        }
+                                                    ]
+                                                },
+                                                "node_type": "Call",
+                                                "source_language": null,
+                                                "source_language_version": null,
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 63,
+                                                        "col_start": 8,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 20,
+                                                        "row_start": 19,
+                                                        "source_file_name": "external_forcing"
+                                                    }
+                                                ]
+                                            },
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 63,
+                                                    "col_start": 8,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 20,
+                                                    "row_start": 19,
+                                                    "source_file_name": "external_forcing"
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "left": {
+                                                "node_type": "LiteralValue",
+                                                "source_code_data_type": [
+                                                    "Python",
+                                                    "3.8",
+                                                    "Tuple"
+                                                ],
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 63,
+                                                        "col_start": 8,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 20,
+                                                        "row_start": 19,
+                                                        "source_file_name": "external_forcing"
+                                                    }
+                                                ],
+                                                "value": [
+                                                    {
+                                                        "default_value": null,
+                                                        "node_type": "Var",
+                                                        "source_refs": [
+                                                            {
+                                                                "col_end": 15,
+                                                                "col_start": 12,
+                                                                "node_type": "SourceRef",
+                                                                "row_end": 19,
+                                                                "row_start": 19,
+                                                                "source_file_name": "external_forcing"
+                                                            }
+                                                        ],
+                                                        "type": "float",
+                                                        "val": {
+                                                            "id": 8,
+                                                            "name": "var",
+                                                            "node_type": "Name",
+                                                            "source_refs": [
+                                                                {
+                                                                    "col_end": 15,
+                                                                    "col_start": 12,
+                                                                    "node_type": "SourceRef",
+                                                                    "row_end": 19,
+                                                                    "row_start": 19,
+                                                                    "source_file_name": "external_forcing"
+                                                                }
+                                                            ]
+                                                        }
+                                                    },
+                                                    {
+                                                        "default_value": null,
+                                                        "node_type": "Var",
+                                                        "source_refs": [
+                                                            {
+                                                                "col_end": 63,
+                                                                "col_start": 8,
+                                                                "node_type": "SourceRef",
+                                                                "row_end": 20,
+                                                                "row_start": 19,
+                                                                "source_file_name": "external_forcing"
+                                                            }
+                                                        ],
+                                                        "type": "iterator",
+                                                        "val": {
+                                                            "id": 12,
+                                                            "name": "generated_iter_1",
+                                                            "node_type": "Name",
+                                                            "source_refs": [
+                                                                {
+                                                                    "col_end": 63,
+                                                                    "col_start": 8,
+                                                                    "node_type": "SourceRef",
+                                                                    "row_end": 20,
+                                                                    "row_start": 19,
+                                                                    "source_file_name": "external_forcing"
+                                                                }
+                                                            ]
+                                                        }
+                                                    },
+                                                    {
+                                                        "default_value": null,
+                                                        "node_type": "Var",
+                                                        "source_refs": [
+                                                            {
+                                                                "col_end": 63,
+                                                                "col_start": 8,
+                                                                "node_type": "SourceRef",
+                                                                "row_end": 20,
+                                                                "row_start": 19,
+                                                                "source_file_name": "external_forcing"
+                                                            }
+                                                        ],
+                                                        "type": "boolean",
+                                                        "val": {
+                                                            "id": 15,
+                                                            "name": "sc_2",
+                                                            "node_type": "Name",
+                                                            "source_refs": [
+                                                                {
+                                                                    "col_end": 63,
+                                                                    "col_start": 8,
+                                                                    "node_type": "SourceRef",
+                                                                    "row_end": 20,
+                                                                    "row_start": 19,
+                                                                    "source_file_name": "external_forcing"
+                                                                }
+                                                            ]
+                                                        }
+                                                    }
+                                                ],
+                                                "value_type": "Tuple"
+                                            },
+                                            "node_type": "Assignment",
+                                            "right": {
+                                                "arguments": [
+                                                    {
+                                                        "default_value": null,
+                                                        "node_type": "Var",
+                                                        "source_refs": [
+                                                            {
+                                                                "col_end": 63,
+                                                                "col_start": 8,
+                                                                "node_type": "SourceRef",
+                                                                "row_end": 20,
+                                                                "row_start": 19,
+                                                                "source_file_name": "external_forcing"
+                                                            }
+                                                        ],
+                                                        "type": "iterator",
+                                                        "val": {
+                                                            "id": 12,
+                                                            "name": "generated_iter_1",
+                                                            "node_type": "Name",
+                                                            "source_refs": [
+                                                                {
+                                                                    "col_end": 63,
+                                                                    "col_start": 8,
+                                                                    "node_type": "SourceRef",
+                                                                    "row_end": 20,
+                                                                    "row_start": 19,
+                                                                    "source_file_name": "external_forcing"
+                                                                }
+                                                            ]
+                                                        }
+                                                    }
+                                                ],
+                                                "func": {
+                                                    "id": 14,
+                                                    "name": "next",
+                                                    "node_type": "Name",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 63,
+                                                            "col_start": 8,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 20,
+                                                            "row_start": 19,
+                                                            "source_file_name": "external_forcing"
+                                                        }
+                                                    ]
+                                                },
+                                                "node_type": "Call",
+                                                "source_language": null,
+                                                "source_language_version": null,
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 63,
+                                                        "col_start": 8,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 20,
+                                                        "row_start": 19,
+                                                        "source_file_name": "external_forcing"
+                                                    }
+                                                ]
+                                            },
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 63,
+                                                    "col_start": 8,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 20,
+                                                    "row_start": 19,
+                                                    "source_file_name": "external_forcing"
+                                                }
+                                            ]
+                                        }
+                                    ],
+                                    "source_refs": [
+                                        {
+                                            "col_end": 63,
+                                            "col_start": 8,
+                                            "node_type": "SourceRef",
+                                            "row_end": 20,
+                                            "row_start": 19,
+                                            "source_file_name": "external_forcing"
+                                        }
+                                    ]
+                                }
+                            ],
+                            "func_args": [
+                                {
+                                    "default_value": null,
+                                    "node_type": "Var",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 21,
+                                            "col_start": 17,
+                                            "node_type": "SourceRef",
+                                            "row_end": 16,
+                                            "row_start": 16,
+                                            "source_file_name": "external_forcing"
+                                        }
+                                    ],
+                                    "type": "float",
+                                    "val": {
+                                        "id": 1,
+                                        "name": "self",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 21,
+                                                "col_start": 17,
+                                                "node_type": "SourceRef",
+                                                "row_end": 16,
+                                                "row_start": 16,
+                                                "source_file_name": "external_forcing"
+                                            }
+                                        ]
+                                    }
+                                },
+                                {
+                                    "default_value": null,
+                                    "node_type": "Var",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 30,
+                                            "col_start": 24,
+                                            "node_type": "SourceRef",
+                                            "row_end": 16,
+                                            "row_start": 16,
+                                            "source_file_name": "external_forcing"
+                                        }
+                                    ],
+                                    "type": "float",
+                                    "val": {
+                                        "id": 2,
+                                        "name": "kwargs",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 30,
+                                                "col_start": 24,
+                                                "node_type": "SourceRef",
+                                                "row_end": 16,
+                                                "row_start": 16,
+                                                "source_file_name": "external_forcing"
+                                            }
+                                        ]
+                                    }
+                                }
+                            ],
+                            "name": {
+                                "id": 16,
+                                "name": "__init__",
+                                "node_type": "Name",
+                                "source_refs": [
+                                    {
+                                        "col_end": 63,
+                                        "col_start": 4,
+                                        "node_type": "SourceRef",
+                                        "row_end": 20,
+                                        "row_start": 16,
+                                        "source_file_name": "external_forcing"
+                                    }
+                                ]
+                            },
+                            "node_type": "FunctionDef",
+                            "source_refs": [
+                                {
+                                    "col_end": 63,
+                                    "col_start": 4,
+                                    "node_type": "SourceRef",
+                                    "row_end": 20,
+                                    "row_start": 16,
+                                    "source_file_name": "external_forcing"
+                                }
+                            ]
+                        },
+                        {
+                            "body": [
+                                {
+                                    "node_type": "ModelReturn",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 38,
+                                            "col_start": 8,
+                                            "node_type": "SourceRef",
+                                            "row_end": 23,
+                                            "row_start": 23,
+                                            "source_file_name": "external_forcing"
+                                        }
+                                    ],
+                                    "value": {
+                                        "attr": {
+                                            "id": 19,
+                                            "name": "forcing_tendencies",
+                                            "node_type": "Name",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 38,
+                                                    "col_start": 15,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 23,
+                                                    "row_start": 23,
+                                                    "source_file_name": "external_forcing"
+                                                }
+                                            ]
+                                        },
+                                        "node_type": "Attribute",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 38,
+                                                "col_start": 15,
+                                                "node_type": "SourceRef",
+                                                "row_end": 23,
+                                                "row_start": 23,
+                                                "source_file_name": "external_forcing"
+                                            }
+                                        ],
+                                        "value": {
+                                            "id": 18,
+                                            "name": "self",
+                                            "node_type": "Name",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 19,
+                                                    "col_start": 15,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 23,
+                                                    "row_start": 23,
+                                                    "source_file_name": "external_forcing"
+                                                }
+                                            ]
+                                        }
+                                    }
+                                }
+                            ],
+                            "func_args": [
+                                {
+                                    "default_value": null,
+                                    "node_type": "Var",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 21,
+                                            "col_start": 17,
+                                            "node_type": "SourceRef",
+                                            "row_end": 22,
+                                            "row_start": 22,
+                                            "source_file_name": "external_forcing"
+                                        }
+                                    ],
+                                    "type": "float",
+                                    "val": {
+                                        "id": 18,
+                                        "name": "self",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 21,
+                                                "col_start": 17,
+                                                "node_type": "SourceRef",
+                                                "row_end": 22,
+                                                "row_start": 22,
+                                                "source_file_name": "external_forcing"
+                                            }
+                                        ]
+                                    }
+                                }
+                            ],
+                            "name": {
+                                "id": 20,
+                                "name": "_compute",
+                                "node_type": "Name",
+                                "source_refs": [
+                                    {
+                                        "col_end": 38,
+                                        "col_start": 4,
+                                        "node_type": "SourceRef",
+                                        "row_end": 23,
+                                        "row_start": 22,
+                                        "source_file_name": "external_forcing"
+                                    }
+                                ]
+                            },
+                            "node_type": "FunctionDef",
+                            "source_refs": [
+                                {
+                                    "col_end": 38,
+                                    "col_start": 4,
+                                    "node_type": "SourceRef",
+                                    "row_end": 23,
+                                    "row_start": 22,
+                                    "source_file_name": "external_forcing"
+                                }
+                            ]
+                        }
+                    ],
+                    "name": "ExternalForcing",
+                    "node_type": "RecordDef",
+                    "source_refs": [
+                        {
+                            "col_end": 38,
+                            "col_start": 0,
+                            "node_type": "SourceRef",
+                            "row_end": 23,
+                            "row_start": 4,
+                            "source_file_name": "external_forcing"
+                        }
+                    ]
+                }
+            ],
+            "name": "external_forcing",
+            "node_type": "Module",
+            "source_refs": [
+                {
+                    "col_end": null,
+                    "col_start": null,
+                    "node_type": "SourceRef",
+                    "row_end": 23,
+                    "row_start": 1,
+                    "source_file_name": "external_forcing.py"
+                }
+            ]
+        }
+    ]
+}

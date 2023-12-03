@@ -1,0 +1,16 @@
+Traceback (most recent call last):
+  File "skema/program_analysis/model_coverage_report/model_coverage_report.py", line 76, in generate_data_product
+    output = func_timeout(10, data_product_function, args=args, kwargs=kwargs)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/func_timeout/dafunc.py", line 108, in func_timeout
+    raise_exception(exception)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/func_timeout/py3_raise.py", line 7, in raise_exception
+    raise exception[0] from None
+  File "skema/program_analysis/model_coverage_report/model_coverage_report.py", line 97, in generate_parse_tree
+    parser.set_language(Language(INSTALLED_LANGUAGES_FILEPATH, language_name))
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/tree_sitter/__init__.py", line 132, in __init__
+    language_function: Callable[[], c_void_p] = getattr(self.lib, "tree_sitter_%s" % name)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/ctypes/__init__.py", line 386, in __getattr__
+    func = self.__getitem__(name)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/ctypes/__init__.py", line 391, in __getitem__
+    func = self._FuncPtr((name_or_ordinal, self))
+AttributeError: /opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/tree_sitter_parsers/build/installed_languages.so: undefined symbol: tree_sitter_None

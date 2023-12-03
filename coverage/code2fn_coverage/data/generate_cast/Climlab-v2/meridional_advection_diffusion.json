@@ -1,0 +1,2982 @@
+{
+    "nodes": [
+        {
+            "body": [
+                {
+                    "alias": null,
+                    "all": false,
+                    "name": "__future__",
+                    "node_type": "ModelImport",
+                    "source_refs": [
+                        {
+                            "col_end": 31,
+                            "col_start": 0,
+                            "node_type": "SourceRef",
+                            "row_end": 35,
+                            "row_start": 35,
+                            "source_file_name": "meridional_advection_diffusion"
+                        }
+                    ],
+                    "symbol": "division"
+                },
+                {
+                    "alias": "np",
+                    "all": false,
+                    "name": "numpy",
+                    "node_type": "ModelImport",
+                    "source_refs": [
+                        {
+                            "col_end": 18,
+                            "col_start": 0,
+                            "node_type": "SourceRef",
+                            "row_end": 36,
+                            "row_start": 36,
+                            "source_file_name": "meridional_advection_diffusion"
+                        }
+                    ],
+                    "symbol": null
+                },
+                {
+                    "alias": null,
+                    "all": false,
+                    "name": "advection_diffusion",
+                    "node_type": "ModelImport",
+                    "source_refs": [
+                        {
+                            "col_end": 62,
+                            "col_start": 0,
+                            "node_type": "SourceRef",
+                            "row_end": 37,
+                            "row_start": 37,
+                            "source_file_name": "meridional_advection_diffusion"
+                        }
+                    ],
+                    "symbol": "AdvectionDiffusion"
+                },
+                {
+                    "alias": null,
+                    "all": false,
+                    "name": "advection_diffusion",
+                    "node_type": "ModelImport",
+                    "source_refs": [
+                        {
+                            "col_end": 62,
+                            "col_start": 0,
+                            "node_type": "SourceRef",
+                            "row_end": 37,
+                            "row_start": 37,
+                            "source_file_name": "meridional_advection_diffusion"
+                        }
+                    ],
+                    "symbol": "Diffusion"
+                },
+                {
+                    "alias": null,
+                    "all": false,
+                    "name": "climlab",
+                    "node_type": "ModelImport",
+                    "source_refs": [
+                        {
+                            "col_end": 38,
+                            "col_start": 0,
+                            "node_type": "SourceRef",
+                            "row_end": 38,
+                            "row_start": 38,
+                            "source_file_name": "meridional_advection_diffusion"
+                        }
+                    ],
+                    "symbol": "constants"
+                },
+                {
+                    "bases": [
+                        {
+                            "id": 1,
+                            "name": "AdvectionDiffusion",
+                            "node_type": "Name",
+                            "source_refs": [
+                                {
+                                    "col_end": 53,
+                                    "col_start": 35,
+                                    "node_type": "SourceRef",
+                                    "row_end": 41,
+                                    "row_start": 41,
+                                    "source_file_name": "meridional_advection_diffusion"
+                                }
+                            ]
+                        }
+                    ],
+                    "fields": [
+                        {
+                            "default_value": null,
+                            "node_type": "Var",
+                            "source_refs": [
+                                {
+                                    "col_end": 28,
+                                    "col_start": 8,
+                                    "node_type": "SourceRef",
+                                    "row_end": 60,
+                                    "row_start": 60,
+                                    "source_file_name": "meridional_advection_diffusion"
+                                }
+                            ],
+                            "type": "float",
+                            "val": {
+                                "id": 32,
+                                "name": "prescribed_flux",
+                                "node_type": "Name",
+                                "source_refs": [
+                                    {
+                                        "col_end": 28,
+                                        "col_start": 8,
+                                        "node_type": "SourceRef",
+                                        "row_end": 60,
+                                        "row_start": 60,
+                                        "source_file_name": "meridional_advection_diffusion"
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "default_value": null,
+                            "node_type": "Var",
+                            "source_refs": [
+                                {
+                                    "col_end": 14,
+                                    "col_start": 8,
+                                    "node_type": "SourceRef",
+                                    "row_end": 61,
+                                    "row_start": 61,
+                                    "source_file_name": "meridional_advection_diffusion"
+                                }
+                            ],
+                            "type": "float",
+                            "val": {
+                                "id": 33,
+                                "name": "K",
+                                "node_type": "Name",
+                                "source_refs": [
+                                    {
+                                        "col_end": 14,
+                                        "col_start": 8,
+                                        "node_type": "SourceRef",
+                                        "row_end": 61,
+                                        "row_start": 61,
+                                        "source_file_name": "meridional_advection_diffusion"
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "default_value": null,
+                            "node_type": "Var",
+                            "source_refs": [
+                                {
+                                    "col_end": 14,
+                                    "col_start": 8,
+                                    "node_type": "SourceRef",
+                                    "row_end": 62,
+                                    "row_start": 62,
+                                    "source_file_name": "meridional_advection_diffusion"
+                                }
+                            ],
+                            "type": "float",
+                            "val": {
+                                "id": 34,
+                                "name": "U",
+                                "node_type": "Name",
+                                "source_refs": [
+                                    {
+                                        "col_end": 14,
+                                        "col_start": 8,
+                                        "node_type": "SourceRef",
+                                        "row_end": 62,
+                                        "row_start": 62,
+                                        "source_file_name": "meridional_advection_diffusion"
+                                    }
+                                ]
+                            }
+                        }
+                    ],
+                    "funcs": [
+                        {
+                            "body": [
+                                {
+                                    "arguments": [
+                                        {
+                                            "left": {
+                                                "default_value": null,
+                                                "node_type": "Var",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 84,
+                                                        "col_start": 8,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 51,
+                                                        "row_start": 50,
+                                                        "source_file_name": "meridional_advection_diffusion"
+                                                    }
+                                                ],
+                                                "type": "float",
+                                                "val": {
+                                                    "id": 100,
+                                                    "name": "K",
+                                                    "node_type": "Name",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 84,
+                                                            "col_start": 8,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 51,
+                                                            "row_start": 50,
+                                                            "source_file_name": "meridional_advection_diffusion"
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "node_type": "Assignment",
+                                            "right": {
+                                                "id": 3,
+                                                "name": "K",
+                                                "node_type": "Name",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 62,
+                                                        "col_start": 61,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 50,
+                                                        "row_start": 50,
+                                                        "source_file_name": "meridional_advection_diffusion"
+                                                    }
+                                                ]
+                                            },
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 84,
+                                                    "col_start": 8,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 51,
+                                                    "row_start": 50,
+                                                    "source_file_name": "meridional_advection_diffusion"
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "left": {
+                                                "default_value": null,
+                                                "node_type": "Var",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 84,
+                                                        "col_start": 8,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 51,
+                                                        "row_start": 50,
+                                                        "source_file_name": "meridional_advection_diffusion"
+                                                    }
+                                                ],
+                                                "type": "float",
+                                                "val": {
+                                                    "id": 100,
+                                                    "name": "U",
+                                                    "node_type": "Name",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 84,
+                                                            "col_start": 8,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 51,
+                                                            "row_start": 50,
+                                                            "source_file_name": "meridional_advection_diffusion"
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "node_type": "Assignment",
+                                            "right": {
+                                                "id": 4,
+                                                "name": "U",
+                                                "node_type": "Name",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 67,
+                                                        "col_start": 66,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 50,
+                                                        "row_start": 50,
+                                                        "source_file_name": "meridional_advection_diffusion"
+                                                    }
+                                                ]
+                                            },
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 84,
+                                                    "col_start": 8,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 51,
+                                                    "row_start": 50,
+                                                    "source_file_name": "meridional_advection_diffusion"
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "left": {
+                                                "default_value": null,
+                                                "node_type": "Var",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 84,
+                                                        "col_start": 8,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 51,
+                                                        "row_start": 50,
+                                                        "source_file_name": "meridional_advection_diffusion"
+                                                    }
+                                                ],
+                                                "type": "float",
+                                                "val": {
+                                                    "id": 100,
+                                                    "name": "diffusion_axis",
+                                                    "node_type": "Name",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 84,
+                                                            "col_start": 8,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 51,
+                                                            "row_start": 50,
+                                                            "source_file_name": "meridional_advection_diffusion"
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "node_type": "Assignment",
+                                            "right": {
+                                                "node_type": "LiteralValue",
+                                                "source_code_data_type": [
+                                                    "Python",
+                                                    "3.8",
+                                                    "<class 'str'>"
+                                                ],
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 36,
+                                                        "col_start": 31,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 51,
+                                                        "row_start": 51,
+                                                        "source_file_name": "meridional_advection_diffusion"
+                                                    }
+                                                ],
+                                                "value": "lat",
+                                                "value_type": "List"
+                                            },
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 84,
+                                                    "col_start": 8,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 51,
+                                                    "row_start": 50,
+                                                    "source_file_name": "meridional_advection_diffusion"
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "left": {
+                                                "default_value": null,
+                                                "node_type": "Var",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 84,
+                                                        "col_start": 8,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 51,
+                                                        "row_start": 50,
+                                                        "source_file_name": "meridional_advection_diffusion"
+                                                    }
+                                                ],
+                                                "type": "float",
+                                                "val": {
+                                                    "id": 100,
+                                                    "name": "use_banded_solver",
+                                                    "node_type": "Name",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 84,
+                                                            "col_start": 8,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 51,
+                                                            "row_start": 50,
+                                                            "source_file_name": "meridional_advection_diffusion"
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "node_type": "Assignment",
+                                            "right": {
+                                                "id": 5,
+                                                "name": "use_banded_solver",
+                                                "node_type": "Name",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 73,
+                                                        "col_start": 56,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 51,
+                                                        "row_start": 51,
+                                                        "source_file_name": "meridional_advection_diffusion"
+                                                    }
+                                                ]
+                                            },
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 84,
+                                                    "col_start": 8,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 51,
+                                                    "row_start": 50,
+                                                    "source_file_name": "meridional_advection_diffusion"
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "id": -1,
+                                            "name": "kwargs",
+                                            "node_type": "Name",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 84,
+                                                    "col_start": 8,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 51,
+                                                    "row_start": 50,
+                                                    "source_file_name": "meridional_advection_diffusion"
+                                                }
+                                            ]
+                                        }
+                                    ],
+                                    "func": {
+                                        "attr": {
+                                            "id": 19,
+                                            "name": "__init__",
+                                            "node_type": "Name",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 58,
+                                                    "col_start": 8,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 50,
+                                                    "row_start": 50,
+                                                    "source_file_name": "meridional_advection_diffusion"
+                                                }
+                                            ]
+                                        },
+                                        "node_type": "Attribute",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 58,
+                                                "col_start": 8,
+                                                "node_type": "SourceRef",
+                                                "row_end": 50,
+                                                "row_start": 50,
+                                                "source_file_name": "meridional_advection_diffusion"
+                                            }
+                                        ],
+                                        "value": {
+                                            "arguments": [
+                                                {
+                                                    "id": 17,
+                                                    "name": "MeridionalAdvectionDiffusion",
+                                                    "node_type": "Name",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 42,
+                                                            "col_start": 14,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 50,
+                                                            "row_start": 50,
+                                                            "source_file_name": "meridional_advection_diffusion"
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "id": 16,
+                                                    "name": "self",
+                                                    "node_type": "Name",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 48,
+                                                            "col_start": 44,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 50,
+                                                            "row_start": 50,
+                                                            "source_file_name": "meridional_advection_diffusion"
+                                                        }
+                                                    ]
+                                                }
+                                            ],
+                                            "func": {
+                                                "id": 18,
+                                                "name": "super",
+                                                "node_type": "Name",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 49,
+                                                        "col_start": 8,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 50,
+                                                        "row_start": 50,
+                                                        "source_file_name": "meridional_advection_diffusion"
+                                                    }
+                                                ]
+                                            },
+                                            "node_type": "Call",
+                                            "source_language": null,
+                                            "source_language_version": null,
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 49,
+                                                    "col_start": 8,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 50,
+                                                    "row_start": 50,
+                                                    "source_file_name": "meridional_advection_diffusion"
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "node_type": "Call",
+                                    "source_language": null,
+                                    "source_language_version": null,
+                                    "source_refs": [
+                                        {
+                                            "col_end": 84,
+                                            "col_start": 8,
+                                            "node_type": "SourceRef",
+                                            "row_end": 51,
+                                            "row_start": 50,
+                                            "source_file_name": "meridional_advection_diffusion"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "left": {
+                                        "default_value": null,
+                                        "node_type": "Var",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 16,
+                                                "col_start": 8,
+                                                "node_type": "SourceRef",
+                                                "row_end": 53,
+                                                "row_start": 53,
+                                                "source_file_name": "meridional_advection_diffusion"
+                                            }
+                                        ],
+                                        "type": "float",
+                                        "val": {
+                                            "id": 8,
+                                            "name": "phi_stag",
+                                            "node_type": "Name",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 16,
+                                                    "col_start": 8,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 53,
+                                                    "row_start": 53,
+                                                    "source_file_name": "meridional_advection_diffusion"
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "node_type": "Assignment",
+                                    "right": {
+                                        "arguments": [
+                                            {
+                                                "attr": {
+                                                    "id": 20,
+                                                    "name": "lat_bounds",
+                                                    "node_type": "Name",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 45,
+                                                            "col_start": 30,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 53,
+                                                            "row_start": 53,
+                                                            "source_file_name": "meridional_advection_diffusion"
+                                                        }
+                                                    ]
+                                                },
+                                                "node_type": "Attribute",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 45,
+                                                        "col_start": 30,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 53,
+                                                        "row_start": 53,
+                                                        "source_file_name": "meridional_advection_diffusion"
+                                                    }
+                                                ],
+                                                "value": {
+                                                    "id": 16,
+                                                    "name": "self",
+                                                    "node_type": "Name",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 34,
+                                                            "col_start": 30,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 53,
+                                                            "row_start": 53,
+                                                            "source_file_name": "meridional_advection_diffusion"
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        ],
+                                        "func": {
+                                            "attr": {
+                                                "id": 21,
+                                                "name": "deg2rad",
+                                                "node_type": "Name",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 29,
+                                                        "col_start": 19,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 53,
+                                                        "row_start": 53,
+                                                        "source_file_name": "meridional_advection_diffusion"
+                                                    }
+                                                ]
+                                            },
+                                            "node_type": "Attribute",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 29,
+                                                    "col_start": 19,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 53,
+                                                    "row_start": 53,
+                                                    "source_file_name": "meridional_advection_diffusion"
+                                                }
+                                            ],
+                                            "value": {
+                                                "id": -1,
+                                                "name": "numpy",
+                                                "node_type": "Name",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 21,
+                                                        "col_start": 19,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 53,
+                                                        "row_start": 53,
+                                                        "source_file_name": "meridional_advection_diffusion"
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        "node_type": "Call",
+                                        "source_language": null,
+                                        "source_language_version": null,
+                                        "source_refs": [
+                                            {
+                                                "col_end": 46,
+                                                "col_start": 19,
+                                                "node_type": "SourceRef",
+                                                "row_end": 53,
+                                                "row_start": 53,
+                                                "source_file_name": "meridional_advection_diffusion"
+                                            }
+                                        ]
+                                    },
+                                    "source_refs": [
+                                        {
+                                            "col_end": 46,
+                                            "col_start": 8,
+                                            "node_type": "SourceRef",
+                                            "row_end": 53,
+                                            "row_start": 53,
+                                            "source_file_name": "meridional_advection_diffusion"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "left": {
+                                        "default_value": null,
+                                        "node_type": "Var",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 11,
+                                                "col_start": 8,
+                                                "node_type": "SourceRef",
+                                                "row_end": 54,
+                                                "row_start": 54,
+                                                "source_file_name": "meridional_advection_diffusion"
+                                            }
+                                        ],
+                                        "type": "float",
+                                        "val": {
+                                            "id": 9,
+                                            "name": "phi",
+                                            "node_type": "Name",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 11,
+                                                    "col_start": 8,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 54,
+                                                    "row_start": 54,
+                                                    "source_file_name": "meridional_advection_diffusion"
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "node_type": "Assignment",
+                                    "right": {
+                                        "arguments": [
+                                            {
+                                                "attr": {
+                                                    "id": 22,
+                                                    "name": "lat",
+                                                    "node_type": "Name",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 33,
+                                                            "col_start": 25,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 54,
+                                                            "row_start": 54,
+                                                            "source_file_name": "meridional_advection_diffusion"
+                                                        }
+                                                    ]
+                                                },
+                                                "node_type": "Attribute",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 33,
+                                                        "col_start": 25,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 54,
+                                                        "row_start": 54,
+                                                        "source_file_name": "meridional_advection_diffusion"
+                                                    }
+                                                ],
+                                                "value": {
+                                                    "id": 16,
+                                                    "name": "self",
+                                                    "node_type": "Name",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 29,
+                                                            "col_start": 25,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 54,
+                                                            "row_start": 54,
+                                                            "source_file_name": "meridional_advection_diffusion"
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        ],
+                                        "func": {
+                                            "attr": {
+                                                "id": 21,
+                                                "name": "deg2rad",
+                                                "node_type": "Name",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 24,
+                                                        "col_start": 14,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 54,
+                                                        "row_start": 54,
+                                                        "source_file_name": "meridional_advection_diffusion"
+                                                    }
+                                                ]
+                                            },
+                                            "node_type": "Attribute",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 24,
+                                                    "col_start": 14,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 54,
+                                                    "row_start": 54,
+                                                    "source_file_name": "meridional_advection_diffusion"
+                                                }
+                                            ],
+                                            "value": {
+                                                "id": -1,
+                                                "name": "numpy",
+                                                "node_type": "Name",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 16,
+                                                        "col_start": 14,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 54,
+                                                        "row_start": 54,
+                                                        "source_file_name": "meridional_advection_diffusion"
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        "node_type": "Call",
+                                        "source_language": null,
+                                        "source_language_version": null,
+                                        "source_refs": [
+                                            {
+                                                "col_end": 34,
+                                                "col_start": 14,
+                                                "node_type": "SourceRef",
+                                                "row_end": 54,
+                                                "row_start": 54,
+                                                "source_file_name": "meridional_advection_diffusion"
+                                            }
+                                        ]
+                                    },
+                                    "source_refs": [
+                                        {
+                                            "col_end": 34,
+                                            "col_start": 8,
+                                            "node_type": "SourceRef",
+                                            "row_end": 54,
+                                            "row_start": 54,
+                                            "source_file_name": "meridional_advection_diffusion"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "left": {
+                                        "default_value": null,
+                                        "node_type": "Var",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 42,
+                                                "col_start": 8,
+                                                "node_type": "SourceRef",
+                                                "row_end": 55,
+                                                "row_start": 55,
+                                                "source_file_name": "meridional_advection_diffusion"
+                                            }
+                                        ],
+                                        "type": "Any",
+                                        "val": {
+                                            "attr": {
+                                                "id": 24,
+                                                "name": "_Xcenter",
+                                                "node_type": "Name",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 21,
+                                                        "col_start": 8,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 55,
+                                                        "row_start": 55,
+                                                        "source_file_name": "meridional_advection_diffusion"
+                                                    }
+                                                ]
+                                            },
+                                            "node_type": "Attribute",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 21,
+                                                    "col_start": 8,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 55,
+                                                    "row_start": 55,
+                                                    "source_file_name": "meridional_advection_diffusion"
+                                                }
+                                            ],
+                                            "value": {
+                                                "id": 16,
+                                                "name": "self",
+                                                "node_type": "Name",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 12,
+                                                        "col_start": 8,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 55,
+                                                        "row_start": 55,
+                                                        "source_file_name": "meridional_advection_diffusion"
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "node_type": "Assignment",
+                                    "right": {
+                                        "arguments": [
+                                            {
+                                                "attr": {
+                                                    "id": 24,
+                                                    "name": "_Xcenter",
+                                                    "node_type": "Name",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 21,
+                                                            "col_start": 8,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 55,
+                                                            "row_start": 55,
+                                                            "source_file_name": "meridional_advection_diffusion"
+                                                        }
+                                                    ]
+                                                },
+                                                "node_type": "Attribute",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 21,
+                                                        "col_start": 8,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 55,
+                                                        "row_start": 55,
+                                                        "source_file_name": "meridional_advection_diffusion"
+                                                    }
+                                                ],
+                                                "value": {
+                                                    "id": 16,
+                                                    "name": "self",
+                                                    "node_type": "Name",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 12,
+                                                            "col_start": 8,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 55,
+                                                            "row_start": 55,
+                                                            "source_file_name": "meridional_advection_diffusion"
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            {
+                                                "node_type": "LiteralValue",
+                                                "source_code_data_type": [
+                                                    "Python",
+                                                    "3.8",
+                                                    "List"
+                                                ],
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": -1,
+                                                        "col_start": -1,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": -1,
+                                                        "row_start": -1,
+                                                        "source_file_name": "meridional_advection_diffusion"
+                                                    }
+                                                ],
+                                                "value": "NotImplemented",
+                                                "value_type": "List"
+                                            },
+                                            {
+                                                "interpreter": "Python",
+                                                "node_type": "Operator",
+                                                "op": "ast.Mult",
+                                                "operands": [
+                                                    {
+                                                        "id": 9,
+                                                        "name": "phi",
+                                                        "node_type": "Name",
+                                                        "source_refs": [
+                                                            {
+                                                                "col_end": 34,
+                                                                "col_start": 31,
+                                                                "node_type": "SourceRef",
+                                                                "row_end": 55,
+                                                                "row_start": 55,
+                                                                "source_file_name": "meridional_advection_diffusion"
+                                                            }
+                                                        ]
+                                                    },
+                                                    {
+                                                        "attr": {
+                                                            "id": 23,
+                                                            "name": "a",
+                                                            "node_type": "Name",
+                                                            "source_refs": [
+                                                                {
+                                                                    "col_end": 42,
+                                                                    "col_start": 35,
+                                                                    "node_type": "SourceRef",
+                                                                    "row_end": 55,
+                                                                    "row_start": 55,
+                                                                    "source_file_name": "meridional_advection_diffusion"
+                                                                }
+                                                            ]
+                                                        },
+                                                        "node_type": "Attribute",
+                                                        "source_refs": [
+                                                            {
+                                                                "col_end": 42,
+                                                                "col_start": 35,
+                                                                "node_type": "SourceRef",
+                                                                "row_end": 55,
+                                                                "row_start": 55,
+                                                                "source_file_name": "meridional_advection_diffusion"
+                                                            }
+                                                        ],
+                                                        "value": {
+                                                            "id": -1,
+                                                            "name": "constants",
+                                                            "node_type": "Name",
+                                                            "source_refs": [
+                                                                {
+                                                                    "col_end": 40,
+                                                                    "col_start": 35,
+                                                                    "node_type": "SourceRef",
+                                                                    "row_end": 55,
+                                                                    "row_start": 55,
+                                                                    "source_file_name": "meridional_advection_diffusion"
+                                                                }
+                                                            ]
+                                                        }
+                                                    }
+                                                ],
+                                                "source_language": "Python",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 42,
+                                                        "col_start": 31,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 55,
+                                                        "row_start": 55,
+                                                        "source_file_name": "meridional_advection_diffusion"
+                                                    }
+                                                ],
+                                                "version": "3.8.18"
+                                            }
+                                        ],
+                                        "func": {
+                                            "id": 25,
+                                            "name": "_set",
+                                            "node_type": "Name",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 42,
+                                                    "col_start": 8,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 55,
+                                                    "row_start": 55,
+                                                    "source_file_name": "meridional_advection_diffusion"
+                                                }
+                                            ]
+                                        },
+                                        "node_type": "Call",
+                                        "source_language": null,
+                                        "source_language_version": null,
+                                        "source_refs": [
+                                            {
+                                                "col_end": 42,
+                                                "col_start": 8,
+                                                "node_type": "SourceRef",
+                                                "row_end": 55,
+                                                "row_start": 55,
+                                                "source_file_name": "meridional_advection_diffusion"
+                                            }
+                                        ]
+                                    },
+                                    "source_refs": [
+                                        {
+                                            "col_end": 42,
+                                            "col_start": 8,
+                                            "node_type": "SourceRef",
+                                            "row_end": 55,
+                                            "row_start": 55,
+                                            "source_file_name": "meridional_advection_diffusion"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "left": {
+                                        "default_value": null,
+                                        "node_type": "Var",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 47,
+                                                "col_start": 8,
+                                                "node_type": "SourceRef",
+                                                "row_end": 56,
+                                                "row_start": 56,
+                                                "source_file_name": "meridional_advection_diffusion"
+                                            }
+                                        ],
+                                        "type": "Any",
+                                        "val": {
+                                            "attr": {
+                                                "id": 26,
+                                                "name": "_Xbounds",
+                                                "node_type": "Name",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 21,
+                                                        "col_start": 8,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 56,
+                                                        "row_start": 56,
+                                                        "source_file_name": "meridional_advection_diffusion"
+                                                    }
+                                                ]
+                                            },
+                                            "node_type": "Attribute",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 21,
+                                                    "col_start": 8,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 56,
+                                                    "row_start": 56,
+                                                    "source_file_name": "meridional_advection_diffusion"
+                                                }
+                                            ],
+                                            "value": {
+                                                "id": 16,
+                                                "name": "self",
+                                                "node_type": "Name",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 12,
+                                                        "col_start": 8,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 56,
+                                                        "row_start": 56,
+                                                        "source_file_name": "meridional_advection_diffusion"
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "node_type": "Assignment",
+                                    "right": {
+                                        "arguments": [
+                                            {
+                                                "attr": {
+                                                    "id": 26,
+                                                    "name": "_Xbounds",
+                                                    "node_type": "Name",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 21,
+                                                            "col_start": 8,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 56,
+                                                            "row_start": 56,
+                                                            "source_file_name": "meridional_advection_diffusion"
+                                                        }
+                                                    ]
+                                                },
+                                                "node_type": "Attribute",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 21,
+                                                        "col_start": 8,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 56,
+                                                        "row_start": 56,
+                                                        "source_file_name": "meridional_advection_diffusion"
+                                                    }
+                                                ],
+                                                "value": {
+                                                    "id": 16,
+                                                    "name": "self",
+                                                    "node_type": "Name",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 12,
+                                                            "col_start": 8,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 56,
+                                                            "row_start": 56,
+                                                            "source_file_name": "meridional_advection_diffusion"
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            {
+                                                "node_type": "LiteralValue",
+                                                "source_code_data_type": [
+                                                    "Python",
+                                                    "3.8",
+                                                    "List"
+                                                ],
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": -1,
+                                                        "col_start": -1,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": -1,
+                                                        "row_start": -1,
+                                                        "source_file_name": "meridional_advection_diffusion"
+                                                    }
+                                                ],
+                                                "value": "NotImplemented",
+                                                "value_type": "List"
+                                            },
+                                            {
+                                                "interpreter": "Python",
+                                                "node_type": "Operator",
+                                                "op": "ast.Mult",
+                                                "operands": [
+                                                    {
+                                                        "id": 8,
+                                                        "name": "phi_stag",
+                                                        "node_type": "Name",
+                                                        "source_refs": [
+                                                            {
+                                                                "col_end": 39,
+                                                                "col_start": 31,
+                                                                "node_type": "SourceRef",
+                                                                "row_end": 56,
+                                                                "row_start": 56,
+                                                                "source_file_name": "meridional_advection_diffusion"
+                                                            }
+                                                        ]
+                                                    },
+                                                    {
+                                                        "attr": {
+                                                            "id": 23,
+                                                            "name": "a",
+                                                            "node_type": "Name",
+                                                            "source_refs": [
+                                                                {
+                                                                    "col_end": 47,
+                                                                    "col_start": 40,
+                                                                    "node_type": "SourceRef",
+                                                                    "row_end": 56,
+                                                                    "row_start": 56,
+                                                                    "source_file_name": "meridional_advection_diffusion"
+                                                                }
+                                                            ]
+                                                        },
+                                                        "node_type": "Attribute",
+                                                        "source_refs": [
+                                                            {
+                                                                "col_end": 47,
+                                                                "col_start": 40,
+                                                                "node_type": "SourceRef",
+                                                                "row_end": 56,
+                                                                "row_start": 56,
+                                                                "source_file_name": "meridional_advection_diffusion"
+                                                            }
+                                                        ],
+                                                        "value": {
+                                                            "id": -1,
+                                                            "name": "constants",
+                                                            "node_type": "Name",
+                                                            "source_refs": [
+                                                                {
+                                                                    "col_end": 45,
+                                                                    "col_start": 40,
+                                                                    "node_type": "SourceRef",
+                                                                    "row_end": 56,
+                                                                    "row_start": 56,
+                                                                    "source_file_name": "meridional_advection_diffusion"
+                                                                }
+                                                            ]
+                                                        }
+                                                    }
+                                                ],
+                                                "source_language": "Python",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 47,
+                                                        "col_start": 31,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 56,
+                                                        "row_start": 56,
+                                                        "source_file_name": "meridional_advection_diffusion"
+                                                    }
+                                                ],
+                                                "version": "3.8.18"
+                                            }
+                                        ],
+                                        "func": {
+                                            "id": 25,
+                                            "name": "_set",
+                                            "node_type": "Name",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 47,
+                                                    "col_start": 8,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 56,
+                                                    "row_start": 56,
+                                                    "source_file_name": "meridional_advection_diffusion"
+                                                }
+                                            ]
+                                        },
+                                        "node_type": "Call",
+                                        "source_language": null,
+                                        "source_language_version": null,
+                                        "source_refs": [
+                                            {
+                                                "col_end": 47,
+                                                "col_start": 8,
+                                                "node_type": "SourceRef",
+                                                "row_end": 56,
+                                                "row_start": 56,
+                                                "source_file_name": "meridional_advection_diffusion"
+                                            }
+                                        ]
+                                    },
+                                    "source_refs": [
+                                        {
+                                            "col_end": 47,
+                                            "col_start": 8,
+                                            "node_type": "SourceRef",
+                                            "row_end": 56,
+                                            "row_start": 56,
+                                            "source_file_name": "meridional_advection_diffusion"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "left": {
+                                        "default_value": null,
+                                        "node_type": "Var",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 53,
+                                                "col_start": 8,
+                                                "node_type": "SourceRef",
+                                                "row_end": 57,
+                                                "row_start": 57,
+                                                "source_file_name": "meridional_advection_diffusion"
+                                            }
+                                        ],
+                                        "type": "Any",
+                                        "val": {
+                                            "attr": {
+                                                "id": 28,
+                                                "name": "_weight_bounds",
+                                                "node_type": "Name",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 27,
+                                                        "col_start": 8,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 57,
+                                                        "row_start": 57,
+                                                        "source_file_name": "meridional_advection_diffusion"
+                                                    }
+                                                ]
+                                            },
+                                            "node_type": "Attribute",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 27,
+                                                    "col_start": 8,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 57,
+                                                    "row_start": 57,
+                                                    "source_file_name": "meridional_advection_diffusion"
+                                                }
+                                            ],
+                                            "value": {
+                                                "id": 16,
+                                                "name": "self",
+                                                "node_type": "Name",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 12,
+                                                        "col_start": 8,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 57,
+                                                        "row_start": 57,
+                                                        "source_file_name": "meridional_advection_diffusion"
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "node_type": "Assignment",
+                                    "right": {
+                                        "arguments": [
+                                            {
+                                                "attr": {
+                                                    "id": 28,
+                                                    "name": "_weight_bounds",
+                                                    "node_type": "Name",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 27,
+                                                            "col_start": 8,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 57,
+                                                            "row_start": 57,
+                                                            "source_file_name": "meridional_advection_diffusion"
+                                                        }
+                                                    ]
+                                                },
+                                                "node_type": "Attribute",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 27,
+                                                        "col_start": 8,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 57,
+                                                        "row_start": 57,
+                                                        "source_file_name": "meridional_advection_diffusion"
+                                                    }
+                                                ],
+                                                "value": {
+                                                    "id": 16,
+                                                    "name": "self",
+                                                    "node_type": "Name",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 12,
+                                                            "col_start": 8,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 57,
+                                                            "row_start": 57,
+                                                            "source_file_name": "meridional_advection_diffusion"
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            {
+                                                "node_type": "LiteralValue",
+                                                "source_code_data_type": [
+                                                    "Python",
+                                                    "3.8",
+                                                    "List"
+                                                ],
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": -1,
+                                                        "col_start": -1,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": -1,
+                                                        "row_start": -1,
+                                                        "source_file_name": "meridional_advection_diffusion"
+                                                    }
+                                                ],
+                                                "value": "NotImplemented",
+                                                "value_type": "List"
+                                            },
+                                            {
+                                                "arguments": [
+                                                    {
+                                                        "id": 8,
+                                                        "name": "phi_stag",
+                                                        "node_type": "Name",
+                                                        "source_refs": [
+                                                            {
+                                                                "col_end": 52,
+                                                                "col_start": 44,
+                                                                "node_type": "SourceRef",
+                                                                "row_end": 57,
+                                                                "row_start": 57,
+                                                                "source_file_name": "meridional_advection_diffusion"
+                                                            }
+                                                        ]
+                                                    }
+                                                ],
+                                                "func": {
+                                                    "attr": {
+                                                        "id": 27,
+                                                        "name": "cos",
+                                                        "node_type": "Name",
+                                                        "source_refs": [
+                                                            {
+                                                                "col_end": 43,
+                                                                "col_start": 37,
+                                                                "node_type": "SourceRef",
+                                                                "row_end": 57,
+                                                                "row_start": 57,
+                                                                "source_file_name": "meridional_advection_diffusion"
+                                                            }
+                                                        ]
+                                                    },
+                                                    "node_type": "Attribute",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 43,
+                                                            "col_start": 37,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 57,
+                                                            "row_start": 57,
+                                                            "source_file_name": "meridional_advection_diffusion"
+                                                        }
+                                                    ],
+                                                    "value": {
+                                                        "id": -1,
+                                                        "name": "numpy",
+                                                        "node_type": "Name",
+                                                        "source_refs": [
+                                                            {
+                                                                "col_end": 39,
+                                                                "col_start": 37,
+                                                                "node_type": "SourceRef",
+                                                                "row_end": 57,
+                                                                "row_start": 57,
+                                                                "source_file_name": "meridional_advection_diffusion"
+                                                            }
+                                                        ]
+                                                    }
+                                                },
+                                                "node_type": "Call",
+                                                "source_language": null,
+                                                "source_language_version": null,
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 53,
+                                                        "col_start": 37,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 57,
+                                                        "row_start": 57,
+                                                        "source_file_name": "meridional_advection_diffusion"
+                                                    }
+                                                ]
+                                            }
+                                        ],
+                                        "func": {
+                                            "id": 25,
+                                            "name": "_set",
+                                            "node_type": "Name",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 53,
+                                                    "col_start": 8,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 57,
+                                                    "row_start": 57,
+                                                    "source_file_name": "meridional_advection_diffusion"
+                                                }
+                                            ]
+                                        },
+                                        "node_type": "Call",
+                                        "source_language": null,
+                                        "source_language_version": null,
+                                        "source_refs": [
+                                            {
+                                                "col_end": 53,
+                                                "col_start": 8,
+                                                "node_type": "SourceRef",
+                                                "row_end": 57,
+                                                "row_start": 57,
+                                                "source_file_name": "meridional_advection_diffusion"
+                                            }
+                                        ]
+                                    },
+                                    "source_refs": [
+                                        {
+                                            "col_end": 53,
+                                            "col_start": 8,
+                                            "node_type": "SourceRef",
+                                            "row_end": 57,
+                                            "row_start": 57,
+                                            "source_file_name": "meridional_advection_diffusion"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "left": {
+                                        "default_value": null,
+                                        "node_type": "Var",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 48,
+                                                "col_start": 8,
+                                                "node_type": "SourceRef",
+                                                "row_end": 58,
+                                                "row_start": 58,
+                                                "source_file_name": "meridional_advection_diffusion"
+                                            }
+                                        ],
+                                        "type": "Any",
+                                        "val": {
+                                            "attr": {
+                                                "id": 29,
+                                                "name": "_weight_center",
+                                                "node_type": "Name",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 27,
+                                                        "col_start": 8,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 58,
+                                                        "row_start": 58,
+                                                        "source_file_name": "meridional_advection_diffusion"
+                                                    }
+                                                ]
+                                            },
+                                            "node_type": "Attribute",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 27,
+                                                    "col_start": 8,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 58,
+                                                    "row_start": 58,
+                                                    "source_file_name": "meridional_advection_diffusion"
+                                                }
+                                            ],
+                                            "value": {
+                                                "id": 16,
+                                                "name": "self",
+                                                "node_type": "Name",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 12,
+                                                        "col_start": 8,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 58,
+                                                        "row_start": 58,
+                                                        "source_file_name": "meridional_advection_diffusion"
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "node_type": "Assignment",
+                                    "right": {
+                                        "arguments": [
+                                            {
+                                                "attr": {
+                                                    "id": 29,
+                                                    "name": "_weight_center",
+                                                    "node_type": "Name",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 27,
+                                                            "col_start": 8,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 58,
+                                                            "row_start": 58,
+                                                            "source_file_name": "meridional_advection_diffusion"
+                                                        }
+                                                    ]
+                                                },
+                                                "node_type": "Attribute",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 27,
+                                                        "col_start": 8,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 58,
+                                                        "row_start": 58,
+                                                        "source_file_name": "meridional_advection_diffusion"
+                                                    }
+                                                ],
+                                                "value": {
+                                                    "id": 16,
+                                                    "name": "self",
+                                                    "node_type": "Name",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 12,
+                                                            "col_start": 8,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 58,
+                                                            "row_start": 58,
+                                                            "source_file_name": "meridional_advection_diffusion"
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            {
+                                                "node_type": "LiteralValue",
+                                                "source_code_data_type": [
+                                                    "Python",
+                                                    "3.8",
+                                                    "List"
+                                                ],
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": -1,
+                                                        "col_start": -1,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": -1,
+                                                        "row_start": -1,
+                                                        "source_file_name": "meridional_advection_diffusion"
+                                                    }
+                                                ],
+                                                "value": "NotImplemented",
+                                                "value_type": "List"
+                                            },
+                                            {
+                                                "arguments": [
+                                                    {
+                                                        "id": 9,
+                                                        "name": "phi",
+                                                        "node_type": "Name",
+                                                        "source_refs": [
+                                                            {
+                                                                "col_end": 47,
+                                                                "col_start": 44,
+                                                                "node_type": "SourceRef",
+                                                                "row_end": 58,
+                                                                "row_start": 58,
+                                                                "source_file_name": "meridional_advection_diffusion"
+                                                            }
+                                                        ]
+                                                    }
+                                                ],
+                                                "func": {
+                                                    "attr": {
+                                                        "id": 27,
+                                                        "name": "cos",
+                                                        "node_type": "Name",
+                                                        "source_refs": [
+                                                            {
+                                                                "col_end": 43,
+                                                                "col_start": 37,
+                                                                "node_type": "SourceRef",
+                                                                "row_end": 58,
+                                                                "row_start": 58,
+                                                                "source_file_name": "meridional_advection_diffusion"
+                                                            }
+                                                        ]
+                                                    },
+                                                    "node_type": "Attribute",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 43,
+                                                            "col_start": 37,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 58,
+                                                            "row_start": 58,
+                                                            "source_file_name": "meridional_advection_diffusion"
+                                                        }
+                                                    ],
+                                                    "value": {
+                                                        "id": -1,
+                                                        "name": "numpy",
+                                                        "node_type": "Name",
+                                                        "source_refs": [
+                                                            {
+                                                                "col_end": 39,
+                                                                "col_start": 37,
+                                                                "node_type": "SourceRef",
+                                                                "row_end": 58,
+                                                                "row_start": 58,
+                                                                "source_file_name": "meridional_advection_diffusion"
+                                                            }
+                                                        ]
+                                                    }
+                                                },
+                                                "node_type": "Call",
+                                                "source_language": null,
+                                                "source_language_version": null,
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 48,
+                                                        "col_start": 37,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 58,
+                                                        "row_start": 58,
+                                                        "source_file_name": "meridional_advection_diffusion"
+                                                    }
+                                                ]
+                                            }
+                                        ],
+                                        "func": {
+                                            "id": 25,
+                                            "name": "_set",
+                                            "node_type": "Name",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 48,
+                                                    "col_start": 8,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 58,
+                                                    "row_start": 58,
+                                                    "source_file_name": "meridional_advection_diffusion"
+                                                }
+                                            ]
+                                        },
+                                        "node_type": "Call",
+                                        "source_language": null,
+                                        "source_language_version": null,
+                                        "source_refs": [
+                                            {
+                                                "col_end": 48,
+                                                "col_start": 8,
+                                                "node_type": "SourceRef",
+                                                "row_end": 58,
+                                                "row_start": 58,
+                                                "source_file_name": "meridional_advection_diffusion"
+                                            }
+                                        ]
+                                    },
+                                    "source_refs": [
+                                        {
+                                            "col_end": 48,
+                                            "col_start": 8,
+                                            "node_type": "SourceRef",
+                                            "row_end": 58,
+                                            "row_start": 58,
+                                            "source_file_name": "meridional_advection_diffusion"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "left": {
+                                        "attr": {
+                                            "id": 6,
+                                            "name": "prescribed_flux",
+                                            "node_type": "Name",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 28,
+                                                    "col_start": 8,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 60,
+                                                    "row_start": 60,
+                                                    "source_file_name": "meridional_advection_diffusion"
+                                                }
+                                            ]
+                                        },
+                                        "node_type": "Attribute",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 28,
+                                                "col_start": 8,
+                                                "node_type": "SourceRef",
+                                                "row_end": 60,
+                                                "row_start": 60,
+                                                "source_file_name": "meridional_advection_diffusion"
+                                            }
+                                        ],
+                                        "value": {
+                                            "id": 16,
+                                            "name": "self",
+                                            "node_type": "Name",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 12,
+                                                    "col_start": 8,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 60,
+                                                    "row_start": 60,
+                                                    "source_file_name": "meridional_advection_diffusion"
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "node_type": "Assignment",
+                                    "right": {
+                                        "id": 6,
+                                        "name": "prescribed_flux",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 46,
+                                                "col_start": 31,
+                                                "node_type": "SourceRef",
+                                                "row_end": 60,
+                                                "row_start": 60,
+                                                "source_file_name": "meridional_advection_diffusion"
+                                            }
+                                        ]
+                                    },
+                                    "source_refs": [
+                                        {
+                                            "col_end": 46,
+                                            "col_start": 8,
+                                            "node_type": "SourceRef",
+                                            "row_end": 60,
+                                            "row_start": 60,
+                                            "source_file_name": "meridional_advection_diffusion"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "left": {
+                                        "attr": {
+                                            "id": 3,
+                                            "name": "K",
+                                            "node_type": "Name",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 14,
+                                                    "col_start": 8,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 61,
+                                                    "row_start": 61,
+                                                    "source_file_name": "meridional_advection_diffusion"
+                                                }
+                                            ]
+                                        },
+                                        "node_type": "Attribute",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 14,
+                                                "col_start": 8,
+                                                "node_type": "SourceRef",
+                                                "row_end": 61,
+                                                "row_start": 61,
+                                                "source_file_name": "meridional_advection_diffusion"
+                                            }
+                                        ],
+                                        "value": {
+                                            "id": 16,
+                                            "name": "self",
+                                            "node_type": "Name",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 12,
+                                                    "col_start": 8,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 61,
+                                                    "row_start": 61,
+                                                    "source_file_name": "meridional_advection_diffusion"
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "node_type": "Assignment",
+                                    "right": {
+                                        "id": 3,
+                                        "name": "K",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 18,
+                                                "col_start": 17,
+                                                "node_type": "SourceRef",
+                                                "row_end": 61,
+                                                "row_start": 61,
+                                                "source_file_name": "meridional_advection_diffusion"
+                                            }
+                                        ]
+                                    },
+                                    "source_refs": [
+                                        {
+                                            "col_end": 18,
+                                            "col_start": 8,
+                                            "node_type": "SourceRef",
+                                            "row_end": 61,
+                                            "row_start": 61,
+                                            "source_file_name": "meridional_advection_diffusion"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "left": {
+                                        "attr": {
+                                            "id": 4,
+                                            "name": "U",
+                                            "node_type": "Name",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 14,
+                                                    "col_start": 8,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 62,
+                                                    "row_start": 62,
+                                                    "source_file_name": "meridional_advection_diffusion"
+                                                }
+                                            ]
+                                        },
+                                        "node_type": "Attribute",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 14,
+                                                "col_start": 8,
+                                                "node_type": "SourceRef",
+                                                "row_end": 62,
+                                                "row_start": 62,
+                                                "source_file_name": "meridional_advection_diffusion"
+                                            }
+                                        ],
+                                        "value": {
+                                            "id": 16,
+                                            "name": "self",
+                                            "node_type": "Name",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 12,
+                                                    "col_start": 8,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 62,
+                                                    "row_start": 62,
+                                                    "source_file_name": "meridional_advection_diffusion"
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "node_type": "Assignment",
+                                    "right": {
+                                        "id": 4,
+                                        "name": "U",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 18,
+                                                "col_start": 17,
+                                                "node_type": "SourceRef",
+                                                "row_end": 62,
+                                                "row_start": 62,
+                                                "source_file_name": "meridional_advection_diffusion"
+                                            }
+                                        ]
+                                    },
+                                    "source_refs": [
+                                        {
+                                            "col_end": 18,
+                                            "col_start": 8,
+                                            "node_type": "SourceRef",
+                                            "row_end": 62,
+                                            "row_start": 62,
+                                            "source_file_name": "meridional_advection_diffusion"
+                                        }
+                                    ]
+                                }
+                            ],
+                            "func_args": [
+                                {
+                                    "default_value": null,
+                                    "node_type": "Var",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 21,
+                                            "col_start": 17,
+                                            "node_type": "SourceRef",
+                                            "row_end": 44,
+                                            "row_start": 44,
+                                            "source_file_name": "meridional_advection_diffusion"
+                                        }
+                                    ],
+                                    "type": "float",
+                                    "val": {
+                                        "id": 2,
+                                        "name": "self",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 21,
+                                                "col_start": 17,
+                                                "node_type": "SourceRef",
+                                                "row_end": 44,
+                                                "row_start": 44,
+                                                "source_file_name": "meridional_advection_diffusion"
+                                            }
+                                        ]
+                                    }
+                                },
+                                {
+                                    "default_value": {
+                                        "node_type": "LiteralValue",
+                                        "source_code_data_type": [
+                                            "Python",
+                                            "3.8",
+                                            "<class 'float'>"
+                                        ],
+                                        "source_refs": [
+                                            {
+                                                "col_end": 21,
+                                                "col_start": 19,
+                                                "node_type": "SourceRef",
+                                                "row_end": 45,
+                                                "row_start": 45,
+                                                "source_file_name": "meridional_advection_diffusion"
+                                            }
+                                        ],
+                                        "value": 0.0,
+                                        "value_type": "AbstractFloat"
+                                    },
+                                    "node_type": "Var",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 18,
+                                            "col_start": 17,
+                                            "node_type": "SourceRef",
+                                            "row_end": 45,
+                                            "row_start": 45,
+                                            "source_file_name": "meridional_advection_diffusion"
+                                        }
+                                    ],
+                                    "type": "float",
+                                    "val": {
+                                        "id": 3,
+                                        "name": "K",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 18,
+                                                "col_start": 17,
+                                                "node_type": "SourceRef",
+                                                "row_end": 45,
+                                                "row_start": 45,
+                                                "source_file_name": "meridional_advection_diffusion"
+                                            }
+                                        ]
+                                    }
+                                },
+                                {
+                                    "default_value": {
+                                        "node_type": "LiteralValue",
+                                        "source_code_data_type": [
+                                            "Python",
+                                            "3.8",
+                                            "<class 'float'>"
+                                        ],
+                                        "source_refs": [
+                                            {
+                                                "col_end": 21,
+                                                "col_start": 19,
+                                                "node_type": "SourceRef",
+                                                "row_end": 46,
+                                                "row_start": 46,
+                                                "source_file_name": "meridional_advection_diffusion"
+                                            }
+                                        ],
+                                        "value": 0.0,
+                                        "value_type": "AbstractFloat"
+                                    },
+                                    "node_type": "Var",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 18,
+                                            "col_start": 17,
+                                            "node_type": "SourceRef",
+                                            "row_end": 46,
+                                            "row_start": 46,
+                                            "source_file_name": "meridional_advection_diffusion"
+                                        }
+                                    ],
+                                    "type": "float",
+                                    "val": {
+                                        "id": 4,
+                                        "name": "U",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 18,
+                                                "col_start": 17,
+                                                "node_type": "SourceRef",
+                                                "row_end": 46,
+                                                "row_start": 46,
+                                                "source_file_name": "meridional_advection_diffusion"
+                                            }
+                                        ]
+                                    }
+                                },
+                                {
+                                    "default_value": {
+                                        "node_type": "LiteralValue",
+                                        "source_code_data_type": [
+                                            "Python",
+                                            "3.8",
+                                            "<class 'bool'>"
+                                        ],
+                                        "source_refs": [
+                                            {
+                                                "col_end": 40,
+                                                "col_start": 35,
+                                                "node_type": "SourceRef",
+                                                "row_end": 47,
+                                                "row_start": 47,
+                                                "source_file_name": "meridional_advection_diffusion"
+                                            }
+                                        ],
+                                        "value": "False",
+                                        "value_type": "Boolean"
+                                    },
+                                    "node_type": "Var",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 34,
+                                            "col_start": 17,
+                                            "node_type": "SourceRef",
+                                            "row_end": 47,
+                                            "row_start": 47,
+                                            "source_file_name": "meridional_advection_diffusion"
+                                        }
+                                    ],
+                                    "type": "float",
+                                    "val": {
+                                        "id": 5,
+                                        "name": "use_banded_solver",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 34,
+                                                "col_start": 17,
+                                                "node_type": "SourceRef",
+                                                "row_end": 47,
+                                                "row_start": 47,
+                                                "source_file_name": "meridional_advection_diffusion"
+                                            }
+                                        ]
+                                    }
+                                },
+                                {
+                                    "default_value": {
+                                        "node_type": "LiteralValue",
+                                        "source_code_data_type": [
+                                            "Python",
+                                            "3.8",
+                                            "<class 'float'>"
+                                        ],
+                                        "source_refs": [
+                                            {
+                                                "col_end": 35,
+                                                "col_start": 33,
+                                                "node_type": "SourceRef",
+                                                "row_end": 48,
+                                                "row_start": 48,
+                                                "source_file_name": "meridional_advection_diffusion"
+                                            }
+                                        ],
+                                        "value": 0.0,
+                                        "value_type": "AbstractFloat"
+                                    },
+                                    "node_type": "Var",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 32,
+                                            "col_start": 17,
+                                            "node_type": "SourceRef",
+                                            "row_end": 48,
+                                            "row_start": 48,
+                                            "source_file_name": "meridional_advection_diffusion"
+                                        }
+                                    ],
+                                    "type": "float",
+                                    "val": {
+                                        "id": 6,
+                                        "name": "prescribed_flux",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 32,
+                                                "col_start": 17,
+                                                "node_type": "SourceRef",
+                                                "row_end": 48,
+                                                "row_start": 48,
+                                                "source_file_name": "meridional_advection_diffusion"
+                                            }
+                                        ]
+                                    }
+                                },
+                                {
+                                    "default_value": null,
+                                    "node_type": "Var",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 25,
+                                            "col_start": 19,
+                                            "node_type": "SourceRef",
+                                            "row_end": 49,
+                                            "row_start": 49,
+                                            "source_file_name": "meridional_advection_diffusion"
+                                        }
+                                    ],
+                                    "type": "float",
+                                    "val": {
+                                        "id": 7,
+                                        "name": "kwargs",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 25,
+                                                "col_start": 19,
+                                                "node_type": "SourceRef",
+                                                "row_end": 49,
+                                                "row_start": 49,
+                                                "source_file_name": "meridional_advection_diffusion"
+                                            }
+                                        ]
+                                    }
+                                }
+                            ],
+                            "name": {
+                                "id": 30,
+                                "name": "__init__",
+                                "node_type": "Name",
+                                "source_refs": [
+                                    {
+                                        "col_end": 18,
+                                        "col_start": 4,
+                                        "node_type": "SourceRef",
+                                        "row_end": 62,
+                                        "row_start": 44,
+                                        "source_file_name": "meridional_advection_diffusion"
+                                    }
+                                ]
+                            },
+                            "node_type": "FunctionDef",
+                            "source_refs": [
+                                {
+                                    "col_end": 18,
+                                    "col_start": 4,
+                                    "node_type": "SourceRef",
+                                    "row_end": 62,
+                                    "row_start": 44,
+                                    "source_file_name": "meridional_advection_diffusion"
+                                }
+                            ]
+                        }
+                    ],
+                    "name": "MeridionalAdvectionDiffusion",
+                    "node_type": "RecordDef",
+                    "source_refs": [
+                        {
+                            "col_end": 18,
+                            "col_start": 0,
+                            "node_type": "SourceRef",
+                            "row_end": 62,
+                            "row_start": 41,
+                            "source_file_name": "meridional_advection_diffusion"
+                        }
+                    ]
+                },
+                {
+                    "bases": [
+                        {
+                            "id": 17,
+                            "name": "MeridionalAdvectionDiffusion",
+                            "node_type": "Name",
+                            "source_refs": [
+                                {
+                                    "col_end": 54,
+                                    "col_start": 26,
+                                    "node_type": "SourceRef",
+                                    "row_end": 65,
+                                    "row_start": 65,
+                                    "source_file_name": "meridional_advection_diffusion"
+                                }
+                            ]
+                        }
+                    ],
+                    "fields": [],
+                    "funcs": [
+                        {
+                            "body": [
+                                {
+                                    "arguments": [
+                                        {
+                                            "left": {
+                                                "default_value": null,
+                                                "node_type": "Var",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 58,
+                                                        "col_start": 8,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 81,
+                                                        "row_start": 77,
+                                                        "source_file_name": "meridional_advection_diffusion"
+                                                    }
+                                                ],
+                                                "type": "float",
+                                                "val": {
+                                                    "id": 100,
+                                                    "name": "U",
+                                                    "node_type": "Name",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 58,
+                                                            "col_start": 8,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 81,
+                                                            "row_start": 77,
+                                                            "source_file_name": "meridional_advection_diffusion"
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "node_type": "Assignment",
+                                            "right": {
+                                                "node_type": "LiteralValue",
+                                                "source_code_data_type": [
+                                                    "Python",
+                                                    "3.8",
+                                                    "<class 'float'>"
+                                                ],
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 16,
+                                                        "col_start": 14,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 78,
+                                                        "row_start": 78,
+                                                        "source_file_name": "meridional_advection_diffusion"
+                                                    }
+                                                ],
+                                                "value": 0.0,
+                                                "value_type": "AbstractFloat"
+                                            },
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 58,
+                                                    "col_start": 8,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 81,
+                                                    "row_start": 77,
+                                                    "source_file_name": "meridional_advection_diffusion"
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "left": {
+                                                "default_value": null,
+                                                "node_type": "Var",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 58,
+                                                        "col_start": 8,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 81,
+                                                        "row_start": 77,
+                                                        "source_file_name": "meridional_advection_diffusion"
+                                                    }
+                                                ],
+                                                "type": "float",
+                                                "val": {
+                                                    "id": 100,
+                                                    "name": "K",
+                                                    "node_type": "Name",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 58,
+                                                            "col_start": 8,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 81,
+                                                            "row_start": 77,
+                                                            "source_file_name": "meridional_advection_diffusion"
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "node_type": "Assignment",
+                                            "right": {
+                                                "id": 36,
+                                                "name": "K",
+                                                "node_type": "Name",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 15,
+                                                        "col_start": 14,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 79,
+                                                        "row_start": 79,
+                                                        "source_file_name": "meridional_advection_diffusion"
+                                                    }
+                                                ]
+                                            },
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 58,
+                                                    "col_start": 8,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 81,
+                                                    "row_start": 77,
+                                                    "source_file_name": "meridional_advection_diffusion"
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "left": {
+                                                "default_value": null,
+                                                "node_type": "Var",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 58,
+                                                        "col_start": 8,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 81,
+                                                        "row_start": 77,
+                                                        "source_file_name": "meridional_advection_diffusion"
+                                                    }
+                                                ],
+                                                "type": "float",
+                                                "val": {
+                                                    "id": 100,
+                                                    "name": "prescribed_flux",
+                                                    "node_type": "Name",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 58,
+                                                            "col_start": 8,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 81,
+                                                            "row_start": 77,
+                                                            "source_file_name": "meridional_advection_diffusion"
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "node_type": "Assignment",
+                                            "right": {
+                                                "id": 38,
+                                                "name": "prescribed_flux",
+                                                "node_type": "Name",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 43,
+                                                        "col_start": 28,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 80,
+                                                        "row_start": 80,
+                                                        "source_file_name": "meridional_advection_diffusion"
+                                                    }
+                                                ]
+                                            },
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 58,
+                                                    "col_start": 8,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 81,
+                                                    "row_start": 77,
+                                                    "source_file_name": "meridional_advection_diffusion"
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "left": {
+                                                "default_value": null,
+                                                "node_type": "Var",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 58,
+                                                        "col_start": 8,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 81,
+                                                        "row_start": 77,
+                                                        "source_file_name": "meridional_advection_diffusion"
+                                                    }
+                                                ],
+                                                "type": "float",
+                                                "val": {
+                                                    "id": 100,
+                                                    "name": "use_banded_solver",
+                                                    "node_type": "Name",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 58,
+                                                            "col_start": 8,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 81,
+                                                            "row_start": 77,
+                                                            "source_file_name": "meridional_advection_diffusion"
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "node_type": "Assignment",
+                                            "right": {
+                                                "id": 37,
+                                                "name": "use_banded_solver",
+                                                "node_type": "Name",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 47,
+                                                        "col_start": 30,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 81,
+                                                        "row_start": 81,
+                                                        "source_file_name": "meridional_advection_diffusion"
+                                                    }
+                                                ]
+                                            },
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 58,
+                                                    "col_start": 8,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 81,
+                                                    "row_start": 77,
+                                                    "source_file_name": "meridional_advection_diffusion"
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "id": -1,
+                                            "name": "kwargs",
+                                            "node_type": "Name",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 58,
+                                                    "col_start": 8,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 81,
+                                                    "row_start": 77,
+                                                    "source_file_name": "meridional_advection_diffusion"
+                                                }
+                                            ]
+                                        }
+                                    ],
+                                    "func": {
+                                        "attr": {
+                                            "id": 19,
+                                            "name": "__init__",
+                                            "node_type": "Name",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 49,
+                                                    "col_start": 8,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 77,
+                                                    "row_start": 77,
+                                                    "source_file_name": "meridional_advection_diffusion"
+                                                }
+                                            ]
+                                        },
+                                        "node_type": "Attribute",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 49,
+                                                "col_start": 8,
+                                                "node_type": "SourceRef",
+                                                "row_end": 77,
+                                                "row_start": 77,
+                                                "source_file_name": "meridional_advection_diffusion"
+                                            }
+                                        ],
+                                        "value": {
+                                            "arguments": [
+                                                {
+                                                    "id": 40,
+                                                    "name": "MeridionalDiffusion",
+                                                    "node_type": "Name",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 33,
+                                                            "col_start": 14,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 77,
+                                                            "row_start": 77,
+                                                            "source_file_name": "meridional_advection_diffusion"
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "id": 35,
+                                                    "name": "self",
+                                                    "node_type": "Name",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 39,
+                                                            "col_start": 35,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 77,
+                                                            "row_start": 77,
+                                                            "source_file_name": "meridional_advection_diffusion"
+                                                        }
+                                                    ]
+                                                }
+                                            ],
+                                            "func": {
+                                                "id": 18,
+                                                "name": "super",
+                                                "node_type": "Name",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 40,
+                                                        "col_start": 8,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 77,
+                                                        "row_start": 77,
+                                                        "source_file_name": "meridional_advection_diffusion"
+                                                    }
+                                                ]
+                                            },
+                                            "node_type": "Call",
+                                            "source_language": null,
+                                            "source_language_version": null,
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 40,
+                                                    "col_start": 8,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 77,
+                                                    "row_start": 77,
+                                                    "source_file_name": "meridional_advection_diffusion"
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "node_type": "Call",
+                                    "source_language": null,
+                                    "source_language_version": null,
+                                    "source_refs": [
+                                        {
+                                            "col_end": 58,
+                                            "col_start": 8,
+                                            "node_type": "SourceRef",
+                                            "row_end": 81,
+                                            "row_start": 77,
+                                            "source_file_name": "meridional_advection_diffusion"
+                                        }
+                                    ]
+                                }
+                            ],
+                            "func_args": [
+                                {
+                                    "default_value": null,
+                                    "node_type": "Var",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 21,
+                                            "col_start": 17,
+                                            "node_type": "SourceRef",
+                                            "row_end": 71,
+                                            "row_start": 71,
+                                            "source_file_name": "meridional_advection_diffusion"
+                                        }
+                                    ],
+                                    "type": "float",
+                                    "val": {
+                                        "id": 35,
+                                        "name": "self",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 21,
+                                                "col_start": 17,
+                                                "node_type": "SourceRef",
+                                                "row_end": 71,
+                                                "row_start": 71,
+                                                "source_file_name": "meridional_advection_diffusion"
+                                            }
+                                        ]
+                                    }
+                                },
+                                {
+                                    "default_value": {
+                                        "node_type": "LiteralValue",
+                                        "source_code_data_type": [
+                                            "Python",
+                                            "3.8",
+                                            "<class 'float'>"
+                                        ],
+                                        "source_refs": [
+                                            {
+                                                "col_end": 21,
+                                                "col_start": 19,
+                                                "node_type": "SourceRef",
+                                                "row_end": 72,
+                                                "row_start": 72,
+                                                "source_file_name": "meridional_advection_diffusion"
+                                            }
+                                        ],
+                                        "value": 0.0,
+                                        "value_type": "AbstractFloat"
+                                    },
+                                    "node_type": "Var",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 18,
+                                            "col_start": 17,
+                                            "node_type": "SourceRef",
+                                            "row_end": 72,
+                                            "row_start": 72,
+                                            "source_file_name": "meridional_advection_diffusion"
+                                        }
+                                    ],
+                                    "type": "float",
+                                    "val": {
+                                        "id": 36,
+                                        "name": "K",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 18,
+                                                "col_start": 17,
+                                                "node_type": "SourceRef",
+                                                "row_end": 72,
+                                                "row_start": 72,
+                                                "source_file_name": "meridional_advection_diffusion"
+                                            }
+                                        ]
+                                    }
+                                },
+                                {
+                                    "default_value": {
+                                        "node_type": "LiteralValue",
+                                        "source_code_data_type": [
+                                            "Python",
+                                            "3.8",
+                                            "<class 'bool'>"
+                                        ],
+                                        "source_refs": [
+                                            {
+                                                "col_end": 40,
+                                                "col_start": 35,
+                                                "node_type": "SourceRef",
+                                                "row_end": 73,
+                                                "row_start": 73,
+                                                "source_file_name": "meridional_advection_diffusion"
+                                            }
+                                        ],
+                                        "value": "False",
+                                        "value_type": "Boolean"
+                                    },
+                                    "node_type": "Var",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 34,
+                                            "col_start": 17,
+                                            "node_type": "SourceRef",
+                                            "row_end": 73,
+                                            "row_start": 73,
+                                            "source_file_name": "meridional_advection_diffusion"
+                                        }
+                                    ],
+                                    "type": "float",
+                                    "val": {
+                                        "id": 37,
+                                        "name": "use_banded_solver",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 34,
+                                                "col_start": 17,
+                                                "node_type": "SourceRef",
+                                                "row_end": 73,
+                                                "row_start": 73,
+                                                "source_file_name": "meridional_advection_diffusion"
+                                            }
+                                        ]
+                                    }
+                                },
+                                {
+                                    "default_value": {
+                                        "node_type": "LiteralValue",
+                                        "source_code_data_type": [
+                                            "Python",
+                                            "3.8",
+                                            "<class 'float'>"
+                                        ],
+                                        "source_refs": [
+                                            {
+                                                "col_end": 35,
+                                                "col_start": 33,
+                                                "node_type": "SourceRef",
+                                                "row_end": 74,
+                                                "row_start": 74,
+                                                "source_file_name": "meridional_advection_diffusion"
+                                            }
+                                        ],
+                                        "value": 0.0,
+                                        "value_type": "AbstractFloat"
+                                    },
+                                    "node_type": "Var",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 32,
+                                            "col_start": 17,
+                                            "node_type": "SourceRef",
+                                            "row_end": 74,
+                                            "row_start": 74,
+                                            "source_file_name": "meridional_advection_diffusion"
+                                        }
+                                    ],
+                                    "type": "float",
+                                    "val": {
+                                        "id": 38,
+                                        "name": "prescribed_flux",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 32,
+                                                "col_start": 17,
+                                                "node_type": "SourceRef",
+                                                "row_end": 74,
+                                                "row_start": 74,
+                                                "source_file_name": "meridional_advection_diffusion"
+                                            }
+                                        ]
+                                    }
+                                },
+                                {
+                                    "default_value": null,
+                                    "node_type": "Var",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 25,
+                                            "col_start": 19,
+                                            "node_type": "SourceRef",
+                                            "row_end": 75,
+                                            "row_start": 75,
+                                            "source_file_name": "meridional_advection_diffusion"
+                                        }
+                                    ],
+                                    "type": "float",
+                                    "val": {
+                                        "id": 39,
+                                        "name": "kwargs",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 25,
+                                                "col_start": 19,
+                                                "node_type": "SourceRef",
+                                                "row_end": 75,
+                                                "row_start": 75,
+                                                "source_file_name": "meridional_advection_diffusion"
+                                            }
+                                        ]
+                                    }
+                                }
+                            ],
+                            "name": {
+                                "id": 41,
+                                "name": "__init__",
+                                "node_type": "Name",
+                                "source_refs": [
+                                    {
+                                        "col_end": 58,
+                                        "col_start": 4,
+                                        "node_type": "SourceRef",
+                                        "row_end": 81,
+                                        "row_start": 71,
+                                        "source_file_name": "meridional_advection_diffusion"
+                                    }
+                                ]
+                            },
+                            "node_type": "FunctionDef",
+                            "source_refs": [
+                                {
+                                    "col_end": 58,
+                                    "col_start": 4,
+                                    "node_type": "SourceRef",
+                                    "row_end": 81,
+                                    "row_start": 71,
+                                    "source_file_name": "meridional_advection_diffusion"
+                                }
+                            ]
+                        }
+                    ],
+                    "name": "MeridionalDiffusion",
+                    "node_type": "RecordDef",
+                    "source_refs": [
+                        {
+                            "col_end": 58,
+                            "col_start": 0,
+                            "node_type": "SourceRef",
+                            "row_end": 81,
+                            "row_start": 65,
+                            "source_file_name": "meridional_advection_diffusion"
+                        }
+                    ]
+                }
+            ],
+            "name": "meridional_advection_diffusion",
+            "node_type": "Module",
+            "source_refs": [
+                {
+                    "col_end": null,
+                    "col_start": null,
+                    "node_type": "SourceRef",
+                    "row_end": 81,
+                    "row_start": 1,
+                    "source_file_name": "meridional_advection_diffusion.py"
+                }
+            ]
+        }
+    ]
+}

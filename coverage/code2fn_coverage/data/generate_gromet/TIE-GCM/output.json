@@ -9,7 +9,7 @@ Traceback (most recent call last):
     gromet_collection = process_file(source_path)
   File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/single_file_ingester.py", line 26, in process_file
     gromet_collection = process_file_system(
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/multi_file_ingester.py", line 81, in process_file_system
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/multi_file_ingester.py", line 84, in process_file_system
     generated_gromet = ann_cast_pipeline(
   File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/utils/script_functions.py", line 234, in ann_cast_pipeline
     pipeline_state = visitor.generate_annotated_cast(grfn_2_2)
@@ -39,8 +39,8 @@ Traceback (most recent call last):
     return self._visit(node)
   File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/functools.py", line 912, in _method
     return method.__get__(obj, cls)(*args, **kwargs)
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/cast_to_annotated_cast.py", line 172, in visit_model_if
-    body = self.visit_node_list(node.body)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/cast_to_annotated_cast.py", line 173, in visit_model_if
+    orelse = self.visit_node_list(node.orelse)
   File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/cast_to_annotated_cast.py", line 51, in visit_node_list
     return [self.visit(node) for node in node_list]
   File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/cast_to_annotated_cast.py", line 51, in <listcomp>
@@ -49,18 +49,22 @@ Traceback (most recent call last):
     return self._visit(node)
   File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/functools.py", line 912, in _method
     return method.__get__(obj, cls)(*args, **kwargs)
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/cast_to_annotated_cast.py", line 75, in visit_assignment
-    left = self.visit(node.left)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/cast_to_annotated_cast.py", line 173, in visit_model_if
+    orelse = self.visit_node_list(node.orelse)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/cast_to_annotated_cast.py", line 51, in visit_node_list
+    return [self.visit(node) for node in node_list]
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/cast_to_annotated_cast.py", line 51, in <listcomp>
+    return [self.visit(node) for node in node_list]
   File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/cast_to_annotated_cast.py", line 67, in visit
     return self._visit(node)
   File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/functools.py", line 912, in _method
     return method.__get__(obj, cls)(*args, **kwargs)
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/cast_to_annotated_cast.py", line 82, in visit_attribute
-    attr = self.visit(node.attr)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/cast_to_annotated_cast.py", line 171, in visit_model_if
+    expr = self.visit(node.expr)
   File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/cast_to_annotated_cast.py", line 67, in visit
     return self._visit(node)
   File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/functools.py", line 912, in _method
     return method.__get__(obj, cls)(*args, **kwargs)
   File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/cast_to_annotated_cast.py", line 71, in _visit
     raise NameError(f"Unrecognized node type: {type(node)}")
-NameError: Unrecognized node type: <class 'str'>
+NameError: Unrecognized node type: <class 'NoneType'>
