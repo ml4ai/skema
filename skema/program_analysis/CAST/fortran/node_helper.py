@@ -38,7 +38,11 @@ class NodeHelper():
         self.source = source
         self.source_file_name = source_file_name
 
-
+        # get_identifier optimization variables
+        self.source_lines = source.splitlines(keepends=True)
+        self.line_lengths = [len(line) for line in self.source_lines]
+        self.line_length_sums = [sum(self.line_lengths[:i+1]) for i in range(len(self.source_lines))]
+        
     def get_source_ref(self, node: Node) -> SourceRef:
         """Given a node and file name, return a CAST SourceRef object."""
         row_start, col_start = node.start_point
@@ -48,26 +52,16 @@ class NodeHelper():
 
     def get_identifier(self, node: Node) -> str:
         """Given a node, return the identifier it represents. ie. The code between node.start_point and node.end_point"""
-        line_num = 0
-        column_num = 0
-        in_identifier = False
-        identifier = ""
-        for i, char in enumerate(self.source):
-            if line_num == node.start_point[0] and column_num == node.start_point[1]:
-                in_identifier = True
-            elif line_num == node.end_point[0] and column_num == node.end_point[1]:
-                break
+        start_line, start_column = node.start_point
+        end_line, end_column = node.end_point
 
-            if char == "\n":
-                line_num += 1
-                column_num = 0
-            else:
-                column_num += 1
+        start_index = self.line_length_sums[start_line-1] + start_column
+        if start_line == end_line:
+            end_index = start_index + (end_column-start_column)
+        else:
+            end_index = self.line_length_sums[end_line] + end_column
 
-            if in_identifier:
-                identifier += char
-
-        return identifier
+        return self.source[start_index:end_index]
 
 def remove_comments(node: Node):
     """Remove comment nodes from tree-sitter parse tree"""
