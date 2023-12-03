@@ -126,7 +126,7 @@ class TS2CAST(object):
             return self.visit_identifier(node)
         elif node.type == "name":
             return self.visit_name(node)
-        elif node.type in ["math_expression", "relational_expression"]:
+        elif node.type in ["unary_expression", "math_expression", "relational_expression"]:
             return self.visit_math_expression(node)
         elif node.type in [
             "number_literal",
@@ -139,7 +139,7 @@ class TS2CAST(object):
             return self.visit_keyword_statement(node)
         elif node.type == "extent_specifier":
             return self.visit_extent_specifier(node)
-        elif node.type == "do_loop_statement":
+        elif node.type in ["do_loop_statement"]:
             return self.visit_do_loop_statement(node)
         elif node.type == "if_statement":
             return self.visit_if_statement(node)
@@ -220,9 +220,9 @@ class TS2CAST(object):
         )  # Visit the name node to add it to the variable context
 
         # If this is a function, check for return type and return value
-        intrinsic_type = None
-        return_value = None
         if node.type == "function":
+            intrinsic_type = None
+            return_value = None
             signature_qualifiers = get_children_by_types(
                 statement_node, ["intrinsic_type", "function_result"]
             )
@@ -235,20 +235,21 @@ class TS2CAST(object):
                 elif qualifier.type == "function_result":
                     return_value = self.visit(
                         get_first_child_by_type(qualifier, "identifier")
-                    )  # TODO: UPDATE NODES
-                    self.variable_context.add_return_value(return_value.val.name)
+                    ).val
+                    self.variable_context.add_return_value(return_value.name)
 
-        # #TODO: What happens if function doesn't return anything?
-        # If this is a function, and there is no explicit results variable, then we will assume the return value is the name of the function
-        if not return_value:
-            self.variable_context.add_return_value(
-                self.node_helper.get_identifier(name_node)
-            )
+           
+            # NOTE: In the case of a function specifically, if there is no explicit return value, the return value will be the name of the function
+            # TODO: Should this be a node instead
+            if not return_value:
+                self.variable_context.add_return_value(
+                    self.node_helper.get_identifier(name_node)
+                )
+                return_value = self.visit(name_node)
 
-        # If funciton has both, then we also need to update the type of the return value in the variable context
-        # It does not explicity have to be declared
-        if return_value and intrinsic_type:
-            self.variable_context.update_type(return_value.val.name, intrinsic_type)
+             # If funciton has both an explicit intrinsic type, then we also need to update the type of the return value in the variable context
+            if intrinsic_type:
+                self.variable_context.update_type(return_value.name, intrinsic_type)
 
         # Generating the function arguments by walking the parameters node
         func_args = []
@@ -365,25 +366,18 @@ class TS2CAST(object):
         ]  # TODO: Make function for this
 
         if len(return_values) == 1:
-            # TODO: Fix this case
             value = self.variable_context.get_node(list(return_values)[0])
         elif len(return_values) > 1:
             value = LiteralValue(
                 value_type="Tuple",
                 value=[
-                    Var(
-                        val=self.variable_context.get_node(ret),
-                        type=self.variable_context.get_type(ret),
-                        default_value=None,
-                        source_refs=None,
-                    )
-                    for ret in return_values
+                    self.variable_context.get_node(ret) for ret in return_values
                 ],
-                source_code_data_type=None,  # TODO: REFACTOR
+                source_code_data_type=None,
                 source_refs=None,
             )
         else:
-            value = LiteralValue(val=None, type=None, source_refs=None)
+            value = LiteralValue(value=None, value_type=None, source_refs=None)
 
         return ModelReturn(
             value=value, source_refs=[self.node_helper.get_source_ref(node)]
@@ -447,7 +441,7 @@ class TS2CAST(object):
                     (...) ...
             (body) ...
         """
-
+        
         # First check for
         # TODO: Add do until Loop support
         while_statement_node = get_first_child_by_type(node, "while_statement")
@@ -777,6 +771,7 @@ class TS2CAST(object):
             default_value=default_value,
             source_refs=[self.node_helper.get_source_ref(node)],
         )
+        
 
     def visit_math_expression(self, node):
         op = self.node_helper.get_identifier(
@@ -785,6 +780,10 @@ class TS2CAST(object):
         operands = []
         for operand in get_non_control_children(node):
             operands.append(self.visit(operand))
+            
+            # For operators, we will only need the name node since we are not allocating space
+            if operand.type == "identifier":
+                operands[-1] = operands[-1].val
 
         return Operator(
             source_language="Fortran",
@@ -822,8 +821,8 @@ class TS2CAST(object):
             type_map = {
                 "integer": "Integer",
                 "real": "AbstractFloat",
-                "double precision": None,
-                "complex": None,
+                "double precision": "AbstractFloat",
+                "complex": "Tuple", # Complex is a Tuple (rational,irrational),
                 "logical": "Boolean",
                 "character": "String",
             }
@@ -871,9 +870,9 @@ class TS2CAST(object):
                             ],
                         )
                     )
-                    vars[-1].left.type = "dimension"
+                    vars[-1].left.type = "List"
                     self.variable_context.update_type(
-                        vars[-1].left.val.name, "dimension"
+                        vars[-1].left.val.name, "List"
                     )
                 else:
                     # If its a regular assignment, we can update the type normally
@@ -892,8 +891,8 @@ class TS2CAST(object):
                 # Declaring a dimension variable using the x(1:5) format. It will look like a call expression in tree-sitter.
                 # We treat it like an identifier by visiting its identifier node. Then the type gets overridden by "dimension"
                 vars.append(self.visit(get_first_child_by_type(variable, "identifier")))
-                vars[-1].type = "dimension"
-                self.variable_context.update_type(vars[-1].val.name, "dimension")
+                vars[-1].type = "List"
+                self.variable_context.update_type(vars[-1].val.name, "List")
 
         # By default, all variables are added to a function's list of return values
         # If the intent is actually in, then we need to remove them from the list
@@ -1196,3 +1195,5 @@ class TS2CAST(object):
             return self.variable_context.get_node(func_name)
 
         return self.variable_context.add_variable(func_name, "function", None)
+
+#TS2CAST("scasum.f")
