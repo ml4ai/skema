@@ -113,7 +113,7 @@ class MatlabToCast(object):
         elif node.type == "iterator":
             return self.visit_iterator(node)
         elif node.type == "for_statement":
-            return self.visit_loop_for(node)
+            return self.visit_for_statement(node)
         elif node.type == "while_statement":
             return self.visit_loop_while(node)
         elif node.type in [
@@ -251,43 +251,75 @@ class MatlabToCast(object):
 
         return first
 
-    def visit_iterator(self, node):
-        return None
+    # CAST has no Iterator node, so we return a partially 
+    # completed Loop object 
+    # MATLAB iterators are either matrices or ranges.
+    def visit_iterator(self, node) -> Loop:
+
+        itr_var = self.visit(get_first_child_by_type(node, "identifier"))
+        loop = Loop(
+            expr = Operator(
+                source_refs=[self.node_helper.get_source_ref(node)]
+            ),
+            post = []
+        )
+
+        # process matrix iterator
+        matrix_node = get_first_child_by_type(node, "matrix")
+        if matrix_node is not None:
+             pass # TODO implement
+
+        # process range iterator
+        range_node = get_first_child_by_type(node, "range")
+        if range_node is not None:
+            numbers = [self.visit(child) for child in 
+                get_children_by_types(range_node, ["number"])]
+            start = numbers[0]
+            loop.expr.op = "<="
+            step = 1
+            if len(numbers) == 2:
+                stop = numbers[1]
+                loop.expr.operands = [itr_var, stop]
+                    
+
+            elif len(numbers) == 3:
+                step = numbers[1]
+                stop = numbers[2]
+                loop.expr.operands = [itr_var, stop]
+
+            loop.pre = [
+                Assignment(
+                    left = itr_var,
+                    right = start,
+                    source_refs=[self.node_helper.get_source_ref(node)],
+                )
+            ]
+            loop.body = [
+                Assignment(
+                    left = itr_var,
+                    right = Operator(
+                        op = "+",
+                        operands = [itr_var, step],
+                        source_refs=[self.node_helper.get_source_ref(node)]
+                    ),
+                    source_refs=[self.node_helper.get_source_ref(node)],
+                )
+             ]
+
+        return loop
 
     def visit_range(self, node):
         return None
 
-    def visit_loop_for(self, node) -> Loop:
+    def visit_for_statement(self, node) -> Loop:
         """ Translate Tree-sitter for loop node into CAST Loop node """
-        itr = get_first_child_by_type(node, "iterator")
-        itr_identifier = get_first_child_by_type(itr, "identifier")
-        itr_range = get_first_child_by_type(itr, "range")
-        limits = get_keyword_children(itr_range)
-        start = self.visit(limits[0])
-        end = self.visit(limits[1])
-        return Loop (
-            # pre = [Assignment(left = iterator_identifier, right = start)],
-            # expr = Operator(op = "<", operands = [iterator_identifier, end]),
-            pre = [],
-            expr = Operator(
-                source_refs = [self.node_helper.get_source_ref(node)]
-            ),
-            body = self.get_block(node),
-            post = [],
-            source_refs = [self.node_helper.get_source_ref(node)]
-        )
 
-    def visit_loop_while(self, node) -> Loop:
-        """ Translate Tree-sitter while loop node into CAST Loop node """
-        return Loop (
-            pre = [],
-            expr = Operator(
-                source_refs = [self.node_helper.get_source_ref(node)]
-            ),
-            body = self.get_block(node),
-            post = [],
-            source_refs = [self.node_helper.get_source_ref(node)]
-        )
+        loop = self.visit(get_first_child_by_type(node, "iterator"))
+        loop.source_refs=[self.node_helper.get_source_ref(node)]
+        loop.body += self.get_block(node)
+
+        return loop
+
 
     def visit_matrix(self, node):
         """ Translate the Tree-sitter cell node into a List """

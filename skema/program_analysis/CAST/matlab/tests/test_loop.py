@@ -6,61 +6,68 @@ from skema.program_analysis.CAST2FN.model.cast import (
     Operator
 )
 
-# Test the for loop
-def test_for():
+# Test the for loop incrementing by 1
+def test_implicit_step():
     """ Test the MATLAB for loop syntax elements"""
     source = """
-        for n = 1:10
-            x = do_something(n)
+        for n = 0:10
+            x = disp(n)
         end
     """
     nodes = cast(source)
     check(nodes[0], 
         Loop(
-            pre = [Assignment(left = "n", right = 1)],
-            expr = Operator(op = "<", operands = ["n", 10]),
+            pre = [Assignment(left = "n", right = 0)],
+            expr = Operator(op = "<=", operands = ["n", 10]),
             body = [
+                Assignment(
+                    left = "n",
+                    right = Operator(
+                        op = "+",
+                        operands = ["n", 1]
+                    )
+                ),
                 Assignment(
                     left = "x",
                     right = Call(
-                        func = "do_something",
+                        func = "disp",
                         arguments = ["n"]
                     )
-                ),
-                Call(
-                    func = "disp",
-                    arguments = ["k"]
                 )
             ],
             post = []
         )
     )
 
-# Test the while loop
-def test_while():
+# Test the for loop incrementing by n
+def test_explicit_step():
     """ Test the MATLAB for loop syntax elements"""
     source = """
-        while k < 5
-            k = k + 2;
-            disp(k);
+        for n = 0:2:10
+            x = disp(n)
         end
     """
     nodes = cast(source)
     check(nodes[0], 
         Loop(
-            pre = [],
-            expr = Operator(), # Operator(op = "<", operands = ["k",5]),
+            pre = [Assignment(left = "n", right = 0)],
+            expr = Operator(op = "<=", operands = ["n", 10]),
             body = [
                 Assignment(
-                    left = "k",
-                    right = Operator(op = "+", operands = ["k",2])
+                    left = "n",
+                    right = Operator(
+                        op = "+",
+                        operands = ["n", 2]
+                    )
                 ),
-                Call(
-                    func = "disp",
-                    arguments = ["k"]
+                Assignment(
+                    left = "x",
+                    right = Call(
+                        func = "disp",
+                        arguments = ["n"]
+                    )
                 )
             ],
             post = []
         )
     )
-
