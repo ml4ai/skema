@@ -53,7 +53,7 @@ def check(result, expected = None):
 
     # every CAST node has a source_refs element
     if isinstance(result, AstNode):
-        assert not result.source_refs == None
+        assert result.source_refs is not None
 
 # we curently produce a CAST object with a single Module in the nodes list.
 def cast(source):
