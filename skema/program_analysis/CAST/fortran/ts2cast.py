@@ -609,9 +609,7 @@ class TS2CAST(object):
             orelse = ModelIf()
             prev = orelse
             for condition in node.children[elseif_index:else_index]:
-                if condition.type == "comment":
-                    continue
-                elseif_expr = self.visit(condition.children[2])
+                elseif_expr = self.visit(get_first_child_by_type(condition, "parenthesized_expression"))
                 elseif_body = [self.visit(child) for child in condition.children[4:]]
                 
                 prev.orelse = ModelIf(elseif_expr, elseif_body, [])
@@ -625,12 +623,6 @@ class TS2CAST(object):
                     else_body.append(child_cast)
                 elif isinstance(child_cast, List):
                     else_body.extend(child_cast)
-
-            """
-            else_body = [
-                self.visit(child) for child in node.children[else_index].children[1:]
-            ]
-            """
 
             if prev:
                 prev.orelse = else_body
@@ -1207,4 +1199,4 @@ class TS2CAST(object):
 
         return self.variable_context.add_variable(func_name, "function", None)
 
-#TS2CAST("snrm2.f")
+#TS2CAST("glissade_velo_higher.F90")
