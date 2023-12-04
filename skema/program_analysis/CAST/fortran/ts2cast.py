@@ -618,9 +618,20 @@ class TS2CAST(object):
                 prev = prev.orelse
 
         if else_index != -1:
+            else_body = []
+            for child in node.children[else_index].children[1:]:
+                child_cast = self.visit(child)
+                if isinstance(child_cast, AstNode):
+                    else_body.append(child_cast)
+                elif isinstance(child_cast, List):
+                    else_body.extend(child_cast)
+
+            """
             else_body = [
                 self.visit(child) for child in node.children[else_index].children[1:]
             ]
+            """
+
             if prev:
                 prev.orelse = else_body
             else:
@@ -1196,4 +1207,4 @@ class TS2CAST(object):
 
         return self.variable_context.add_variable(func_name, "function", None)
 
-#TS2CAST("scasum.f")
+#TS2CAST("snrm2.f")
