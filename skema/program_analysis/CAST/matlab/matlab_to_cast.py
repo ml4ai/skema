@@ -267,7 +267,20 @@ class MatlabToCast(object):
         # process matrix iterator
         matrix_node = get_first_child_by_type(node, "matrix")
         if matrix_node is not None:
-             pass # TODO implement
+            row_node = get_first_child_by_type(matrix_node, "row")
+            if (row_node):
+                operand = LiteralValue(
+                    value_type="List",
+                    value = self.visit(row_node),
+                    source_code_data_type=["matlab", MATLAB_VERSION, "unknown"],
+                    source_refs=[self.node_helper.get_source_ref(cell_node)]
+                )
+                return self.get_operator(
+                    op = "in", 
+                    operands = [identifier, operand], 
+                    source_refs = source_refs
+                )
+
 
         # process range iterator
         range_node = get_first_child_by_type(node, "range")
@@ -430,16 +443,6 @@ class MatlabToCast(object):
             "unary_operator"
         ]
         
-        def get_operator(op, operands, source_refs):
-            """ return an Operator representing the case test """
-            return Operator(
-                source_language = "matlab",
-                interpreter = INTERPRETER,
-                version = MATLAB_VERSION,
-                op = op,
-                operands = operands,
-                source_refs = source_refs
-            )
 
         def get_case_expression(case_node, identifier):
             """ return an Operator representing the case test """
@@ -453,11 +456,19 @@ class MatlabToCast(object):
                     source_code_data_type=["matlab", MATLAB_VERSION, "unknown"],
                     source_refs=[self.node_helper.get_source_ref(cell_node)]
                 )
-                return get_operator("in", [identifier, operand], source_refs)
+                return self.get_operator(
+                    op = "in", 
+                    operands = [identifier, operand], 
+                    source_refs = source_refs
+                )
             # single case argument
             operand = [self.visit(node) for node in 
                 get_children_by_types(case_node, case_node_types)][0]
-            return get_operator("==", [identifier, operand], source_refs)
+            return self.get_operator(
+                op = "==", 
+                operands = [identifier, operand], 
+                source_refs = source_refs
+            )
 
         def get_model_if(case_node, identifier):
             """ return conditional logic representing the case """
@@ -491,6 +502,17 @@ class MatlabToCast(object):
         if block:
             return [self.visit(child) for child in 
                 get_keyword_children(block)]
+
+    def get_operator(self, op, operands, source_refs):
+        """ return an Operator representing the case test """
+        return Operator(
+            source_language = "matlab",
+            interpreter = INTERPRETER,
+            version = MATLAB_VERSION,
+            op = op,
+            operands = operands,
+            source_refs = source_refs
+        )
 
     # skip control nodes and other junk
     def _visit_passthrough(self, node):
