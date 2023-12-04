@@ -41,9 +41,9 @@ def test_identifier():
 def test_operator():
     """ Test assignment of operator"""
     check(
-        cast("Vtot = V1PF+V1AZ;")[0], 
+        cast("x = x + 1")[0], 
         Assignment(
-            left = "Vtot", 
-            right = Operator(op = "+",operands = ["V1PF", "V1AZ"])
+            left = "x", 
+            right = Operator(op = "+",operands = ["x", 1])
         )
     )
