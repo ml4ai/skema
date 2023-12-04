@@ -1182,7 +1182,15 @@ fn create_function_net(gromet: &ModuleCollection, mut start: u32) -> Vec<String>
                 }
             }
             FunctionType::Imported => {
-                create_import(
+                create_att_primitive(
+                    gromet,     // gromet for metadata
+                    &mut nodes, // nodes
+                    &mut edges,
+                    &mut meta_nodes,
+                    &mut start,
+                    c_args.clone(),
+                );
+                /*create_import(
                     gromet,
                     &mut nodes,
                     &mut edges,
@@ -1199,11 +1207,19 @@ fn create_function_net(gromet: &ModuleCollection, mut start: u32) -> Vec<String>
                     c_args.att_idx,
                     c_args.bf_counter,
                     c_args.parent_node.clone(),
-                );
+                );*/
             }
             FunctionType::ImportedMethod => {
+                create_att_primitive(
+                    gromet,     // gromet for metadata
+                    &mut nodes, // nodes
+                    &mut edges,
+                    &mut meta_nodes,
+                    &mut start,
+                    c_args.clone(),
+                );
                 // basically seems like these are just functions to me.
-                c_args.att_idx = boxf.contents.unwrap() as usize;
+                /*c_args.att_idx = boxf.contents.unwrap() as usize;
                 c_args.att_box = gromet.modules[0].attributes[c_args.att_idx - 1].clone();
                 create_function(
                     gromet,     // gromet for metadata
@@ -1212,7 +1228,7 @@ fn create_function_net(gromet: &ModuleCollection, mut start: u32) -> Vec<String>
                     &mut meta_nodes,
                     &mut start,
                     c_args.clone(),
-                );
+                );*/
             }
             _ => {}
         }
@@ -1611,8 +1627,7 @@ pub fn create_function(
                         }
                         FunctionType::ImportedMethod => {
                             // this is a function call, but for some reason is not called a function
-                            new_c_args.att_idx = att_sub_box.contents.unwrap() as usize;
-                            create_function(
+                            create_att_primitive(
                                 gromet, // gromet for metadata
                                 nodes,  // nodes
                                 edges,
@@ -1620,9 +1635,26 @@ pub fn create_function(
                                 start,
                                 new_c_args.clone(),
                             );
+                            /*new_c_args.att_idx = att_sub_box.contents.unwrap() as usize;
+                            create_function(
+                                gromet, // gromet for metadata
+                                nodes,  // nodes
+                                edges,
+                                meta_nodes,
+                                start,
+                                new_c_args.clone(),
+                            );*/
                         }
                         FunctionType::Imported => {
-                            create_import(gromet, nodes, edges, meta_nodes, start, c_args.clone());
+                            create_att_primitive(
+                                gromet, // gromet for metadata
+                                nodes,  // nodes
+                                edges,
+                                meta_nodes,
+                                start,
+                                new_c_args.clone(),
+                            );
+                            /*create_import(gromet, nodes, edges, meta_nodes, start, c_args.clone());
                             *start += 1;
                             // now to implement wiring
                             import_wiring(
@@ -1632,7 +1664,7 @@ pub fn create_function(
                                 c_args.att_idx,
                                 c_args.bf_counter,
                                 c_args.parent_node.clone(),
-                            );
+                            );*/
                         }
                         _ => {
                             println!(
@@ -4146,7 +4178,7 @@ pub fn create_att_abstract(
     // now make the node with the port information
     let mut metadata_idx = 0;
     let n3 = Node {
-        n_type: String::from("Primitive"),
+        n_type: String::from("Abstract"),
         value: None,
         name: c_args.cur_box.name.clone(),
         node_id: format!("n{}", start),
@@ -5099,7 +5131,7 @@ pub fn wfopo_cross_att_wiring(
     }
 }
 // this will construct connections from the sub function modules opi's to another sub module opo's, tracing data inside the function
-// opi(sub)->opo(sub)
+// opi(sub)->opo(sub) or pif(current) -> opo(sub) or opi(sub) -> pof(current)
 #[allow(unused_assignments)]
 pub fn wff_cross_att_wiring(
     eboxf: FunctionNet, // This is the current attribute, should be the function if in a function
@@ -5232,7 +5264,7 @@ pub fn wff_cross_att_wiring(
                             && (tgt_box as u32) == node.box_counter as u32
                         {
                             // only opo's
-                            if node.n_type == "Primitive" || node.n_type == "Literal" {
+                            if node.n_type == "Primitive" || node.n_type == "Literal" || node.n_type == "Abstract" {
                                 // iterate through port to check for tgt
                                 for p in node.out_idx.as_ref().unwrap().iter() {
                                     // push the src first, being pif
@@ -5269,6 +5301,7 @@ pub fn wff_cross_att_wiring(
                 }
             }
         } else {
+            // This should be pif -> opo
             let src_nbox = bf_counter; // nbox value of src opi
                                        // collect info to identify the opo tgt node
             let tgt_idx = wire.tgt; // port index
@@ -5298,11 +5331,11 @@ pub fn wff_cross_att_wiring(
                             && (src_box as u32) == node.box_counter as u32
                         {
                             // only opo's
-                            if node.n_type == "Primitive" {
+                            if node.n_type == "Primitive" || node.n_type == "Abstract" {
                                 // iterate through port to check for tgt
                                 for p in node.in_indx.as_ref().unwrap().iter() {
                                     // push the src first, being pif
-                                    if (src_opi_idx as u32) == *p {
+                                    if (src_idx as u32) == *p {
                                         wff_src_tgt.push(node.node_id.clone());
                                     }
                                 }
