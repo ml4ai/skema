@@ -1,21 +1,11 @@
-// use crate::parsers::math_expression_tree::is_unary_operator;
+use crate::ast::{operator::Operator, MathExpression, Mi};
 use crate::parsers::math_expression_tree::MathExpressionTree;
-use crate::{
-    ast::{
-        operator::Operator,
-        Math, MathExpression,
-        MathExpression::{Mfrac, Mn, Mo, Mover, Msqrt, Msubsup, Msup},
-        Mi, Mrow,
-    },
-    petri_net::recognizers::recognize_leibniz_differential_operator,
-};
 use petgraph::{graph::NodeIndex, Graph};
 use std::{clone::Clone, collections::VecDeque};
 
 /// Struct for representing mathematical expressions in order to align with source code.
 pub type MathExpressionGraph<'a> = Graph<String, String>;
-
-use crate::parsers::math_expression_tree::Token::Op;
+use petgraph::dot::Dot;
 use std::string::ToString;
 
 #[derive(Debug, PartialEq, Eq, Clone)]
@@ -61,33 +51,6 @@ fn is_unary_operator(op: &Operator) -> bool {
         _ => false,
     }
 }
-
-/// Check if the fraction is a derivative expressed in Leibniz notation. If yes, mutate it to
-/// remove the 'd' prefixes.
-pub fn is_derivative(
-    numerator: &mut Box<MathExpression>,
-    denominator: &mut Box<MathExpression>,
-) -> bool {
-    if recognize_leibniz_differential_operator(numerator, denominator).is_ok() {
-        if let MathExpression::Mrow(Mrow(x)) = &mut **numerator {
-            x.remove(0);
-        }
-
-        if let MathExpression::Mrow(Mrow(x)) = &mut **denominator {
-            x.remove(0);
-        }
-        return true;
-    }
-    false
-}
-
-/// Identify if there is an implicit multiplication operator, and if so, add an
-/// explicit multiplication operator.
-// fn insert_explicit_multiplication_operator(pre: &mut Expression) {
-//     if pre.args.len() >= pre.ops.len() {
-//         pre.ops.push(Operator::Multiply);
-//     }
-// }
 
 /// Processes a MathExpression under the type of MathExpressionTree::Atom and appends
 /// the corresponding LaTeX representation to the provided String.
@@ -316,19 +279,19 @@ impl MathExpressionTree {
                 if let Expr::Expression { ops, args, name } = expr {
                     args.push(new_expr.clone());
                 }
-                println!();
             }
         }
         expr
     }
     pub fn to_graph(self) -> MathExpressionGraph<'static> {
+        let mut expr = self.clone();
         let mut pre_exp = Expr::Expression {
             ops: vec![Operator::Other("root".to_string())],
             args: Vec::<Expr>::new(),
             name: "root".to_string(),
         };
 
-        self.to_expr(&mut pre_exp);
+        expr.to_expr(&mut pre_exp);
 
         if let Expr::Expression { ops, args, name } = &mut pre_exp {
             for mut arg in args {
@@ -1210,125 +1173,6 @@ pub fn get_node_idx(graph: &mut MathExpressionGraph, name: &mut String) -> NodeI
     graph.add_node(name.to_string())
 }
 
-/// Remove redundant mrow next to specific MathML elements. This function will likely be removed
-/// once the img2mml pipeline is fixed.
-pub fn remove_redundant_mrow(mml: String, key_word: String) -> String {
-    let mut content = mml;
-    let key_words_left = "<mrow>".to_string() + &*key_word.clone();
-    let mut key_word_right = key_word.clone();
-    key_word_right.insert(1, '/');
-    let key_words_right = key_word_right.clone() + "</mrow>";
-    let locs: Vec<_> = content
-        .match_indices(&key_words_left)
-        .map(|(i, _)| i)
-        .collect();
-    for loc in locs.iter().rev() {
-        if content[loc + 1..].contains(&key_words_right) {
-            let l = content[*loc..].find(&key_word_right).map(|i| i + *loc);
-            if let Some(x) = l {
-                if content.len() > (x + key_words_right.len())
-                    && content[x..x + key_words_right.len()] == key_words_right
-                {
-                    content.replace_range(x..x + key_words_right.len(), key_word_right.as_str());
-                    content.replace_range(*loc..*loc + key_words_left.len(), key_word.as_str());
-                }
-            }
-        }
-    }
-    content
-}
-
-/// Remove redundant mrows in mathml because some mathml elements don't need mrow to wrap. This
-/// function will likely be removed
-/// once the img2mml pipeline is fixed.
-pub fn remove_redundant_mrows(mathml_content: String) -> String {
-    let mut content = mathml_content;
-    content = content.replace("<mrow>", "(");
-    content = content.replace("</mrow>", ")");
-    let f = |b: &[u8]| -> Vec<u8> {
-        let v = (0..)
-            .zip(b)
-            .scan(vec![], |a, (b, c)| {
-                Some(match c {
-                    40 => {
-                        a.push(b);
-                        None
-                    }
-                    41 => Some((a.pop()?, b)),
-                    _ => None,
-                })
-            })
-            .flatten()
-            .collect::<Vec<_>>();
-        for k in &v {
-            if k.0 == 0 && k.1 == b.len() - 1 {
-                return b[1..b.len() - 1].to_vec();
-            }
-            for l in &v {
-                if l.0 == k.0 + 1 && l.1 == k.1 - 1 {
-                    return [&b[..k.0], &b[l.0..k.1], &b[k.1 + 1..]].concat();
-                }
-            }
-        }
-        b.to_vec()
-    };
-    let g = |mut b: Vec<u8>| {
-        while f(&b) != b {
-            b = f(&b)
-        }
-        b
-    };
-    content = std::str::from_utf8(&g(content.bytes().collect()))
-        .unwrap()
-        .to_string();
-    content = content.replace('(', "<mrow>");
-    content = content.replace(')', "</mrow>");
-    content = remove_redundant_mrow(content, "<mi>".to_string());
-    content = remove_redundant_mrow(content, "<mo>".to_string());
-    content = remove_redundant_mrow(content, "<mfrac>".to_string());
-    content = remove_redundant_mrow(content, "<mover>".to_string());
-    content
-}
-
-/// Preprocess the content prior to parsing.
-pub fn preprocess_content(content_str: String) -> String {
-    let mut pre_string = content_str;
-    pre_string = pre_string.replace(' ', "");
-    pre_string = pre_string.replace('\n', "");
-    pre_string = pre_string.replace('\t', "");
-    pre_string = pre_string.replace("<mo>(</mo><mi>t</mi><mo>)</mo>", "");
-    pre_string = pre_string.replace("<mo>,</mo>", "");
-    pre_string = pre_string.replace("<mo>(</mo>", "<mrow>");
-    pre_string = pre_string.replace("<mo>)</mo>", "</mrow>");
-
-    // Unicode to Symbol
-    let unicode_locs: Vec<_> = pre_string.match_indices("&#").map(|(i, _)| i).collect();
-    for ul in unicode_locs.iter().rev() {
-        let loc = pre_string[*ul..].find('<').map(|i| i + ul);
-        match loc {
-            None => {}
-            Some(_x) => {}
-        }
-    }
-    pre_string = html_escape::decode_html_entities(&pre_string).to_string();
-    pre_string = pre_string.replace(
-        &html_escape::decode_html_entities("&#x2212;").to_string(),
-        "-",
-    );
-    pre_string = remove_redundant_mrows(pre_string);
-    pre_string
-}
-
-/// Wrap mathml vectors by mrow as a single expression to process
-pub fn wrap_math(math: Math) -> MathExpression {
-    let mut math_vec = vec![];
-    for con in math.content {
-        math_vec.push(con);
-    }
-
-    MathExpression::Mrow(Mrow(math_vec))
-}
-
 #[test]
 fn test_plus_to_graph() {
     let input = "
@@ -1341,30 +1185,15 @@ fn test_plus_to_graph() {
     </math>
     ";
     let exp = input.parse::<MathExpressionTree>().unwrap();
-    let s_exp = exp.to_string();
-    println!("s_exp={:?}", s_exp);
-    let mut pre_exp = Expr::Expression {
-        ops: vec![Operator::Other("root".to_string())],
-        args: Vec::<Expr>::new(),
-        name: "root".to_string(),
-    };
-    // exp.to_expr(&mut pre_exp);
-    // match &pre_exp {
-    //     Expr::Atom(_) => {}
-    //     Expr::Expression { ops, args, .. } => {
-    //         assert_eq!(ops[0], Operator::Other("root".to_string()));
-    //         match &args[0] {
-    //             Expr::Atom(_) => {}
-    //             Expr::Expression { ops, args, .. } => {
-    //                 assert_eq!(ops[0], Operator::Other("".to_string()));
-    //                 assert_eq!(ops[1], Operator::Add);
-    //                 assert_eq!(args[0], Expr::Atom(Atom::Identifier("a".to_string())));
-    //                 assert_eq!(args[1], Expr::Atom(Atom::Identifier("b".to_string())));
-    //             }
-    //         }
-    //     }
-    // }
-    println!("graph={:?}", exp.clone().to_graph());
+    let g = exp.to_graph();
+    let dot_representation = Dot::new(&g);
+    assert_eq!(
+        dot_representation
+            .to_string()
+            .replace("\n", "")
+            .replace(" ", ""),
+        "digraph{0[label=\"a+b\"]1[label=\"a\"]2[label=\"b\"]1->0[label=\"+\"]2->0[label=\"+\"]}"
+    )
 }
 
 #[test]
@@ -1412,12 +1241,10 @@ fn test_equation_halfar_dome_8_1_to_latex() {
     ";
 
     let exp = input.parse::<MathExpressionTree>().unwrap();
-    let s_exp = exp.to_string();
-    println!("s_exp={:?}", s_exp);
-    println!("graph={:?}", exp.clone().to_graph());
-    let latex_exp = exp.to_latex();
-    assert_eq!(
-        latex_exp,
-        "\\frac{d H}{dt}=\\nabla \\cdot {(\\Gamma*H^{n+2}*\\left|\\nabla{H}\\right|^{n-1}*\\nabla{H})}"
-    );
+    let g = exp.to_graph();
+    let dot_representation = Dot::new(&g);
+    assert_eq!(dot_representation.to_string()
+        .replace("\n", "")
+        .replace(" ", ""), 
+       "digraph{0[label=\"Div(Γ*(H^(n+2))*(Abs(Grad(H))^(n-1))*Grad(H))\"]1[label=\"D(1,t)(H)\"]2[label=\"Γ*(H^(n+2))*(Abs(Grad(H))^(n-1))*Grad(H)\"]3[label=\"Γ\"]4[label=\"H^(n+2)\"]5[label=\"H\"]6[label=\"n+2\"]7[label=\"n\"]8[label=\"2\"]9[label=\"Abs(Grad(H))^(n-1)\"]10[label=\"Abs(Grad(H))\"]11[label=\"Grad(H)\"]12[label=\"n-1\"]13[label=\"1\"]1->0[label=\"=\"]2->0[label=\"Div\"]3->2[label=\"*\"]4->2[label=\"*\"]5->4[label=\"^\"]6->4[label=\"^\"]7->6[label=\"+\"]8->6[label=\"+\"]9->2[label=\"*\"]10->9[label=\"^\"]11->10[label=\"Abs\"]5->11[label=\"Grad\"]12->9[label=\"^\"]7->12[label=\"+\"]13->12[label=\"-\"]11->2[label=\"*\"]}");
 }
