@@ -47,3 +47,14 @@ def test_operator():
             right = Operator(op = "+",operands = ["x", 1])
         )
     )
+
+def test_matrix():
+    """ Test assignment of matrix"""
+    check(
+        cast("x = [1 cat 'dog' ]")[0], 
+        Assignment(
+            left = "x", 
+            right = [1, 'cat', "'dog'"]
+        )
+    )
+
