@@ -33,6 +33,7 @@ from skema.program_analysis.CAST.fortran.node_helper import (
     NodeHelper,
     remove_comments,
     get_children_by_types,
+    get_children_except_types,
     get_first_child_by_type,
     get_control_children,
     get_non_control_children,
@@ -141,7 +142,7 @@ class TS2CAST(object):
             return self.visit_extent_specifier(node)
         elif node.type in ["do_loop_statement"]:
             return self.visit_do_loop_statement(node)
-        elif node.type == "if_statement":
+        elif node.type in ["if_statement", "else_if_clause", "else_clause"]:
             return self.visit_if_statement(node)
         elif node.type == "logical_expression":
             return self.visit_logical_expression(node)
@@ -574,80 +575,35 @@ class TS2CAST(object):
         #  (else_clause)
         #  (end_if_statement)
 
-        if_condition = self.visit(get_first_child_by_type(node, "parenthesized_expression"))
+        #TODO: Can you have a parenthesized expression as a body node
+        body_nodes = get_children_except_types(node, ["if", "elseif", "else", "then", "parenthesized_expression", "elseif_clause", "else_clause", "end_if_statement"])
+        body = self.generate_cast_body(body_nodes)
+        
+        expr_node = get_first_child_by_type(node, "parenthesized_expression")
+        expr = None
+        if expr_node:
+            expr = self.visit(expr_node)
 
-        child_types = [child.type for child in node.children]
-
-        try:
-            elseif_index = child_types.index("elseif_clause")
-        except ValueError:
-            elseif_index = -1
-
-        try:
-            else_index = child_types.index("else_clause")
-        except ValueError:
-            else_index = -1
-
-        if elseif_index != -1:
-            body_stop_index = elseif_index
-        else:
-            body_stop_index = else_index
-
-        # Single line if conditions don't have a 'then' or 'end if' clause. 
-        # So the starting index for the body can either be 2 or 3.
-        then_index = get_first_child_index(node, "then")
-        if then_index:
-            body_start_index = then_index+1
-        else:
-            body_start_index = 2
-            body_stop_index = len(node.children)
-
-        prev = None
-        orelse = None
-        # If there are else_if statements, they need
-        if elseif_index != -1:
-            orelse = ModelIf()
-            prev = orelse
-            for condition in node.children[elseif_index:else_index]:
-                elseif_expr = self.visit(get_first_child_by_type(condition, "parenthesized_expression"))
-                elseif_body = [self.visit(child) for child in condition.children[4:]]
+        elseif_nodes = get_children_by_types(node, ["elseif_clause"])
+        elseif_cast = [self.visit(elseif_clause) for elseif_clause in elseif_nodes]
+        for i in range(len(elseif_cast)-1):
+            elseif_cast[i].orelse = [elseif_cast[i+1]]
                 
-                prev.orelse = ModelIf(elseif_expr, elseif_body, [])
-                prev = prev.orelse
+        else_node = get_first_child_by_type(node, "else_clause")
+        else_cast = None
+        if else_node:
+            else_cast = self.visit(else_node)
+            
+        orelse = []
+        if len(elseif_cast) > 0:
+            orelse = [elseif_cast[0]]
+        elif else_cast:
+            orelse = else_cast.body
 
-        if else_index != -1:
-            else_body = []
-            for child in node.children[else_index].children[1:]:
-                child_cast = self.visit(child)
-                if isinstance(child_cast, AstNode):
-                    else_body.append(child_cast)
-                elif isinstance(child_cast, List):
-                    else_body.extend(child_cast)
-
-            if prev:
-                prev.orelse = else_body
-            else:
-                orelse = else_body
-
-        # TODO: This orelse logic has gotten a little complex, we might want to refactor this.
-        if isinstance(orelse, ModelIf):
-            orelse = orelse.orelse
-        if orelse:
-            if isinstance(orelse, ModelIf):
-                orelse = [orelse]
-
-        body = []
-        for child in node.children[body_start_index:body_stop_index]:
-            child_cast = self.visit(child)
-            if isinstance(child_cast, AstNode):
-                body.append(child_cast)
-            elif isinstance(child_cast, List):
-                body.extend(child_cast)
-    
         return ModelIf(
-            expr=self.visit(node.children[1]),
+            expr=expr,
             body=body,
-            orelse=orelse if orelse else [],
+            orelse=orelse
         )
 
     def visit_logical_expression(self, node):
@@ -668,7 +624,6 @@ class TS2CAST(object):
         is_or = "or" in operator.type 
         
         top_if = ModelIf()
-
         top_if_expr = self.visit(left)
         top_if.expr = top_if_expr
         
@@ -787,6 +742,7 @@ class TS2CAST(object):
             # For operators, we will only need the name node since we are not allocating space
             if operand.type == "identifier":
                 operands[-1] = operands[-1].val
+
 
         return Operator(
             source_language="Fortran",
@@ -1199,4 +1155,14 @@ class TS2CAST(object):
 
         return self.variable_context.add_variable(func_name, "function", None)
 
-#TS2CAST("glissade_velo_higher.F90")
+    def generate_cast_body(self, body_nodes: List):
+        body = []
+        for node in body_nodes:
+            cast = self.visit(node)
+            if isinstance(cast, AstNode):
+                body.append(cast)
+            elif isinstance(cast, List):
+                body.extend(cast)
+        return body
+
+#TS2CAST("glad_output_states.F90")
