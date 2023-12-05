@@ -5560,7 +5560,7 @@ pub fn construct_memgraph_queries(nodes: &mut Vec<Node>, edges: &mut Vec<Edge>, 
         // handles case of parsing a list as a proper list object, only depth one though
         // would need recursive function for aritrary depth. To be done at somepoint. 
         let value = match &node.value {
-            Some(val) => if val.value_type == *"List" {
+            Some(val) => if val.value_type == *"List" && &val.value[0..1] == "[" && &val.value[1..2] != "]"  {
                 let val_type = val.value_type.clone();
                 let val_grom_type = val.gromet_type.as_ref().unwrap();
                 let val_len = val.value[..].len();
