@@ -17,6 +17,23 @@ use neo4rs;
 use neo4rs::{query, Error};
 use std::sync::Arc;
 
+#[derive(Clone, Debug)]
+pub struct ModelNode {
+    id: i64,
+    label: String,
+    name: String,
+    value: Option<String>,
+}
+
+#[derive(Clone, Debug)]
+pub struct ModelEdge {
+    id: i64,
+    src_id: i64,
+    tgt_id: i64,
+    index: Option<i64>,
+    refer: Option<i64>,
+}
+
 #[allow(non_snake_case)]
 pub async fn module_id2mathml_MET_ast(module_id: i64, config: Config) -> Vec<FirstOrderODE> {
     let mut core_dynamics_ast = Vec::<FirstOrderODE>::new();

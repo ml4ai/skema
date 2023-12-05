@@ -779,7 +779,8 @@ fn create_function_net_lib(gromet: &ModuleCollection, mut start: u32) -> Vec<Str
         }
     } */
     // convert every node object into a node query
-    let create = String::from("CREATE");
+    queries.append(&mut construct_memgraph_queries(&mut nodes, &mut edges, &mut meta_nodes, &mut queries.clone()));
+    /*let create = String::from("CREATE");
     for node in nodes.iter() {
         let mut name = String::from("a");
         if node.name.is_none() {
@@ -839,7 +840,7 @@ fn create_function_net_lib(gromet: &ModuleCollection, mut start: u32) -> Vec<Str
             let set_query = format!("set e{}{}.refer={}", edge.src, edge.tgt, edge.refer.unwrap());
             queries.push(set_query);
         }
-    }
+    }*/
     queries
 }
 
@@ -1311,7 +1312,8 @@ fn create_function_net(gromet: &ModuleCollection, mut start: u32) -> Vec<String>
         }
     }
     // convert every node object into a node query
-    let create = String::from("CREATE");
+    queries.append(&mut construct_memgraph_queries(&mut nodes, &mut edges, &mut meta_nodes, &mut queries.clone()));
+    /*let create = String::from("CREATE");
     for node in nodes.iter() {
         let mut name = String::from("a");
         if node.name.is_none() {
@@ -1371,7 +1373,7 @@ fn create_function_net(gromet: &ModuleCollection, mut start: u32) -> Vec<String>
             let set_query = format!("set e{}{}.refer={}", edge.src, edge.tgt, edge.refer.unwrap());
             queries.push(set_query);
         }
-    }
+    }*/
     queries
 }
 // this method creates an import type function
@@ -4197,9 +4199,18 @@ pub fn create_att_abstract(
         }
     }
     // now to construct an entry of ValueL for abstract port references
+    let mut value_vec = Vec::<ValueL>::new();
+    for name in pof_names.iter() {
+        let val = ValueL {
+            value_type: "String".to_string(),
+            value: format!("{:?}", name.clone()),
+            gromet_type: Some("Name".to_string()),
+        };
+        value_vec.push(val.clone());
+    }
     let val = ValueL {
         value_type: "List".to_string(),
-        value: format!("{:?}", pof_names.clone()),
+        value: format!("{:?}", value_vec.clone()),
         gromet_type: Some("Abstract".to_string()),
     };
     // now make the node with the port information
@@ -5532,4 +5543,105 @@ pub fn parse_gromet_queries(gromet: ModuleCollection) -> Vec<String> {
     queries.append(&mut create_graph_queries(&gromet, start));
 
     queries
+}
+
+// convert every node object into a node query
+pub fn construct_memgraph_queries(nodes: &mut Vec<Node>, edges: &mut Vec<Edge>, meta_nodes: &mut Vec<MetadataNode>, queries: &mut Vec<String>) -> Vec<String> {
+    // convert every node object into a node query
+    let create = String::from("CREATE");
+    for node in nodes.iter() {
+        let mut name = String::from("a");
+        if node.name.is_none() {
+            name = node.n_type.clone();
+        } else {
+            name = node.name.as_ref().unwrap().to_string();
+        }
+        // better parsing of values for inference later on.
+        // handles case of parsing a list as a proper list object, only depth one though
+        // would need recursive function for aritrary depth. To be done at somepoint. 
+        let value = match &node.value {
+            Some(val) => if val.value_type == *"List" {
+                let val_type = val.value_type.clone();
+                let val_grom_type = val.gromet_type.as_ref().unwrap();
+                let val_len = val.value[..].len();
+                let val_val: Vec<String> = val.value[1..val_len].split("}, ").map(|x| x.to_string()).collect();
+
+                let mut val_vec = Vec::<String>::new();
+                for (i, val) in val_val.iter().enumerate() {
+                    if i == val_val.len() - 1 {
+                        let val_string = format!("{}}}", &val[7..(val.len()-2)]);
+                        val_vec.push(val_string.clone());
+                    } else {
+                        let val_string = format!("{}}}", &val[7..]);
+                        val_vec.push(val_string.clone());
+                    }
+                }
+                let mut final_val_vec = Vec::<String>::new();
+                for val_str in val_vec.iter() {
+                    let val_fields: Vec<String> = val_str.split(", ").map(|x| x.to_string()).collect();
+                    let cor_val: Vec<String> = val_fields[1].split(": ").map(|x| x.to_string()).collect();
+                    let final_val =  cor_val[1].replace("\\\"", "");
+                    final_val_vec.push(final_val.clone());
+                }
+                format!(
+                    "{{ value_type:{:?}, value:{:?}, gromet_type:{:?} }}",
+                    val_type,
+                    final_val_vec,
+                    val_grom_type
+                ).replace("\\\"", "")
+            } else {
+                format!(
+                    "{{ value_type:{:?}, value:{:?}, gromet_type:{:?} }}",
+                    val.value_type,
+                    val.value,
+                    val.gromet_type.as_ref().unwrap()
+                )
+            },
+            None => String::from("\"\""),
+        };
+
+        // NOTE: The format of value has changed to represent a literal Cypher map {field:value}.
+        // We no longer need to format value with the debug :? parameter
+        let node_query = format!(
+            "{} ({}:{} {{name:{:?},value:{},order_box:{:?},order_att:{:?}}})",
+            create, node.node_id, node.n_type, name, value, node.nbox, node.contents
+        );
+        queries.push(node_query);
+    }
+    for node in meta_nodes.iter() {
+        queries.append(&mut create_metadata_node_query(node.clone()));
+    }
+
+    // convert every edge object into an edge query
+    let init_edges = edges.len();
+    edges.sort();
+    edges.dedup();
+    let edges_clone = edges.clone();
+    // also dedup if edge prop is different
+    for (i, edge) in edges_clone.iter().enumerate().rev() {
+        if i != 0 && edge.src == edges_clone[i - 1].src && edge.tgt == edges_clone[i - 1].tgt {
+            edges.remove(i);
+        }
+    }
+    let fin_edges = edges.len();
+    if init_edges != fin_edges {
+        println!("Duplicated Edges Removed, check for bugs");
+    }
+    for edge in edges.iter() {
+        let edge_query = format!(
+            "{} ({})-[e{}{}:{}]->({})",
+            create, edge.src, edge.src, edge.tgt, edge.e_type, edge.tgt
+        );
+        queries.push(edge_query);
+
+        if edge.prop.is_some() {
+            let set_query = format!("set e{}{}.index={}", edge.src, edge.tgt, edge.prop.unwrap());
+            queries.push(set_query);
+        }
+        if edge.refer.is_some() {
+            let set_query = format!("set e{}{}.refer={}", edge.src, edge.tgt, edge.refer.unwrap());
+            queries.push(set_query);
+        }
+    }
+    queries.to_vec()
 }
