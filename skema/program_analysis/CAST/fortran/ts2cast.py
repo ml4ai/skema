@@ -69,7 +69,7 @@ class TS2CAST(object):
 
         # Start visiting
         self.out_cast = self.generate_cast()
-        #print(self.out_cast[0].to_json_str())
+        print(self.out_cast[1].to_json_str())
         
     def generate_cast(self) -> List[CAST]:
         '''Interface for generating CAST.'''
@@ -138,6 +138,8 @@ class TS2CAST(object):
             return self.visit_literal(node)
         elif node.type == "keyword_statement":
             return self.visit_keyword_statement(node)
+        elif node.type == "print_statement":
+            return self.visit_print_statement(node)
         elif node.type == "extent_specifier":
             return self.visit_extent_specifier(node)
         elif node.type in ["do_loop_statement"]:
@@ -306,11 +308,7 @@ class TS2CAST(object):
         function_node = get_children_by_types(node, ["unary_expression", "subroutine", "identifier", "derived_type_member_expression"])[0]
 
         if function_node.type == "derived_type_member_expression":
-            func = Attribute(
-                value=None,
-                attr=None
-            )
-            return None
+            return self.visit_derived_type_member_expression(function_node)
         
         arguments_node = get_first_child_by_type(node, "argument_list")
         
@@ -382,6 +380,18 @@ class TS2CAST(object):
 
         return ModelReturn(
             value=value, source_refs=[self.node_helper.get_source_ref(node)]
+        )
+
+    def visit_print_statement(self, node):
+        func = self.get_gromet_function_node("print")
+
+        arguments = []
+
+        return Call(
+            func=func,
+            arguments=arguments,
+            source_language=None,
+            source_language_version=None
         )
 
     def visit_use_statement(self, node):
@@ -922,7 +932,7 @@ class TS2CAST(object):
         # If we tell the variable context we are in a record definition, it will append the type name as a prefix to all defined variables.
         self.variable_context.enter_record_definition(record_name)
 
-        # TODO: Full support for this requires handling the contains statement generally
+        # Note: 
         funcs = []
         derived_type_procedures_node = get_first_child_by_type(
             node, "derived_type_procedures"
@@ -1165,4 +1175,4 @@ class TS2CAST(object):
                 body.extend(cast)
         return body
 
-#TS2CAST("glad_output_states.F90")
+TS2CAST("derived_type.f")
