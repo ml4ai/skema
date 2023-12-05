@@ -257,29 +257,66 @@ class MatlabToCast(object):
     def visit_iterator(self, node) -> Loop:
 
         itr_var = self.visit(get_first_child_by_type(node, "identifier"))
-        loop = Loop(
-            expr = Operator(
-                source_refs=[self.node_helper.get_source_ref(node)]
-            ),
-            post = []
-        )
+        source_ref = self.node_helper.get_source_ref(node)
 
         # process matrix iterator
         matrix_node = get_first_child_by_type(node, "matrix")
         if matrix_node is not None:
             row_node = get_first_child_by_type(matrix_node, "row")
-            if (row_node):
-                operand = LiteralValue(
-                    value_type="List",
-                    value = self.visit(row_node),
-                    source_code_data_type=["matlab", MATLAB_VERSION, "unknown"],
-                    source_refs=[self.node_helper.get_source_ref(cell_node)]
+            if row_node is not None:
+                mat = [self.visit(child) for child in 
+                    get_keyword_children(row_node)]
+                mat_idx = 0
+                mat_len = len(mat)
+
+
+                return Loop(
+                    pre = [
+                        Assignment(
+                            left = "_mat",
+                            right = mat,
+                            source_refs = [source_ref]
+                        ),
+                        Assignment(
+                            left = "_mat_len",
+                            right = mat_len,
+                            source_refs = [source_ref]
+                        ),
+                        Assignment(
+                            left = "_mat_idx",
+                            right = mat_idx,
+                            source_refs = [source_ref]
+                        ),
+                        Assignment(
+                            left = itr_var,
+                            right = mat[mat_idx],
+                            source_refs = [source_ref]
+                        )
+                    ],
+                    expr = self.get_operator(
+                        op = "<",
+                        operands = ["_mat_idx", "_mat_len"],
+                        source_refs = [source_ref]
+                    ),
+                    body = [
+                        Assignment(
+                            left = "_mat_idx",
+                            right = self.get_operator(
+                                op = "+",
+                                operands = ["_mat_idx", 1],
+                                source_refs = [source_ref]
+                            ),
+                            source_refs = [source_ref]
+                        ),
+                        Assignment(
+                            left = itr_var,
+                            right = "_mat[_mat_idx]",
+                            source_refs = [source_ref]
+                        )
+                    ],
+                    post = []
                 )
-                return self.get_operator(
-                    op = "in", 
-                    operands = [identifier, operand], 
-                    source_refs = source_refs
-                )
+
 
 
         # process range iterator
@@ -288,38 +325,42 @@ class MatlabToCast(object):
             numbers = [self.visit(child) for child in 
                 get_children_by_types(range_node, ["number"])]
             start = numbers[0]
-            loop.expr.op = "<="
             step = 1
+            stop = 0
             if len(numbers) == 2:
                 stop = numbers[1]
-                loop.expr.operands = [itr_var, stop]
-                    
 
             elif len(numbers) == 3:
                 step = numbers[1]
                 stop = numbers[2]
-                loop.expr.operands = [itr_var, stop]
 
-            loop.pre = [
-                Assignment(
-                    left = itr_var,
-                    right = start,
-                    source_refs=[self.node_helper.get_source_ref(node)],
-                )
-            ]
-            loop.body = [
-                Assignment(
-                    left = itr_var,
-                    right = Operator(
-                        op = "+",
-                        operands = [itr_var, step],
-                        source_refs=[self.node_helper.get_source_ref(node)]
-                    ),
-                    source_refs=[self.node_helper.get_source_ref(node)],
-                )
-             ]
+            return Loop(
+                pre = [
+                    Assignment(
+                        left = itr_var,
+                        right = start,
+                        source_refs = [source_ref]
+                    )
+                ],
+                expr = self.get_operator(
+                    op = "<=",
+                    operands = [itr_var, stop],
+                    source_refs = [source_ref]
+                ),
+                body = [
+                    Assignment(
+                        left = itr_var,
+                        right = self.get_operator(
+                            op = "+",
+                            operands = [itr_var, step],
+                            source_refs = [source_ref]
+                        ),
+                        source_refs = [source_ref]
+                    )
+                ],
+                post = []
+            )
 
-        return loop
 
     def visit_range(self, node):
         return None
@@ -329,7 +370,7 @@ class MatlabToCast(object):
 
         loop = self.visit(get_first_child_by_type(node, "iterator"))
         loop.source_refs=[self.node_helper.get_source_ref(node)]
-        loop.body += self.get_block(node)
+        loop.body = self.get_block(node) + loop.body
 
         return loop
 
@@ -407,17 +448,14 @@ class MatlabToCast(object):
         )
 
     def visit_operator(self, node):
-        """return an Operator based on the Tree-sitter node """
+        """return an operator based on the Tree-sitter node """
         # The operator will be the first control character
         op = self.node_helper.get_identifier(
            get_control_children(node)[0]
         )
         # the operands will be the keyword children
         operands=[self.visit(child) for child in get_keyword_children(node)]
-        return Operator(
-            source_language="matlab",
-            interpreter=INTERPRETER,
-            version=MATLAB_VERSION,
+        return self.get_operator(
             op = op,
             operands = operands,
             source_refs=[self.node_helper.get_source_ref(node)],
@@ -445,7 +483,7 @@ class MatlabToCast(object):
         
 
         def get_case_expression(case_node, identifier):
-            """ return an Operator representing the case test """
+            """ return an operator representing the case test """
             source_refs=[self.node_helper.get_source_ref(case_node)]
             cell_node = get_first_child_by_type(case_node, "cell")
             # multiple case arguments
@@ -504,7 +542,7 @@ class MatlabToCast(object):
                 get_keyword_children(block)]
 
     def get_operator(self, op, operands, source_refs):
-        """ return an Operator representing the case test """
+        """ return an operator representing the arguments """
         return Operator(
             source_language = "matlab",
             interpreter = INTERPRETER,
