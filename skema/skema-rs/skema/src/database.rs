@@ -68,12 +68,13 @@ pub struct Node {
     pub box_counter: usize, // this indexes the box call for the node one scope up, matches nbox if higher scope is top level
 }
 
-#[derive(Debug, Clone, PartialEq, Ord, Eq, PartialOrd)]
+#[derive(Debug, Clone, PartialEq, Ord, Eq, PartialOrd, Default)]
 pub struct Edge {
     pub src: String,
     pub tgt: String,
     pub e_type: String,
     pub prop: Option<usize>, // option because of opo's and opi's
+    pub refer: Option<usize>,
 }
 
 #[derive(Debug, Clone)]
@@ -378,7 +379,7 @@ fn create_module(gromet: &ModuleCollection) -> Vec<String> {
         src: String::from("mod"),
         tgt: format!("m{}", metadata_idx),
         e_type: String::from("Metadata"),
-        prop: None,
+        ..Default::default()
     };
     let edge_query = format!(
         "{} ({})-[e{}{}:{}]->({})",
@@ -453,6 +454,7 @@ fn create_function_net_lib(gromet: &ModuleCollection, mut start: u32) -> Vec<Str
             tgt: format!("n{}", start),
             e_type: String::from("Contains"),
             prop: Some(1),
+            ..Default::default()
         };
         nodes.push(n1.clone());
         edges.push(e1);
@@ -471,7 +473,7 @@ fn create_function_net_lib(gromet: &ModuleCollection, mut start: u32) -> Vec<Str
                     src: n1.node_id.clone(),
                     tgt: format!("m{}", metadata_idx),
                     e_type: String::from("Metadata"),
-                    prop: None,
+                    ..Default::default()
                 };
                 edges.push(me1);
             }
@@ -521,7 +523,7 @@ fn create_function_net_lib(gromet: &ModuleCollection, mut start: u32) -> Vec<Str
                     src: n1.node_id.clone(),
                     tgt: node.node_id.clone(),
                     e_type: String::from("Contains"),
-                    prop: None,
+                    ..Default::default()
                 };
                 edges.push(e5);
             }
@@ -579,7 +581,7 @@ fn create_function_net_lib(gromet: &ModuleCollection, mut start: u32) -> Vec<Str
                     src: wfopi_src_tgt[0].clone(),
                     tgt: wfopi_src_tgt[1].clone(),
                     e_type: String::from("Wire"),
-                    prop: None,
+                    ..Default::default()
                 };
                 edges.push(e6);
             }
@@ -632,7 +634,7 @@ fn create_function_net_lib(gromet: &ModuleCollection, mut start: u32) -> Vec<Str
                     src: wfopo_src_tgt[0].clone(),
                     tgt: wfopo_src_tgt[1].clone(),
                     e_type: String::from("Wire"),
-                    prop: None,
+                    ..Default::default()
                 };
                 edges.push(e7);
             }
@@ -833,6 +835,10 @@ fn create_function_net_lib(gromet: &ModuleCollection, mut start: u32) -> Vec<Str
             let set_query = format!("set e{}{}.index={}", edge.src, edge.tgt, edge.prop.unwrap());
             queries.push(set_query);
         }
+        if edge.refer.is_some() {
+            let set_query = format!("set e{}{}.refer={}", edge.src, edge.tgt, edge.refer.unwrap());
+            queries.push(set_query);
+        }
     }
     queries
 }
@@ -972,6 +978,7 @@ fn create_function_net(gromet: &ModuleCollection, mut start: u32) -> Vec<String>
                         tgt: format!("n{}", start),
                         e_type: String::from("Contains"),
                         prop: Some(boxf.contents.unwrap() as usize),
+                        ..Default::default()
                     };
                     nodes.push(n1.clone());
                     edges.push(e1);
@@ -991,7 +998,7 @@ fn create_function_net(gromet: &ModuleCollection, mut start: u32) -> Vec<String>
                                 src: n1.node_id.clone(),
                                 tgt: format!("m{}", metadata_idx),
                                 e_type: String::from("Metadata"),
-                                prop: None,
+                                ..Default::default()
                             };
                             edges.push(me1);
                         }
@@ -1012,7 +1019,7 @@ fn create_function_net(gromet: &ModuleCollection, mut start: u32) -> Vec<String>
                                 src: n1.node_id.clone(),
                                 tgt: format!("m{}", metadata_idx),
                                 e_type: String::from("Metadata"),
-                                prop: None,
+                                ..Default::default()
                             };
                             edges.push(me1);
                         }
@@ -1052,7 +1059,7 @@ fn create_function_net(gromet: &ModuleCollection, mut start: u32) -> Vec<String>
                                 src: n1.node_id.clone(),
                                 tgt: node.node_id.clone(),
                                 e_type: String::from("Contains"),
-                                prop: None,
+                                ..Default::default()
                             };
                             edges.push(e5);
                         }
@@ -1110,7 +1117,7 @@ fn create_function_net(gromet: &ModuleCollection, mut start: u32) -> Vec<String>
                                 src: wfopi_src_tgt[0].clone(),
                                 tgt: wfopi_src_tgt[1].clone(),
                                 e_type: String::from("Wire"),
-                                prop: None,
+                                ..Default::default()
                             };
                             edges.push(e6);
                         }
@@ -1163,7 +1170,7 @@ fn create_function_net(gromet: &ModuleCollection, mut start: u32) -> Vec<String>
                                 src: wfopo_src_tgt[0].clone(),
                                 tgt: wfopo_src_tgt[1].clone(),
                                 e_type: String::from("Wire"),
-                                prop: None,
+                                ..Default::default()
                             };
                             edges.push(e7);
                         }
@@ -1360,6 +1367,10 @@ fn create_function_net(gromet: &ModuleCollection, mut start: u32) -> Vec<String>
             let set_query = format!("set e{}{}.index={}", edge.src, edge.tgt, edge.prop.unwrap());
             queries.push(set_query);
         }
+        if edge.refer.is_some() {
+            let set_query = format!("set e{}{}.refer={}", edge.src, edge.tgt, edge.refer.unwrap());
+            queries.push(set_query);
+        }
     }
     queries
 }
@@ -1422,7 +1433,7 @@ pub fn create_import(
         src: c_args.parent_node.node_id,
         tgt: n3.node_id.clone(),
         e_type: String::from("Contains"),
-        prop: None,
+        ..Default::default()
     };
     edges.push(e4);
     if eboxf.metadata.is_some() {
@@ -1439,7 +1450,7 @@ pub fn create_import(
                 src: n3.node_id,
                 tgt: format!("m{}", metadata_idx),
                 e_type: String::from("Metadata"),
-                prop: None,
+                ..Default::default()
             };
             edges.push(me1);
         }
@@ -1500,6 +1511,7 @@ pub fn create_function(
                     tgt: n1.node_id.clone(),
                     e_type: String::from("Contains"),
                     prop: Some(c_args.att_idx),
+                    ..Default::default()
                 };
                 parent_node = n1.clone();
                 nodes.push(n1.clone());
@@ -1520,7 +1532,7 @@ pub fn create_function(
                             src: n1.node_id.clone(),
                             tgt: format!("m{}", metadata_idx),
                             e_type: String::from("Metadata"),
-                            prop: None,
+                            ..Default::default()
                         };
                         edges.push(me1);
                     }
@@ -1799,6 +1811,7 @@ pub fn create_conditional(
         tgt: format!("n{}", start),
         e_type: String::from("Contains"),
         prop: Some(cond_counter as usize),
+        ..Default::default()
     };
     nodes.push(n1.clone());
     edges.push(e1);
@@ -1832,7 +1845,7 @@ pub fn create_conditional(
                 src: n1.node_id.clone(),
                 tgt: format!("n{}", start),
                 e_type: String::from("Port_Of"),
-                prop: None,
+                ..Default::default()
             };
             nodes.push(n2.clone());
             edges.push(e3);
@@ -1850,7 +1863,7 @@ pub fn create_conditional(
                         src: n2.node_id.clone(),
                         tgt: format!("m{}", metadata_idx),
                         e_type: String::from("Metadata"),
-                        prop: None,
+                        ..Default::default()
                     };
                     edges.push(me1);
                 }
@@ -1885,7 +1898,7 @@ pub fn create_conditional(
                 src: n1.node_id.clone(),
                 tgt: format!("n{}", start),
                 e_type: String::from("Port_Of"),
-                prop: None,
+                ..Default::default()
             };
             nodes.push(n3.clone());
             edges.push(e5);
@@ -1903,7 +1916,7 @@ pub fn create_conditional(
                         src: n3.node_id.clone(),
                         tgt: format!("m{}", metadata_idx),
                         e_type: String::from("Metadata"),
-                        prop: None,
+                        ..Default::default()
                     };
                     edges.push(me1);
                 }
@@ -2051,7 +2064,7 @@ pub fn create_conditional(
                     src: wfc_src_tgt[0].clone(),
                     tgt: wfc_src_tgt[1].clone(),
                     e_type: String::from("Wire"),
-                    prop: None,
+                    ..Default::default()
                 };
                 edges.push(e8);
             }
@@ -2104,7 +2117,7 @@ pub fn create_conditional(
                 src: cond_src_tgt[0].clone(),
                 tgt: cond_src_tgt[1].clone(),
                 e_type: String::from("Wire"),
-                prop: None,
+                ..Default::default()
             };
             edges.push(e9);
         }
@@ -2151,7 +2164,7 @@ pub fn create_conditional(
                 src: if_src_tgt[0].clone(),
                 tgt: if_src_tgt[1].clone(),
                 e_type: String::from("Wire"),
-                prop: None,
+                ..Default::default()
             };
             edges.push(e10);
         }
@@ -2199,7 +2212,7 @@ pub fn create_conditional(
                     src: else_src_tgt[0].clone(),
                     tgt: else_src_tgt[1].clone(),
                     e_type: String::from("Wire"),
-                    prop: None,
+                    ..Default::default()
                 };
                 edges.push(e11);
             }
@@ -2251,7 +2264,7 @@ pub fn create_conditional(
                 src: if_src_tgt[0].clone(),
                 tgt: if_src_tgt[1].clone(),
                 e_type: String::from("Wire"),
-                prop: None,
+                ..Default::default()
             };
             edges.push(e12);
         }
@@ -2299,7 +2312,7 @@ pub fn create_conditional(
                     src: else_src_tgt[0].clone(),
                     tgt: else_src_tgt[1].clone(),
                     e_type: String::from("Wire"),
-                    prop: None,
+                    ..Default::default()
                 };
                 edges.push(e13);
             }
@@ -2349,7 +2362,7 @@ pub fn create_conditional(
                 src: cond_src_tgt[0].clone(),
                 tgt: cond_src_tgt[1].clone(),
                 e_type: String::from("Wire"),
-                prop: None,
+                ..Default::default()
             };
             edges.push(e14);
         }
@@ -2389,6 +2402,7 @@ pub fn create_for_loop(
         tgt: format!("n{}", start),
         e_type: String::from("Contains"),
         prop: Some(cond_counter as usize),
+        ..Default::default()
     };
     nodes.push(n1.clone());
     edges.push(e1);
@@ -2412,7 +2426,7 @@ pub fn create_for_loop(
                 src: n1.node_id.clone(),
                 tgt: format!("m{}", metadata_idx),
                 e_type: String::from("Metadata"),
-                prop: None,
+                ..Default::default()
             };
             edges.push(me1);
         }
@@ -2524,7 +2538,7 @@ pub fn create_for_loop(
                 src: n1.node_id.clone(),
                 tgt: format!("n{}", start),
                 e_type: String::from("Port_Of"),
-                prop: None,
+                ..Default::default()
             };
             nodes.push(n2.clone());
             edges.push(e3);
@@ -2542,7 +2556,7 @@ pub fn create_for_loop(
                         src: n2.node_id.clone(),
                         tgt: format!("m{}", metadata_idx),
                         e_type: String::from("Metadata"),
-                        prop: None,
+                        ..Default::default()
                     };
                     edges.push(me1);
                 }
@@ -2576,7 +2590,7 @@ pub fn create_for_loop(
                 src: n1.node_id.clone(),
                 tgt: format!("n{}", start),
                 e_type: String::from("Port_Of"),
-                prop: None,
+                ..Default::default()
             };
             nodes.push(n3.clone());
             edges.push(e5);
@@ -2594,7 +2608,7 @@ pub fn create_for_loop(
                         src: n3.node_id.clone(),
                         tgt: format!("m{}", metadata_idx),
                         e_type: String::from("Metadata"),
-                        prop: None,
+                        ..Default::default()
                     };
                     edges.push(me1);
                 }
@@ -2668,7 +2682,7 @@ pub fn create_for_loop(
                 src: wfl_src_tgt[0].clone(),
                 tgt: wfl_src_tgt[1].clone(),
                 e_type: String::from("Wire"),
-                prop: None,
+                ..Default::default()
             };
             edges.push(e8);
         }
@@ -2717,7 +2731,7 @@ pub fn create_for_loop(
                 src: cond_src_tgt[0].clone(),
                 tgt: cond_src_tgt[1].clone(),
                 e_type: String::from("Wire"),
-                prop: None,
+                ..Default::default()
             };
             edges.push(e9);
         }
@@ -2764,7 +2778,7 @@ pub fn create_for_loop(
                 src: if_src_tgt[0].clone(),
                 tgt: if_src_tgt[1].clone(),
                 e_type: String::from("Wire"),
-                prop: None,
+                ..Default::default()
             };
             edges.push(e10);
         }
@@ -2814,7 +2828,7 @@ pub fn create_for_loop(
                 src: if_src_tgt[0].clone(),
                 tgt: if_src_tgt[1].clone(),
                 e_type: String::from("Wire"),
-                prop: None,
+                ..Default::default()
             };
             edges.push(e12);
         }
@@ -2861,7 +2875,7 @@ pub fn create_for_loop(
                 src: if_src_tgt[0].clone(),
                 tgt: if_src_tgt[1].clone(),
                 e_type: String::from("Wire"),
-                prop: None,
+                ..Default::default()
             };
             edges.push(e15);
         }
@@ -2911,7 +2925,7 @@ pub fn create_for_loop(
                 src: if_src_tgt[0].clone(),
                 tgt: if_src_tgt[1].clone(),
                 e_type: String::from("Wire"),
-                prop: None,
+                ..Default::default()
             };
             edges.push(e16);
         }
@@ -2960,7 +2974,7 @@ pub fn create_for_loop(
                 src: cond_src_tgt[0].clone(),
                 tgt: cond_src_tgt[1].clone(),
                 e_type: String::from("Wire"),
-                prop: None,
+                ..Default::default()
             };
             edges.push(e14);
         }
@@ -3001,6 +3015,7 @@ pub fn create_while_loop(
         tgt: format!("n{}", start),
         e_type: String::from("Contains"),
         prop: Some(cond_counter as usize),
+        ..Default::default()
     };
     nodes.push(n1.clone());
     edges.push(e1);
@@ -3024,7 +3039,7 @@ pub fn create_while_loop(
                 src: n1.node_id.clone(),
                 tgt: format!("m{}", metadata_idx),
                 e_type: String::from("Metadata"),
-                prop: None,
+                ..Default::default()
             };
             edges.push(me1);
         }
@@ -3113,7 +3128,7 @@ pub fn create_while_loop(
                 src: n1.node_id.clone(),
                 tgt: format!("n{}", start),
                 e_type: String::from("Port_Of"),
-                prop: None,
+                ..Default::default()
             };
             nodes.push(n2.clone());
             edges.push(e3);
@@ -3131,7 +3146,7 @@ pub fn create_while_loop(
                         src: n2.node_id.clone(),
                         tgt: format!("m{}", metadata_idx),
                         e_type: String::from("Metadata"),
-                        prop: None,
+                        ..Default::default()
                     };
                     edges.push(me1);
                 }
@@ -3165,7 +3180,7 @@ pub fn create_while_loop(
                 src: n1.node_id.clone(),
                 tgt: format!("n{}", start),
                 e_type: String::from("Port_Of"),
-                prop: None,
+                ..Default::default()
             };
             nodes.push(n3.clone());
             edges.push(e5);
@@ -3183,7 +3198,7 @@ pub fn create_while_loop(
                         src: n3.node_id.clone(),
                         tgt: format!("m{}", metadata_idx),
                         e_type: String::from("Metadata"),
-                        prop: None,
+                        ..Default::default()
                     };
                     edges.push(me1);
                 }
@@ -3257,7 +3272,7 @@ pub fn create_while_loop(
                 src: wfl_src_tgt[0].clone(),
                 tgt: wfl_src_tgt[1].clone(),
                 e_type: String::from("Wire"),
-                prop: None,
+                ..Default::default()
             };
             edges.push(e8);
         }
@@ -3306,7 +3321,7 @@ pub fn create_while_loop(
                 src: cond_src_tgt[0].clone(),
                 tgt: cond_src_tgt[1].clone(),
                 e_type: String::from("Wire"),
-                prop: None,
+                ..Default::default()
             };
             edges.push(e9);
         }
@@ -3353,7 +3368,7 @@ pub fn create_while_loop(
                 src: if_src_tgt[0].clone(),
                 tgt: if_src_tgt[1].clone(),
                 e_type: String::from("Wire"),
-                prop: None,
+                ..Default::default()
             };
             edges.push(e10);
         }
@@ -3403,7 +3418,7 @@ pub fn create_while_loop(
                 src: if_src_tgt[0].clone(),
                 tgt: if_src_tgt[1].clone(),
                 e_type: String::from("Wire"),
-                prop: None,
+                ..Default::default()
             };
             edges.push(e12);
         }
@@ -3452,7 +3467,7 @@ pub fn create_while_loop(
                 src: cond_src_tgt[0].clone(),
                 tgt: cond_src_tgt[1].clone(),
                 e_type: String::from("Wire"),
-                prop: None,
+                ..Default::default()
             };
             edges.push(e14);
         }
@@ -3488,6 +3503,7 @@ pub fn create_att_expression(
         tgt: format!("n{}", start),
         e_type: String::from("Contains"),
         prop: Some(c_args.att_idx),
+        ..Default::default()
     };
     nodes.push(n1.clone());
     edges.push(e1);
@@ -3508,7 +3524,7 @@ pub fn create_att_expression(
                 src: n1.node_id.clone(),
                 tgt: format!("m{}", metadata_idx),
                 e_type: String::from("Metadata"),
-                prop: None,
+                ..Default::default()
             };
             edges.push(me1);
         }
@@ -3577,7 +3593,7 @@ pub fn create_att_expression(
                     src: n1.node_id.clone(),
                     tgt: n2.node_id.clone(),
                     e_type: String::from("Port_Of"),
-                    prop: None,
+                    ..Default::default()
                 };
                 edges.push(e3);
                 if att_box.opo.clone().as_ref().unwrap()[oport as usize]
@@ -3601,7 +3617,7 @@ pub fn create_att_expression(
                             src: n2.node_id.clone(),
                             tgt: format!("m{}", metadata_idx),
                             e_type: String::from("Metadata"),
-                            prop: None,
+                            ..Default::default()
                         };
                         edges.push(me1);
                     }
@@ -3676,7 +3692,7 @@ pub fn create_att_expression(
                 src: n1.node_id.clone(),
                 tgt: n2.node_id.clone(),
                 e_type: String::from("Port_Of"),
-                prop: None,
+                ..Default::default()
             };
             edges.push(e3);
             if att_box.opi.clone().as_ref().unwrap()[iport as usize]
@@ -3700,7 +3716,7 @@ pub fn create_att_expression(
                         src: n2.node_id.clone(),
                         tgt: format!("m{}", metadata_idx),
                         e_type: String::from("Metadata"),
-                        prop: None,
+                        ..Default::default()
                     };
                     edges.push(me1);
                 }
@@ -3791,6 +3807,7 @@ pub fn create_att_predicate(
         tgt: format!("n{}", start),
         e_type: String::from("Contains"),
         prop: Some(c_args.att_idx),
+        ..Default::default()
     };
     nodes.push(n1.clone());
     edges.push(e1);
@@ -3811,7 +3828,7 @@ pub fn create_att_predicate(
                 src: n1.node_id.clone(),
                 tgt: format!("m{}", metadata_idx),
                 e_type: String::from("Metadata"),
-                prop: None,
+                ..Default::default()
             };
             edges.push(me1);
         }
@@ -3854,7 +3871,7 @@ pub fn create_att_predicate(
                 src: n1.node_id.clone(),
                 tgt: n2.node_id.clone(),
                 e_type: String::from("Port_Of"),
-                prop: None,
+                ..Default::default()
             };
             edges.push(e3);
             if att_box.opo.clone().as_ref().unwrap()[oport as usize]
@@ -3878,7 +3895,7 @@ pub fn create_att_predicate(
                         src: n2.node_id.clone(),
                         tgt: format!("m{}", metadata_idx),
                         e_type: String::from("Metadata"),
-                        prop: None,
+                        ..Default::default()
                     };
                     edges.push(me1);
                 }
@@ -3915,7 +3932,7 @@ pub fn create_att_predicate(
                 src: n1.node_id.clone(),
                 tgt: n2.node_id.clone(),
                 e_type: String::from("Port_Of"),
-                prop: None,
+                ..Default::default()
             };
             edges.push(e3);
             if att_box.opi.clone().as_ref().unwrap()[iport as usize]
@@ -3939,7 +3956,7 @@ pub fn create_att_predicate(
                         src: n2.node_id.clone(),
                         tgt: format!("m{}", metadata_idx),
                         e_type: String::from("Metadata"),
-                        prop: None,
+                        ..Default::default()
                     };
                     edges.push(me1);
                 }
@@ -4041,7 +4058,7 @@ pub fn create_att_literal(
         src: c_args.parent_node.node_id,
         tgt: n3.node_id.clone(),
         e_type: String::from("Contains"),
-        prop: None,
+        ..Default::default()
     };
     edges.push(e4);
     if lit_box.metadata.is_some() {
@@ -4058,7 +4075,7 @@ pub fn create_att_literal(
                 src: n3.node_id,
                 tgt: format!("m{}", metadata_idx),
                 e_type: String::from("Metadata"),
-                prop: None,
+                ..Default::default()
             };
             edges.push(me1);
         }
@@ -4117,7 +4134,7 @@ pub fn create_att_primitive(
         src: c_args.parent_node.node_id,
         tgt: n3.node_id.clone(),
         e_type: String::from("Contains"),
-        prop: None,
+        ..Default::default()
     };
     edges.push(e4);
     if c_args.cur_box.metadata.is_some() {
@@ -4134,7 +4151,7 @@ pub fn create_att_primitive(
                 src: n3.node_id,
                 tgt: format!("m{}", metadata_idx),
                 e_type: String::from("Metadata"),
-                prop: None,
+                ..Default::default()
             };
             edges.push(me1);
         }
@@ -4155,11 +4172,15 @@ pub fn create_att_abstract(
 ) {
     // first find the pof's for box
     let mut pof: Vec<u32> = vec![];
+    let mut pof_names: Vec<String> = vec![];
     if c_args.att_box.pof.is_some() {
         let mut po_idx: u32 = 1;
         for port in c_args.att_box.pof.clone().unwrap().iter() {
             if port.r#box == c_args.box_counter as u8 {
                 pof.push(po_idx);
+                if port.name.is_some() {
+                    pof_names.push(port.name.clone().unwrap());
+                }
             }
             po_idx += 1;
         }
@@ -4175,11 +4196,17 @@ pub fn create_att_abstract(
             pi_idx += 1;
         }
     }
+    // now to construct an entry of ValueL for abstract port references
+    let val = ValueL {
+        value_type: "List".to_string(),
+        value: format!("{:?}", pof_names.clone()),
+        gromet_type: Some("Abstract".to_string()),
+    };
     // now make the node with the port information
     let mut metadata_idx = 0;
     let n3 = Node {
         n_type: String::from("Abstract"),
-        value: None,
+        value: Some(val),
         name: c_args.cur_box.name.clone(),
         node_id: format!("n{}", start),
         out_idx: Some(pof),
@@ -4195,7 +4222,7 @@ pub fn create_att_abstract(
         src: c_args.parent_node.node_id,
         tgt: n3.node_id.clone(),
         e_type: String::from("Contains"),
-        prop: None,
+        ..Default::default()
     };
     edges.push(e4);
     if c_args.cur_box.metadata.is_some() {
@@ -4212,7 +4239,7 @@ pub fn create_att_abstract(
                 src: n3.node_id,
                 tgt: format!("m{}", metadata_idx),
                 e_type: String::from("Metadata"),
-                prop: None,
+                ..Default::default()
             };
             edges.push(me1);
         }
@@ -4267,7 +4294,7 @@ pub fn create_opo(
                 src: c_args.parent_node.node_id.clone(),
                 tgt: n2.node_id.clone(),
                 e_type: String::from("Port_Of"),
-                prop: None,
+                ..Default::default()
             };
             edges.push(e3);
 
@@ -4293,7 +4320,7 @@ pub fn create_opo(
                         src: n2.node_id.clone(),
                         tgt: format!("m{}", metadata_idx),
                         e_type: String::from("Metadata"),
-                        prop: None,
+                        ..Default::default()
                     };
                     edges.push(me1);
                 }
@@ -4352,7 +4379,7 @@ pub fn create_opi(
                 src: c_args.parent_node.node_id.clone(),
                 tgt: n2.node_id.clone(),
                 e_type: String::from("Port_Of"),
-                prop: None,
+                ..Default::default()
             };
             edges.push(e3);
 
@@ -4378,7 +4405,7 @@ pub fn create_opi(
                         src: n2.node_id.clone(),
                         tgt: format!("m{}", metadata_idx),
                         e_type: String::from("Metadata"),
-                        prop: None,
+                        ..Default::default()
                     };
                     edges.push(me1);
                 }
@@ -4450,6 +4477,7 @@ pub fn wfopi_wiring(
                 tgt: wfopi_src_tgt[1].clone(),
                 e_type: String::from("Wire"),
                 prop: Some(prop.unwrap() as usize),
+                ..Default::default()
             };
             edges.push(e6);
         }
@@ -4512,7 +4540,7 @@ pub fn wfopo_wiring(
                 src: wfopo_src_tgt[0].clone(),
                 tgt: wfopo_src_tgt[1].clone(),
                 e_type: String::from("Wire"),
-                prop: None,
+                ..Default::default()
             };
             edges.push(e7);
         }
@@ -4532,6 +4560,7 @@ pub fn wff_wiring(
     for wire in eboxf.wff.unwrap().iter() {
         let mut wff_src_tgt: Vec<String> = vec![];
         let mut prop = None;
+        let mut refer = None;
 
         let src_idx = wire.src; // port index
 
@@ -4565,7 +4594,7 @@ pub fn wff_wiring(
                                     // push the tgt
                                     if (wire.src as u32) == *p {
                                         wff_src_tgt.push(node.node_id.clone());
-                                        prop = Some(i as u32);
+                                        prop = Some(i as usize);
                                     }
                                 }
                             }
@@ -4587,10 +4616,13 @@ pub fn wff_wiring(
                             // exclude opo's
                             if node.n_type != "Opo" {
                                 // iterate through port to check for tgt
-                                for p in node.out_idx.as_ref().unwrap().iter() {
+                                for (i, p) in node.out_idx.as_ref().unwrap().iter().enumerate() {
                                     // push the tgt
                                     if (wire.tgt as u32) == *p {
                                         wff_src_tgt.push(node.node_id.clone());
+                                        if node.n_type == "Abstract" {
+                                            refer = Some(i as usize);
+                                        }
                                     }
                                 }
                             }
@@ -4604,7 +4636,8 @@ pub fn wff_wiring(
                 src: wff_src_tgt[0].clone(),
                 tgt: wff_src_tgt[1].clone(),
                 e_type: String::from("Wire"),
-                prop: Some(prop.unwrap() as usize),
+                prop: Some(prop.unwrap()),
+                refer: refer,
             };
             edges.push(e8);
         }
@@ -4667,7 +4700,7 @@ pub fn wopio_wiring(
                 src: wopio_src_tgt[0].clone(),
                 tgt: wopio_src_tgt[1].clone(),
                 e_type: String::from("Wire"),
-                prop: None,
+                ..Default::default()
             };
             edges.push(e7);
         }
@@ -4817,7 +4850,7 @@ pub fn import_wiring(
                     src: wff_src_tgt[0].clone(),
                     tgt: wff_src_tgt[1].clone(),
                     e_type: String::from("Wire"),
-                    prop: None,
+                    ..Default::default()
                 };
                 edges.push(e8);
             }
@@ -4905,7 +4938,7 @@ pub fn import_wiring(
                         src: wff_src_tgt[0].clone(),
                         tgt: wff_src_tgt[1].clone(),
                         e_type: String::from("Wire"),
-                        prop: None,
+                        ..Default::default()
                     };
                     edges.push(e8);
                 }
@@ -5039,7 +5072,7 @@ pub fn wfopi_cross_att_wiring(
                     src: wfopi_src_tgt[0].clone(),
                     tgt: wfopi_src_tgt[1].clone(),
                     e_type: String::from("Wire"),
-                    prop: None,
+                    ..Default::default()
                 };
                 edges.push(e8);
             }
@@ -5123,7 +5156,7 @@ pub fn wfopo_cross_att_wiring(
                     src: wfopo_src_tgt[0].clone(),
                     tgt: wfopo_src_tgt[1].clone(),
                     e_type: String::from("Wire"),
-                    prop: None,
+                    ..Default::default()
                 };
                 edges.push(e8);
             }
@@ -5227,7 +5260,7 @@ pub fn wff_cross_att_wiring(
                         src: wff_src_tgt[0].clone(),
                         tgt: wff_src_tgt[1].clone(),
                         e_type: String::from("Wire"),
-                        prop: None,
+                        ..Default::default()
                     };
                     edges.push(e8);
                 }
@@ -5295,7 +5328,7 @@ pub fn wff_cross_att_wiring(
                         src: wff_src_tgt[0].clone(),
                         tgt: wff_src_tgt[1].clone(),
                         e_type: String::from("Wire"),
-                        prop: None,
+                        ..Default::default()
                     };
                     edges.push(e8);
                 }
@@ -5368,7 +5401,7 @@ pub fn wff_cross_att_wiring(
                         src: wff_src_tgt[0].clone(),
                         tgt: wff_src_tgt[1].clone(),
                         e_type: String::from("Wire"),
-                        prop: None,
+                        ..Default::default()
                     };
                     edges.push(e8);
                 }
@@ -5482,7 +5515,7 @@ pub fn external_wiring(gromet: &ModuleCollection, nodes: &mut [Node], edges: &mu
                     src: wff_src_tgt[0].clone(),
                     tgt: wff_src_tgt[1].clone(),
                     e_type: String::from("Wire"),
-                    prop: None,
+                    ..Default::default()
                 };
                 edges.push(e9);
             }
