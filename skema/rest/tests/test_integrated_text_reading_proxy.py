@@ -1,6 +1,7 @@
 from pathlib import Path
 
 import pytest
+from pytest import approx
 from fastapi.testclient import TestClient
 from fastapi import status
 
@@ -87,6 +88,36 @@ def test_mira_grounding():
     assert len(data) == 2, "Service didn't return results for all queries"
     assert all(len(groundings) == params["k"] for groundings in
                data), "Service didn't return the requested number of candidates for each query"
+
+
+def test_extraction_evaluation():
+    """ Test the extraction evaluation endpoint such that:
+        - Runs end to end
+        - Doesn't drastically change in performance due to a bug on the evaluation function
+    """
+
+    extractions_path = Path(__file__).parents[0] / "data" / "integrated_text_reading" / "eval" / "extractions.json"
+    annotations_path = Path(__file__).parents[0] / "data" / "integrated_text_reading" / "eval" / "annotations.json"
+    json_path = Path(__file__).parents[0] / "data" / "integrated_text_reading" / "eval" / "contents.json"
+
+    with extractions_path.open("rb") as extractions, annotations_path.open("rb") as annotations, json_path.open("rb") as json:
+        files = {
+            "extractions_file": ("paper_variable_extractions.json", extractions),
+            "gt_annotations": ("paper_gt_annotations.json", annotations),
+            "json_text": ("paper_cosmos_output.json", json),
+        }
+
+        response = client.post(f"/eval",  files=files)
+
+    assert response.status_code == status.HTTP_200_OK
+
+    results = response.json()
+
+    assert results['num_manual_annotations'] == 220, "There should be 220 gt manual annotations"
+    assert results['precision'] == approx(0.7230769230768118), "Precision drastically different from the expected value"
+    assert results['recall'] == approx(0.21363636363636362), "Recall drastically different from the expected value"
+    assert results['f1'] == approx(0.32982456136828636), "F1 drastically different from the expected value"
+
 
 
 def test_healthcheck():
