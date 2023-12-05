@@ -1,11 +1,10 @@
 from pathlib import Path
 
-import pytest
-from pytest import approx
-from fastapi.testclient import TestClient
 from fastapi import status
+from fastapi.testclient import TestClient
+from pytest import approx
 
-from skema.rest.integrated_text_reading_proxy import app, cosmos_client
+from skema.rest.integrated_text_reading_proxy import app
 from skema.rest.schema import MiraGroundingOutputItem, TextReadingAnnotationsOutput
 
 client = TestClient(app)
@@ -100,14 +99,15 @@ def test_extraction_evaluation():
     annotations_path = Path(__file__).parents[0] / "data" / "integrated_text_reading" / "eval" / "annotations.json"
     json_path = Path(__file__).parents[0] / "data" / "integrated_text_reading" / "eval" / "contents.json"
 
-    with extractions_path.open("rb") as extractions, annotations_path.open("rb") as annotations, json_path.open("rb") as json:
+    with extractions_path.open("rb") as extractions, annotations_path.open("rb") as annotations, json_path.open(
+            "rb") as json:
         files = {
             "extractions_file": ("paper_variable_extractions.json", extractions),
             "gt_annotations": ("paper_gt_annotations.json", annotations),
             "json_text": ("paper_cosmos_output.json", json),
         }
 
-        response = client.post(f"/eval",  files=files)
+        response = client.post(f"/eval", files=files)
 
     assert response.status_code == status.HTTP_200_OK
 
@@ -117,7 +117,6 @@ def test_extraction_evaluation():
     assert results['precision'] == approx(0.7230769230768118), "Precision drastically different from the expected value"
     assert results['recall'] == approx(0.21363636363636362), "Recall drastically different from the expected value"
     assert results['f1'] == approx(0.32982456136828636), "F1 drastically different from the expected value"
-
 
 
 def test_healthcheck():
