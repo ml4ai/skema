@@ -2,6 +2,8 @@ import argparse
 import glob
 import sys
 import os.path
+import yaml
+from pathlib import Path
 from typing import List
 
 from skema.gromet import GROMET_VERSION
@@ -14,7 +16,7 @@ from skema.program_analysis.python2cast import python_to_cast
 from skema.program_analysis.fortran2cast import fortran_to_cast
 from skema.program_analysis.matlab2cast import matlab_to_cast
 from skema.utils.fold import dictionary_to_gromet_json, del_nulls
-
+from skema.program_analysis.tree_sitter_parsers.build_parsers import LANGUAGES_YAML_FILEPATH
 
 def get_args():
     parser = argparse.ArgumentParser()
@@ -53,16 +55,17 @@ def process_file_system(
         executables=[],
     )
 
+    language_yaml_obj = yaml.safe_load(LANGUAGES_YAML_FILEPATH.read_text())
     for f in file_list:
         full_file = os.path.join(os.path.normpath(root_dir), f.strip("\n"))
-        
+        full_file_obj = Path(full_file)
         try:
             # To maintain backwards compatibility for the process_file_system function, for now we will determine the language by file extension
-            if full_file.endswith(".py"):
+            if full_file_obj.suffix in language_yaml_obj["python"]["extensions"]:
                 cast = python_to_cast(full_file, cast_obj=True)
-            elif full_file.endswith(".m"):
+            elif full_file_obj.suffix in language_yaml_obj["matlab"]["extensions"]:
                 cast = matlab_to_cast(full_file, cast_obj=True)
-            elif full_file.endswith(".F") or full_file.endswith(".f95"):
+            elif full_file_obj.suffix in language_yaml_obj["fortran"]["extensions"]:
                 cast = fortran_to_cast(full_file, cast_obj=True)
             else:
                 print(f"File extension not supported for {full_file}")

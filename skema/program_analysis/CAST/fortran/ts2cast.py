@@ -1,5 +1,6 @@
 import json
 import os.path
+import time
 from pathlib import Path
 from typing import Any, Dict, List, Union
 
@@ -60,7 +61,7 @@ class TS2CAST(object):
         )
         self.tree = parser.parse(bytes(self.source, "utf8"))
         self.root_node = remove_comments(self.tree.root_node)
-        #print(self.root_node.sexp())
+        
         # Walking data
         self.variable_context = VariableContext()
         self.node_helper = NodeHelper(self.source, self.source_file_name)
@@ -299,7 +300,16 @@ class TS2CAST(object):
         # Pull relevent nodes
         # A subroutine and function won't neccessarily have an arguments node.
         # So we should be careful about trying to access it.
-        function_node = get_children_by_types(node, ["unary_expression", "subroutine", "identifier",])[0]
+
+        function_node = get_children_by_types(node, ["unary_expression", "subroutine", "identifier", "derived_type_member_expression"])[0]
+
+        if function_node.type == "derived_type_member_expression":
+            func = Attribute(
+                value=None,
+                attr=None
+            )
+            return None
+        
         arguments_node = get_first_child_by_type(node, "argument_list")
         
         # If this is a unary expression (+foo()) the identifier will be nested.
@@ -341,9 +351,13 @@ class TS2CAST(object):
         )
 
     def visit_keyword_statement(self, node):
-        # Currently, the only keyword_identifier produced by tree-sitter is Return
-        # However, there may be other instances
-
+        # NOTE: RETURN is not the only Fortran keyword. GO TO and CONTINUE are also considered keywords.
+        # TODO: Handle GO TO and CONTINUE
+        identifier = self.node_helper.get_identifier(node).lower()
+        if node.type == "keyword_statement":
+            if "continue" in identifier or "go to" in identifier:
+                return self._visit_no_op(node)
+            
         # In Fortran the return statement doesn't return a value (there is the obsolete "alternative return")
         # We keep track of values that need to be returned in the variable context
         return_values = self.variable_context.context_return_values[
@@ -625,9 +639,17 @@ class TS2CAST(object):
             if isinstance(orelse, ModelIf):
                 orelse = [orelse]
 
+        body = []
+        for child in node.children[body_start_index:body_stop_index]:
+            child_cast = self.visit(child)
+            if isinstance(child_cast, AstNode):
+                body.append(child_cast)
+            elif isinstance(child_cast, List):
+                body.extend(child_cast)
+    
         return ModelIf(
             expr=self.visit(node.children[1]),
-            body=[self.visit(child) for child in node.children[body_start_index:body_stop_index]],
+            body=body,
             orelse=orelse if orelse else [],
         )
 
@@ -800,11 +822,13 @@ class TS2CAST(object):
             type_map = {
                 "integer": "Integer",
                 "real": "AbstractFloat",
+                "double precision": None,
                 "complex": None,
                 "logical": "Boolean",
                 "character": "String",
             }
-            variable_type = type_map[self.node_helper.get_identifier(intrinsic_type_node)]
+            # NOTE: Identifiers are case sensitive, so we always need to make sure we are comparing to the lower() version
+            variable_type = type_map[self.node_helper.get_identifier(intrinsic_type_node).lower()]
         elif derived_type_node:
             variable_type = self.node_helper.get_identifier(
                 get_first_child_by_type(derived_type_node, "type_name", recurse=True),
@@ -1012,10 +1036,13 @@ class TS2CAST(object):
             # Instead, we should visit the identifier node which will add it to the variable context automatically if it doesn't exist.
             value = self.visit(get_first_child_by_type(node, "identifier", recurse=True))
 
-        attr = self.node_helper.get_identifier(
-            get_first_child_by_type(node, "type_member", recurse=True)
-        )
-
+        # NOTE: Attribue should be a Name node, NOT a string or Var node
+        #attr = self.node_helper.get_identifier(
+        #    get_first_child_by_type(node, "type_member", recurse=True)
+        #)
+        #print(self.node_helper.get_identifier(get_first_child_by_type(node, "type_member", recurse=True)))
+        attr = self.visit_name(get_first_child_by_type(node, "type_member"))
+    
         return Attribute(
             value=value,
             attr=attr,
@@ -1153,6 +1180,15 @@ class TS2CAST(object):
             if child_cast:
                 return child_cast
 
+    def _visit_no_op(self, node):
+        """For unsupported idioms, we can generate a no op instruction so that the body is not empty"""
+        return Call(
+            func=self.get_gromet_function_node("no_op"),
+            source_language=None,
+            source_language_version=None,
+            arguments=[]
+        )
+    
     def get_gromet_function_node(self, func_name: str) -> Name:
         # Idealy, we would be able to create a dummy node and just call the name visitor.
         # However, tree-sitter does not allow you to create or modify nodes, so we have to recreate the logic here.
