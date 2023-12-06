@@ -779,7 +779,12 @@ fn create_function_net_lib(gromet: &ModuleCollection, mut start: u32) -> Vec<Str
         }
     } */
     // convert every node object into a node query
-    queries.append(&mut construct_memgraph_queries(&mut nodes, &mut edges, &mut meta_nodes, &mut queries.clone()));
+    queries.append(&mut construct_memgraph_queries(
+        &mut nodes,
+        &mut edges,
+        &mut meta_nodes,
+        &mut queries.clone(),
+    ));
     /*let create = String::from("CREATE");
     for node in nodes.iter() {
         let mut name = String::from("a");
@@ -1312,7 +1317,12 @@ fn create_function_net(gromet: &ModuleCollection, mut start: u32) -> Vec<String>
         }
     }
     // convert every node object into a node query
-    queries.append(&mut construct_memgraph_queries(&mut nodes, &mut edges, &mut meta_nodes, &mut queries.clone()));
+    queries.append(&mut construct_memgraph_queries(
+        &mut nodes,
+        &mut edges,
+        &mut meta_nodes,
+        &mut queries.clone(),
+    ));
     /*let create = String::from("CREATE");
     for node in nodes.iter() {
         let mut name = String::from("a");
@@ -4605,7 +4615,7 @@ pub fn wff_wiring(
                                     // push the tgt
                                     if (wire.src as u32) == *p {
                                         wff_src_tgt.push(node.node_id.clone());
-                                        prop = Some(i as usize);
+                                        prop = Some(i);
                                     }
                                 }
                             }
@@ -4632,7 +4642,7 @@ pub fn wff_wiring(
                                     if (wire.tgt as u32) == *p {
                                         wff_src_tgt.push(node.node_id.clone());
                                         if node.n_type == "Abstract" {
-                                            refer = Some(i as usize);
+                                            refer = Some(i);
                                         }
                                     }
                                 }
@@ -4648,7 +4658,7 @@ pub fn wff_wiring(
                 tgt: wff_src_tgt[1].clone(),
                 e_type: String::from("Wire"),
                 prop: Some(prop.unwrap()),
-                refer: refer,
+                refer,
             };
             edges.push(e8);
         }
@@ -5308,7 +5318,10 @@ pub fn wff_cross_att_wiring(
                             && (tgt_box as u32) == node.box_counter as u32
                         {
                             // only opo's
-                            if node.n_type == "Primitive" || node.n_type == "Literal" || node.n_type == "Abstract" {
+                            if node.n_type == "Primitive"
+                                || node.n_type == "Literal"
+                                || node.n_type == "Abstract"
+                            {
                                 // iterate through port to check for tgt
                                 for p in node.out_idx.as_ref().unwrap().iter() {
                                     // push the src first, being pif
@@ -5546,7 +5559,12 @@ pub fn parse_gromet_queries(gromet: ModuleCollection) -> Vec<String> {
 }
 
 // convert every node object into a node query
-pub fn construct_memgraph_queries(nodes: &mut Vec<Node>, edges: &mut Vec<Edge>, meta_nodes: &mut Vec<MetadataNode>, queries: &mut Vec<String>) -> Vec<String> {
+pub fn construct_memgraph_queries(
+    nodes: &mut Vec<Node>,
+    edges: &mut Vec<Edge>,
+    meta_nodes: &mut Vec<MetadataNode>,
+    queries: &mut Vec<String>,
+) -> Vec<String> {
     // convert every node object into a node query
     let create = String::from("CREATE");
     for node in nodes.iter() {
@@ -5558,45 +5576,51 @@ pub fn construct_memgraph_queries(nodes: &mut Vec<Node>, edges: &mut Vec<Edge>, 
         }
         // better parsing of values for inference later on.
         // handles case of parsing a list as a proper list object, only depth one though
-        // would need recursive function for aritrary depth. To be done at somepoint. 
+        // would need recursive function for aritrary depth. To be done at somepoint.
         let value = match &node.value {
-            Some(val) => if val.value_type == *"List" && &val.value[0..1] == "[" && &val.value[1..2] != "]"  {
-                let val_type = val.value_type.clone();
-                let val_grom_type = val.gromet_type.as_ref().unwrap();
-                let val_len = val.value[..].len();
-                let val_val: Vec<String> = val.value[1..val_len].split("}, ").map(|x| x.to_string()).collect();
+            Some(val) => {
+                if val.value_type == *"List" && &val.value[0..1] == "[" && &val.value[1..2] != "]" {
+                    let val_type = val.value_type.clone();
+                    let val_grom_type = val.gromet_type.as_ref().unwrap();
+                    let val_len = val.value[..].len();
+                    let val_val: Vec<String> = val.value[1..val_len]
+                        .split("}, ")
+                        .map(|x| x.to_string())
+                        .collect();
 
-                let mut val_vec = Vec::<String>::new();
-                for (i, val) in val_val.iter().enumerate() {
-                    if i == val_val.len() - 1 {
-                        let val_string = format!("{}}}", &val[7..(val.len()-2)]);
-                        val_vec.push(val_string.clone());
-                    } else {
-                        let val_string = format!("{}}}", &val[7..]);
-                        val_vec.push(val_string.clone());
+                    let mut val_vec = Vec::<String>::new();
+                    for (i, val) in val_val.iter().enumerate() {
+                        if i == val_val.len() - 1 {
+                            let val_string = format!("{}}}", &val[7..(val.len() - 2)]);
+                            val_vec.push(val_string.clone());
+                        } else {
+                            let val_string = format!("{}}}", &val[7..]);
+                            val_vec.push(val_string.clone());
+                        }
                     }
+                    let mut final_val_vec = Vec::<String>::new();
+                    for val_str in val_vec.iter() {
+                        let val_fields: Vec<String> =
+                            val_str.split(", ").map(|x| x.to_string()).collect();
+                        let cor_val: Vec<String> =
+                            val_fields[1].split(": ").map(|x| x.to_string()).collect();
+                        let final_val = cor_val[1].replace("\\\"", "");
+                        final_val_vec.push(final_val.clone());
+                    }
+                    format!(
+                        "{{ value_type:{:?}, value:{:?}, gromet_type:{:?} }}",
+                        val_type, final_val_vec, val_grom_type
+                    )
+                    .replace("\\\"", "")
+                } else {
+                    format!(
+                        "{{ value_type:{:?}, value:{:?}, gromet_type:{:?} }}",
+                        val.value_type,
+                        val.value,
+                        val.gromet_type.as_ref().unwrap()
+                    )
                 }
-                let mut final_val_vec = Vec::<String>::new();
-                for val_str in val_vec.iter() {
-                    let val_fields: Vec<String> = val_str.split(", ").map(|x| x.to_string()).collect();
-                    let cor_val: Vec<String> = val_fields[1].split(": ").map(|x| x.to_string()).collect();
-                    let final_val =  cor_val[1].replace("\\\"", "");
-                    final_val_vec.push(final_val.clone());
-                }
-                format!(
-                    "{{ value_type:{:?}, value:{:?}, gromet_type:{:?} }}",
-                    val_type,
-                    final_val_vec,
-                    val_grom_type
-                ).replace("\\\"", "")
-            } else {
-                format!(
-                    "{{ value_type:{:?}, value:{:?}, gromet_type:{:?} }}",
-                    val.value_type,
-                    val.value,
-                    val.gromet_type.as_ref().unwrap()
-                )
-            },
+            }
             None => String::from("\"\""),
         };
 
@@ -5639,7 +5663,12 @@ pub fn construct_memgraph_queries(nodes: &mut Vec<Node>, edges: &mut Vec<Edge>, 
             queries.push(set_query);
         }
         if edge.refer.is_some() {
-            let set_query = format!("set e{}{}.refer={}", edge.src, edge.tgt, edge.refer.unwrap());
+            let set_query = format!(
+                "set e{}{}.refer={}",
+                edge.src,
+                edge.tgt,
+                edge.refer.unwrap()
+            );
             queries.push(set_query);
         }
     }

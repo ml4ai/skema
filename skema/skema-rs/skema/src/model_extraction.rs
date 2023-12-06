@@ -17,6 +17,7 @@ use neo4rs;
 use neo4rs::{query, Error};
 use std::sync::Arc;
 
+/// This struct is the node struct for the constructed petgraph
 #[derive(Clone, Debug)]
 pub struct ModelNode {
     id: i64,
@@ -25,6 +26,7 @@ pub struct ModelNode {
     value: Option<String>,
 }
 
+/// This struct is the edge struct for the constructed petgraph
 #[derive(Clone, Debug)]
 pub struct ModelEdge {
     id: i64,
@@ -65,8 +67,7 @@ pub async fn module_id2mathml_MET_ast(module_id: i64, config: Config) -> Vec<Fir
     core_dynamics_ast
 }
 
-// this function finds the core dynamics and returns a vector of
-// node id's that meet the criteria for identification
+/// this function finds the core dynamics and returns a vector of node id's that meet the criteria for identification
 #[allow(clippy::if_same_then_else)]
 pub async fn find_pn_dynamics(module_id: i64, config: Config) -> Vec<i64> {
     let graph = subgraph2petgraph(module_id, config.clone()).await;
@@ -177,7 +178,7 @@ fn tree_2_MET_ast(
     let mut lhs = Vec::<Ci>::new();
     if graph[root_node].label == *"Opo" {
         // we first construct the derivative of the first node
-        let deriv_name: &str = &graph[root_node].name.as_ref().unwrap();
+        let deriv_name: &str = graph[root_node].name.as_ref().unwrap();
         // this will let us know if additional trimming is needed to handle the code implementation of the equations
         // let mut step_impl = false; this will be used for step implementaion for later
         // This is very bespoke right now
@@ -289,9 +290,7 @@ pub fn get_operator_MET(
     } else if *graph[root_node].name.as_ref().unwrap() == "ast.Div" {
         op.push(Operator::Divide);
     } else {
-        op.push(Operator::Other(
-            graph[root_node].name.clone().unwrap(),
-        ));
+        op.push(Operator::Other(graph[root_node].name.clone().unwrap()));
     }
     op[0].clone()
 }
@@ -315,7 +314,14 @@ async fn trim_un_named(
             // one incoming one outgoing
             if bypass.len() == 2 {
                 // annoyingly have to pull the edge/Relation to insert into graph
-                graph.add_edge(bypass[0], bypass[1], graph.edge_weight(graph.find_edge(bypass[0], node_index).unwrap()).unwrap().clone());
+                graph.add_edge(
+                    bypass[0],
+                    bypass[1],
+                    graph
+                        .edge_weight(graph.find_edge(bypass[0], node_index).unwrap())
+                        .unwrap()
+                        .clone(),
+                );
             } else if bypass.len() > 2 {
                 // this operates on the assumption that there maybe multiple references to the port
                 // (incoming arrows) but only one outgoing arrow, this seems to be the case based on
@@ -324,7 +330,14 @@ async fn trim_un_named(
                 let end_node_idx = bypass.len() - 1;
                 for (i, _ent) in bypass[0..end_node_idx].iter().enumerate() {
                     // this iterates over all but the last entry in the bypass vec
-                    graph.add_edge(bypass[i], bypass[end_node_idx], graph.edge_weight(graph.find_edge(bypass[i], node_index).unwrap()).unwrap().clone());
+                    graph.add_edge(
+                        bypass[i],
+                        bypass[end_node_idx],
+                        graph
+                            .edge_weight(graph.find_edge(bypass[i], node_index).unwrap())
+                            .unwrap()
+                            .clone(),
+                    );
                 }
             }
         }
@@ -343,6 +356,7 @@ async fn trim_un_named(
     graph
 }
 
+/// This function takes in a node id and returns a petgraph subgraph of only the wire type edges
 async fn subgraph_wiring(
     module_id: i64,
     config: Config,
@@ -372,7 +386,7 @@ async fn subgraph_wiring(
             id: node.id(),
             label: node.labels()[0].clone(),
             name: node.get::<String>("name"),
-            value: node.get::<String>("value")
+            value: node.get::<String>("value"),
         };
         node_list.push(modelnode);
     }
@@ -397,7 +411,7 @@ async fn subgraph_wiring(
             src_id: edge.start_node_id(),
             tgt_id: edge.end_node_id(),
             index: edge.get::<i64>("index"),
-            refer: edge.get::<i64>("refer")
+            refer: edge.get::<i64>("refer"),
         };
         edge_list.push(modeledge);
     }
@@ -430,6 +444,7 @@ async fn subgraph_wiring(
     Ok(graph)
 }
 
+/// This function takes in a node id and returns a petgraph representing the memgraph
 async fn subgraph2petgraph(
     module_id: i64,
     config: Config,
@@ -465,6 +480,7 @@ async fn subgraph2petgraph(
     graph
 }
 
+/// This function takes in a node id and returns the nodes and edges in it
 pub async fn get_subgraph(
     module_id: i64,
     config: Config,
@@ -495,7 +511,7 @@ pub async fn get_subgraph(
             id: node.id(),
             label: node.labels()[0].clone(),
             name: node.get::<String>("name"),
-            value: node.get::<String>("value")
+            value: node.get::<String>("value"),
         };
         node_list.push(modelnode);
     }
@@ -519,7 +535,7 @@ pub async fn get_subgraph(
             src_id: edge.start_node_id(),
             tgt_id: edge.end_node_id(),
             index: edge.get::<i64>("index"),
-            refer: edge.get::<i64>("refer")
+            refer: edge.get::<i64>("refer"),
         };
         edge_list.push(modeledge);
     }
