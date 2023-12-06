@@ -392,7 +392,7 @@ async fn trim_un_named(
         }
     }
 
-    // now we perform a filter_map to remove the un-named nodes and only the bypass edge will remain to connect the nodes
+    // now we remove the un-named nodes and only the bypass edge will remain to connect the nodes
     // we also remove the unpack node if it is present here as well
     for node_index in graph.node_indices().rev() {
         if graph[node_index].name.clone().unwrap() == *"un-named"
@@ -535,7 +535,6 @@ pub async fn get_subgraph(
     module_id: i64,
     config: Config,
 ) -> Result<(Vec<ModelNode>, Vec<ModelEdge>), Error> {
-    // construct the query that will delete the module with a given unique identifier
 
     let mut node_list = Vec::<ModelNode>::new();
     let mut edge_list = Vec::<ModelEdge>::new();
