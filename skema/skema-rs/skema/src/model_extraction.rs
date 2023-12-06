@@ -36,11 +36,32 @@ pub struct ModelEdge {
     refer: Option<i64>,
 }
 
+/**
+ * This is the main function call for model extraction.
+ * 
+ * Parameters:
+ * - module_id: i64 -> This is the top level id of the gromet module in memgraph. 
+ * - config: Config -> This is a config struct for connecting to memgraph
+ * 
+ * Returns:
+ * - Vector of FirstOrderODE -> This vector of structs is used to construct a PetriNet or RegNet further down the pipeline
+ * 
+ * Assumptions:
+ * - As of right now, we can always assume the code has been sliced to only one relevant function which contains the 
+ * core dynamics in it somewhere
+ * 
+ * Notes: 
+ * - FirstOrderODE is primarily composed of a LHS and a RHS,
+ *      - LHS is just a Mi object of the state being differentiated. There are additional fields for the LHS but only the
+ *      content field is used in downstream inference for now. 
+ *      - RHS is where the bulk of the inference happens, it produces an expression tree, hence the MET -> Math Expression Tree.
+ *          Every operator has a vector of arguments. (order matters)
+ */
 #[allow(non_snake_case)]
 pub async fn module_id2mathml_MET_ast(module_id: i64, config: Config) -> Vec<FirstOrderODE> {
     let mut core_dynamics_ast = Vec::<FirstOrderODE>::new();
 
-    let core_id = find_pn_dynamics(module_id, config.clone()).await; // gives back list of function nodes that might contain the dynamics
+    let core_id = find_pn_dynamics(module_id, config.clone()).await;
 
     if core_id.is_empty() {
         let deriv = Ci {
@@ -67,7 +88,15 @@ pub async fn module_id2mathml_MET_ast(module_id: i64, config: Config) -> Vec<Fir
     core_dynamics_ast
 }
 
-/// this function finds the core dynamics and returns a vector of node id's that meet the criteria for identification
+/** 
+ * This function finds the core dynamics and returns a vector of node id's that meet the criteria for identification
+ * 
+ * Based on the fact we are getting in only the function we expect to have dynamics, this should just be depricated in the future 
+ * and replaced with a inference to move from the module_id to the top level function node id, however for now we should keep it 
+ * as a simple heuristic because it is used in the original code2amr (zip repo) endpoint which would need to be updated first. 
+ * 
+ * Plus the case when it fails defaults to a emptry AMR which is preferable to crashing. 
+*/
 #[allow(clippy::if_same_then_else)]
 pub async fn find_pn_dynamics(module_id: i64, config: Config) -> Vec<i64> {
     let graph = subgraph2petgraph(module_id, config.clone()).await;
@@ -125,6 +154,12 @@ pub async fn find_pn_dynamics(module_id: i64, config: Config) -> Vec<i64> {
     core_id
 }
 
+
+/**
+ * Once the function node has been identified, this function takes it from there to extract the vector of FirstOrderODE's
+ * 
+ * This is based heavily on the assumption that each equation is in a seperate expression which breaks for the vector case. 
+ */
 #[allow(non_snake_case)]
 pub async fn subgrapg2_core_dyn_MET_ast(
     root_node_id: i64,
@@ -168,6 +203,10 @@ pub async fn subgrapg2_core_dyn_MET_ast(
     Ok(core_dynamics)
 }
 
+
+/**
+ * This function is designed to take in a petgraph instance of a wires only expression subgraph and output a FirstOrderODE equations representing it. 
+ */
 #[allow(non_snake_case)]
 fn tree_2_MET_ast(
     graph: &mut petgraph::Graph<ModelNode, ModelEdge>,
@@ -222,6 +261,7 @@ fn tree_2_MET_ast(
     Ok(fo_eq_vec[0].clone())
 }
 
+/// This is a recursive function that walks along the wired subgraph of an expression to construct the expression tree
 #[allow(non_snake_case)]
 pub fn get_args_MET(
     graph: &petgraph::Graph<ModelNode, ModelEdge>,
@@ -271,7 +311,7 @@ pub fn get_args_MET(
     ordered_args
 }
 
-// this gets the operator from the node name
+/// This gets the operator from the node name
 #[allow(non_snake_case)]
 #[allow(clippy::if_same_then_else)]
 pub fn get_operator_MET(
@@ -295,7 +335,16 @@ pub fn get_operator_MET(
     op[0].clone()
 }
 
-// this currently only works for un-named nodes that are not chained or have multiple incoming/outgoing edges
+/**
+ * This function takes in a wiring only petgraph of an expression and trims off the un-named nodes and unpack nodes. 
+ * 
+ * This is done by creating new edges that bypass the un-named nodes and then deleting them from the graph. 
+ * For deleting the unpacks, the assumption is they are always terminal in the subgraph and can be deleted freely. 
+ * 
+ * Concerns: 
+ * - I don't think this will work if there are multiple un-named nodes changed together. I haven't seen this in practice, 
+ * but I think it's possible. So something to keep in mind. 
+ */
 async fn trim_un_named(
     graph: &mut petgraph::Graph<ModelNode, ModelEdge>,
 ) -> &mut petgraph::Graph<ModelNode, ModelEdge> {
@@ -356,7 +405,8 @@ async fn trim_un_named(
     graph
 }
 
-/// This function takes in a node id and returns a petgraph subgraph of only the wire type edges
+/// This function takes in a node id (typically that of an expression subgraph) and returns a 
+/// petgraph subgraph of only the wire type edges
 async fn subgraph_wiring(
     module_id: i64,
     config: Config,
@@ -444,7 +494,7 @@ async fn subgraph_wiring(
     Ok(graph)
 }
 
-/// This function takes in a node id and returns a petgraph representing the memgraph
+/// This function takes in a node id and returns a petgraph represention of the memgraph graph
 async fn subgraph2petgraph(
     module_id: i64,
     config: Config,
