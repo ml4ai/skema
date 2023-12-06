@@ -379,6 +379,7 @@ impl Expr {
 
     /// 1) distribute variables and terms over multiplications, e.g., a*(b+c) => a*b+a*c
     /// 2) distribute variables and terms over divisions, e.g., a/(b+c)/(e+f) => a/(be+bf+ce+cf)
+    #[allow(dead_code)] // used in tests I believe
     fn distribute_expr(&mut self) {
         if let Expr::Expression { ops, args, .. } = self {
             let mut ops_copy = ops.clone();
@@ -1024,6 +1025,7 @@ impl Expression {
         }
     }
 
+    #[allow(dead_code)] // used in tests I believe
     fn distribute_expr(&mut self) {
         for arg in &mut self.args {
             if let Expr::Expression { .. } = arg {
@@ -1179,7 +1181,7 @@ pub fn preprocess_content(content_str: String) -> String {
         let loc = pre_string[*ul..].find('<').map(|i| i + ul);
         match loc {
             None => {}
-            Some(x) => {}
+            Some(_x) => {}
         }
     }
     pre_string = html_escape::decode_html_entities(&pre_string).to_string();
