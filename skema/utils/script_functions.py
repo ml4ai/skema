@@ -254,8 +254,10 @@ def ann_cast_pipeline(
         pdf_file_name = f"{f_name}-AnnCast.pdf"
         agraph.to_pdf(pdf_file_name)
 
-    print("\nCalling GrfnVarCreationPass-------------------")
-    GrfnVarCreationPass(pipeline_state)
+    if not gromet:
+        # We only need the GrfnVarCreationPass if we are making Grfn
+        print("\nCalling GrfnVarCreationPass-------------------")
+        GrfnVarCreationPass(pipeline_state)
 
     print("\nCalling GrfnAssignmentPass-------------------")
     GrfnAssignmentPass(pipeline_state)
