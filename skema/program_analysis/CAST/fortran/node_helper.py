@@ -1,7 +1,9 @@
+import itertools
 from typing import List, Dict
-from skema.program_analysis.CAST2FN.model.cast import SourceRef
 
 from tree_sitter import Node
+
+from skema.program_analysis.CAST2FN.model.cast import SourceRef
 
 CONTROL_CHARACTERS = [
     ",",
@@ -41,7 +43,7 @@ class NodeHelper():
         # get_identifier optimization variables
         self.source_lines = source.splitlines(keepends=True)
         self.line_lengths = [len(line) for line in self.source_lines]
-        self.line_length_sums = [sum(self.line_lengths[:i+1]) for i in range(len(self.source_lines))]
+        self.line_length_sums = list(itertools.accumulate(self.line_lengths))#[sum(self.line_lengths[:i+1]) for i in range(len(self.source_lines))]
         
     def get_source_ref(self, node: Node) -> SourceRef:
         """Given a node and file name, return a CAST SourceRef object."""
