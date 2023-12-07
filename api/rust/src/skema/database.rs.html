@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `skema/src/database.rs`."><title>database.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-fa3bb1812debf86c.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="skema" data-themes="" data-resource-suffix="" data-rustdoc-version="1.74.0 (79e9716c9 2023-11-13)" data-channel="1.74.0" data-search-js="search-8be46b629f5f14a8.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-c5bd66d33317d69f.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../skema/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `skema/src/database.rs`."><title>database.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-fa3bb1812debf86c.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="skema" data-themes="" data-resource-suffix="" data-rustdoc-version="1.74.1 (a28077b28 2023-12-04)" data-channel="1.74.1" data-search-js="search-8be46b629f5f14a8.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-c5bd66d33317d69f.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../skema/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -5467,6 +5467,213 @@
 <a href="#5467" id="5467">5467</a>
 <a href="#5468" id="5468">5468</a>
 <a href="#5469" id="5469">5469</a>
+<a href="#5470" id="5470">5470</a>
+<a href="#5471" id="5471">5471</a>
+<a href="#5472" id="5472">5472</a>
+<a href="#5473" id="5473">5473</a>
+<a href="#5474" id="5474">5474</a>
+<a href="#5475" id="5475">5475</a>
+<a href="#5476" id="5476">5476</a>
+<a href="#5477" id="5477">5477</a>
+<a href="#5478" id="5478">5478</a>
+<a href="#5479" id="5479">5479</a>
+<a href="#5480" id="5480">5480</a>
+<a href="#5481" id="5481">5481</a>
+<a href="#5482" id="5482">5482</a>
+<a href="#5483" id="5483">5483</a>
+<a href="#5484" id="5484">5484</a>
+<a href="#5485" id="5485">5485</a>
+<a href="#5486" id="5486">5486</a>
+<a href="#5487" id="5487">5487</a>
+<a href="#5488" id="5488">5488</a>
+<a href="#5489" id="5489">5489</a>
+<a href="#5490" id="5490">5490</a>
+<a href="#5491" id="5491">5491</a>
+<a href="#5492" id="5492">5492</a>
+<a href="#5493" id="5493">5493</a>
+<a href="#5494" id="5494">5494</a>
+<a href="#5495" id="5495">5495</a>
+<a href="#5496" id="5496">5496</a>
+<a href="#5497" id="5497">5497</a>
+<a href="#5498" id="5498">5498</a>
+<a href="#5499" id="5499">5499</a>
+<a href="#5500" id="5500">5500</a>
+<a href="#5501" id="5501">5501</a>
+<a href="#5502" id="5502">5502</a>
+<a href="#5503" id="5503">5503</a>
+<a href="#5504" id="5504">5504</a>
+<a href="#5505" id="5505">5505</a>
+<a href="#5506" id="5506">5506</a>
+<a href="#5507" id="5507">5507</a>
+<a href="#5508" id="5508">5508</a>
+<a href="#5509" id="5509">5509</a>
+<a href="#5510" id="5510">5510</a>
+<a href="#5511" id="5511">5511</a>
+<a href="#5512" id="5512">5512</a>
+<a href="#5513" id="5513">5513</a>
+<a href="#5514" id="5514">5514</a>
+<a href="#5515" id="5515">5515</a>
+<a href="#5516" id="5516">5516</a>
+<a href="#5517" id="5517">5517</a>
+<a href="#5518" id="5518">5518</a>
+<a href="#5519" id="5519">5519</a>
+<a href="#5520" id="5520">5520</a>
+<a href="#5521" id="5521">5521</a>
+<a href="#5522" id="5522">5522</a>
+<a href="#5523" id="5523">5523</a>
+<a href="#5524" id="5524">5524</a>
+<a href="#5525" id="5525">5525</a>
+<a href="#5526" id="5526">5526</a>
+<a href="#5527" id="5527">5527</a>
+<a href="#5528" id="5528">5528</a>
+<a href="#5529" id="5529">5529</a>
+<a href="#5530" id="5530">5530</a>
+<a href="#5531" id="5531">5531</a>
+<a href="#5532" id="5532">5532</a>
+<a href="#5533" id="5533">5533</a>
+<a href="#5534" id="5534">5534</a>
+<a href="#5535" id="5535">5535</a>
+<a href="#5536" id="5536">5536</a>
+<a href="#5537" id="5537">5537</a>
+<a href="#5538" id="5538">5538</a>
+<a href="#5539" id="5539">5539</a>
+<a href="#5540" id="5540">5540</a>
+<a href="#5541" id="5541">5541</a>
+<a href="#5542" id="5542">5542</a>
+<a href="#5543" id="5543">5543</a>
+<a href="#5544" id="5544">5544</a>
+<a href="#5545" id="5545">5545</a>
+<a href="#5546" id="5546">5546</a>
+<a href="#5547" id="5547">5547</a>
+<a href="#5548" id="5548">5548</a>
+<a href="#5549" id="5549">5549</a>
+<a href="#5550" id="5550">5550</a>
+<a href="#5551" id="5551">5551</a>
+<a href="#5552" id="5552">5552</a>
+<a href="#5553" id="5553">5553</a>
+<a href="#5554" id="5554">5554</a>
+<a href="#5555" id="5555">5555</a>
+<a href="#5556" id="5556">5556</a>
+<a href="#5557" id="5557">5557</a>
+<a href="#5558" id="5558">5558</a>
+<a href="#5559" id="5559">5559</a>
+<a href="#5560" id="5560">5560</a>
+<a href="#5561" id="5561">5561</a>
+<a href="#5562" id="5562">5562</a>
+<a href="#5563" id="5563">5563</a>
+<a href="#5564" id="5564">5564</a>
+<a href="#5565" id="5565">5565</a>
+<a href="#5566" id="5566">5566</a>
+<a href="#5567" id="5567">5567</a>
+<a href="#5568" id="5568">5568</a>
+<a href="#5569" id="5569">5569</a>
+<a href="#5570" id="5570">5570</a>
+<a href="#5571" id="5571">5571</a>
+<a href="#5572" id="5572">5572</a>
+<a href="#5573" id="5573">5573</a>
+<a href="#5574" id="5574">5574</a>
+<a href="#5575" id="5575">5575</a>
+<a href="#5576" id="5576">5576</a>
+<a href="#5577" id="5577">5577</a>
+<a href="#5578" id="5578">5578</a>
+<a href="#5579" id="5579">5579</a>
+<a href="#5580" id="5580">5580</a>
+<a href="#5581" id="5581">5581</a>
+<a href="#5582" id="5582">5582</a>
+<a href="#5583" id="5583">5583</a>
+<a href="#5584" id="5584">5584</a>
+<a href="#5585" id="5585">5585</a>
+<a href="#5586" id="5586">5586</a>
+<a href="#5587" id="5587">5587</a>
+<a href="#5588" id="5588">5588</a>
+<a href="#5589" id="5589">5589</a>
+<a href="#5590" id="5590">5590</a>
+<a href="#5591" id="5591">5591</a>
+<a href="#5592" id="5592">5592</a>
+<a href="#5593" id="5593">5593</a>
+<a href="#5594" id="5594">5594</a>
+<a href="#5595" id="5595">5595</a>
+<a href="#5596" id="5596">5596</a>
+<a href="#5597" id="5597">5597</a>
+<a href="#5598" id="5598">5598</a>
+<a href="#5599" id="5599">5599</a>
+<a href="#5600" id="5600">5600</a>
+<a href="#5601" id="5601">5601</a>
+<a href="#5602" id="5602">5602</a>
+<a href="#5603" id="5603">5603</a>
+<a href="#5604" id="5604">5604</a>
+<a href="#5605" id="5605">5605</a>
+<a href="#5606" id="5606">5606</a>
+<a href="#5607" id="5607">5607</a>
+<a href="#5608" id="5608">5608</a>
+<a href="#5609" id="5609">5609</a>
+<a href="#5610" id="5610">5610</a>
+<a href="#5611" id="5611">5611</a>
+<a href="#5612" id="5612">5612</a>
+<a href="#5613" id="5613">5613</a>
+<a href="#5614" id="5614">5614</a>
+<a href="#5615" id="5615">5615</a>
+<a href="#5616" id="5616">5616</a>
+<a href="#5617" id="5617">5617</a>
+<a href="#5618" id="5618">5618</a>
+<a href="#5619" id="5619">5619</a>
+<a href="#5620" id="5620">5620</a>
+<a href="#5621" id="5621">5621</a>
+<a href="#5622" id="5622">5622</a>
+<a href="#5623" id="5623">5623</a>
+<a href="#5624" id="5624">5624</a>
+<a href="#5625" id="5625">5625</a>
+<a href="#5626" id="5626">5626</a>
+<a href="#5627" id="5627">5627</a>
+<a href="#5628" id="5628">5628</a>
+<a href="#5629" id="5629">5629</a>
+<a href="#5630" id="5630">5630</a>
+<a href="#5631" id="5631">5631</a>
+<a href="#5632" id="5632">5632</a>
+<a href="#5633" id="5633">5633</a>
+<a href="#5634" id="5634">5634</a>
+<a href="#5635" id="5635">5635</a>
+<a href="#5636" id="5636">5636</a>
+<a href="#5637" id="5637">5637</a>
+<a href="#5638" id="5638">5638</a>
+<a href="#5639" id="5639">5639</a>
+<a href="#5640" id="5640">5640</a>
+<a href="#5641" id="5641">5641</a>
+<a href="#5642" id="5642">5642</a>
+<a href="#5643" id="5643">5643</a>
+<a href="#5644" id="5644">5644</a>
+<a href="#5645" id="5645">5645</a>
+<a href="#5646" id="5646">5646</a>
+<a href="#5647" id="5647">5647</a>
+<a href="#5648" id="5648">5648</a>
+<a href="#5649" id="5649">5649</a>
+<a href="#5650" id="5650">5650</a>
+<a href="#5651" id="5651">5651</a>
+<a href="#5652" id="5652">5652</a>
+<a href="#5653" id="5653">5653</a>
+<a href="#5654" id="5654">5654</a>
+<a href="#5655" id="5655">5655</a>
+<a href="#5656" id="5656">5656</a>
+<a href="#5657" id="5657">5657</a>
+<a href="#5658" id="5658">5658</a>
+<a href="#5659" id="5659">5659</a>
+<a href="#5660" id="5660">5660</a>
+<a href="#5661" id="5661">5661</a>
+<a href="#5662" id="5662">5662</a>
+<a href="#5663" id="5663">5663</a>
+<a href="#5664" id="5664">5664</a>
+<a href="#5665" id="5665">5665</a>
+<a href="#5666" id="5666">5666</a>
+<a href="#5667" id="5667">5667</a>
+<a href="#5668" id="5668">5668</a>
+<a href="#5669" id="5669">5669</a>
+<a href="#5670" id="5670">5670</a>
+<a href="#5671" id="5671">5671</a>
+<a href="#5672" id="5672">5672</a>
+<a href="#5673" id="5673">5673</a>
+<a href="#5674" id="5674">5674</a>
+<a href="#5675" id="5675">5675</a>
+<a href="#5676" id="5676">5676</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Interface to the graph database we are using for persisting GroMEt objects and performing
 //! queries on them. We currently use MemgraphDB, an in-memory graph database.
 
@@ -5537,13 +5744,14 @@ There being a second function call of the same function which contains an expres
     </span><span class="kw">pub </span>box_counter: usize, <span class="comment">// this indexes the box call for the node one scope up, matches nbox if higher scope is top level
 </span>}
 
-<span class="attr">#[derive(Debug, Clone, PartialEq, Ord, Eq, PartialOrd)]
+<span class="attr">#[derive(Debug, Clone, PartialEq, Ord, Eq, PartialOrd, Default)]
 </span><span class="kw">pub struct </span>Edge {
     <span class="kw">pub </span>src: String,
     <span class="kw">pub </span>tgt: String,
     <span class="kw">pub </span>e_type: String,
     <span class="kw">pub </span>prop: <span class="prelude-ty">Option</span>&lt;usize&gt;, <span class="comment">// option because of opo&#39;s and opi&#39;s
-</span>}
+    </span><span class="kw">pub </span>refer: <span class="prelude-ty">Option</span>&lt;usize&gt;,
+}
 
 <span class="attr">#[derive(Debug, Clone)]
 </span><span class="kw">pub struct </span>ConstructorArgs {
@@ -5847,7 +6055,7 @@ There being a second function call of the same function which contains an expres
         src: String::from(<span class="string">&quot;mod&quot;</span>),
         tgt: <span class="macro">format!</span>(<span class="string">&quot;m{}&quot;</span>, metadata_idx),
         e_type: String::from(<span class="string">&quot;Metadata&quot;</span>),
-        prop: <span class="prelude-val">None</span>,
+        ..Default::default()
     };
     <span class="kw">let </span>edge_query = <span class="macro">format!</span>(
         <span class="string">&quot;{} ({})-[e{}{}:{}]-&gt;({})&quot;</span>,
@@ -5922,6 +6130,7 @@ There being a second function call of the same function which contains an expres
             tgt: <span class="macro">format!</span>(<span class="string">&quot;n{}&quot;</span>, start),
             e_type: String::from(<span class="string">&quot;Contains&quot;</span>),
             prop: <span class="prelude-val">Some</span>(<span class="number">1</span>),
+            ..Default::default()
         };
         nodes.push(n1.clone());
         edges.push(e1);
@@ -5940,7 +6149,7 @@ There being a second function call of the same function which contains an expres
                     src: n1.node_id.clone(),
                     tgt: <span class="macro">format!</span>(<span class="string">&quot;m{}&quot;</span>, metadata_idx),
                     e_type: String::from(<span class="string">&quot;Metadata&quot;</span>),
-                    prop: <span class="prelude-val">None</span>,
+                    ..Default::default()
                 };
                 edges.push(me1);
             }
@@ -5990,7 +6199,7 @@ There being a second function call of the same function which contains an expres
                     src: n1.node_id.clone(),
                     tgt: node.node_id.clone(),
                     e_type: String::from(<span class="string">&quot;Contains&quot;</span>),
-                    prop: <span class="prelude-val">None</span>,
+                    ..Default::default()
                 };
                 edges.push(e5);
             }
@@ -6048,7 +6257,7 @@ There being a second function call of the same function which contains an expres
                     src: wfopi_src_tgt[<span class="number">0</span>].clone(),
                     tgt: wfopi_src_tgt[<span class="number">1</span>].clone(),
                     e_type: String::from(<span class="string">&quot;Wire&quot;</span>),
-                    prop: <span class="prelude-val">None</span>,
+                    ..Default::default()
                 };
                 edges.push(e6);
             }
@@ -6101,7 +6310,7 @@ There being a second function call of the same function which contains an expres
                     src: wfopo_src_tgt[<span class="number">0</span>].clone(),
                     tgt: wfopo_src_tgt[<span class="number">1</span>].clone(),
                     e_type: String::from(<span class="string">&quot;Wire&quot;</span>),
-                    prop: <span class="prelude-val">None</span>,
+                    ..Default::default()
                 };
                 edges.push(e7);
             }
@@ -6246,64 +6455,74 @@ There being a second function call of the same function which contains an expres
         }
     } */
     // convert every node object into a node query
-    </span><span class="kw">let </span>create = String::from(<span class="string">&quot;CREATE&quot;</span>);
-    <span class="kw">for </span>node <span class="kw">in </span>nodes.iter() {
-        <span class="kw">let </span><span class="kw-2">mut </span>name = String::from(<span class="string">&quot;a&quot;</span>);
-        <span class="kw">if </span>node.name.is_none() {
+    </span>queries.append(<span class="kw-2">&amp;mut </span>construct_memgraph_queries(
+        <span class="kw-2">&amp;mut </span>nodes,
+        <span class="kw-2">&amp;mut </span>edges,
+        <span class="kw-2">&amp;mut </span>meta_nodes,
+        <span class="kw-2">&amp;mut </span>queries.clone(),
+    ));
+    <span class="comment">/*let create = String::from(&quot;CREATE&quot;);
+    for node in nodes.iter() {
+        let mut name = String::from(&quot;a&quot;);
+        if node.name.is_none() {
             name = node.n_type.clone();
-        } <span class="kw">else </span>{
+        } else {
             name = node.name.as_ref().unwrap().to_string();
         }
-        <span class="kw">let </span>value = <span class="kw">match </span><span class="kw-2">&amp;</span>node.value {
-            <span class="prelude-val">Some</span>(val) =&gt; <span class="macro">format!</span>(
-                <span class="string">&quot;{{ value_type:{:?}, value:{:?}, gromet_type:{:?} }}&quot;</span>,
+        let value = match &amp;node.value {
+            Some(val) =&gt; format!(
+                &quot;{{ value_type:{:?}, value:{:?}, gromet_type:{:?} }}&quot;,
                 val.value_type,
                 val.value,
                 val.gromet_type.as_ref().unwrap()
             ),
-            <span class="prelude-val">None </span>=&gt; String::from(<span class="string">&quot;\&quot;\&quot;&quot;</span>),
+            None =&gt; String::from(&quot;\&quot;\&quot;&quot;),
         };
 
-        <span class="comment">// NOTE: The format of value has changed to represent a literal Cypher map {field:value}.
+        // NOTE: The format of value has changed to represent a literal Cypher map {field:value}.
         // We no longer need to format value with the debug :? parameter
-        </span><span class="kw">let </span>node_query = <span class="macro">format!</span>(
-            <span class="string">&quot;{} ({}:{} {{name:{:?},value:{},order_box:{:?},order_att:{:?}}})&quot;</span>,
+        let node_query = format!(
+            &quot;{} ({}:{} {{name:{:?},value:{},order_box:{:?},order_att:{:?}}})&quot;,
             create, node.node_id, node.n_type, name, value, node.nbox, node.contents
         );
         queries.push(node_query);
     }
-    <span class="kw">for </span>node <span class="kw">in </span>meta_nodes.iter() {
-        queries.append(<span class="kw-2">&amp;mut </span>create_metadata_node_query(node.clone()));
+    for node in meta_nodes.iter() {
+        queries.append(&amp;mut create_metadata_node_query(node.clone()));
     }
 
-    <span class="comment">// convert every edge object into an edge query
-    </span><span class="kw">let </span>init_edges = edges.len();
+    // convert every edge object into an edge query
+    let init_edges = edges.len();
     edges.sort();
     edges.dedup();
-    <span class="kw">let </span>edges_clone = edges.clone();
-    <span class="comment">// also dedup if edge prop is different
-    </span><span class="kw">for </span>(i, edge) <span class="kw">in </span>edges_clone.iter().enumerate().rev() {
-        <span class="kw">if </span>i != <span class="number">0 </span>&amp;&amp; edge.src == edges_clone[i - <span class="number">1</span>].src &amp;&amp; edge.tgt == edges_clone[i - <span class="number">1</span>].tgt {
+    let edges_clone = edges.clone();
+    // also dedup if edge prop is different
+    for (i, edge) in edges_clone.iter().enumerate().rev() {
+        if i != 0 &amp;&amp; edge.src == edges_clone[i - 1].src &amp;&amp; edge.tgt == edges_clone[i - 1].tgt {
             edges.remove(i);
         }
     }
-    <span class="kw">let </span>fin_edges = edges.len();
-    <span class="kw">if </span>init_edges != fin_edges {
-        <span class="macro">println!</span>(<span class="string">&quot;Duplicated Edges Removed, check for bugs&quot;</span>);
+    let fin_edges = edges.len();
+    if init_edges != fin_edges {
+        println!(&quot;Duplicated Edges Removed, check for bugs&quot;);
     }
-    <span class="kw">for </span>edge <span class="kw">in </span>edges.iter() {
-        <span class="kw">let </span>edge_query = <span class="macro">format!</span>(
-            <span class="string">&quot;{} ({})-[e{}{}:{}]-&gt;({})&quot;</span>,
+    for edge in edges.iter() {
+        let edge_query = format!(
+            &quot;{} ({})-[e{}{}:{}]-&gt;({})&quot;,
             create, edge.src, edge.src, edge.tgt, edge.e_type, edge.tgt
         );
         queries.push(edge_query);
 
-        <span class="kw">if </span>edge.prop.is_some() {
-            <span class="kw">let </span>set_query = <span class="macro">format!</span>(<span class="string">&quot;set e{}{}.index={}&quot;</span>, edge.src, edge.tgt, edge.prop.unwrap());
+        if edge.prop.is_some() {
+            let set_query = format!(&quot;set e{}{}.index={}&quot;, edge.src, edge.tgt, edge.prop.unwrap());
             queries.push(set_query);
         }
-    }
-    queries
+        if edge.refer.is_some() {
+            let set_query = format!(&quot;set e{}{}.refer={}&quot;, edge.src, edge.tgt, edge.refer.unwrap());
+            queries.push(set_query);
+        }
+    }*/
+    </span>queries
 }
 
 <span class="attr">#[allow(unused_assignments)]
@@ -6441,6 +6660,7 @@ There being a second function call of the same function which contains an expres
                         tgt: <span class="macro">format!</span>(<span class="string">&quot;n{}&quot;</span>, start),
                         e_type: String::from(<span class="string">&quot;Contains&quot;</span>),
                         prop: <span class="prelude-val">Some</span>(boxf.contents.unwrap() <span class="kw">as </span>usize),
+                        ..Default::default()
                     };
                     nodes.push(n1.clone());
                     edges.push(e1);
@@ -6460,7 +6680,7 @@ There being a second function call of the same function which contains an expres
                                 src: n1.node_id.clone(),
                                 tgt: <span class="macro">format!</span>(<span class="string">&quot;m{}&quot;</span>, metadata_idx),
                                 e_type: String::from(<span class="string">&quot;Metadata&quot;</span>),
-                                prop: <span class="prelude-val">None</span>,
+                                ..Default::default()
                             };
                             edges.push(me1);
                         }
@@ -6481,7 +6701,7 @@ There being a second function call of the same function which contains an expres
                                 src: n1.node_id.clone(),
                                 tgt: <span class="macro">format!</span>(<span class="string">&quot;m{}&quot;</span>, metadata_idx),
                                 e_type: String::from(<span class="string">&quot;Metadata&quot;</span>),
-                                prop: <span class="prelude-val">None</span>,
+                                ..Default::default()
                             };
                             edges.push(me1);
                         }
@@ -6521,7 +6741,7 @@ There being a second function call of the same function which contains an expres
                                 src: n1.node_id.clone(),
                                 tgt: node.node_id.clone(),
                                 e_type: String::from(<span class="string">&quot;Contains&quot;</span>),
-                                prop: <span class="prelude-val">None</span>,
+                                ..Default::default()
                             };
                             edges.push(e5);
                         }
@@ -6579,7 +6799,7 @@ There being a second function call of the same function which contains an expres
                                 src: wfopi_src_tgt[<span class="number">0</span>].clone(),
                                 tgt: wfopi_src_tgt[<span class="number">1</span>].clone(),
                                 e_type: String::from(<span class="string">&quot;Wire&quot;</span>),
-                                prop: <span class="prelude-val">None</span>,
+                                ..Default::default()
                             };
                             edges.push(e6);
                         }
@@ -6632,7 +6852,7 @@ There being a second function call of the same function which contains an expres
                                 src: wfopo_src_tgt[<span class="number">0</span>].clone(),
                                 tgt: wfopo_src_tgt[<span class="number">1</span>].clone(),
                                 e_type: String::from(<span class="string">&quot;Wire&quot;</span>),
-                                prop: <span class="prelude-val">None</span>,
+                                ..Default::default()
                             };
                             edges.push(e7);
                         }
@@ -6651,30 +6871,7 @@ There being a second function call of the same function which contains an expres
                 }
             }
             FunctionType::Imported =&gt; {
-                create_import(
-                    gromet,
-                    <span class="kw-2">&amp;mut </span>nodes,
-                    <span class="kw-2">&amp;mut </span>edges,
-                    <span class="kw-2">&amp;mut </span>meta_nodes,
-                    <span class="kw-2">&amp;mut </span>start,
-                    c_args.clone(),
-                );
-                start += <span class="number">1</span>;
-                <span class="comment">// now to implement wiring
-                </span>import_wiring(
-                    <span class="kw-2">&amp;</span>gromet.clone(),
-                    <span class="kw-2">&amp;mut </span>nodes,
-                    <span class="kw-2">&amp;mut </span>edges,
-                    c_args.att_idx,
-                    c_args.bf_counter,
-                    c_args.parent_node.clone(),
-                );
-            }
-            FunctionType::ImportedMethod =&gt; {
-                <span class="comment">// basically seems like these are just functions to me.
-                </span>c_args.att_idx = boxf.contents.unwrap() <span class="kw">as </span>usize;
-                c_args.att_box = gromet.modules[<span class="number">0</span>].attributes[c_args.att_idx - <span class="number">1</span>].clone();
-                create_function(
+                create_att_primitive(
                     gromet,     <span class="comment">// gromet for metadata
                     </span><span class="kw-2">&amp;mut </span>nodes, <span class="comment">// nodes
                     </span><span class="kw-2">&amp;mut </span>edges,
@@ -6682,7 +6879,46 @@ There being a second function call of the same function which contains an expres
                     <span class="kw-2">&amp;mut </span>start,
                     c_args.clone(),
                 );
-            }
+                <span class="comment">/*create_import(
+                    gromet,
+                    &amp;mut nodes,
+                    &amp;mut edges,
+                    &amp;mut meta_nodes,
+                    &amp;mut start,
+                    c_args.clone(),
+                );
+                start += 1;
+                // now to implement wiring
+                import_wiring(
+                    &amp;gromet.clone(),
+                    &amp;mut nodes,
+                    &amp;mut edges,
+                    c_args.att_idx,
+                    c_args.bf_counter,
+                    c_args.parent_node.clone(),
+                );*/
+            </span>}
+            FunctionType::ImportedMethod =&gt; {
+                create_att_primitive(
+                    gromet,     <span class="comment">// gromet for metadata
+                    </span><span class="kw-2">&amp;mut </span>nodes, <span class="comment">// nodes
+                    </span><span class="kw-2">&amp;mut </span>edges,
+                    <span class="kw-2">&amp;mut </span>meta_nodes,
+                    <span class="kw-2">&amp;mut </span>start,
+                    c_args.clone(),
+                );
+                <span class="comment">// basically seems like these are just functions to me.
+                /*c_args.att_idx = boxf.contents.unwrap() as usize;
+                c_args.att_box = gromet.modules[0].attributes[c_args.att_idx - 1].clone();
+                create_function(
+                    gromet,     // gromet for metadata
+                    &amp;mut nodes, // nodes
+                    &amp;mut edges,
+                    &amp;mut meta_nodes,
+                    &amp;mut start,
+                    c_args.clone(),
+                );*/
+            </span>}
             <span class="kw">_ </span>=&gt; {}
         }
         start += <span class="number">1</span>;
@@ -6757,64 +6993,74 @@ There being a second function call of the same function which contains an expres
         }
     }
     <span class="comment">// convert every node object into a node query
-    </span><span class="kw">let </span>create = String::from(<span class="string">&quot;CREATE&quot;</span>);
-    <span class="kw">for </span>node <span class="kw">in </span>nodes.iter() {
-        <span class="kw">let </span><span class="kw-2">mut </span>name = String::from(<span class="string">&quot;a&quot;</span>);
-        <span class="kw">if </span>node.name.is_none() {
+    </span>queries.append(<span class="kw-2">&amp;mut </span>construct_memgraph_queries(
+        <span class="kw-2">&amp;mut </span>nodes,
+        <span class="kw-2">&amp;mut </span>edges,
+        <span class="kw-2">&amp;mut </span>meta_nodes,
+        <span class="kw-2">&amp;mut </span>queries.clone(),
+    ));
+    <span class="comment">/*let create = String::from(&quot;CREATE&quot;);
+    for node in nodes.iter() {
+        let mut name = String::from(&quot;a&quot;);
+        if node.name.is_none() {
             name = node.n_type.clone();
-        } <span class="kw">else </span>{
+        } else {
             name = node.name.as_ref().unwrap().to_string();
         }
-        <span class="kw">let </span>value = <span class="kw">match </span><span class="kw-2">&amp;</span>node.value {
-            <span class="prelude-val">Some</span>(val) =&gt; <span class="macro">format!</span>(
-                <span class="string">&quot;{{ value_type:{:?}, value:{:?}, gromet_type:{:?} }}&quot;</span>,
+        let value = match &amp;node.value {
+            Some(val) =&gt; format!(
+                &quot;{{ value_type:{:?}, value:{:?}, gromet_type:{:?} }}&quot;,
                 val.value_type,
                 val.value,
                 val.gromet_type.as_ref().unwrap()
             ),
-            <span class="prelude-val">None </span>=&gt; String::from(<span class="string">&quot;\&quot;\&quot;&quot;</span>),
+            None =&gt; String::from(&quot;\&quot;\&quot;&quot;),
         };
 
-        <span class="comment">// NOTE: The format of value has changed to represent a literal Cypher map {field:value}.
+        // NOTE: The format of value has changed to represent a literal Cypher map {field:value}.
         // We no longer need to format value with the debug :? parameter
-        </span><span class="kw">let </span>node_query = <span class="macro">format!</span>(
-            <span class="string">&quot;{} ({}:{} {{name:{:?},value:{},order_box:{:?},order_att:{:?}}})&quot;</span>,
+        let node_query = format!(
+            &quot;{} ({}:{} {{name:{:?},value:{},order_box:{:?},order_att:{:?}}})&quot;,
             create, node.node_id, node.n_type, name, value, node.nbox, node.contents
         );
         queries.push(node_query);
     }
-    <span class="kw">for </span>node <span class="kw">in </span>meta_nodes.iter() {
-        queries.append(<span class="kw-2">&amp;mut </span>create_metadata_node_query(node.clone()));
+    for node in meta_nodes.iter() {
+        queries.append(&amp;mut create_metadata_node_query(node.clone()));
     }
 
-    <span class="comment">// convert every edge object into an edge query
-    </span><span class="kw">let </span>init_edges = edges.len();
+    // convert every edge object into an edge query
+    let init_edges = edges.len();
     edges.sort();
     edges.dedup();
-    <span class="kw">let </span>edges_clone = edges.clone();
-    <span class="comment">// also dedup if edge prop is different
-    </span><span class="kw">for </span>(i, edge) <span class="kw">in </span>edges_clone.iter().enumerate().rev() {
-        <span class="kw">if </span>i != <span class="number">0 </span>&amp;&amp; edge.src == edges_clone[i - <span class="number">1</span>].src &amp;&amp; edge.tgt == edges_clone[i - <span class="number">1</span>].tgt {
+    let edges_clone = edges.clone();
+    // also dedup if edge prop is different
+    for (i, edge) in edges_clone.iter().enumerate().rev() {
+        if i != 0 &amp;&amp; edge.src == edges_clone[i - 1].src &amp;&amp; edge.tgt == edges_clone[i - 1].tgt {
             edges.remove(i);
         }
     }
-    <span class="kw">let </span>fin_edges = edges.len();
-    <span class="kw">if </span>init_edges != fin_edges {
-        <span class="macro">println!</span>(<span class="string">&quot;Duplicated Edges Removed, check for bugs&quot;</span>);
+    let fin_edges = edges.len();
+    if init_edges != fin_edges {
+        println!(&quot;Duplicated Edges Removed, check for bugs&quot;);
     }
-    <span class="kw">for </span>edge <span class="kw">in </span>edges.iter() {
-        <span class="kw">let </span>edge_query = <span class="macro">format!</span>(
-            <span class="string">&quot;{} ({})-[e{}{}:{}]-&gt;({})&quot;</span>,
+    for edge in edges.iter() {
+        let edge_query = format!(
+            &quot;{} ({})-[e{}{}:{}]-&gt;({})&quot;,
             create, edge.src, edge.src, edge.tgt, edge.e_type, edge.tgt
         );
         queries.push(edge_query);
 
-        <span class="kw">if </span>edge.prop.is_some() {
-            <span class="kw">let </span>set_query = <span class="macro">format!</span>(<span class="string">&quot;set e{}{}.index={}&quot;</span>, edge.src, edge.tgt, edge.prop.unwrap());
+        if edge.prop.is_some() {
+            let set_query = format!(&quot;set e{}{}.index={}&quot;, edge.src, edge.tgt, edge.prop.unwrap());
             queries.push(set_query);
         }
-    }
-    queries
+        if edge.refer.is_some() {
+            let set_query = format!(&quot;set e{}{}.refer={}&quot;, edge.src, edge.tgt, edge.refer.unwrap());
+            queries.push(set_query);
+        }
+    }*/
+    </span>queries
 }
 <span class="comment">// this method creates an import type function
 // currently assumes top level call
@@ -6875,7 +7121,7 @@ There being a second function call of the same function which contains an expres
         src: c_args.parent_node.node_id,
         tgt: n3.node_id.clone(),
         e_type: String::from(<span class="string">&quot;Contains&quot;</span>),
-        prop: <span class="prelude-val">None</span>,
+        ..Default::default()
     };
     edges.push(e4);
     <span class="kw">if </span>eboxf.metadata.is_some() {
@@ -6892,7 +7138,7 @@ There being a second function call of the same function which contains an expres
                 src: n3.node_id,
                 tgt: <span class="macro">format!</span>(<span class="string">&quot;m{}&quot;</span>, metadata_idx),
                 e_type: String::from(<span class="string">&quot;Metadata&quot;</span>),
-                prop: <span class="prelude-val">None</span>,
+                ..Default::default()
             };
             edges.push(me1);
         }
@@ -6953,6 +7199,7 @@ There being a second function call of the same function which contains an expres
                     tgt: n1.node_id.clone(),
                     e_type: String::from(<span class="string">&quot;Contains&quot;</span>),
                     prop: <span class="prelude-val">Some</span>(c_args.att_idx),
+                    ..Default::default()
                 };
                 parent_node = n1.clone();
                 nodes.push(n1.clone());
@@ -6973,7 +7220,7 @@ There being a second function call of the same function which contains an expres
                             src: n1.node_id.clone(),
                             tgt: <span class="macro">format!</span>(<span class="string">&quot;m{}&quot;</span>, metadata_idx),
                             e_type: String::from(<span class="string">&quot;Metadata&quot;</span>),
-                            prop: <span class="prelude-val">None</span>,
+                            ..Default::default()
                         };
                         edges.push(me1);
                     }
@@ -7080,8 +7327,7 @@ There being a second function call of the same function which contains an expres
                         }
                         FunctionType::ImportedMethod =&gt; {
                             <span class="comment">// this is a function call, but for some reason is not called a function
-                            </span>new_c_args.att_idx = att_sub_box.contents.unwrap() <span class="kw">as </span>usize;
-                            create_function(
+                            </span>create_att_primitive(
                                 gromet, <span class="comment">// gromet for metadata
                                 </span>nodes,  <span class="comment">// nodes
                                 </span>edges,
@@ -7089,20 +7335,37 @@ There being a second function call of the same function which contains an expres
                                 start,
                                 new_c_args.clone(),
                             );
-                        }
+                            <span class="comment">/*new_c_args.att_idx = att_sub_box.contents.unwrap() as usize;
+                            create_function(
+                                gromet, // gromet for metadata
+                                nodes,  // nodes
+                                edges,
+                                meta_nodes,
+                                start,
+                                new_c_args.clone(),
+                            );*/
+                        </span>}
                         FunctionType::Imported =&gt; {
-                            create_import(gromet, nodes, edges, meta_nodes, start, c_args.clone());
-                            <span class="kw-2">*</span>start += <span class="number">1</span>;
-                            <span class="comment">// now to implement wiring
-                            </span>import_wiring(
-                                <span class="kw-2">&amp;</span>gromet.clone(),
+                            create_att_primitive(
+                                gromet, <span class="comment">// gromet for metadata
+                                </span>nodes,  <span class="comment">// nodes
+                                </span>edges,
+                                meta_nodes,
+                                start,
+                                new_c_args.clone(),
+                            );
+                            <span class="comment">/*create_import(gromet, nodes, edges, meta_nodes, start, c_args.clone());
+                            *start += 1;
+                            // now to implement wiring
+                            import_wiring(
+                                &amp;gromet.clone(),
                                 nodes,
                                 edges,
                                 c_args.att_idx,
                                 c_args.bf_counter,
                                 c_args.parent_node.clone(),
-                            );
-                        }
+                            );*/
+                        </span>}
                         <span class="kw">_ </span>=&gt; {
                             <span class="macro">println!</span>(
                                 <span class="string">&quot;Missing a box in a function! {:?}&quot;</span>,
@@ -7236,6 +7499,7 @@ There being a second function call of the same function which contains an expres
         tgt: <span class="macro">format!</span>(<span class="string">&quot;n{}&quot;</span>, start),
         e_type: String::from(<span class="string">&quot;Contains&quot;</span>),
         prop: <span class="prelude-val">Some</span>(cond_counter <span class="kw">as </span>usize),
+        ..Default::default()
     };
     nodes.push(n1.clone());
     edges.push(e1);
@@ -7269,7 +7533,7 @@ There being a second function call of the same function which contains an expres
                 src: n1.node_id.clone(),
                 tgt: <span class="macro">format!</span>(<span class="string">&quot;n{}&quot;</span>, start),
                 e_type: String::from(<span class="string">&quot;Port_Of&quot;</span>),
-                prop: <span class="prelude-val">None</span>,
+                ..Default::default()
             };
             nodes.push(n2.clone());
             edges.push(e3);
@@ -7287,7 +7551,7 @@ There being a second function call of the same function which contains an expres
                         src: n2.node_id.clone(),
                         tgt: <span class="macro">format!</span>(<span class="string">&quot;m{}&quot;</span>, metadata_idx),
                         e_type: String::from(<span class="string">&quot;Metadata&quot;</span>),
-                        prop: <span class="prelude-val">None</span>,
+                        ..Default::default()
                     };
                     edges.push(me1);
                 }
@@ -7322,7 +7586,7 @@ There being a second function call of the same function which contains an expres
                 src: n1.node_id.clone(),
                 tgt: <span class="macro">format!</span>(<span class="string">&quot;n{}&quot;</span>, start),
                 e_type: String::from(<span class="string">&quot;Port_Of&quot;</span>),
-                prop: <span class="prelude-val">None</span>,
+                ..Default::default()
             };
             nodes.push(n3.clone());
             edges.push(e5);
@@ -7340,7 +7604,7 @@ There being a second function call of the same function which contains an expres
                         src: n3.node_id.clone(),
                         tgt: <span class="macro">format!</span>(<span class="string">&quot;m{}&quot;</span>, metadata_idx),
                         e_type: String::from(<span class="string">&quot;Metadata&quot;</span>),
-                        prop: <span class="prelude-val">None</span>,
+                        ..Default::default()
                     };
                     edges.push(me1);
                 }
@@ -7488,7 +7752,7 @@ There being a second function call of the same function which contains an expres
                     src: wfc_src_tgt[<span class="number">0</span>].clone(),
                     tgt: wfc_src_tgt[<span class="number">1</span>].clone(),
                     e_type: String::from(<span class="string">&quot;Wire&quot;</span>),
-                    prop: <span class="prelude-val">None</span>,
+                    ..Default::default()
                 };
                 edges.push(e8);
             }
@@ -7541,7 +7805,7 @@ There being a second function call of the same function which contains an expres
                 src: cond_src_tgt[<span class="number">0</span>].clone(),
                 tgt: cond_src_tgt[<span class="number">1</span>].clone(),
                 e_type: String::from(<span class="string">&quot;Wire&quot;</span>),
-                prop: <span class="prelude-val">None</span>,
+                ..Default::default()
             };
             edges.push(e9);
         }
@@ -7588,7 +7852,7 @@ There being a second function call of the same function which contains an expres
                 src: if_src_tgt[<span class="number">0</span>].clone(),
                 tgt: if_src_tgt[<span class="number">1</span>].clone(),
                 e_type: String::from(<span class="string">&quot;Wire&quot;</span>),
-                prop: <span class="prelude-val">None</span>,
+                ..Default::default()
             };
             edges.push(e10);
         }
@@ -7636,7 +7900,7 @@ There being a second function call of the same function which contains an expres
                     src: else_src_tgt[<span class="number">0</span>].clone(),
                     tgt: else_src_tgt[<span class="number">1</span>].clone(),
                     e_type: String::from(<span class="string">&quot;Wire&quot;</span>),
-                    prop: <span class="prelude-val">None</span>,
+                    ..Default::default()
                 };
                 edges.push(e11);
             }
@@ -7688,7 +7952,7 @@ There being a second function call of the same function which contains an expres
                 src: if_src_tgt[<span class="number">0</span>].clone(),
                 tgt: if_src_tgt[<span class="number">1</span>].clone(),
                 e_type: String::from(<span class="string">&quot;Wire&quot;</span>),
-                prop: <span class="prelude-val">None</span>,
+                ..Default::default()
             };
             edges.push(e12);
         }
@@ -7736,7 +8000,7 @@ There being a second function call of the same function which contains an expres
                     src: else_src_tgt[<span class="number">0</span>].clone(),
                     tgt: else_src_tgt[<span class="number">1</span>].clone(),
                     e_type: String::from(<span class="string">&quot;Wire&quot;</span>),
-                    prop: <span class="prelude-val">None</span>,
+                    ..Default::default()
                 };
                 edges.push(e13);
             }
@@ -7786,7 +8050,7 @@ There being a second function call of the same function which contains an expres
                 src: cond_src_tgt[<span class="number">0</span>].clone(),
                 tgt: cond_src_tgt[<span class="number">1</span>].clone(),
                 e_type: String::from(<span class="string">&quot;Wire&quot;</span>),
-                prop: <span class="prelude-val">None</span>,
+                ..Default::default()
             };
             edges.push(e14);
         }
@@ -7826,6 +8090,7 @@ There being a second function call of the same function which contains an expres
         tgt: <span class="macro">format!</span>(<span class="string">&quot;n{}&quot;</span>, start),
         e_type: String::from(<span class="string">&quot;Contains&quot;</span>),
         prop: <span class="prelude-val">Some</span>(cond_counter <span class="kw">as </span>usize),
+        ..Default::default()
     };
     nodes.push(n1.clone());
     edges.push(e1);
@@ -7849,7 +8114,7 @@ There being a second function call of the same function which contains an expres
                 src: n1.node_id.clone(),
                 tgt: <span class="macro">format!</span>(<span class="string">&quot;m{}&quot;</span>, metadata_idx),
                 e_type: String::from(<span class="string">&quot;Metadata&quot;</span>),
-                prop: <span class="prelude-val">None</span>,
+                ..Default::default()
             };
             edges.push(me1);
         }
@@ -7961,7 +8226,7 @@ There being a second function call of the same function which contains an expres
                 src: n1.node_id.clone(),
                 tgt: <span class="macro">format!</span>(<span class="string">&quot;n{}&quot;</span>, start),
                 e_type: String::from(<span class="string">&quot;Port_Of&quot;</span>),
-                prop: <span class="prelude-val">None</span>,
+                ..Default::default()
             };
             nodes.push(n2.clone());
             edges.push(e3);
@@ -7979,7 +8244,7 @@ There being a second function call of the same function which contains an expres
                         src: n2.node_id.clone(),
                         tgt: <span class="macro">format!</span>(<span class="string">&quot;m{}&quot;</span>, metadata_idx),
                         e_type: String::from(<span class="string">&quot;Metadata&quot;</span>),
-                        prop: <span class="prelude-val">None</span>,
+                        ..Default::default()
                     };
                     edges.push(me1);
                 }
@@ -8013,7 +8278,7 @@ There being a second function call of the same function which contains an expres
                 src: n1.node_id.clone(),
                 tgt: <span class="macro">format!</span>(<span class="string">&quot;n{}&quot;</span>, start),
                 e_type: String::from(<span class="string">&quot;Port_Of&quot;</span>),
-                prop: <span class="prelude-val">None</span>,
+                ..Default::default()
             };
             nodes.push(n3.clone());
             edges.push(e5);
@@ -8031,7 +8296,7 @@ There being a second function call of the same function which contains an expres
                         src: n3.node_id.clone(),
                         tgt: <span class="macro">format!</span>(<span class="string">&quot;m{}&quot;</span>, metadata_idx),
                         e_type: String::from(<span class="string">&quot;Metadata&quot;</span>),
-                        prop: <span class="prelude-val">None</span>,
+                        ..Default::default()
                     };
                     edges.push(me1);
                 }
@@ -8105,7 +8370,7 @@ There being a second function call of the same function which contains an expres
                 src: wfl_src_tgt[<span class="number">0</span>].clone(),
                 tgt: wfl_src_tgt[<span class="number">1</span>].clone(),
                 e_type: String::from(<span class="string">&quot;Wire&quot;</span>),
-                prop: <span class="prelude-val">None</span>,
+                ..Default::default()
             };
             edges.push(e8);
         }
@@ -8154,7 +8419,7 @@ There being a second function call of the same function which contains an expres
                 src: cond_src_tgt[<span class="number">0</span>].clone(),
                 tgt: cond_src_tgt[<span class="number">1</span>].clone(),
                 e_type: String::from(<span class="string">&quot;Wire&quot;</span>),
-                prop: <span class="prelude-val">None</span>,
+                ..Default::default()
             };
             edges.push(e9);
         }
@@ -8201,7 +8466,7 @@ There being a second function call of the same function which contains an expres
                 src: if_src_tgt[<span class="number">0</span>].clone(),
                 tgt: if_src_tgt[<span class="number">1</span>].clone(),
                 e_type: String::from(<span class="string">&quot;Wire&quot;</span>),
-                prop: <span class="prelude-val">None</span>,
+                ..Default::default()
             };
             edges.push(e10);
         }
@@ -8251,7 +8516,7 @@ There being a second function call of the same function which contains an expres
                 src: if_src_tgt[<span class="number">0</span>].clone(),
                 tgt: if_src_tgt[<span class="number">1</span>].clone(),
                 e_type: String::from(<span class="string">&quot;Wire&quot;</span>),
-                prop: <span class="prelude-val">None</span>,
+                ..Default::default()
             };
             edges.push(e12);
         }
@@ -8298,7 +8563,7 @@ There being a second function call of the same function which contains an expres
                 src: if_src_tgt[<span class="number">0</span>].clone(),
                 tgt: if_src_tgt[<span class="number">1</span>].clone(),
                 e_type: String::from(<span class="string">&quot;Wire&quot;</span>),
-                prop: <span class="prelude-val">None</span>,
+                ..Default::default()
             };
             edges.push(e15);
         }
@@ -8348,7 +8613,7 @@ There being a second function call of the same function which contains an expres
                 src: if_src_tgt[<span class="number">0</span>].clone(),
                 tgt: if_src_tgt[<span class="number">1</span>].clone(),
                 e_type: String::from(<span class="string">&quot;Wire&quot;</span>),
-                prop: <span class="prelude-val">None</span>,
+                ..Default::default()
             };
             edges.push(e16);
         }
@@ -8397,7 +8662,7 @@ There being a second function call of the same function which contains an expres
                 src: cond_src_tgt[<span class="number">0</span>].clone(),
                 tgt: cond_src_tgt[<span class="number">1</span>].clone(),
                 e_type: String::from(<span class="string">&quot;Wire&quot;</span>),
-                prop: <span class="prelude-val">None</span>,
+                ..Default::default()
             };
             edges.push(e14);
         }
@@ -8438,6 +8703,7 @@ There being a second function call of the same function which contains an expres
         tgt: <span class="macro">format!</span>(<span class="string">&quot;n{}&quot;</span>, start),
         e_type: String::from(<span class="string">&quot;Contains&quot;</span>),
         prop: <span class="prelude-val">Some</span>(cond_counter <span class="kw">as </span>usize),
+        ..Default::default()
     };
     nodes.push(n1.clone());
     edges.push(e1);
@@ -8461,7 +8727,7 @@ There being a second function call of the same function which contains an expres
                 src: n1.node_id.clone(),
                 tgt: <span class="macro">format!</span>(<span class="string">&quot;m{}&quot;</span>, metadata_idx),
                 e_type: String::from(<span class="string">&quot;Metadata&quot;</span>),
-                prop: <span class="prelude-val">None</span>,
+                ..Default::default()
             };
             edges.push(me1);
         }
@@ -8550,7 +8816,7 @@ There being a second function call of the same function which contains an expres
                 src: n1.node_id.clone(),
                 tgt: <span class="macro">format!</span>(<span class="string">&quot;n{}&quot;</span>, start),
                 e_type: String::from(<span class="string">&quot;Port_Of&quot;</span>),
-                prop: <span class="prelude-val">None</span>,
+                ..Default::default()
             };
             nodes.push(n2.clone());
             edges.push(e3);
@@ -8568,7 +8834,7 @@ There being a second function call of the same function which contains an expres
                         src: n2.node_id.clone(),
                         tgt: <span class="macro">format!</span>(<span class="string">&quot;m{}&quot;</span>, metadata_idx),
                         e_type: String::from(<span class="string">&quot;Metadata&quot;</span>),
-                        prop: <span class="prelude-val">None</span>,
+                        ..Default::default()
                     };
                     edges.push(me1);
                 }
@@ -8602,7 +8868,7 @@ There being a second function call of the same function which contains an expres
                 src: n1.node_id.clone(),
                 tgt: <span class="macro">format!</span>(<span class="string">&quot;n{}&quot;</span>, start),
                 e_type: String::from(<span class="string">&quot;Port_Of&quot;</span>),
-                prop: <span class="prelude-val">None</span>,
+                ..Default::default()
             };
             nodes.push(n3.clone());
             edges.push(e5);
@@ -8620,7 +8886,7 @@ There being a second function call of the same function which contains an expres
                         src: n3.node_id.clone(),
                         tgt: <span class="macro">format!</span>(<span class="string">&quot;m{}&quot;</span>, metadata_idx),
                         e_type: String::from(<span class="string">&quot;Metadata&quot;</span>),
-                        prop: <span class="prelude-val">None</span>,
+                        ..Default::default()
                     };
                     edges.push(me1);
                 }
@@ -8694,7 +8960,7 @@ There being a second function call of the same function which contains an expres
                 src: wfl_src_tgt[<span class="number">0</span>].clone(),
                 tgt: wfl_src_tgt[<span class="number">1</span>].clone(),
                 e_type: String::from(<span class="string">&quot;Wire&quot;</span>),
-                prop: <span class="prelude-val">None</span>,
+                ..Default::default()
             };
             edges.push(e8);
         }
@@ -8743,7 +9009,7 @@ There being a second function call of the same function which contains an expres
                 src: cond_src_tgt[<span class="number">0</span>].clone(),
                 tgt: cond_src_tgt[<span class="number">1</span>].clone(),
                 e_type: String::from(<span class="string">&quot;Wire&quot;</span>),
-                prop: <span class="prelude-val">None</span>,
+                ..Default::default()
             };
             edges.push(e9);
         }
@@ -8790,7 +9056,7 @@ There being a second function call of the same function which contains an expres
                 src: if_src_tgt[<span class="number">0</span>].clone(),
                 tgt: if_src_tgt[<span class="number">1</span>].clone(),
                 e_type: String::from(<span class="string">&quot;Wire&quot;</span>),
-                prop: <span class="prelude-val">None</span>,
+                ..Default::default()
             };
             edges.push(e10);
         }
@@ -8840,7 +9106,7 @@ There being a second function call of the same function which contains an expres
                 src: if_src_tgt[<span class="number">0</span>].clone(),
                 tgt: if_src_tgt[<span class="number">1</span>].clone(),
                 e_type: String::from(<span class="string">&quot;Wire&quot;</span>),
-                prop: <span class="prelude-val">None</span>,
+                ..Default::default()
             };
             edges.push(e12);
         }
@@ -8889,7 +9155,7 @@ There being a second function call of the same function which contains an expres
                 src: cond_src_tgt[<span class="number">0</span>].clone(),
                 tgt: cond_src_tgt[<span class="number">1</span>].clone(),
                 e_type: String::from(<span class="string">&quot;Wire&quot;</span>),
-                prop: <span class="prelude-val">None</span>,
+                ..Default::default()
             };
             edges.push(e14);
         }
@@ -8925,6 +9191,7 @@ There being a second function call of the same function which contains an expres
         tgt: <span class="macro">format!</span>(<span class="string">&quot;n{}&quot;</span>, start),
         e_type: String::from(<span class="string">&quot;Contains&quot;</span>),
         prop: <span class="prelude-val">Some</span>(c_args.att_idx),
+        ..Default::default()
     };
     nodes.push(n1.clone());
     edges.push(e1);
@@ -8945,7 +9212,7 @@ There being a second function call of the same function which contains an expres
                 src: n1.node_id.clone(),
                 tgt: <span class="macro">format!</span>(<span class="string">&quot;m{}&quot;</span>, metadata_idx),
                 e_type: String::from(<span class="string">&quot;Metadata&quot;</span>),
-                prop: <span class="prelude-val">None</span>,
+                ..Default::default()
             };
             edges.push(me1);
         }
@@ -9014,7 +9281,7 @@ There being a second function call of the same function which contains an expres
                     src: n1.node_id.clone(),
                     tgt: n2.node_id.clone(),
                     e_type: String::from(<span class="string">&quot;Port_Of&quot;</span>),
-                    prop: <span class="prelude-val">None</span>,
+                    ..Default::default()
                 };
                 edges.push(e3);
                 <span class="kw">if </span>att_box.opo.clone().as_ref().unwrap()[oport <span class="kw">as </span>usize]
@@ -9038,7 +9305,7 @@ There being a second function call of the same function which contains an expres
                             src: n2.node_id.clone(),
                             tgt: <span class="macro">format!</span>(<span class="string">&quot;m{}&quot;</span>, metadata_idx),
                             e_type: String::from(<span class="string">&quot;Metadata&quot;</span>),
-                            prop: <span class="prelude-val">None</span>,
+                            ..Default::default()
                         };
                         edges.push(me1);
                     }
@@ -9113,7 +9380,7 @@ There being a second function call of the same function which contains an expres
                 src: n1.node_id.clone(),
                 tgt: n2.node_id.clone(),
                 e_type: String::from(<span class="string">&quot;Port_Of&quot;</span>),
-                prop: <span class="prelude-val">None</span>,
+                ..Default::default()
             };
             edges.push(e3);
             <span class="kw">if </span>att_box.opi.clone().as_ref().unwrap()[iport <span class="kw">as </span>usize]
@@ -9137,7 +9404,7 @@ There being a second function call of the same function which contains an expres
                         src: n2.node_id.clone(),
                         tgt: <span class="macro">format!</span>(<span class="string">&quot;m{}&quot;</span>, metadata_idx),
                         e_type: String::from(<span class="string">&quot;Metadata&quot;</span>),
-                        prop: <span class="prelude-val">None</span>,
+                        ..Default::default()
                     };
                     edges.push(me1);
                 }
@@ -9228,6 +9495,7 @@ There being a second function call of the same function which contains an expres
         tgt: <span class="macro">format!</span>(<span class="string">&quot;n{}&quot;</span>, start),
         e_type: String::from(<span class="string">&quot;Contains&quot;</span>),
         prop: <span class="prelude-val">Some</span>(c_args.att_idx),
+        ..Default::default()
     };
     nodes.push(n1.clone());
     edges.push(e1);
@@ -9248,7 +9516,7 @@ There being a second function call of the same function which contains an expres
                 src: n1.node_id.clone(),
                 tgt: <span class="macro">format!</span>(<span class="string">&quot;m{}&quot;</span>, metadata_idx),
                 e_type: String::from(<span class="string">&quot;Metadata&quot;</span>),
-                prop: <span class="prelude-val">None</span>,
+                ..Default::default()
             };
             edges.push(me1);
         }
@@ -9291,7 +9559,7 @@ There being a second function call of the same function which contains an expres
                 src: n1.node_id.clone(),
                 tgt: n2.node_id.clone(),
                 e_type: String::from(<span class="string">&quot;Port_Of&quot;</span>),
-                prop: <span class="prelude-val">None</span>,
+                ..Default::default()
             };
             edges.push(e3);
             <span class="kw">if </span>att_box.opo.clone().as_ref().unwrap()[oport <span class="kw">as </span>usize]
@@ -9315,7 +9583,7 @@ There being a second function call of the same function which contains an expres
                         src: n2.node_id.clone(),
                         tgt: <span class="macro">format!</span>(<span class="string">&quot;m{}&quot;</span>, metadata_idx),
                         e_type: String::from(<span class="string">&quot;Metadata&quot;</span>),
-                        prop: <span class="prelude-val">None</span>,
+                        ..Default::default()
                     };
                     edges.push(me1);
                 }
@@ -9352,7 +9620,7 @@ There being a second function call of the same function which contains an expres
                 src: n1.node_id.clone(),
                 tgt: n2.node_id.clone(),
                 e_type: String::from(<span class="string">&quot;Port_Of&quot;</span>),
-                prop: <span class="prelude-val">None</span>,
+                ..Default::default()
             };
             edges.push(e3);
             <span class="kw">if </span>att_box.opi.clone().as_ref().unwrap()[iport <span class="kw">as </span>usize]
@@ -9376,7 +9644,7 @@ There being a second function call of the same function which contains an expres
                         src: n2.node_id.clone(),
                         tgt: <span class="macro">format!</span>(<span class="string">&quot;m{}&quot;</span>, metadata_idx),
                         e_type: String::from(<span class="string">&quot;Metadata&quot;</span>),
-                        prop: <span class="prelude-val">None</span>,
+                        ..Default::default()
                     };
                     edges.push(me1);
                 }
@@ -9478,7 +9746,7 @@ There being a second function call of the same function which contains an expres
         src: c_args.parent_node.node_id,
         tgt: n3.node_id.clone(),
         e_type: String::from(<span class="string">&quot;Contains&quot;</span>),
-        prop: <span class="prelude-val">None</span>,
+        ..Default::default()
     };
     edges.push(e4);
     <span class="kw">if </span>lit_box.metadata.is_some() {
@@ -9495,7 +9763,7 @@ There being a second function call of the same function which contains an expres
                 src: n3.node_id,
                 tgt: <span class="macro">format!</span>(<span class="string">&quot;m{}&quot;</span>, metadata_idx),
                 e_type: String::from(<span class="string">&quot;Metadata&quot;</span>),
-                prop: <span class="prelude-val">None</span>,
+                ..Default::default()
             };
             edges.push(me1);
         }
@@ -9554,7 +9822,7 @@ There being a second function call of the same function which contains an expres
         src: c_args.parent_node.node_id,
         tgt: n3.node_id.clone(),
         e_type: String::from(<span class="string">&quot;Contains&quot;</span>),
-        prop: <span class="prelude-val">None</span>,
+        ..Default::default()
     };
     edges.push(e4);
     <span class="kw">if </span>c_args.cur_box.metadata.is_some() {
@@ -9571,7 +9839,7 @@ There being a second function call of the same function which contains an expres
                 src: n3.node_id,
                 tgt: <span class="macro">format!</span>(<span class="string">&quot;m{}&quot;</span>, metadata_idx),
                 e_type: String::from(<span class="string">&quot;Metadata&quot;</span>),
-                prop: <span class="prelude-val">None</span>,
+                ..Default::default()
             };
             edges.push(me1);
         }
@@ -9592,11 +9860,15 @@ There being a second function call of the same function which contains an expres
 ) {
     <span class="comment">// first find the pof&#39;s for box
     </span><span class="kw">let </span><span class="kw-2">mut </span>pof: Vec&lt;u32&gt; = <span class="macro">vec!</span>[];
+    <span class="kw">let </span><span class="kw-2">mut </span>pof_names: Vec&lt;String&gt; = <span class="macro">vec!</span>[];
     <span class="kw">if </span>c_args.att_box.pof.is_some() {
         <span class="kw">let </span><span class="kw-2">mut </span>po_idx: u32 = <span class="number">1</span>;
         <span class="kw">for </span>port <span class="kw">in </span>c_args.att_box.pof.clone().unwrap().iter() {
             <span class="kw">if </span>port.r#box == c_args.box_counter <span class="kw">as </span>u8 {
                 pof.push(po_idx);
+                <span class="kw">if </span>port.name.is_some() {
+                    pof_names.push(port.name.clone().unwrap());
+                }
             }
             po_idx += <span class="number">1</span>;
         }
@@ -9612,11 +9884,26 @@ There being a second function call of the same function which contains an expres
             pi_idx += <span class="number">1</span>;
         }
     }
+    <span class="comment">// now to construct an entry of ValueL for abstract port references
+    </span><span class="kw">let </span><span class="kw-2">mut </span>value_vec = Vec::&lt;ValueL&gt;::new();
+    <span class="kw">for </span>name <span class="kw">in </span>pof_names.iter() {
+        <span class="kw">let </span>val = ValueL {
+            value_type: <span class="string">&quot;String&quot;</span>.to_string(),
+            value: <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, name.clone()),
+            gromet_type: <span class="prelude-val">Some</span>(<span class="string">&quot;Name&quot;</span>.to_string()),
+        };
+        value_vec.push(val.clone());
+    }
+    <span class="kw">let </span>val = ValueL {
+        value_type: <span class="string">&quot;List&quot;</span>.to_string(),
+        value: <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, value_vec.clone()),
+        gromet_type: <span class="prelude-val">Some</span>(<span class="string">&quot;Abstract&quot;</span>.to_string()),
+    };
     <span class="comment">// now make the node with the port information
     </span><span class="kw">let </span><span class="kw-2">mut </span>metadata_idx = <span class="number">0</span>;
     <span class="kw">let </span>n3 = Node {
-        n_type: String::from(<span class="string">&quot;Primitive&quot;</span>),
-        value: <span class="prelude-val">None</span>,
+        n_type: String::from(<span class="string">&quot;Abstract&quot;</span>),
+        value: <span class="prelude-val">Some</span>(val),
         name: c_args.cur_box.name.clone(),
         node_id: <span class="macro">format!</span>(<span class="string">&quot;n{}&quot;</span>, start),
         out_idx: <span class="prelude-val">Some</span>(pof),
@@ -9632,7 +9919,7 @@ There being a second function call of the same function which contains an expres
         src: c_args.parent_node.node_id,
         tgt: n3.node_id.clone(),
         e_type: String::from(<span class="string">&quot;Contains&quot;</span>),
-        prop: <span class="prelude-val">None</span>,
+        ..Default::default()
     };
     edges.push(e4);
     <span class="kw">if </span>c_args.cur_box.metadata.is_some() {
@@ -9649,7 +9936,7 @@ There being a second function call of the same function which contains an expres
                 src: n3.node_id,
                 tgt: <span class="macro">format!</span>(<span class="string">&quot;m{}&quot;</span>, metadata_idx),
                 e_type: String::from(<span class="string">&quot;Metadata&quot;</span>),
-                prop: <span class="prelude-val">None</span>,
+                ..Default::default()
             };
             edges.push(me1);
         }
@@ -9704,7 +9991,7 @@ There being a second function call of the same function which contains an expres
                 src: c_args.parent_node.node_id.clone(),
                 tgt: n2.node_id.clone(),
                 e_type: String::from(<span class="string">&quot;Port_Of&quot;</span>),
-                prop: <span class="prelude-val">None</span>,
+                ..Default::default()
             };
             edges.push(e3);
 
@@ -9730,7 +10017,7 @@ There being a second function call of the same function which contains an expres
                         src: n2.node_id.clone(),
                         tgt: <span class="macro">format!</span>(<span class="string">&quot;m{}&quot;</span>, metadata_idx),
                         e_type: String::from(<span class="string">&quot;Metadata&quot;</span>),
-                        prop: <span class="prelude-val">None</span>,
+                        ..Default::default()
                     };
                     edges.push(me1);
                 }
@@ -9789,7 +10076,7 @@ There being a second function call of the same function which contains an expres
                 src: c_args.parent_node.node_id.clone(),
                 tgt: n2.node_id.clone(),
                 e_type: String::from(<span class="string">&quot;Port_Of&quot;</span>),
-                prop: <span class="prelude-val">None</span>,
+                ..Default::default()
             };
             edges.push(e3);
 
@@ -9815,7 +10102,7 @@ There being a second function call of the same function which contains an expres
                         src: n2.node_id.clone(),
                         tgt: <span class="macro">format!</span>(<span class="string">&quot;m{}&quot;</span>, metadata_idx),
                         e_type: String::from(<span class="string">&quot;Metadata&quot;</span>),
-                        prop: <span class="prelude-val">None</span>,
+                        ..Default::default()
                     };
                     edges.push(me1);
                 }
@@ -9887,6 +10174,7 @@ There being a second function call of the same function which contains an expres
                 tgt: wfopi_src_tgt[<span class="number">1</span>].clone(),
                 e_type: String::from(<span class="string">&quot;Wire&quot;</span>),
                 prop: <span class="prelude-val">Some</span>(prop.unwrap() <span class="kw">as </span>usize),
+                ..Default::default()
             };
             edges.push(e6);
         }
@@ -9949,7 +10237,7 @@ There being a second function call of the same function which contains an expres
                 src: wfopo_src_tgt[<span class="number">0</span>].clone(),
                 tgt: wfopo_src_tgt[<span class="number">1</span>].clone(),
                 e_type: String::from(<span class="string">&quot;Wire&quot;</span>),
-                prop: <span class="prelude-val">None</span>,
+                ..Default::default()
             };
             edges.push(e7);
         }
@@ -9969,6 +10257,7 @@ There being a second function call of the same function which contains an expres
     </span><span class="kw">for </span>wire <span class="kw">in </span>eboxf.wff.unwrap().iter() {
         <span class="kw">let </span><span class="kw-2">mut </span>wff_src_tgt: Vec&lt;String&gt; = <span class="macro">vec!</span>[];
         <span class="kw">let </span><span class="kw-2">mut </span>prop = <span class="prelude-val">None</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>refer = <span class="prelude-val">None</span>;
 
         <span class="kw">let </span>src_idx = wire.src; <span class="comment">// port index
 
@@ -10002,7 +10291,7 @@ There being a second function call of the same function which contains an expres
                                     <span class="comment">// push the tgt
                                     </span><span class="kw">if </span>(wire.src <span class="kw">as </span>u32) == <span class="kw-2">*</span>p {
                                         wff_src_tgt.push(node.node_id.clone());
-                                        prop = <span class="prelude-val">Some</span>(i <span class="kw">as </span>u32);
+                                        prop = <span class="prelude-val">Some</span>(i);
                                     }
                                 }
                             }
@@ -10024,10 +10313,13 @@ There being a second function call of the same function which contains an expres
                             <span class="comment">// exclude opo&#39;s
                             </span><span class="kw">if </span>node.n_type != <span class="string">&quot;Opo&quot; </span>{
                                 <span class="comment">// iterate through port to check for tgt
-                                </span><span class="kw">for </span>p <span class="kw">in </span>node.out_idx.as_ref().unwrap().iter() {
+                                </span><span class="kw">for </span>(i, p) <span class="kw">in </span>node.out_idx.as_ref().unwrap().iter().enumerate() {
                                     <span class="comment">// push the tgt
                                     </span><span class="kw">if </span>(wire.tgt <span class="kw">as </span>u32) == <span class="kw-2">*</span>p {
                                         wff_src_tgt.push(node.node_id.clone());
+                                        <span class="kw">if </span>node.n_type == <span class="string">&quot;Abstract&quot; </span>{
+                                            refer = <span class="prelude-val">Some</span>(i);
+                                        }
                                     }
                                 }
                             }
@@ -10041,7 +10333,8 @@ There being a second function call of the same function which contains an expres
                 src: wff_src_tgt[<span class="number">0</span>].clone(),
                 tgt: wff_src_tgt[<span class="number">1</span>].clone(),
                 e_type: String::from(<span class="string">&quot;Wire&quot;</span>),
-                prop: <span class="prelude-val">Some</span>(prop.unwrap() <span class="kw">as </span>usize),
+                prop: <span class="prelude-val">Some</span>(prop.unwrap()),
+                refer,
             };
             edges.push(e8);
         }
@@ -10104,7 +10397,7 @@ There being a second function call of the same function which contains an expres
                 src: wopio_src_tgt[<span class="number">0</span>].clone(),
                 tgt: wopio_src_tgt[<span class="number">1</span>].clone(),
                 e_type: String::from(<span class="string">&quot;Wire&quot;</span>),
-                prop: <span class="prelude-val">None</span>,
+                ..Default::default()
             };
             edges.push(e7);
         }
@@ -10254,7 +10547,7 @@ There being a second function call of the same function which contains an expres
                     src: wff_src_tgt[<span class="number">0</span>].clone(),
                     tgt: wff_src_tgt[<span class="number">1</span>].clone(),
                     e_type: String::from(<span class="string">&quot;Wire&quot;</span>),
-                    prop: <span class="prelude-val">None</span>,
+                    ..Default::default()
                 };
                 edges.push(e8);
             }
@@ -10342,7 +10635,7 @@ There being a second function call of the same function which contains an expres
                         src: wff_src_tgt[<span class="number">0</span>].clone(),
                         tgt: wff_src_tgt[<span class="number">1</span>].clone(),
                         e_type: String::from(<span class="string">&quot;Wire&quot;</span>),
-                        prop: <span class="prelude-val">None</span>,
+                        ..Default::default()
                     };
                     edges.push(e8);
                 }
@@ -10476,7 +10769,7 @@ There being a second function call of the same function which contains an expres
                     src: wfopi_src_tgt[<span class="number">0</span>].clone(),
                     tgt: wfopi_src_tgt[<span class="number">1</span>].clone(),
                     e_type: String::from(<span class="string">&quot;Wire&quot;</span>),
-                    prop: <span class="prelude-val">None</span>,
+                    ..Default::default()
                 };
                 edges.push(e8);
             }
@@ -10560,7 +10853,7 @@ There being a second function call of the same function which contains an expres
                     src: wfopo_src_tgt[<span class="number">0</span>].clone(),
                     tgt: wfopo_src_tgt[<span class="number">1</span>].clone(),
                     e_type: String::from(<span class="string">&quot;Wire&quot;</span>),
-                    prop: <span class="prelude-val">None</span>,
+                    ..Default::default()
                 };
                 edges.push(e8);
             }
@@ -10568,7 +10861,7 @@ There being a second function call of the same function which contains an expres
     }
 }
 <span class="comment">// this will construct connections from the sub function modules opi&#39;s to another sub module opo&#39;s, tracing data inside the function
-// opi(sub)-&gt;opo(sub)
+// opi(sub)-&gt;opo(sub) or pif(current) -&gt; opo(sub) or opi(sub) -&gt; pof(current)
 </span><span class="attr">#[allow(unused_assignments)]
 </span><span class="kw">pub fn </span>wff_cross_att_wiring(
     eboxf: FunctionNet, <span class="comment">// This is the current attribute, should be the function if in a function
@@ -10664,7 +10957,7 @@ There being a second function call of the same function which contains an expres
                         src: wff_src_tgt[<span class="number">0</span>].clone(),
                         tgt: wff_src_tgt[<span class="number">1</span>].clone(),
                         e_type: String::from(<span class="string">&quot;Wire&quot;</span>),
-                        prop: <span class="prelude-val">None</span>,
+                        ..Default::default()
                     };
                     edges.push(e8);
                 }
@@ -10701,7 +10994,10 @@ There being a second function call of the same function which contains an expres
                             &amp;&amp; (tgt_box <span class="kw">as </span>u32) == node.box_counter <span class="kw">as </span>u32
                         {
                             <span class="comment">// only opo&#39;s
-                            </span><span class="kw">if </span>node.n_type == <span class="string">&quot;Primitive&quot; </span>|| node.n_type == <span class="string">&quot;Literal&quot; </span>{
+                            </span><span class="kw">if </span>node.n_type == <span class="string">&quot;Primitive&quot;
+                                </span>|| node.n_type == <span class="string">&quot;Literal&quot;
+                                </span>|| node.n_type == <span class="string">&quot;Abstract&quot;
+                            </span>{
                                 <span class="comment">// iterate through port to check for tgt
                                 </span><span class="kw">for </span>p <span class="kw">in </span>node.out_idx.as_ref().unwrap().iter() {
                                     <span class="comment">// push the src first, being pif
@@ -10732,13 +11028,14 @@ There being a second function call of the same function which contains an expres
                         src: wff_src_tgt[<span class="number">0</span>].clone(),
                         tgt: wff_src_tgt[<span class="number">1</span>].clone(),
                         e_type: String::from(<span class="string">&quot;Wire&quot;</span>),
-                        prop: <span class="prelude-val">None</span>,
+                        ..Default::default()
                     };
                     edges.push(e8);
                 }
             }
         } <span class="kw">else </span>{
-            <span class="kw">let </span>src_nbox = bf_counter; <span class="comment">// nbox value of src opi
+            <span class="comment">// This should be pif -&gt; opo
+            </span><span class="kw">let </span>src_nbox = bf_counter; <span class="comment">// nbox value of src opi
                                        // collect info to identify the opo tgt node
             </span><span class="kw">let </span>tgt_idx = wire.tgt; <span class="comment">// port index
             </span><span class="kw">let </span>tgt_pof = eboxf.pof.as_ref().unwrap()[(tgt_idx - <span class="number">1</span>) <span class="kw">as </span>usize].clone(); <span class="comment">// tgt port
@@ -10767,11 +11064,11 @@ There being a second function call of the same function which contains an expres
                             &amp;&amp; (src_box <span class="kw">as </span>u32) == node.box_counter <span class="kw">as </span>u32
                         {
                             <span class="comment">// only opo&#39;s
-                            </span><span class="kw">if </span>node.n_type == <span class="string">&quot;Primitive&quot; </span>{
+                            </span><span class="kw">if </span>node.n_type == <span class="string">&quot;Primitive&quot; </span>|| node.n_type == <span class="string">&quot;Abstract&quot; </span>{
                                 <span class="comment">// iterate through port to check for tgt
                                 </span><span class="kw">for </span>p <span class="kw">in </span>node.in_indx.as_ref().unwrap().iter() {
                                     <span class="comment">// push the src first, being pif
-                                    </span><span class="kw">if </span>(src_opi_idx <span class="kw">as </span>u32) == <span class="kw-2">*</span>p {
+                                    </span><span class="kw">if </span>(src_idx <span class="kw">as </span>u32) == <span class="kw-2">*</span>p {
                                         wff_src_tgt.push(node.node_id.clone());
                                     }
                                 }
@@ -10804,7 +11101,7 @@ There being a second function call of the same function which contains an expres
                         src: wff_src_tgt[<span class="number">0</span>].clone(),
                         tgt: wff_src_tgt[<span class="number">1</span>].clone(),
                         e_type: String::from(<span class="string">&quot;Wire&quot;</span>),
-                        prop: <span class="prelude-val">None</span>,
+                        ..Default::default()
                     };
                     edges.push(e8);
                 }
@@ -10918,7 +11215,7 @@ There being a second function call of the same function which contains an expres
                     src: wff_src_tgt[<span class="number">0</span>].clone(),
                     tgt: wff_src_tgt[<span class="number">1</span>].clone(),
                     e_type: String::from(<span class="string">&quot;Wire&quot;</span>),
-                    prop: <span class="prelude-val">None</span>,
+                    ..Default::default()
                 };
                 edges.push(e9);
             }
@@ -10935,5 +11232,122 @@ There being a second function call of the same function which contains an expres
     queries.append(<span class="kw-2">&amp;mut </span>create_graph_queries(<span class="kw-2">&amp;</span>gromet, start));
 
     queries
+}
+
+<span class="comment">// convert every node object into a node query
+</span><span class="kw">pub fn </span>construct_memgraph_queries(
+    nodes: <span class="kw-2">&amp;mut </span>Vec&lt;Node&gt;,
+    edges: <span class="kw-2">&amp;mut </span>Vec&lt;Edge&gt;,
+    meta_nodes: <span class="kw-2">&amp;mut </span>Vec&lt;MetadataNode&gt;,
+    queries: <span class="kw-2">&amp;mut </span>Vec&lt;String&gt;,
+) -&gt; Vec&lt;String&gt; {
+    <span class="comment">// convert every node object into a node query
+    </span><span class="kw">let </span>create = String::from(<span class="string">&quot;CREATE&quot;</span>);
+    <span class="kw">for </span>node <span class="kw">in </span>nodes.iter() {
+        <span class="kw">let </span><span class="kw-2">mut </span>name = String::from(<span class="string">&quot;a&quot;</span>);
+        <span class="kw">if </span>node.name.is_none() {
+            name = node.n_type.clone();
+        } <span class="kw">else </span>{
+            name = node.name.as_ref().unwrap().to_string();
+        }
+        <span class="comment">// better parsing of values for inference later on.
+        // handles case of parsing a list as a proper list object, only depth one though
+        // would need recursive function for aritrary depth. To be done at somepoint.
+        </span><span class="kw">let </span>value = <span class="kw">match </span><span class="kw-2">&amp;</span>node.value {
+            <span class="prelude-val">Some</span>(val) =&gt; {
+                <span class="kw">if </span>val.value_type == <span class="kw-2">*</span><span class="string">&quot;List&quot; </span>&amp;&amp; <span class="kw-2">&amp;</span>val.value[<span class="number">0</span>..<span class="number">1</span>] == <span class="string">&quot;[&quot; </span>&amp;&amp; <span class="kw-2">&amp;</span>val.value[<span class="number">1</span>..<span class="number">2</span>] != <span class="string">&quot;]&quot; </span>{
+                    <span class="kw">let </span>val_type = val.value_type.clone();
+                    <span class="kw">let </span>val_grom_type = val.gromet_type.as_ref().unwrap();
+                    <span class="kw">let </span>val_len = val.value[..].len();
+                    <span class="kw">let </span>val_val: Vec&lt;String&gt; = val.value[<span class="number">1</span>..val_len]
+                        .split(<span class="string">&quot;}, &quot;</span>)
+                        .map(|x| x.to_string())
+                        .collect();
+
+                    <span class="kw">let </span><span class="kw-2">mut </span>val_vec = Vec::&lt;String&gt;::new();
+                    <span class="kw">for </span>(i, val) <span class="kw">in </span>val_val.iter().enumerate() {
+                        <span class="kw">if </span>i == val_val.len() - <span class="number">1 </span>{
+                            <span class="kw">let </span>val_string = <span class="macro">format!</span>(<span class="string">&quot;{}}}&quot;</span>, <span class="kw-2">&amp;</span>val[<span class="number">7</span>..(val.len() - <span class="number">2</span>)]);
+                            val_vec.push(val_string.clone());
+                        } <span class="kw">else </span>{
+                            <span class="kw">let </span>val_string = <span class="macro">format!</span>(<span class="string">&quot;{}}}&quot;</span>, <span class="kw-2">&amp;</span>val[<span class="number">7</span>..]);
+                            val_vec.push(val_string.clone());
+                        }
+                    }
+                    <span class="kw">let </span><span class="kw-2">mut </span>final_val_vec = Vec::&lt;String&gt;::new();
+                    <span class="kw">for </span>val_str <span class="kw">in </span>val_vec.iter() {
+                        <span class="kw">let </span>val_fields: Vec&lt;String&gt; =
+                            val_str.split(<span class="string">&quot;, &quot;</span>).map(|x| x.to_string()).collect();
+                        <span class="kw">let </span>cor_val: Vec&lt;String&gt; =
+                            val_fields[<span class="number">1</span>].split(<span class="string">&quot;: &quot;</span>).map(|x| x.to_string()).collect();
+                        <span class="kw">let </span>final_val = cor_val[<span class="number">1</span>].replace(<span class="string">&quot;\\\&quot;&quot;</span>, <span class="string">&quot;&quot;</span>);
+                        final_val_vec.push(final_val.clone());
+                    }
+                    <span class="macro">format!</span>(
+                        <span class="string">&quot;{{ value_type:{:?}, value:{:?}, gromet_type:{:?} }}&quot;</span>,
+                        val_type, final_val_vec, val_grom_type
+                    )
+                    .replace(<span class="string">&quot;\\\&quot;&quot;</span>, <span class="string">&quot;&quot;</span>)
+                } <span class="kw">else </span>{
+                    <span class="macro">format!</span>(
+                        <span class="string">&quot;{{ value_type:{:?}, value:{:?}, gromet_type:{:?} }}&quot;</span>,
+                        val.value_type,
+                        val.value,
+                        val.gromet_type.as_ref().unwrap()
+                    )
+                }
+            }
+            <span class="prelude-val">None </span>=&gt; String::from(<span class="string">&quot;\&quot;\&quot;&quot;</span>),
+        };
+
+        <span class="comment">// NOTE: The format of value has changed to represent a literal Cypher map {field:value}.
+        // We no longer need to format value with the debug :? parameter
+        </span><span class="kw">let </span>node_query = <span class="macro">format!</span>(
+            <span class="string">&quot;{} ({}:{} {{name:{:?},value:{},order_box:{:?},order_att:{:?}}})&quot;</span>,
+            create, node.node_id, node.n_type, name, value, node.nbox, node.contents
+        );
+        queries.push(node_query);
+    }
+    <span class="kw">for </span>node <span class="kw">in </span>meta_nodes.iter() {
+        queries.append(<span class="kw-2">&amp;mut </span>create_metadata_node_query(node.clone()));
+    }
+
+    <span class="comment">// convert every edge object into an edge query
+    </span><span class="kw">let </span>init_edges = edges.len();
+    edges.sort();
+    edges.dedup();
+    <span class="kw">let </span>edges_clone = edges.clone();
+    <span class="comment">// also dedup if edge prop is different
+    </span><span class="kw">for </span>(i, edge) <span class="kw">in </span>edges_clone.iter().enumerate().rev() {
+        <span class="kw">if </span>i != <span class="number">0 </span>&amp;&amp; edge.src == edges_clone[i - <span class="number">1</span>].src &amp;&amp; edge.tgt == edges_clone[i - <span class="number">1</span>].tgt {
+            edges.remove(i);
+        }
+    }
+    <span class="kw">let </span>fin_edges = edges.len();
+    <span class="kw">if </span>init_edges != fin_edges {
+        <span class="macro">println!</span>(<span class="string">&quot;Duplicated Edges Removed, check for bugs&quot;</span>);
+    }
+    <span class="kw">for </span>edge <span class="kw">in </span>edges.iter() {
+        <span class="kw">let </span>edge_query = <span class="macro">format!</span>(
+            <span class="string">&quot;{} ({})-[e{}{}:{}]-&gt;({})&quot;</span>,
+            create, edge.src, edge.src, edge.tgt, edge.e_type, edge.tgt
+        );
+        queries.push(edge_query);
+
+        <span class="kw">if </span>edge.prop.is_some() {
+            <span class="kw">let </span>set_query = <span class="macro">format!</span>(<span class="string">&quot;set e{}{}.index={}&quot;</span>, edge.src, edge.tgt, edge.prop.unwrap());
+            queries.push(set_query);
+        }
+        <span class="kw">if </span>edge.refer.is_some() {
+            <span class="kw">let </span>set_query = <span class="macro">format!</span>(
+                <span class="string">&quot;set e{}{}.refer={}&quot;</span>,
+                edge.src,
+                edge.tgt,
+                edge.refer.unwrap()
+            );
+            queries.push(set_query);
+        }
+    }
+    queries.to_vec()
 }
 </code></pre></div></section></main></body></html>

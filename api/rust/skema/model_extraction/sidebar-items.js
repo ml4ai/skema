@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["find_pn_dynamics","get_args_MET","get_operator_MET","get_subgraph","module_id2mathml_MET_ast","subgrapg2_core_dyn_MET_ast"],"struct":["ACSet","Term"]};
+window.SIDEBAR_ITEMS = {"fn":["find_pn_dynamics","get_args_MET","get_operator_MET","get_subgraph","module_id2mathml_MET_ast","subgrapg2_core_dyn_MET_ast"],"struct":["ACSet","ModelEdge","ModelNode","Term"]};

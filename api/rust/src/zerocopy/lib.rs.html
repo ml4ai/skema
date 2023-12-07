@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/zerocopy-0.7.28/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-fa3bb1812debf86c.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="zerocopy" data-themes="" data-resource-suffix="" data-rustdoc-version="1.74.0 (79e9716c9 2023-11-13)" data-channel="1.74.0" data-search-js="search-8be46b629f5f14a8.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-c5bd66d33317d69f.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../zerocopy/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/zerocopy-0.7.29/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-fa3bb1812debf86c.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="zerocopy" data-themes="" data-resource-suffix="" data-rustdoc-version="1.74.1 (a28077b28 2023-12-04)" data-channel="1.74.1" data-search-js="search-8be46b629f5f14a8.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-c5bd66d33317d69f.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../zerocopy/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -8154,6 +8154,47 @@
 <a href="#8154" id="8154">8154</a>
 <a href="#8155" id="8155">8155</a>
 <a href="#8156" id="8156">8156</a>
+<a href="#8157" id="8157">8157</a>
+<a href="#8158" id="8158">8158</a>
+<a href="#8159" id="8159">8159</a>
+<a href="#8160" id="8160">8160</a>
+<a href="#8161" id="8161">8161</a>
+<a href="#8162" id="8162">8162</a>
+<a href="#8163" id="8163">8163</a>
+<a href="#8164" id="8164">8164</a>
+<a href="#8165" id="8165">8165</a>
+<a href="#8166" id="8166">8166</a>
+<a href="#8167" id="8167">8167</a>
+<a href="#8168" id="8168">8168</a>
+<a href="#8169" id="8169">8169</a>
+<a href="#8170" id="8170">8170</a>
+<a href="#8171" id="8171">8171</a>
+<a href="#8172" id="8172">8172</a>
+<a href="#8173" id="8173">8173</a>
+<a href="#8174" id="8174">8174</a>
+<a href="#8175" id="8175">8175</a>
+<a href="#8176" id="8176">8176</a>
+<a href="#8177" id="8177">8177</a>
+<a href="#8178" id="8178">8178</a>
+<a href="#8179" id="8179">8179</a>
+<a href="#8180" id="8180">8180</a>
+<a href="#8181" id="8181">8181</a>
+<a href="#8182" id="8182">8182</a>
+<a href="#8183" id="8183">8183</a>
+<a href="#8184" id="8184">8184</a>
+<a href="#8185" id="8185">8185</a>
+<a href="#8186" id="8186">8186</a>
+<a href="#8187" id="8187">8187</a>
+<a href="#8188" id="8188">8188</a>
+<a href="#8189" id="8189">8189</a>
+<a href="#8190" id="8190">8190</a>
+<a href="#8191" id="8191">8191</a>
+<a href="#8192" id="8192">8192</a>
+<a href="#8193" id="8193">8193</a>
+<a href="#8194" id="8194">8194</a>
+<a href="#8195" id="8195">8195</a>
+<a href="#8196" id="8196">8196</a>
+<a href="#8197" id="8197">8197</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018 The Fuchsia Authors
 //
 // Licensed under the 2-Clause BSD License &lt;LICENSE-BSD or
@@ -11667,8 +11708,8 @@
     ///
     /// In other words, the layout of a `[T]` or `[T; N]` is a sequence of `T`s
     /// laid out back-to-back with no bytes in between. Therefore, `[T]` or `[T;
-    /// N]` are `FromZeroes`, `FromBytes`, and `AsBytes` if `T` is
-    /// (respectively). Furthermore, since an array/slice has &quot;the same
+    /// N]` are `TryFromBytes`, `FromZeroes`, `FromBytes`, and `AsBytes` if `T`
+    /// is (respectively). Furthermore, since an array/slice has &quot;the same
     /// alignment of `T`&quot;, `[T]` and `[T; N]` are `Unaligned` if `T` is.
     ///
     /// Note that we don&#39;t `assert_unaligned!` for slice types because
@@ -11680,6 +11721,42 @@
     <span class="macro">unsafe_impl!</span>(<span class="kw">const </span>N: usize, T: AsBytes =&gt; AsBytes <span class="kw">for </span>[T; N]);
     <span class="macro">unsafe_impl!</span>(<span class="kw">const </span>N: usize, T: Unaligned =&gt; Unaligned <span class="kw">for </span>[T; N]);
     <span class="macro">assert_unaligned!</span>([(); <span class="number">0</span>], [(); <span class="number">1</span>], [u8; <span class="number">0</span>], [u8; <span class="number">1</span>]);
+    <span class="macro">unsafe_impl!</span>(T: TryFromBytes =&gt; TryFromBytes <span class="kw">for </span>[T]; |c: Ptr&lt;[T]&gt;| {
+        <span class="comment">// SAFETY: Assuming the preconditions of `is_bit_valid` are satisfied,
+        // so too will the postcondition: that, if `is_bit_valid(candidate)`
+        // returns true, `*candidate` contains a valid `Self`. Per the reference
+        // [1]:
+        //
+        //   An array of `[T; N]` has a size of `size_of::&lt;T&gt;() * N` and the
+        //   same alignment of `T`. Arrays are laid out so that the zero-based
+        //   `nth` element of the array is offset from the start of the array by
+        //   `n * size_of::&lt;T&gt;()` bytes.
+        //
+        //   ...
+        //
+        //   Slices have the same layout as the section of the array they slice.
+        //
+        // In other words, the layout of a `[T] is a sequence of `T`s laid out
+        // back-to-back with no bytes in between. If all elements in `candidate`
+        // are `is_bit_valid`, so too is `candidate`.
+        //
+        // Note that any of the below calls may panic, but it would still be
+        // sound even if it did. `is_bit_valid` does not promise that it will
+        // not panic (in fact, it explicitly warns that it&#39;s a possibility), and
+        // we have not violated any safety invariants that we must fix before
+        // returning.
+        </span>c.iter().all(|elem|
+            <span class="comment">// SAFETY: We uphold the safety contract of `is_bit_valid(elem)`, by
+            // precondition on the surrounding call to `is_bit_valid`. The
+            // memory referenced by `elem` is contained entirely within `c`, and
+            // satisfies the preconditions satisfied by `c`. By axiom, we assume
+            // that `Iterator:all` does not invalidate these preconditions
+            // (e.g., by writing to `elem`.) Since `elem` is derived from `c`,
+            // it is only possible for uninitialized bytes to occur in `elem` at
+            // the same bytes they occur within `c`.
+            </span><span class="kw">unsafe </span>{ &lt;T <span class="kw">as </span>TryFromBytes&gt;::is_bit_valid(elem) }
+        )
+    });
     <span class="macro">unsafe_impl!</span>(T: FromZeroes =&gt; FromZeroes <span class="kw">for </span>[T]);
     <span class="macro">unsafe_impl!</span>(T: FromBytes =&gt; FromBytes <span class="kw">for </span>[T]);
     <span class="macro">unsafe_impl!</span>(T: AsBytes =&gt; AsBytes <span class="kw">for </span>[T]);
@@ -15822,6 +15899,7 @@
                     @failure <span class="number">0xD800u32</span>, <span class="number">0xDFFFu32</span>, <span class="number">0x110000u32</span>;
             str  =&gt; @success <span class="string">&quot;&quot;</span>, <span class="string">&quot;hello&quot;</span>, <span class="string">&quot;❤️🧡💛💚💙💜&quot;</span>,
                     @failure [<span class="number">0</span>, <span class="number">159</span>, <span class="number">146</span>, <span class="number">150</span>];
+            [u8] =&gt; @success [], [<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>];
             NonZeroU8, NonZeroI8, NonZeroU16, NonZeroI16, NonZeroU32,
             NonZeroI32, NonZeroU64, NonZeroI64, NonZeroU128, NonZeroI128,
             NonZeroUsize, NonZeroIsize
@@ -15831,6 +15909,9 @@
                     // `0` may be any integer type with a different size or
                     // alignment than some `NonZeroXxx` types).
                     </span>@failure <span class="prelude-ty">Option</span>::&lt;<span class="self">Self</span>&gt;::None;
+            [bool]
+                =&gt; @success [<span class="bool-val">true</span>, <span class="bool-val">false</span>], [<span class="bool-val">false</span>, <span class="bool-val">true</span>],
+                    @failure [<span class="number">2u8</span>], [<span class="number">3u8</span>], [<span class="number">0xFFu8</span>], [<span class="number">0u8</span>, <span class="number">1u8</span>, <span class="number">2u8</span>];
         );
 
         <span class="comment">// Asserts that `$ty` implements any `$trait` and doesn&#39;t implement any
@@ -15996,7 +16077,8 @@
         <span class="macro">assert_impls!</span>(Unalign&lt;u8&gt;: KnownLayout, FromZeroes, FromBytes, AsBytes, Unaligned, !TryFromBytes);
         <span class="macro">assert_impls!</span>(Unalign&lt;NotZerocopy&gt;: Unaligned, !KnownLayout, !TryFromBytes, !FromZeroes, !FromBytes, !AsBytes);
 
-        <span class="macro">assert_impls!</span>([u8]: KnownLayout, FromZeroes, FromBytes, AsBytes, Unaligned, !TryFromBytes);
+        <span class="macro">assert_impls!</span>([u8]: KnownLayout, TryFromBytes, FromZeroes, FromBytes, AsBytes, Unaligned);
+        <span class="macro">assert_impls!</span>([bool]: KnownLayout, TryFromBytes, FromZeroes, AsBytes, Unaligned, !FromBytes);
         <span class="macro">assert_impls!</span>([NotZerocopy]: !KnownLayout, !TryFromBytes, !FromZeroes, !FromBytes, !AsBytes, !Unaligned);
         <span class="macro">assert_impls!</span>([u8; <span class="number">0</span>]: KnownLayout, FromZeroes, FromBytes, AsBytes, Unaligned, !TryFromBytes);
         <span class="macro">assert_impls!</span>([NotZerocopy; <span class="number">0</span>]: KnownLayout, !TryFromBytes, !FromZeroes, !FromBytes, !AsBytes, !Unaligned);
