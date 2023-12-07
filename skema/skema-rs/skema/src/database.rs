@@ -3745,9 +3745,7 @@ pub fn create_att_expression(
         for att_sub_box in att_box.bf.as_ref().unwrap().iter() {
             new_c_args.box_counter = box_counter;
             new_c_args.cur_box = att_sub_box.clone();
-            if att_sub_box.contents.is_some() {
-                new_c_args.att_idx = att_sub_box.contents.unwrap() as usize;
-            }
+            new_c_args.att_idx = c_args.att_idx.clone();
             match att_sub_box.function_type {
                 FunctionType::Literal => {
                     create_att_literal(
@@ -3769,6 +3767,17 @@ pub fn create_att_expression(
                         new_c_args.clone(),
                     );
                 }
+                FunctionType::Expression => {
+                    new_c_args.att_idx = att_sub_box.contents.unwrap() as usize;
+                    create_att_expression(
+                        gromet, // gromet for metadata
+                        nodes,  // nodes
+                        edges,
+                        meta_nodes,
+                        start,
+                        new_c_args.clone(),
+                    );
+                }
                 _ => {}
             }
             box_counter += 1;
@@ -3777,6 +3786,14 @@ pub fn create_att_expression(
     }
     // Now we perform the internal wiring of this branch
     internal_wiring(
+        att_box.clone(),
+        nodes,
+        edges,
+        c_args.att_idx,
+        c_args.bf_counter,
+    );
+
+    cross_att_wiring(
         att_box.clone(),
         nodes,
         edges,
