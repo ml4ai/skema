@@ -1,8 +1,8 @@
 use crate::config::Config;
-use crate::database::Node;
+
 use mathml::ast::operator::Operator;
 pub use mathml::mml2pn::{ACSet, Term};
-use petgraph::matrix_graph::node_index;
+
 use petgraph::prelude::*;
 use petgraph::visit::IntoNeighborsDirected;
 
@@ -189,7 +189,7 @@ pub async fn subgrapg2_core_dyn_MET_ast(
         let mut prim_counter = 0;
         let mut has_call = false;
         for node_index in sub_w.node_indices() {
-            if sub_w[node_index].label == "Primitive".to_string() {
+            if sub_w[node_index].label == *"Primitive" {
                 prim_counter += 1;
                 if *sub_w[node_index].name.as_ref().unwrap() == "_call" {
                     has_call = true;
@@ -200,13 +200,9 @@ pub async fn subgrapg2_core_dyn_MET_ast(
             println!("expression: {}", graph[expression_nodes[i]].id);
             // the call expressions get referenced by multiple top level expressions, so deleting the nodes in it breaks the other graphs. Need to pass clone of expression subgraph so references to original has all the nodes.
             if has_call {
-                println!("trimmed calls");
-                println!("node count pre call trimming: {:?}", sub_w.node_count());
                 sub_w = trim_calls(sub_w.clone())
             }
-            println!("node count post call trimming: {:?}", sub_w.node_count());
             let expr = trim_un_named(&mut sub_w);
-            println!("node count post un-named trimming: {:?}", expr.node_count());
             let mut root_node = Vec::<NodeIndex>::new();
             for node_index in expr.node_indices() {
                 if expr[node_index].label.clone() == *"Opo" {
@@ -214,7 +210,7 @@ pub async fn subgrapg2_core_dyn_MET_ast(
                 }
             }
             if root_node.len() >= 2 {
-                // println!("More than one Opo! Skipping Expression!");
+                println!("More than one Opo! Skipping Expression!");
             } else {
                 core_dynamics.push(tree_2_MET_ast(expr, root_node[0]).unwrap());
             }
@@ -264,7 +260,6 @@ fn tree_2_MET_ast(
                 let operate = get_operator_MET(graph, node); // output -> Operator
                 let rhs_arg = get_args_MET(graph, node); // output -> Vec<MathExpressionTree>
                 let rhs = MathExpressionTree::Cons(operate, rhs_arg); // MathExpressionTree
-                println!("rhs: {:?}", rhs.clone());
                 let rhs_flat = flatten_mults(rhs.clone());
                 let fo_eq = FirstOrderODE {
                     lhs_var: lhs[0].clone(),
@@ -385,11 +380,6 @@ fn trim_un_named(
             // one incoming one outgoing
             if bypass.len() == 1 && outgoing_bypass.len() == 1 {
                 // annoyingly have to pull the edge/Relation to insert into graph
-                println!(
-                    "bypass[0]: {:?}, node_index: {:?}",
-                    graph[bypass[0]].clone(),
-                    graph[node_index].clone()
-                );
                 graph.add_edge(
                     bypass[0],
                     outgoing_bypass[0],
@@ -403,7 +393,6 @@ fn trim_un_named(
                 // (incoming arrows) but only one outgoing arrow, this seems to be the case based on
                 // data too.
 
-                let end_node_idx = bypass.len() - 1;
                 for (i, _ent) in bypass.iter().enumerate() {
                     // this iterates over all but the last entry in the bypass vec
                     graph.add_edge(
@@ -681,11 +670,6 @@ pub fn trim_calls(
     }
     inner_nodes.sort();
     for node in inner_nodes.iter().rev() {
-        println!(
-            "node_index: {:?}, node name: {:?}",
-            node,
-            graph_clone.clone()[*node].name.clone().unwrap()
-        );
         graph_clone.remove_node(*node);
     }
 
@@ -709,7 +693,6 @@ pub fn to_terminal(
             node_vec.append(&mut temp.1); // append previous path nodes
         }
     }
-    println!("to terminal node_vec step: {:?}", node_vec.clone());
     (end_node, node_vec)
 }
 
@@ -730,6 +713,5 @@ pub fn to_primitive(
             end_node = node;
         }
     }
-    println!("to primitive node_vec step: {:?}", node_vec.clone());
     (end_node, node_vec)
 }

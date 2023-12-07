@@ -3745,7 +3745,7 @@ pub fn create_att_expression(
         for att_sub_box in att_box.bf.as_ref().unwrap().iter() {
             new_c_args.box_counter = box_counter;
             new_c_args.cur_box = att_sub_box.clone();
-            new_c_args.att_idx = c_args.att_idx.clone();
+            new_c_args.att_idx = c_args.att_idx;
             match att_sub_box.function_type {
                 FunctionType::Literal => {
                     create_att_literal(
