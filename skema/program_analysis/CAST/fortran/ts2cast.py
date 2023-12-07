@@ -216,12 +216,8 @@ class TS2CAST(object):
         self.variable_context.push_context()
 
         # Top level statement node
-        try:
-            statement_node = get_children_by_types(node, ["subroutine_statement", "function_statement"])[0]
-        except:
-            print(node)
-            print(node.children)
-            exit()
+        statement_node = get_children_by_types(node, ["subroutine_statement", "function_statement"])[0]
+    
         name_node = get_first_child_by_type(statement_node, "name")
         name = self.visit(
             name_node
