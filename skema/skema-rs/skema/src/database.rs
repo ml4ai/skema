@@ -3745,9 +3745,7 @@ pub fn create_att_expression(
         for att_sub_box in att_box.bf.as_ref().unwrap().iter() {
             new_c_args.box_counter = box_counter;
             new_c_args.cur_box = att_sub_box.clone();
-            if att_sub_box.contents.is_some() {
-                new_c_args.att_idx = att_sub_box.contents.unwrap() as usize;
-            }
+            new_c_args.att_idx = c_args.att_idx;
             match att_sub_box.function_type {
                 FunctionType::Literal => {
                     create_att_literal(
@@ -3769,6 +3767,17 @@ pub fn create_att_expression(
                         new_c_args.clone(),
                     );
                 }
+                FunctionType::Expression => {
+                    new_c_args.att_idx = att_sub_box.contents.unwrap() as usize;
+                    create_att_expression(
+                        gromet, // gromet for metadata
+                        nodes,  // nodes
+                        edges,
+                        meta_nodes,
+                        start,
+                        new_c_args.clone(),
+                    );
+                }
                 _ => {}
             }
             box_counter += 1;
@@ -3777,6 +3786,14 @@ pub fn create_att_expression(
     }
     // Now we perform the internal wiring of this branch
     internal_wiring(
+        att_box.clone(),
+        nodes,
+        edges,
+        c_args.att_idx,
+        c_args.bf_counter,
+    );
+
+    cross_att_wiring(
         att_box.clone(),
         nodes,
         edges,
@@ -5195,6 +5212,7 @@ pub fn wff_cross_att_wiring(
     bf_counter: u8, // this is the current box
 ) {
     for wire in eboxf.wff.as_ref().unwrap().iter() {
+        let mut prop = None;
         // collect info to identify the opi src node
         let src_idx = wire.src; // port index
         let src_pif = eboxf.pif.as_ref().unwrap()[(src_idx - 1) as usize].clone(); // src port
@@ -5390,10 +5408,11 @@ pub fn wff_cross_att_wiring(
                             // only opo's
                             if node.n_type == "Primitive" || node.n_type == "Abstract" {
                                 // iterate through port to check for tgt
-                                for p in node.in_indx.as_ref().unwrap().iter() {
+                                for (i, p) in node.in_indx.as_ref().unwrap().iter().enumerate() {
                                     // push the src first, being pif
                                     if (src_idx as u32) == *p {
                                         wff_src_tgt.push(node.node_id.clone());
+                                        prop = Some(i);
                                     }
                                 }
                             }
@@ -5425,6 +5444,7 @@ pub fn wff_cross_att_wiring(
                         src: wff_src_tgt[0].clone(),
                         tgt: wff_src_tgt[1].clone(),
                         e_type: String::from("Wire"),
+                        prop: Some(prop.unwrap()),
                         ..Default::default()
                     };
                     edges.push(e8);
