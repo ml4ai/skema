@@ -96,6 +96,9 @@ def get_children_by_types(node: Node, types: List):
     """Takes in a node and a list of types as inputs and returns all children matching those types. Otherwise, return an empty list"""
     return [child for child in node.children if child.type in types]
 
+def get_children_except_types(node: Node, types: List):
+    """Takes in a node and a list of types as inputs and returns all children not matching those types. Otherwise, return an empty list"""
+    return [child for child in node.children if child.type not in types]
 
 def get_first_child_index(node, type: str):
     """Get the index of the first child of node with type type."""

@@ -69,7 +69,7 @@ class TS2CAST(object):
 
         # Start visiting
         self.out_cast = self.generate_cast()
-        print(self.out_cast[1].to_json_str())
+        #print(self.out_cast[0].to_json_str())
         
     def generate_cast(self) -> List[CAST]:
         '''Interface for generating CAST.'''
@@ -216,7 +216,12 @@ class TS2CAST(object):
         self.variable_context.push_context()
 
         # Top level statement node
-        statement_node = get_children_by_types(node, ["subroutine_statement", "function_statement"])[0]
+        try:
+            statement_node = get_children_by_types(node, ["subroutine_statement", "function_statement"])[0]
+        except:
+            print(node)
+            print(node.children)
+            exit()
         name_node = get_first_child_by_type(statement_node, "name")
         name = self.visit(
             name_node
@@ -415,7 +420,7 @@ class TS2CAST(object):
                 alias=import_alias,
                 all=import_all,
                 symbol=None,
-                source_refs=None,
+                source_refs=[self.node_helper.get_source_ref(node)],
             )
         else:
             imports = []
@@ -1174,5 +1179,3 @@ class TS2CAST(object):
             elif isinstance(cast, List):
                 body.extend(cast)
         return body
-
-TS2CAST("derived_type.f")
