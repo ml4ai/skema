@@ -5674,6 +5674,26 @@
 <a href="#5674" id="5674">5674</a>
 <a href="#5675" id="5675">5675</a>
 <a href="#5676" id="5676">5676</a>
+<a href="#5677" id="5677">5677</a>
+<a href="#5678" id="5678">5678</a>
+<a href="#5679" id="5679">5679</a>
+<a href="#5680" id="5680">5680</a>
+<a href="#5681" id="5681">5681</a>
+<a href="#5682" id="5682">5682</a>
+<a href="#5683" id="5683">5683</a>
+<a href="#5684" id="5684">5684</a>
+<a href="#5685" id="5685">5685</a>
+<a href="#5686" id="5686">5686</a>
+<a href="#5687" id="5687">5687</a>
+<a href="#5688" id="5688">5688</a>
+<a href="#5689" id="5689">5689</a>
+<a href="#5690" id="5690">5690</a>
+<a href="#5691" id="5691">5691</a>
+<a href="#5692" id="5692">5692</a>
+<a href="#5693" id="5693">5693</a>
+<a href="#5694" id="5694">5694</a>
+<a href="#5695" id="5695">5695</a>
+<a href="#5696" id="5696">5696</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Interface to the graph database we are using for persisting GroMEt objects and performing
 //! queries on them. We currently use MemgraphDB, an in-memory graph database.
 
@@ -9421,9 +9441,7 @@ There being a second function call of the same function which contains an expres
         <span class="kw">for </span>att_sub_box <span class="kw">in </span>att_box.bf.as_ref().unwrap().iter() {
             new_c_args.box_counter = box_counter;
             new_c_args.cur_box = att_sub_box.clone();
-            <span class="kw">if </span>att_sub_box.contents.is_some() {
-                new_c_args.att_idx = att_sub_box.contents.unwrap() <span class="kw">as </span>usize;
-            }
+            new_c_args.att_idx = c_args.att_idx;
             <span class="kw">match </span>att_sub_box.function_type {
                 FunctionType::Literal =&gt; {
                     create_att_literal(
@@ -9445,6 +9463,17 @@ There being a second function call of the same function which contains an expres
                         new_c_args.clone(),
                     );
                 }
+                FunctionType::Expression =&gt; {
+                    new_c_args.att_idx = att_sub_box.contents.unwrap() <span class="kw">as </span>usize;
+                    create_att_expression(
+                        gromet, <span class="comment">// gromet for metadata
+                        </span>nodes,  <span class="comment">// nodes
+                        </span>edges,
+                        meta_nodes,
+                        start,
+                        new_c_args.clone(),
+                    );
+                }
                 <span class="kw">_ </span>=&gt; {}
             }
             box_counter += <span class="number">1</span>;
@@ -9453,6 +9482,14 @@ There being a second function call of the same function which contains an expres
     }
     <span class="comment">// Now we perform the internal wiring of this branch
     </span>internal_wiring(
+        att_box.clone(),
+        nodes,
+        edges,
+        c_args.att_idx,
+        c_args.bf_counter,
+    );
+
+    cross_att_wiring(
         att_box.clone(),
         nodes,
         edges,
@@ -10871,6 +10908,7 @@ There being a second function call of the same function which contains an expres
     </span>bf_counter: u8, <span class="comment">// this is the current box
 </span>) {
     <span class="kw">for </span>wire <span class="kw">in </span>eboxf.wff.as_ref().unwrap().iter() {
+        <span class="kw">let </span><span class="kw-2">mut </span>prop = <span class="prelude-val">None</span>;
         <span class="comment">// collect info to identify the opi src node
         </span><span class="kw">let </span>src_idx = wire.src; <span class="comment">// port index
         </span><span class="kw">let </span>src_pif = eboxf.pif.as_ref().unwrap()[(src_idx - <span class="number">1</span>) <span class="kw">as </span>usize].clone(); <span class="comment">// src port
@@ -11066,10 +11104,11 @@ There being a second function call of the same function which contains an expres
                             <span class="comment">// only opo&#39;s
                             </span><span class="kw">if </span>node.n_type == <span class="string">&quot;Primitive&quot; </span>|| node.n_type == <span class="string">&quot;Abstract&quot; </span>{
                                 <span class="comment">// iterate through port to check for tgt
-                                </span><span class="kw">for </span>p <span class="kw">in </span>node.in_indx.as_ref().unwrap().iter() {
+                                </span><span class="kw">for </span>(i, p) <span class="kw">in </span>node.in_indx.as_ref().unwrap().iter().enumerate() {
                                     <span class="comment">// push the src first, being pif
                                     </span><span class="kw">if </span>(src_idx <span class="kw">as </span>u32) == <span class="kw-2">*</span>p {
                                         wff_src_tgt.push(node.node_id.clone());
+                                        prop = <span class="prelude-val">Some</span>(i);
                                     }
                                 }
                             }
@@ -11101,6 +11140,7 @@ There being a second function call of the same function which contains an expres
                         src: wff_src_tgt[<span class="number">0</span>].clone(),
                         tgt: wff_src_tgt[<span class="number">1</span>].clone(),
                         e_type: String::from(<span class="string">&quot;Wire&quot;</span>),
+                        prop: <span class="prelude-val">Some</span>(prop.unwrap()),
                         ..Default::default()
                     };
                     edges.push(e8);
