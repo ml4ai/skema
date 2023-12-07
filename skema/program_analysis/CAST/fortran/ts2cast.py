@@ -611,6 +611,14 @@ class TS2CAST(object):
         elif else_cast:
             orelse = else_cast.body
 
+        body = []
+        for child in node.children[body_start_index:body_stop_index]:
+            child_cast = self.visit(child)
+            if isinstance(child_cast, AstNode):
+                body.append(child_cast)
+            elif isinstance(child_cast, List):
+                body.extend(child_cast)
+    
         return ModelIf(
             expr=expr,
             body=body,

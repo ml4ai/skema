@@ -25,7 +25,7 @@ class CosmosTextReadingPipeline(contextWindowSize: Int, processorOpt: Option[Pro
     new ParagraphPreprocessor(),
     new UnicodePreprocessor(),
     new CasePreprocessor(CasePreprocessor.defaultCutoff),
-    new NumberPreprocessor(NumberPreprocessor.Hyperparameters()),
+    new NumberPreprocessor(NumberPreprocessor.Parameters()),
     new LigaturePreprocessor(languageModel),
     new LineBreakPreprocessor(languageModel),
     new WordBreakByHyphenPreprocessor(),
