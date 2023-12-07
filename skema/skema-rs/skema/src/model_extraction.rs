@@ -2,6 +2,7 @@ use crate::config::Config;
 use crate::database::Node;
 use mathml::ast::operator::Operator;
 pub use mathml::mml2pn::{ACSet, Term};
+use petgraph::matrix_graph::node_index;
 use petgraph::prelude::*;
 use petgraph::visit::IntoNeighborsDirected;
 
@@ -199,10 +200,13 @@ pub async fn subgrapg2_core_dyn_MET_ast(
             println!("expression: {}", graph[expression_nodes[i]].id);
             // the call expressions get referenced by multiple top level expressions, so deleting the nodes in it breaks the other graphs. Need to pass clone of expression subgraph so references to original has all the nodes.
             if has_call {
+                println!("trimmed calls");
+                println!("node count pre call trimming: {:?}", sub_w.node_count());
                 sub_w = trim_calls(sub_w.clone())
             }
+            println!("node count post call trimming: {:?}", sub_w.node_count());
             let expr = trim_un_named(&mut sub_w);
-            println!("node count post trimming: {:?}", expr.node_count());
+            println!("node count post un-named trimming: {:?}", expr.node_count());
             let mut root_node = Vec::<NodeIndex>::new();
             for node_index in expr.node_indices() {
                 if expr[node_index].label.clone() == *"Opo" {
@@ -371,14 +375,15 @@ fn trim_un_named(
     for node_index in graph.node_indices() {
         if graph[node_index].clone().name.unwrap().clone() == *"un-named" {
             let mut bypass = Vec::<NodeIndex>::new();
+            let mut outgoing_bypass = Vec::<NodeIndex>::new();
             for node1 in graph.neighbors_directed(node_index, Incoming) {
                 bypass.push(node1);
             }
             for node2 in graph.neighbors_directed(node_index, Outgoing) {
-                bypass.push(node2);
+                outgoing_bypass.push(node2);
             }
             // one incoming one outgoing
-            if bypass.len() == 2 {
+            if bypass.len() == 1 && outgoing_bypass.len() == 1 {
                 // annoyingly have to pull the edge/Relation to insert into graph
                 println!(
                     "bypass[0]: {:?}, node_index: {:?}",
@@ -387,25 +392,23 @@ fn trim_un_named(
                 );
                 graph.add_edge(
                     bypass[0],
-                    bypass[1],
+                    outgoing_bypass[0],
                     graph
                         .edge_weight(graph.find_edge(bypass[0], node_index).unwrap())
                         .unwrap()
                         .clone(),
                 );
-            } else if bypass.len() > 2 {
+            } else if bypass.len() >= 2 && outgoing_bypass.len() == 1 {
                 // this operates on the assumption that there maybe multiple references to the port
                 // (incoming arrows) but only one outgoing arrow, this seems to be the case based on
                 // data too.
 
-                // SIDARTHE: failing if only an outgoing edge....
-
                 let end_node_idx = bypass.len() - 1;
-                for (i, _ent) in bypass[0..end_node_idx].iter().enumerate() {
+                for (i, _ent) in bypass.iter().enumerate() {
                     // this iterates over all but the last entry in the bypass vec
                     graph.add_edge(
                         bypass[i],
-                        bypass[end_node_idx],
+                        outgoing_bypass[0],
                         graph
                             .edge_weight(graph.find_edge(bypass[i], node_index).unwrap())
                             .unwrap()
@@ -619,23 +622,29 @@ pub async fn get_subgraph(
 pub fn trim_calls(
     graph: petgraph::Graph<ModelNode, ModelEdge>,
 ) -> petgraph::Graph<ModelNode, ModelEdge> {
-
     let mut graph_clone = graph.clone();
 
+    // This will be all the nodes to be deleted
+    let mut inner_nodes = Vec::<NodeIndex>::new();
     // find the call nodes
     for node_index in graph.node_indices() {
         if graph[node_index].clone().name.unwrap().clone() == *"_call" {
             // we now trace up the incoming path until we hit a primitive,
             // this will be the start node for the new edge.
-            
+
             // initialize trackers
             let mut node_start = node_index;
             let mut node_end = node_index;
-            let mut inner_nodes = Vec::<NodeIndex>::new();
 
             // find end node and track path
             for node in graph.neighbors_directed(node_index, Outgoing) {
-                if graph.edge_weight(graph.find_edge(node_index, node).unwrap()).unwrap().index.unwrap() == 0 {
+                if graph
+                    .edge_weight(graph.find_edge(node_index, node).unwrap())
+                    .unwrap()
+                    .index
+                    .unwrap()
+                    == 0
+                {
                     let mut temp = to_terminal(graph.clone(), node);
                     node_end = temp.0;
                     inner_nodes.append(&mut temp.1);
@@ -652,24 +661,41 @@ pub fn trim_calls(
             // add edge from start to end node, with weight from start node a matching outgoing node form it
             for node in graph.clone().neighbors_directed(node_start, Outgoing) {
                 for node_p in inner_nodes.iter() {
-                    if node == *node_p { 
-                        graph_clone.add_edge(node_start, node_end, graph.clone().edge_weight(graph.clone().find_edge(node_start, node).unwrap()).unwrap().clone());
+                    if node == *node_p {
+                        graph_clone.add_edge(
+                            node_start,
+                            node_end,
+                            graph
+                                .clone()
+                                .edge_weight(graph.clone().find_edge(node_start, node).unwrap())
+                                .unwrap()
+                                .clone(),
+                        );
                     }
                 }
             }
             // we keep track all the node indexes we found while tracing the path and delete all
-            // intermediate nodes. 
-            for node in inner_nodes.iter() {
-                graph_clone.remove_node(*node);
-            }
+            // intermediate nodes.
+            inner_nodes.push(node_index);
         }
+    }
+    inner_nodes.sort();
+    for node in inner_nodes.iter().rev() {
+        println!(
+            "node_index: {:?}, node name: {:?}",
+            node,
+            graph_clone.clone()[*node].name.clone().unwrap()
+        );
+        graph_clone.remove_node(*node);
     }
 
     graph_clone
 }
 
-// outgoing walker to terminal node
-pub fn to_terminal(graph: petgraph::Graph<ModelNode, ModelEdge>, node_index: NodeIndex) -> (NodeIndex, Vec<NodeIndex>) {
+pub fn to_terminal(
+    graph: petgraph::Graph<ModelNode, ModelEdge>,
+    node_index: NodeIndex,
+) -> (NodeIndex, Vec<NodeIndex>) {
     let mut node_vec = Vec::<NodeIndex>::new();
     let mut end_node = node_index;
     // if there another node deeper
@@ -682,17 +708,21 @@ pub fn to_terminal(graph: petgraph::Graph<ModelNode, ModelEdge>, node_index: Nod
             end_node = temp.0; // make end_node
             node_vec.append(&mut temp.1); // append previous path nodes
         }
-    }   
+    }
+    println!("to terminal node_vec step: {:?}", node_vec.clone());
     (end_node, node_vec)
 }
 
-// incoming walker to first primitive
-pub fn to_primitive(graph: petgraph::Graph<ModelNode, ModelEdge>, node_index: NodeIndex) -> (NodeIndex, Vec<NodeIndex>) {
+// incoming walker to first primitive (NOTE: assumes input is not a primitive)
+pub fn to_primitive(
+    graph: petgraph::Graph<ModelNode, ModelEdge>,
+    node_index: NodeIndex,
+) -> (NodeIndex, Vec<NodeIndex>) {
     let mut node_vec = Vec::<NodeIndex>::new();
     let mut end_node = node_index;
     node_vec.push(node_index);
-    for node in graph.neighbors_directed(node_index, Outgoing) {
-        if graph[node].label.clone() != *"Primtive" {
+    for node in graph.neighbors_directed(node_index, Incoming) {
+        if graph[node].label.clone() != *"Primitive" {
             let mut temp = to_primitive(graph.clone(), node);
             end_node = temp.0;
             node_vec.append(&mut temp.1);
@@ -700,5 +730,6 @@ pub fn to_primitive(graph: petgraph::Graph<ModelNode, ModelEdge>, node_index: No
             end_node = node;
         }
     }
+    println!("to primitive node_vec step: {:?}", node_vec.clone());
     (end_node, node_vec)
 }
