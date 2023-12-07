@@ -12,6 +12,7 @@ import org.ml4ai.skema.text_reading.{CosmosTextReadingPipeline, TextReadingPipel
 import org.ml4ai.skema.text_reading.serializer.SkemaJSONSerializer
 import org.ml4ai.skema.text_reading.utils.DisplayUtils
 import org.slf4j.{Logger, LoggerFactory}
+import org.clulab.processors.clu.BalaurProcessor
 import play.api.libs.json._
 import play.api.mvc._
 
@@ -45,7 +46,7 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
   // Use this one instead of the lazy val in MireEmbeddingsGrounder or newGrounder.
   val miraEmbeddingsGrounder = TextReadingPipeline.newGrounder(fastNlpProcessorOpt, chosenEngineOpt = Some("miraembeddings"))
 
-  val processorOpt = Some(DocumentByWord.processor)
+  val processorOpt = None//Some(DocumentByWord.processor)
   // TODO Add the window parameter to the configuration file.
   val cosmosPipeline = new CosmosTextReadingPipeline(contextWindowSize = 3, processorOpt, odinEngineOpt, Some(miraEmbeddingsGrounder))
   // TODO Add the window parameter to the configuration file.

@@ -663,9 +663,11 @@ def healthcheck() -> int:
     return status_code
 
 
-@router.get("/eval", response_model=TextReadingEvaluationResults, status_code=200)
+@router.get("/eval", response_model=TextReadingEvaluationResults, status_code=200, deprecated=True)
 def quantitative_eval() -> TextReadingEvaluationResults:
-    """ Compares the SIDARTHE paper extractions against ground truth extractions """
+    """ Compares the SIDARTHE paper extractions against ground truth extractions. This path stays for compatibility
+    with the dashboard, but will be removed in the near future as the dashboard is updated to run dynamically the POST
+    path"""
 
     # Read ground truth annotations
     with (Path(__file__).parents[0] / "data" / "sidarthe_annotations.json").open() as f:
@@ -678,15 +680,17 @@ def quantitative_eval() -> TextReadingEvaluationResults:
 
 
 @router.post("/eval", response_model=TextReadingEvaluationResults, status_code=200)
-def quantitative_eval(extractions_file: UploadFile, gt_annotations: UploadFile):
+def quantitative_eval(extractions_file: UploadFile,
+                      gt_annotations: UploadFile, json_text: UploadFile) -> TextReadingEvaluationResults:
     """
-    # Gets performance metrics of a set of text extractions againts a ground truth annotations file.
+    # Gets performance metrics of a set of text extractions against a ground truth annotations file.
 
     ## Example:
     ```python
     files = {
         "extractions_file": ("paper_variable_extractions.json", open("paper_variable_extractions.json", 'rb')),
         "gt_annotations": ("paper_gt_annotations.json", open("paper_gt_annotations.json", 'rb')),
+        "json_text": ("paper_cosmos_output.json", open("paper_cosmos_output.json", 'rb')),
     }
 
     response = requests.post(f"{endpoint}/text-reading/eval", files=files)
@@ -695,8 +699,9 @@ def quantitative_eval(extractions_file: UploadFile, gt_annotations: UploadFile):
     """
 
     gt_data = json.load(gt_annotations.file)
+    json_contents = json.load(json_text.file)
 
-    # Support both Attribute Collections serialized and within the envelop of this rest API
+    # Support both Attribute Collections serialized and within the envelope of this rest API
     extractions_json = json.load(extractions_file.file)
     try:
         extractions = AttributeCollection.from_json(extractions_json)
@@ -711,7 +716,7 @@ def quantitative_eval(extractions_file: UploadFile, gt_annotations: UploadFile):
         extractions = AttributeCollection(
             attributes=list(it.chain.from_iterable(c.attributes for c in collections)))
 
-    return compute_text_reading_evaluation(gt_data, extractions)
+    return compute_text_reading_evaluation(gt_data, extractions, json_contents)
 
 
 app = FastAPI()
