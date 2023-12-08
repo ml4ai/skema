@@ -478,9 +478,8 @@ class MatlabToCast(object):
             "string",
             "unary_operator"
         ]
-        
 
-        def get_case_expression(case_node, identifier):
+        def get_case_expression(case_node, switch_var):
             """ return an operator representing the case test """
             source_refs=[self.node_helper.get_source_ref(case_node)]
             cell_node = get_first_child_by_type(case_node, "cell")
@@ -494,7 +493,7 @@ class MatlabToCast(object):
                 )
                 return self.get_operator(
                     op = "in", 
-                    operands = [identifier, operand], 
+                    operands = [switch_var, operand], 
                     source_refs = source_refs
                 )
             # single case argument
@@ -502,25 +501,31 @@ class MatlabToCast(object):
                 get_children_by_types(case_node, case_node_types)][0]
             return self.get_operator(
                 op = "==", 
-                operands = [identifier, operand], 
+                operands = [switch_var, operand], 
                 source_refs = source_refs
             )
 
-        def get_model_if(case_node, identifier):
+        def get_model_if(case_node, switch_var):
             """ return conditional logic representing the case """
             return ModelIf(
-                expr = get_case_expression(case_node, identifier),
+                expr = get_case_expression(case_node, switch_var),
                 body = self.get_block(case_node),
                 orelse = [],
                 source_refs=[self.node_helper.get_source_ref(case_node)]
             )
         
-        # switch statement identifier
-        identifier = self.visit(get_first_child_by_type(node, "identifier"))
-        
+        # switch variable is usually an identifier
+        switch_var = get_first_child_by_type(node, "identifier")
+        if switch_var is not None:
+            switch_var = self.visit(switch_var)
+
+        # however it can be a function call
+        else:
+            switch_var = self.visit(get_first_child_by_type(node, "function_call"))
+
         # n case clauses as 'if then' nodes
         case_nodes = get_children_by_types(node, ["case_clause"])
-        model_ifs = [get_model_if(node, identifier) for node in case_nodes]
+        model_ifs = [get_model_if(node, switch_var) for node in case_nodes]
         for i, model_if in enumerate(model_ifs[1:]):
             model_ifs[i].orelse = [model_if]
 
