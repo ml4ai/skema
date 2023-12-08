@@ -242,6 +242,8 @@ async def llm_assisted_codebase_to_pn_amr(zip_file: UploadFile = File()):
     files = []
     blobs = []
     amrs = []
+
+    # There could now be multiple blocks that we need to handle and adjoin together
     for linespan in linespans:
         lines = linespan.block[0].split("-")
         line_begin.append(
