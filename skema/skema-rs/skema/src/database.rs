@@ -1584,6 +1584,7 @@ pub fn create_function(
                     new_c_args.box_counter = box_counter;
                     new_c_args.cur_box = att_sub_box.clone();
                     new_c_args.att_idx = c_args.att_idx;
+                    new_c_args.att_bf_idx = c_args.att_bf_idx;
                     match att_sub_box.function_type {
                         FunctionType::Function => {
                             new_c_args.att_idx = att_sub_box.contents.unwrap() as usize;
@@ -1610,6 +1611,7 @@ pub fn create_function(
                         }
                         FunctionType::Expression => {
                             new_c_args.att_idx = att_sub_box.contents.unwrap() as usize;
+                            new_c_args.att_bf_idx = c_args.att_idx;
                             create_att_expression(
                                 gromet, // gromet for metadata
                                 nodes,  // nodes
@@ -3584,6 +3586,13 @@ pub fn create_att_expression(
                 }
             }
         }
+        if opo_name.is_empty() {
+            println!(
+                "Missed Opo at att_idx: {:?} and box_counter: {:?}",
+                c_args.att_idx, c_args.box_counter
+            );
+            println!("parent att box: {:?}", c_args.att_bf_idx);
+        }
         if !opo_name.clone().is_empty() {
             let mut oport: u32 = 0;
             for _op in att_box.opo.as_ref().unwrap().iter() {
@@ -3746,6 +3755,7 @@ pub fn create_att_expression(
             new_c_args.box_counter = box_counter;
             new_c_args.cur_box = att_sub_box.clone();
             new_c_args.att_idx = c_args.att_idx;
+            new_c_args.att_bf_idx = c_args.att_bf_idx;
             match att_sub_box.function_type {
                 FunctionType::Literal => {
                     create_att_literal(
@@ -3769,6 +3779,7 @@ pub fn create_att_expression(
                 }
                 FunctionType::Expression => {
                     new_c_args.att_idx = att_sub_box.contents.unwrap() as usize;
+                    new_c_args.att_bf_idx = c_args.att_idx;
                     create_att_expression(
                         gromet, // gromet for metadata
                         nodes,  // nodes
