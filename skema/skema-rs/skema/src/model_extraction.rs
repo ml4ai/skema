@@ -29,7 +29,7 @@ pub struct ModelNode {
     id: i64,
     label: String,
     name: Option<String>,
-    value: Option<String>,
+    value: Option<ValueL>,
 }
 
 /// This struct is the edge struct for the constructed petgraph
@@ -305,8 +305,7 @@ pub fn get_args_MET(
         } else {
             // asummption it is atomic
             if graph[node].label.clone() == *"Literal" {
-                let temp_string = "3".to_string();
-                println!("{:?}", graph[node].clone());
+                let temp_string = graph[node].value.clone().unwrap().value.replace("\"", "");
                 let arg2 = MathExpressionTree::Atom(MathExpression::Mi(Mi(temp_string.clone())));
                 args.push(arg2.clone());
             } else {
@@ -459,9 +458,9 @@ async fn subgraph_wiring(
         let node: neo4rs::Node = row.get("nodes2").unwrap();
         let modelnode = ModelNode {
             id: node.id(),
-            label: node.labels()[0].clone(),
-            name: node.get::<String>("name"),
-            value: node.get::<String>("value"),
+            label: node.labels()[0].to_string(),
+            name: node.get::<String>("name").ok(),
+            value: node.get::<ValueL>("value").ok(),
         };
         node_list.push(modelnode.clone());
     }
@@ -485,8 +484,8 @@ async fn subgraph_wiring(
             id: edge.id(),
             src_id: edge.start_node_id(),
             tgt_id: edge.end_node_id(),
-            index: edge.get::<i64>("index"),
-            refer: edge.get::<i64>("refer"),
+            index: edge.get::<i64>("index").ok(),
+            refer: edge.get::<i64>("refer").ok(),
         };
         edge_list.push(modeledge);
     }
@@ -582,9 +581,9 @@ pub async fn get_subgraph(
         let node: neo4rs::Node = row.get("nodes2").unwrap();
         let modelnode = ModelNode {
             id: node.id(),
-            label: node.labels()[0].clone(),
-            name: node.get::<String>("name"),
-            value: node.get::<String>("value"),
+            label: node.labels()[0].to_string(),
+            name: node.get::<String>("name").ok(),
+            value: node.get::<ValueL>("value").ok(),
         };
         node_list.push(modelnode);
     }
@@ -607,8 +606,8 @@ pub async fn get_subgraph(
             id: edge.id(),
             src_id: edge.start_node_id(),
             tgt_id: edge.end_node_id(),
-            index: edge.get::<i64>("index"),
-            refer: edge.get::<i64>("refer"),
+            index: edge.get::<i64>("index").ok(),
+            refer: edge.get::<i64>("refer").ok(),
         };
         edge_list.push(modeledge);
     }
