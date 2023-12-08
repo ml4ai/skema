@@ -3,11 +3,11 @@ use crate::ValueL;
 
 use mathml::ast::operator::Operator;
 pub use mathml::mml2pn::{ACSet, Term};
-use petgraph::dot;
-use petgraph::matrix_graph::node_index;
+
+
 use petgraph::prelude::*;
 use petgraph::visit::IntoNeighborsDirected;
-use std::collections::HashMap;
+
 
 use std::string::ToString;
 
@@ -305,7 +305,7 @@ pub fn get_args_MET(
         } else {
             // asummption it is atomic
             if graph[node].label.clone() == *"Literal" {
-                let temp_string = graph[node].value.clone().unwrap().value.replace("\"", "");
+                let temp_string = graph[node].value.clone().unwrap().value.replace('\"', "");
                 let arg2 = MathExpressionTree::Atom(MathExpression::Mi(Mi(temp_string.clone())));
                 args.push(arg2.clone());
             } else {
