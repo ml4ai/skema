@@ -54,8 +54,6 @@ KEYWORDS = [
     'for_statement',
     'iterator',
     'range',
-    'while',
-    'while_statement'
 
     # keywords to be supported
     'field_expression',

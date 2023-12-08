@@ -114,8 +114,6 @@ class MatlabToCast(object):
             return self.visit_iterator(node)
         elif node.type == "for_statement":
             return self.visit_for_statement(node)
-        elif node.type == "while_statement":
-            return self.visit_loop_while(node)
         elif node.type in [
             "cell",
             "matrix"
