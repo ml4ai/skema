@@ -96,8 +96,8 @@
     }
     <span class="kw">pub async fn </span>graphdb_connection(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Graph {
         <span class="kw">let </span>uri = <span class="self">self</span>.create_graphdb_uri();
-        <span class="macro">println!</span>(<span class="string">&quot;skema-rs:memgraph uri:\t{addr}&quot;</span>, addr = uri);
-        <span class="kw">let </span>graph_config = ConfigBuilder::new()
+        <span class="comment">//println!(&quot;skema-rs:memgraph uri:\t{addr}&quot;, addr = uri);
+        </span><span class="kw">let </span>graph_config = ConfigBuilder::new()
             .uri(uri)
             .user(<span class="string">&quot;&quot;</span>.to_string())
             .password(<span class="string">&quot;&quot;</span>.to_string())

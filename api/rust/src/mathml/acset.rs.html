@@ -856,8 +856,6 @@
 <a href="#856" id="856">856</a>
 <a href="#857" id="857">857</a>
 <a href="#858" id="858">858</a>
-<a href="#859" id="859">859</a>
-<a href="#860" id="860">860</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Structs to represent elements of ACSets (Annotated C-Sets, a concept from category theory).
 //! JSON-serialized ACSets are the form of model exchange between TA1 and TA2.
 </span><span class="kw">use </span><span class="kw">crate</span>::parsers::first_order_ode::{get_terms, FirstOrderODE, PnTerm};
@@ -1227,7 +1225,6 @@
                 terms.push(term.clone());
             }
         }
-
         <span class="kw">for </span>term <span class="kw">in </span>terms.iter() {
             <span class="kw">for </span>param <span class="kw">in </span><span class="kw-2">&amp;</span>term.parameters {
                 <span class="kw">let </span>parameters = Parameter {
@@ -1285,7 +1282,6 @@
         <span class="kw">for </span>i <span class="kw">in </span>paired_term_indices.iter().rev() {
             terms.remove(<span class="kw-2">*</span>i);
         }
-
         <span class="comment">// Now we replace unpaired terms with subterms, by their subterms and repeat the process
 
         // but first we need to inherit the dynamic state to each sub term

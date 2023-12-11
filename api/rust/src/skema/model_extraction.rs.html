@@ -715,13 +715,19 @@
 <a href="#715" id="715">715</a>
 <a href="#716" id="716">716</a>
 <a href="#717" id="717">717</a>
+<a href="#718" id="718">718</a>
+<a href="#719" id="719">719</a>
+<a href="#720" id="720">720</a>
+<a href="#721" id="721">721</a>
+<a href="#722" id="722">722</a>
+<a href="#723" id="723">723</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::config::Config;
+<span class="kw">use </span><span class="kw">crate</span>::ValueL;
 
 <span class="kw">use </span>mathml::ast::operator::Operator;
 <span class="kw">pub use </span>mathml::mml2pn::{ACSet, Term};
 
 <span class="kw">use </span>petgraph::prelude::<span class="kw-2">*</span>;
-<span class="kw">use </span>petgraph::visit::IntoNeighborsDirected;
 
 <span class="kw">use </span>std::string::ToString;
 
@@ -743,7 +749,7 @@
     id: i64,
     label: String,
     name: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    value: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    value: <span class="prelude-ty">Option</span>&lt;ValueL&gt;,
 }
 
 <span class="doccomment">/// This struct is the edge struct for the constructed petgraph
@@ -914,6 +920,7 @@
             }
         }
         <span class="kw">if </span>sub_w.node_count() &gt; <span class="number">3 </span>&amp;&amp; !(prim_counter == <span class="number">1 </span>&amp;&amp; has_call) &amp;&amp; prim_counter != <span class="number">0 </span>{
+            <span class="macro">println!</span>(<span class="string">&quot;--------------------&quot;</span>);
             <span class="macro">println!</span>(<span class="string">&quot;expression: {}&quot;</span>, graph[expression_nodes[i]].id);
             <span class="comment">// the call expressions get referenced by multiple top level expressions, so deleting the nodes in it breaks the other graphs. Need to pass clone of expression subgraph so references to original has all the nodes.
             </span><span class="kw">if </span>has_call {
@@ -1017,9 +1024,15 @@
             </span>args.push(rhs.clone());
         } <span class="kw">else </span>{
             <span class="comment">// asummption it is atomic
-            </span><span class="kw">let </span>temp_string = graph[node].name.as_ref().unwrap().clone();
-            <span class="kw">let </span>arg2 = MathExpressionTree::Atom(MathExpression::Mi(Mi(temp_string.clone())));
-            args.push(arg2.clone());
+            </span><span class="kw">if </span>graph[node].label.clone() == <span class="kw-2">*</span><span class="string">&quot;Literal&quot; </span>{
+                <span class="kw">let </span>temp_string = graph[node].value.clone().unwrap().value.replace(<span class="string">&#39;\&quot;&#39;</span>, <span class="string">&quot;&quot;</span>);
+                <span class="kw">let </span>arg2 = MathExpressionTree::Atom(MathExpression::Mi(Mi(temp_string.clone())));
+                args.push(arg2.clone());
+            } <span class="kw">else </span>{
+                <span class="kw">let </span>temp_string = graph[node].name.as_ref().unwrap().clone();
+                <span class="kw">let </span>arg2 = MathExpressionTree::Atom(MathExpression::Mi(Mi(temp_string.clone())));
+                args.push(arg2.clone());
+            }
         }
 
         <span class="comment">// construct order of args
@@ -1030,10 +1043,8 @@
             .unwrap();
         arg_order.push(x);
     }
-
     <span class="comment">// fix order of args
     </span><span class="kw">let </span><span class="kw-2">mut </span>ordered_args = args.clone();
-
     <span class="kw">for </span>(i, ind) <span class="kw">in </span>arg_order.iter().enumerate() {
         <span class="comment">// the ind&#39;th element of order_args is the ith element of the unordered args
         </span><span class="kw">if </span>ordered_args.len() &gt; <span class="kw-2">*</span>ind <span class="kw">as </span>usize {
@@ -1167,11 +1178,11 @@
         <span class="kw">let </span>node: neo4rs::Node = row.get(<span class="string">&quot;nodes2&quot;</span>).unwrap();
         <span class="kw">let </span>modelnode = ModelNode {
             id: node.id(),
-            label: node.labels()[<span class="number">0</span>].clone(),
-            name: node.get::&lt;String&gt;(<span class="string">&quot;name&quot;</span>),
-            value: node.get::&lt;String&gt;(<span class="string">&quot;value&quot;</span>),
+            label: node.labels()[<span class="number">0</span>].to_string(),
+            name: node.get::&lt;String&gt;(<span class="string">&quot;name&quot;</span>).ok(),
+            value: node.get::&lt;ValueL&gt;(<span class="string">&quot;value&quot;</span>).ok(),
         };
-        node_list.push(modelnode);
+        node_list.push(modelnode.clone());
     }
     <span class="comment">// edge query
     </span><span class="kw">let </span><span class="kw-2">mut </span>result2 = graph
@@ -1193,8 +1204,8 @@
             id: edge.id(),
             src_id: edge.start_node_id(),
             tgt_id: edge.end_node_id(),
-            index: edge.get::&lt;i64&gt;(<span class="string">&quot;index&quot;</span>),
-            refer: edge.get::&lt;i64&gt;(<span class="string">&quot;refer&quot;</span>),
+            index: edge.get::&lt;i64&gt;(<span class="string">&quot;index&quot;</span>).ok(),
+            refer: edge.get::&lt;i64&gt;(<span class="string">&quot;refer&quot;</span>).ok(),
         };
         edge_list.push(modeledge);
     }
@@ -1290,9 +1301,9 @@
         <span class="kw">let </span>node: neo4rs::Node = row.get(<span class="string">&quot;nodes2&quot;</span>).unwrap();
         <span class="kw">let </span>modelnode = ModelNode {
             id: node.id(),
-            label: node.labels()[<span class="number">0</span>].clone(),
-            name: node.get::&lt;String&gt;(<span class="string">&quot;name&quot;</span>),
-            value: node.get::&lt;String&gt;(<span class="string">&quot;value&quot;</span>),
+            label: node.labels()[<span class="number">0</span>].to_string(),
+            name: node.get::&lt;String&gt;(<span class="string">&quot;name&quot;</span>).ok(),
+            value: node.get::&lt;ValueL&gt;(<span class="string">&quot;value&quot;</span>).ok(),
         };
         node_list.push(modelnode);
     }
@@ -1315,8 +1326,8 @@
             id: edge.id(),
             src_id: edge.start_node_id(),
             tgt_id: edge.end_node_id(),
-            index: edge.get::&lt;i64&gt;(<span class="string">&quot;index&quot;</span>),
-            refer: edge.get::&lt;i64&gt;(<span class="string">&quot;refer&quot;</span>),
+            index: edge.get::&lt;i64&gt;(<span class="string">&quot;index&quot;</span>).ok(),
+            refer: edge.get::&lt;i64&gt;(<span class="string">&quot;refer&quot;</span>).ok(),
         };
         edge_list.push(modeledge);
     }
@@ -1341,6 +1352,7 @@
             // initialize trackers
             </span><span class="kw">let </span><span class="kw-2">mut </span>node_start = node_index;
             <span class="kw">let </span><span class="kw-2">mut </span>node_end = node_index;
+            <span class="kw">let </span><span class="kw-2">mut </span>i_inner_nodes = Vec::&lt;NodeIndex&gt;::new();
 
             <span class="comment">// find end node and track path
             </span><span class="kw">for </span>node <span class="kw">in </span>graph.neighbors_directed(node_index, Outgoing) {
@@ -1353,7 +1365,7 @@
                 </span>{
                     <span class="kw">let </span><span class="kw-2">mut </span>temp = to_terminal(graph.clone(), node);
                     node_end = temp.<span class="number">0</span>;
-                    inner_nodes.append(<span class="kw-2">&amp;mut </span>temp.<span class="number">1</span>);
+                    i_inner_nodes.append(<span class="kw-2">&amp;mut </span>temp.<span class="number">1</span>);
                 }
             }
 
@@ -1361,12 +1373,12 @@
             </span><span class="kw">for </span>node <span class="kw">in </span>graph.neighbors_directed(node_index, Incoming) {
                 <span class="kw">let </span><span class="kw-2">mut </span>temp = to_primitive(graph.clone(), node);
                 node_start = temp.<span class="number">0</span>;
-                inner_nodes.append(<span class="kw-2">&amp;mut </span>temp.<span class="number">1</span>);
+                i_inner_nodes.append(<span class="kw-2">&amp;mut </span>temp.<span class="number">1</span>);
             }
 
             <span class="comment">// add edge from start to end node, with weight from start node a matching outgoing node form it
             </span><span class="kw">for </span>node <span class="kw">in </span>graph.clone().neighbors_directed(node_start, Outgoing) {
-                <span class="kw">for </span>node_p <span class="kw">in </span>inner_nodes.iter() {
+                <span class="kw">for </span>node_p <span class="kw">in </span>i_inner_nodes.iter() {
                     <span class="kw">if </span>node == <span class="kw-2">*</span>node_p {
                         graph_clone.add_edge(
                             node_start,
@@ -1382,14 +1394,14 @@
             }
             <span class="comment">// we keep track all the node indexes we found while tracing the path and delete all
             // intermediate nodes.
-            </span>inner_nodes.push(node_index);
+            </span>i_inner_nodes.push(node_index);
+            inner_nodes.append(<span class="kw-2">&amp;mut </span>i_inner_nodes.clone());
         }
     }
     inner_nodes.sort();
     <span class="kw">for </span>node <span class="kw">in </span>inner_nodes.iter().rev() {
         graph_clone.remove_node(<span class="kw-2">*</span>node);
     }
-
     graph_clone
 }
 

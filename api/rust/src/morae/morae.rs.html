@@ -140,6 +140,7 @@
 <a href="#140" id="140">140</a>
 <a href="#141" id="141">141</a>
 <a href="#142" id="142">142</a>
+<a href="#143" id="143">143</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>clap::Parser;
 
 <span class="kw">pub use </span>mathml::mml2pn::{ACSet, Term};
@@ -228,10 +229,11 @@
         }
         <span class="macro">println!</span>(<span class="string">&quot;{:?}&quot;</span>, ids.clone());
         <span class="kw">let </span>math_content = module_id2mathml_MET_ast(ids[ids.len() - <span class="number">1</span>], config.clone()).<span class="kw">await</span>;
-        <span class="macro">println!</span>(<span class="string">&quot;{:?}&quot;</span>, math_content.clone());
-        <span class="macro">println!</span>(<span class="string">&quot;\nAMR from code: {:?}&quot;</span>, PetriNet::from(math_content));
+        <span class="kw">let </span>pn_amr = PetriNet::from(math_content);
+        <span class="comment">//println!(&quot;{:?}&quot;, math_content.clone());
+        //println!(&quot;\nAMR from code: {:?}&quot;, PetriNet::from(math_content));
 
-        <span class="comment">//let input_src = &quot;../../data/mml2pn_inputs/testing_eqns/sidarthe_mml.txt&quot;;
+        //let input_src = &quot;../../data/mml2pn_inputs/testing_eqns/sidarthe_mml.txt&quot;;
 
         // This does get a panic with a message, so need to figure out how to forward it
         //let _mathml_ast = get_mathml_asts_from_file(input_src.clone());

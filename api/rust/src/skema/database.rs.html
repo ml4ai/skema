@@ -5694,6 +5694,17 @@
 <a href="#5694" id="5694">5694</a>
 <a href="#5695" id="5695">5695</a>
 <a href="#5696" id="5696">5696</a>
+<a href="#5697" id="5697">5697</a>
+<a href="#5698" id="5698">5698</a>
+<a href="#5699" id="5699">5699</a>
+<a href="#5700" id="5700">5700</a>
+<a href="#5701" id="5701">5701</a>
+<a href="#5702" id="5702">5702</a>
+<a href="#5703" id="5703">5703</a>
+<a href="#5704" id="5704">5704</a>
+<a href="#5705" id="5705">5705</a>
+<a href="#5706" id="5706">5706</a>
+<a href="#5707" id="5707">5707</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Interface to the graph database we are using for persisting GroMEt objects and performing
 //! queries on them. We currently use MemgraphDB, an in-memory graph database.
 
@@ -7280,6 +7291,7 @@ There being a second function call of the same function which contains an expres
                     new_c_args.box_counter = box_counter;
                     new_c_args.cur_box = att_sub_box.clone();
                     new_c_args.att_idx = c_args.att_idx;
+                    new_c_args.att_bf_idx = c_args.att_bf_idx;
                     <span class="kw">match </span>att_sub_box.function_type {
                         FunctionType::Function =&gt; {
                             new_c_args.att_idx = att_sub_box.contents.unwrap() <span class="kw">as </span>usize;
@@ -7306,6 +7318,7 @@ There being a second function call of the same function which contains an expres
                         }
                         FunctionType::Expression =&gt; {
                             new_c_args.att_idx = att_sub_box.contents.unwrap() <span class="kw">as </span>usize;
+                            new_c_args.att_bf_idx = c_args.att_idx;
                             create_att_expression(
                                 gromet, <span class="comment">// gromet for metadata
                                 </span>nodes,  <span class="comment">// nodes
@@ -9280,6 +9293,13 @@ There being a second function call of the same function which contains an expres
                 }
             }
         }
+        <span class="kw">if </span>opo_name.is_empty() {
+            <span class="macro">println!</span>(
+                <span class="string">&quot;Missed Opo at att_idx: {:?} and box_counter: {:?}&quot;</span>,
+                c_args.att_idx, c_args.box_counter
+            );
+            <span class="macro">println!</span>(<span class="string">&quot;parent att box: {:?}&quot;</span>, c_args.att_bf_idx);
+        }
         <span class="kw">if </span>!opo_name.clone().is_empty() {
             <span class="kw">let </span><span class="kw-2">mut </span>oport: u32 = <span class="number">0</span>;
             <span class="kw">for </span>_op <span class="kw">in </span>att_box.opo.as_ref().unwrap().iter() {
@@ -9442,6 +9462,7 @@ There being a second function call of the same function which contains an expres
             new_c_args.box_counter = box_counter;
             new_c_args.cur_box = att_sub_box.clone();
             new_c_args.att_idx = c_args.att_idx;
+            new_c_args.att_bf_idx = c_args.att_bf_idx;
             <span class="kw">match </span>att_sub_box.function_type {
                 FunctionType::Literal =&gt; {
                     create_att_literal(
@@ -9465,6 +9486,7 @@ There being a second function call of the same function which contains an expres
                 }
                 FunctionType::Expression =&gt; {
                     new_c_args.att_idx = att_sub_box.contents.unwrap() <span class="kw">as </span>usize;
+                    new_c_args.att_bf_idx = c_args.att_idx;
                     create_att_expression(
                         gromet, <span class="comment">// gromet for metadata
                         </span>nodes,  <span class="comment">// nodes
