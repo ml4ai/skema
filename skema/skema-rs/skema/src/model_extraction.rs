@@ -4,10 +4,8 @@ use crate::ValueL;
 use mathml::ast::operator::Operator;
 pub use mathml::mml2pn::{ACSet, Term};
 
-
 use petgraph::prelude::*;
 use petgraph::visit::IntoNeighborsDirected;
-
 
 use std::string::ToString;
 
