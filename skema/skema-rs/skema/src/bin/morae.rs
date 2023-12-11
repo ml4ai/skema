@@ -86,8 +86,9 @@ async fn main() {
         }
         println!("{:?}", ids.clone());
         let math_content = module_id2mathml_MET_ast(ids[ids.len() - 1], config.clone()).await;
-        println!("{:?}", math_content.clone());
-        println!("\nAMR from code: {:?}", PetriNet::from(math_content));
+        let pn_amr = PetriNet::from(math_content);
+        //println!("{:?}", math_content.clone());
+        //println!("\nAMR from code: {:?}", PetriNet::from(math_content));
 
         //let input_src = "../../data/mml2pn_inputs/testing_eqns/sidarthe_mml.txt";
 
