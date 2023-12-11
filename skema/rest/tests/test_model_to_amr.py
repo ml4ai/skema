@@ -78,7 +78,7 @@ def test_any_amr_chime_sir():
         else:
             if blocks == 2:
                 temp = "".join(blobs[i].splitlines(keepends=True)[import_begin[i]:import_end[i]])
-                blobs[i] = temp + "\n" + blobs[i].splitlines(keepends=True)[line_begin[i]:line_end[i]]
+                blobs[i] = temp + "\n" + "".join(blobs[i].splitlines(keepends=True)[line_begin[i]:line_end[i]])
             else:
                 blobs[i] = "".join(blobs[i].splitlines(keepends=True)[line_begin[i]:line_end[i]])
             try:
@@ -175,7 +175,7 @@ def test_any_amr_sidarthe():
         else:
             if blocks == 2:
                 temp = "".join(blobs[i].splitlines(keepends=True)[import_begin[i]:import_end[i]])
-                blobs[i] = temp + "\n" + blobs[i].splitlines(keepends=True)[line_begin[i]:line_end[i]]
+                blobs[i] = temp + "\n" + "".join(blobs[i].splitlines(keepends=True)[line_begin[i]:line_end[i]])
             else:
                 blobs[i] = "".join(blobs[i].splitlines(keepends=True)[line_begin[i]:line_end[i]])
             try:
