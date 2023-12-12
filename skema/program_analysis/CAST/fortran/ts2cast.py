@@ -10,6 +10,7 @@ from skema.program_analysis.CAST2FN.cast import CAST
 from skema.program_analysis.CAST2FN.model.cast import (
     Module,
     SourceRef,
+    ModelBreak,
     Assignment,
     LiteralValue,
     Var,
@@ -45,6 +46,16 @@ from skema.program_analysis.CAST.fortran.util import generate_dummy_source_refs
 from skema.program_analysis.CAST.fortran.preprocessor.preprocess import preprocess
 from skema.program_analysis.tree_sitter_parsers.build_parsers import INSTALLED_LANGUAGES_FILEPATH
 
+builtin_statements = set(
+    [
+        "read_statement",
+        "write_statement",
+        "rewind_statement",
+        "open_statement",
+        "common_statement",
+        "print_statement"
+    ]
+)
 class TS2CAST(object):
     def __init__(self, source_file_path: str):
         # Prepare source with preprocessor
@@ -69,7 +80,7 @@ class TS2CAST(object):
 
         # Start visiting
         self.out_cast = self.generate_cast()
-        #print(self.out_cast[0].to_json_str())
+        print(self.out_cast[0].to_json_str())
         
     def generate_cast(self) -> List[CAST]:
         '''Interface for generating CAST.'''
@@ -138,8 +149,8 @@ class TS2CAST(object):
             return self.visit_literal(node)
         elif node.type == "keyword_statement":
             return self.visit_keyword_statement(node)
-        elif node.type == "print_statement":
-            return self.visit_print_statement(node)
+        elif node.type in builtin_statements:
+            return self.visit_fortran_builtin_statement(node)
         elif node.type == "extent_specifier":
             return self.visit_extent_specifier(node)
         elif node.type in ["do_loop_statement"]:
@@ -265,7 +276,7 @@ class TS2CAST(object):
                     self.node_helper.get_identifier(parameter)
                 )
                 func_args.append(self.visit(parameter))
-
+ 
         # The first child of function will be the function statement, the rest will be body nodes
         body = []
         for body_node in node.children[1:]:
@@ -306,8 +317,8 @@ class TS2CAST(object):
         # A subroutine and function won't neccessarily have an arguments node.
         # So we should be careful about trying to access it.
 
+        
         function_node = get_children_by_types(node, ["unary_expression", "subroutine", "identifier", "derived_type_member_expression"])[0]
-
         if function_node.type == "derived_type_member_expression":
             return self.visit_derived_type_member_expression(function_node)
         
@@ -351,6 +362,7 @@ class TS2CAST(object):
             source_refs=[self.node_helper.get_source_ref(node)],
         )
 
+   
     def visit_keyword_statement(self, node):
         # NOTE: RETURN is not the only Fortran keyword. GO TO and CONTINUE are also considered keywords.
         # TODO: Handle GO TO and CONTINUE
@@ -358,6 +370,10 @@ class TS2CAST(object):
         if node.type == "keyword_statement":
             if "continue" in identifier or "go to" in identifier:
                 return self._visit_no_op(node)
+            if "exit" in identifier:
+                return ModelBreak(
+                    source_refs = [self.node_helper.get_source_ref(node)]
+                )
             
         # In Fortran the return statement doesn't return a value (there is the obsolete "alternative return")
         # We keep track of values that need to be returned in the variable context
@@ -381,6 +397,23 @@ class TS2CAST(object):
 
         return ModelReturn(
             value=value, source_refs=[self.node_helper.get_source_ref(node)]
+        )
+
+    def visit_fortran_builtin_statement(self, node):
+        """Visitor for Fortran keywords that are not classified as keyword_statement by tree-sitter"""
+        # All of the node types that fall into this category end with _statment.
+        # So the function name will be the node type with _statement removed (write, read, open, ...)
+        func = self.get_gromet_function_node(node.type.replace("_statement", ""))
+        
+
+        arguments = []
+
+        return Call(
+            func=func,
+            arguments=arguments,
+            source_language="Fortran",
+            source_language_version=None,
+            source_refs=[self.node_helper.get_source_ref(node)] 
         )
 
     def visit_print_statement(self, node):
@@ -454,15 +487,13 @@ class TS2CAST(object):
             (body) ...
         """
         
-        # First check for
-        # TODO: Add do until Loop support
-        while_statement_node = get_first_child_by_type(node, "while_statement")
-        if while_statement_node:
+
+        loop_control_node= get_first_child_by_type(node, "loop_contrel_expression")
+        if not loop_control_node:
             return self._visit_while(node)
 
         # If there is a loop control expression, the first body node will be the node after the loop_control_expression
         # It is valid Fortran to have a single itteration do loop as well.
-        # TODO: Add support for single itteration do-loop
         # NOTE: This code is for the creation of the main body. The do loop will still add some additional nodes at the end of this body.
         body = []
         body_start_index = 1 + get_first_child_index(node, "loop_control_expression")
@@ -1087,23 +1118,25 @@ class TS2CAST(object):
         """
         while_statement_node = get_first_child_by_type(node, "while_statement")
 
+        # Fortran has certain while(True) constructs that won't contain a while_statement node
+        if not while_statement_node:
+            body_start_index = 0
+            expr = LiteralValue(
+                value_type="Boolean",
+                value="True",
+            )
+        else:
+            body_start_index = 1 + get_first_child_index(node, "while_statement")
+            # We don't have explicit handling for parenthesized_expression, but the passthrough handler will make sure that we visit the expression correctly.
+            expr = self.visit(
+                get_first_child_by_type(while_statement_node, "parenthesized_expression")
+            )
+
         # The first body node will be the node after the while_statement
-        body = []
-        body_start_index = 1 + get_first_child_index(node, "while_statement")
-        for body_node in node.children[body_start_index:]:
-            child_cast = self.visit(body_node)
-            if isinstance(child_cast, List):
-                body.extend(child_cast)
-            elif isinstance(child_cast, AstNode):
-                body.append(child_cast)
-
-        # We don't have explicit handling for parenthesized_expression, but the passthrough handler will make sure that we visit the expression correctly.
-        expr = self.visit(
-            get_first_child_by_type(while_statement_node, "parenthesized_expression")
-        )
-
+        body = self.generate_cast_body(node.children[body_start_index:])
+      
         return Loop(
-            pre=[],  # TODO: Should pre and post contain anything?
+            pre=[],
             expr=expr,
             body=body,
             post=[],
@@ -1175,3 +1208,7 @@ class TS2CAST(object):
             elif isinstance(cast, List):
                 body.extend(cast)
         return body
+
+#TS2CAST("drotmg.f")
+#import cProfile
+#cProfile.run("TS2CAST('he_coef0_dres.F')", sort="tottime")
