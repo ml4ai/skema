@@ -1,10 +1,10 @@
 use crate::config::Config;
+use crate::ValueL;
 
 use mathml::ast::operator::Operator;
 pub use mathml::mml2pn::{ACSet, Term};
 
 use petgraph::prelude::*;
-use petgraph::visit::IntoNeighborsDirected;
 
 use std::string::ToString;
 
@@ -26,7 +26,7 @@ pub struct ModelNode {
     id: i64,
     label: String,
     name: Option<String>,
-    value: Option<String>,
+    value: Option<ValueL>,
 }
 
 /// This struct is the edge struct for the constructed petgraph
@@ -197,6 +197,7 @@ pub async fn subgrapg2_core_dyn_MET_ast(
             }
         }
         if sub_w.node_count() > 3 && !(prim_counter == 1 && has_call) && prim_counter != 0 {
+            println!("--------------------");
             println!("expression: {}", graph[expression_nodes[i]].id);
             // the call expressions get referenced by multiple top level expressions, so deleting the nodes in it breaks the other graphs. Need to pass clone of expression subgraph so references to original has all the nodes.
             if has_call {
@@ -300,9 +301,15 @@ pub fn get_args_MET(
             args.push(rhs.clone());
         } else {
             // asummption it is atomic
-            let temp_string = graph[node].name.as_ref().unwrap().clone();
-            let arg2 = MathExpressionTree::Atom(MathExpression::Mi(Mi(temp_string.clone())));
-            args.push(arg2.clone());
+            if graph[node].label.clone() == *"Literal" {
+                let temp_string = graph[node].value.clone().unwrap().value.replace('\"', "");
+                let arg2 = MathExpressionTree::Atom(MathExpression::Mi(Mi(temp_string.clone())));
+                args.push(arg2.clone());
+            } else {
+                let temp_string = graph[node].name.as_ref().unwrap().clone();
+                let arg2 = MathExpressionTree::Atom(MathExpression::Mi(Mi(temp_string.clone())));
+                args.push(arg2.clone());
+            }
         }
 
         // construct order of args
@@ -313,10 +320,8 @@ pub fn get_args_MET(
             .unwrap();
         arg_order.push(x);
     }
-
     // fix order of args
     let mut ordered_args = args.clone();
-
     for (i, ind) in arg_order.iter().enumerate() {
         // the ind'th element of order_args is the ith element of the unordered args
         if ordered_args.len() > *ind as usize {
@@ -450,11 +455,11 @@ async fn subgraph_wiring(
         let node: neo4rs::Node = row.get("nodes2").unwrap();
         let modelnode = ModelNode {
             id: node.id(),
-            label: node.labels()[0].clone(),
-            name: node.get::<String>("name"),
-            value: node.get::<String>("value"),
+            label: node.labels()[0].to_string(),
+            name: node.get::<String>("name").ok(),
+            value: node.get::<ValueL>("value").ok(),
         };
-        node_list.push(modelnode);
+        node_list.push(modelnode.clone());
     }
     // edge query
     let mut result2 = graph
@@ -476,8 +481,8 @@ async fn subgraph_wiring(
             id: edge.id(),
             src_id: edge.start_node_id(),
             tgt_id: edge.end_node_id(),
-            index: edge.get::<i64>("index"),
-            refer: edge.get::<i64>("refer"),
+            index: edge.get::<i64>("index").ok(),
+            refer: edge.get::<i64>("refer").ok(),
         };
         edge_list.push(modeledge);
     }
@@ -573,9 +578,9 @@ pub async fn get_subgraph(
         let node: neo4rs::Node = row.get("nodes2").unwrap();
         let modelnode = ModelNode {
             id: node.id(),
-            label: node.labels()[0].clone(),
-            name: node.get::<String>("name"),
-            value: node.get::<String>("value"),
+            label: node.labels()[0].to_string(),
+            name: node.get::<String>("name").ok(),
+            value: node.get::<ValueL>("value").ok(),
         };
         node_list.push(modelnode);
     }
@@ -598,8 +603,8 @@ pub async fn get_subgraph(
             id: edge.id(),
             src_id: edge.start_node_id(),
             tgt_id: edge.end_node_id(),
-            index: edge.get::<i64>("index"),
-            refer: edge.get::<i64>("refer"),
+            index: edge.get::<i64>("index").ok(),
+            refer: edge.get::<i64>("refer").ok(),
         };
         edge_list.push(modeledge);
     }
@@ -624,6 +629,7 @@ pub fn trim_calls(
             // initialize trackers
             let mut node_start = node_index;
             let mut node_end = node_index;
+            let mut i_inner_nodes = Vec::<NodeIndex>::new();
 
             // find end node and track path
             for node in graph.neighbors_directed(node_index, Outgoing) {
@@ -636,7 +642,7 @@ pub fn trim_calls(
                 {
                     let mut temp = to_terminal(graph.clone(), node);
                     node_end = temp.0;
-                    inner_nodes.append(&mut temp.1);
+                    i_inner_nodes.append(&mut temp.1);
                 }
             }
 
@@ -644,12 +650,12 @@ pub fn trim_calls(
             for node in graph.neighbors_directed(node_index, Incoming) {
                 let mut temp = to_primitive(graph.clone(), node);
                 node_start = temp.0;
-                inner_nodes.append(&mut temp.1);
+                i_inner_nodes.append(&mut temp.1);
             }
 
             // add edge from start to end node, with weight from start node a matching outgoing node form it
             for node in graph.clone().neighbors_directed(node_start, Outgoing) {
-                for node_p in inner_nodes.iter() {
+                for node_p in i_inner_nodes.iter() {
                     if node == *node_p {
                         graph_clone.add_edge(
                             node_start,
@@ -665,14 +671,14 @@ pub fn trim_calls(
             }
             // we keep track all the node indexes we found while tracing the path and delete all
             // intermediate nodes.
-            inner_nodes.push(node_index);
+            i_inner_nodes.push(node_index);
+            inner_nodes.append(&mut i_inner_nodes.clone());
         }
     }
     inner_nodes.sort();
     for node in inner_nodes.iter().rev() {
         graph_clone.remove_node(*node);
     }
-
     graph_clone
 }
 

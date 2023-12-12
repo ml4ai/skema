@@ -367,7 +367,6 @@ impl From<Vec<FirstOrderODE>> for PetriNet {
                 terms.push(term.clone());
             }
         }
-
         for term in terms.iter() {
             for param in &term.parameters {
                 let parameters = Parameter {
@@ -425,7 +424,6 @@ impl From<Vec<FirstOrderODE>> for PetriNet {
         for i in paired_term_indices.iter().rev() {
             terms.remove(*i);
         }
-
         // Now we replace unpaired terms with subterms, by their subterms and repeat the process
 
         // but first we need to inherit the dynamic state to each sub term
