@@ -332,6 +332,12 @@ class MatlabToCast(object):
                 step = numbers[1]
                 stop = numbers[2]
 
+            range_name_node = self.variable_context.get_gromet_function_node("range")
+            iter_name_node = self.variable_context.get_gromet_function_node("iter")
+            next_name_node = self.variable_context.get_gromet_function_node("next")
+            generated_iter_name_node = self.variable_context.generate_iterator()
+            stop_condition_name_node = self.variable_context.generate_stop_condition()
+
             return Loop(
                 pre = [
                     Assignment(
@@ -554,6 +560,10 @@ class MatlabToCast(object):
             operands = operands,
             source_refs = source_refs
         )
+
+    def get_gromet_function_node(self, func_name: str) -> Name:
+        if self.variable_context.is_variable(func_name):
+            return self.variable_context.get_node(func_name)
 
     # skip control nodes and other junk
     def _visit_passthrough(self, node):

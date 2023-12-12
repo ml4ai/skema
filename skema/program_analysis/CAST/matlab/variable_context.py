@@ -72,3 +72,18 @@ class VariableContext(object):
 
     def get_type(self, symbol: str) -> str:
         return self.all_symbols[symbol]["type"]
+
+    def get_gromet_function_node(self, func_name: str) -> Name:
+        if self.is_variable(func_name):
+            return self.get_node(func_name)
+
+    def generate_iterator(self):
+        symbol = f"generated_iter_{self.iterator_id}"
+        self.iterator_id += 1
+        return self.add_variable(symbol, "iterator", None)
+
+    def generate_stop_condition(self):
+        symbol = f"sc_{self.stop_condition_id}"
+        self.stop_condition_id += 1
+        return self.add_variable(symbol, "boolean", None)
+
