@@ -5705,6 +5705,19 @@
 <a href="#5705" id="5705">5705</a>
 <a href="#5706" id="5706">5706</a>
 <a href="#5707" id="5707">5707</a>
+<a href="#5708" id="5708">5708</a>
+<a href="#5709" id="5709">5709</a>
+<a href="#5710" id="5710">5710</a>
+<a href="#5711" id="5711">5711</a>
+<a href="#5712" id="5712">5712</a>
+<a href="#5713" id="5713">5713</a>
+<a href="#5714" id="5714">5714</a>
+<a href="#5715" id="5715">5715</a>
+<a href="#5716" id="5716">5716</a>
+<a href="#5717" id="5717">5717</a>
+<a href="#5718" id="5718">5718</a>
+<a href="#5719" id="5719">5719</a>
+<a href="#5720" id="5720">5720</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Interface to the graph database we are using for persisting GroMEt objects and performing
 //! queries on them. We currently use MemgraphDB, an in-memory graph database.
 
@@ -6099,12 +6112,25 @@ There being a second function call of the same function which contains an expres
 
 <span class="kw">fn </span>create_graph_queries(gromet: <span class="kw-2">&amp;</span>ModuleCollection, start: u32) -&gt; Vec&lt;String&gt; {
     <span class="kw">let </span><span class="kw-2">mut </span>queries: Vec&lt;String&gt; = <span class="macro">vec!</span>[];
+    <span class="kw">let </span><span class="kw-2">mut </span>only_imports = <span class="bool-val">true</span>;
     <span class="comment">// if a library module need to walk through gromet differently
     </span><span class="kw">if </span>gromet.modules[<span class="number">0</span>].r#fn.bf.is_none() {
         queries.append(<span class="kw-2">&amp;mut </span>create_function_net_lib(gromet, start));
     } <span class="kw">else </span>{
         <span class="comment">// if executable code
-        </span>queries.append(<span class="kw-2">&amp;mut </span>create_function_net(gromet, start));
+        </span><span class="kw">for </span>bf <span class="kw">in </span>gromet.modules[<span class="number">0</span>].r#fn.bf.as_ref().unwrap().iter() {
+            <span class="kw">if </span>bf.function_type != FunctionType::Imported
+                &amp;&amp; bf.function_type != FunctionType::ImportedMethod
+            {
+                only_imports = <span class="bool-val">false</span>;
+            }
+        }
+        <span class="macro">println!</span>(<span class="string">&quot;{}&quot;</span>, only_imports);
+        <span class="kw">if </span>only_imports {
+            queries.append(<span class="kw-2">&amp;mut </span>create_function_net_lib(gromet, start));
+        } <span class="kw">else </span>{
+            queries.append(<span class="kw-2">&amp;mut </span>create_function_net(gromet, start));
+        }
     }
     queries
 }
