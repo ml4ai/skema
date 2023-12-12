@@ -136,6 +136,10 @@ class TS2CAST(object):
             return self.visit_return(node)
         elif node.type == &#34;call&#34;:
             return self.visit_call(node)
+        elif node.type == &#34;if_statement&#34;:
+            return self.visit_if_statement(node)
+        elif node.type == &#34;comparison_operator&#34;:
+            return self.visit_comparison_op(node)
         elif node.type == &#34;assignment&#34;:
             return self.visit_assignment(node)
         elif node.type == &#34;identifier&#34;:
@@ -256,6 +260,84 @@ class TS2CAST(object):
             source_refs=[ref]
         )
 
+    def visit_comparison_op(self, node: Node):
+        ref = self.node_helper.get_source_ref(node)
+        op = get_op(self.node_helper.get_operator(node.children[1]))
+        left, _, right = node.children
+
+        left_cast = get_name_node(self.visit(left))
+        right_cast = get_name_node(self.visit(right))
+
+        return Operator(
+            op=op, 
+            operands=[left_cast, right_cast], 
+            source_refs=[ref]
+        )
+
+    def visit_if_statement(self, node: Node) -&gt; ModelIf:
+        if_condition = self.visit(get_first_child_by_type(node, &#34;comparison_operator&#34;))
+
+        # Get the body of the if true part
+        if_true = get_children_by_types(node, &#34;block&#34;)[0].children
+
+        # Because in tree-sitter the else if, and else aren&#39;t nested, but they&#39;re 
+        # in a flat level order, we need to do some arranging of the pieces
+        # in order to get the correct CAST nested structure that we use
+        # Visit all the alternatives, generate CAST for each one
+        # and then join them all together
+        alternatives = get_children_by_types(node, [&#34;elif_clause&#34;,&#34;else_clause&#34;])
+
+        if_true_cast = []
+        for node in if_true: 
+            cast = self.visit(node)
+            if isinstance(cast, List):
+                if_true_cast.extend(cast)
+            elif isinstance(cast, AstNode):
+                if_true_cast.append(cast)
+
+        # If we have ts nodes in alternatives, then we&#39;re guaranteed
+        # at least an else at the end of the if-statement construct
+        # We generate the cast for the final else statement, and then
+        # reverse the rest of the if-elses that we have, so we can 
+        # create the CAST correctly
+        final_else_cast = [] 
+        if len(alternatives) &gt; 0:
+            final_else = alternatives.pop() 
+            alternatives.reverse()
+            final_else_body = get_children_by_types(final_else, &#34;block&#34;)[0].children
+            for node in final_else_body:
+                cast = self.visit(node)
+                if isinstance(cast, List):
+                    final_else_cast.extend(cast)
+                elif isinstance(cast, AstNode):
+                    final_else_cast.append(cast)
+        
+        # We go through any additional if-else nodes that we may have,
+        # generating their ModelIf CAST and appending the tail of the 
+        # overall if-else construct, starting with the else at the very end
+        # We do this tail appending so that when we finish generating CAST the
+        # resulting ModelIf CAST is in the correct order
+        alternatives_cast = None
+        for ts_node in alternatives:
+            assert ts_node.type == &#34;elif_clause&#34;
+            temp_cast = self.visit_if_statement(ts_node)
+            if alternatives_cast == None:
+                temp_cast.orelse = final_else_cast
+            else:
+                temp_cast.orelse = [alternatives_cast]
+            alternatives_cast = temp_cast
+
+        if alternatives_cast == None:
+            if_false_cast = final_else_cast 
+        else:
+            if_false_cast = [alternatives_cast]
+
+        return ModelIf(
+            expr=if_condition, 
+            body=if_true_cast, 
+            orelse=if_false_cast, 
+            source_refs=[self.node_helper.get_source_ref(node)]
+        )
 
     def visit_assignment(self, node: Node) -&gt; Assignment:
         left, _, right = node.children
@@ -304,7 +386,6 @@ class TS2CAST(object):
             Binary Ops
             left OP right
             where left and right can either be operators or literals
-        
         &#34;&#34;&#34;
         ref = self.node_helper.get_source_ref(node)
         op = get_op(self.node_helper.get_operator(node.children[1]))
@@ -501,6 +582,10 @@ def get_name_node(node):
             return self.visit_return(node)
         elif node.type == &#34;call&#34;:
             return self.visit_call(node)
+        elif node.type == &#34;if_statement&#34;:
+            return self.visit_if_statement(node)
+        elif node.type == &#34;comparison_operator&#34;:
+            return self.visit_comparison_op(node)
         elif node.type == &#34;assignment&#34;:
             return self.visit_assignment(node)
         elif node.type == &#34;identifier&#34;:
@@ -621,6 +706,84 @@ def get_name_node(node):
             source_refs=[ref]
         )
 
+    def visit_comparison_op(self, node: Node):
+        ref = self.node_helper.get_source_ref(node)
+        op = get_op(self.node_helper.get_operator(node.children[1]))
+        left, _, right = node.children
+
+        left_cast = get_name_node(self.visit(left))
+        right_cast = get_name_node(self.visit(right))
+
+        return Operator(
+            op=op, 
+            operands=[left_cast, right_cast], 
+            source_refs=[ref]
+        )
+
+    def visit_if_statement(self, node: Node) -&gt; ModelIf:
+        if_condition = self.visit(get_first_child_by_type(node, &#34;comparison_operator&#34;))
+
+        # Get the body of the if true part
+        if_true = get_children_by_types(node, &#34;block&#34;)[0].children
+
+        # Because in tree-sitter the else if, and else aren&#39;t nested, but they&#39;re 
+        # in a flat level order, we need to do some arranging of the pieces
+        # in order to get the correct CAST nested structure that we use
+        # Visit all the alternatives, generate CAST for each one
+        # and then join them all together
+        alternatives = get_children_by_types(node, [&#34;elif_clause&#34;,&#34;else_clause&#34;])
+
+        if_true_cast = []
+        for node in if_true: 
+            cast = self.visit(node)
+            if isinstance(cast, List):
+                if_true_cast.extend(cast)
+            elif isinstance(cast, AstNode):
+                if_true_cast.append(cast)
+
+        # If we have ts nodes in alternatives, then we&#39;re guaranteed
+        # at least an else at the end of the if-statement construct
+        # We generate the cast for the final else statement, and then
+        # reverse the rest of the if-elses that we have, so we can 
+        # create the CAST correctly
+        final_else_cast = [] 
+        if len(alternatives) &gt; 0:
+            final_else = alternatives.pop() 
+            alternatives.reverse()
+            final_else_body = get_children_by_types(final_else, &#34;block&#34;)[0].children
+            for node in final_else_body:
+                cast = self.visit(node)
+                if isinstance(cast, List):
+                    final_else_cast.extend(cast)
+                elif isinstance(cast, AstNode):
+                    final_else_cast.append(cast)
+        
+        # We go through any additional if-else nodes that we may have,
+        # generating their ModelIf CAST and appending the tail of the 
+        # overall if-else construct, starting with the else at the very end
+        # We do this tail appending so that when we finish generating CAST the
+        # resulting ModelIf CAST is in the correct order
+        alternatives_cast = None
+        for ts_node in alternatives:
+            assert ts_node.type == &#34;elif_clause&#34;
+            temp_cast = self.visit_if_statement(ts_node)
+            if alternatives_cast == None:
+                temp_cast.orelse = final_else_cast
+            else:
+                temp_cast.orelse = [alternatives_cast]
+            alternatives_cast = temp_cast
+
+        if alternatives_cast == None:
+            if_false_cast = final_else_cast 
+        else:
+            if_false_cast = [alternatives_cast]
+
+        return ModelIf(
+            expr=if_condition, 
+            body=if_true_cast, 
+            orelse=if_false_cast, 
+            source_refs=[self.node_helper.get_source_ref(node)]
+        )
 
     def visit_assignment(self, node: Node) -&gt; Assignment:
         left, _, right = node.children
@@ -669,7 +832,6 @@ def get_name_node(node):
             Binary Ops
             left OP right
             where left and right can either be operators or literals
-        
         &#34;&#34;&#34;
         ref = self.node_helper.get_source_ref(node)
         op = get_op(self.node_helper.get_operator(node.children[1]))
@@ -807,6 +969,10 @@ def get_name_node(node):
         return self.visit_return(node)
     elif node.type == &#34;call&#34;:
         return self.visit_call(node)
+    elif node.type == &#34;if_statement&#34;:
+        return self.visit_if_statement(node)
+    elif node.type == &#34;comparison_operator&#34;:
+        return self.visit_comparison_op(node)
     elif node.type == &#34;assignment&#34;:
         return self.visit_assignment(node)
     elif node.type == &#34;identifier&#34;:
@@ -862,7 +1028,6 @@ where left and right can either be operators or literals</p></div>
         Binary Ops
         left OP right
         where left and right can either be operators or literals
-    
     &#34;&#34;&#34;
     ref = self.node_helper.get_source_ref(node)
     op = get_op(self.node_helper.get_operator(node.children[1]))
@@ -907,6 +1072,30 @@ where left and right can either be operators or literals</p></div>
     return Call(
         func=func_name.val, 
         arguments=func_args, 
+        source_refs=[ref]
+    )</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_comparison_op"><code class="name flex">
+<span>def <span class="ident">visit_comparison_op</span></span>(<span>self, node: tree_sitter.Node)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def visit_comparison_op(self, node: Node):
+    ref = self.node_helper.get_source_ref(node)
+    op = get_op(self.node_helper.get_operator(node.children[1]))
+    left, _, right = node.children
+
+    left_cast = get_name_node(self.visit(left))
+    right_cast = get_name_node(self.visit(right))
+
+    return Operator(
+        op=op, 
+        operands=[left_cast, right_cast], 
         source_refs=[ref]
     )</code></pre>
 </details>
@@ -1013,6 +1202,81 @@ where left and right can either be operators or literals</p></div>
         val=value,
         type=var_type,
         default_value=default_value,
+        source_refs=[self.node_helper.get_source_ref(node)]
+    )</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_if_statement"><code class="name flex">
+<span>def <span class="ident">visit_if_statement</span></span>(<span>self, node: tree_sitter.Node) ‑> <a title="skema.program_analysis.CAST2FN.model.cast.model_if.ModelIf" href="../../CAST2FN/model/cast/model_if.html#skema.program_analysis.CAST2FN.model.cast.model_if.ModelIf">ModelIf</a></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def visit_if_statement(self, node: Node) -&gt; ModelIf:
+    if_condition = self.visit(get_first_child_by_type(node, &#34;comparison_operator&#34;))
+
+    # Get the body of the if true part
+    if_true = get_children_by_types(node, &#34;block&#34;)[0].children
+
+    # Because in tree-sitter the else if, and else aren&#39;t nested, but they&#39;re 
+    # in a flat level order, we need to do some arranging of the pieces
+    # in order to get the correct CAST nested structure that we use
+    # Visit all the alternatives, generate CAST for each one
+    # and then join them all together
+    alternatives = get_children_by_types(node, [&#34;elif_clause&#34;,&#34;else_clause&#34;])
+
+    if_true_cast = []
+    for node in if_true: 
+        cast = self.visit(node)
+        if isinstance(cast, List):
+            if_true_cast.extend(cast)
+        elif isinstance(cast, AstNode):
+            if_true_cast.append(cast)
+
+    # If we have ts nodes in alternatives, then we&#39;re guaranteed
+    # at least an else at the end of the if-statement construct
+    # We generate the cast for the final else statement, and then
+    # reverse the rest of the if-elses that we have, so we can 
+    # create the CAST correctly
+    final_else_cast = [] 
+    if len(alternatives) &gt; 0:
+        final_else = alternatives.pop() 
+        alternatives.reverse()
+        final_else_body = get_children_by_types(final_else, &#34;block&#34;)[0].children
+        for node in final_else_body:
+            cast = self.visit(node)
+            if isinstance(cast, List):
+                final_else_cast.extend(cast)
+            elif isinstance(cast, AstNode):
+                final_else_cast.append(cast)
+    
+    # We go through any additional if-else nodes that we may have,
+    # generating their ModelIf CAST and appending the tail of the 
+    # overall if-else construct, starting with the else at the very end
+    # We do this tail appending so that when we finish generating CAST the
+    # resulting ModelIf CAST is in the correct order
+    alternatives_cast = None
+    for ts_node in alternatives:
+        assert ts_node.type == &#34;elif_clause&#34;
+        temp_cast = self.visit_if_statement(ts_node)
+        if alternatives_cast == None:
+            temp_cast.orelse = final_else_cast
+        else:
+            temp_cast.orelse = [alternatives_cast]
+        alternatives_cast = temp_cast
+
+    if alternatives_cast == None:
+        if_false_cast = final_else_cast 
+    else:
+        if_false_cast = [alternatives_cast]
+
+    return ModelIf(
+        expr=if_condition, 
+        body=if_true_cast, 
+        orelse=if_false_cast, 
         source_refs=[self.node_helper.get_source_ref(node)]
     )</code></pre>
 </details>
@@ -1193,9 +1457,11 @@ where operand is some kind of expression</p></div>
 <li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_assignment" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_assignment">visit_assignment</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_binary_op" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_binary_op">visit_binary_op</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_call" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_call">visit_call</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_comparison_op" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_comparison_op">visit_comparison_op</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_expression" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_expression">visit_expression</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_function_def" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_function_def">visit_function_def</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_identifier" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_identifier">visit_identifier</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_if_statement" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_if_statement">visit_if_statement</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_literal" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_literal">visit_literal</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_module" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_module">visit_module</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_name" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_name">visit_name</a></code></li>
