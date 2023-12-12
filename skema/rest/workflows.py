@@ -283,6 +283,7 @@ async def llm_assisted_codebase_to_pn_amr(zip_file: UploadFile = File()):
             try:
                 time.sleep(0.5)
                 print(f"Time call code-snippets: {time.time()}")
+                print(blobs[i])
                 code_snippet_response = await code_snippets_to_pn_amr(
                         code2fn.System(
                             files=[files[i]],
