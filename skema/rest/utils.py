@@ -1,7 +1,8 @@
+import itertools as it
 from collections import defaultdict
 from typing import Any, Dict
-import itertools as it
-from askem_extractions.data_model import AttributeCollection, AttributeType, Mention
+
+from askem_extractions.data_model import AttributeCollection, AttributeType, AnchoredEntity
 from bs4 import BeautifulSoup, Comment
 
 from skema.rest.schema import TextReadingEvaluationResults, AMRLinkingEvaluationResults
@@ -26,21 +27,22 @@ def fn_preprocessor(function_network: Dict[str, Any]):
     keys_to_check = ['bf', 'wff', 'wfopi', 'wfopo', 'wopio']
     metadata_keys_to_check = ['line_begin', 'line_end', 'col_begin', 'col_end']
     for key in metadata_keys_to_check:
-        try: 
+        try:
             for (i, entry) in enumerate(fn_data['modules'][0]['metadata_collection']):
                 try:
                     for (j, datum) in enumerate(entry):
                         try:
                             if datum[key] == -1:
                                 datum[key] = 1
-                                logs.append(f"The {j + 1}'th metadata in the {i+1} metadata index has -1 for the {key} entry")
+                                logs.append(
+                                    f"The {j + 1}'th metadata in the {i + 1} metadata index has -1 for the {key} entry")
                         except:
                             continue
                 except:
                     continue
         except:
             continue
-                    
+
     for key in keys_to_check:
         if key == 'bf':
             try:
@@ -73,7 +75,7 @@ def fn_preprocessor(function_network: Dict[str, Any]):
                         if entry['tgt'] == -1:
                             try:
                                 fn_data['modules'][0]['fn'][key].remove(entry)
-                                logs.append(f"The {i+1}'th {key} wire in the top level bf is targeting -1")
+                                logs.append(f"The {i + 1}'th {key} wire in the top level bf is targeting -1")
                             except:
                                 entry['tgt'] = 1
                     except:
@@ -109,18 +111,19 @@ def fn_preprocessor(function_network: Dict[str, Any]):
                 except:
                     continue
             else:
-                try: 
+                try:
                     for (i, entry) in enumerate(reversed(fn_ent[key])):
                         if entry['tgt'] == -1:
                             try:
                                 fn_ent[key][i].remove(entry)
-                                logs.append(f"The {i+1}'th {key} wire in the {j+1}'th fn_array is targeting -1")
+                                logs.append(f"The {i + 1}'th {key} wire in the {j + 1}'th fn_array is targeting -1")
                             except:
                                 entry['tgt'] = 1
                 except:
                     continue
 
     return fn_data, logs
+
 
 def clean_mml(mml: str) -> str:
     """Cleans/sterilizes pMML for AMR generation service"""
@@ -138,7 +141,7 @@ def clean_mml(mml: str) -> str:
     return str(soup).replace("\n", "")
 
 
-def extraction_matches_annotation(mention: Mention, annotation: Dict[str, Any]) -> bool:
+def extraction_matches_annotation(extraction: AnchoredEntity, annotation: Dict[str, Any], json_contents: Dict) -> bool:
     """ Determines whether the extraction matches the annotation"""
 
     # First iteration of the matching algorithm
@@ -147,12 +150,14 @@ def extraction_matches_annotation(mention: Mention, annotation: Dict[str, Any]) 
     gt_text = annotation["text"]
 
     # Get the extractions text
-    m_text = mention.extraction_source.surrounding_passage
+    src = extraction.extraction_source
+    m_text = json_contents[src.block]['content'][src.char_start:src.char_end]
 
-    return gt_text in m_text
+    return gt_text in m_text or m_text in gt_text
 
 
-def compute_text_reading_evaluation(gt_data: list, attributes: AttributeCollection) -> TextReadingEvaluationResults:
+def compute_text_reading_evaluation(gt_data: list, attributes: AttributeCollection,
+                                    json_contents: Dict) -> TextReadingEvaluationResults:
     """ Compute the coverage of text reading extractions """
 
     # Get the extractions from the attribute collection
@@ -176,13 +181,12 @@ def compute_text_reading_evaluation(gt_data: list, attributes: AttributeCollecti
                     page_annotations = annotations_by_page[e_page]
                     matched = False
                     for a in page_annotations:
-                        if extraction_matches_annotation(m, a):
+                        if extraction_matches_annotation(m, a, json_contents):
                             matched = True
                             tp += 1
                             break
                     if not matched:
                         fp += 1
-
 
     recall = tp / len(gt_data)
     precision = tp / (tp + fp + 0.00000000001)

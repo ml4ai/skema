@@ -40,7 +40,7 @@ impl Config {
     }
     pub async fn graphdb_connection(&self) -> Graph {
         let uri = self.create_graphdb_uri();
-        println!("skema-rs:memgraph uri:\t{addr}", addr = uri);
+        //println!("skema-rs:memgraph uri:\t{addr}", addr = uri);
         let graph_config = ConfigBuilder::new()
             .uri(uri)
             .user("".to_string())
