@@ -211,7 +211,6 @@ class MatlabToCast(object):
             val = self.visit_name(node),
             type = self.variable_context.get_type(identifier) if
                 self.variable_context.is_variable(identifier) else "Unknown",
-            default_value = "LiteralValue",
             source_refs = [self.node_helper.get_source_ref(node)],
         )
 
