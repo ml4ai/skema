@@ -238,16 +238,27 @@ async def llm_assisted_codebase_to_pn_amr(zip_file: UploadFile = File()):
     print(f"Time response linespan: {time.time()}")
 
     line_begin = []
+    import_begin = []
     line_end = []
+    import_end = []
     files = []
     blobs = []
     amrs = []
+
+    # There could now be multiple blocks that we need to handle and adjoin together
     for linespan in linespans:
-        lines = linespan.block[0].split("-")
+        blocks = len(linespan.block)
+        lines = linespan.block[blocks-1].split("-")
         line_begin.append(
             max(int(lines[0][1:]) - 1, 0)
         )  # Normalizing the 1-index response from llm_proxy
         line_end.append(int(lines[1][1:]))
+        if blocks == 2:
+            lines = linespan.block[0].split("-")
+            import_begin.append(
+            max(int(lines[0][1:]) - 1, 0)
+            )  # Normalizing the 1-index response from llm_proxy
+            import_end.append(int(lines[1][1:]))
 
         # So we are required to do the same when slicing the source code using its output.
     with ZipFile(BytesIO(zip_file.file.read()), "r") as zip:
@@ -264,10 +275,15 @@ async def llm_assisted_codebase_to_pn_amr(zip_file: UploadFile = File()):
         if line_begin[i] == line_end[i]:
             print("failed linespan")
         else:
-            blobs[i] = "".join(blobs[i].splitlines(keepends=True)[line_begin[i]:line_end[i]])
+            if blocks == 2:
+                temp = "".join(blobs[i].splitlines(keepends=True)[import_begin[i]:import_end[i]])
+                blobs[i] = temp + "\n" + "".join(blobs[i].splitlines(keepends=True)[line_begin[i]:line_end[i]])
+            else:
+                blobs[i] = "".join(blobs[i].splitlines(keepends=True)[line_begin[i]:line_end[i]])
             try:
                 time.sleep(0.5)
                 print(f"Time call code-snippets: {time.time()}")
+                print(blobs[i])
                 code_snippet_response = await code_snippets_to_pn_amr(
                         code2fn.System(
                             files=[files[i]],
@@ -276,6 +292,9 @@ async def llm_assisted_codebase_to_pn_amr(zip_file: UploadFile = File()):
                     )
                 print(f"Time response code-snippets: {time.time()}")
                 if "model" in code_snippet_response:
+                    code_snippet_response["header"]["name"] = "LLM-assisted code to amr model"
+                    code_snippet_response["header"]["description"] = f"This model came from code file: {files[i]}"
+                    code_snippet_response["header"]["linespan"] = f"{linespans[i]}"
                     amrs.append(code_snippet_response)
                 else:
                     print("snippets failure")
