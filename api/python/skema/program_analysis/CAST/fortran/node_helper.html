@@ -27,10 +27,12 @@
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">from typing import List, Dict
-from skema.program_analysis.CAST2FN.model.cast import SourceRef
+<pre><code class="python">import itertools
+from typing import List, Dict
 
 from tree_sitter import Node
+
+from skema.program_analysis.CAST2FN.model.cast import SourceRef
 
 CONTROL_CHARACTERS = [
     &#34;,&#34;,
@@ -70,7 +72,7 @@ class NodeHelper():
         # get_identifier optimization variables
         self.source_lines = source.splitlines(keepends=True)
         self.line_lengths = [len(line) for line in self.source_lines]
-        self.line_length_sums = [sum(self.line_lengths[:i+1]) for i in range(len(self.source_lines))]
+        self.line_length_sums = list(itertools.accumulate(self.line_lengths))#[sum(self.line_lengths[:i+1]) for i in range(len(self.source_lines))]
         
     def get_source_ref(self, node: Node) -&gt; SourceRef:
         &#34;&#34;&#34;Given a node and file name, return a CAST SourceRef object.&#34;&#34;&#34;
@@ -125,6 +127,9 @@ def get_children_by_types(node: Node, types: List):
     &#34;&#34;&#34;Takes in a node and a list of types as inputs and returns all children matching those types. Otherwise, return an empty list&#34;&#34;&#34;
     return [child for child in node.children if child.type in types]
 
+def get_children_except_types(node: Node, types: List):
+    &#34;&#34;&#34;Takes in a node and a list of types as inputs and returns all children not matching those types. Otherwise, return an empty list&#34;&#34;&#34;
+    return [child for child in node.children if child.type not in types]
 
 def get_first_child_index(node, type: str):
     &#34;&#34;&#34;Get the index of the first child of node with type type.&#34;&#34;&#34;
@@ -174,6 +179,20 @@ def get_non_control_children(node: Node):
 <pre><code class="python">def get_children_by_types(node: Node, types: List):
     &#34;&#34;&#34;Takes in a node and a list of types as inputs and returns all children matching those types. Otherwise, return an empty list&#34;&#34;&#34;
     return [child for child in node.children if child.type in types]</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST.fortran.node_helper.get_children_except_types"><code class="name flex">
+<span>def <span class="ident">get_children_except_types</span></span>(<span>node: tree_sitter.Node, types: List[~T])</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Takes in a node and a list of types as inputs and returns all children not matching those types. Otherwise, return an empty list</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_children_except_types(node: Node, types: List):
+    &#34;&#34;&#34;Takes in a node and a list of types as inputs and returns all children not matching those types. Otherwise, return an empty list&#34;&#34;&#34;
+    return [child for child in node.children if child.type not in types]</code></pre>
 </details>
 </dd>
 <dt id="skema.program_analysis.CAST.fortran.node_helper.get_control_children"><code class="name flex">
@@ -313,7 +332,7 @@ When the recurse argument is set, it will also recursivly search children nodes 
         # get_identifier optimization variables
         self.source_lines = source.splitlines(keepends=True)
         self.line_lengths = [len(line) for line in self.source_lines]
-        self.line_length_sums = [sum(self.line_lengths[:i+1]) for i in range(len(self.source_lines))]
+        self.line_length_sums = list(itertools.accumulate(self.line_lengths))#[sum(self.line_lengths[:i+1]) for i in range(len(self.source_lines))]
         
     def get_source_ref(self, node: Node) -&gt; SourceRef:
         &#34;&#34;&#34;Given a node and file name, return a CAST SourceRef object.&#34;&#34;&#34;
@@ -395,6 +414,7 @@ When the recurse argument is set, it will also recursivly search children nodes 
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
 <li><code><a title="skema.program_analysis.CAST.fortran.node_helper.get_children_by_types" href="#skema.program_analysis.CAST.fortran.node_helper.get_children_by_types">get_children_by_types</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.fortran.node_helper.get_children_except_types" href="#skema.program_analysis.CAST.fortran.node_helper.get_children_except_types">get_children_except_types</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.fortran.node_helper.get_control_children" href="#skema.program_analysis.CAST.fortran.node_helper.get_control_children">get_control_children</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.fortran.node_helper.get_first_child_by_type" href="#skema.program_analysis.CAST.fortran.node_helper.get_first_child_by_type">get_first_child_by_type</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.fortran.node_helper.get_first_child_index" href="#skema.program_analysis.CAST.fortran.node_helper.get_first_child_index">get_first_child_index</a></code></li>

@@ -9,22 +9,51 @@ Traceback (most recent call last):
     gromet_collection = process_file(source_path)
   File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/single_file_ingester.py", line 26, in process_file
     gromet_collection = process_file_system(
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/multi_file_ingester.py", line 69, in process_file_system
-    cast = fortran_to_cast(full_file, cast_obj=True)
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/fortran2cast.py", line 64, in fortran_to_cast
-    out_cast = TS2CAST(path).out_cast
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST/fortran/ts2cast.py", line 70, in __init__
-    self.out_cast = self.generate_cast()
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST/fortran/ts2cast.py", line 75, in generate_cast
-    modules = self.run(self.root_node)
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST/fortran/ts2cast.py", line 96, in run
-    child_cast = self.visit(body_node)
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST/fortran/ts2cast.py", line 116, in visit
-    return self.visit_function_def(node)
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST/fortran/ts2cast.py", line 267, in visit_function_def
-    child_cast = self.visit(body_node)
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST/fortran/ts2cast.py", line 143, in visit
-    return self.visit_do_loop_statement(node)
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST/fortran/ts2cast.py", line 462, in visit_do_loop_statement
-    body_start_index = 1 + get_first_child_index(node, "loop_control_expression")
-TypeError: unsupported operand type(s) for +: 'int' and 'NoneType'
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/multi_file_ingester.py", line 135, in process_file_system
+    raise e
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/multi_file_ingester.py", line 84, in process_file_system
+    generated_gromet = ann_cast_pipeline(
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/utils/script_functions.py", line 269, in ann_cast_pipeline
+    ToGrometPass(pipeline_state)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/to_gromet_pass.py", line 275, in __init__
+    self.visit(node, parent_gromet_fn=None, parent_cast_node=None)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/to_gromet_pass.py", line 633, in visit
+    raise e
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/to_gromet_pass.py", line 628, in visit
+    return self._visit(node, parent_gromet_fn, parent_cast_node)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/functools.py", line 912, in _method
+    return method.__get__(obj, cls)(*args, **kwargs)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/to_gromet_pass.py", line 4275, in visit_module
+    self.visit_node_list(node.body, new_gromet, node)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/to_gromet_pass.py", line 641, in visit_node_list
+    return [
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/to_gromet_pass.py", line 642, in <listcomp>
+    self.visit(node, parent_gromet_fn, parent_cast_node)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/to_gromet_pass.py", line 633, in visit
+    raise e
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/to_gromet_pass.py", line 628, in visit
+    return self._visit(node, parent_gromet_fn, parent_cast_node)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/functools.py", line 912, in _method
+    return method.__get__(obj, cls)(*args, **kwargs)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/to_gromet_pass.py", line 3183, in visit_function_def
+    self.handle_function_def(
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/to_gromet_pass.py", line 2974, in handle_function_def
+    self.visit(n, new_gromet_fn, node)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/to_gromet_pass.py", line 633, in visit
+    raise e
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/to_gromet_pass.py", line 628, in visit
+    return self._visit(node, parent_gromet_fn, parent_cast_node)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/functools.py", line 912, in _method
+    return method.__get__(obj, cls)(*args, **kwargs)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/to_gromet_pass.py", line 2535, in visit_call
+    in_module = self.func_in_module(func_name)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/to_gromet_pass.py", line 2497, in func_in_module
+    if curr_module[2] and find_func_in_module(
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST/pythonAST/modules_list.py", line 324, in find_func_in_module
+    module_import = importlib.import_module(module_name)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/importlib/__init__.py", line 127, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 1014, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 991, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 973, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'mpi'

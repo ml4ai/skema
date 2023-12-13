@@ -2074,24 +2074,35 @@
                         {
                             "body": [
                                 {
-                                    "node_type": "LiteralValue",
-                                    "source_code_data_type": [
-                                        "Fortran",
-                                        "Fortran95",
-                                        "integer"
-                                    ],
+                                    "arguments": [],
+                                    "func": {
+                                        "id": 15,
+                                        "name": "write",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": -1,
+                                                "col_start": -1,
+                                                "node_type": "SourceRef",
+                                                "row_end": -1,
+                                                "row_start": -1,
+                                                "source_file_name": ""
+                                            }
+                                        ]
+                                    },
+                                    "node_type": "Call",
+                                    "source_language": "Fortran",
+                                    "source_language_version": null,
                                     "source_refs": [
                                         {
-                                            "col_end": 9,
-                                            "col_start": 8,
+                                            "col_end": 30,
+                                            "col_start": 2,
                                             "node_type": "SourceRef",
-                                            "row_end": 76,
+                                            "row_end": 79,
                                             "row_start": 76,
                                             "source_file_name": "allocdata.F"
                                         }
-                                    ],
-                                    "value": "6",
-                                    "value_type": "Integer"
+                                    ]
                                 }
                             ],
                             "expr": {
@@ -2100,34 +2111,19 @@
                                 "op": "/=",
                                 "operands": [
                                     {
-                                        "default_value": null,
-                                        "node_type": "Var",
+                                        "id": 2,
+                                        "name": "istat",
+                                        "node_type": "Name",
                                         "source_refs": [
                                             {
-                                                "col_end": 9,
-                                                "col_start": 4,
+                                                "col_end": 18,
+                                                "col_start": 13,
                                                 "node_type": "SourceRef",
-                                                "row_end": 75,
-                                                "row_start": 75,
+                                                "row_end": 34,
+                                                "row_start": 34,
                                                 "source_file_name": "allocdata.F"
                                             }
-                                        ],
-                                        "type": "Integer",
-                                        "val": {
-                                            "id": 2,
-                                            "name": "istat",
-                                            "node_type": "Name",
-                                            "source_refs": [
-                                                {
-                                                    "col_end": 18,
-                                                    "col_start": 13,
-                                                    "node_type": "SourceRef",
-                                                    "row_end": 34,
-                                                    "row_start": 34,
-                                                    "source_file_name": "allocdata.F"
-                                                }
-                                            ]
-                                        }
+                                        ]
                                     },
                                     {
                                         "node_type": "LiteralValue",
@@ -2166,24 +2162,35 @@
                             "node_type": "ModelIf",
                             "orelse": [
                                 {
-                                    "node_type": "LiteralValue",
-                                    "source_code_data_type": [
-                                        "Fortran",
-                                        "Fortran95",
-                                        "integer"
-                                    ],
+                                    "arguments": [],
+                                    "func": {
+                                        "id": 15,
+                                        "name": "write",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": -1,
+                                                "col_start": -1,
+                                                "node_type": "SourceRef",
+                                                "row_end": -1,
+                                                "row_start": -1,
+                                                "source_file_name": ""
+                                            }
+                                        ]
+                                    },
+                                    "node_type": "Call",
+                                    "source_language": "Fortran",
+                                    "source_language_version": null,
                                     "source_refs": [
                                         {
-                                            "col_end": 9,
-                                            "col_start": 8,
+                                            "col_end": 63,
+                                            "col_start": 2,
                                             "node_type": "SourceRef",
                                             "row_end": 81,
                                             "row_start": 81,
                                             "source_file_name": "allocdata.F"
                                         }
-                                    ],
-                                    "value": "6",
-                                    "value_type": "Integer"
+                                    ]
                                 },
                                 {
                                     "left": {
@@ -2233,64 +2240,34 @@
                                                         "op": "*",
                                                         "operands": [
                                                             {
-                                                                "default_value": null,
-                                                                "node_type": "Var",
+                                                                "id": 10,
+                                                                "name": "nlevp1",
+                                                                "node_type": "Name",
                                                                 "source_refs": [
                                                                     {
-                                                                        "col_end": 14,
-                                                                        "col_start": 8,
+                                                                        "col_end": 23,
+                                                                        "col_start": 17,
                                                                         "node_type": "SourceRef",
-                                                                        "row_end": 82,
-                                                                        "row_start": 82,
+                                                                        "row_end": 74,
+                                                                        "row_start": 74,
                                                                         "source_file_name": "allocdata.F"
                                                                     }
-                                                                ],
-                                                                "type": "Unknown",
-                                                                "val": {
-                                                                    "id": 10,
-                                                                    "name": "nlevp1",
-                                                                    "node_type": "Name",
-                                                                    "source_refs": [
-                                                                        {
-                                                                            "col_end": 23,
-                                                                            "col_start": 17,
-                                                                            "node_type": "SourceRef",
-                                                                            "row_end": 74,
-                                                                            "row_start": 74,
-                                                                            "source_file_name": "allocdata.F"
-                                                                        }
-                                                                    ]
-                                                                }
+                                                                ]
                                                             },
                                                             {
-                                                                "default_value": null,
-                                                                "node_type": "Var",
+                                                                "id": 11,
+                                                                "name": "nlonp4",
+                                                                "node_type": "Name",
                                                                 "source_refs": [
                                                                     {
-                                                                        "col_end": 21,
-                                                                        "col_start": 15,
+                                                                        "col_end": 30,
+                                                                        "col_start": 24,
                                                                         "node_type": "SourceRef",
-                                                                        "row_end": 82,
-                                                                        "row_start": 82,
+                                                                        "row_end": 74,
+                                                                        "row_start": 74,
                                                                         "source_file_name": "allocdata.F"
                                                                     }
-                                                                ],
-                                                                "type": "Unknown",
-                                                                "val": {
-                                                                    "id": 11,
-                                                                    "name": "nlonp4",
-                                                                    "node_type": "Name",
-                                                                    "source_refs": [
-                                                                        {
-                                                                            "col_end": 30,
-                                                                            "col_start": 24,
-                                                                            "node_type": "SourceRef",
-                                                                            "row_end": 74,
-                                                                            "row_start": 74,
-                                                                            "source_file_name": "allocdata.F"
-                                                                        }
-                                                                    ]
-                                                                }
+                                                                ]
                                                             }
                                                         ],
                                                         "source_language": "Fortran",
@@ -2307,34 +2284,19 @@
                                                         "version": null
                                                     },
                                                     {
-                                                        "default_value": null,
-                                                        "node_type": "Var",
+                                                        "id": 12,
+                                                        "name": "nlat",
+                                                        "node_type": "Name",
                                                         "source_refs": [
                                                             {
-                                                                "col_end": 26,
-                                                                "col_start": 22,
+                                                                "col_end": 35,
+                                                                "col_start": 31,
                                                                 "node_type": "SourceRef",
-                                                                "row_end": 82,
-                                                                "row_start": 82,
+                                                                "row_end": 74,
+                                                                "row_start": 74,
                                                                 "source_file_name": "allocdata.F"
                                                             }
-                                                        ],
-                                                        "type": "Unknown",
-                                                        "val": {
-                                                            "id": 12,
-                                                            "name": "nlat",
-                                                            "node_type": "Name",
-                                                            "source_refs": [
-                                                                {
-                                                                    "col_end": 35,
-                                                                    "col_start": 31,
-                                                                    "node_type": "SourceRef",
-                                                                    "row_end": 74,
-                                                                    "row_start": 74,
-                                                                    "source_file_name": "allocdata.F"
-                                                                }
-                                                            ]
-                                                        }
+                                                        ]
                                                     }
                                                 ],
                                                 "source_language": "Fortran",
@@ -2351,34 +2313,19 @@
                                                 "version": null
                                             },
                                             {
-                                                "default_value": null,
-                                                "node_type": "Var",
+                                                "id": 13,
+                                                "name": "nf4d",
+                                                "node_type": "Name",
                                                 "source_refs": [
                                                     {
-                                                        "col_end": 31,
-                                                        "col_start": 27,
+                                                        "col_end": 40,
+                                                        "col_start": 36,
                                                         "node_type": "SourceRef",
-                                                        "row_end": 82,
-                                                        "row_start": 82,
+                                                        "row_end": 74,
+                                                        "row_start": 74,
                                                         "source_file_name": "allocdata.F"
                                                     }
-                                                ],
-                                                "type": "Unknown",
-                                                "val": {
-                                                    "id": 13,
-                                                    "name": "nf4d",
-                                                    "node_type": "Name",
-                                                    "source_refs": [
-                                                        {
-                                                            "col_end": 40,
-                                                            "col_start": 36,
-                                                            "node_type": "SourceRef",
-                                                            "row_end": 74,
-                                                            "row_start": 74,
-                                                            "source_file_name": "allocdata.F"
-                                                        }
-                                                    ]
-                                                }
+                                                ]
                                             }
                                         ],
                                         "source_language": "Fortran",
@@ -2406,24 +2353,35 @@
                                     ]
                                 },
                                 {
-                                    "node_type": "LiteralValue",
-                                    "source_code_data_type": [
-                                        "Fortran",
-                                        "Fortran95",
-                                        "integer"
-                                    ],
+                                    "arguments": [],
+                                    "func": {
+                                        "id": 15,
+                                        "name": "write",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": -1,
+                                                "col_start": -1,
+                                                "node_type": "SourceRef",
+                                                "row_end": -1,
+                                                "row_start": -1,
+                                                "source_file_name": ""
+                                            }
+                                        ]
+                                    },
+                                    "node_type": "Call",
+                                    "source_language": "Fortran",
+                                    "source_language_version": null,
                                     "source_refs": [
                                         {
-                                            "col_end": 9,
-                                            "col_start": 8,
+                                            "col_end": 34,
+                                            "col_start": 2,
                                             "node_type": "SourceRef",
-                                            "row_end": 83,
+                                            "row_end": 85,
                                             "row_start": 83,
                                             "source_file_name": "allocdata.F"
                                         }
-                                    ],
-                                    "value": "6",
-                                    "value_type": "Integer"
+                                    ]
                                 }
                             ],
                             "source_refs": [
@@ -2624,24 +2582,35 @@
                         {
                             "body": [
                                 {
-                                    "node_type": "LiteralValue",
-                                    "source_code_data_type": [
-                                        "Fortran",
-                                        "Fortran95",
-                                        "integer"
-                                    ],
+                                    "arguments": [],
+                                    "func": {
+                                        "id": 15,
+                                        "name": "write",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": -1,
+                                                "col_start": -1,
+                                                "node_type": "SourceRef",
+                                                "row_end": -1,
+                                                "row_start": -1,
+                                                "source_file_name": ""
+                                            }
+                                        ]
+                                    },
+                                    "node_type": "Call",
+                                    "source_language": "Fortran",
+                                    "source_language_version": null,
                                     "source_refs": [
                                         {
-                                            "col_end": 8,
-                                            "col_start": 7,
+                                            "col_end": 51,
+                                            "col_start": 1,
                                             "node_type": "SourceRef",
                                             "row_end": 89,
                                             "row_start": 89,
                                             "source_file_name": "allocdata.F"
                                         }
-                                    ],
-                                    "value": "6",
-                                    "value_type": "Integer"
+                                    ]
                                 }
                             ],
                             "expr": {
@@ -2650,34 +2619,19 @@
                                 "op": "/=",
                                 "operands": [
                                     {
-                                        "default_value": null,
-                                        "node_type": "Var",
+                                        "id": 2,
+                                        "name": "istat",
+                                        "node_type": "Name",
                                         "source_refs": [
                                             {
-                                                "col_end": 9,
-                                                "col_start": 4,
+                                                "col_end": 18,
+                                                "col_start": 13,
                                                 "node_type": "SourceRef",
-                                                "row_end": 88,
-                                                "row_start": 88,
+                                                "row_end": 34,
+                                                "row_start": 34,
                                                 "source_file_name": "allocdata.F"
                                             }
-                                        ],
-                                        "type": "Integer",
-                                        "val": {
-                                            "id": 2,
-                                            "name": "istat",
-                                            "node_type": "Name",
-                                            "source_refs": [
-                                                {
-                                                    "col_end": 18,
-                                                    "col_start": 13,
-                                                    "node_type": "SourceRef",
-                                                    "row_end": 34,
-                                                    "row_start": 34,
-                                                    "source_file_name": "allocdata.F"
-                                                }
-                                            ]
-                                        }
+                                        ]
                                     },
                                     {
                                         "node_type": "LiteralValue",
@@ -2754,19 +2708,24 @@
                                 }
                             ],
                             "value": {
-                                "id": 0,
-                                "name": "allocdata",
-                                "node_type": "Name",
+                                "node_type": "LiteralValue",
+                                "source_code_data_type": [
+                                    "Fortran",
+                                    "Fotran95",
+                                    "None"
+                                ],
                                 "source_refs": [
                                     {
-                                        "col_end": 20,
-                                        "col_start": 11,
+                                        "col_end": -1,
+                                        "col_start": -1,
                                         "node_type": "SourceRef",
-                                        "row_end": 7,
-                                        "row_start": 7,
-                                        "source_file_name": "allocdata.F"
+                                        "row_end": -1,
+                                        "row_start": -1,
+                                        "source_file_name": ""
                                     }
-                                ]
+                                ],
+                                "value": null,
+                                "value_type": null
                             }
                         }
                     ],
