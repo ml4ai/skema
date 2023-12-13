@@ -32,8 +32,10 @@ def json_to_gromet(path: str) -> GrometFNModuleCollection:
         sys.modules["skema.gromet.metadata"], inspect.isclass
     ):
         instance = metadata_object()
-        if "metadata_type" in instance.attribute_map:
-            gromet_metadata_map[instance.metadata_type] = metadata_object
+        if "is_metadatum" in instance.attribute_map and instance.is_metadatum:
+            gromet_metadata_map[metadata_name] = metadata_object
+        else:
+            gromet_fn_map[metadata_name] = metadata_object
 
     def get_obj_type(obj: Dict) -> Any:
         """Given a dictionary representing a Gromet object (i.e. BoxFunction), return an instance of that object.
@@ -42,10 +44,10 @@ def json_to_gromet(path: str) -> GrometFNModuleCollection:
 
         # First check if we already have a mapping to a data-class memeber. All Gromet FN and most Gromet Metadata classes will fall into this category.
         # There are a few Gromet Metadata fields such as Provenance that do not have a "metadata_type" field
-        if "gromet_type" in obj:
+        if "gromet_type" in obj and ("is_metadatum" not in obj or obj["is_metadatum"] != True):
             return gromet_fn_map[obj["gromet_type"]]()
-        elif "metadata_type" in obj:
-            return gromet_metadata_map[obj["metadata_type"]]()
+        elif obj["is_metadatum"]:
+            return gromet_metadata_map[obj["gromet_type"]]()
 
         # If there is not a mapping to an object, we will check the fields to see if they match an existing class in the data-model.
         # For example: (id, box, metadata) would map to GrometPort

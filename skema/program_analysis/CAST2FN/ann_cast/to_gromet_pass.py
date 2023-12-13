@@ -3241,7 +3241,6 @@ class ToGrometPass:
             )
 
             code_data_metadata = SourceCodeDataType(
-                gromet_type="source_code_data_type",
                 provenance=generate_provenance(),
                 source_language=ref[0],
                 source_language_version=ref[1],
