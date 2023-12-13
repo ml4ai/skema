@@ -145,7 +145,17 @@ async def get_lines_of_model(zip_file: UploadFile = File()) -> List[Dynamics]:
             line_begin = 0
             line_end = 0
 
+        # if the line_begin of meta entry 2 (base 0) and meta entry 3 (base 0) are we add a slice from [meta2.line_begin, meta3.line_begin)
+        # to capture all the imports, return a Dynamics.block with 2 entries, both of which need to be concatenated to pass forward
+        file_line_begin = response_zip.json()['modules'][0]['metadata_collection'][2][0]['line_begin']
+
+        code_line_begin = response_zip.json()['modules'][0]['metadata_collection'][3][0]['line_begin'] - 1
+
+        if file_line_begin != code_line_begin:
+            block.append(f"L{file_line_begin}-L{code_line_begin}")
+
         block.append(f"L{line_begin}-L{line_end}")
+
 
         output = Dynamics(name=file, description=description, block=block)
         outputs.append(output)
