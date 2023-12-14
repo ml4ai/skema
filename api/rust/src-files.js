@@ -191,7 +191,7 @@ var srcIndex = JSON.parse('{\
 "walkdir":["",[],["dent.rs","error.rs","lib.rs","util.rs"]],\
 "webpki":["",[["subject_name",[],["dns_name.rs","ip_address.rs","mod.rs","name.rs","verify.rs"]]],["calendar.rs","cert.rs","crl.rs","der.rs","end_entity.rs","error.rs","lib.rs","signed_data.rs","time.rs","trust_anchor.rs","verify_cert.rs","x509.rs"]],\
 "webpki_roots":["",[],["lib.rs"]],\
-"zerocopy":["",[["third_party",[["rust",[],["layout.rs"]]]]],["lib.rs","macro_util.rs","macros.rs","util.rs","wrappers.rs"]],\
+"zerocopy":["",[["third_party",[["rust",[],["layout.rs"]]]]],["lib.rs","macro_util.rs","macros.rs","post_monomorphization_compile_fail_tests.rs","util.rs","wrappers.rs"]],\
 "zstd":["",[["bulk",[],["compressor.rs","decompressor.rs","mod.rs"]],["stream",[["read",[],["mod.rs"]],["write",[],["mod.rs"]],["zio",[],["mod.rs","reader.rs","writer.rs"]]],["functions.rs","mod.rs","raw.rs"]]],["dict.rs","lib.rs"]],\
 "zstd_safe":["",[],["constants.rs","lib.rs"]],\
 "zstd_sys":["",[],["bindings_zdict.rs","bindings_zstd.rs","lib.rs"]]\

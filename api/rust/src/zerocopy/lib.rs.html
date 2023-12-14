@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/zerocopy-0.7.30/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-fa3bb1812debf86c.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="zerocopy" data-themes="" data-resource-suffix="" data-rustdoc-version="1.74.1 (a28077b28 2023-12-04)" data-channel="1.74.1" data-search-js="search-8be46b629f5f14a8.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-c5bd66d33317d69f.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../zerocopy/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/zerocopy-0.7.31/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-fa3bb1812debf86c.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="zerocopy" data-themes="" data-resource-suffix="" data-rustdoc-version="1.74.1 (a28077b28 2023-12-04)" data-channel="1.74.1" data-search-js="search-8be46b629f5f14a8.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-c5bd66d33317d69f.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../zerocopy/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -8201,6 +8201,59 @@
 <a href="#8201" id="8201">8201</a>
 <a href="#8202" id="8202">8202</a>
 <a href="#8203" id="8203">8203</a>
+<a href="#8204" id="8204">8204</a>
+<a href="#8205" id="8205">8205</a>
+<a href="#8206" id="8206">8206</a>
+<a href="#8207" id="8207">8207</a>
+<a href="#8208" id="8208">8208</a>
+<a href="#8209" id="8209">8209</a>
+<a href="#8210" id="8210">8210</a>
+<a href="#8211" id="8211">8211</a>
+<a href="#8212" id="8212">8212</a>
+<a href="#8213" id="8213">8213</a>
+<a href="#8214" id="8214">8214</a>
+<a href="#8215" id="8215">8215</a>
+<a href="#8216" id="8216">8216</a>
+<a href="#8217" id="8217">8217</a>
+<a href="#8218" id="8218">8218</a>
+<a href="#8219" id="8219">8219</a>
+<a href="#8220" id="8220">8220</a>
+<a href="#8221" id="8221">8221</a>
+<a href="#8222" id="8222">8222</a>
+<a href="#8223" id="8223">8223</a>
+<a href="#8224" id="8224">8224</a>
+<a href="#8225" id="8225">8225</a>
+<a href="#8226" id="8226">8226</a>
+<a href="#8227" id="8227">8227</a>
+<a href="#8228" id="8228">8228</a>
+<a href="#8229" id="8229">8229</a>
+<a href="#8230" id="8230">8230</a>
+<a href="#8231" id="8231">8231</a>
+<a href="#8232" id="8232">8232</a>
+<a href="#8233" id="8233">8233</a>
+<a href="#8234" id="8234">8234</a>
+<a href="#8235" id="8235">8235</a>
+<a href="#8236" id="8236">8236</a>
+<a href="#8237" id="8237">8237</a>
+<a href="#8238" id="8238">8238</a>
+<a href="#8239" id="8239">8239</a>
+<a href="#8240" id="8240">8240</a>
+<a href="#8241" id="8241">8241</a>
+<a href="#8242" id="8242">8242</a>
+<a href="#8243" id="8243">8243</a>
+<a href="#8244" id="8244">8244</a>
+<a href="#8245" id="8245">8245</a>
+<a href="#8246" id="8246">8246</a>
+<a href="#8247" id="8247">8247</a>
+<a href="#8248" id="8248">8248</a>
+<a href="#8249" id="8249">8249</a>
+<a href="#8250" id="8250">8250</a>
+<a href="#8251" id="8251">8251</a>
+<a href="#8252" id="8252">8252</a>
+<a href="#8253" id="8253">8253</a>
+<a href="#8254" id="8254">8254</a>
+<a href="#8255" id="8255">8255</a>
+<a href="#8256" id="8256">8256</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018 The Fuchsia Authors
 //
 // Licensed under the 2-Clause BSD License &lt;LICENSE-BSD or
@@ -8452,6 +8505,7 @@
 </span><span class="kw">pub mod </span>byteorder;
 <span class="attr">#[doc(hidden)]
 </span><span class="kw">pub mod </span>macro_util;
+<span class="kw">mod </span>post_monomorphization_compile_fail_tests;
 <span class="kw">mod </span>util;
 <span class="comment">// TODO(#252): If we make this pub, come up with a better name.
 </span><span class="kw">mod </span>wrappers;
@@ -12847,12 +12901,12 @@
     /// `into_ref` consumes the `Ref`, and returns a reference to `T`.
     </span><span class="attr">#[inline(always)]
     </span><span class="kw">pub fn </span>into_ref(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T {
-        <span class="comment">// SAFETY: This is sound because `B` is guaranteed to live for the
-        // lifetime `&#39;a`, meaning that a) the returned reference cannot outlive
-        // the `B` from which `self` was constructed and, b) no mutable methods
-        // on that `B` can be called during the lifetime of the returned
-        // reference. See the documentation on `deref_helper` for what
-        // invariants we are required to uphold.
+        <span class="macro">assert!</span>(B::INTO_REF_INTO_MUT_ARE_SOUND);
+
+        <span class="comment">// SAFETY: According to the safety preconditions on
+        // `ByteSlice::INTO_REF_INTO_MUT_ARE_SOUND`, the preceding assert
+        // ensures that, given `B: &#39;a`, it is sound to drop `self` and still
+        // access the underlying memory using reads for `&#39;a`.
         </span><span class="kw">unsafe </span>{ <span class="self">self</span>.deref_helper() }
     }
 }
@@ -12867,12 +12921,13 @@
     /// `into_mut` consumes the `Ref`, and returns a mutable reference to `T`.
     </span><span class="attr">#[inline(always)]
     </span><span class="kw">pub fn </span>into_mut(<span class="kw-2">mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>T {
-        <span class="comment">// SAFETY: This is sound because `B` is guaranteed to live for the
-        // lifetime `&#39;a`, meaning that a) the returned reference cannot outlive
-        // the `B` from which `self` was constructed and, b) no other methods -
-        // mutable or immutable - on that `B` can be called during the lifetime
-        // of the returned reference. See the documentation on
-        // `deref_mut_helper` for what invariants we are required to uphold.
+        <span class="macro">assert!</span>(B::INTO_REF_INTO_MUT_ARE_SOUND);
+
+        <span class="comment">// SAFETY: According to the safety preconditions on
+        // `ByteSlice::INTO_REF_INTO_MUT_ARE_SOUND`, the preceding assert
+        // ensures that, given `B: &#39;a + ByteSliceMut`, it is sound to drop
+        // `self` and still access the underlying memory using both reads and
+        // writes for `&#39;a`.
         </span><span class="kw">unsafe </span>{ <span class="self">self</span>.deref_mut_helper() }
     }
 }
@@ -12887,12 +12942,12 @@
     /// `into_slice` consumes the `Ref`, and returns a reference to `[T]`.
     </span><span class="attr">#[inline(always)]
     </span><span class="kw">pub fn </span>into_slice(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[T] {
-        <span class="comment">// SAFETY: This is sound because `B` is guaranteed to live for the
-        // lifetime `&#39;a`, meaning that a) the returned reference cannot outlive
-        // the `B` from which `self` was constructed and, b) no mutable methods
-        // on that `B` can be called during the lifetime of the returned
-        // reference. See the documentation on `deref_slice_helper` for what
-        // invariants we are required to uphold.
+        <span class="macro">assert!</span>(B::INTO_REF_INTO_MUT_ARE_SOUND);
+
+        <span class="comment">// SAFETY: According to the safety preconditions on
+        // `ByteSlice::INTO_REF_INTO_MUT_ARE_SOUND`, the preceding assert
+        // ensures that, given `B: &#39;a`, it is sound to drop `self` and still
+        // access the underlying memory using reads for `&#39;a`.
         </span><span class="kw">unsafe </span>{ <span class="self">self</span>.deref_slice_helper() }
     }
 }
@@ -12908,13 +12963,13 @@
     /// `[T]`.
     </span><span class="attr">#[inline(always)]
     </span><span class="kw">pub fn </span>into_mut_slice(<span class="kw-2">mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>[T] {
-        <span class="comment">// SAFETY: This is sound because `B` is guaranteed to live for the
-        // lifetime `&#39;a`, meaning that a) the returned reference cannot outlive
-        // the `B` from which `self` was constructed and, b) no other methods -
-        // mutable or immutable - on that `B` can be called during the lifetime
-        // of the returned reference. See the documentation on
-        // `deref_mut_slice_helper` for what invariants we are required to
-        // uphold.
+        <span class="macro">assert!</span>(B::INTO_REF_INTO_MUT_ARE_SOUND);
+
+        <span class="comment">// SAFETY: According to the safety preconditions on
+        // `ByteSlice::INTO_REF_INTO_MUT_ARE_SOUND`, the preceding assert
+        // ensures that, given `B: &#39;a + ByteSliceMut`, it is sound to drop
+        // `self` and still access the underlying memory using both reads and
+        // writes for `&#39;a`.
         </span><span class="kw">unsafe </span>{ <span class="self">self</span>.deref_mut_slice_helper() }
     }
 }
@@ -13330,6 +13385,29 @@
 </span><span class="kw">pub unsafe trait </span>ByteSlice:
     Deref&lt;Target = [u8]&gt; + Sized + <span class="self">self</span>::sealed::ByteSliceSealed
 {
+    <span class="doccomment">/// Are the [`Ref::into_ref`] and [`Ref::into_mut`] methods sound when used
+    /// with `Self`? If not, evaluating this constant must panic at compile
+    /// time.
+    ///
+    /// This exists to work around #716 on versions of zerocopy prior to 0.8.
+    ///
+    /// # Safety
+    ///
+    /// This may only be set to true if the following holds: Given the
+    /// following:
+    /// - `Self: &#39;a`
+    /// - `bytes: Self`
+    /// - `let ptr = bytes.as_ptr()`
+    ///
+    /// ...then:
+    /// - Using `ptr` to read the memory previously addressed by `bytes` is
+    ///   sound for `&#39;a` even after `bytes` has been dropped.
+    /// - If `Self: ByteSliceMut`, using `ptr` to write the memory previously
+    ///   addressed by `bytes` is sound for `&#39;a` even after `bytes` has been
+    ///   dropped.
+    </span><span class="attr">#[doc(hidden)]
+    </span><span class="kw">const </span>INTO_REF_INTO_MUT_ARE_SOUND: bool;
+
     <span class="doccomment">/// Gets a raw pointer to the first byte in the slice.
     </span><span class="attr">#[inline]
     </span><span class="kw">fn </span>as_ptr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*const </span>u8 {
@@ -13364,6 +13442,10 @@
 <span class="comment">// TODO(#429): Add a &quot;SAFETY&quot; comment and remove this `allow`.
 </span><span class="attr">#[allow(clippy::undocumented_unsafe_blocks)]
 </span><span class="kw">unsafe impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; ByteSlice <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8] {
+    <span class="comment">// SAFETY: If `&amp;&#39;b [u8]: &#39;a`, then the underlying memory is treated as
+    // borrowed immutably for `&#39;a` even if the slice itself is dropped.
+    </span><span class="kw">const </span>INTO_REF_INTO_MUT_ARE_SOUND: bool = <span class="bool-val">true</span>;
+
     <span class="attr">#[inline]
     </span><span class="kw">fn </span>split_at(<span class="self">self</span>, mid: usize) -&gt; (<span class="self">Self</span>, <span class="self">Self</span>) {
         &lt;[u8]&gt;::split_at(<span class="self">self</span>, mid)
@@ -13374,6 +13456,10 @@
 <span class="comment">// TODO(#429): Add a &quot;SAFETY&quot; comment and remove this `allow`.
 </span><span class="attr">#[allow(clippy::undocumented_unsafe_blocks)]
 </span><span class="kw">unsafe impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; ByteSlice <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>[u8] {
+    <span class="comment">// SAFETY: If `&amp;&#39;b mut [u8]: &#39;a`, then the underlying memory is treated as
+    // borrowed mutably for `&#39;a` even if the slice itself is dropped.
+    </span><span class="kw">const </span>INTO_REF_INTO_MUT_ARE_SOUND: bool = <span class="bool-val">true</span>;
+
     <span class="attr">#[inline]
     </span><span class="kw">fn </span>split_at(<span class="self">self</span>, mid: usize) -&gt; (<span class="self">Self</span>, <span class="self">Self</span>) {
         &lt;[u8]&gt;::split_at_mut(<span class="self">self</span>, mid)
@@ -13384,6 +13470,16 @@
 <span class="comment">// TODO(#429): Add a &quot;SAFETY&quot; comment and remove this `allow`.
 </span><span class="attr">#[allow(clippy::undocumented_unsafe_blocks)]
 </span><span class="kw">unsafe impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; ByteSlice <span class="kw">for </span>cell::Ref&lt;<span class="lifetime">&#39;a</span>, [u8]&gt; {
+    <span class="kw">const </span>INTO_REF_INTO_MUT_ARE_SOUND: bool = <span class="kw">if </span>!<span class="macro">cfg!</span>(doc) {
+        <span class="macro">panic!</span>(<span class="string">&quot;Ref::into_ref and Ref::into_mut are unsound when used with core::cell::Ref; see https://github.com/google/zerocopy/issues/716&quot;</span>)
+    } <span class="kw">else </span>{
+        <span class="comment">// When compiling documentation, allow the evaluation of this constant
+        // to succeed. This doesn&#39;t represent a soundness hole - it just delays
+        // any error to runtime. The reason we need this is that, otherwise,
+        // `rustdoc` will fail when trying to document this item.
+        </span><span class="bool-val">false
+    </span>};
+
     <span class="attr">#[inline]
     </span><span class="kw">fn </span>split_at(<span class="self">self</span>, mid: usize) -&gt; (<span class="self">Self</span>, <span class="self">Self</span>) {
         cell::Ref::map_split(<span class="self">self</span>, |slice| &lt;[u8]&gt;::split_at(slice, mid))
@@ -13394,6 +13490,16 @@
 <span class="comment">// TODO(#429): Add a &quot;SAFETY&quot; comment and remove this `allow`.
 </span><span class="attr">#[allow(clippy::undocumented_unsafe_blocks)]
 </span><span class="kw">unsafe impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; ByteSlice <span class="kw">for </span>RefMut&lt;<span class="lifetime">&#39;a</span>, [u8]&gt; {
+    <span class="kw">const </span>INTO_REF_INTO_MUT_ARE_SOUND: bool = <span class="kw">if </span>!<span class="macro">cfg!</span>(doc) {
+        <span class="macro">panic!</span>(<span class="string">&quot;Ref::into_ref and Ref::into_mut are unsound when used with core::cell::RefMut; see https://github.com/google/zerocopy/issues/716&quot;</span>)
+    } <span class="kw">else </span>{
+        <span class="comment">// When compiling documentation, allow the evaluation of this constant
+        // to succeed. This doesn&#39;t represent a soundness hole - it just delays
+        // any error to runtime. The reason we need this is that, otherwise,
+        // `rustdoc` will fail when trying to document this item.
+        </span><span class="bool-val">false
+    </span>};
+
     <span class="attr">#[inline]
     </span><span class="kw">fn </span>split_at(<span class="self">self</span>, mid: usize) -&gt; (<span class="self">Self</span>, <span class="self">Self</span>) {
         RefMut::map_split(<span class="self">self</span>, |slice| &lt;[u8]&gt;::split_at_mut(slice, mid))

@@ -803,6 +803,35 @@
 <a href="#803" id="803">803</a>
 <a href="#804" id="804">804</a>
 <a href="#805" id="805">805</a>
+<a href="#806" id="806">806</a>
+<a href="#807" id="807">807</a>
+<a href="#808" id="808">808</a>
+<a href="#809" id="809">809</a>
+<a href="#810" id="810">810</a>
+<a href="#811" id="811">811</a>
+<a href="#812" id="812">812</a>
+<a href="#813" id="813">813</a>
+<a href="#814" id="814">814</a>
+<a href="#815" id="815">815</a>
+<a href="#816" id="816">816</a>
+<a href="#817" id="817">817</a>
+<a href="#818" id="818">818</a>
+<a href="#819" id="819">819</a>
+<a href="#820" id="820">820</a>
+<a href="#821" id="821">821</a>
+<a href="#822" id="822">822</a>
+<a href="#823" id="823">823</a>
+<a href="#824" id="824">824</a>
+<a href="#825" id="825">825</a>
+<a href="#826" id="826">826</a>
+<a href="#827" id="827">827</a>
+<a href="#828" id="828">828</a>
+<a href="#829" id="829">829</a>
+<a href="#830" id="830">830</a>
+<a href="#831" id="831">831</a>
+<a href="#832" id="832">832</a>
+<a href="#833" id="833">833</a>
+<a href="#834" id="834">834</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! This module contains parsers that perform some amount of preliminary domain-specific
 //! interpretation of presentation MathML (e.g., globbing S(t) to an identifier S of type
 //! &#39;function&#39;). This is in contrast to the `generic_mathml.rs` module that contains parsers that
@@ -1241,7 +1270,7 @@
     );
 
     <span class="kw">let </span>(s, (func, order)) = delimited(
-        <span class="macro">stag!</span>(<span class="string">&quot;mover&quot;</span>),
+        alt((tag(<span class="string">&quot;&lt;mrow&gt;&lt;mover&gt;&quot;</span>), tag(<span class="string">&quot;&lt;mover&gt;&quot;</span>))),
         pair(
             map(
                 ci_unknown,
@@ -1257,7 +1286,7 @@
             ),
             n_dots,
         ),
-        <span class="macro">etag!</span>(<span class="string">&quot;mover&quot;</span>),
+        alt((tag(<span class="string">&quot;&lt;/mover&gt;&lt;/mrow&gt;&quot;</span>), <span class="macro">etag!</span>(<span class="string">&quot;mover&quot;</span>))),
     )(input)<span class="question-mark">?</span>;
     <span class="kw">let </span>(s, mi_func_of) = alt((parenthesized_identifier, empty_parenthesis))(s)<span class="question-mark">?</span>;
     <span class="kw">let </span><span class="kw-2">mut </span>ci_func_of: Vec&lt;Ci&gt; = Vec::new();
@@ -1265,9 +1294,10 @@
         <span class="kw">let </span>b = Ci::new(<span class="prelude-val">Some</span>(Type::Real), Box::new(MathExpression::Mi(bvar)), <span class="prelude-val">None</span>);
         ci_func_of.push(b.clone());
     }
+    <span class="kw">let </span>func_mi = ci_func_of.get(<span class="number">0</span>).unwrap().content.clone();
     <span class="kw">let </span>new_with_respect_to: Box&lt;MathExpression&gt; = Box::new(MathExpression::Ci(Ci {
         r#type: <span class="prelude-val">None</span>,
-        content: Box::new(MathExpression::Mi(Mi(<span class="string">&quot;&quot;</span>.to_string()))),
+        content: Box::new(MathExpression::Mi(Mi(func_mi.to_string()))),
         func_of: <span class="prelude-val">None</span>,
     }));
 
@@ -1402,8 +1432,8 @@
     ws(alt((
         map(div, MathExpression::Mo),
         alt((ws(absolute_with_msup), ws(paren_as_msup))),
-        sqrt,
-        map(
+        <span class="comment">//sqrt,
+        </span>map(
             grad_func,
             |(
                 op,
@@ -1473,6 +1503,34 @@
                             bound_var,
                         },
                     ))),
+                    func: Box::new(MathExpression::Ci(Ci {
+                        r#type,
+                        content,
+                        func_of,
+                    })),
+                })
+            },
+        ),
+        map(
+            newtonian_derivative,
+            |(
+                Derivative {
+                    order,
+                    var_index,
+                    bound_var,
+                },
+                Ci {
+                    r#type,
+                    content,
+                    func_of,
+                },
+            )| {
+                MathExpression::Differential(Differential {
+                    diff: Box::new(MathExpression::Mo(Operator::Derivative(Derivative {
+                        order,
+                        var_index,
+                        bound_var,
+                    }))),
                     func: Box::new(MathExpression::Ci(Ci {
                         r#type,
                         content,
@@ -1576,7 +1634,7 @@
                 })
             },
         ),
-        absolute,
+        alt((absolute, sqrt)),
         alt((
             map(operator, MathExpression::Mo),
             map(gradient, MathExpression::Mo),
