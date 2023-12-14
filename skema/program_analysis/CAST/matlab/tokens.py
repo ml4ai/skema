@@ -26,6 +26,7 @@ KEYWORDS = [
     'function_arguments',
     'function_call',
     'function_definition',
+    'function_output',
     'identifier',
     'if',
     'if_statement',
@@ -46,20 +47,19 @@ KEYWORDS = [
     'switch_statement',
     'unary_operator',
 
-    # keywords to be supported
+    # keywords currently being added
     'break_statement',
     'continue_statement',
-    'field_expression',
     'for',
     'for_statement',
-    'function_output',
     'iterator',
+    'range',
+
+    # keywords to be supported
+    'field_expression',
     'lambda',
     'line_continuation',
     'multioutput_variable',
-    'range',
-    'while',
-    'while_statement'
 ]
 
 """ anything not a keyword """
