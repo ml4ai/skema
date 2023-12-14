@@ -84,20 +84,19 @@ def insert_gromet_object(t: list, obj):
     If the table we're trying to insert into doesn't already exist, then we
     first create it, and then insert the value.
     """
+    
+    if t == None:
+        t = []
 
     # Logic for generating port ids
     if isinstance(obj, GrometPort):
-        if t == None:
-            obj.id = 1
-        else:
-            current_box = obj.box
-            current_box_ports = [port for port in t if port.box == current_box]
-            obj.id = len(current_box_ports) + 1
+        obj.id = 1
+        for port in reversed(t):
+            if port.box == obj.box:
+                obj.id = port.id + 1
+                break
 
-    if t == None:
-        t = []
     t.append(obj)
-
     return t
 
 
@@ -3013,7 +3012,6 @@ class ToGrometPass:
         # We're out of the function definition here, so we
         # can clear the local  variable environment
         var_environment["local"] = deepcopy(prev_local_env)
-
 
     @_visit.register
     def visit_function_def(
