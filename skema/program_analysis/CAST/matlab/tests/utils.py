@@ -37,6 +37,11 @@ def check(result, expected = None):
         check(result.expr, expected.expr)
         check(result.body, expected.body)
         check(result.orelse, expected.orelse)
+    elif isinstance(result, Loop):
+        check(result.pre, expected.pre)
+        check(result.expr, expected.expr)
+        check(result.body, expected.body)
+        check(result.post, expected.post)
     elif isinstance(result, LiteralValue):
         check(result.value, expected)
     elif isinstance(result, Var):
@@ -48,7 +53,7 @@ def check(result, expected = None):
 
     # every CAST node has a source_refs element
     if isinstance(result, AstNode):
-        assert not result.source_refs == None
+        assert result.source_refs is not None
 
 # we curently produce a CAST object with a single Module in the nodes list.
 def cast(source):
