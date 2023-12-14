@@ -2172,3 +2172,73 @@ fn new_quadratic_equation() {
     );
     assert_eq!(exp.to_latex(), "x=\\frac{(-b)-\\sqrt{b^{2}-(4*a*c)}}{2*a}");
 }
+
+#[test]
+fn test_dot_in_derivative() {
+    let input = "<math>
+        <mrow>
+    <mover>
+      <mi>S</mi>
+      <mo>&#x02D9;</mo>
+    </mover>
+  </mrow>
+<mo>(</mo>
+  <mi>t</mi>
+  <mo>)</mo>
+</math>";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    let s_exp = exp.to_string();
+    assert_eq!(s_exp, "(D(1, t) S)");
+}
+
+#[test]
+fn test_sidarthe_equation() {
+    let input = "<math>
+  <mrow>
+    <mover>
+      <mi>S</mi>
+      <mo>&#x02D9;</mo>
+    </mover>
+  </mrow>
+  <mo>(</mo>
+  <mi>t</mi>
+  <mo>)</mo>
+  <mo>=</mo>
+  <mo>&#x2212;</mo>
+  <mi>S</mi>
+  <mo>(</mo>
+  <mi>t</mi>
+  <mo>)</mo>
+  <mo>(</mo>
+  <mi>&#x03B1;</mi>
+  <mi>I</mi>
+  <mo>(</mo>
+  <mi>t</mi>
+  <mo>)</mo>
+  <mo>+</mo>
+  <mi>&#x03B2;</mi>
+  <mi>D</mi>
+  <mo>(</mo>
+  <mi>t</mi>
+  <mo>)</mo>
+  <mo>+</mo>
+  <mi>&#x03B3;</mi>
+  <mi>A</mi>
+  <mo>(</mo>
+  <mi>t</mi>
+  <mo>)</mo>
+  <mo>+</mo>
+  <mi>&#x03B4;</mi>
+  <mi>R</mi>
+  <mo>(</mo>
+  <mi>t</mi>
+  <mo>)</mo>
+  <mo>)</mo>
+</math>";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    let s_exp = exp.to_string();
+    assert_eq!(
+        s_exp,
+        "(= (D(1, t) S) (* (- S) (+ (+ (+ (* α I) (* β D)) (* γ A)) (* δ R))))"
+    );
+}
