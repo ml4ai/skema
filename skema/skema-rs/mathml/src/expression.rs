@@ -5,6 +5,7 @@ use std::{clone::Clone, collections::VecDeque};
 
 /// Struct for representing mathematical expressions in order to align with source code.
 pub type MathExpressionGraph<'a> = Graph<String, String>;
+
 use petgraph::dot::Dot;
 use std::string::ToString;
 
@@ -1197,7 +1198,7 @@ fn test_plus_to_graph() {
 }
 
 #[test]
-fn test_equation_halfar_dome_8_1_to_latex() {
+fn test_equation_halfar_dome_8_1_to_graph() {
     let input = "
     <math>
       <mfrac>
@@ -1244,7 +1245,63 @@ fn test_equation_halfar_dome_8_1_to_latex() {
     let g = exp.to_graph();
     let dot_representation = Dot::new(&g);
     assert_eq!(dot_representation.to_string()
-        .replace("\n", "")
-        .replace(" ", ""), 
-       "digraph{0[label=\"Div(Γ*(H^(n+2))*(Abs(Grad(H))^(n-1))*Grad(H))\"]1[label=\"D(1,t)(H)\"]2[label=\"Γ*(H^(n+2))*(Abs(Grad(H))^(n-1))*Grad(H)\"]3[label=\"Γ\"]4[label=\"H^(n+2)\"]5[label=\"H\"]6[label=\"n+2\"]7[label=\"n\"]8[label=\"2\"]9[label=\"Abs(Grad(H))^(n-1)\"]10[label=\"Abs(Grad(H))\"]11[label=\"Grad(H)\"]12[label=\"n-1\"]13[label=\"1\"]1->0[label=\"=\"]2->0[label=\"Div\"]3->2[label=\"*\"]4->2[label=\"*\"]5->4[label=\"^\"]6->4[label=\"^\"]7->6[label=\"+\"]8->6[label=\"+\"]9->2[label=\"*\"]10->9[label=\"^\"]11->10[label=\"Abs\"]5->11[label=\"Grad\"]12->9[label=\"^\"]7->12[label=\"+\"]13->12[label=\"-\"]11->2[label=\"*\"]}");
+                   .replace("\n", "")
+                   .replace(" ", ""),
+               "digraph{0[label=\"Div(Γ*(H^(n+2))*(Abs(Grad(H))^(n-1))*Grad(H))\"]1[label=\"D(1,t)(H)\"]2[label=\"Γ*(H^(n+2))*(Abs(Grad(H))^(n-1))*Grad(H)\"]3[label=\"Γ\"]4[label=\"H^(n+2)\"]5[label=\"H\"]6[label=\"n+2\"]7[label=\"n\"]8[label=\"2\"]9[label=\"Abs(Grad(H))^(n-1)\"]10[label=\"Abs(Grad(H))\"]11[label=\"Grad(H)\"]12[label=\"n-1\"]13[label=\"1\"]1->0[label=\"=\"]2->0[label=\"Div\"]3->2[label=\"*\"]4->2[label=\"*\"]5->4[label=\"^\"]6->4[label=\"^\"]7->6[label=\"+\"]8->6[label=\"+\"]9->2[label=\"*\"]10->9[label=\"^\"]11->10[label=\"Abs\"]5->11[label=\"Grad\"]12->9[label=\"^\"]7->12[label=\"+\"]13->12[label=\"-\"]11->2[label=\"*\"]}");
+}
+
+#[test]
+fn test_equation_sidarthe_1_to_graph() {
+    let input = "
+    <math>
+      <mrow>
+        <mover>
+          <mi>S</mi>
+          <mo>&#x02D9;</mo>
+        </mover>
+      </mrow>
+      <mo>(</mo>
+      <mi>t</mi>
+      <mo>)</mo>
+      <mo>=</mo>
+      <mo>&#x2212;</mo>
+      <mi>S</mi>
+      <mo>(</mo>
+      <mi>t</mi>
+      <mo>)</mo>
+      <mo>(</mo>
+      <mi>&#x03B1;</mi>
+      <mi>I</mi>
+      <mo>(</mo>
+      <mi>t</mi>
+      <mo>)</mo>
+      <mo>+</mo>
+      <mi>&#x03B2;</mi>
+      <mi>D</mi>
+      <mo>(</mo>
+      <mi>t</mi>
+      <mo>)</mo>
+      <mo>+</mo>
+      <mi>&#x03B3;</mi>
+      <mi>A</mi>
+      <mo>(</mo>
+      <mi>t</mi>
+      <mo>)</mo>
+      <mo>+</mo>
+      <mi>&#x03B4;</mi>
+      <mi>R</mi>
+      <mo>(</mo>
+      <mi>t</mi>
+      <mo>)</mo>
+      <mo>)</mo>
+    </math>
+    ";
+
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    let g = exp.to_graph();
+    let dot_representation = Dot::new(&g);
+    assert_eq!(dot_representation.to_string()
+                   .replace("\n", "")
+                   .replace(" ", ""),
+               "digraph{0[label=\"-(S)*(α*I+β*D+γ*A+δ*R)\"]1[label=\"D(1,t)(S)\"]2[label=\"-(S)\"]3[label=\"S\"]4[label=\"α*I+β*D+γ*A+δ*R\"]5[label=\"α*I\"]6[label=\"α\"]7[label=\"I\"]8[label=\"β*D\"]9[label=\"β\"]10[label=\"D\"]11[label=\"γ*A\"]12[label=\"γ\"]13[label=\"A\"]14[label=\"δ*R\"]15[label=\"δ\"]16[label=\"R\"]1->0[label=\"=\"]2->0[label=\"*\"]3->2[label=\"-\"]4->0[label=\"*\"]5->4[label=\"+\"]6->5[label=\"*\"]7->5[label=\"*\"]8->4[label=\"+\"]9->8[label=\"*\"]10->8[label=\"*\"]11->4[label=\"+\"]12->11[label=\"*\"]13->11[label=\"*\"]14->4[label=\"+\"]15->14[label=\"*\"]16->14[label=\"*\"]}");
 }
