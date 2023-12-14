@@ -39,12 +39,6 @@ Traceback (most recent call last):
     return self._visit(node)
   File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/functools.py", line 912, in _method
     return method.__get__(obj, cls)(*args, **kwargs)
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/cast_to_annotated_cast.py", line 194, in visit_var
-    default_value = self.visit(node.default_value)
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/cast_to_annotated_cast.py", line 67, in visit
-    return self._visit(node)
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/functools.py", line 912, in _method
-    return method.__get__(obj, cls)(*args, **kwargs)
   File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST2FN/ann_cast/cast_to_annotated_cast.py", line 71, in _visit
     raise NameError(f"Unrecognized node type: {type(node)}")
-NameError: Unrecognized node type: <class 'str'>
+NameError: Unrecognized node type: <class 'list'>
