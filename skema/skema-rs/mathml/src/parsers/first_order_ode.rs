@@ -1108,7 +1108,7 @@ fn test_first_order_ode() {
 
     assert_eq!(lhs_var.to_string(), "S");
     assert_eq!(func_of[0].to_string(), "");
-    assert_eq!(with_respect_to.to_string(), "");
+    assert_eq!(with_respect_to.to_string(), "t");
     assert_eq!(rhs.to_string(), "(* (* (- β) I) (/ S N))");
 }
 
