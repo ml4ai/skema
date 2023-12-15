@@ -1,7 +1,9 @@
+import itertools
 from typing import List, Dict
-from skema.program_analysis.CAST2FN.model.cast import SourceRef
 
 from tree_sitter import Node
+
+from skema.program_analysis.CAST2FN.model.cast import SourceRef
 
 CONTROL_CHARACTERS = [
     ",",
@@ -41,7 +43,7 @@ class NodeHelper():
         # get_identifier optimization variables
         self.source_lines = source.splitlines(keepends=True)
         self.line_lengths = [len(line) for line in self.source_lines]
-        self.line_length_sums = [sum(self.line_lengths[:i+1]) for i in range(len(self.source_lines))]
+        self.line_length_sums = list(itertools.accumulate(self.line_lengths))#[sum(self.line_lengths[:i+1]) for i in range(len(self.source_lines))]
         
     def get_source_ref(self, node: Node) -> SourceRef:
         """Given a node and file name, return a CAST SourceRef object."""
@@ -96,6 +98,9 @@ def get_children_by_types(node: Node, types: List):
     """Takes in a node and a list of types as inputs and returns all children matching those types. Otherwise, return an empty list"""
     return [child for child in node.children if child.type in types]
 
+def get_children_except_types(node: Node, types: List):
+    """Takes in a node and a list of types as inputs and returns all children not matching those types. Otherwise, return an empty list"""
+    return [child for child in node.children if child.type not in types]
 
 def get_first_child_index(node, type: str):
     """Get the index of the first child of node with type type."""
