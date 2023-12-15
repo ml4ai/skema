@@ -80,7 +80,7 @@ class TS2CAST(object):
 
         # Start visiting
         self.out_cast = self.generate_cast()
-        print(self.out_cast[0].to_json_str())
+        #print(self.out_cast[0].to_json_str())
         
     def generate_cast(self) -> List[CAST]:
         '''Interface for generating CAST.'''
@@ -495,15 +495,17 @@ class TS2CAST(object):
         # If there is a loop control expression, the first body node will be the node after the loop_control_expression
         # It is valid Fortran to have a single itteration do loop as well.
         # NOTE: This code is for the creation of the main body. The do loop will still add some additional nodes at the end of this body.
-        body = []
         body_start_index = 1 + get_first_child_index(node, "loop_control_expression")
+        body = self.generate_cast_body(node.children[body_start_index:])
+        """
         for body_node in node.children[body_start_index:]:
             child_cast = self.visit(body_node)
             if isinstance(child_cast, List):
                 body.extend(child_cast)
             elif isinstance(child_cast, AstNode):
                 body.append(child_cast)
-
+        """
+        
         # For the init and expression fields, we first need to determine if we are in a regular "do" or a "do while" loop
         # PRE:
         # _next(_iter(range(start, stop, step)))
@@ -1207,8 +1209,13 @@ class TS2CAST(object):
                 body.append(cast)
             elif isinstance(cast, List):
                 body.extend(cast)
+        
+        # Gromet doesn't support empty bodies, so we should create a no_op instead
+        if len(body) == 0:
+            body.append(self._visit_no_op(None))
+        
         return body
 
-#TS2CAST("drotmg.f")
+#TS2CAST("qjoule.F")
 #import cProfile
 #cProfile.run("TS2CAST('he_coef0_dres.F')", sort="tottime")
