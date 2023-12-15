@@ -110,11 +110,10 @@ class MatlabToCast(object):
         ]:return self.visit_identifier(node)
         elif node.type == "if_statement":
             return self.visit_if_statement(node)
-#        elif node.type in [
-#            "for_statement",
-#            "iterator",
-#            "while_statement"
-#        ]: return self.visit_loop(node)
+        elif node.type == "iterator":
+            return self.visit_iterator(node)
+        elif node.type == "for_statement":
+            return self.visit_for_statement(node)
         elif node.type in [
             "cell",
             "matrix"
@@ -139,6 +138,8 @@ class MatlabToCast(object):
         ]: return self.visit_operator(node)
         elif node.type == "string":
            return self.visit_string(node)
+        elif node.type == "range":
+           return self.visit_range(node)
         elif node.type == "switch_statement":
             return self.visit_switch_statement(node)
         else:
@@ -210,7 +211,6 @@ class MatlabToCast(object):
             val = self.visit_name(node),
             type = self.variable_context.get_type(identifier) if
                 self.variable_context.is_variable(identifier) else "Unknown",
-            default_value = "LiteralValue",
             source_refs = [self.node_helper.get_source_ref(node)],
         )
 
@@ -248,12 +248,135 @@ class MatlabToCast(object):
 
         return first
 
-    # General loop translator for all MATLAB loop types
-    # def visit_loop(self, node) -> Loop:
-    #     """ Translate Tree-sitter for_loop node into CAST Loop node """
-    #     return Loop (
-    #         source_refs = [self.node_helper.get_source_ref(node)]
-    #     )
+    # CAST has no Iterator node, so we return a partially 
+    # completed Loop object 
+    # MATLAB iterators are either matrices or ranges.
+    def visit_iterator(self, node) -> Loop:
+
+        itr_var = self.visit(get_first_child_by_type(node, "identifier"))
+        source_ref = self.node_helper.get_source_ref(node)
+
+        # process matrix iterator
+        matrix_node = get_first_child_by_type(node, "matrix")
+        if matrix_node is not None:
+            row_node = get_first_child_by_type(matrix_node, "row")
+            if row_node is not None:
+                mat = [self.visit(child) for child in 
+                    get_keyword_children(row_node)]
+                mat_idx = 0
+                mat_len = len(mat)
+
+
+                return Loop(
+                    pre = [
+                        Assignment(
+                            left = "_mat",
+                            right = mat,
+                            source_refs = [source_ref]
+                        ),
+                        Assignment(
+                            left = "_mat_len",
+                            right = mat_len,
+                            source_refs = [source_ref]
+                        ),
+                        Assignment(
+                            left = "_mat_idx",
+                            right = mat_idx,
+                            source_refs = [source_ref]
+                        ),
+                        Assignment(
+                            left = itr_var,
+                            right = mat[mat_idx],
+                            source_refs = [source_ref]
+                        )
+                    ],
+                    expr = self.get_operator(
+                        op = "<",
+                        operands = ["_mat_idx", "_mat_len"],
+                        source_refs = [source_ref]
+                    ),
+                    body = [
+                        Assignment(
+                            left = "_mat_idx",
+                            right = self.get_operator(
+                                op = "+",
+                                operands = ["_mat_idx", 1],
+                                source_refs = [source_ref]
+                            ),
+                            source_refs = [source_ref]
+                        ),
+                        Assignment(
+                            left = itr_var,
+                            right = "_mat[_mat_idx]",
+                            source_refs = [source_ref]
+                        )
+                    ],
+                    post = []
+                )
+
+
+
+        # process range iterator
+        range_node = get_first_child_by_type(node, "range")
+        if range_node is not None:
+            numbers = [self.visit(child) for child in 
+                get_children_by_types(range_node, ["number"])]
+            start = numbers[0]
+            step = 1
+            stop = 0
+            if len(numbers) == 2:
+                stop = numbers[1]
+
+            elif len(numbers) == 3:
+                step = numbers[1]
+                stop = numbers[2]
+
+            range_name_node = self.variable_context.get_gromet_function_node("range")
+            iter_name_node = self.variable_context.get_gromet_function_node("iter")
+            next_name_node = self.variable_context.get_gromet_function_node("next")
+            generated_iter_name_node = self.variable_context.generate_iterator()
+            stop_condition_name_node = self.variable_context.generate_stop_condition()
+
+            return Loop(
+                pre = [
+                    Assignment(
+                        left = itr_var,
+                        right = start,
+                        source_refs = [source_ref]
+                    )
+                ],
+                expr = self.get_operator(
+                    op = "<=",
+                    operands = [itr_var, stop],
+                    source_refs = [source_ref]
+                ),
+                body = [
+                    Assignment(
+                        left = itr_var,
+                        right = self.get_operator(
+                            op = "+",
+                            operands = [itr_var, step],
+                            source_refs = [source_ref]
+                        ),
+                        source_refs = [source_ref]
+                    )
+                ],
+                post = []
+            )
+
+
+    def visit_range(self, node):
+        return None
+
+    def visit_for_statement(self, node) -> Loop:
+        """ Translate Tree-sitter for loop node into CAST Loop node """
+
+        loop = self.visit(get_first_child_by_type(node, "iterator"))
+        loop.source_refs=[self.node_helper.get_source_ref(node)]
+        loop.body = self.get_block(node) + loop.body
+
+        return loop
+
 
     def visit_matrix(self, node):
         """ Translate the Tree-sitter cell node into a List """
@@ -328,17 +451,14 @@ class MatlabToCast(object):
         )
 
     def visit_operator(self, node):
-        """return an Operator based on the Tree-sitter node """
+        """return an operator based on the Tree-sitter node """
         # The operator will be the first control character
         op = self.node_helper.get_identifier(
            get_control_children(node)[0]
         )
         # the operands will be the keyword children
         operands=[self.visit(child) for child in get_keyword_children(node)]
-        return Operator(
-            source_language="matlab",
-            interpreter=INTERPRETER,
-            version=MATLAB_VERSION,
+        return self.get_operator(
             op = op,
             operands = operands,
             source_refs=[self.node_helper.get_source_ref(node)],
@@ -363,20 +483,9 @@ class MatlabToCast(object):
             "string",
             "unary_operator"
         ]
-        
-        def get_operator(op, operands, source_refs):
-            """ return an Operator representing the case test """
-            return Operator(
-                source_language = "matlab",
-                interpreter = INTERPRETER,
-                version = MATLAB_VERSION,
-                op = op,
-                operands = operands,
-                source_refs = source_refs
-            )
 
-        def get_case_expression(case_node, identifier):
-            """ return an Operator representing the case test """
+        def get_case_expression(case_node, switch_var):
+            """ return an operator representing the case test """
             source_refs=[self.node_helper.get_source_ref(case_node)]
             cell_node = get_first_child_by_type(case_node, "cell")
             # multiple case arguments
@@ -387,27 +496,41 @@ class MatlabToCast(object):
                     source_code_data_type=["matlab", MATLAB_VERSION, "unknown"],
                     source_refs=[self.node_helper.get_source_ref(cell_node)]
                 )
-                return get_operator("in", [identifier, operand], source_refs)
+                return self.get_operator(
+                    op = "in", 
+                    operands = [switch_var, operand], 
+                    source_refs = source_refs
+                )
             # single case argument
             operand = [self.visit(node) for node in 
                 get_children_by_types(case_node, case_node_types)][0]
-            return get_operator("==", [identifier, operand], source_refs)
+            return self.get_operator(
+                op = "==", 
+                operands = [switch_var, operand], 
+                source_refs = source_refs
+            )
 
-        def get_model_if(case_node, identifier):
+        def get_model_if(case_node, switch_var):
             """ return conditional logic representing the case """
             return ModelIf(
-                expr = get_case_expression(case_node, identifier),
+                expr = get_case_expression(case_node, switch_var),
                 body = self.get_block(case_node),
                 orelse = [],
                 source_refs=[self.node_helper.get_source_ref(case_node)]
             )
         
-        # switch statement identifier
-        identifier = self.visit(get_first_child_by_type(node, "identifier"))
-        
+        # switch variable is usually an identifier
+        switch_var = get_first_child_by_type(node, "identifier")
+        if switch_var is not None:
+            switch_var = self.visit(switch_var)
+
+        # however it can be a function call
+        else:
+            switch_var = self.visit(get_first_child_by_type(node, "function_call"))
+
         # n case clauses as 'if then' nodes
         case_nodes = get_children_by_types(node, ["case_clause"])
-        model_ifs = [get_model_if(node, identifier) for node in case_nodes]
+        model_ifs = [get_model_if(node, switch_var) for node in case_nodes]
         for i, model_if in enumerate(model_ifs[1:]):
             model_ifs[i].orelse = [model_if]
 
@@ -425,6 +548,21 @@ class MatlabToCast(object):
         if block:
             return [self.visit(child) for child in 
                 get_keyword_children(block)]
+
+    def get_operator(self, op, operands, source_refs):
+        """ return an operator representing the arguments """
+        return Operator(
+            source_language = "matlab",
+            interpreter = INTERPRETER,
+            version = MATLAB_VERSION,
+            op = op,
+            operands = operands,
+            source_refs = source_refs
+        )
+
+    def get_gromet_function_node(self, func_name: str) -> Name:
+        if self.variable_context.is_variable(func_name):
+            return self.variable_context.get_node(func_name)
 
     # skip control nodes and other junk
     def _visit_passthrough(self, node):

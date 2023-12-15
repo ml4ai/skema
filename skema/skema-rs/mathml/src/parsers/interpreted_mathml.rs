@@ -436,7 +436,7 @@ pub fn newtonian_derivative(input: Span) -> IResult<(Derivative, Ci)> {
     );
 
     let (s, (func, order)) = delimited(
-        stag!("mover"),
+        alt((tag("<mrow><mover>"), tag("<mover>"))),
         pair(
             map(
                 ci_unknown,
@@ -452,7 +452,7 @@ pub fn newtonian_derivative(input: Span) -> IResult<(Derivative, Ci)> {
             ),
             n_dots,
         ),
-        etag!("mover"),
+        alt((tag("</mover></mrow>"), etag!("mover"))),
     )(input)?;
     let (s, mi_func_of) = alt((parenthesized_identifier, empty_parenthesis))(s)?;
     let mut ci_func_of: Vec<Ci> = Vec::new();
@@ -460,9 +460,10 @@ pub fn newtonian_derivative(input: Span) -> IResult<(Derivative, Ci)> {
         let b = Ci::new(Some(Type::Real), Box::new(MathExpression::Mi(bvar)), None);
         ci_func_of.push(b.clone());
     }
+    let func_mi = ci_func_of.get(0).unwrap().content.clone();
     let new_with_respect_to: Box<MathExpression> = Box::new(MathExpression::Ci(Ci {
         r#type: None,
-        content: Box::new(MathExpression::Mi(Mi("".to_string()))),
+        content: Box::new(MathExpression::Mi(Mi(func_mi.to_string()))),
         func_of: None,
     }));
 
@@ -597,7 +598,7 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
     ws(alt((
         map(div, MathExpression::Mo),
         alt((ws(absolute_with_msup), ws(paren_as_msup))),
-        sqrt,
+        //sqrt,
         map(
             grad_func,
             |(
@@ -668,6 +669,34 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                             bound_var,
                         },
                     ))),
+                    func: Box::new(MathExpression::Ci(Ci {
+                        r#type,
+                        content,
+                        func_of,
+                    })),
+                })
+            },
+        ),
+        map(
+            newtonian_derivative,
+            |(
+                Derivative {
+                    order,
+                    var_index,
+                    bound_var,
+                },
+                Ci {
+                    r#type,
+                    content,
+                    func_of,
+                },
+            )| {
+                MathExpression::Differential(Differential {
+                    diff: Box::new(MathExpression::Mo(Operator::Derivative(Derivative {
+                        order,
+                        var_index,
+                        bound_var,
+                    }))),
                     func: Box::new(MathExpression::Ci(Ci {
                         r#type,
                         content,
@@ -771,7 +800,7 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                 })
             },
         ),
-        absolute,
+        alt((absolute, sqrt)),
         alt((
             map(operator, MathExpression::Mo),
             map(gradient, MathExpression::Mo),

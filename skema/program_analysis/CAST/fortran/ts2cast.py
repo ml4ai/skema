@@ -80,7 +80,7 @@ class TS2CAST(object):
 
         # Start visiting
         self.out_cast = self.generate_cast()
-        #print(self.out_cast[0].to_json_str())
+        print(self.out_cast[0].to_json_str())
         
     def generate_cast(self) -> List[CAST]:
         '''Interface for generating CAST.'''
