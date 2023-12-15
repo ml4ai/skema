@@ -115,12 +115,16 @@ class TS2CAST(object):
             return self.visit_assignment(node)
         elif node.type == "identifier":
             return self.visit_identifier(node)
-        elif node.type =="unary_operator":
+        elif node.type == "unary_operator":
             return self.visit_unary_op(node)
-        elif node.type =="binary_operator":
+        elif node.type == "binary_operator":
             return self.visit_binary_op(node)
         elif node.type in ["integer"]:
             return self.visit_literal(node)
+        elif node.type == "while_statement":
+            return self.visit_while(node)
+        elif node.type == "for_statement":
+            return self.visit_for(node)
         else:
             return self._visit_passthrough(node)
 
@@ -417,6 +421,40 @@ class TS2CAST(object):
                 source_code_data_type=["Python", PYTHON_VERSION, str(type(True))],
                 source_refs=[literal_source_ref]
             )
+
+    def visit_while(self, node: Node) -> Loop:
+        ref = self.node_helper.get_source_ref(node)
+        
+        # Push a variable context since a loop 
+        # can create variables that only it can see
+
+        loop_cond_node = get_children_by_types(node, ["boolean_operator", "call", "comparison_operator"])[0]
+        loop_body_node = get_children_by_types(node, "block")[0].children
+
+        loop_cond = self.visit(loop_cond_node)
+
+        self.variable_context.push_context()
+        loop_body = []
+        for node in loop_body_node:
+            cast = self.visit(node)
+            if isinstance(cast, List):
+                loop_body.extend(cast)
+            elif isinstance(cast, AstNode):
+                loop_body.append(cast)
+
+        self.variable_context.pop_context()
+
+        return Loop(
+            pre=[],
+            expr=loop_cond,
+            body=loop_body,
+            post=[]
+        )
+
+
+    def visit_for(self, node: Node) -> Loop:
+        pass
+
 
     def visit_name(self, node):
         # First, we will check if this name is already defined, and if it is return the name node generated previously
