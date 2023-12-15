@@ -156,15 +156,16 @@ class MatlabToCast(object):
 
     def visit_boolean(self, node):
         """ Translate Tree-sitter boolean node """
+        value_type = "Boolean"
         for child in node.children:
             # set the first letter to upper case for python
             value = child.type
             value = value[0].upper() + value[1:].lower()
             # store as string, use Python Boolean capitalization.
             return LiteralValue(
-                value_type="Boolean",
+                value_type=value_type,
                 value = value,
-                source_code_data_type=["matlab", MATLAB_VERSION, "boolean"],
+                source_code_data_type=["matlab", MATLAB_VERSION, value_type],
                 source_refs=[self.node_helper.get_source_ref(node)],
             )
 
@@ -437,16 +438,18 @@ class MatlabToCast(object):
         literal_value = self.node_helper.get_identifier(node)
         # Check if this is a real value, or an Integer
         if "e" in literal_value.lower() or "." in literal_value:
+            value_type = "AbstractFloat"
             return LiteralValue(
-                value_type="AbstractFloat",
+                value_type=value_type,
                 value=float(literal_value),
-                source_code_data_type=["matlab", MATLAB_VERSION, "real"],
+                source_code_data_type=["matlab", MATLAB_VERSION, value_type],
                 source_refs=[self.node_helper.get_source_ref(node)]
             )
+        value_type = "Integer"
         return LiteralValue(
-            value_type="Integer",
+            value_type=value_type,
             value=int(literal_value),
-            source_code_data_type=["matlab", MATLAB_VERSION, "integer"],
+            source_code_data_type=["matlab", MATLAB_VERSION, value_type],
             source_refs=[self.node_helper.get_source_ref(node)]
         )
 
@@ -465,10 +468,11 @@ class MatlabToCast(object):
         )
 
     def visit_string(self, node):
+        value_type = "Character"
         return LiteralValue(
-            value_type="Character",
+            value_type=value_type,
             value=self.node_helper.get_identifier(node),
-            source_code_data_type=["matlab", MATLAB_VERSION, "character"],
+            source_code_data_type=["matlab", MATLAB_VERSION, value_type],
             source_refs=[self.node_helper.get_source_ref(node)]
         )
 
