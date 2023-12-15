@@ -18,7 +18,6 @@ def get_length(gromet_item):
 def check_wire(gromet_wire, src_port_count, tgt_port_count, wire_type = "", metadata=None):
     # The current wiring checks are
     # Checking if the ports on both ends of the wire are below or over the bounds
-    # TODO: dump out metadata information for the line number information
     error_detected = False
     if gromet_wire.src < 0:
         error_detected = True
@@ -51,7 +50,7 @@ def check_wire(gromet_wire, src_port_count, tgt_port_count, wire_type = "", meta
 def find_metadata_idx(gromet_fn):
     """
         Attempts to find a metadata associated with this fn
-        If it find something, return it, otherwise return None
+        If it finds something, return it, otherwise return None
     """
     if gromet_fn.b != None:
         for b in gromet_fn.b:
