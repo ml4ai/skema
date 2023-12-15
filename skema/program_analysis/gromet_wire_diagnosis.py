@@ -1,5 +1,5 @@
 import argparse
-from JSON2GroMEt import json2gromet
+from skema.program_analysis.JSON2GroMEt import json2gromet
 from skema.gromet.metadata import SourceCodeReference
 
 # Ways to expand
