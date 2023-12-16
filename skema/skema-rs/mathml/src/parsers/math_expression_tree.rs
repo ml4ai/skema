@@ -2242,3 +2242,46 @@ fn test_sidarthe_equation() {
         "(= (D(1, t) S) (* (- S) (+ (+ (+ (* α I) (* β D)) (* γ A)) (* δ R))))"
     );
 }
+
+#[test]
+fn test_heating_rate() {
+    let input = "<math>
+  <msub>
+    <mi>Q</mi>
+    <mi>i</mi>
+  </msub>
+  <mo>=</mo>
+  <mrow>
+    <mo>(</mo>
+    <msub>
+      <mi>T</mi>
+      <mi>i</mi>
+    </msub>
+    <mo>−</mo>
+    <msub>
+      <mi>T</mi>
+      <mrow>
+        <mi>i</mi>
+        <mo>−</mo>
+        <mn>1</mn>
+      </mrow>
+    </msub>
+    <mo>)</mo>
+  </mrow>
+    <mo>/</mo>
+  <mrow>
+    <mo>(</mo>
+    <msub>
+      <mi>C</mi>
+      <mi>p</mi>
+    </msub>
+    <mi>&#x0394;</mi>
+    <mi>t</mi>
+    <mo>)</mo>
+  </mrow>
+</math>
+    ";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    let s_exp = exp.to_string();
+    assert_eq!(s_exp, "(= Q_{i} (/ (- T_{i} T_{i-1}) (* C_{p} Δt)))");
+}

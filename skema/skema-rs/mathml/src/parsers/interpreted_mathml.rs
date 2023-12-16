@@ -10,8 +10,8 @@ use crate::{
         Ci, Differential, Math, MathExpression, Mi, Mrow, Type,
     },
     parsers::generic_mathml::{
-        add, attribute, dot, elem_many0, equals, etag, grad, lparen, mean, mi, mn, msub, msubsup,
-        mtext, multiply, rparen, stag, subtract, tag_parser, ws, xml_declaration, IResult,
+        add, attribute, divide, dot, elem_many0, equals, etag, grad, lparen, mean, mi, mn, msub,
+        msubsup, mtext, multiply, rparen, stag, subtract, tag_parser, ws, xml_declaration, IResult,
         ParseError, Span,
     },
 };
@@ -29,7 +29,9 @@ use nom::{
 pub fn operator(input: Span) -> IResult<Operator> {
     let (s, op) = ws(delimited(
         stag!("mo"),
-        alt((add, subtract, multiply, equals, lparen, rparen, mean, dot)),
+        alt((
+            add, subtract, multiply, divide, equals, lparen, rparen, mean, dot,
+        )),
         etag!("mo"),
     ))(input)?;
     Ok((s, op))
@@ -592,12 +594,32 @@ pub fn sqrt(input: Span) -> IResult<MathExpression> {
     ))
 }
 
+/// Parser for change in a variable :
+/// Example: Δx
+pub fn change_in_variable(input: Span) -> IResult<Ci> {
+    let (s, elements) = ws(preceded(
+        alt((tag("<mi>Δ</mi>"), tag("<mi>&#x0394;</mi>"))),
+        math_expression,
+    ))(input)?;
+    let temp_sum = format!("Δ{}", elements.to_string());
+    let change_in_var = Ci::new(
+        Some(Type::Real),
+        Box::new(MathExpression::Mi(Mi(temp_sum.to_string()))),
+        None,
+    );
+    Ok((s, change_in_var))
+}
+
 /// Parser for math expressions. This varies from the one in the generic_mathml module, since it
 /// assumes that expressions such as S(t) are actually univariate functions.
 pub fn math_expression(input: Span) -> IResult<MathExpression> {
     ws(alt((
         map(div, MathExpression::Mo),
-        alt((ws(absolute_with_msup), ws(paren_as_msup))),
+        alt((
+            ws(absolute_with_msup),
+            ws(paren_as_msup),
+            map(change_in_variable, MathExpression::Ci),
+        )),
         //sqrt,
         map(
             grad_func,

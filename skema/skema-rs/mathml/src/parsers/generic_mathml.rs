@@ -198,6 +198,11 @@ pub fn multiply(input: Span) -> IResult<Operator> {
     Ok((s, op))
 }
 
+pub fn divide(input: Span) -> IResult<Operator> {
+    let (s, op) = value(Operator::Divide, alt((ws(tag("/")), ws(tag("&#x2215;")))))(input)?;
+    Ok((s, op))
+}
+
 pub fn equals(input: Span) -> IResult<Operator> {
     let (s, op) = value(Operator::Equals, ws(tag("=")))(input)?;
     Ok((s, op))
@@ -252,6 +257,7 @@ pub fn operator(input: Span) -> IResult<Operator> {
         rparen,
         mean,
         multiply,
+        divide,
         grad,
         dot,
         period,
