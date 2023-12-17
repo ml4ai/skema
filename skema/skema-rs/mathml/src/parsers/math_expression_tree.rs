@@ -3,7 +3,7 @@
 
 use crate::{
     ast::{
-        operator::{Derivative, Operator, PartialDerivative},
+        operator::{Derivative, Operator, PartialDerivative, Munderover},
         Math, MathExpression, Mi, Mrow,
     },
     parsers::interpreted_mathml::interpreted_math,
@@ -1008,6 +1008,7 @@ fn prefix_binding_power(op: &Operator) -> ((), u8) {
         Operator::Div => ((), 25),
         Operator::Abs => ((), 25),
         Operator::Sqrt => ((), 25),
+        Operator::Munderover(Munderover {..}) => ((), 26),
         _ => panic!("Bad operator: {:?}", op),
     }
 }
@@ -1031,6 +1032,7 @@ fn infix_binding_power(op: &Operator) -> Option<(u8, u8)> {
         Operator::Divide => (9, 10),
         Operator::Compose => (14, 13),
         Operator::Power => (16, 15),
+        //Operator::Munderover(Munderover {..}) => (18, 17),
         Operator::Other(op) => panic!("Unhandled operator: {}!", op),
         _ => return None,
     };
@@ -2284,4 +2286,24 @@ fn test_heating_rate() {
     let exp = input.parse::<MathExpressionTree>().unwrap();
     let s_exp = exp.to_string();
     assert_eq!(s_exp, "(= Q_{i} (/ (- T_{i} T_{i-1}) (* C_{p} Δt)))");
+}
+
+#[test]
+fn test_munderover() {
+    let input = "<math>
+<munderover>
+    <mo>&#x2211;</mo>
+    <mrow>
+      <mi>l</mi>
+      <mo>=</mo>
+      <mi>k</mi>
+    </mrow>
+    <mi>K</mi>
+  </munderover>
+<mi>S</mi>
+    </math>";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    let s_exp = exp.to_string();
+    println!("s_exp={:?}", s_exp);
+    //assert_eq!(s_exp, "(= Q_{i} (/ (- T_{i} T_{i-1}) (* C_{p} Δt)))");
 }

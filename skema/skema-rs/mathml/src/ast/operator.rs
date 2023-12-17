@@ -1,6 +1,7 @@
 use crate::ast::Ci;
 use derive_new::new;
 use std::fmt;
+use crate::ast::MathExpression;
 
 /// Derivative operator, in line with Spivak notation: http://ceres-solver.org/spivak_notation.html
 #[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
@@ -9,12 +10,21 @@ pub struct Derivative {
     pub var_index: u8,
     pub bound_var: Ci,
 }
+
 /// Partial derivative operator
 #[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
 pub struct PartialDerivative {
     pub order: u8,
     pub var_index: u8,
     pub bound_var: Ci,
+}
+
+/// Summation operator
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
+pub struct Munderover {
+    pub op: Box<MathExpression>,
+    pub under: Box<MathExpression>,
+    pub over: Box<MathExpression>,
 }
 
 #[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
@@ -52,6 +62,8 @@ pub enum Operator {
     Arccsc,
     Arccot,
     Mean,
+    Sum,
+    Munderover(Munderover),
     // Catchall for operators we haven't explicitly defined as enum variants yet.
     Other(String),
 }
@@ -105,6 +117,10 @@ impl fmt::Display for Operator {
             Operator::Period => write!(f, ""),
             Operator::Div => write!(f, "Div"),
             Operator::Abs => write!(f, "Abs"),
+            Operator::Sum => write!(f, "∑"),
+            Operator::Munderover(Munderover{op, under, over }) => {
+                write!(f, "{op}_{{{under}}}^{{{over}}}")
+            }
         }
     }
 }

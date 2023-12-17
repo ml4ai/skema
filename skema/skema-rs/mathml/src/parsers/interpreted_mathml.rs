@@ -6,7 +6,7 @@
 
 use crate::{
     ast::{
-        operator::{Derivative, Operator, PartialDerivative},
+        operator::{Derivative, Operator, PartialDerivative, Munderover},
         Ci, Differential, Math, MathExpression, Mi, Mrow, Type,
     },
     parsers::generic_mathml::{
@@ -610,6 +610,21 @@ pub fn change_in_variable(input: Span) -> IResult<Ci> {
     Ok((s, change_in_var))
 }
 
+///
+pub fn munderover_summation(input: Span) -> IResult<(Operator, MathExpression, MathExpression)>{
+    let (s, (under, over)) = ws(delimited(
+        alt((tag("<munderover><mo>∑</mo>"), tag("<munderover><mo>&#x2211;</mo>"))),
+        pair(ws(delimited(tag("<mrow>"),many0(math_expression), tag("</mrow>"))), many0(math_expression)),
+        tag("</munderover>")
+    ))(input)?;
+    let sum_operator = Operator::Sum;
+    let under_comp = MathExpression::Mrow(Mrow(under));
+    let over_comp = MathExpression::Mrow(Mrow(over));
+    //println!("under_comp={:?}", under_comp);
+    //println!("over_comp={:?}", over_comp);
+    Ok((s, (sum_operator, under_comp, over_comp)))
+}
+
 /// Parser for math expressions. This varies from the one in the generic_mathml module, since it
 /// assumes that expressions such as S(t) are actually univariate functions.
 pub fn math_expression(input: Span) -> IResult<MathExpression> {
@@ -621,6 +636,20 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
             map(change_in_variable, MathExpression::Ci),
         )),
         //sqrt,
+        map(
+            munderover_summation,
+            |(
+                 op,
+                 under,
+                 over,
+             )| {
+                MathExpression::Mo(Operator::Munderover(Munderover {
+                    op: Box::new(MathExpression::Mo(op)),
+                    under: Box::new(under),
+                    over: Box::new(over),
+                }))
+            },
+        ),
         map(
             grad_func,
             |(
