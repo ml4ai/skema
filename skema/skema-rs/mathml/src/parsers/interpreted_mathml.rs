@@ -7,7 +7,7 @@
 use crate::{
     ast::{
         operator::{Derivative, Operator, PartialDerivative, Munderover},
-        Ci, Differential, Math, MathExpression, Mi, Mrow, Type,
+        Ci, Differential, Math, MathExpression, Mi, Mrow, SummationMath, Type,
     },
     parsers::generic_mathml::{
         add, attribute, divide, dot, elem_many0, equals, etag, grad, lparen, mean, mi, mn, msub,
@@ -611,18 +611,25 @@ pub fn change_in_variable(input: Span) -> IResult<Ci> {
 }
 
 ///
-pub fn munderover_summation(input: Span) -> IResult<(Operator, MathExpression, MathExpression)>{
+pub fn munderover_summation(input: Span) -> IResult<(Munderover, Mrow)>{
     let (s, (under, over)) = ws(delimited(
         alt((tag("<munderover><mo>∑</mo>"), tag("<munderover><mo>&#x2211;</mo>"))),
         pair(ws(delimited(tag("<mrow>"),many0(math_expression), tag("</mrow>"))), many0(math_expression)),
         tag("</munderover>")
     ))(input)?;
+    let (s, comps) = many0(math_expression)(s)?;
     let sum_operator = Operator::Sum;
     let under_comp = MathExpression::Mrow(Mrow(under));
     let over_comp = MathExpression::Mrow(Mrow(over));
+    let other_comps = Mrow::new(comps); //MathExpression::Mrow(Mrow(comps));
     //println!("under_comp={:?}", under_comp);
     //println!("over_comp={:?}", over_comp);
-    Ok((s, (sum_operator, under_comp, over_comp)))
+    let operator = Munderover::new(
+        Box::new(MathExpression::Mo(sum_operator)),
+        Box::new(under_comp),
+        Box::new(over_comp),
+    );
+    Ok((s, (operator, other_comps)))
 }
 
 /// Parser for math expressions. This varies from the one in the generic_mathml module, since it
@@ -639,15 +646,23 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
         map(
             munderover_summation,
             |(
-                 op,
-                 under,
-                 over,
+                 Munderover{
+                     op,
+                     under,
+                     over
+                 },
+                 comp,
              )| {
-                MathExpression::Mo(Operator::Munderover(Munderover {
-                    op: Box::new(MathExpression::Mo(op)),
-                    under: Box::new(under),
-                    over: Box::new(over),
-                }))
+                MathExpression::SummationMath(SummationMath{
+                    op: Box::new(MathExpression::Mo(Operator::Munderover(Munderover {
+                        op,
+                        under,
+                        over,
+                    }))),
+                    func: Box::new(MathExpression::Mrow(comp)),
+                }
+                )
+
             },
         ),
         map(

@@ -801,6 +801,18 @@ impl MathExpression {
                     tokens.push(MathExpression::Mo(Operator::Rparen));
                 }
             }
+            MathExpression::SummationMath(x) => {
+                tokens.push(MathExpression::Mo(Operator::Lparen));
+                //if let Box::new(MathExpression::Mo(Operator::Munderover(Munderover {op, under,over}))) = x.clone().op{
+                //if x.op == Box::new(MathExpression::Mo(Operator::Munderover(Munderover {op, under,over}))) {
+                //tokens.push(MathExpression::Mo(Operator::Munderover());
+                //} else {
+                x.op.flatten(tokens);
+                x.func.flatten(tokens);
+                //}
+                //x.func.flatten(tokens);
+                tokens.push(MathExpression::Mo(Operator::Rparen));
+            }
             t => tokens.push(t.clone()),
         }
     }
@@ -2306,4 +2318,48 @@ fn test_munderover() {
     let s_exp = exp.to_string();
     println!("s_exp={:?}", s_exp);
     //assert_eq!(s_exp, "(= Q_{i} (/ (- T_{i} T_{i-1}) (* C_{p} Δt)))");
+}
+
+#[test]
+fn test_hydrostatic(){
+    let input = "<math>
+  <msub>
+    <mi>Φ</mi>
+    <mi>k</mi>
+  </msub>
+  <mo>=</mo>
+  <msub>
+    <mi>Φ</mi>
+    <mi>s</mi>
+  </msub>
+  <mo>+</mo>
+  <mi>R</mi>
+  <munderover>
+    <mo>∑</mo>
+    <mrow>
+      <mi>l</mi>
+      <mo>=</mo>
+      <mi>k</mi>
+    </mrow>
+    <mi>K</mi>
+  </munderover>
+  <msub>
+    <mi>H</mi>
+    <mrow>
+      <mi>k</mi>
+      <mi>l</mi>
+    </mrow>
+  </msub>
+  <msub>
+    <mi>T</mi>
+    <mrow>
+      <mi>v</mi>
+      <mi>l</mi>
+    </mrow>
+  </msub>
+</math>
+    ";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    let s_exp = exp.to_string();
+    println!("s_exp={:?}", s_exp);
 }
