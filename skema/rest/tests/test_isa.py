@@ -8,7 +8,7 @@ client = TestClient(app)
 
 
 @pytest.mark.ci_only
-def test_post_image_to_latex():
+def test_align_eqns():
     """Test case for /align-eqns endpoint."""
 
     halfar_dome_eqn = """<math>
