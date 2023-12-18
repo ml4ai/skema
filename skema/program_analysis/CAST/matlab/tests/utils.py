@@ -77,7 +77,8 @@ def cast(source):
 def validate(cast):
     """ Test that the cast can be parsed """
     try:
-        c = CASTToAGraphVisitor(cast)
+        foo = CASTToAGraphVisitor(cast)
+        foo.to_pdf("/dev/null")
         return True
     except:
         return False
