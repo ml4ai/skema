@@ -7,7 +7,7 @@
 <title>skema.isa.lib API documentation</title>
 <meta name="description" content="All the functions required by performing incremental structure alignment (ISA)
 Author: Liang Zhang (liangzh@arizona.edu)
-Updated date: August 24, 2023" />
+Updated date: December 18, 2023" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
 <link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
@@ -27,7 +27,7 @@ Updated date: August 24, 2023" />
 <section id="section-intro">
 <p>All the functions required by performing incremental structure alignment (ISA)
 Author: Liang Zhang (liangzh@arizona.edu)
-Updated date: August 24, 2023</p>
+Updated date: December 18, 2023</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -36,13 +36,14 @@ Updated date: August 24, 2023</p>
 &#34;&#34;&#34;
 All the functions required by performing incremental structure alignment (ISA)
 Author: Liang Zhang (liangzh@arizona.edu)
-Updated date: August 24, 2023
+Updated date: December 18, 2023
 &#34;&#34;&#34;
 import json
 import warnings
 from typing import List, Any, Union, Dict
 from numpy import ndarray
 from pydot import Dot
+from skema.rest.proxies import SKEMA_RS_ADDESS
 
 warnings.filterwarnings(&#34;ignore&#34;)
 import requests
@@ -207,8 +208,9 @@ def generate_graph(file: str = &#34;&#34;, render: bool = False) -&gt; pydot.Dot
             content = f.read()
 
     digraph = requests.put(
-        &#34;http://localhost:8080/mathml/math-exp-graph&#34;, data=content.encode(&#34;utf-8&#34;)
+        f&#34;{SKEMA_RS_ADDESS}/mathml/math-exp-graph&#34;, data=content.encode(&#34;utf-8&#34;)
     )
+
     if render:
         src = Source(digraph.text)
         src.render(&#34;doctest-output/mathml_exp_tree&#34;, view=True)
@@ -1654,8 +1656,9 @@ Output: the GraphViz representation (pydot.Dot)</p></div>
             content = f.read()
 
     digraph = requests.put(
-        &#34;http://localhost:8080/mathml/math-exp-graph&#34;, data=content.encode(&#34;utf-8&#34;)
+        f&#34;{SKEMA_RS_ADDESS}/mathml/math-exp-graph&#34;, data=content.encode(&#34;utf-8&#34;)
     )
+
     if render:
         src = Source(digraph.text)
         src.render(&#34;doctest-output/mathml_exp_tree&#34;, view=True)

@@ -29,13 +29,14 @@
 </summary>
 <pre><code class="python"># -*- coding: utf-8 -*-
 
-from fastapi import FastAPI, File
+from fastapi import FastAPI, APIRouter
 from skema.isa.lib import align_mathml_eqs
 from pydantic import BaseModel
+import requests
 
-# Create a web app using FastAPI
+from skema.rest.proxies import SKEMA_RS_ADDESS
 
-app = FastAPI()
+router = APIRouter()
 
 
 # Model for ISA_Result
@@ -44,12 +45,12 @@ class ISA_Result(BaseModel):
     union_graph: str = None
 
 
-@app.get(&#34;/ping&#34;, summary=&#34;Ping endpoint to test health of service&#34;)
-def ping():
-    return &#34;The ISA service is running.&#34;
+@router.get(&#34;/healthcheck&#34;, summary=&#34;Status of ISA service&#34;)
+async def healthcheck() -&gt; int:
+    return requests.get(f&#34;{SKEMA_RS_ADDESS}/ping&#34;).status_code
 
 
-@app.put(&#34;/align-eqns&#34;, summary=&#34;Align two MathML equations&#34;)
+@router.put(&#34;/align-eqns&#34;, summary=&#34;Align two MathML equations&#34;)
 async def align_eqns(
     file1: str, file2: str, mention_json1: str = &#34;&#34;, mention_json2: str = &#34;&#34;
 ) -&gt; ISA_Result:
@@ -69,7 +70,11 @@ async def align_eqns(
     ir = ISA_Result()
     ir.matching_ratio = matching_ratio
     ir.union_graph = union_graph.to_string()
-    return ir</code></pre>
+    return ir
+
+
+app = FastAPI()
+app.include_router(router)</code></pre>
 </details>
 </section>
 <section>
@@ -88,7 +93,7 @@ async def align_eqns(
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">@app.put(&#34;/align-eqns&#34;, summary=&#34;Align two MathML equations&#34;)
+<pre><code class="python">@router.put(&#34;/align-eqns&#34;, summary=&#34;Align two MathML equations&#34;)
 async def align_eqns(
     file1: str, file2: str, mention_json1: str = &#34;&#34;, mention_json2: str = &#34;&#34;
 ) -&gt; ISA_Result:
@@ -111,8 +116,8 @@ async def align_eqns(
     return ir</code></pre>
 </details>
 </dd>
-<dt id="skema.isa.isa_service.ping"><code class="name flex">
-<span>def <span class="ident">ping</span></span>(<span>)</span>
+<dt id="skema.isa.isa_service.healthcheck"><code class="name flex">
+<span>async def <span class="ident">healthcheck</span></span>(<span>) ‑> int</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -120,9 +125,9 @@ async def align_eqns(
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">@app.get(&#34;/ping&#34;, summary=&#34;Ping endpoint to test health of service&#34;)
-def ping():
-    return &#34;The ISA service is running.&#34;</code></pre>
+<pre><code class="python">@router.get(&#34;/healthcheck&#34;, summary=&#34;Status of ISA service&#34;)
+async def healthcheck() -&gt; int:
+    return requests.get(f&#34;{SKEMA_RS_ADDESS}/ping&#34;).status_code</code></pre>
 </details>
 </dd>
 </dl>
@@ -229,7 +234,7 @@ allow <code>self</code> as a field name.</p></div>
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
 <li><code><a title="skema.isa.isa_service.align_eqns" href="#skema.isa.isa_service.align_eqns">align_eqns</a></code></li>
-<li><code><a title="skema.isa.isa_service.ping" href="#skema.isa.isa_service.ping">ping</a></code></li>
+<li><code><a title="skema.isa.isa_service.healthcheck" href="#skema.isa.isa_service.healthcheck">healthcheck</a></code></li>
 </ul>
 </li>
 <li><h3><a href="#header-classes">Classes</a></h3>
