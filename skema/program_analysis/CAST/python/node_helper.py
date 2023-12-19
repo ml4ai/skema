@@ -1,3 +1,4 @@
+import itertools
 from typing import List, Dict
 from skema.program_analysis.CAST2FN.model.cast import SourceRef
 
@@ -24,6 +25,30 @@ CONTROL_CHARACTERS = [
     "not"
 ]
 
+# Whatever constructs we see in the left
+# part of the for loop construct
+# for LEFT in RIGHT: 
+FOR_LOOP_LEFT_TYPES = [
+    "identifier",
+    "tuple_pattern",
+    "pattern_list"
+]
+
+# Whatever constructs we see in the right
+# part of the for loop construct
+# for LEFT in RIGHT: 
+FOR_LOOP_RIGHT_TYPES = [
+    "call",
+]
+
+# Whatever constructs we see in the conditional
+# part of the while loop
+WHILE_COND_TYPES = [
+    "boolean_operator",
+    "call",
+    "comparison_operator"
+]
+
 class NodeHelper():
     def __init__(self, source: str, source_file_name: str):
         self.source = source
@@ -32,7 +57,7 @@ class NodeHelper():
         # get_identifier optimization variables
         self.source_lines = source.splitlines(keepends=True)
         self.line_lengths = [len(line) for line in self.source_lines]
-        self.line_length_sums = [sum(self.line_lengths[:i+1]) for i in range(len(self.source_lines))]
+        self.line_length_sums = list(itertools.accumulate(self.line_lengths))
         
     def get_identifier(self, node: Node) -> str:
         """Given a node, return the identifier it represents. ie. The code between node.start_point and node.end_point"""

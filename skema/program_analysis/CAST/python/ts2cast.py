@@ -35,7 +35,10 @@ from skema.program_analysis.CAST.python.node_helper import (
     get_first_child_index,
     get_last_child_index,
     get_control_children,
-    get_non_control_children
+    get_non_control_children,
+    FOR_LOOP_LEFT_TYPES,
+    FOR_LOOP_RIGHT_TYPES,
+    WHILE_COND_TYPES
 )
 from skema.program_analysis.CAST.python.util import (
     generate_dummy_source_refs,
@@ -427,13 +430,13 @@ class TS2CAST(object):
         
         # Push a variable context since a loop 
         # can create variables that only it can see
+        self.variable_context.push_context()
 
-        loop_cond_node = get_children_by_types(node, ["boolean_operator", "call", "comparison_operator"])[0]
+        loop_cond_node = get_children_by_types(node, WHILE_COND_TYPES)[0]
         loop_body_node = get_children_by_types(node, "block")[0].children
 
         loop_cond = self.visit(loop_cond_node)
 
-        self.variable_context.push_context()
         loop_body = []
         for node in loop_body_node:
             cast = self.visit(node)
@@ -448,12 +451,34 @@ class TS2CAST(object):
             pre=[],
             expr=loop_cond,
             body=loop_body,
-            post=[]
+            post=[],
+            source_refs = ref
         )
 
-
     def visit_for(self, node: Node) -> Loop:
-        pass
+        ref = self.node_helper.get_source_ref(node)
+        # Pre: left, right        
+        loop_cond_left = get_children_by_types(node, FOR_LOOP_LEFT_TYPES)
+        loop_cond_right = get_children_by_types(node, FOR_LOOP_RIGHT_TYPES)
+
+        # Construct pre and expr value using left and right as needed
+        # need calls to "_Iterator"
+        loop_body_node = get_children_by_types(node, "block")[0].children
+        loop_body = []
+        for node in loop_body_node:
+            cast = self.visit(node)
+            if isinstance(cast, List):
+                loop_body.extend(cast)
+            elif isinstance(cast, AstNode):
+                loop_body.append(cast)
+
+        return Loop(
+            pre=[],
+            expr=[],
+            body=loop_body,
+            post=[],
+            source_refs = ref
+        )
 
 
     def visit_name(self, node):
