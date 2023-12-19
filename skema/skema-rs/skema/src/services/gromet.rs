@@ -7,6 +7,7 @@ use actix_web::web::ServiceConfig;
 use actix_web::{delete, get, post, put, web, HttpResponse};
 use mathml::acset::{PetriNet, RegNet};
 
+use mathml::parsers::math_expression_tree::MathExpressionTree;
 use neo4rs;
 use neo4rs::{query, Error, Node};
 use std::collections::HashMap;
@@ -44,6 +45,23 @@ pub async fn model_to_PN(gromet: ModuleCollection, config: Config) -> Result<Pet
     let mathml_ast = module_id2mathml_MET_ast(*ref_module_id1.unwrap(), config.clone()).await; // turns model into mathml ast equations
     let _del_response = delete_module(*ref_module_id2.unwrap(), config.clone()).await; // deletes model from db
     Ok(PetriNet::from(mathml_ast))
+}
+
+// this takes in a gromet and returns just the METs
+pub async fn model_to_MET(
+    gromet: ModuleCollection,
+    config: Config,
+) -> Result<Vec<MathExpressionTree>, Error> {
+    let module_id = push_model_to_db(gromet, config.clone()).await; // pushes model to db and gets id
+    let ref_module_id1 = module_id.as_ref();
+    let ref_module_id2 = module_id.as_ref();
+    let mathml_ast = module_id2mathml_MET_ast(*ref_module_id1.unwrap(), config.clone()).await; // turns model into mathml ast equations
+    let _del_response = delete_module(*ref_module_id2.unwrap(), config.clone()).await; // deletes model from db
+    let mut mets = Vec::<MathExpressionTree>::new();
+    for entry in mathml_ast.iter() {
+        mets.push(entry.rhs.clone());
+    }
+    Ok(mets)
 }
 
 pub async fn push_model_to_db(gromet: ModuleCollection, config: Config) -> Result<i64, Error> {

@@ -8,7 +8,10 @@ use mathml::acset::PetriNet;
 use neo4rs::{query, Node};
 use skema::config::Config;
 use skema::model_extraction::module_id2mathml_MET_ast;
+use skema::services::gromet::model_to_MET;
+use skema::ModuleCollection;
 use std::env;
+use std::fs;
 
 use std::sync::Arc;
 
@@ -20,24 +23,6 @@ struct Cli {
 
     #[arg(short, long)]
     model_id: Option<i64>,
-}
-
-pub async fn module_query(config: Config) -> Vec<i64> {
-    // Connect to Memgraph.
-
-    let graph = Arc::new(config.graphdb_connection().await);
-
-    let mut ids = Vec::<i64>::new();
-    let mut result = graph
-        .execute(query("MATCH (n:Module) RETURN n"))
-        .await
-        .unwrap();
-    while let Ok(Some(row)) = result.next().await {
-        let node: Node = row.get("n").unwrap();
-        ids.push(node.id());
-    }
-
-    ids
 }
 
 #[allow(unused_variables)]
@@ -71,8 +56,6 @@ async fn main() {
             db_host: db_host.clone(),
             db_port: db_port.parse::<u16>().unwrap(),
         };
-
-        let _response = module_query(config.clone()).await;
 
         let mut ids = Vec::<i64>::new();
         let graph = Arc::new(config.graphdb_connection().await);
@@ -124,6 +107,39 @@ async fn main() {
         //    serde_json::to_string(&PetriNet::from(odes)).unwrap()
         //);
         //println!("\nAMR from code: {:?}", PetriNet::from(math_content));
+    } else {
+        println!("Here");
+        // setup the config for memgraph, will need local running instance
+        // in ASKEM-TA1-DockerVM, under end-to-end-rest run:> docker compose up -d graphdb
+        // Then the following default values for the config environment variables should work
+        let db_protocol = env::var("SKEMA_GRAPH_DB_PROTO").unwrap_or("bolt://".to_string());
+        let db_host = env::var("SKEMA_GRAPH_DB_HOST").unwrap_or("0.0.0.0".to_string());
+        let db_port = env::var("SKEMA_GRAPH_DB_PORT").unwrap_or("7687".to_string());
+
+        let config = Config {
+            db_protocol: db_protocol.clone(),
+            db_host: db_host.clone(),
+            db_port: db_port.parse::<u16>().unwrap(),
+        };
+
+        // put in path to json of gromet to turn into MET's
+        let json_gromet_path =
+            "../../data/gromet/testing/SIDARTHE_imports-12-12-23.json".to_string();
+
+        // deserialize gromet into ModuleCollection
+        let data = fs::read_to_string(&json_gromet_path).expect("Unable to read file");
+        let gromet: ModuleCollection = serde_json::from_str(&data).expect("Unable to parse");
+
+        // extract the MET's from it
+        let mets = model_to_MET(gromet, config).await;
+        println!("\n _______________________");
+        println!("|---------MET's---------|");
+        println!(" ----------\\/-----------");
+        if mets.is_ok() {
+            for (i, eq) in mets.unwrap().iter().enumerate() {
+                println!("Equation MET {}:\n{:?}\n", i, eq.clone());
+            }
+        }
     }
     // This is the graph id for the top level function for the core dynamics for our test case.
 }
