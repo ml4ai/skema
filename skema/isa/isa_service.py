@@ -3,7 +3,9 @@
 from fastapi import FastAPI, APIRouter
 from skema.isa.lib import align_mathml_eqs
 from pydantic import BaseModel
+import requests
 
+from skema.rest.proxies import SKEMA_RS_ADDESS
 
 router = APIRouter()
 
@@ -14,9 +16,9 @@ class ISA_Result(BaseModel):
     union_graph: str = None
 
 
-@router.get("/ping", summary="Ping endpoint to test health of service")
-def ping():
-    return "The ISA service is running."
+@router.get("/healthcheck", summary="Status of ISA service")
+async def healthcheck() -> int:
+    return requests.get(f"{SKEMA_RS_ADDESS}/ping").status_code
 
 
 @router.put("/align-eqns", summary="Align two MathML equations")
