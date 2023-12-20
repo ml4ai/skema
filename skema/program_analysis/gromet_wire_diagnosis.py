@@ -47,6 +47,8 @@ def check_wire(gromet_wire, src_port_count, tgt_port_count, wire_type = "", meta
             print(f"Wire is associated with source code lines start:{metadata.line_begin} end:{metadata.line_end}")
         print()
 
+    return error_detected
+
 def find_metadata_idx(gromet_fn):
     """
         Attempts to find a metadata associated with this fn
