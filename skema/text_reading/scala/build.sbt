@@ -35,6 +35,7 @@ libraryDependencies ++= {
     "xml-apis"                    % "xml-apis"                            % "1.4.01",
     "com.github.scopt"           %% "scopt"                               % "4.1.0",
     "com.lihaoyi"                %% "requests"                            % "0.1.8",
+    "org.clulab"                 %% "scala-grounders"                     % "0.0.3-SNAPSHOT",
   )
 }
 
