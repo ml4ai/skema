@@ -56,6 +56,7 @@ builtin_statements = set(
         "print_statement"
     ]
 )
+
 class TS2CAST(object):
     def __init__(self, source_file_path: str):
         # Prepare source with preprocessor
@@ -80,7 +81,7 @@ class TS2CAST(object):
 
         # Start visiting
         self.out_cast = self.generate_cast()
-        print(self.out_cast[0].to_json_str())
+        #print(self.out_cast[0].to_json_str())
         
     def generate_cast(self) -> List[CAST]:
         '''Interface for generating CAST.'''
@@ -227,8 +228,9 @@ class TS2CAST(object):
         self.variable_context.push_context()
 
         # Top level statement node
+      
         statement_node = get_children_by_types(node, ["subroutine_statement", "function_statement"])[0]
-    
+
         name_node = get_first_child_by_type(statement_node, "name")
         name = self.visit(
             name_node
@@ -1214,8 +1216,5 @@ class TS2CAST(object):
         if len(body) == 0:
             body.append(self._visit_no_op(None))
         
+        # TODO: How to add more support for source references
         return body
-
-#TS2CAST("qjoule.F")
-#import cProfile
-#cProfile.run("TS2CAST('he_coef0_dres.F')", sort="tottime")
