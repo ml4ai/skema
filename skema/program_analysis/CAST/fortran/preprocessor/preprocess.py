@@ -68,6 +68,7 @@ def preprocess(
     # Step 2: Correct include directives to remove system references
     source = fix_include_directives(source)
     
+
     # Step 3: Process with gcc c-preprocessor
     include_base_directory = Path(source_path.parent, f"include_{source_path.stem}")
     if not include_base_directory.exists():
@@ -76,11 +77,13 @@ def preprocess(
     if out_gcc:
         gcc_path.write_text(source)
     
+    
     # Step 4: Prepare for tree-sitter
     # This step removes any additional preprocessor directives added or not removed by GCC
     source = "\n".join(
         ["!" + line if line.startswith("#") else line for line in source.splitlines()]
     )
+    
     
     # Step 5: Check for unsupported idioms
     if out_unsupported:
@@ -93,6 +96,7 @@ def preprocess(
     if out_free:
         free_path.write_text(source)
 
+    print(source)
     return source
 
 
@@ -173,7 +177,7 @@ def fix_include_directives(source: str) -> str:
 def run_c_preprocessor(source: str, include_base_path: Path) -> str:
     """Run the gcc c-preprocessor. Its run from the context of the include_base_path, so that it can find all included files"""
     result = run(
-        ["gcc", "-cpp", "-E", "-"],
+        ["gcc", "-cpp", "-E", "-x", "f95", "-"],
         input=source,
         text=True,
         capture_output=True,
@@ -182,6 +186,9 @@ def run_c_preprocessor(source: str, include_base_path: Path) -> str:
     )
     return result.stdout
 
+def convert_assigned(source: str) -> str:
+    """Convered ASSIGNED GO TO to COMPUTED GO TO"""
+    pass
 
 def convert_to_free_form(source: str) -> str:
     """If fixed-form Fortran source, convert to free-form"""
