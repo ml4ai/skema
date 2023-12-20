@@ -392,12 +392,25 @@ fn create_module(gromet: &ModuleCollection) -> Vec<String> {
 
 fn create_graph_queries(gromet: &ModuleCollection, start: u32) -> Vec<String> {
     let mut queries: Vec<String> = vec![];
+    let mut only_imports = true;
     // if a library module need to walk through gromet differently
     if gromet.modules[0].r#fn.bf.is_none() {
         queries.append(&mut create_function_net_lib(gromet, start));
     } else {
         // if executable code
-        queries.append(&mut create_function_net(gromet, start));
+        for bf in gromet.modules[0].r#fn.bf.as_ref().unwrap().iter() {
+            if bf.function_type != FunctionType::Imported
+                && bf.function_type != FunctionType::ImportedMethod
+            {
+                only_imports = false;
+            }
+        }
+        println!("{}", only_imports);
+        if only_imports {
+            queries.append(&mut create_function_net_lib(gromet, start));
+        } else {
+            queries.append(&mut create_function_net(gromet, start));
+        }
     }
     queries
 }
@@ -1584,6 +1597,7 @@ pub fn create_function(
                     new_c_args.box_counter = box_counter;
                     new_c_args.cur_box = att_sub_box.clone();
                     new_c_args.att_idx = c_args.att_idx;
+                    new_c_args.att_bf_idx = c_args.att_bf_idx;
                     match att_sub_box.function_type {
                         FunctionType::Function => {
                             new_c_args.att_idx = att_sub_box.contents.unwrap() as usize;
@@ -1610,6 +1624,7 @@ pub fn create_function(
                         }
                         FunctionType::Expression => {
                             new_c_args.att_idx = att_sub_box.contents.unwrap() as usize;
+                            new_c_args.att_bf_idx = c_args.att_idx;
                             create_att_expression(
                                 gromet, // gromet for metadata
                                 nodes,  // nodes
@@ -3584,6 +3599,13 @@ pub fn create_att_expression(
                 }
             }
         }
+        if opo_name.is_empty() {
+            println!(
+                "Missed Opo at att_idx: {:?} and box_counter: {:?}",
+                c_args.att_idx, c_args.box_counter
+            );
+            println!("parent att box: {:?}", c_args.att_bf_idx);
+        }
         if !opo_name.clone().is_empty() {
             let mut oport: u32 = 0;
             for _op in att_box.opo.as_ref().unwrap().iter() {
@@ -3746,6 +3768,7 @@ pub fn create_att_expression(
             new_c_args.box_counter = box_counter;
             new_c_args.cur_box = att_sub_box.clone();
             new_c_args.att_idx = c_args.att_idx;
+            new_c_args.att_bf_idx = c_args.att_bf_idx;
             match att_sub_box.function_type {
                 FunctionType::Literal => {
                     create_att_literal(
@@ -3769,6 +3792,7 @@ pub fn create_att_expression(
                 }
                 FunctionType::Expression => {
                     new_c_args.att_idx = att_sub_box.contents.unwrap() as usize;
+                    new_c_args.att_bf_idx = c_args.att_idx;
                     create_att_expression(
                         gromet, // gromet for metadata
                         nodes,  // nodes

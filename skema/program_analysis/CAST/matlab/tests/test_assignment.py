@@ -7,9 +7,8 @@ from skema.program_analysis.CAST2FN.model.cast import (
 def test_boolean():
     """ Test assignment of literal boolean types. """
     # we translate these MATLAB keywords into capitalized strings for Python
-    nodes = cast("x = true; y = false")
-    check(nodes[0], Assignment(left = "x", right = "True"))
-    check(nodes[1], Assignment(left = "y", right = "False"))
+    check(cast("x = true")[0], Assignment(left = "x", right = "True"))
+    check(cast("y = false")[0], Assignment(left = "y", right = "False"))
 
 def test_number_zero_integer():
     """ Test assignment of integer and real numbers."""
@@ -42,9 +41,20 @@ def test_identifier():
 def test_operator():
     """ Test assignment of operator"""
     check(
-        cast("Vtot = V1PF+V1AZ;")[0], 
+        cast("x = x + 1")[0], 
         Assignment(
-            left = "Vtot", 
-            right = Operator(op = "+",operands = ["V1PF", "V1AZ"])
+            left = "x", 
+            right = Operator(op = "+",operands = ["x", 1])
         )
     )
+
+def test_matrix():
+    """ Test assignment of matrix"""
+    check(
+        cast("x = [1 cat 'dog' ]")[0], 
+        Assignment(
+            left = "x", 
+            right = [1, 'cat', "'dog'"]
+        )
+    )
+
