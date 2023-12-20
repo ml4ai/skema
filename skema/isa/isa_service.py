@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 
-from fastapi import FastAPI, File
+from fastapi import FastAPI, APIRouter
 from skema.isa.lib import align_mathml_eqs
 from pydantic import BaseModel
+import requests
 
-# Create a web app using FastAPI
+from skema.rest.proxies import SKEMA_RS_ADDESS
 
-app = FastAPI()
+router = APIRouter()
 
 
 # Model for ISA_Result
@@ -15,12 +16,12 @@ class ISA_Result(BaseModel):
     union_graph: str = None
 
 
-@app.get("/ping", summary="Ping endpoint to test health of service")
-def ping():
-    return "The ISA service is running."
+@router.get("/healthcheck", summary="Status of ISA service")
+async def healthcheck() -> int:
+    return requests.get(f"{SKEMA_RS_ADDESS}/ping").status_code
 
 
-@app.put("/align-eqns", summary="Align two MathML equations")
+@router.put("/align-eqns", summary="Align two MathML equations")
 async def align_eqns(
     file1: str, file2: str, mention_json1: str = "", mention_json2: str = ""
 ) -> ISA_Result:
@@ -41,3 +42,7 @@ async def align_eqns(
     ir.matching_ratio = matching_ratio
     ir.union_graph = union_graph.to_string()
     return ir
+
+
+app = FastAPI()
+app.include_router(router)
