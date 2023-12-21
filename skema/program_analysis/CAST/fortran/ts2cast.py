@@ -504,14 +504,6 @@ class TS2CAST(object):
         # NOTE: This code is for the creation of the main body. The do loop will still add some additional nodes at the end of this body.
         body_start_index = 1 + get_first_child_index(node, "loop_control_expression")
         body = self.generate_cast_body(node.children[body_start_index:])
-        """
-        for body_node in node.children[body_start_index:]:
-            child_cast = self.visit(body_node)
-            if isinstance(child_cast, List):
-                body.extend(child_cast)
-            elif isinstance(child_cast, AstNode):
-                body.append(child_cast)
-        """
 
         # For the init and expression fields, we first need to determine if we are in a regular "do" or a "do while" loop
         # PRE:
