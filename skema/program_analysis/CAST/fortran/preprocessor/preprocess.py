@@ -34,7 +34,7 @@ def preprocess(
     """
     # NOTE: The order of preprocessing steps does matter. We have to run the GCC preprocessor before correcting the continuation lines or there could be issues
 
-    # TODO: Create single location for generating include base path 
+    # TODO: Create single location for generating include base path
     source = source_path.read_text()
 
     # Get paths for intermediate products
@@ -67,7 +67,6 @@ def preprocess(
 
     # Step 2: Correct include directives to remove system references
     source = fix_include_directives(source)
-    
 
     # Step 3: Process with gcc c-preprocessor
     include_base_directory = Path(source_path.parent, f"include_{source_path.stem}")
@@ -76,15 +75,13 @@ def preprocess(
     source = run_c_preprocessor(source, include_base_directory)
     if out_gcc:
         gcc_path.write_text(source)
-    
-    
+
     # Step 4: Prepare for tree-sitter
     # This step removes any additional preprocessor directives added or not removed by GCC
     source = "\n".join(
         ["!" + line if line.startswith("#") else line for line in source.splitlines()]
     )
-    
-    
+
     # Step 5: Check for unsupported idioms
     if out_unsupported:
         unsupported_path.write_text(
@@ -96,7 +93,6 @@ def preprocess(
     if out_free:
         free_path.write_text(source)
 
-    print(source)
     return source
 
 
@@ -186,12 +182,15 @@ def run_c_preprocessor(source: str, include_base_path: Path) -> str:
     )
     return result.stdout
 
+
 def convert_assigned(source: str) -> str:
     """Convered ASSIGNED GO TO to COMPUTED GO TO"""
     pass
 
+
 def convert_to_free_form(source: str) -> str:
     """If fixed-form Fortran source, convert to free-form"""
+
     def validate_parse_tree(source: str) -> bool:
         """Parse source with tree-sitter and check if an error is returned."""
         language = Language(INSTALLED_LANGUAGES_FILEPATH, "fortran")
@@ -211,7 +210,7 @@ def convert_to_free_form(source: str) -> str:
         )
         if validate_parse_tree(free_source):
             return free_source
-    
+
     return source
 
 

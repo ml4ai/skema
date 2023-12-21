@@ -74,6 +74,7 @@ if __name__ == "__main__":
         flag = f"--{language}"
         help_text = f"Include {language} language"
         parser.add_argument(flag, action="store_true", help=help_text)
+    parser.add_argument("--ci",  action="store_true", help="Copy to site packages if running on ci")
     args = parser.parse_args()
 
     if args.all:
@@ -82,4 +83,6 @@ if __name__ == "__main__":
         selected_languages = [language for language, value in vars(args).items() if value]
     
     build_parsers(selected_languages)
-    copy_to_site_packages()
+
+    if args.ci:
+        copy_to_site_packages()
