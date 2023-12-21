@@ -52,7 +52,6 @@ builtin_statements = set(
         "write_statement",
         "rewind_statement",
         "open_statement",
-        "common_statement",
         "print_statement"
     ]
 )
