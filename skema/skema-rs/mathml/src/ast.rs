@@ -119,7 +119,7 @@ impl fmt::Display for MathExpression {
                 write!(f, "{superscript:?}")
             }
             MathExpression::Mtext(text) => write!(f, "{}", text),
-            MathExpression::SummationMath(SummationMath{op,func }) => {
+            MathExpression::SummationMath(SummationMath { op, func }) => {
                 write!(f, "{op}")?;
                 write!(f, "{func}")
             }

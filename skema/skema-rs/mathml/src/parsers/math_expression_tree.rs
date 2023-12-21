@@ -3,7 +3,7 @@
 
 use crate::{
     ast::{
-        operator::{Derivative, Operator, PartialDerivative, Munderover},
+        operator::{Derivative, Munderover, Operator, PartialDerivative},
         Math, MathExpression, Mi, Mrow,
     },
     parsers::interpreted_mathml::interpreted_math,
@@ -738,6 +738,7 @@ impl MathExpression {
                 tokens.push(MathExpression::Mo(Operator::Divide));
                 tokens.push(MathExpression::Mo(Operator::Lparen));
                 denominator.flatten(tokens);
+
                 tokens.push(MathExpression::Mo(Operator::Rparen));
             }
             MathExpression::Msup(base, superscript) => {
@@ -803,14 +804,9 @@ impl MathExpression {
             }
             MathExpression::SummationMath(x) => {
                 tokens.push(MathExpression::Mo(Operator::Lparen));
-                //if let Box::new(MathExpression::Mo(Operator::Munderover(Munderover {op, under,over}))) = x.clone().op{
-                //if x.op == Box::new(MathExpression::Mo(Operator::Munderover(Munderover {op, under,over}))) {
-                //tokens.push(MathExpression::Mo(Operator::Munderover());
-                //} else {
+
                 x.op.flatten(tokens);
                 x.func.flatten(tokens);
-                //}
-                //x.func.flatten(tokens);
                 tokens.push(MathExpression::Mo(Operator::Rparen));
             }
             t => tokens.push(t.clone()),
@@ -1013,14 +1009,15 @@ fn prefix_binding_power(op: &Operator) -> ((), u8) {
         Operator::Sin => ((), 21),
         Operator::Tan => ((), 21),
         Operator::Mean => ((), 25),
-        Operator::Dot => ((), 25),
+        //Operator::Dot => ((), 25),
+        //Operator::Cross => ((), 25),
         Operator::Grad => ((), 25),
         Operator::Derivative(Derivative { .. }) => ((), 25),
         Operator::PartialDerivative(PartialDerivative { .. }) => ((), 25),
         Operator::Div => ((), 25),
         Operator::Abs => ((), 25),
         Operator::Sqrt => ((), 25),
-        Operator::Munderover(Munderover {..}) => ((), 26),
+        Operator::Munderover(Munderover { .. }) => ((), 26),
         _ => panic!("Bad operator: {:?}", op),
     }
 }
@@ -1044,7 +1041,9 @@ fn infix_binding_power(op: &Operator) -> Option<(u8, u8)> {
         Operator::Divide => (9, 10),
         Operator::Compose => (14, 13),
         Operator::Power => (16, 15),
-        //Operator::Munderover(Munderover {..}) => (18, 17),
+        Operator::Dot => (18, 17),
+        Operator::Cross => (18, 17),
+        //Operator::Comma => (18, 17),
         Operator::Other(op) => panic!("Unhandled operator: {}!", op),
         _ => return None,
     };
@@ -2282,7 +2281,7 @@ fn test_heating_rate() {
     </msub>
     <mo>)</mo>
   </mrow>
-    <mo>/</mo>
+    <mo>∕</mo>
   <mrow>
     <mo>(</mo>
     <msub>
@@ -2301,7 +2300,7 @@ fn test_heating_rate() {
 }
 
 #[test]
-fn test_munderover() {
+fn test_sum_munderover() {
     let input = "<math>
 <munderover>
     <mo>&#x2211;</mo>
@@ -2316,12 +2315,12 @@ fn test_munderover() {
     </math>";
     let exp = input.parse::<MathExpressionTree>().unwrap();
     let s_exp = exp.to_string();
-    println!("s_exp={:?}", s_exp);
-    //assert_eq!(s_exp, "(= Q_{i} (/ (- T_{i} T_{i-1}) (* C_{p} Δt)))");
+    //println!("s_exp={:?}", s_exp);
+    assert_eq!(s_exp, "(∑_{l=k}^{K} S)");
 }
 
 #[test]
-fn test_hydrostatic(){
+fn test_hydrostatic() {
     let input = "<math>
   <msub>
     <mi>Φ</mi>
@@ -2361,5 +2360,94 @@ fn test_hydrostatic(){
     ";
     let exp = input.parse::<MathExpressionTree>().unwrap();
     let s_exp = exp.to_string();
+    //println!("s_exp={:?}", s_exp);
+    assert_eq!(
+        s_exp,
+        "(= Φ_{k} (+ Φ_{s} (* R (∑_{l=k}^{K} (* H_{kl} T_{vl})))))"
+    );
+}
+
+#[test]
+fn test_temperature_evolution() {
+    let input = "<math>
+   <mfrac>
+    <mrow>
+      <mi>Δ</mi>
+      <msub>
+        <mi>s</mi>
+        <mi>i</mi>
+      </msub>
+    </mrow>
+    <mrow>
+      <mi>Δ</mi>
+      <mi>t</mi>
+    </mrow>
+  </mfrac>
+    <mo>∕</mo>
+  <msub>
+    <mi>C</mi>
+    <mi>p</mi>
+  </msub>
+  <mo>=</mo>
+  <mfrac>
+    <mrow>
+      <mo>(</mo>
+      <msub>
+        <mi>s</mi>
+        <mi>i</mi>
+      </msub>
+      <mo>−</mo>
+      <msub>
+        <mi>s</mi>
+        <mrow>
+          <mi>i</mi>
+          <mo>−</mo>
+          <mn>1</mn>
+        </mrow>
+      </msub>
+      <mo>)</mo>
+    </mrow>
+    <mrow>
+      <mi>Δ</mi>
+      <mi>t</mi>
+    </mrow>
+  </mfrac>
+    <mo>∕</mo>
+  <msub>
+    <mi>C</mi>
+    <mi>p</mi>
+  </msub>
+</math>";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    let s_exp = exp.to_string();
     println!("s_exp={:?}", s_exp);
+    assert_eq!(
+        s_exp,
+        "(= (/ (/ Δs_{i} Δt) C_{p}) (/ (/ (- s_{i} s_{i-1}) Δt) C_{p}))"
+    );
+}
+
+#[test]
+fn test_cross_product() {
+    let input = "<math>
+    <mi>f</mi>
+    <mo>&#x00D7;</mo>
+    <mi>u</mi>
+    </math>";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    let s_exp = exp.to_string();
+    println!("s_exp={:?}", s_exp);
+    assert_eq!(s_exp, "(× f u)");
+}
+#[test]
+fn test_dot_product() {
+    let input = "<math>
+    <mi>f</mi>
+    <mo>&#x22c5;</mo>
+    <mi>u</mi>
+    </math>";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    let s_exp = exp.to_string();
+    println!("s_exp={:?}", s_exp);
+    assert_eq!(s_exp, "(⋅ f u)");
 }

@@ -1,7 +1,7 @@
 use crate::ast::Ci;
+use crate::ast::MathExpression;
 use derive_new::new;
 use std::fmt;
-use crate::ast::MathExpression;
 
 /// Derivative operator, in line with Spivak notation: http://ceres-solver.org/spivak_notation.html
 #[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
@@ -64,6 +64,7 @@ pub enum Operator {
     Mean,
     Sum,
     Munderover(Munderover),
+    Cross,
     // Catchall for operators we haven't explicitly defined as enum variants yet.
     Other(String),
 }
@@ -80,7 +81,7 @@ impl fmt::Display for Operator {
             Operator::Lparen => write!(f, "("),
             Operator::Rparen => write!(f, ")"),
             Operator::Compose => write!(f, "."),
-            Operator::Comma => write!(f, ""),
+            Operator::Comma => write!(f, ","),
             Operator::Factorial => write!(f, "!"),
             Operator::Derivative(Derivative {
                 order,
@@ -113,14 +114,15 @@ impl fmt::Display for Operator {
             Operator::Arccot => write!(f, "Arccot"),
             Operator::Mean => write!(f, "Mean"),
             Operator::Grad => write!(f, "Grad"),
-            Operator::Dot => write!(f, "Dot"),
+            Operator::Dot => write!(f, "⋅"),
             Operator::Period => write!(f, ""),
             Operator::Div => write!(f, "Div"),
             Operator::Abs => write!(f, "Abs"),
             Operator::Sum => write!(f, "∑"),
-            Operator::Munderover(Munderover{op, under, over }) => {
+            Operator::Munderover(Munderover { op, under, over }) => {
                 write!(f, "{op}_{{{under}}}^{{{over}}}")
             }
+            Operator::Cross => write!(f, "×"),
         }
     }
 }
