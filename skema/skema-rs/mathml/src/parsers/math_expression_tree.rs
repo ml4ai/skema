@@ -2654,3 +2654,53 @@ fn test_hat_operator() {
     println!("s_exp={:?}", s_exp);
     assert_eq!(s_exp, "(Hat z)");
 }
+
+#[test]
+fn test_vector_invariant_form() {
+    let input = "<math>
+    <msub>
+    <mi>∂</mi>
+    <mi>t</mi>
+    </msub>
+    <mi>u</mi>
+    <mo>+</mo>
+    <mo>(</mo>
+    <mi>ζ</mi>
+    <mrow>
+    <mover>
+    <mi>z</mi>
+    <mo>^</mo>
+    </mover>
+    </mrow>
+    <mo>+</mo>
+    <mi>f</mi>
+    <mo>)</mo>
+    <mo>×</mo>
+    <mi>u</mi>
+    <mo>=</mo>
+    <mo>−</mo>
+    <mi>∇</mi>
+    <mrow>
+    <mo>[</mo>
+    <mi>g</mi>
+    <mo>(</mo>
+    <mi>h</mi>
+    <mo>+</mo>
+    <mi>b</mi>
+    <mo>)</mo>
+    <mo>+</mo>
+    <mfrac>
+    <mn>1</mn>
+    <mn>2</mn>
+    </mfrac>
+    <mi>u</mi>
+    <mo>⋅</mo>
+    <mi>u</mi>
+    <mo>]</mo>
+    </mrow>
+    </math>";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    let s_exp = exp.to_string();
+    println!("s_exp={:?}", s_exp);
+    //assert_eq!(s_exp, "(Hat z)");
+}

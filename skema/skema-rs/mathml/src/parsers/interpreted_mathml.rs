@@ -657,6 +657,7 @@ pub fn gradient(input: Span) -> IResult<Operator> {
         delimited(stag!("mo"), grad, etag!("mo")),
         delimited(stag!("mi"), grad, etag!("mi")),
     )))(input)?;
+    println!("op={:?}", op);
     Ok((s, op))
 }
 
@@ -664,6 +665,14 @@ pub fn grad_func(input: Span) -> IResult<(Operator, Ci)> {
     let (s, (op, id)) = ws(pair(gradient, mi))(input)?;
     let ci = Ci::new(Some(Type::Real), Box::new(MathExpression::Mi(id)), None);
     Ok((s, (op, ci)))
+}
+
+pub fn functions_of_grad(input: Span) -> IResult<(Operator, Mrow)> {
+    let (s, (op, id)) = ws(pair(gradient, map(ws(many0(math_expression)), Mrow)))(input)?;
+    println!("id={:?}", id);
+    //let ci = Ci::new(Some(Type::Real), Box::new(MathExpression::Mrow(id)), None);
+    //println!("ci={:?}",ci);
+    Ok((s, (op, id)))
 }
 
 ///Absolute with Msup value
@@ -809,21 +818,21 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
             ws(absolute_with_msup),
             ws(paren_as_msup),
             map(change_in_variable, MathExpression::Ci),
+            //sqrt,
+            map(
+                munderover_summation,
+                |(SumUnderOver { op, under, over }, comp)| {
+                    MathExpression::SummationMath(SummationMath {
+                        op: Box::new(MathExpression::Mo(Operator::SumUnderOver(SumUnderOver {
+                            op,
+                            under,
+                            over,
+                        }))),
+                        func: Box::new(MathExpression::Mrow(comp)),
+                    })
+                },
+            ),
         )),
-        //sqrt,
-        map(
-            munderover_summation,
-            |(SumUnderOver { op, under, over }, comp)| {
-                MathExpression::SummationMath(SummationMath {
-                    op: Box::new(MathExpression::Mo(Operator::SumUnderOver(SumUnderOver {
-                        op,
-                        under,
-                        over,
-                    }))),
-                    func: Box::new(MathExpression::Mrow(comp)),
-                })
-            },
-        ),
         map(
             grad_func,
             |(
@@ -844,6 +853,12 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                 })
             },
         ),
+        map(functions_of_grad, |(op, comp)| {
+            MathExpression::Differential(Differential {
+                diff: Box::new(MathExpression::Mo(op)),
+                func: Box::new(MathExpression::Mrow(comp)),
+            })
+        }),
         map(
             first_order_derivative_leibniz_notation,
             |(
