@@ -146,7 +146,12 @@ app.include_router(
     tags=["isa"]
 )
 
-
+@app.head(
+  "/version", 
+  tags=["core"], 
+  summary="API version",
+  status_code=status.HTTP_200_OK
+)
 @app.get(
     "/version", 
     tags=["core"], 
