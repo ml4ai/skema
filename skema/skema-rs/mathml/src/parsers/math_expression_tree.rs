@@ -2702,5 +2702,5 @@ fn test_vector_invariant_form() {
     let exp = input.parse::<MathExpressionTree>().unwrap();
     let s_exp = exp.to_string();
     println!("s_exp={:?}", s_exp);
-    //assert_eq!(s_exp, "(Hat z)");
+    assert_eq!(s_exp, "(= (+ (PD(1, t) u) (× (+ (* ζ (Hat z)) f) u)) (- (Grad (+ (* g (+ h b)) (* (/ 1 2) (⋅ u u))))))");
 }
