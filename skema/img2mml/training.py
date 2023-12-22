@@ -8,6 +8,7 @@ import time
 import json
 import math
 import argparse
+import wandb
 import torch
 import torch.nn as nn
 import torch.distributed as dist
@@ -217,6 +218,7 @@ def train_model(rank=None,):
     momentum = config["momentum"]
     CLIP = config["clip"]
     SEED = config["seed"]
+    isWandb = config["wandb"]
     min_length_bean_search_normalization = config[
         "min_length_bean_search_normalization"
     ]
@@ -237,6 +239,12 @@ def train_model(rank=None,):
 
     # set_random_seed
     set_random_seed(SEED)
+
+    if isWandb:
+        if (not ddp) or (ddp and rank == 0): 
+            # initiate the wandb    
+            wandb.init()
+            wandb.config.update(cfg)
 
     # to save trained model and logs
     FOLDER = ["trained_models", "logs"]
@@ -403,6 +411,10 @@ def train_model(rank=None,):
 
     best_valid_loss = float("inf")
 
+    if isWandb:
+        if (not ddp) or (ddp and rank == 0):
+            wandb.watch(model)
+
     # raw data paths
     img_tnsr_path = (
         f"{config['data_path']}/{config['dataset_type']}/image_tensors"
@@ -455,6 +467,11 @@ def train_model(rank=None,):
                     rank=rank,
                     g2p=g2p,
                 )
+
+                if isWandb:
+                    if (not ddp) or (ddp and rank == 0):
+                        wandb.log({"train_loss": train_loss})
+                        wandb.log({"val_loss": val_loss})
 
                 end_time = time.time()
                 # total time spent on training an epoch
