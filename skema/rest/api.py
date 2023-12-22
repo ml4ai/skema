@@ -63,15 +63,27 @@ tags_metadata = [
     },
     {
         "name": "morae",
-        "description": "",
+        "description": "Operations to MORAE.",
         "externalDocs": {
             "description": "Issues",
             "url": "https://github.com/ml4ai/skema/issues?q=is%3Aopen+is%3Aissue+label%3AMORAE",
         },
     },
     {
+        "name": "isa",
+        "description": "Operations to ISA",
+        "externalDocs": {
+            "description": "Issues",
+            "url": "https://github.com/ml4ai/skema/issues?q=is%3Aopen+is%3Aissue+label%3AISA",
+        },
+    },
+    {
         "name": "text reading",
         "description": "Unified proxy and integration code for MIT and SKEMA TR pipelines",
+        "externalDocs": {
+            "description": "Issues",
+            "url": "https://github.com/ml4ai/skema/issues?q=is%3Aopen+is%3Aissue+label%3AText%20Reading",
+        },
     },
     {
         "name": "metal",
@@ -140,11 +152,11 @@ app.include_router(
     tags=["metal"]
 )
 
-# app.include_router(
-#     isa_service.router,
-#     prefix="/isa",
-#     tags=["isa"]
-# )
+app.include_router(
+    isa_service.router,
+    prefix="/isa",
+    tags=["isa"]
+)
 
 @app.head(
     "/version", 
@@ -167,6 +179,7 @@ async def version() -> str:
     tags=["core"],
     summary="Health of component services",
     status_code=status.HTTP_200_OK,
+    response_model=int
     responses={
         200: {
             "model": schema.HealthStatus,
@@ -182,7 +195,7 @@ async def healthcheck(response: Response) -> schema.HealthStatus:
     morae_status = await morae_proxy.healthcheck()
     mathjax_status = eqn2mml.latex2mml_healthcheck()
     eqn2mml_status = eqn2mml.img2mml_healthcheck()
-    code2fn_status = code2fn.ping()
+    code2fn_status = code2fn.healthcheck()
     text_reading_status = integrated_text_reading_proxy.healthcheck()
     metal_status = metal_proxy.healthcheck()
     # check if any services failing and alter response status code accordingly

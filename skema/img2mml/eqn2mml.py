@@ -7,7 +7,7 @@ node data_generation/mathjax_server.js
 
 from typing import Text
 from typing_extensions import Annotated
-from fastapi import APIRouter, FastAPI, Response, Request, Query, UploadFile
+from fastapi import APIRouter, FastAPI, status, Response, Request, Query, UploadFile
 from skema.rest.proxies import SKEMA_MATHJAX_ADDRESS
 from skema.img2mml.api import (
     get_mathml_from_bytes,
@@ -86,23 +86,23 @@ def process_latex_equation(eqn: Text) -> Response:
     "/img2mml/healthcheck",
     summary="Check health of eqn2mml service",
     response_model=int,
-    status_code=200,
+    status_code=status.HTTP_200_OK,
 )
 def img2mml_healthcheck() -> int:
-    return 200
+    return status.HTTP_200_OK
 
 
 @router.get(
     "/latex2mml/healthcheck",
     summary="Check health of mathjax service",
     response_model=int,
-    status_code=200,
+    status_code=status.HTTP_200_OK,
 )
 def latex2mml_healthcheck() -> int:
     try:
         return int(requests.get(f"{SKEMA_MATHJAX_ADDRESS}/healthcheck").status_code)
     except:
-        return 500
+        return status.HTTP_500_INTERNAL_SERVER_ERROR
 
 
 @router.post("/image/mml", summary="Get MathML representation of an equation image")
