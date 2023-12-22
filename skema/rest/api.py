@@ -13,6 +13,7 @@ from skema.rest import (
     metal_proxy,
     llm_proxy,
 )
+from skema.isa import isa_service
 from skema.img2mml import eqn2mml
 from skema.skema_py import server as code2fn
 from skema.gromet.execution_engine import server as execution_engine
@@ -137,6 +138,12 @@ app.include_router(
     metal_proxy.router,
     prefix="/metal",
     tags=["metal"]
+)
+
+app.include_router(
+    isa_service.router,
+    prefix="/isa",
+    tags=["isa"]
 )
 
 
