@@ -44,9 +44,9 @@
 "momentum":0.9,
 "beta_1":0.9,
 "beta_2":0.8,
-"learning_rate":0.001,
-"weight_decay": 0.0001,
-"dropout":0.3,
+"learning_rate":0.0001,
+"weight_decay": 0.00001,
+"dropout":0.1,
 
 "__":"if want to scheduler. Options: {step_lr, multistep_lr, exp_lr, reduce_lr, cycle_lr}",
 "isScheduler":false,
@@ -66,17 +66,17 @@
 
 
 "_comment_":"encoder params",
-"encoder_dim":256,
+"encoder_dim":128,
 "input_channels":3,
 "encoding_type":"positional_encoding",
 "n_xfmer_heads":4,
-"n_xfmer_encoder_layers":6,
+"n_xfmer_encoder_layers":3,
 "dim_feedforward_for_xfmer":256,
 
 "_comment_":"decoder params",
 "embedding_dim":128,
 "decoder_hid_dim":256,
-"n_xfmer_decoder_layers":6,
+"n_xfmer_decoder_layers":3,
 
 "_comment_":"training/testing params",
 "clip":1,
