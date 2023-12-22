@@ -178,8 +178,7 @@ async def version() -> str:
     "/healthcheck",
     tags=["core"],
     summary="Health of component services",
-    status_code=status.HTTP_200_OK,
-    response_model=int,
+    status_code=status.HTTP_200_OK
     responses={
         200: {
             "model": schema.HealthStatus,

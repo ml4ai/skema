@@ -23,7 +23,7 @@ def test_align_eqns():
     }
 
     endpoint = "/isa/align-eqns"
-    response = client.put(endpoint, params=data)
+    response = client.post(endpoint, params=data)
     expected = isa_data.expected
 
     # check status code
