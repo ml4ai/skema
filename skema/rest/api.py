@@ -140,11 +140,11 @@ app.include_router(
     tags=["metal"]
 )
 
-app.include_router(
-    isa_service.router,
-    prefix="/isa",
-    tags=["isa"]
-)
+# app.include_router(
+#     isa_service.router,
+#     prefix="/isa",
+#     tags=["isa"]
+# )
 
 @app.head(
   "/version", 
