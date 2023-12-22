@@ -147,10 +147,10 @@ app.include_router(
 # )
 
 @app.head(
-  "/version", 
-  tags=["core"], 
-  summary="API version",
-  status_code=status.HTTP_200_OK
+    "/version", 
+    tags=["core"], 
+    summary="API version",
+    status_code=status.HTTP_200_OK
 )
 @app.get(
     "/version", 
