@@ -1084,7 +1084,7 @@ fn test_first_order_ode() {
     assert_eq!(lhs_var.to_string(), "S");
     assert_eq!(func_of[0].to_string(), "t");
     assert_eq!(with_respect_to.to_string(), "t");
-    assert_eq!(rhs.to_string(), "(/ (* (* (- β) I) S) N)");
+    assert_eq!(rhs.to_string(), "(* (* (- β) I) (/ S N))");
     //assert_eq!(rhs.to_string(), "(/ (* (* (- β) I(t)) S(t)) N)");
 
     // ASKEM Hackathon 2, scenario 1, equation 1, but with Newtonian derivative notation.
@@ -1108,8 +1108,8 @@ fn test_first_order_ode() {
 
     assert_eq!(lhs_var.to_string(), "S");
     assert_eq!(func_of[0].to_string(), "");
-    assert_eq!(with_respect_to.to_string(), "");
-    assert_eq!(rhs.to_string(), "(/ (* (* (- β) I) S) N)");
+    assert_eq!(with_respect_to.to_string(), "t");
+    assert_eq!(rhs.to_string(), "(* (* (- β) I) (/ S N))");
 }
 
 #[test]

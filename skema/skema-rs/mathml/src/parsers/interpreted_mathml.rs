@@ -10,8 +10,8 @@ use crate::{
         Ci, Differential, Math, MathExpression, Mi, Mrow, Type,
     },
     parsers::generic_mathml::{
-        add, attribute, dot, elem_many0, equals, etag, grad, lparen, mean, mi, mn, msqrt, msub,
-        msubsup, multiply, rparen, stag, subtract, tag_parser, ws, xml_declaration, IResult,
+        add, attribute, dot, elem_many0, equals, etag, grad, lparen, mean, mi, mn, msub, msubsup,
+        mtext, multiply, rparen, stag, subtract, tag_parser, ws, xml_declaration, IResult,
         ParseError, Span,
     },
 };
@@ -21,7 +21,7 @@ use nom::{
     bytes::complete::tag,
     combinator::{map, opt, value},
     multi::{many0, many1, separated_list1},
-    sequence::{delimited, pair, preceded, separated_pair, tuple},
+    sequence::{delimited, pair, preceded, tuple},
 };
 
 /// Function to parse operators. This function differs from the one in parsers::generic_mathml by
@@ -29,9 +29,7 @@ use nom::{
 pub fn operator(input: Span) -> IResult<Operator> {
     let (s, op) = ws(delimited(
         stag!("mo"),
-        alt((
-            add, subtract, multiply, equals, lparen, rparen, mean, grad, dot,
-        )),
+        alt((add, subtract, multiply, equals, lparen, rparen, mean, dot)),
         etag!("mo"),
     ))(input)?;
     Ok((s, op))
@@ -167,7 +165,7 @@ fn partial(input: Span) -> IResult<()> {
         Ok((s, ()))
     } else if let "&#x2202;" = x.as_ref() {
         Ok((s, ()))
-    }else {
+    } else {
         Err(nom::Err::Error(ParseError::new(
             "Unable to identify Mi('∂')".to_string(),
             input,
@@ -438,7 +436,7 @@ pub fn newtonian_derivative(input: Span) -> IResult<(Derivative, Ci)> {
     );
 
     let (s, (func, order)) = delimited(
-        stag!("mover"),
+        alt((tag("<mrow><mover>"), tag("<mover>"))),
         pair(
             map(
                 ci_unknown,
@@ -454,7 +452,7 @@ pub fn newtonian_derivative(input: Span) -> IResult<(Derivative, Ci)> {
             ),
             n_dots,
         ),
-        etag!("mover"),
+        alt((tag("</mover></mrow>"), etag!("mover"))),
     )(input)?;
     let (s, mi_func_of) = alt((parenthesized_identifier, empty_parenthesis))(s)?;
     let mut ci_func_of: Vec<Ci> = Vec::new();
@@ -462,9 +460,10 @@ pub fn newtonian_derivative(input: Span) -> IResult<(Derivative, Ci)> {
         let b = Ci::new(Some(Type::Real), Box::new(MathExpression::Mi(bvar)), None);
         ci_func_of.push(b.clone());
     }
+    let func_mi = ci_func_of.get(0).unwrap().content.clone();
     let new_with_respect_to: Box<MathExpression> = Box::new(MathExpression::Ci(Ci {
         r#type: None,
-        content: Box::new(MathExpression::Mi(Mi("".to_string()))),
+        content: Box::new(MathExpression::Mi(Mi(func_mi.to_string()))),
         func_of: None,
     }));
 
@@ -527,13 +526,16 @@ pub fn absolute(input: Span) -> IResult<MathExpression> {
 
 /// Example: Divergence
 pub fn div(input: Span) -> IResult<Operator> {
-    let (s, op) = ws(pair(gradient, ws(delimited(stag!("mo"), dot, etag!("mo")))))(input)?;
+    let (s, _op) = ws(pair(gradient, ws(delimited(stag!("mo"), dot, etag!("mo")))))(input)?;
     let div = Operator::Div;
     Ok((s, div))
 }
 
 pub fn gradient(input: Span) -> IResult<Operator> {
-    let (s, op) = ws(delimited(stag!("mo"), grad, etag!("mo")))(input)?;
+    let (s, op) = ws(alt((
+        delimited(stag!("mo"), grad, etag!("mo")),
+        delimited(stag!("mi"), grad, etag!("mi")),
+    )))(input)?;
     Ok((s, op))
 }
 
@@ -547,13 +549,14 @@ pub fn grad_func(input: Span) -> IResult<(Operator, Ci)> {
 pub fn absolute_with_msup(input: Span) -> IResult<MathExpression> {
     let (s, sup) = ws(map(
         ws(delimited(
-            tag("<mo>|</mo>"),
-            tuple((
+            ws(tuple((stag!("mo"), tag("|"), etag!("mo")))),
+            //ws(tag("<mo>|</mo>")),
+            ws(tuple((
                 //math_expression,
-                map(many0(math_expression), |z| Mrow(z)),
-                preceded(tag("<msup><mo>|</mo>"), math_expression),
-            )),
-            tag("</msup>"),
+                map(ws(many0(math_expression)), Mrow),
+                preceded(ws(tag("<msup><mo>|</mo>")), ws(math_expression)),
+            ))),
+            ws(tag("</msup>")),
         )),
         |(x, y)| MathExpression::AbsoluteSup(Box::new(MathExpression::Mrow(x)), Box::new(y)),
     ))(input)?;
@@ -566,7 +569,7 @@ pub fn paren_as_msup(input: Span) -> IResult<MathExpression> {
         ws(delimited(
             tag("<mo>(</mo>"),
             tuple((
-                map(many0(math_expression), |z| Mrow(z)),
+                map(many0(math_expression), Mrow),
                 preceded(tag("<msup><mo>)</mo>"), math_expression),
             )),
             tag("</msup>"),
@@ -576,13 +579,46 @@ pub fn paren_as_msup(input: Span) -> IResult<MathExpression> {
     Ok((s, sup))
 }
 
+/// Parser for multiple elements in square root
+pub fn sqrt(input: Span) -> IResult<MathExpression> {
+    let (s, elements) = ws(delimited(
+        stag!("msqrt"),
+        many0(math_expression),
+        etag!("msqrt"),
+    ))(input)?;
+    Ok((
+        s,
+        MathExpression::Msqrt(Box::new(MathExpression::Mrow(Mrow(elements)))),
+    ))
+}
+
 /// Parser for math expressions. This varies from the one in the generic_mathml module, since it
 /// assumes that expressions such as S(t) are actually univariate functions.
 pub fn math_expression(input: Span) -> IResult<MathExpression> {
     ws(alt((
         map(div, MathExpression::Mo),
-        absolute_with_msup,
-        paren_as_msup,
+        alt((ws(absolute_with_msup), ws(paren_as_msup))),
+        //sqrt,
+        map(
+            grad_func,
+            |(
+                op,
+                Ci {
+                    r#type,
+                    content,
+                    func_of,
+                },
+            )| {
+                MathExpression::Differential(Differential {
+                    diff: Box::new(MathExpression::Mo(op)),
+                    func: Box::new(MathExpression::Ci(Ci {
+                        r#type,
+                        content,
+                        func_of,
+                    })),
+                })
+            },
+        ),
         map(
             first_order_derivative_leibniz_notation,
             |(
@@ -633,6 +669,34 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                             bound_var,
                         },
                     ))),
+                    func: Box::new(MathExpression::Ci(Ci {
+                        r#type,
+                        content,
+                        func_of,
+                    })),
+                })
+            },
+        ),
+        map(
+            newtonian_derivative,
+            |(
+                Derivative {
+                    order,
+                    var_index,
+                    bound_var,
+                },
+                Ci {
+                    r#type,
+                    content,
+                    func_of,
+                },
+            )| {
+                MathExpression::Differential(Differential {
+                    diff: Box::new(MathExpression::Mo(Operator::Derivative(Derivative {
+                        order,
+                        var_index,
+                        bound_var,
+                    }))),
                     func: Box::new(MathExpression::Ci(Ci {
                         r#type,
                         content,
@@ -736,13 +800,12 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                 })
             },
         ),
-        //map(gradient, MathExpression::Mo),
-        absolute,
-        map(operator, MathExpression::Mo),
-        mn,
-        superscript,
-        over_term,
-        alt((msub, msqrt, mfrac)),
+        alt((absolute, sqrt)),
+        alt((
+            map(operator, MathExpression::Mo),
+            map(gradient, MathExpression::Mo),
+        )),
+        alt((mn, msub, superscript, mfrac, mtext, over_term)),
         map(mrow, MathExpression::Mrow),
         msubsup,
     )))(input)
@@ -755,13 +818,13 @@ pub fn interpreted_math(input: Span) -> IResult<Math> {
         opt(xml_declaration),
         alt((
             ws(delimited(
-                tag("<math>"),
-                many0(math_expression),
+                ws(tag("<math>")),
+                ws(many0(math_expression)),
                 ws(tag("<mo>,</mo></math>")),
             )),
             ws(delimited(
-                tag("<math>"),
-                many0(math_expression),
+                ws(tag("<math>")),
+                ws(many0(math_expression)),
                 ws(tag("<mo>.</mo></math>")),
             )),
             elem_many0!("math"),

@@ -2,13 +2,14 @@
 """
 All the functions required by performing incremental structure alignment (ISA)
 Author: Liang Zhang (liangzh@arizona.edu)
-Updated date: August 24, 2023
+Updated date: December 18, 2023
 """
 import json
 import warnings
 from typing import List, Any, Union, Dict
 from numpy import ndarray
 from pydot import Dot
+from skema.rest.proxies import SKEMA_RS_ADDESS
 
 warnings.filterwarnings("ignore")
 import requests
@@ -173,8 +174,9 @@ def generate_graph(file: str = "", render: bool = False) -> pydot.Dot:
             content = f.read()
 
     digraph = requests.put(
-        "http://localhost:8080/mathml/math-exp-graph", data=content.encode("utf-8")
+        f"{SKEMA_RS_ADDESS}/mathml/math-exp-graph", data=content.encode("utf-8")
     )
+
     if render:
         src = Source(digraph.text)
         src.render("doctest-output/mathml_exp_tree", view=True)

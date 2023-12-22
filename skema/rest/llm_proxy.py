@@ -16,6 +16,7 @@ from pathlib import Path
 from pydantic import BaseModel, Field
 from typing import List, Optional
 from skema.rest.proxies import SKEMA_OPENAI_KEY
+import time
 
 router = APIRouter()
 
@@ -66,6 +67,30 @@ async def get_lines_of_model(zip_file: UploadFile = File()) -> List[Dynamics]:
                 files.append(file)
                 blobs.append(zip.open(file).read().decode("utf-8"))
 
+    # this is the formatting instructions
+    response_schemas = [
+        ResponseSchema(name="model_function", description="The name of the function that contains the model dynamics")
+    ]
+
+    # for structured output parsing, converts schema to langhchain object
+    output_parser = StructuredOutputParser.from_response_schemas(response_schemas)
+
+    # for structured output parsing, makes the instructions to be passed as a variable to prompt template
+    format_instructions = output_parser.get_format_instructions()
+
+    # low temp as is not generative
+    temperature = 0.0
+
+    # initialize the models
+    openai = ChatOpenAI(
+        temperature=temperature,
+        model_name='gpt-3.5-turbo',
+        openai_api_key=SKEMA_OPENAI_KEY
+    )
+
+    template="You are a assistant that answers questions about code."
+    system_message_prompt = SystemMessagePromptTemplate.from_template(template)
+
     # iterate through each file 
     for f in range(len(files)):
     # read in the code, for the prompt
@@ -77,30 +102,7 @@ async def get_lines_of_model(zip_file: UploadFile = File()) -> List[Dynamics]:
                 "blobs": [code],
             }
 
-        # this is the formatting instructions
-        response_schemas = [
-            ResponseSchema(name="model_function", description="The name of the function that contains the model dynamics")
-        ]
-
-        # for structured output parsing, converts schema to langhchain object
-        output_parser = StructuredOutputParser.from_response_schemas(response_schemas)
-
-        # for structured output parsing, makes the instructions to be passed as a variable to prompt template
-        format_instructions = output_parser.get_format_instructions()
-
-        # low temp as is not generative
-        temperature = 0.0
-
-        # initialize the models
-        openai = ChatOpenAI(
-            temperature=temperature,
-            model_name='gpt-3.5-turbo',
-            openai_api_key=SKEMA_OPENAI_KEY
-        )
-
         # construct the prompts
-        template="You are a assistant that answers questions about code."
-        system_message_prompt = SystemMessagePromptTemplate.from_template(template)
         human_template="Find the function that contains the model dynamics in {code} \n{format_instructions}"
         human_message_prompt = HumanMessagePromptTemplate.from_template(human_template)
 
@@ -121,6 +123,7 @@ async def get_lines_of_model(zip_file: UploadFile = File()) -> List[Dynamics]:
 
             # Get the FN from it
             url = "https://api.askem.lum.ai/code2fn/fn-given-filepaths"
+            time.sleep(0.5)
             response_zip = requests.post(url, json=single_snippet_payload)
 
             # get metadata entry for function
@@ -142,10 +145,22 @@ async def get_lines_of_model(zip_file: UploadFile = File()) -> List[Dynamics]:
             line_begin = 0
             line_end = 0
 
+        # if the line_begin of meta entry 2 (base 0) and meta entry 3 (base 0) are we add a slice from [meta2.line_begin, meta3.line_begin)
+        # to capture all the imports, return a Dynamics.block with 2 entries, both of which need to be concatenated to pass forward
+        file_line_begin = response_zip.json()['modules'][0]['metadata_collection'][2][0]['line_begin']
+
+        code_line_begin = response_zip.json()['modules'][0]['metadata_collection'][3][0]['line_begin'] - 1
+
+        if file_line_begin != code_line_begin:
+            block.append(f"L{file_line_begin}-L{code_line_begin}")
+
         block.append(f"L{line_begin}-L{line_end}")
+
 
         output = Dynamics(name=file, description=description, block=block)
         outputs.append(output)
+        block = []
+        description = None
 
     return outputs
 

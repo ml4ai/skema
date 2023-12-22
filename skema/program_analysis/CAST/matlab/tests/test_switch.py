@@ -1,13 +1,13 @@
 from skema.program_analysis.CAST.matlab.tests.utils import (check, cast)
 from skema.program_analysis.CAST2FN.model.cast import (
     Assignment,
+    Call,
     ModelIf,
     Operator
 )
 
-def test_case_clause_1_argument():
+def test_1_argument():
     """ Test CAST from single argument case clause."""
-
     source = """
     switch s
         case 'one'
@@ -19,38 +19,26 @@ def test_case_clause_1_argument():
             n = 0;
     end
     """
-
     # switch statement translated into conditional
     check(
         cast(source)[0],
         ModelIf(
-            # if
             expr = Operator(op = "==", operands = ["s", "'one'"]),
-            # then
-            body = [
-                Assignment(left="n", right = 1)
-            ],
-            # else
+            body = [Assignment(left="n", right = 1)],
             orelse = [
                 ModelIf(
-                    # if
                     expr = Operator(op = "==", operands = ["s", "'two'"]),
-                    # then
                     body = [
                         Assignment(left="n", right = 2),
                         Assignment(left="x", right = "y"),
                     ],
-                    # else
-                    orelse = [
-                        Assignment(left="n", right = 0)
-                    ]
+                    orelse = [Assignment(left="n", right = 0)]
                 )
             ]
         )
     )
                        
-
-def test_case_clause_n_arguments():
+def test_n_arguments():
     """ Test CAST from multipe argument case clause."""
 
     source = """
@@ -61,23 +49,44 @@ def test_case_clause_n_arguments():
             n = 0;
     end
     """
-
     # switch statement translated into conditional
     check(
         cast(source)[0],
         ModelIf(
-            # if
             expr = Operator(
                 op = "in",
                 operands = ["s", [1, 1.0, "one", "'one'"]]
             ),
-            # then
-            body = [
-                Assignment(left="n", right = 1)
-            ],
-            # else
-            orelse = [
-                Assignment(left="n", right = 0)
-            ]
+            body = [Assignment(left="n", right = 1)],
+            orelse = [Assignment(left="n", right = 0)]
+        )
+    )
+                       
+def test_call_argument():
+    """ Test CAST using the value of a function call """
+
+    source = """
+    switch fd(i,j)
+        case 0
+            x = 5
+    end
+
+    """
+    # switch statement translated into conditional
+    check(
+        cast(source)[0],
+        ModelIf(
+            expr = Operator(
+                op = "==",
+                operands = [
+                    Call (
+                        func = "fd",
+                        arguments = ["i","j"]
+                    ),
+                    0
+                ]
+            ),
+            body = [Assignment(left="x", right = 5)],
+            orelse = []
         )
     )

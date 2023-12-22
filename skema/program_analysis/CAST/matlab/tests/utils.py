@@ -4,6 +4,7 @@ from skema.program_analysis.CAST2FN.model.cast import (
     Assignment,
     AstNode,
     Call,
+    FunctionDef,
     LiteralValue,
     Loop,
     Operator,
@@ -28,10 +29,19 @@ def check(result, expected = None):
     elif isinstance(result, Call):
         check(result.func, expected.func)
         check(result.arguments, expected.arguments)
+    elif isinstance(result, FunctionDef):
+        check(result.name, expected.name)
+        check(result.func_args, expected.func_args)
+        check(result.body, expected.body)
     elif isinstance(result, ModelIf):
         check(result.expr, expected.expr)
         check(result.body, expected.body)
         check(result.orelse, expected.orelse)
+    elif isinstance(result, Loop):
+        check(result.pre, expected.pre)
+        check(result.expr, expected.expr)
+        check(result.body, expected.body)
+        check(result.post, expected.post)
     elif isinstance(result, LiteralValue):
         check(result.value, expected)
     elif isinstance(result, Var):
@@ -43,7 +53,7 @@ def check(result, expected = None):
 
     # every CAST node has a source_refs element
     if isinstance(result, AstNode):
-        assert not result.source_refs == None
+        assert result.source_refs is not None
 
 # we curently produce a CAST object with a single Module in the nodes list.
 def cast(source):
