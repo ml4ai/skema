@@ -147,7 +147,12 @@ app.include_router(
 )
 
 
-@app.get("/version", tags=["core"], summary="API version")
+@app.get(
+    "/version", 
+    tags=["core"], 
+    summary="API version",
+    status_code=status.HTTP_200_OK
+)
 async def version() -> str:
     return PlainTextResponse(VERSION)
 
