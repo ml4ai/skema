@@ -3,7 +3,7 @@
 
 use crate::{
     ast::{
-        operator::{Derivative, Munderover, Operator, PartialDerivative},
+        operator::{Derivative, Operator, PartialDerivative, SumUnderOver},
         Math, MathExpression, Mi, Mrow,
     },
     parsers::interpreted_mathml::interpreted_math,
@@ -800,6 +800,11 @@ impl MathExpression {
                     tokens.push(MathExpression::Mo(Operator::Lparen));
                     base.flatten(tokens);
                     tokens.push(MathExpression::Mo(Operator::Rparen));
+                } else if MathExpression::Mo(Operator::Hat) == **over {
+                    tokens.push(MathExpression::Mo(Operator::Hat));
+                    tokens.push(MathExpression::Mo(Operator::Lparen));
+                    base.flatten(tokens);
+                    tokens.push(MathExpression::Mo(Operator::Rparen));
                 }
             }
             MathExpression::SummationMath(x) => {
@@ -1009,7 +1014,7 @@ fn prefix_binding_power(op: &Operator) -> ((), u8) {
         Operator::Sin => ((), 21),
         Operator::Tan => ((), 21),
         Operator::Mean => ((), 25),
-        //Operator::Dot => ((), 25),
+        Operator::Hat => ((), 25),
         //Operator::Cross => ((), 25),
         Operator::Grad => ((), 25),
         Operator::Derivative(Derivative { .. }) => ((), 25),
@@ -1017,7 +1022,7 @@ fn prefix_binding_power(op: &Operator) -> ((), u8) {
         Operator::Div => ((), 25),
         Operator::Abs => ((), 25),
         Operator::Sqrt => ((), 25),
-        Operator::Munderover(Munderover { .. }) => ((), 26),
+        Operator::SumUnderOver(SumUnderOver { .. }) => ((), 26),
         _ => panic!("Bad operator: {:?}", op),
     }
 }
@@ -2138,12 +2143,12 @@ fn test_equation_with_mtext() {
 #[test]
 fn new_msqrt_test_function() {
     let input = "<math>
-        <msqrt>
-        <mn>4</mn>
-        <mi>a</mi>
-        <mi>c</mi>
-</msqrt>
-</math>";
+    <msqrt>
+    <mn>4</mn>
+    <mi>a</mi>
+    <mi>c</mi>
+    </msqrt>
+    </math>";
     let exp = input.parse::<MathExpressionTree>().unwrap();
     let s_exp = exp.to_string();
     assert_eq!(s_exp, "(√ (* (* 4 a) c))");
@@ -2189,16 +2194,16 @@ fn new_quadratic_equation() {
 #[test]
 fn test_dot_in_derivative() {
     let input = "<math>
-        <mrow>
+    <mrow>
     <mover>
-      <mi>S</mi>
-      <mo>&#x02D9;</mo>
+    <mi>S</mi>
+    <mo>&#x02D9;</mo>
     </mover>
-  </mrow>
-<mo>(</mo>
-  <mi>t</mi>
-  <mo>)</mo>
-</math>";
+    </mrow>
+    <mo>(</mo>
+    <mi>t</mi>
+    <mo>)</mo>
+    </math>";
     let exp = input.parse::<MathExpressionTree>().unwrap();
     let s_exp = exp.to_string();
     assert_eq!(s_exp, "(D(1, t) S)");
@@ -2259,16 +2264,16 @@ fn test_sidarthe_equation() {
 #[test]
 fn test_heating_rate() {
     let input = "<math>
-  <msub>
+    <msub>
     <mi>Q</mi>
     <mi>i</mi>
-  </msub>
-  <mo>=</mo>
-  <mrow>
+    </msub>
+    <mo>=</mo>
+    <mrow>
     <mo>(</mo>
     <msub>
-      <mi>T</mi>
-      <mi>i</mi>
+    <mi>T</mi>
+    <mi>i</mi>
     </msub>
     <mo>−</mo>
     <msub>
@@ -2302,16 +2307,16 @@ fn test_heating_rate() {
 #[test]
 fn test_sum_munderover() {
     let input = "<math>
-<munderover>
+    <munderover>
     <mo>&#x2211;</mo>
     <mrow>
-      <mi>l</mi>
-      <mo>=</mo>
-      <mi>k</mi>
+    <mi>l</mi>
+    <mo>=</mo>
+    <mi>k</mi>
     </mrow>
     <mi>K</mi>
-  </munderover>
-<mi>S</mi>
+    </munderover>
+    <mi>S</mi>
     </math>";
     let exp = input.parse::<MathExpressionTree>().unwrap();
     let s_exp = exp.to_string();
@@ -2322,42 +2327,41 @@ fn test_sum_munderover() {
 #[test]
 fn test_hydrostatic() {
     let input = "<math>
-  <msub>
+    <msub>
     <mi>Φ</mi>
     <mi>k</mi>
-  </msub>
-  <mo>=</mo>
-  <msub>
+    </msub>
+    <mo>=</mo>
+    <msub>
     <mi>Φ</mi>
     <mi>s</mi>
-  </msub>
-  <mo>+</mo>
-  <mi>R</mi>
-  <munderover>
+    </msub>
+    <mo>+</mo>
+    <mi>R</mi>
+    <munderover>
     <mo>∑</mo>
     <mrow>
-      <mi>l</mi>
-      <mo>=</mo>
-      <mi>k</mi>
+    <mi>l</mi>
+    <mo>=</mo>
+    <mi>k</mi>
     </mrow>
     <mi>K</mi>
-  </munderover>
-  <msub>
+    </munderover>
+    <msub>
     <mi>H</mi>
     <mrow>
-      <mi>k</mi>
-      <mi>l</mi>
+    <mi>k</mi>
+    <mi>l</mi>
     </mrow>
-  </msub>
-  <msub>
+    </msub>
+    <msub>
     <mi>T</mi>
     <mrow>
-      <mi>v</mi>
-      <mi>l</mi>
+    <mi>v</mi>
+    <mi>l</mi>
     </mrow>
-  </msub>
-</math>
-    ";
+    </msub>
+    </math>";
     let exp = input.parse::<MathExpressionTree>().unwrap();
     let s_exp = exp.to_string();
     //println!("s_exp={:?}", s_exp);
@@ -2370,54 +2374,54 @@ fn test_hydrostatic() {
 #[test]
 fn test_temperature_evolution() {
     let input = "<math>
-   <mfrac>
+    <mfrac>
     <mrow>
-      <mi>Δ</mi>
-      <msub>
-        <mi>s</mi>
-        <mi>i</mi>
-      </msub>
+    <mi>Δ</mi>
+    <msub>
+    <mi>s</mi>
+    <mi>i</mi>
+    </msub>
     </mrow>
     <mrow>
-      <mi>Δ</mi>
-      <mi>t</mi>
+    <mi>Δ</mi>
+    <mi>t</mi>
     </mrow>
-  </mfrac>
+    </mfrac>
     <mo>∕</mo>
-  <msub>
+    <msub>
     <mi>C</mi>
     <mi>p</mi>
-  </msub>
-  <mo>=</mo>
-  <mfrac>
+    </msub>
+    <mo>=</mo>
+    <mfrac>
     <mrow>
-      <mo>(</mo>
-      <msub>
-        <mi>s</mi>
-        <mi>i</mi>
-      </msub>
-      <mo>−</mo>
-      <msub>
-        <mi>s</mi>
-        <mrow>
-          <mi>i</mi>
-          <mo>−</mo>
-          <mn>1</mn>
-        </mrow>
-      </msub>
-      <mo>)</mo>
+    <mo>(</mo>
+    <msub>
+    <mi>s</mi>
+    <mi>i</mi>
+    </msub>
+    <mo>−</mo>
+    <msub>
+    <mi>s</mi>
+    <mrow>
+    <mi>i</mi>
+    <mo>−</mo>
+    <mn>1</mn>
+    </mrow>
+    </msub>
+    <mo>)</mo>
     </mrow>
     <mrow>
-      <mi>Δ</mi>
-      <mi>t</mi>
+    <mi>Δ</mi>
+    <mi>t</mi>
     </mrow>
-  </mfrac>
+    </mfrac>
     <mo>∕</mo>
-  <msub>
+    <msub>
     <mi>C</mi>
     <mi>p</mi>
-  </msub>
-</math>";
+    </msub>
+    </math>";
     let exp = input.parse::<MathExpressionTree>().unwrap();
     let s_exp = exp.to_string();
     println!("s_exp={:?}", s_exp);
@@ -2450,4 +2454,203 @@ fn test_dot_product() {
     let s_exp = exp.to_string();
     println!("s_exp={:?}", s_exp);
     assert_eq!(s_exp, "(⋅ f u)");
+}
+
+#[test]
+fn test_partial_with_msub_t() {
+    let input = "<math>
+    <msub>
+    <mi>∂</mi>
+    <mi>t</mi>
+    </msub>
+    <mi>S</mi>
+    </math>";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", exp);
+    let s_exp = exp.to_string();
+    println!("s_exp={:?}", s_exp);
+    assert_eq!(s_exp, "(PD(1, t) S)");
+}
+
+#[test]
+fn test_tracer_conversion_equation() {
+    let input = "<math>
+    <msub>
+    <mi>∂</mi>
+    <mi>t</mi>
+    </msub>
+    <mi>c</mi>
+    <mo>=</mo>
+    <mo>−</mo>
+    <mi>v</mi>
+    <mo>⋅</mo>
+    <mi>∇</mi>
+    <mi>c</mi>
+    <mo>−</mo>
+    <mi>V</mi>
+    <mo>⋅</mo>
+    <mi>∇</mi>
+    <mi>c</mi>
+    <mo>−</mo>
+    <mi>v</mi>
+    <mo>⋅</mo>
+    <mi>∇</mi>
+    <mi>C</mi>
+    <mo>−</mo>
+    <mi>∇</mi>
+    <mo>⋅</mo>
+    <msub>
+    <mi>q</mi>
+    <mi>c</mi>
+    </msub>
+    <mo>+</mo>
+    <msub>
+    <mi>F</mi>
+    <mi>c</mi>
+    </msub>
+    <mo>,</mo>
+    </math>";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", exp);
+    let s_exp = exp.to_string();
+    println!("s_exp={:?}", s_exp);
+    assert_eq!(s_exp, "(= (PD(1, t) c) (+ (- (- (- (- (⋅ v (Grad c))) (⋅ V (Grad c))) (⋅ v (Grad C))) (Div q_{c})) F_{c}))");
+}
+
+#[test]
+fn test_momentum_conservation() {
+    let input = "<math>
+    <msub>
+    <mi>∂</mi>
+    <mi>t</mi>
+    </msub>
+    <mi>u</mi>
+    <mo>=</mo>
+    <mo>−</mo>
+    <mo>(</mo>
+    <mi>v</mi>
+    <mo>⋅</mo>
+    <mi>∇</mi>
+    <mo>)</mo>
+    <mi>u</mi>
+    <mo>−</mo>
+    <mi>f</mi>
+    <mo>×</mo>
+    <mi>u</mi>
+    <mo>−</mo>
+    <msub>
+    <mi>∇</mi>
+    <mi>h</mi>
+    </msub>
+    <mo>(</mo>
+    <mi>p</mi>
+    <mo>+</mo>
+    <mi>g</mi>
+    <mi>η</mi>
+    <mo>)</mo>
+    <mo>−</mo>
+    <mi>∇</mi>
+    <mo>⋅</mo>
+    <mi>τ</mi>
+    <mo>+</mo>
+    <msub>
+    <mi>F</mi>
+    <mrow>
+    <mi>u</mi>
+    </mrow>
+    </msub>
+    </math>";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", exp);
+    let s_exp = exp.to_string();
+    println!("s_exp={:?}", s_exp);
+    assert_eq!(s_exp, "(= (PD(1, t) u) (+ (- (- (- (* (- (⋅ v ∇)) u) (× f u)) (* ∇_{h} (+ p (* g η)))) (Div τ)) F_{u}))");
+}
+
+#[test]
+fn test_dry_static_energy() {
+    let input = "<math>
+    <msub>
+    <mi>s</mi>
+    <mi>i</mi>
+    </msub>
+    <mo>=</mo>
+    <msub>
+    <mi>s</mi>
+    <mrow>
+    <mi>i</mi>
+    <mo>−</mo>
+    <mn>1</mn>
+    </mrow>
+    </msub>
+    <mo>+</mo>
+    <mo>(</mo>
+    <mi>Δ</mi>
+    <mi>t</mi>
+    <mo>)</mo>
+    <msub>
+    <mi>Q</mi>
+    <mi>i</mi>
+    </msub>
+    <mrow>
+    <mo>(</mo>
+    <msub>
+    <mi>s</mi>
+    <mrow>
+    <mi>i</mi>
+    <mo>−</mo>
+    <mn>1</mn>
+    </mrow>
+    </msub>
+    <mo>,</mo>
+    <msub>
+    <mi>T</mi>
+    <mrow>
+    <mi>i</mi>
+    <mo>−</mo>
+    <mn>1</mn>
+    </mrow>
+    </msub>
+    <mo>,</mo>
+    <msub>
+    <mi>Φ</mi>
+    <mrow>
+        <mi>i</mi>
+        <mo>−</mo>
+        <mn>1</mn>
+      </mrow>
+    </msub>
+    <mo>,</mo>
+    <msub>
+      <mi>q</mi>
+      <mrow>
+        <mi>i</mi>
+        <mo>−</mo>
+        <mn>1</mn>
+      </mrow>
+    </msub>
+    <mo>)</mo>
+  </mrow>
+    </math>";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", exp);
+    let s_exp = exp.to_string();
+    println!("s_exp={:?}", s_exp);
+    assert_eq!(s_exp, "(= s_{i} (+ s_{i-1} (* Δt Q_{i})))");
+}
+
+#[test]
+fn test_hat_operator() {
+    let input = "<math>
+    <mrow>
+    <mover>
+    <mi>z</mi>
+    <mo>&#x5E;</mo>
+    </mover>
+    </mrow>
+    </math>";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    let s_exp = exp.to_string();
+    println!("s_exp={:?}", s_exp);
+    assert_eq!(s_exp, "(Hat z)");
 }

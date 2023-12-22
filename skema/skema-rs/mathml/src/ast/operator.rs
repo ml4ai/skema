@@ -21,7 +21,7 @@ pub struct PartialDerivative {
 
 /// Summation operator
 #[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
-pub struct Munderover {
+pub struct SumUnderOver {
     pub op: Box<MathExpression>,
     pub under: Box<MathExpression>,
     pub over: Box<MathExpression>,
@@ -63,8 +63,9 @@ pub enum Operator {
     Arccot,
     Mean,
     Sum,
-    Munderover(Munderover),
+    SumUnderOver(SumUnderOver),
     Cross,
+    Hat,
     // Catchall for operators we haven't explicitly defined as enum variants yet.
     Other(String),
 }
@@ -119,10 +120,11 @@ impl fmt::Display for Operator {
             Operator::Div => write!(f, "Div"),
             Operator::Abs => write!(f, "Abs"),
             Operator::Sum => write!(f, "∑"),
-            Operator::Munderover(Munderover { op, under, over }) => {
+            Operator::SumUnderOver(SumUnderOver { op, under, over }) => {
                 write!(f, "{op}_{{{under}}}^{{{over}}}")
             }
             Operator::Cross => write!(f, "×"),
+            Operator::Hat => write!(f, "Hat"),
         }
     }
 }

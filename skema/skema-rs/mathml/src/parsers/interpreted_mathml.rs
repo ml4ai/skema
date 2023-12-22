@@ -6,16 +6,17 @@
 
 use crate::{
     ast::{
-        operator::{Derivative, Munderover, Operator, PartialDerivative},
+        operator::{Derivative, Operator, PartialDerivative, SumUnderOver},
         Ci, Differential, Math, MathExpression, Mi, Mrow, SummationMath, Type,
     },
     parsers::generic_mathml::{
-        add, attribute, cross, divide, dot, elem_many0, equals, etag, grad, lparen, mean, mi, mn,
-        msub, msubsup, mtext, multiply, rparen, stag, subtract, tag_parser, ws, xml_declaration,
-        IResult, ParseError, Span,
+        add, attribute, cross, divide, dot, elem_many0, equals, etag, grad, hat, lparen, mean, mi,
+        mn, msub, msubsup, mtext, multiply, rparen, stag, subtract, tag_parser, ws,
+        xml_declaration, IResult, ParseError, Span,
     },
 };
 
+use nom::sequence::terminated;
 use nom::{
     branch::alt,
     bytes::complete::tag,
@@ -30,7 +31,7 @@ pub fn operator(input: Span) -> IResult<Operator> {
     let (s, op) = ws(delimited(
         stag!("mo"),
         alt((
-            add, subtract, multiply, divide, equals, lparen, rparen, mean, dot, cross,
+            add, subtract, multiply, divide, equals, lparen, rparen, mean, dot, cross, hat,
         )),
         etag!("mo"),
     ))(input)?;
@@ -48,18 +49,26 @@ fn parenthesized_identifier(input: Span) -> IResult<Vec<Mi>> {
 }
 
 /// Parses function of identifiers
-/// Example: Q ( t_{i-1}, s_{i-1} ) identifies ( t_{i-1}, s_{i-1} ) as identifiers.
+/// Example: Q_i ( t_{i-1}, s_{i-1} ) identifies ( t_{i-1}, s_{i-1} ) as identifiers.
 fn parenthesized_msub_identifier(input: Span) -> IResult<Vec<Mi>> {
     let mo_lparen = delimited(stag!("mo"), lparen, etag!("mo"));
     let mo_rparen = delimited(stag!("mo"), rparen, etag!("mo"));
+    let mo_mrow_lparen = delimited(tag("<mrow><mo>"), lparen, tag("</mo>"));
+    let mo_mrow_rparen = delimited(tag("<mo>"), rparen, tag("</mo></mrow>"));
     let mo_comma = delimited(stag!("mo"), ws(tag(",")), etag!("mo"));
-    let (s, bound_vars) = delimited(mo_lparen, separated_list1(mo_comma, msub), mo_rparen)(input)?;
+    let (s, bound_vars) = delimited(
+        alt((mo_lparen, mo_mrow_lparen)),
+        separated_list1(mo_comma, msub),
+        alt((mo_mrow_rparen, mo_rparen)),
+    )(input)?;
     //let bound_subs = Mi(bound_vars.to_string());
+    println!("bound_vars={:?}", bound_vars);
     let mut mi_func_of: Vec<Mi> = Vec::new();
     for bvar in bound_vars {
         let b = Mi(bvar.to_string());
         mi_func_of.push(b.clone());
     }
+    println!("mi_func_of={:?}", mi_func_of);
     Ok((s, mi_func_of))
 }
 
@@ -144,17 +153,19 @@ pub fn ci_subscript_func(input: Span) -> IResult<Ci> {
     let (s, (x, bound_vars)) = tuple((
         msub,
         alt((
+            parenthesized_msub_identifier,
             parenthesized_identifier,
             empty_parenthesis,
-            parenthesized_msub_identifier,
         )),
     ))(input)?;
+    println!("x={:?}", x);
+    println!("bound_vars={:?}", bound_vars);
     let mut ci_func_of: Vec<Ci> = Vec::new();
+    println!("ci_func_of={:?}", ci_func_of);
     for bvar in bound_vars {
         let b = Ci::new(Some(Type::Real), Box::new(MathExpression::Mi(bvar)), None);
         ci_func_of.push(b.clone());
     }
-    println!("ci_func_of={:?}", ci_func_of);
     Ok((
         s,
         Ci::new(Some(Type::Function), Box::new(x), Some(ci_func_of)),
@@ -386,8 +397,7 @@ pub fn first_order_partial_derivative_partial_func(
     input: Span,
 ) -> IResult<(PartialDerivative, Ci)> {
     let (s, _) = tuple((stag!("msub"), partial))(input)?;
-    let (s, with_respect_to) = ws(preceded(etag!("msub"), mi))(s)?;
-    println!("with_respect_to={:?}", with_respect_to);
+    let (s, with_respect_to) = ws(terminated(mi, etag!("msub")))(s)?;
     let (s, func) = ws(alt((
         ci_univariate_func,
         map(
@@ -404,7 +414,6 @@ pub fn first_order_partial_derivative_partial_func(
         ),
         ci_subscript_func,
     )))(s)?;
-    println!("func={:?}", func);
     if let Some(ref ci_vec) = func.func_of {
         for (indx, bvar) in ci_vec.iter().enumerate() {
             if Some(bvar.content.clone())
@@ -711,9 +720,7 @@ pub fn change_in_variable(input: Span) -> IResult<Ci> {
         alt((tag("<mi>Δ</mi>"), tag("<mi>&#x0394;</mi>"))),
         math_expression,
     ))(input)?;
-    //println!("elements={:?}", elements);
     let temp_sum = format!("Δ{}", elements.to_string());
-    //println!("temp_sum={:?}", temp_sum);
     let change_in_var = Ci::new(
         Some(Type::Real),
         Box::new(MathExpression::Mi(Mi(temp_sum.to_string()))),
@@ -734,7 +741,7 @@ pub fn multiple_dots(input: Span) -> IResult<Ci> {
 }
 
 /// Handles summation as operator
-pub fn munderover_summation(input: Span) -> IResult<(Munderover, Mrow)> {
+pub fn munderover_summation(input: Span) -> IResult<(SumUnderOver, Mrow)> {
     let (s, (under, over)) = ws(delimited(
         alt((
             tag("<munderover><mo>∑</mo>"),
@@ -754,10 +761,8 @@ pub fn munderover_summation(input: Span) -> IResult<(Munderover, Mrow)> {
     let sum_operator = Operator::Sum;
     let under_comp = MathExpression::Mrow(Mrow(under));
     let over_comp = MathExpression::Mrow(Mrow(over));
-    let other_comps = Mrow::new(comps); //MathExpression::Mrow(Mrow(comps));
-                                        //println!("under_comp={:?}", under_comp);
-                                        //println!("over_comp={:?}", over_comp);
-    let operator = Munderover::new(
+    let other_comps = Mrow::new(comps);
+    let operator = SumUnderOver::new(
         Box::new(MathExpression::Mo(sum_operator)),
         Box::new(under_comp),
         Box::new(over_comp),
@@ -808,9 +813,9 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
         //sqrt,
         map(
             munderover_summation,
-            |(Munderover { op, under, over }, comp)| {
+            |(SumUnderOver { op, under, over }, comp)| {
                 MathExpression::SummationMath(SummationMath {
-                    op: Box::new(MathExpression::Mo(Operator::Munderover(Munderover {
+                    op: Box::new(MathExpression::Mo(Operator::SumUnderOver(SumUnderOver {
                         op,
                         under,
                         over,
