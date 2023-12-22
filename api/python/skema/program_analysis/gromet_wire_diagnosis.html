@@ -1,0 +1,541 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.10.0" />
+<title>skema.program_analysis.gromet_wire_diagnosis API documentation</title>
+<meta name="description" content="" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS_CHTML" integrity="sha256-kZafAc6mZvK3W3v1pHOcUix30OHQN6pU/NO2oFkqZVw=" crossorigin></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>skema.program_analysis.gromet_wire_diagnosis</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">import argparse
+from skema.program_analysis.JSON2GroMEt import json2gromet
+from skema.gromet.metadata import SourceCodeReference
+
+# Ways to expand
+# Check loop, condition FN indices
+# Check bf call FN indices
+# Boxes associated with ports
+
+def disp_wire(wire):
+    return f&#34;src:{wire.src}&lt;--&gt;tgt:{wire.tgt}&#34;
+
+def get_length(gromet_item):
+    # For any gromet object we can generically retrieve the length, since they all exist
+    # in lists
+    return len(gromet_item) if gromet_item != None else 0
+
+def check_wire(gromet_wire, src_port_count, tgt_port_count, wire_type = &#34;&#34;, metadata=None):
+    # The current wiring checks are
+    # Checking if the ports on both ends of the wire are below or over the bounds
+    error_detected = False
+    if gromet_wire.src &lt; 0:
+        error_detected = True
+        print(f&#34;Gromet Wire {wire_type} {disp_wire(gromet_wire)} has negative src port.&#34;)
+    if gromet_wire.src == 0:
+        error_detected = True
+        print(f&#34;Gromet Wire {wire_type} {disp_wire(gromet_wire)} has zero src port.&#34;)
+    if gromet_wire.src &gt; src_port_count:
+        error_detected = True
+        print(f&#34;Gromet Wire {wire_type} {disp_wire(gromet_wire)} has a src port that goes over the boundary of {src_port_count} src ports.&#34;)
+
+    if gromet_wire.tgt &lt; 0:
+        error_detected = True
+        print(f&#34;Gromet Wire {wire_type} {disp_wire(gromet_wire)} has negative tgt port.&#34;)
+    if gromet_wire.tgt == 0:
+        error_detected = True
+        print(f&#34;Gromet Wire {wire_type} {disp_wire(gromet_wire)} has zero tgt port.&#34;)
+    if gromet_wire.tgt &gt; tgt_port_count:
+        error_detected = True
+        print(f&#34;Gromet Wire {wire_type} {disp_wire(gromet_wire)} has a tgt port that goes over the boundary of {tgt_port_count} tgt ports.&#34;)
+
+
+    if error_detected:
+        if metadata == None:
+            print(&#34;No line number information exists for this particular wire!&#34;)
+        else:
+            print(f&#34;Wire is associated with source code lines start:{metadata.line_begin} end:{metadata.line_end}&#34;)
+        print()
+
+    return error_detected
+
+def find_metadata_idx(gromet_fn):
+    &#34;&#34;&#34;
+        Attempts to find a metadata associated with this fn
+        If it finds something, return it, otherwise return None
+    &#34;&#34;&#34;
+    if gromet_fn.b != None:
+        for b in gromet_fn.b:
+            if b.metadata != None:
+                return b.metadata
+
+    if gromet_fn.bf != None:
+        for bf in gromet_fn.bf:
+            if bf.metadata != None:
+                return bf.metadata
+
+    return None
+
+def analyze_fn_wiring(gromet_fn, metadata_collection):
+    # Acquire information for all the ports, if they exist
+    pif_length = get_length(gromet_fn.pif)
+    pof_length = get_length(gromet_fn.pof)
+    opi_length = get_length(gromet_fn.opi)
+    opo_length = get_length(gromet_fn.opo)
+    pil_length = get_length(gromet_fn.pil)
+    pol_length = get_length(gromet_fn.pol)
+    pic_length = get_length(gromet_fn.pic)
+    poc_length = get_length(gromet_fn.poc)
+    
+    # Find a SourceCodeReference metadata that we can extract line number information for
+    # so we can display some line number information about potential errors in the wiring 
+    # NOTE: Can we make this extraction more accurate?
+    metadata_idx = find_metadata_idx(gromet_fn)
+    metadata = None
+    if metadata_idx != None:
+        for md in metadata_collection[metadata_idx - 1]:
+            if isinstance(md, SourceCodeReference):
+                metadata = md
+
+    wopio_length = get_length(gromet_fn.wopio)
+    if wopio_length &gt; 0:
+        for wire in gromet_fn.wff:
+            check_wire(wire, opo_length, opi_length, &#34;wff&#34;, metadata)
+
+    ######################## loop (bl) wiring
+
+    wlopi_length = get_length(gromet_fn.wlopi)
+    if wlopi_length &gt; 0:
+        for wire in gromet_fn.wlopi:
+            check_wire(wire, pil_length, opi_length, &#34;wlopi&#34;, metadata)
+
+    wll_length = get_length(gromet_fn.wll)
+    if wll_length &gt; 0:
+        for wire in gromet_fn.wll:
+            check_wire(wire, pil_length, pol_length, &#34;wll&#34;, metadata)
+
+    wlf_length = get_length(gromet_fn.wlf)
+    if wlf_length &gt; 0:
+        for wire in gromet_fn.wlf:
+            check_wire(wire, pif_length, pol_length, &#34;wlf&#34;, metadata)
+    
+    wlc_length = get_length(gromet_fn.wlc)
+    if wlc_length &gt; 0:
+        for wire in gromet_fn.wlc:
+            check_wire(wire, pic_length, pol_length, &#34;wlc&#34;, metadata)
+
+    wlopo_length = get_length(gromet_fn.wlopo)
+    if wlopo_length &gt; 0:
+        for wire in gromet_fn.wlopo:
+            check_wire(wire, opo_length, pol_length, &#34;wlopo&#34;, metadata)
+
+    ######################## function (bf) wiring
+    wfopi_length = get_length(gromet_fn.wfopi)
+    if wfopi_length &gt; 0:
+        for wire in gromet_fn.wfopi:
+            check_wire(wire, pif_length, opi_length, &#34;wfopi&#34;, metadata)
+
+    wfl_length = get_length(gromet_fn.wfl)
+    if wfl_length &gt; 0:
+        for wire in gromet_fn.wfl:
+            check_wire(wire, pil_length, pof_length, &#34;wfl&#34;, metadata)
+
+    wff_length = get_length(gromet_fn.wff)
+    if wff_length &gt; 0:
+        for wire in gromet_fn.wff:
+            check_wire(wire, pif_length, pof_length, &#34;wff&#34;, metadata)
+    
+    wfc_length = get_length(gromet_fn.wfc)
+    if wfc_length &gt; 0:
+        for wire in gromet_fn.wfc:
+            check_wire(wire, pic_length, pof_length, &#34;wfc&#34;, metadata)
+
+    wfopo_length = get_length(gromet_fn.wfopo)
+    if wfopo_length &gt; 0:
+        for wire in gromet_fn.wfopo:
+            check_wire(wire, opo_length, pof_length, &#34;wfopo&#34;, metadata)
+
+    ######################## condition (bc) wiring
+    wcopi_length = get_length(gromet_fn.wcopi)
+    if wcopi_length &gt; 0:
+        for wire in gromet_fn.wcopi:
+            check_wire(wire, pic_length, opi_length, &#34;wcopi&#34;, metadata)
+
+    wcl_length = get_length(gromet_fn.wcl)
+    if wcl_length &gt; 0:
+        for wire in gromet_fn.wcl:
+            check_wire(wire, pil_length, poc_length, &#34;wcl&#34;, metadata)
+
+    wcf_length = get_length(gromet_fn.wcf)
+    if wcf_length &gt; 0:
+        for wire in gromet_fn.wcf:
+            check_wire(wire, pif_length, poc_length, &#34;wcf&#34;, metadata)
+    
+    wcc_length = get_length(gromet_fn.wcc)
+    if wcc_length &gt; 0:
+        for wire in gromet_fn.wcc:
+            check_wire(wire, pic_length, poc_length, &#34;wcc&#34;, metadata)
+
+    wcopo_length = get_length(gromet_fn.wcopo)
+    if wcopo_length &gt; 0:
+        for wire in gromet_fn.wcopo:
+            check_wire(wire, opo_length, poc_length, &#34;wcopo&#34;, metadata)
+
+
+def wiring_analyzer(gromet_obj):
+    # TODO: Multifiles
+
+    for module in gromet_obj.modules:
+        # first_module = gromet_obj.modules[0]
+        metadata = []
+        # Analyze base FN
+        print(f&#34;Analyzing {module.name}&#34;)
+        analyze_fn_wiring(module.fn, module.metadata_collection)
+
+        # Analyze the rest of the FN_array
+        for fn in module.fn_array:
+            analyze_fn_wiring(fn, module.metadata_collection) 
+
+def get_args():
+    parser = argparse.ArgumentParser(
+        &#34;Attempts to analyize GroMEt JSON for issues&#34;
+    )
+    parser.add_argument(
+        &#34;gromet_file_path&#34;,
+        help=&#34;input GroMEt JSON file&#34;
+    )
+
+    options = parser.parse_args()
+    return options
+
+if __name__ == &#34;__main__&#34;:
+    args = get_args()
+    gromet_obj = json2gromet.json_to_gromet(args.gromet_file_path)
+
+    wiring_analyzer(gromet_obj)
+
+    </code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="skema.program_analysis.gromet_wire_diagnosis.analyze_fn_wiring"><code class="name flex">
+<span>def <span class="ident">analyze_fn_wiring</span></span>(<span>gromet_fn, metadata_collection)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def analyze_fn_wiring(gromet_fn, metadata_collection):
+    # Acquire information for all the ports, if they exist
+    pif_length = get_length(gromet_fn.pif)
+    pof_length = get_length(gromet_fn.pof)
+    opi_length = get_length(gromet_fn.opi)
+    opo_length = get_length(gromet_fn.opo)
+    pil_length = get_length(gromet_fn.pil)
+    pol_length = get_length(gromet_fn.pol)
+    pic_length = get_length(gromet_fn.pic)
+    poc_length = get_length(gromet_fn.poc)
+    
+    # Find a SourceCodeReference metadata that we can extract line number information for
+    # so we can display some line number information about potential errors in the wiring 
+    # NOTE: Can we make this extraction more accurate?
+    metadata_idx = find_metadata_idx(gromet_fn)
+    metadata = None
+    if metadata_idx != None:
+        for md in metadata_collection[metadata_idx - 1]:
+            if isinstance(md, SourceCodeReference):
+                metadata = md
+
+    wopio_length = get_length(gromet_fn.wopio)
+    if wopio_length &gt; 0:
+        for wire in gromet_fn.wff:
+            check_wire(wire, opo_length, opi_length, &#34;wff&#34;, metadata)
+
+    ######################## loop (bl) wiring
+
+    wlopi_length = get_length(gromet_fn.wlopi)
+    if wlopi_length &gt; 0:
+        for wire in gromet_fn.wlopi:
+            check_wire(wire, pil_length, opi_length, &#34;wlopi&#34;, metadata)
+
+    wll_length = get_length(gromet_fn.wll)
+    if wll_length &gt; 0:
+        for wire in gromet_fn.wll:
+            check_wire(wire, pil_length, pol_length, &#34;wll&#34;, metadata)
+
+    wlf_length = get_length(gromet_fn.wlf)
+    if wlf_length &gt; 0:
+        for wire in gromet_fn.wlf:
+            check_wire(wire, pif_length, pol_length, &#34;wlf&#34;, metadata)
+    
+    wlc_length = get_length(gromet_fn.wlc)
+    if wlc_length &gt; 0:
+        for wire in gromet_fn.wlc:
+            check_wire(wire, pic_length, pol_length, &#34;wlc&#34;, metadata)
+
+    wlopo_length = get_length(gromet_fn.wlopo)
+    if wlopo_length &gt; 0:
+        for wire in gromet_fn.wlopo:
+            check_wire(wire, opo_length, pol_length, &#34;wlopo&#34;, metadata)
+
+    ######################## function (bf) wiring
+    wfopi_length = get_length(gromet_fn.wfopi)
+    if wfopi_length &gt; 0:
+        for wire in gromet_fn.wfopi:
+            check_wire(wire, pif_length, opi_length, &#34;wfopi&#34;, metadata)
+
+    wfl_length = get_length(gromet_fn.wfl)
+    if wfl_length &gt; 0:
+        for wire in gromet_fn.wfl:
+            check_wire(wire, pil_length, pof_length, &#34;wfl&#34;, metadata)
+
+    wff_length = get_length(gromet_fn.wff)
+    if wff_length &gt; 0:
+        for wire in gromet_fn.wff:
+            check_wire(wire, pif_length, pof_length, &#34;wff&#34;, metadata)
+    
+    wfc_length = get_length(gromet_fn.wfc)
+    if wfc_length &gt; 0:
+        for wire in gromet_fn.wfc:
+            check_wire(wire, pic_length, pof_length, &#34;wfc&#34;, metadata)
+
+    wfopo_length = get_length(gromet_fn.wfopo)
+    if wfopo_length &gt; 0:
+        for wire in gromet_fn.wfopo:
+            check_wire(wire, opo_length, pof_length, &#34;wfopo&#34;, metadata)
+
+    ######################## condition (bc) wiring
+    wcopi_length = get_length(gromet_fn.wcopi)
+    if wcopi_length &gt; 0:
+        for wire in gromet_fn.wcopi:
+            check_wire(wire, pic_length, opi_length, &#34;wcopi&#34;, metadata)
+
+    wcl_length = get_length(gromet_fn.wcl)
+    if wcl_length &gt; 0:
+        for wire in gromet_fn.wcl:
+            check_wire(wire, pil_length, poc_length, &#34;wcl&#34;, metadata)
+
+    wcf_length = get_length(gromet_fn.wcf)
+    if wcf_length &gt; 0:
+        for wire in gromet_fn.wcf:
+            check_wire(wire, pif_length, poc_length, &#34;wcf&#34;, metadata)
+    
+    wcc_length = get_length(gromet_fn.wcc)
+    if wcc_length &gt; 0:
+        for wire in gromet_fn.wcc:
+            check_wire(wire, pic_length, poc_length, &#34;wcc&#34;, metadata)
+
+    wcopo_length = get_length(gromet_fn.wcopo)
+    if wcopo_length &gt; 0:
+        for wire in gromet_fn.wcopo:
+            check_wire(wire, opo_length, poc_length, &#34;wcopo&#34;, metadata)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.gromet_wire_diagnosis.check_wire"><code class="name flex">
+<span>def <span class="ident">check_wire</span></span>(<span>gromet_wire, src_port_count, tgt_port_count, wire_type='', metadata=None)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def check_wire(gromet_wire, src_port_count, tgt_port_count, wire_type = &#34;&#34;, metadata=None):
+    # The current wiring checks are
+    # Checking if the ports on both ends of the wire are below or over the bounds
+    error_detected = False
+    if gromet_wire.src &lt; 0:
+        error_detected = True
+        print(f&#34;Gromet Wire {wire_type} {disp_wire(gromet_wire)} has negative src port.&#34;)
+    if gromet_wire.src == 0:
+        error_detected = True
+        print(f&#34;Gromet Wire {wire_type} {disp_wire(gromet_wire)} has zero src port.&#34;)
+    if gromet_wire.src &gt; src_port_count:
+        error_detected = True
+        print(f&#34;Gromet Wire {wire_type} {disp_wire(gromet_wire)} has a src port that goes over the boundary of {src_port_count} src ports.&#34;)
+
+    if gromet_wire.tgt &lt; 0:
+        error_detected = True
+        print(f&#34;Gromet Wire {wire_type} {disp_wire(gromet_wire)} has negative tgt port.&#34;)
+    if gromet_wire.tgt == 0:
+        error_detected = True
+        print(f&#34;Gromet Wire {wire_type} {disp_wire(gromet_wire)} has zero tgt port.&#34;)
+    if gromet_wire.tgt &gt; tgt_port_count:
+        error_detected = True
+        print(f&#34;Gromet Wire {wire_type} {disp_wire(gromet_wire)} has a tgt port that goes over the boundary of {tgt_port_count} tgt ports.&#34;)
+
+
+    if error_detected:
+        if metadata == None:
+            print(&#34;No line number information exists for this particular wire!&#34;)
+        else:
+            print(f&#34;Wire is associated with source code lines start:{metadata.line_begin} end:{metadata.line_end}&#34;)
+        print()
+
+    return error_detected</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.gromet_wire_diagnosis.disp_wire"><code class="name flex">
+<span>def <span class="ident">disp_wire</span></span>(<span>wire)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def disp_wire(wire):
+    return f&#34;src:{wire.src}&lt;--&gt;tgt:{wire.tgt}&#34;</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.gromet_wire_diagnosis.find_metadata_idx"><code class="name flex">
+<span>def <span class="ident">find_metadata_idx</span></span>(<span>gromet_fn)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Attempts to find a metadata associated with this fn
+If it finds something, return it, otherwise return None</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def find_metadata_idx(gromet_fn):
+    &#34;&#34;&#34;
+        Attempts to find a metadata associated with this fn
+        If it finds something, return it, otherwise return None
+    &#34;&#34;&#34;
+    if gromet_fn.b != None:
+        for b in gromet_fn.b:
+            if b.metadata != None:
+                return b.metadata
+
+    if gromet_fn.bf != None:
+        for bf in gromet_fn.bf:
+            if bf.metadata != None:
+                return bf.metadata
+
+    return None</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.gromet_wire_diagnosis.get_args"><code class="name flex">
+<span>def <span class="ident">get_args</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_args():
+    parser = argparse.ArgumentParser(
+        &#34;Attempts to analyize GroMEt JSON for issues&#34;
+    )
+    parser.add_argument(
+        &#34;gromet_file_path&#34;,
+        help=&#34;input GroMEt JSON file&#34;
+    )
+
+    options = parser.parse_args()
+    return options</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.gromet_wire_diagnosis.get_length"><code class="name flex">
+<span>def <span class="ident">get_length</span></span>(<span>gromet_item)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_length(gromet_item):
+    # For any gromet object we can generically retrieve the length, since they all exist
+    # in lists
+    return len(gromet_item) if gromet_item != None else 0</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.gromet_wire_diagnosis.wiring_analyzer"><code class="name flex">
+<span>def <span class="ident">wiring_analyzer</span></span>(<span>gromet_obj)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def wiring_analyzer(gromet_obj):
+    # TODO: Multifiles
+
+    for module in gromet_obj.modules:
+        # first_module = gromet_obj.modules[0]
+        metadata = []
+        # Analyze base FN
+        print(f&#34;Analyzing {module.name}&#34;)
+        analyze_fn_wiring(module.fn, module.metadata_collection)
+
+        # Analyze the rest of the FN_array
+        for fn in module.fn_array:
+            analyze_fn_wiring(fn, module.metadata_collection) </code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="skema.program_analysis" href="index.html">skema.program_analysis</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="two-column">
+<li><code><a title="skema.program_analysis.gromet_wire_diagnosis.analyze_fn_wiring" href="#skema.program_analysis.gromet_wire_diagnosis.analyze_fn_wiring">analyze_fn_wiring</a></code></li>
+<li><code><a title="skema.program_analysis.gromet_wire_diagnosis.check_wire" href="#skema.program_analysis.gromet_wire_diagnosis.check_wire">check_wire</a></code></li>
+<li><code><a title="skema.program_analysis.gromet_wire_diagnosis.disp_wire" href="#skema.program_analysis.gromet_wire_diagnosis.disp_wire">disp_wire</a></code></li>
+<li><code><a title="skema.program_analysis.gromet_wire_diagnosis.find_metadata_idx" href="#skema.program_analysis.gromet_wire_diagnosis.find_metadata_idx">find_metadata_idx</a></code></li>
+<li><code><a title="skema.program_analysis.gromet_wire_diagnosis.get_args" href="#skema.program_analysis.gromet_wire_diagnosis.get_args">get_args</a></code></li>
+<li><code><a title="skema.program_analysis.gromet_wire_diagnosis.get_length" href="#skema.program_analysis.gromet_wire_diagnosis.get_length">get_length</a></code></li>
+<li><code><a title="skema.program_analysis.gromet_wire_diagnosis.wiring_analyzer" href="#skema.program_analysis.gromet_wire_diagnosis.wiring_analyzer">wiring_analyzer</a></code></li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
+</footer>
+</body>
+</html>
