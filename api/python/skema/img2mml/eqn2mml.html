@@ -40,7 +40,7 @@ node data_generation/mathjax_server.js
 
 from typing import Text
 from typing_extensions import Annotated
-from fastapi import APIRouter, FastAPI, Response, Request, Query, UploadFile
+from fastapi import APIRouter, FastAPI, status, Response, Request, Query, UploadFile
 from skema.rest.proxies import SKEMA_MATHJAX_ADDRESS
 from skema.img2mml.api import (
     get_mathml_from_bytes,
@@ -119,23 +119,23 @@ def process_latex_equation(eqn: Text) -&gt; Response:
     &#34;/img2mml/healthcheck&#34;,
     summary=&#34;Check health of eqn2mml service&#34;,
     response_model=int,
-    status_code=200,
+    status_code=status.HTTP_200_OK,
 )
 def img2mml_healthcheck() -&gt; int:
-    return 200
+    return status.HTTP_200_OK
 
 
 @router.get(
     &#34;/latex2mml/healthcheck&#34;,
     summary=&#34;Check health of mathjax service&#34;,
     response_model=int,
-    status_code=200,
+    status_code=status.HTTP_200_OK,
 )
 def latex2mml_healthcheck() -&gt; int:
     try:
         return int(requests.get(f&#34;{SKEMA_MATHJAX_ADDRESS}/healthcheck&#34;).status_code)
     except:
-        return 500
+        return status.HTTP_500_INTERNAL_SERVER_ERROR
 
 
 @router.post(&#34;/image/mml&#34;, summary=&#34;Get MathML representation of an equation image&#34;)
@@ -287,10 +287,10 @@ async def get_tex_to_mathml(tex_src: EquationQueryParameter) -&gt; Response:
     &#34;/img2mml/healthcheck&#34;,
     summary=&#34;Check health of eqn2mml service&#34;,
     response_model=int,
-    status_code=200,
+    status_code=status.HTTP_200_OK,
 )
 def img2mml_healthcheck() -&gt; int:
-    return 200</code></pre>
+    return status.HTTP_200_OK</code></pre>
 </details>
 </dd>
 <dt id="skema.img2mml.eqn2mml.latex2mml_healthcheck"><code class="name flex">
@@ -306,13 +306,13 @@ def img2mml_healthcheck() -&gt; int:
     &#34;/latex2mml/healthcheck&#34;,
     summary=&#34;Check health of mathjax service&#34;,
     response_model=int,
-    status_code=200,
+    status_code=status.HTTP_200_OK,
 )
 def latex2mml_healthcheck() -&gt; int:
     try:
         return int(requests.get(f&#34;{SKEMA_MATHJAX_ADDRESS}/healthcheck&#34;).status_code)
     except:
-        return 500</code></pre>
+        return status.HTTP_500_INTERNAL_SERVER_ERROR</code></pre>
 </details>
 </dd>
 <dt id="skema.img2mml.eqn2mml.post_b64image_to_mathml"><code class="name flex">

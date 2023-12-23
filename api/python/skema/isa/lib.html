@@ -707,8 +707,8 @@ def check_square_array(arr: np.ndarray) -&gt; List[int]:
 
 
 def align_mathml_eqs(
-    file1: str = &#34;&#34;,
-    file2: str = &#34;&#34;,
+    mml1: str = &#34;&#34;,
+    mml2: str = &#34;&#34;,
     mention_json1: str = &#34;&#34;,
     mention_json2: str = &#34;&#34;,
     mode: int = 2,
@@ -721,7 +721,7 @@ def align_mathml_eqs(
     [1] Fishkind, D. E., Adali, S., Patsolic, H. G., Meng, L., Singh, D., Lyzinski, V., &amp; Priebe, C. E. (2019).
     Seeded graph matching. Pattern recognition, 87, 203-215.
 
-    Input: the paths of the two equation MathMLs; mention_json1: the mention file of paper 1; mention_json1: the mention file of paper 2;
+    Input: mml1 &amp; mml2: the file path or contents of the two equation MathMLs; mention_json1: the mention file of paper 1; mention_json1: the mention file of paper 2;
             mode 0: without considering any priors; mode 1: having a heuristic prior
             with the similarity of node labels; mode 2: using the variable definitions
     Output:
@@ -734,8 +734,8 @@ def align_mathml_eqs(
         union_graph: the visualization of the alignment result
         perfectly_matched_indices1: strictly matched node indices in Graph 1
     &#34;&#34;&#34;
-    graph1 = generate_graph(file1)
-    graph2 = generate_graph(file2)
+    graph1 = generate_graph(mml1)
+    graph2 = generate_graph(mml2)
 
     amatrix1, node_labels1 = generate_amatrix(graph1)
     amatrix2, node_labels2 = generate_amatrix(graph2)
@@ -1025,13 +1025,13 @@ def generate_variable_dict(mathml_string):
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
 <dt id="skema.isa.lib.align_mathml_eqs"><code class="name flex">
-<span>def <span class="ident">align_mathml_eqs</span></span>(<span>file1: str = '', file2: str = '', mention_json1: str = '', mention_json2: str = '', mode: int = 2) ‑> Tuple[Any, Any, List[str], List[str], Union[int, Any], Union[int, Any], pydot.Dot, List[int]]</span>
+<span>def <span class="ident">align_mathml_eqs</span></span>(<span>mml1: str = '', mml2: str = '', mention_json1: str = '', mention_json2: str = '', mode: int = 2) ‑> Tuple[Any, Any, List[str], List[str], Union[int, Any], Union[int, Any], pydot.Dot, List[int]]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>align two equation graphs using the seeded graph matching (SGD) algorithm [1].</p>
 <p>[1] Fishkind, D. E., Adali, S., Patsolic, H. G., Meng, L., Singh, D., Lyzinski, V., &amp; Priebe, C. E. (2019).
 Seeded graph matching. Pattern recognition, 87, 203-215.</p>
-<p>Input: the paths of the two equation MathMLs; mention_json1: the mention file of paper 1; mention_json1: the mention file of paper 2;
+<p>Input: mml1 &amp; mml2: the file path or contents of the two equation MathMLs; mention_json1: the mention file of paper 1; mention_json1: the mention file of paper 2;
 mode 0: without considering any priors; mode 1: having a heuristic prior
 with the similarity of node labels; mode 2: using the variable definitions</p>
 <h2 id="output">Output</h2>
@@ -1048,8 +1048,8 @@ perfectly_matched_indices1: strictly matched node indices in Graph 1</p></div>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def align_mathml_eqs(
-    file1: str = &#34;&#34;,
-    file2: str = &#34;&#34;,
+    mml1: str = &#34;&#34;,
+    mml2: str = &#34;&#34;,
     mention_json1: str = &#34;&#34;,
     mention_json2: str = &#34;&#34;,
     mode: int = 2,
@@ -1062,7 +1062,7 @@ perfectly_matched_indices1: strictly matched node indices in Graph 1</p></div>
     [1] Fishkind, D. E., Adali, S., Patsolic, H. G., Meng, L., Singh, D., Lyzinski, V., &amp; Priebe, C. E. (2019).
     Seeded graph matching. Pattern recognition, 87, 203-215.
 
-    Input: the paths of the two equation MathMLs; mention_json1: the mention file of paper 1; mention_json1: the mention file of paper 2;
+    Input: mml1 &amp; mml2: the file path or contents of the two equation MathMLs; mention_json1: the mention file of paper 1; mention_json1: the mention file of paper 2;
             mode 0: without considering any priors; mode 1: having a heuristic prior
             with the similarity of node labels; mode 2: using the variable definitions
     Output:
@@ -1075,8 +1075,8 @@ perfectly_matched_indices1: strictly matched node indices in Graph 1</p></div>
         union_graph: the visualization of the alignment result
         perfectly_matched_indices1: strictly matched node indices in Graph 1
     &#34;&#34;&#34;
-    graph1 = generate_graph(file1)
-    graph2 = generate_graph(file2)
+    graph1 = generate_graph(mml1)
+    graph2 = generate_graph(mml2)
 
     amatrix1, node_labels1 = generate_amatrix(graph1)
     amatrix2, node_labels2 = generate_amatrix(graph2)

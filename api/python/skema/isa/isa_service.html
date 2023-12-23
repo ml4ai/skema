@@ -29,8 +29,9 @@
 </summary>
 <pre><code class="python"># -*- coding: utf-8 -*-
 
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, status
 from skema.isa.lib import align_mathml_eqs
+import skema.isa.data as isa_data
 from pydantic import BaseModel
 import requests
 
@@ -45,17 +46,38 @@ class ISA_Result(BaseModel):
     union_graph: str = None
 
 
-@router.get(&#34;/healthcheck&#34;, summary=&#34;Status of ISA service&#34;)
+@router.get(
+    &#34;/healthcheck&#34;, 
+    summary=&#34;Status of ISA service&#34;,
+    response_model=int,
+    status_code=status.HTTP_200_OK
+)
 async def healthcheck() -&gt; int:
     return requests.get(f&#34;{SKEMA_RS_ADDESS}/ping&#34;).status_code
 
 
-@router.put(&#34;/align-eqns&#34;, summary=&#34;Align two MathML equations&#34;)
+@router.post(
+    &#34;/align-eqns&#34;, 
+    summary=&#34;Align two MathML equations&#34;
+)
 async def align_eqns(
-    file1: str, file2: str, mention_json1: str = &#34;&#34;, mention_json2: str = &#34;&#34;
+    mml1: str, mml2: str, mention_json1: str = &#34;&#34;, mention_json2: str = &#34;&#34;
 ) -&gt; ISA_Result:
-    &#34;&#34;&#34;
+    f&#34;&#34;&#34;
     Endpoint for align two MathML equations.
+
+    ### Python example
+
+    ```
+    import requests
+
+    request = {{
+        &#34;mml1&#34;: {isa_data.mml},
+        &#34;mml2&#34;: {isa_data.mml}
+    }}
+
+    response=client.post(&#34;/isa/align-eqns&#34;, json=request)
+    res = response.json()
     &#34;&#34;&#34;
     (
         matching_ratio,
@@ -66,15 +88,19 @@ async def align_eqns(
         aligned_indices2,
         union_graph,
         perfectly_matched_indices1,
-    ) = align_mathml_eqs(file1, file2, mention_json1, mention_json2)
-    ir = ISA_Result()
-    ir.matching_ratio = matching_ratio
-    ir.union_graph = union_graph.to_string()
-    return ir
+    ) = align_mathml_eqs(mml1, mml2, mention_json1, mention_json2)
+    return ISA_Result(
+      matching_ratio = matching_ratio,
+      union_graph = union_graph.to_string()
+    )
 
 
 app = FastAPI()
-app.include_router(router)</code></pre>
+app.include_router(
+    router,
+    prefix=&#34;/isa&#34;,
+    tags=[&#34;isa&#34;],
+)</code></pre>
 </details>
 </section>
 <section>
@@ -85,20 +111,36 @@ app.include_router(router)</code></pre>
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
 <dt id="skema.isa.isa_service.align_eqns"><code class="name flex">
-<span>async def <span class="ident">align_eqns</span></span>(<span>file1: str, file2: str, mention_json1: str = '', mention_json2: str = '') ‑> <a title="skema.isa.isa_service.ISA_Result" href="#skema.isa.isa_service.ISA_Result">ISA_Result</a></span>
+<span>async def <span class="ident">align_eqns</span></span>(<span>mml1: str, mml2: str, mention_json1: str = '', mention_json2: str = '') ‑> <a title="skema.isa.isa_service.ISA_Result" href="#skema.isa.isa_service.ISA_Result">ISA_Result</a></span>
 </code></dt>
 <dd>
-<div class="desc"><p>Endpoint for align two MathML equations.</p></div>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">@router.put(&#34;/align-eqns&#34;, summary=&#34;Align two MathML equations&#34;)
+<pre><code class="python">@router.post(
+    &#34;/align-eqns&#34;, 
+    summary=&#34;Align two MathML equations&#34;
+)
 async def align_eqns(
-    file1: str, file2: str, mention_json1: str = &#34;&#34;, mention_json2: str = &#34;&#34;
+    mml1: str, mml2: str, mention_json1: str = &#34;&#34;, mention_json2: str = &#34;&#34;
 ) -&gt; ISA_Result:
-    &#34;&#34;&#34;
+    f&#34;&#34;&#34;
     Endpoint for align two MathML equations.
+
+    ### Python example
+
+    ```
+    import requests
+
+    request = {{
+        &#34;mml1&#34;: {isa_data.mml},
+        &#34;mml2&#34;: {isa_data.mml}
+    }}
+
+    response=client.post(&#34;/isa/align-eqns&#34;, json=request)
+    res = response.json()
     &#34;&#34;&#34;
     (
         matching_ratio,
@@ -109,11 +151,11 @@ async def align_eqns(
         aligned_indices2,
         union_graph,
         perfectly_matched_indices1,
-    ) = align_mathml_eqs(file1, file2, mention_json1, mention_json2)
-    ir = ISA_Result()
-    ir.matching_ratio = matching_ratio
-    ir.union_graph = union_graph.to_string()
-    return ir</code></pre>
+    ) = align_mathml_eqs(mml1, mml2, mention_json1, mention_json2)
+    return ISA_Result(
+      matching_ratio = matching_ratio,
+      union_graph = union_graph.to_string()
+    )</code></pre>
 </details>
 </dd>
 <dt id="skema.isa.isa_service.healthcheck"><code class="name flex">
@@ -125,7 +167,12 @@ async def align_eqns(
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">@router.get(&#34;/healthcheck&#34;, summary=&#34;Status of ISA service&#34;)
+<pre><code class="python">@router.get(
+    &#34;/healthcheck&#34;, 
+    summary=&#34;Status of ISA service&#34;,
+    response_model=int,
+    status_code=status.HTTP_200_OK
+)
 async def healthcheck() -&gt; int:
     return requests.get(f&#34;{SKEMA_RS_ADDESS}/ping&#34;).status_code</code></pre>
 </details>

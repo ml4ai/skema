@@ -37,7 +37,7 @@ from typing import List, Dict, Optional
 from io import BytesIO
 from zipfile import ZipFile
 from urllib.request import urlopen
-from fastapi import APIRouter, FastAPI, Body, File, UploadFile
+from fastapi import APIRouter, FastAPI, status, Body, File, UploadFile
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
@@ -255,9 +255,14 @@ async def system_to_gromet(system: System):
 router = APIRouter()
 
 
-@router.get(&#34;/ping&#34;, summary=&#34;Ping endpoint to test health of service&#34;)
-def ping() -&gt; int:
-    return 200
+@router.get(
+    &#34;/healthcheck&#34;, 
+    summary=&#34;Ping endpoint to test health of service&#34;,
+    status_code=status.HTTP_200_OK,
+    response_model=int
+)
+def healthcheck() -&gt; int:
+    return status.HTTP_200_OK
 
 
 @router.get(
@@ -829,8 +834,8 @@ async def gromet_object_count(gromet_object: Dict):
     return gromet_keys</code></pre>
 </details>
 </dd>
-<dt id="skema.skema_py.server.ping"><code class="name flex">
-<span>def <span class="ident">ping</span></span>(<span>) ‑> int</span>
+<dt id="skema.skema_py.server.healthcheck"><code class="name flex">
+<span>def <span class="ident">healthcheck</span></span>(<span>) ‑> int</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -838,9 +843,14 @@ async def gromet_object_count(gromet_object: Dict):
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">@router.get(&#34;/ping&#34;, summary=&#34;Ping endpoint to test health of service&#34;)
-def ping() -&gt; int:
-    return 200</code></pre>
+<pre><code class="python">@router.get(
+    &#34;/healthcheck&#34;, 
+    summary=&#34;Ping endpoint to test health of service&#34;,
+    status_code=status.HTTP_200_OK,
+    response_model=int
+)
+def healthcheck() -&gt; int:
+    return status.HTTP_200_OK</code></pre>
 </details>
 </dd>
 <dt id="skema.skema_py.server.system_to_enriched_system"><code class="name flex">
@@ -1222,7 +1232,7 @@ allow <code>self</code> as a field name.</p></div>
 <li><code><a title="skema.skema_py.server.get_pyacset" href="#skema.skema_py.server.get_pyacset">get_pyacset</a></code></li>
 <li><code><a title="skema.skema_py.server.get_supported_languages" href="#skema.skema_py.server.get_supported_languages">get_supported_languages</a></code></li>
 <li><code><a title="skema.skema_py.server.gromet_object_count" href="#skema.skema_py.server.gromet_object_count">gromet_object_count</a></code></li>
-<li><code><a title="skema.skema_py.server.ping" href="#skema.skema_py.server.ping">ping</a></code></li>
+<li><code><a title="skema.skema_py.server.healthcheck" href="#skema.skema_py.server.healthcheck">healthcheck</a></code></li>
 <li><code><a title="skema.skema_py.server.system_to_enriched_system" href="#skema.skema_py.server.system_to_enriched_system">system_to_enriched_system</a></code></li>
 <li><code><a title="skema.skema_py.server.system_to_gromet" href="#skema.skema_py.server.system_to_gromet">system_to_gromet</a></code></li>
 </ul>

@@ -40,9 +40,9 @@ from skema.gromet.metadata.debug import Debug
 client = TestClient(app)
 
 
-def test_ping():
+def test_healthcheck():
     &#34;&#34;&#34;Test case for /code2fn/ping endpoint.&#34;&#34;&#34;
-    response = client.get(&#34;/code2fn/ping&#34;)
+    response = client.get(&#34;/code2fn/healthcheck&#34;)
     assert response.status_code == 200
 
 
@@ -404,6 +404,21 @@ def test_get_pyacset():
     assert gromet_object_count[&#34;ports&#34;] == 14</code></pre>
 </details>
 </dd>
+<dt id="skema.skema_py.tests.test_server.test_healthcheck"><code class="name flex">
+<span>def <span class="ident">test_healthcheck</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Test case for /code2fn/ping endpoint.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_healthcheck():
+    &#34;&#34;&#34;Test case for /code2fn/ping endpoint.&#34;&#34;&#34;
+    response = client.get(&#34;/code2fn/healthcheck&#34;)
+    assert response.status_code == 200</code></pre>
+</details>
+</dd>
 <dt id="skema.skema_py.tests.test_server.test_no_supported_files"><code class="name flex">
 <span>def <span class="ident">test_no_supported_files</span></span>(<span>)</span>
 </code></dt>
@@ -474,21 +489,6 @@ def test_get_pyacset():
     assert gromet_collection[&#34;metadata_collection&#34;][0][0][&#34;severity&#34;] == &#34;WARNING&#34;</code></pre>
 </details>
 </dd>
-<dt id="skema.skema_py.tests.test_server.test_ping"><code class="name flex">
-<span>def <span class="ident">test_ping</span></span>(<span>)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Test case for /code2fn/ping endpoint.</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def test_ping():
-    &#34;&#34;&#34;Test case for /code2fn/ping endpoint.&#34;&#34;&#34;
-    response = client.get(&#34;/code2fn/ping&#34;)
-    assert response.status_code == 200</code></pre>
-</details>
-</dd>
 </dl>
 </section>
 <section>
@@ -513,9 +513,9 @@ def test_get_pyacset():
 <li><code><a title="skema.skema_py.tests.test_server.test_fn_supported_file_extensions" href="#skema.skema_py.tests.test_server.test_fn_supported_file_extensions">test_fn_supported_file_extensions</a></code></li>
 <li><code><a title="skema.skema_py.tests.test_server.test_get_pyacset" href="#skema.skema_py.tests.test_server.test_get_pyacset">test_get_pyacset</a></code></li>
 <li><code><a title="skema.skema_py.tests.test_server.test_gromet_object_count" href="#skema.skema_py.tests.test_server.test_gromet_object_count">test_gromet_object_count</a></code></li>
+<li><code><a title="skema.skema_py.tests.test_server.test_healthcheck" href="#skema.skema_py.tests.test_server.test_healthcheck">test_healthcheck</a></code></li>
 <li><code><a title="skema.skema_py.tests.test_server.test_no_supported_files" href="#skema.skema_py.tests.test_server.test_no_supported_files">test_no_supported_files</a></code></li>
 <li><code><a title="skema.skema_py.tests.test_server.test_partial_supported_files" href="#skema.skema_py.tests.test_server.test_partial_supported_files">test_partial_supported_files</a></code></li>
-<li><code><a title="skema.skema_py.tests.test_server.test_ping" href="#skema.skema_py.tests.test_server.test_ping">test_ping</a></code></li>
 </ul>
 </li>
 </ul>
