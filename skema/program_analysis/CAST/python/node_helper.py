@@ -31,7 +31,8 @@ CONTROL_CHARACTERS = [
 FOR_LOOP_LEFT_TYPES = [
     "identifier",
     "tuple_pattern",
-    "pattern_list"
+    "pattern_list",
+    "list_pattern"
 ]
 
 # Whatever constructs we see in the right
@@ -39,6 +40,9 @@ FOR_LOOP_LEFT_TYPES = [
 # for LEFT in RIGHT: 
 FOR_LOOP_RIGHT_TYPES = [
     "call",
+    "identifier",
+    "list",
+    "tuple"
 ]
 
 # Whatever constructs we see in the conditional
@@ -57,14 +61,19 @@ class NodeHelper():
         # get_identifier optimization variables
         self.source_lines = source.splitlines(keepends=True)
         self.line_lengths = [len(line) for line in self.source_lines]
-        self.line_length_sums = list(itertools.accumulate(self.line_lengths))
-        
+        self.line_length_sums = [sum(self.line_lengths[:i+1]) for i in range(len(self.source_lines))] 
+
     def get_identifier(self, node: Node) -> str:
         """Given a node, return the identifier it represents. ie. The code between node.start_point and node.end_point"""
         start_line, start_column = node.start_point
         end_line, end_column = node.end_point
 
-        start_index = self.line_length_sums[start_line-1] + start_column
+        # Edge case for when an identifier is on the very first line of the code
+        # We can't index into the line_length_sums
+        if start_line == 0:
+            start_index = start_column
+        else:
+            start_index = self.line_length_sums[start_line-1] + start_column
         if start_line == end_line:
             end_index = start_index + (end_column-start_column)
         else:
