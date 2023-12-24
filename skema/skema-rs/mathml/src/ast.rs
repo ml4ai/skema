@@ -1,17 +1,18 @@
 use derive_new::new;
 use std::fmt;
+use serde::Deserialize;
 
 pub mod operator;
 
 use operator::Operator;
 
-#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize)]
 pub struct Mi(pub String);
 
-#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize)]
 pub struct Mrow(pub Vec<MathExpression>);
 
-#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize)]
 pub enum Type {
     Integer,
     Rational,
@@ -27,14 +28,14 @@ pub enum Type {
     Matrix,
 }
 
-#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize)]
 pub struct Ci {
     pub r#type: Option<Type>,
     pub content: Box<MathExpression>,
     pub func_of: Option<Vec<Ci>>,
 }
 
-#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize)]
 pub struct Differential {
     pub diff: Box<MathExpression>,
     pub func: Box<MathExpression>,
@@ -42,7 +43,7 @@ pub struct Differential {
 
 /// The MathExpression enum is not faithful to the corresponding element type in MathML 3
 /// (https://www.w3.org/TR/MathML3/appendixa.html#parsing_MathExpression)
-#[derive(Debug, PartialOrd, Ord, PartialEq, Eq, Clone, Hash, Default, new)]
+#[derive(Debug, PartialOrd, Ord, PartialEq, Eq, Clone, Hash, Default, new, Deserialize)]
 pub enum MathExpression {
     Mi(Mi),
     Mo(Operator),

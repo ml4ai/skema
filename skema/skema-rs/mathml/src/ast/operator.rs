@@ -1,23 +1,24 @@
 use crate::ast::Ci;
 use derive_new::new;
 use std::fmt;
+use serde::Deserialize;
 
 /// Derivative operator, in line with Spivak notation: http://ceres-solver.org/spivak_notation.html
-#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize)]
 pub struct Derivative {
     pub order: u8,
     pub var_index: u8,
     pub bound_var: Ci,
 }
 /// Partial derivative operator
-#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize)]
 pub struct PartialDerivative {
     pub order: u8,
     pub var_index: u8,
     pub bound_var: Ci,
 }
 
-#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize)]
 pub enum Operator {
     Add,
     Multiply,
