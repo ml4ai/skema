@@ -49,7 +49,7 @@
 "dropout":0.2,
 
 "__":"if want to scheduler. Options: {step_lr, multistep_lr, exp_lr, reduce_lr, cycle_lr}",
-"isScheduler":false,
+"isScheduler":true,
 "whichScheduler":"multistep_lr",
 
 "__":"params for cycle_lr",
@@ -60,9 +60,9 @@
 "mode":"triangular",
 
 "--": "these params are for step_lr, and reduce_lr only",
-"starting_lr":0.001,
-"step_size":10,
-"gamma":0.5,
+"starting_lr":0.0009,
+"step_size":5,
+"gamma":0.8,
 
 "_comment_":"encoder params",
 "encoder_dim":512,
