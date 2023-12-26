@@ -19,12 +19,18 @@ pub struct PartialDerivative {
     pub bound_var: Ci,
 }
 
-/// Summation operator
+/// Summation operator with under and over components
 #[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
 pub struct SumUnderOver {
     pub op: Box<MathExpression>,
     pub under: Box<MathExpression>,
     pub over: Box<MathExpression>,
+}
+
+/// Hat operation
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
+pub struct HatOp {
+    pub comp: Box<MathExpression>,
 }
 
 #[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
@@ -66,6 +72,7 @@ pub enum Operator {
     SumUnderOver(SumUnderOver),
     Cross,
     Hat,
+    HatOp(HatOp),
     // Catchall for operators we haven't explicitly defined as enum variants yet.
     Other(String),
 }
@@ -125,6 +132,7 @@ impl fmt::Display for Operator {
             }
             Operator::Cross => write!(f, "×"),
             Operator::Hat => write!(f, "Hat"),
+            Operator::HatOp(HatOp { comp }) => write!(f, "Hat({comp})"),
         }
     }
 }

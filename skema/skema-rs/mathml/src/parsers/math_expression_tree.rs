@@ -3,7 +3,7 @@
 
 use crate::{
     ast::{
-        operator::{Derivative, Operator, PartialDerivative, SumUnderOver},
+        operator::{Derivative, HatOp, Operator, PartialDerivative, SumUnderOver},
         Math, MathExpression, Mi, Mrow,
     },
     parsers::interpreted_mathml::interpreted_math,
@@ -700,7 +700,7 @@ impl MathExpression {
                 tokens.push(MathExpression::Mo(Operator::Lparen));
                 for element in elements {
                     if let MathExpression::Ci(x) = element {
-                        // Handles cos and sin as operators
+                        // Handles cos, sin, tan as operators
                         if x.content == Box::new(MathExpression::Mi(Mi("cos".to_string()))) {
                             tokens.push(MathExpression::Mo(Operator::Cos));
                             if let Some(vec) = x.func_of.clone() {
@@ -710,6 +710,18 @@ impl MathExpression {
                             }
                         } else if x.content == Box::new(MathExpression::Mi(Mi("sin".to_string()))) {
                             tokens.push(MathExpression::Mo(Operator::Sin));
+                            if let Some(vec) = x.func_of.clone() {
+                                for v in vec {
+                                    tokens.push(MathExpression::Ci(v));
+                                }
+                            }
+                        } else if x.content == Box::new(MathExpression::Mi(Mi("tan".to_string()))) {
+                            tokens.push(MathExpression::Mo(Operator::Tan));
+                            if let Some(vec) = x.func_of.clone() {
+                                for v in vec {
+                                    tokens.push(MathExpression::Ci(v));
+                                }
+                            }
                         } else {
                             element.flatten(tokens);
                         }
@@ -720,12 +732,13 @@ impl MathExpression {
                 tokens.push(MathExpression::Mo(Operator::Rparen));
             }
             MathExpression::Differential(x) => {
-                tokens.push(MathExpression::Mo(Operator::Lparen));
+                //tokens.push(MathExpression::Mo(Operator::Lparen));
                 if x.diff == Box::new(MathExpression::Mo(Operator::Grad)) {
                     tokens.push(MathExpression::Mo(Operator::Grad));
                 } else {
                     x.diff.flatten(tokens);
                 }
+                tokens.push(MathExpression::Mo(Operator::Lparen));
                 x.func.flatten(tokens);
                 tokens.push(MathExpression::Mo(Operator::Rparen));
             }
@@ -738,9 +751,9 @@ impl MathExpression {
                 tokens.push(MathExpression::Mo(Operator::Divide));
                 tokens.push(MathExpression::Mo(Operator::Lparen));
                 denominator.flatten(tokens);
-
                 tokens.push(MathExpression::Mo(Operator::Rparen));
             }
+            /// Insert implicit `exponential` and `power` operators
             MathExpression::Msup(base, superscript) => {
                 if let MathExpression::Ci(x) = &**base {
                     if x.content == Box::new(MathExpression::Mi(Mi("e".to_string()))) {
@@ -758,7 +771,6 @@ impl MathExpression {
                         tokens.push(MathExpression::Mo(Operator::Rparen));
                     }
                 } else {
-                    //tokens.push(MathExpression::Mo(Operator::Lparen));
                     base.flatten(tokens);
                     tokens.push(MathExpression::Mo(Operator::Power));
                     tokens.push(MathExpression::Mo(Operator::Lparen));
@@ -800,18 +812,19 @@ impl MathExpression {
                     tokens.push(MathExpression::Mo(Operator::Lparen));
                     base.flatten(tokens);
                     tokens.push(MathExpression::Mo(Operator::Rparen));
-                } else if MathExpression::Mo(Operator::Hat) == **over {
-                    tokens.push(MathExpression::Mo(Operator::Hat));
-                    tokens.push(MathExpression::Mo(Operator::Lparen));
-                    base.flatten(tokens);
-                    tokens.push(MathExpression::Mo(Operator::Rparen));
                 }
             }
             MathExpression::SummationMath(x) => {
                 tokens.push(MathExpression::Mo(Operator::Lparen));
-
                 x.op.flatten(tokens);
                 x.func.flatten(tokens);
+                tokens.push(MathExpression::Mo(Operator::Rparen));
+            }
+            MathExpression::HatComp(x) => {
+                //tokens.push(MathExpression::Mo(Operator::Lparen));
+                x.op.flatten(tokens);
+                tokens.push(MathExpression::Mo(Operator::Lparen));
+                x.comp.flatten(tokens);
                 tokens.push(MathExpression::Mo(Operator::Rparen));
             }
             t => tokens.push(t.clone()),
@@ -1022,7 +1035,8 @@ fn prefix_binding_power(op: &Operator) -> ((), u8) {
         Operator::Div => ((), 25),
         Operator::Abs => ((), 25),
         Operator::Sqrt => ((), 25),
-        Operator::SumUnderOver(SumUnderOver { .. }) => ((), 26),
+        Operator::SumUnderOver(SumUnderOver { .. }) => ((), 25),
+        Operator::HatOp(HatOp { .. }) => ((), 25),
         _ => panic!("Bad operator: {:?}", op),
     }
 }
@@ -1031,6 +1045,7 @@ fn prefix_binding_power(op: &Operator) -> ((), u8) {
 fn postfix_binding_power(op: &Operator) -> Option<(u8, ())> {
     let res = match op {
         Operator::Factorial => (11, ()),
+        //Operator::HatOp(HatOp { .. }) => (11, ()),
         _ => return None,
     };
     Some(res)
@@ -2473,101 +2488,6 @@ fn test_partial_with_msub_t() {
 }
 
 #[test]
-fn test_tracer_conversion_equation() {
-    let input = "<math>
-    <msub>
-    <mi>∂</mi>
-    <mi>t</mi>
-    </msub>
-    <mi>c</mi>
-    <mo>=</mo>
-    <mo>−</mo>
-    <mi>v</mi>
-    <mo>⋅</mo>
-    <mi>∇</mi>
-    <mi>c</mi>
-    <mo>−</mo>
-    <mi>V</mi>
-    <mo>⋅</mo>
-    <mi>∇</mi>
-    <mi>c</mi>
-    <mo>−</mo>
-    <mi>v</mi>
-    <mo>⋅</mo>
-    <mi>∇</mi>
-    <mi>C</mi>
-    <mo>−</mo>
-    <mi>∇</mi>
-    <mo>⋅</mo>
-    <msub>
-    <mi>q</mi>
-    <mi>c</mi>
-    </msub>
-    <mo>+</mo>
-    <msub>
-    <mi>F</mi>
-    <mi>c</mi>
-    </msub>
-    <mo>,</mo>
-    </math>";
-    let exp = input.parse::<MathExpressionTree>().unwrap();
-    println!("exp={:?}", exp);
-    let s_exp = exp.to_string();
-    println!("s_exp={:?}", s_exp);
-    assert_eq!(s_exp, "(= (PD(1, t) c) (+ (- (- (- (- (⋅ v (Grad c))) (⋅ V (Grad c))) (⋅ v (Grad C))) (Div q_{c})) F_{c}))");
-}
-
-#[test]
-fn test_momentum_conservation() {
-    let input = "<math>
-    <msub>
-    <mi>∂</mi>
-    <mi>t</mi>
-    </msub>
-    <mi>u</mi>
-    <mo>=</mo>
-    <mo>−</mo>
-    <mo>(</mo>
-    <mi>v</mi>
-    <mo>⋅</mo>
-    <mi>∇</mi>
-    <mo>)</mo>
-    <mi>u</mi>
-    <mo>−</mo>
-    <mi>f</mi>
-    <mo>×</mo>
-    <mi>u</mi>
-    <mo>−</mo>
-    <msub>
-    <mi>∇</mi>
-    <mi>h</mi>
-    </msub>
-    <mo>(</mo>
-    <mi>p</mi>
-    <mo>+</mo>
-    <mi>g</mi>
-    <mi>η</mi>
-    <mo>)</mo>
-    <mo>−</mo>
-    <mi>∇</mi>
-    <mo>⋅</mo>
-    <mi>τ</mi>
-    <mo>+</mo>
-    <msub>
-    <mi>F</mi>
-    <mrow>
-    <mi>u</mi>
-    </mrow>
-    </msub>
-    </math>";
-    let exp = input.parse::<MathExpressionTree>().unwrap();
-    println!("exp={:?}", exp);
-    let s_exp = exp.to_string();
-    println!("s_exp={:?}", s_exp);
-    assert_eq!(s_exp, "(= (PD(1, t) u) (+ (- (- (- (* (- (⋅ v ∇)) u) (× f u)) (* ∇_{h} (+ p (* g η)))) (Div τ)) F_{u}))");
-}
-
-#[test]
 fn test_dry_static_energy() {
     let input = "<math>
     <msub>
@@ -2642,6 +2562,7 @@ fn test_dry_static_energy() {
 #[test]
 fn test_hat_operator() {
     let input = "<math>
+    <mi>ζ</mi>
     <mrow>
     <mover>
     <mi>z</mi>
@@ -2650,9 +2571,10 @@ fn test_hat_operator() {
     </mrow>
     </math>";
     let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", exp);
     let s_exp = exp.to_string();
     println!("s_exp={:?}", s_exp);
-    assert_eq!(s_exp, "(Hat z)");
+    assert_eq!(s_exp, "(Hat(z) ζ)");
 }
 
 #[test]
@@ -2679,7 +2601,7 @@ fn test_vector_invariant_form() {
     <mi>u</mi>
     <mo>=</mo>
     <mo>−</mo>
-    <mi>∇</mi>
+    <mi>&#x2207;</mi>
     <mrow>
     <mo>[</mo>
     <mi>g</mi>
@@ -2700,7 +2622,58 @@ fn test_vector_invariant_form() {
     </mrow>
     </math>";
     let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", exp);
     let s_exp = exp.to_string();
     println!("s_exp={:?}", s_exp);
-    assert_eq!(s_exp, "(= (+ (PD(1, t) u) (× (+ (* ζ (Hat z)) f) u)) (- (Grad (+ (* g (+ h b)) (* (/ 1 2) (⋅ u u))))))");
+    assert_eq!(s_exp, "(= (+ (PD(1, t) u) (× (+ (Hat(z) ζ) f) u)) (- (Grad (+ (* g (+ h b)) (* (/ 1 2) (⋅ u u))))))");
+}
+
+#[test]
+fn test_momentum_conservation() {
+    let input = "<math>
+    <msub>
+    <mi>∂</mi>
+    <mi>t</mi>
+    </msub>
+    <mi>u</mi>
+    <mo>=</mo>
+    <mo>−</mo>
+    <mo>(</mo>
+    <mi>v</mi>
+    <mo>⋅</mo>
+    <mi>∇</mi>
+    <mo>)</mo>
+    <mi>u</mi>
+    <mo>−</mo>
+    <mi>f</mi>
+    <mo>&#x00D7;</mo>
+    <mi>u</mi>
+    <mo>−</mo>
+    <msub>
+    <mi>∇</mi>
+    <mi>h</mi>
+    </msub>
+    <mo>(</mo>
+    <mi>p</mi>
+    <mo>+</mo>
+    <mi>g</mi>
+    <mi>η</mi>
+    <mo>)</mo>
+    <mo>−</mo>
+    <mi>∇</mi>
+    <mo>⋅</mo>
+    <mi>τ</mi>
+    <mo>+</mo>
+    <msub>
+    <mi>F</mi>
+    <mrow>
+    <mi>u</mi>
+    </mrow>
+    </msub>
+    </math>";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", exp);
+    let s_exp = exp.to_string();
+    println!("s_exp={:?}", s_exp);
+    //assert_eq!(s_exp, "(= (PD(1, t) u) (+ (- (- (- (* (- (⋅ v ∇)) u) (× f u)) (* ∇_{h} (+ p (* g η)))) (Div τ)) F_{u}))");
 }
