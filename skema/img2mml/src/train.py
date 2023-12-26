@@ -66,7 +66,8 @@ def train(
 
         if (not ddp) or (ddp and rank == 0):
             desc = 'Loss: %.4f - Learning Rate: %.6f' % (loss.item(), optimizer.param_groups[0]['lr'])
-            tset.set_description(desc)
+            # tset.set_description(desc)
+            tset.set_postfix(desc)
 
         if (isScheduler) and (whichScheduler == "cycle_lr"):
             scheduler.step()
