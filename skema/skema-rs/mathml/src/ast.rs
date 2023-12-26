@@ -47,6 +47,13 @@ pub struct SummationMath {
     pub func: Box<MathExpression>,
 }
 
+/// Hat operation
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
+pub struct HatComp {
+    pub op: Box<MathExpression>,
+    pub comp: Box<MathExpression>,
+}
+
 /// The MathExpression enum is not faithful to the corresponding element type in MathML 3
 /// (https://www.w3.org/TR/MathML3/appendixa.html#parsing_MathExpression)
 #[derive(Debug, PartialOrd, Ord, PartialEq, Eq, Clone, Hash, Default, new)]
@@ -76,7 +83,7 @@ pub enum MathExpression {
     SummationMath(SummationMath),
     AbsoluteSup(Box<MathExpression>, Box<MathExpression>),
     Absolute(Box<MathExpression>, Box<MathExpression>),
-    //Munderover(Munderover),
+    HatComp(HatComp),
     //Differential(Box<MathExpression>, Box<MathExpression>),
     #[default]
     None,
@@ -122,6 +129,10 @@ impl fmt::Display for MathExpression {
             MathExpression::SummationMath(SummationMath { op, func }) => {
                 write!(f, "{op}")?;
                 write!(f, "{func}")
+            }
+            MathExpression::HatComp(HatComp { op, comp }) => {
+                write!(f, "{op}")?;
+                write!(f, "{comp}")
             }
             expression => write!(f, "{expression:?}"),
         }

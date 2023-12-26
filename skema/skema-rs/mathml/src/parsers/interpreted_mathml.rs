@@ -61,14 +61,11 @@ fn parenthesized_msub_identifier(input: Span) -> IResult<Vec<Mi>> {
         separated_list1(mo_comma, msub),
         alt((mo_mrow_rparen, mo_rparen)),
     )(input)?;
-    //let bound_subs = Mi(bound_vars.to_string());
-    println!("bound_vars={:?}", bound_vars);
     let mut mi_func_of: Vec<Mi> = Vec::new();
     for bvar in bound_vars {
         let b = Mi(bvar.to_string());
         mi_func_of.push(b.clone());
     }
-    println!("mi_func_of={:?}", mi_func_of);
     Ok((s, mi_func_of))
 }
 
@@ -158,10 +155,7 @@ pub fn ci_subscript_func(input: Span) -> IResult<Ci> {
             empty_parenthesis,
         )),
     ))(input)?;
-    println!("x={:?}", x);
-    println!("bound_vars={:?}", bound_vars);
     let mut ci_func_of: Vec<Ci> = Vec::new();
-    println!("ci_func_of={:?}", ci_func_of);
     for bvar in bound_vars {
         let b = Ci::new(Some(Type::Real), Box::new(MathExpression::Mi(bvar)), None);
         ci_func_of.push(b.clone());
@@ -194,13 +188,9 @@ pub fn over_term(input: Span) -> IResult<MathExpression> {
         )),
         |(x, y)| MathExpression::Mover(Box::new(x), Box::new(y)),
     ))(input)?;
-    println!("over={:?}", over);
     if let MathExpression::Mover(ref x, ref y) = over.clone() {
-        println!("x={:?}", x);
-        println!("y={:?}", y);
         if MathExpression::Mo(Operator::Hat) == **y {
             let new_op = Operator::HatOp(HatOp::new(x.clone()));
-            println!("new_op={:?}", new_op);
             return Ok((s, MathExpression::Mo(new_op)));
         } else {
             return Ok((s, over));
@@ -679,7 +669,6 @@ pub fn gradient(input: Span) -> IResult<Operator> {
         delimited(stag!("mo"), grad, etag!("mo")),
         delimited(stag!("mi"), grad, etag!("mi")),
     )))(input)?;
-    println!("op={:?}", op);
     Ok((s, op))
 }
 
@@ -690,21 +679,7 @@ pub fn grad_func(input: Span) -> IResult<(Operator, Ci)> {
 }
 
 pub fn functions_of_grad(input: Span) -> IResult<(Operator, Mrow)> {
-    let (s, (op, mut id)) = ws(pair(gradient,
-                                    delimited( alt((tag("<mo>[</mo>"), tag("<mrow><mo>[</mo>"),tag("<mrow><mo>(</mo>"),tag("<mo>(</mo>") )),
-                                    map(ws(many0(math_expression)), Mrow),
-                                               alt((tag("<<mo>]</mo>"),tag("<mo>]</mo></mrow>"), tag("<mo>)</mo></mrow>"),tag("<mo>)</mo>"))))
-    ))(input)?;
-    println!("id={:?}", id);
-    //let (s, (op, id)) = ws(pair(gradient, map(ws(many0(math_expression)), Mrow)))(input)?;
-    //println!("id={:?}", id);
-    //Tp handle the case where there is ) after Gradient operation
-    /*if id.0.get(0) == Some(&MathExpression::Mo(Operator::Rparen)) {
-        id.0.remove(0);
-    }*/
-    println!("id={:?}", id);
-    //let ci = Ci::new(Some(Type::Real), Box::new(MathExpression::Mrow(id)), None);
-    //println!("ci={:?}",ci);
+    let (s, (op, id)) = ws(pair(gradient, map(ws(many0(math_expression)), Mrow)))(input)?;
     Ok((s, (op, id)))
 }
 
@@ -874,12 +849,6 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                 },
             ),
         )),
-        map(functions_of_grad, |(op, comp)| {
-            MathExpression::Differential(Differential {
-                diff: Box::new(MathExpression::Mo(op)),
-                func: Box::new(MathExpression::Mrow(comp)),
-            })
-        }),
         map(
             grad_func,
             |(
@@ -1052,6 +1021,12 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                 })
             },
         ),
+        map(functions_of_grad, |(op, comp)| {
+            MathExpression::Differential(Differential {
+                diff: Box::new(MathExpression::Mo(op)),
+                func: Box::new(MathExpression::Mrow(comp)),
+            })
+        }),
         map(ci_univariate_without_bounds, MathExpression::Ci),
         map(ci_subscript, MathExpression::Ci),
         map(multiple_dots, MathExpression::Ci),

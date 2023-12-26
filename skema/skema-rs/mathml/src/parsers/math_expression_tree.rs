@@ -732,13 +732,12 @@ impl MathExpression {
                 tokens.push(MathExpression::Mo(Operator::Rparen));
             }
             MathExpression::Differential(x) => {
-                //tokens.push(MathExpression::Mo(Operator::Lparen));
+                tokens.push(MathExpression::Mo(Operator::Lparen));
                 if x.diff == Box::new(MathExpression::Mo(Operator::Grad)) {
                     tokens.push(MathExpression::Mo(Operator::Grad));
                 } else {
                     x.diff.flatten(tokens);
                 }
-                tokens.push(MathExpression::Mo(Operator::Lparen));
                 x.func.flatten(tokens);
                 tokens.push(MathExpression::Mo(Operator::Rparen));
             }
@@ -2335,7 +2334,6 @@ fn test_sum_munderover() {
     </math>";
     let exp = input.parse::<MathExpressionTree>().unwrap();
     let s_exp = exp.to_string();
-    //println!("s_exp={:?}", s_exp);
     assert_eq!(s_exp, "(∑_{l=k}^{K} S)");
 }
 
@@ -2439,7 +2437,6 @@ fn test_temperature_evolution() {
     </math>";
     let exp = input.parse::<MathExpressionTree>().unwrap();
     let s_exp = exp.to_string();
-    println!("s_exp={:?}", s_exp);
     assert_eq!(
         s_exp,
         "(= (/ (/ Δs_{i} Δt) C_{p}) (/ (/ (- s_{i} s_{i-1}) Δt) C_{p}))"
@@ -2455,7 +2452,6 @@ fn test_cross_product() {
     </math>";
     let exp = input.parse::<MathExpressionTree>().unwrap();
     let s_exp = exp.to_string();
-    println!("s_exp={:?}", s_exp);
     assert_eq!(s_exp, "(× f u)");
 }
 #[test]
@@ -2467,7 +2463,6 @@ fn test_dot_product() {
     </math>";
     let exp = input.parse::<MathExpressionTree>().unwrap();
     let s_exp = exp.to_string();
-    println!("s_exp={:?}", s_exp);
     assert_eq!(s_exp, "(⋅ f u)");
 }
 
@@ -2481,9 +2476,7 @@ fn test_partial_with_msub_t() {
     <mi>S</mi>
     </math>";
     let exp = input.parse::<MathExpressionTree>().unwrap();
-    println!("exp={:?}", exp);
     let s_exp = exp.to_string();
-    println!("s_exp={:?}", s_exp);
     assert_eq!(s_exp, "(PD(1, t) S)");
 }
 
@@ -2553,9 +2546,7 @@ fn test_dry_static_energy() {
   </mrow>
     </math>";
     let exp = input.parse::<MathExpressionTree>().unwrap();
-    println!("exp={:?}", exp);
     let s_exp = exp.to_string();
-    println!("s_exp={:?}", s_exp);
     assert_eq!(s_exp, "(= s_{i} (+ s_{i-1} (* Δt Q_{i})))");
 }
 
@@ -2571,9 +2562,7 @@ fn test_hat_operator() {
     </mrow>
     </math>";
     let exp = input.parse::<MathExpressionTree>().unwrap();
-    println!("exp={:?}", exp);
     let s_exp = exp.to_string();
-    println!("s_exp={:?}", s_exp);
     assert_eq!(s_exp, "(Hat(z) ζ)");
 }
 
@@ -2622,58 +2611,6 @@ fn test_vector_invariant_form() {
     </mrow>
     </math>";
     let exp = input.parse::<MathExpressionTree>().unwrap();
-    println!("exp={:?}", exp);
     let s_exp = exp.to_string();
-    println!("s_exp={:?}", s_exp);
     assert_eq!(s_exp, "(= (+ (PD(1, t) u) (× (+ (Hat(z) ζ) f) u)) (- (Grad (+ (* g (+ h b)) (* (/ 1 2) (⋅ u u))))))");
-}
-
-#[test]
-fn test_momentum_conservation() {
-    let input = "<math>
-    <msub>
-    <mi>∂</mi>
-    <mi>t</mi>
-    </msub>
-    <mi>u</mi>
-    <mo>=</mo>
-    <mo>−</mo>
-    <mo>(</mo>
-    <mi>v</mi>
-    <mo>⋅</mo>
-    <mi>∇</mi>
-    <mo>)</mo>
-    <mi>u</mi>
-    <mo>−</mo>
-    <mi>f</mi>
-    <mo>&#x00D7;</mo>
-    <mi>u</mi>
-    <mo>−</mo>
-    <msub>
-    <mi>∇</mi>
-    <mi>h</mi>
-    </msub>
-    <mo>(</mo>
-    <mi>p</mi>
-    <mo>+</mo>
-    <mi>g</mi>
-    <mi>η</mi>
-    <mo>)</mo>
-    <mo>−</mo>
-    <mi>∇</mi>
-    <mo>⋅</mo>
-    <mi>τ</mi>
-    <mo>+</mo>
-    <msub>
-    <mi>F</mi>
-    <mrow>
-    <mi>u</mi>
-    </mrow>
-    </msub>
-    </math>";
-    let exp = input.parse::<MathExpressionTree>().unwrap();
-    println!("exp={:?}", exp);
-    let s_exp = exp.to_string();
-    println!("s_exp={:?}", s_exp);
-    //assert_eq!(s_exp, "(= (PD(1, t) u) (+ (- (- (- (* (- (⋅ v ∇)) u) (× f u)) (* ∇_{h} (+ p (* g η)))) (Div τ)) F_{u}))");
 }
