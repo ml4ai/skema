@@ -416,15 +416,15 @@ def objective(
         if trial.should_prune():
             raise optuna.exceptions.TrialPruned()
 
-    del model
-    torch.cuda.empty_cache()
-    gc.collect()
-    torch.cuda.reset_max_memory_allocated()
+    # del model
+    # torch.cuda.empty_cache()
+    # gc.collect()
+    # torch.cuda.reset_max_memory_allocated()
 
-    if ddp:
-        dist.destroy_process_group()
-        os._exit(0)
-        
+    # if ddp:
+    #     dist.destroy_process_group()
+    #     os._exit(0)
+
     time.sleep(30)
 
     bs = calculate_bleu_score()
