@@ -419,7 +419,7 @@ def objective(
     if ddp:
         dist.destroy_process_group()
 
-    time.sleep(3)
+    time.sleep(30)
 
     bs = calculate_bleu_score()
 
@@ -442,7 +442,7 @@ def tune(rank=None,):
 
 
     study = optuna.create_study(direction="maximize")
-    study.optimize(func, n_trials=25)
+    study.optimize(func, n_trials=1)
 
     pruned_trials = study.get_trials(
         deepcopy=False, states=[TrialState.PRUNED]
