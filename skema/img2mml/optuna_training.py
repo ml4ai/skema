@@ -225,7 +225,7 @@ def objective(
     # transformers params
     DIM_FEEDFWD = trial.suggest_int("dim_ff_xfmer", low=64, high=1024, step=64)#config["dim_feedforward_for_xfmer"]
     N_HEADS = trial.suggest_int("n_heads", low=2, high=8, step=2)#config["n_xfmer_heads"]
-    N_XFMER_ENCODER_LAYERS = 6#trial.suggest_int("n_enc_layer", low=1, high=8, step=1)#config["n_xfmer_encoder_layers"]
+    N_XFMER_ENCODER_LAYERS = trial.suggest_int("n_enc_layer", low=1, high=8, step=1)#config["n_xfmer_encoder_layers"]
     N_XFMER_DECODER_LAYERS = trial.suggest_int("n_dec_layer", low=2, high=8, step=1)#config["n_xfmer_decoder_layers"]
 
     EPOCHS = config["epochs"]
@@ -442,7 +442,7 @@ def tune(rank=None,):
 
 
     study = optuna.create_study(direction="maximize")
-    study.optimize(func, n_trials=20)
+    study.optimize(func, n_trials=25)
 
     pruned_trials = study.get_trials(
         deepcopy=False, states=[TrialState.PRUNED]
