@@ -511,7 +511,7 @@ def objective(trial):
 
     bs = calculate_bleu_score()
 
-    return bs, trial
+    return bs
 
 def tune():
 
