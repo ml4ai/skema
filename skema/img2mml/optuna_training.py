@@ -431,10 +431,6 @@ def training(rank, trial):
 
     time.sleep(3)
 
-    bs = calculate_bleu_score()
-
-    return bs
-
 def objective(trial):
     
     os.environ["MASTER_ADDR"] = "localhost"
@@ -446,6 +442,10 @@ def objective(trial):
             args=(trial,), 
             nprocs=world_size, 
             join=True)
+
+    bs = calculate_bleu_score()
+
+    return bs
 
 def tune():
 
