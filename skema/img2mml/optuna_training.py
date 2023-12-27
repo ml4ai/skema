@@ -474,8 +474,8 @@ def objective(trial):
     weight_decay = trial.suggest_loguniform("weight_decay", 1e-6, 1e-2)
     batch_size = trial.suggest_int("batch_size", low=32, high=128, step=8)
     DROPOUT = trial.suggest_float("DROPOUT", low=0.1, high=0.5, step=0.1)
-    EMB_DIM = trial.suggest_int("EMB_DIM", low=64, high=512, step=64)
-    ENC_DIM = trial.suggest_int("ENC_DIM", low=64, high=512, step=64)
+    EMB_DIM = trial.suggest_int("EMB_DIM", low=128, high=512, step=128)
+    ENC_DIM = trial.suggest_int("ENC_DIM", low=128, high=512, step=128)
     DEC_HID_DIM = trial.suggest_int("DEC_HID_DIM", low=64, high=512, step=64)
     if optimizer_type == "Adam":
         beta_1 = 0.7#trial.suggest_float("beta1", low=0.5, high=0.9, step=0.1)
@@ -483,7 +483,7 @@ def objective(trial):
 
     # transformers params
     DIM_FEEDFWD = trial.suggest_int("dim_ff_xfmer", low=64, high=1024, step=64)#config["dim_feedforward_for_xfmer"]
-    N_HEADS = trial.suggest_int("n_heads", low=2, high=8, step=2)#config["n_xfmer_heads"]
+    N_HEADS = trial.suggest_int("n_heads", low=4, high=8, step=4)#config["n_xfmer_heads"]
     N_XFMER_ENCODER_LAYERS = trial.suggest_int("n_enc_layer", low=1, high=8, step=1)#config["n_xfmer_encoder_layers"]
     N_XFMER_DECODER_LAYERS = trial.suggest_int("n_dec_layer", low=2, high=8, step=1)#config["n_xfmer_decoder_layers"]
 
