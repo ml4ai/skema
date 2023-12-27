@@ -204,27 +204,53 @@ def epoch_time(start_time, end_time):
     return elapsed_mins, elapsed_secs
 
 
-def training(rank, trial):
+def training(rank, trial, params):
 
-    # parameters
-    optimizer_type = trial.suggest_categorical("optimizer_type", ["Adam"])
-    learning_rate = trial.suggest_loguniform("lr", 1e-5, 1e-2)
-    weight_decay = trial.suggest_loguniform("weight_decay", 1e-6, 1e-2)
-    # gamma = trial.suggest_loguniform("gamma", 0.1, 0.9)
-    batch_size = trial.suggest_int("batch_size", low=32, high=128, step=8)
-    DROPOUT = trial.suggest_float("DROPOUT", low=0.1, high=0.5, step=0.1)
-    EMB_DIM = trial.suggest_int("EMB_DIM", low=64, high=512, step=64)
-    ENC_DIM = trial.suggest_int("ENC_DIM", low=64, high=512, step=64)
-    DEC_HID_DIM = trial.suggest_int("DEC_HID_DIM", low=64, high=512, step=64)
-    if optimizer_type == "Adam":
-        beta_1 = 0.7#trial.suggest_float("beta1", low=0.5, high=0.9, step=0.1)
-        beta_2 = 0.9#trial.suggest_float("beta2", low=0.5, high=0.999, step=0.1)
+    (
+        optimizer_type,
+        learning_rate,
+        weight_decay,
+        batch_size,
+        DROPOUT,
+        EMB_DIM,
+        ENC_DIM,
+        DEC_HID_DIM,
+        beta_1,
+        beta_2,
+        DIM_FEEDFWD,
+        N_HEADS,
+        N_XFMER_DECODER_LAYERS,
+        N_XFMER_ENCODER_LAYERS
+    ) = params
+    
+    config["dropout"] = DROPOUT
+    config["emb_dim"] = EMB_DIM
+    config["ENC_DIM"] = ENC_DIM
+    config["dec_hid_dim"] = DEC_HID_DIM
+    config["dim_feedforward_for_xfmer"] = DIM_FEEDFWD
+    config["n_xfmer_heads"] = N_HEADS
+    config["n_xfmer_encoder_layers"] = N_XFMER_ENCODER_LAYERS
+    config["n_xfmer_decoder_layers"] = N_XFMER_DECODER_LAYERS
 
-    # transformers params
-    DIM_FEEDFWD = trial.suggest_int("dim_ff_xfmer", low=64, high=1024, step=64)#config["dim_feedforward_for_xfmer"]
-    N_HEADS = trial.suggest_int("n_heads", low=2, high=8, step=2)#config["n_xfmer_heads"]
-    N_XFMER_ENCODER_LAYERS = trial.suggest_int("n_enc_layer", low=1, high=8, step=1)#config["n_xfmer_encoder_layers"]
-    N_XFMER_DECODER_LAYERS = trial.suggest_int("n_dec_layer", low=2, high=8, step=1)#config["n_xfmer_decoder_layers"]
+    # # parameters
+    # optimizer_type = trial.suggest_categorical("optimizer_type", ["Adam"])
+    # learning_rate = trial.suggest_loguniform("lr", 1e-5, 1e-2)
+    # weight_decay = trial.suggest_loguniform("weight_decay", 1e-6, 1e-2)
+    # # gamma = trial.suggest_loguniform("gamma", 0.1, 0.9)
+    # batch_size = trial.suggest_int("batch_size", low=32, high=128, step=8)
+    # DROPOUT = trial.suggest_float("DROPOUT", low=0.1, high=0.5, step=0.1)
+    # EMB_DIM = trial.suggest_int("EMB_DIM", low=64, high=512, step=64)
+    # ENC_DIM = trial.suggest_int("ENC_DIM", low=64, high=512, step=64)
+    # DEC_HID_DIM = trial.suggest_int("DEC_HID_DIM", low=64, high=512, step=64)
+    # if optimizer_type == "Adam":
+    #     beta_1 = 0.7#trial.suggest_float("beta1", low=0.5, high=0.9, step=0.1)
+    #     beta_2 = 0.9#trial.suggest_float("beta2", low=0.5, high=0.999, step=0.1)
+
+    # # transformers params
+    # DIM_FEEDFWD = trial.suggest_int("dim_ff_xfmer", low=64, high=1024, step=64)#config["dim_feedforward_for_xfmer"]
+    # N_HEADS = trial.suggest_int("n_heads", low=2, high=8, step=2)#config["n_xfmer_heads"]
+    # N_XFMER_ENCODER_LAYERS = trial.suggest_int("n_enc_layer", low=1, high=8, step=1)#config["n_xfmer_encoder_layers"]
+    # N_XFMER_DECODER_LAYERS = trial.suggest_int("n_dec_layer", low=2, high=8, step=1)#config["n_xfmer_decoder_layers"]
 
     EPOCHS = config["epochs"]
     # batch_size = config["batch_size"]
@@ -379,7 +405,7 @@ def training(rank, trial):
     )
 
     print("trial: ", trial.params.items())
-    
+
     for epoch in range(EPOCHS):
 
         start_time = time.time()
@@ -436,16 +462,50 @@ def training(rank, trial):
 
 
 def objective(trial):
-    
-    
-
     os.environ["MASTER_ADDR"] = "localhost"
     os.environ["MASTER_PORT"] = "29860"
     world_size = config["world_size"]
     os.environ["NCCL_DEBUG"] = "INFO"
     os.environ["CUDA_VISIBLE_DEVICES"] = config["DDP gpus"]
+
+    # parameters
+    optimizer_type = trial.suggest_categorical("optimizer_type", ["Adam"])
+    learning_rate = trial.suggest_loguniform("lr", 1e-5, 1e-2)
+    weight_decay = trial.suggest_loguniform("weight_decay", 1e-6, 1e-2)
+    batch_size = trial.suggest_int("batch_size", low=32, high=128, step=8)
+    DROPOUT = trial.suggest_float("DROPOUT", low=0.1, high=0.5, step=0.1)
+    EMB_DIM = trial.suggest_int("EMB_DIM", low=64, high=512, step=64)
+    ENC_DIM = trial.suggest_int("ENC_DIM", low=64, high=512, step=64)
+    DEC_HID_DIM = trial.suggest_int("DEC_HID_DIM", low=64, high=512, step=64)
+    if optimizer_type == "Adam":
+        beta_1 = 0.7#trial.suggest_float("beta1", low=0.5, high=0.9, step=0.1)
+        beta_2 = 0.9#trial.suggest_float("beta2", low=0.5, high=0.999, step=0.1)
+
+    # transformers params
+    DIM_FEEDFWD = trial.suggest_int("dim_ff_xfmer", low=64, high=1024, step=64)#config["dim_feedforward_for_xfmer"]
+    N_HEADS = trial.suggest_int("n_heads", low=2, high=8, step=2)#config["n_xfmer_heads"]
+    N_XFMER_ENCODER_LAYERS = trial.suggest_int("n_enc_layer", low=1, high=8, step=1)#config["n_xfmer_encoder_layers"]
+    N_XFMER_DECODER_LAYERS = trial.suggest_int("n_dec_layer", low=2, high=8, step=1)#config["n_xfmer_decoder_layers"]
+
+    params = (
+        optimizer_type,
+        learning_rate,
+        weight_decay,
+        batch_size,
+        DROPOUT,
+        EMB_DIM,
+        ENC_DIM,
+        DEC_HID_DIM,
+        beta_1,
+        beta_2,
+        DIM_FEEDFWD,
+        N_HEADS,
+        N_XFMER_DECODER_LAYERS,
+        N_XFMER_ENCODER_LAYERS
+    )
+    
     mp.spawn(training, 
-            args=(trial,), 
+            args=(trial, params), 
             nprocs=world_size, 
             join=True)
 
