@@ -204,8 +204,8 @@ def epoch_time(start_time, end_time):
     return elapsed_mins, elapsed_secs
 
 
-def objective(
-    trial, train_dataloader, test_dataloader, val_dataloader, vocab, rank=None
+def train(
+    rank, trial, train_dataloader, test_dataloader, val_dataloader, vocab
 ):
 
     # parameters
@@ -421,16 +421,28 @@ def objective(
     # gc.collect()
     # torch.cuda.reset_max_memory_allocated()
 
-    # if ddp:
-    #     dist.destroy_process_group()
-    #     os._exit(0)
+    if ddp:
+        dist.destroy_process_group()
+        # os._exit(0)
 
-    time.sleep(30)
+    time.sleep(3)
 
     bs = calculate_bleu_score()
 
     return bs
 
+def objective(trial,
+              train_dataloader, test_dataloader, val_dataloader, vocab, rank):
+    os.environ["MASTER_ADDR"] = "localhost"
+    os.environ["MASTER_PORT"] = "29860"
+    world_size = config["world_size"]
+    os.environ["NCCL_DEBUG"] = "INFO"
+    os.environ["CUDA_VISIBLE_DEVICES"] = config["DDP gpus"]
+    mp.spawn(train, args=(trial,
+                          train_dataloader, 
+                          test_dataloader, 
+                          val_dataloader, 
+                          vocab), nprocs=world_size, join=True)
 
 def tune(rank=None,):
 
@@ -445,7 +457,6 @@ def tune(rank=None,):
     func = lambda trial: objective(
         trial, train_dataloader, test_dataloader, val_dataloader, vocab, rank
     )
-
 
     study = optuna.create_study(direction="maximize")
     study.optimize(func, n_trials=2)
@@ -473,12 +484,12 @@ def tune(rank=None,):
         print("    {}: {}".format(key, value))
 
 if __name__ == "__main__":
-    if config["DDP"]:
-        os.environ["MASTER_ADDR"] = "localhost"
-        os.environ["MASTER_PORT"] = "29860"
-        world_size = config["world_size"]
-        os.environ["NCCL_DEBUG"] = "INFO"
-        os.environ["CUDA_VISIBLE_DEVICES"] = config["DDP gpus"]
-        mp.spawn(tune, args=(), nprocs=world_size, join=True)
-    else:
-        tune()
+    # if config["DDP"]:
+        # os.environ["MASTER_ADDR"] = "localhost"
+        # os.environ["MASTER_PORT"] = "29860"
+        # world_size = config["world_size"]
+        # os.environ["NCCL_DEBUG"] = "INFO"
+        # os.environ["CUDA_VISIBLE_DEVICES"] = config["DDP gpus"]
+        # mp.spawn(tune, args=(), nprocs=world_size, join=True)
+    # else:
+    tune()
