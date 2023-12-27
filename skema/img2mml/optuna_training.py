@@ -204,9 +204,7 @@ def epoch_time(start_time, end_time):
     return elapsed_mins, elapsed_secs
 
 
-def train(
-    rank, trial, train_dataloader, test_dataloader, val_dataloader, vocab
-):
+def train(rank, trial):
 
     # parameters
     optimizer_type = trial.suggest_categorical("optimizer_type", ["Adam"])
@@ -306,7 +304,7 @@ def train(
                 val_dataloader,
                 vocab,
             ) = preprocess_dataset(config)
-            
+
             model = define_model(config, vocab, rank)
             model = DDP(
                 model.to(f"cuda:{rank}"),
@@ -437,12 +435,7 @@ def train(
 
     return bs
 
-def objective(trial,
-              train_dataloader, 
-              test_dataloader, 
-              val_dataloader, 
-              vocab, 
-              rank):
+def objective(trial):
     
     os.environ["MASTER_ADDR"] = "localhost"
     os.environ["MASTER_PORT"] = "29860"
@@ -450,11 +443,7 @@ def objective(trial,
     os.environ["NCCL_DEBUG"] = "INFO"
     os.environ["CUDA_VISIBLE_DEVICES"] = config["DDP gpus"]
     mp.spawn(train, 
-            args=(trial,
-                train_dataloader, 
-                test_dataloader, 
-                val_dataloader, 
-                vocab), 
+            args=(trial,), 
             nprocs=world_size, 
             join=True)
 
