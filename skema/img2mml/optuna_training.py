@@ -4,7 +4,7 @@
 import os, random
 import subprocess
 import numpy as np
-import time
+import time, gc
 import json
 import math
 import argparse
@@ -416,9 +416,15 @@ def objective(
         if trial.should_prune():
             raise optuna.exceptions.TrialPruned()
 
+    del model
+    torch.cuda.empty_cache()
+    gc.collect()
+    torch.cuda.reset_max_memory_allocated()
+
     if ddp:
         dist.destroy_process_group()
-
+        os._exit(0)
+        
     time.sleep(30)
 
     bs = calculate_bleu_score()
