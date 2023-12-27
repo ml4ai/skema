@@ -300,7 +300,13 @@ def train(
             # add rank to config
             config["rank"] = rank
             device = f"cuda:{rank}"
-
+            (
+                train_dataloader,
+                test_dataloader,
+                val_dataloader,
+                vocab,
+            ) = preprocess_dataset(config)
+            
             model = define_model(config, vocab, rank)
             model = DDP(
                 model.to(f"cuda:{rank}"),
@@ -432,34 +438,34 @@ def train(
     return bs
 
 def objective(trial,
-              train_dataloader, test_dataloader, val_dataloader, vocab, rank):
+              train_dataloader, 
+              test_dataloader, 
+              val_dataloader, 
+              vocab, 
+              rank):
+    
     os.environ["MASTER_ADDR"] = "localhost"
     os.environ["MASTER_PORT"] = "29860"
     world_size = config["world_size"]
     os.environ["NCCL_DEBUG"] = "INFO"
     os.environ["CUDA_VISIBLE_DEVICES"] = config["DDP gpus"]
-    mp.spawn(train, args=(trial,
-                          train_dataloader, 
-                          test_dataloader, 
-                          val_dataloader, 
-                          vocab), nprocs=world_size, join=True)
+    mp.spawn(train, 
+            args=(trial,
+                train_dataloader, 
+                test_dataloader, 
+                val_dataloader, 
+                vocab), 
+            nprocs=world_size, 
+            join=True)
 
-def tune(rank=None,):
+def tune():
 
-    config["rank"] = rank
-    (
-        train_dataloader,
-        test_dataloader,
-        val_dataloader,
-        vocab,
-    ) = preprocess_dataset(config)
-
-    func = lambda trial: objective(
-        trial, train_dataloader, test_dataloader, val_dataloader, vocab, rank
-    )
+    # func = lambda trial: objective(
+    #     trial, train_dataloader, test_dataloader, val_dataloader, vocab, rank
+    # )
 
     study = optuna.create_study(direction="maximize")
-    study.optimize(func, n_trials=2)
+    study.optimize(objective, n_trials=2)
 
     pruned_trials = study.get_trials(
         deepcopy=False, states=[TrialState.PRUNED]
