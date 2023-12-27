@@ -433,6 +433,8 @@ def training(rank, trial):
 
 def objective(trial):
     
+    print("trial: ", trial)
+
     os.environ["MASTER_ADDR"] = "localhost"
     os.environ["MASTER_PORT"] = "29860"
     world_size = config["world_size"]
