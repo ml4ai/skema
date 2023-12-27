@@ -204,7 +204,7 @@ def epoch_time(start_time, end_time):
     return elapsed_mins, elapsed_secs
 
 
-def train(rank, trial):
+def training(rank, trial):
 
     # parameters
     optimizer_type = trial.suggest_categorical("optimizer_type", ["Adam"])
@@ -442,7 +442,7 @@ def objective(trial):
     world_size = config["world_size"]
     os.environ["NCCL_DEBUG"] = "INFO"
     os.environ["CUDA_VISIBLE_DEVICES"] = config["DDP gpus"]
-    mp.spawn(train, 
+    mp.spawn(training, 
             args=(trial,), 
             nprocs=world_size, 
             join=True)
