@@ -378,6 +378,8 @@ def training(rank, trial):
         f"{config['data_path']}/{config['dataset_type']}/image_tensors"
     )
 
+    print("trial: ", trial.params.items())
+    
     for epoch in range(EPOCHS):
 
         start_time = time.time()
@@ -431,9 +433,11 @@ def training(rank, trial):
 
     time.sleep(3)
 
+
+
 def objective(trial):
     
-    print("trial: ", trial.params.items())
+    
 
     os.environ["MASTER_ADDR"] = "localhost"
     os.environ["MASTER_PORT"] = "29860"
