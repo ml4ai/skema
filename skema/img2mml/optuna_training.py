@@ -447,8 +447,6 @@ def objective(trial):
             nprocs=world_size, 
             join=True)
 
-    return bs
-
 def tune():
 
     # func = lambda trial: objective(
