@@ -520,7 +520,7 @@ def tune():
     # )
 
     study = optuna.create_study(direction="maximize")
-    study.optimize(objective, n_trials=3)
+    study.optimize(objective, n_trials=25)
 
     pruned_trials = study.get_trials(
         deepcopy=False, states=[TrialState.PRUNED]
