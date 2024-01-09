@@ -2,13 +2,14 @@
 """
 All the functions required by performing incremental structure alignment (ISA)
 Author: Liang Zhang (liangzh@arizona.edu)
-Updated date: August 24, 2023
+Updated date: December 18, 2023
 """
 import json
 import warnings
 from typing import List, Any, Union, Dict
 from numpy import ndarray
 from pydot import Dot
+from skema.rest.proxies import SKEMA_RS_ADDESS
 
 warnings.filterwarnings("ignore")
 import requests
@@ -173,8 +174,9 @@ def generate_graph(file: str = "", render: bool = False) -> pydot.Dot:
             content = f.read()
 
     digraph = requests.put(
-        "http://localhost:8080/mathml/math-exp-graph", data=content.encode("utf-8")
+        f"{SKEMA_RS_ADDESS}/mathml/math-exp-graph", data=content.encode("utf-8")
     )
+
     if render:
         src = Source(digraph.text)
         src.render("doctest-output/mathml_exp_tree", view=True)
@@ -671,8 +673,8 @@ def check_square_array(arr: np.ndarray) -> List[int]:
 
 
 def align_mathml_eqs(
-    file1: str = "",
-    file2: str = "",
+    mml1: str = "",
+    mml2: str = "",
     mention_json1: str = "",
     mention_json2: str = "",
     mode: int = 2,
@@ -685,7 +687,7 @@ def align_mathml_eqs(
     [1] Fishkind, D. E., Adali, S., Patsolic, H. G., Meng, L., Singh, D., Lyzinski, V., & Priebe, C. E. (2019).
     Seeded graph matching. Pattern recognition, 87, 203-215.
 
-    Input: the paths of the two equation MathMLs; mention_json1: the mention file of paper 1; mention_json1: the mention file of paper 2;
+    Input: mml1 & mml2: the file path or contents of the two equation MathMLs; mention_json1: the mention file of paper 1; mention_json1: the mention file of paper 2;
             mode 0: without considering any priors; mode 1: having a heuristic prior
             with the similarity of node labels; mode 2: using the variable definitions
     Output:
@@ -698,8 +700,8 @@ def align_mathml_eqs(
         union_graph: the visualization of the alignment result
         perfectly_matched_indices1: strictly matched node indices in Graph 1
     """
-    graph1 = generate_graph(file1)
-    graph2 = generate_graph(file2)
+    graph1 = generate_graph(mml1)
+    graph2 = generate_graph(mml2)
 
     amatrix1, node_labels1 = generate_amatrix(graph1)
     amatrix2, node_labels2 = generate_amatrix(graph2)

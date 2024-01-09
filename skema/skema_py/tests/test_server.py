@@ -11,9 +11,9 @@ from skema.gromet.metadata.debug import Debug
 client = TestClient(app)
 
 
-def test_ping():
+def test_healthcheck():
     """Test case for /code2fn/ping endpoint."""
-    response = client.get("/code2fn/ping")
+    response = client.get("/code2fn/healthcheck")
     assert response.status_code == 200
 
 

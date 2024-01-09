@@ -8,7 +8,7 @@ from typing import List, Dict, Optional
 from io import BytesIO
 from zipfile import ZipFile
 from urllib.request import urlopen
-from fastapi import APIRouter, FastAPI, Body, File, UploadFile
+from fastapi import APIRouter, FastAPI, status, Body, File, UploadFile
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
@@ -226,9 +226,14 @@ async def system_to_gromet(system: System):
 router = APIRouter()
 
 
-@router.get("/ping", summary="Ping endpoint to test health of service")
-def ping() -> int:
-    return 200
+@router.get(
+    "/healthcheck", 
+    summary="Ping endpoint to test health of service",
+    status_code=status.HTTP_200_OK,
+    response_model=int
+)
+def healthcheck() -> int:
+    return status.HTTP_200_OK
 
 
 @router.get(

@@ -11,8 +11,6 @@ use mathml::parsers::math_expression_tree::{
 
 use mathml::{
     acset::{AMRmathml, PetriNet, RegNet},
-    ast::Math,
-    expression::{preprocess_content, wrap_math},
     parsers::first_order_ode::{first_order_ode, FirstOrderODE},
 };
 use petgraph::dot::{Config, Dot};
@@ -57,11 +55,8 @@ pub async fn get_ast_graph(payload: String) -> String {
 #[put("/mathml/math-exp-graph")]
 pub async fn get_math_exp_graph(payload: String) -> String {
     let mut contents = payload;
-    contents = preprocess_content(contents);
-    let mut math = contents.parse::<Math>().unwrap();
-    math.normalize();
-    let new_math = wrap_math(math);
-    let g = new_math.to_graph();
+    let exp = contents.parse::<MathExpressionTree>().unwrap();
+    let g = exp.to_graph();
     let dot_representation = Dot::new(&g);
     dot_representation.to_string()
 }
