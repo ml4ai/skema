@@ -12,9 +12,6 @@ from skema.program_analysis.CAST2FN.model.cast import (
     Operator
 )
 
-# NOTE: these examples are very trivial for the realm of recursion
-#       more complex ones will follow later as needed
-
 def for1():
     return """
 x = 7
