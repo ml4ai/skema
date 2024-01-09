@@ -350,8 +350,13 @@ def find_func_in_module(module_name, func_name):
     import sys
 
     sys.path.append(os.getcwd())
-    module_import = importlib.import_module(module_name)
 
+    # TODO: Support find_func_in_module for Fortran source code as well
+    try:
+        module_import = importlib.import_module(module_name)
+    except:
+        return False
+    
     funcs = list(dir(module_import))
     return func_name in funcs</code></pre>
 </details>
@@ -391,8 +396,13 @@ using 'dir' to determine if func_name is within module_name's list of functions<
     import sys
 
     sys.path.append(os.getcwd())
-    module_import = importlib.import_module(module_name)
 
+    # TODO: Support find_func_in_module for Fortran source code as well
+    try:
+        module_import = importlib.import_module(module_name)
+    except:
+        return False
+    
     funcs = list(dir(module_import))
     return func_name in funcs</code></pre>
 </details>

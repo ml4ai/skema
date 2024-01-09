@@ -63,7 +63,7 @@ def preprocess(
     &#34;&#34;&#34;
     # NOTE: The order of preprocessing steps does matter. We have to run the GCC preprocessor before correcting the continuation lines or there could be issues
 
-    # TODO: Create single location for generating include base path 
+    # TODO: Create single location for generating include base path
     source = source_path.read_text()
 
     # Get paths for intermediate products
@@ -96,7 +96,7 @@ def preprocess(
 
     # Step 2: Correct include directives to remove system references
     source = fix_include_directives(source)
-    
+
     # Step 3: Process with gcc c-preprocessor
     include_base_directory = Path(source_path.parent, f&#34;include_{source_path.stem}&#34;)
     if not include_base_directory.exists():
@@ -104,13 +104,13 @@ def preprocess(
     source = run_c_preprocessor(source, include_base_directory)
     if out_gcc:
         gcc_path.write_text(source)
-    
+
     # Step 4: Prepare for tree-sitter
     # This step removes any additional preprocessor directives added or not removed by GCC
     source = &#34;\n&#34;.join(
         [&#34;!&#34; + line if line.startswith(&#34;#&#34;) else line for line in source.splitlines()]
     )
-    
+
     # Step 5: Check for unsupported idioms
     if out_unsupported:
         unsupported_path.write_text(
@@ -202,7 +202,7 @@ def fix_include_directives(source: str) -&gt; str:
 def run_c_preprocessor(source: str, include_base_path: Path) -&gt; str:
     &#34;&#34;&#34;Run the gcc c-preprocessor. Its run from the context of the include_base_path, so that it can find all included files&#34;&#34;&#34;
     result = run(
-        [&#34;gcc&#34;, &#34;-cpp&#34;, &#34;-E&#34;, &#34;-&#34;],
+        [&#34;gcc&#34;, &#34;-cpp&#34;, &#34;-E&#34;, &#34;-x&#34;, &#34;f95&#34;, &#34;-&#34;],
         input=source,
         text=True,
         capture_output=True,
@@ -212,8 +212,14 @@ def run_c_preprocessor(source: str, include_base_path: Path) -&gt; str:
     return result.stdout
 
 
+def convert_assigned(source: str) -&gt; str:
+    &#34;&#34;&#34;Convered ASSIGNED GO TO to COMPUTED GO TO&#34;&#34;&#34;
+    pass
+
+
 def convert_to_free_form(source: str) -&gt; str:
     &#34;&#34;&#34;If fixed-form Fortran source, convert to free-form&#34;&#34;&#34;
+
     def validate_parse_tree(source: str) -&gt; bool:
         &#34;&#34;&#34;Parse source with tree-sitter and check if an error is returned.&#34;&#34;&#34;
         language = Language(INSTALLED_LANGUAGES_FILEPATH, &#34;fortran&#34;)
@@ -233,7 +239,7 @@ def convert_to_free_form(source: str) -&gt; str:
         )
         if validate_parse_tree(free_source):
             return free_source
-    
+
     return source
 
 
@@ -333,6 +339,20 @@ if __name__ == &#34;__main__&#34;:
     return missing_files</code></pre>
 </details>
 </dd>
+<dt id="skema.program_analysis.CAST.fortran.preprocessor.preprocess.convert_assigned"><code class="name flex">
+<span>def <span class="ident">convert_assigned</span></span>(<span>source: str) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Convered ASSIGNED GO TO to COMPUTED GO TO</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def convert_assigned(source: str) -&gt; str:
+    &#34;&#34;&#34;Convered ASSIGNED GO TO to COMPUTED GO TO&#34;&#34;&#34;
+    pass</code></pre>
+</details>
+</dd>
 <dt id="skema.program_analysis.CAST.fortran.preprocessor.preprocess.convert_to_free_form"><code class="name flex">
 <span>def <span class="ident">convert_to_free_form</span></span>(<span>source: str) ‑> str</span>
 </code></dt>
@@ -344,6 +364,7 @@ if __name__ == &#34;__main__&#34;:
 </summary>
 <pre><code class="python">def convert_to_free_form(source: str) -&gt; str:
     &#34;&#34;&#34;If fixed-form Fortran source, convert to free-form&#34;&#34;&#34;
+
     def validate_parse_tree(source: str) -&gt; bool:
         &#34;&#34;&#34;Parse source with tree-sitter and check if an error is returned.&#34;&#34;&#34;
         language = Language(INSTALLED_LANGUAGES_FILEPATH, &#34;fortran&#34;)
@@ -363,7 +384,7 @@ if __name__ == &#34;__main__&#34;:
         )
         if validate_parse_tree(free_source):
             return free_source
-    
+
     return source</code></pre>
 </details>
 </dd>
@@ -478,7 +499,7 @@ An intermediary directory will also be created containing:
     &#34;&#34;&#34;
     # NOTE: The order of preprocessing steps does matter. We have to run the GCC preprocessor before correcting the continuation lines or there could be issues
 
-    # TODO: Create single location for generating include base path 
+    # TODO: Create single location for generating include base path
     source = source_path.read_text()
 
     # Get paths for intermediate products
@@ -511,7 +532,7 @@ An intermediary directory will also be created containing:
 
     # Step 2: Correct include directives to remove system references
     source = fix_include_directives(source)
-    
+
     # Step 3: Process with gcc c-preprocessor
     include_base_directory = Path(source_path.parent, f&#34;include_{source_path.stem}&#34;)
     if not include_base_directory.exists():
@@ -519,13 +540,13 @@ An intermediary directory will also be created containing:
     source = run_c_preprocessor(source, include_base_directory)
     if out_gcc:
         gcc_path.write_text(source)
-    
+
     # Step 4: Prepare for tree-sitter
     # This step removes any additional preprocessor directives added or not removed by GCC
     source = &#34;\n&#34;.join(
         [&#34;!&#34; + line if line.startswith(&#34;#&#34;) else line for line in source.splitlines()]
     )
-    
+
     # Step 5: Check for unsupported idioms
     if out_unsupported:
         unsupported_path.write_text(
@@ -576,7 +597,7 @@ An intermediary directory will also be created containing:
 <pre><code class="python">def run_c_preprocessor(source: str, include_base_path: Path) -&gt; str:
     &#34;&#34;&#34;Run the gcc c-preprocessor. Its run from the context of the include_base_path, so that it can find all included files&#34;&#34;&#34;
     result = run(
-        [&#34;gcc&#34;, &#34;-cpp&#34;, &#34;-E&#34;, &#34;-&#34;],
+        [&#34;gcc&#34;, &#34;-cpp&#34;, &#34;-E&#34;, &#34;-x&#34;, &#34;f95&#34;, &#34;-&#34;],
         input=source,
         text=True,
         capture_output=True,
@@ -627,6 +648,7 @@ An intermediary directory will also be created containing:
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
 <li><code><a title="skema.program_analysis.CAST.fortran.preprocessor.preprocess.check_for_missing_includes" href="#skema.program_analysis.CAST.fortran.preprocessor.preprocess.check_for_missing_includes">check_for_missing_includes</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.fortran.preprocessor.preprocess.convert_assigned" href="#skema.program_analysis.CAST.fortran.preprocessor.preprocess.convert_assigned">convert_assigned</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.fortran.preprocessor.preprocess.convert_to_free_form" href="#skema.program_analysis.CAST.fortran.preprocessor.preprocess.convert_to_free_form">convert_to_free_form</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.fortran.preprocessor.preprocess.fix_include_directives" href="#skema.program_analysis.CAST.fortran.preprocessor.preprocess.fix_include_directives">fix_include_directives</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.fortran.preprocessor.preprocess.main" href="#skema.program_analysis.CAST.fortran.preprocessor.preprocess.main">main</a></code></li>
