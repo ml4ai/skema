@@ -241,7 +241,7 @@ class TS2CAST(object):
         if func_name.val.name == "range":
             start_step_value = LiteralValue(
                 ScalarType.INTEGER, 
-                value=1,
+                value="1",
                 source_code_data_type=["Python", PYTHON_VERSION, str(type(1))],
                 source_refs=[ref]
             )
@@ -460,7 +460,7 @@ class TS2CAST(object):
         elif literal_type == "list":
             list_items = []
             for elem in node.children:
-                cast = self.visit(cast)
+                cast = self.visit(elem)
                 if isinstance(cast, List):
                     list_items.extend(cast)
                 elif isinstance(cast, AstNode):
@@ -525,7 +525,7 @@ class TS2CAST(object):
 
         # Pre: left, right        
         loop_cond_left = get_children_by_types(node, FOR_LOOP_LEFT_TYPES)[0]
-        loop_cond_right = get_children_by_types(node, FOR_LOOP_RIGHT_TYPES)[0]
+        loop_cond_right = get_children_by_types(node, FOR_LOOP_RIGHT_TYPES)[-1]
 
         # Construct pre and expr value using left and right as needed
         # need calls to "_Iterator"
@@ -549,9 +549,6 @@ class TS2CAST(object):
                 )
             )
         )
-
-        print(loop_cond_left)
-        print(loop_cond_left_cast)
 
         loop_pre.append(
             Assignment(
