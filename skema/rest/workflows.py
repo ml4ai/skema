@@ -219,7 +219,7 @@ async def repo_to_pn_amr(zip_file: UploadFile = File(), client: httpx.AsyncClien
     "/code/llm-assisted-codebase-to-pn-amr",
     summary="Code repo (zip archive) → PetriNet AMR",
 )
-async def llm_assisted_codebase_to_pn_amr(zip_file: UploadFile = File()):
+async def llm_assisted_codebase_to_pn_amr(zip_file: UploadFile = File(), client: httpx.AsyncClient = Depends(utils.get_client)):
     """Codebase->AMR workflow using an llm to extract the dynamics line span.
     ### Python example
     ```
@@ -288,7 +288,8 @@ async def llm_assisted_codebase_to_pn_amr(zip_file: UploadFile = File()):
                         code2fn.System(
                             files=[files[i]],
                             blobs=[blobs[i]],
-                        )
+                        ),
+                        client
                     )
                 print(f"Time response code-snippets: {time.time()}")
                 if "model" in code_snippet_response:
@@ -299,8 +300,9 @@ async def llm_assisted_codebase_to_pn_amr(zip_file: UploadFile = File()):
                 else:
                     print("snippets failure")
                     logging.append(f"{files[i]} failed to parse an AMR from the dynamics")
-            except:
+            except Exception as e:
                 print("Hit except to snippets failure")
+                print(f"Exception:\t{e}")
                 logging.append(f"{files[i]} failed to parse an AMR from the dynamics")
     # we will return the amr with most states, in assumption it is the most "correct"
     # by default it returns the first entry
