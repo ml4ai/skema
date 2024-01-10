@@ -271,13 +271,15 @@ async def llm_assisted_codebase_to_pn_amr(zip_file: UploadFile = File(), client:
     # The source code is a string, so to slice using the line spans, we must first convert it to a list.
     # Then we can convert it back to a string using .join
     logging = []
+    import_counter = 0
     for i in range(len(blobs)):
         if line_begin[i] == line_end[i]:
             print("failed linespan")
         else:
-            if blocks == 2:
-                temp = "".join(blobs[i].splitlines(keepends=True)[import_begin[i]:import_end[i]])
+            if len(linespans[i].block) == 2:
+                temp = "".join(blobs[i].splitlines(keepends=True)[import_begin[import_counter]:import_end[import_counter]])
                 blobs[i] = temp + "\n" + "".join(blobs[i].splitlines(keepends=True)[line_begin[i]:line_end[i]])
+                import_counter += 1
             else:
                 blobs[i] = "".join(blobs[i].splitlines(keepends=True)[line_begin[i]:line_end[i]])
             try:
@@ -292,6 +294,11 @@ async def llm_assisted_codebase_to_pn_amr(zip_file: UploadFile = File(), client:
                         client
                     )
                 print(f"Time response code-snippets: {time.time()}")
+                print("-------------------")
+                print("-------------------")
+                print(code_snippet_response)
+                print("-------------------")
+                print("-------------------")
                 if "model" in code_snippet_response:
                     code_snippet_response["header"]["name"] = "LLM-assisted code to amr model"
                     code_snippet_response["header"]["description"] = f"This model came from code file: {files[i]}"
