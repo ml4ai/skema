@@ -9,6 +9,7 @@ from io import BytesIO
 from typing import List
 from pathlib import Path
 import httpx
+import json
 
 from fastapi import APIRouter, Depends, File, UploadFile, FastAPI
 from starlette.responses import JSONResponse
@@ -293,6 +294,8 @@ async def llm_assisted_codebase_to_pn_amr(zip_file: UploadFile = File(), client:
                         ),
                         client
                     )
+                
+                code_snippet_response = json.loads(code_snippet_response.body)
                 print(f"Time response code-snippets: {time.time()}")
                 print("-------------------")
                 print("-------------------")
