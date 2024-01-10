@@ -8,15 +8,14 @@ from langchain.output_parsers import (
     StructuredOutputParser,
     ResponseSchema
 )
-from fastapi import APIRouter, Depends, FastAPI, File, UploadFile
+from fastapi import APIRouter, FastAPI, File, UploadFile
 from io import BytesIO
 from zipfile import ZipFile
 from pathlib import Path
 from pydantic import BaseModel, Field
 from typing import List, Optional
+from skema.skema_py import server as code2fn
 from skema.rest.proxies import SKEMA_OPENAI_KEY
-from skema.rest import utils
-import httpx
 import time
 
 router = APIRouter()
@@ -39,7 +38,7 @@ class Dynamics(BaseModel):
         " get a line span of the dynamics back. One for each code file."
     ),
 )
-async def get_lines_of_model(zip_file: UploadFile = File(), client: httpx.AsyncClient = Depends(utils.get_client)) -> List[Dynamics]:
+async def get_lines_of_model(zip_file: UploadFile = File()) -> List[Dynamics]:
     """
     Endpoint for generating a line span containing the dynamics from a zip archive. Currently
     it only expects there to be one python file in the zip. There can be other files, such as a
@@ -122,16 +121,14 @@ async def get_lines_of_model(zip_file: UploadFile = File(), client: httpx.AsyncC
 
             function_name = parsed_output['model_function']
 
-            # FIXME: this shouldn't be hard-coded!
-            # It cannot be tested locally...
-            # Get the FN from it
-            url = "https://api.askem.lum.ai/code2fn/fn-given-filepaths"
             # FIXME: we should rewrite things to avoid this need
             time.sleep(0.5)
-            response_zip = await client.post(url, json=single_snippet_payload)
-
+            system = code2fn.System(**single_snippet_payload)
+            print(f"System:\t{system}")
+            response_zip = await code2fn.fn_given_filepaths(system)
+            #print(f"response_zip:\t{response_zip}")
             # get metadata entry for function
-            for entry in response_zip.json()['modules'][0]['fn_array']:
+            for entry in response_zip['modules'][0]['fn_array']:
                 try:
                     if entry['b'][0]['name'][0:len(function_name)] == function_name:
                         metadata_idx = entry['b'][0]['metadata']
@@ -139,21 +136,22 @@ async def get_lines_of_model(zip_file: UploadFile = File(), client: httpx.AsyncC
                     continue
 
             # get line span using metadata
-            for (i,metadata) in enumerate(response_zip.json()['modules'][0]['metadata_collection']):
+            for (i,metadata) in enumerate(response_zip['modules'][0]['metadata_collection']):
                 if i == (metadata_idx - 1):
                     line_begin = metadata[0]['line_begin']
                     line_end =  metadata[0]['line_end']
-        except:
+        except Exception as e:
             print("Failed to parse dynamics")
+            print(f"e:\t{e}")
             description = "Failed to parse dynamics"
             line_begin = 0
             line_end = 0
 
         # if the line_begin of meta entry 2 (base 0) and meta entry 3 (base 0) are we add a slice from [meta2.line_begin, meta3.line_begin)
         # to capture all the imports, return a Dynamics.block with 2 entries, both of which need to be concatenated to pass forward
-        file_line_begin = response_zip.json()['modules'][0]['metadata_collection'][2][0]['line_begin']
+        file_line_begin = response_zip['modules'][0]['metadata_collection'][2][0]['line_begin']
 
-        code_line_begin = response_zip.json()['modules'][0]['metadata_collection'][3][0]['line_begin'] - 1
+        code_line_begin = response_zip['modules'][0]['metadata_collection'][3][0]['line_begin'] - 1
 
         if file_line_begin != code_line_begin:
             block.append(f"L{file_line_begin}-L{code_line_begin}")

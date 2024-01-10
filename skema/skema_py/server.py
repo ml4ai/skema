@@ -134,7 +134,7 @@ async def system_to_enriched_system(system: System) -> System:
 
     return system
 
-
+# returns an abbreviated Dict representing a GrometFNModuleCollection
 async def system_to_gromet(system: System):
     """Convert a System to Gromet JSON"""
 
