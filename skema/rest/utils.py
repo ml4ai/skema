@@ -6,13 +6,14 @@ from typing import Any, Dict
 from askem_extractions.data_model import AttributeCollection, AttributeType, AnchoredEntity
 from bs4 import BeautifulSoup, Comment
 
+from skema.rest import config
 from skema.rest.schema import TextReadingEvaluationResults, AMRLinkingEvaluationResults
 
 
 # see https://stackoverflow.com/a/74401249
 async def get_client():
     # create a new client for each request
-    async with httpx.AsyncClient() as client:
+    async with httpx.AsyncClient(timeout=config.SKEMA_RS_DEFAULT_TIMEOUT, follow_redirects=True) as client:
         # yield the client to the endpoint function
         yield client
         # close the client when the request is done
