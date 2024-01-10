@@ -130,7 +130,7 @@ async def system_to_enriched_system(system: System) -> System:
     comments = {"files": {}}
     for file_path, result in zip(file_paths, results):
         comments["files"][str(file_path)] = result
-    system.comments = MultiFileCommentResponse.parse_obj(comments)
+    system.comments = MultiFileCommentResponse(**comments)
 
     return system
 
