@@ -8,14 +8,15 @@ from langchain.output_parsers import (
     StructuredOutputParser,
     ResponseSchema
 )
-from fastapi import APIRouter, FastAPI, File, UploadFile
+from fastapi import APIRouter, Depends, FastAPI, File, UploadFile
 from io import BytesIO
 from zipfile import ZipFile
-import requests
 from pathlib import Path
 from pydantic import BaseModel, Field
 from typing import List, Optional
 from skema.rest.proxies import SKEMA_OPENAI_KEY
+from skema.rest import utils
+import httpx
 import time
 
 router = APIRouter()
@@ -38,7 +39,7 @@ class Dynamics(BaseModel):
         " get a line span of the dynamics back. One for each code file."
     ),
 )
-async def get_lines_of_model(zip_file: UploadFile = File()) -> List[Dynamics]:
+async def get_lines_of_model(zip_file: UploadFile = File(), client: httpx.AsyncClient = Depends(utils.get_client)) -> List[Dynamics]:
     """
     Endpoint for generating a line span containing the dynamics from a zip archive. Currently
     it only expects there to be one python file in the zip. There can be other files, such as a
@@ -121,10 +122,13 @@ async def get_lines_of_model(zip_file: UploadFile = File()) -> List[Dynamics]:
 
             function_name = parsed_output['model_function']
 
+            # FIXME: this shouldn't be hard-coded!
+            # It cannot be tested locally...
             # Get the FN from it
             url = "https://api.askem.lum.ai/code2fn/fn-given-filepaths"
+            # FIXME: we should rewrite things to avoid this need
             time.sleep(0.5)
-            response_zip = requests.post(url, json=single_snippet_payload)
+            response_zip = await client.post(url, json=single_snippet_payload)
 
             # get metadata entry for function
             for entry in response_zip.json()['modules'][0]['fn_array']:

@@ -3,14 +3,14 @@
 End-to-end skema workflows
 """
 import copy
-import requests
 import time
 from zipfile import ZipFile
 from io import BytesIO
 from typing import List
 from pathlib import Path
+import httpx
 
-from fastapi import APIRouter, File, UploadFile, FastAPI
+from fastapi import APIRouter, Depends, File, UploadFile, FastAPI
 from starlette.responses import JSONResponse
 
 from skema.img2mml import eqn2mml
@@ -27,7 +27,7 @@ router = APIRouter()
 @router.post(
     "/images/base64/equations-to-amr", summary="Equations (base64 images) → MML → AMR"
 )
-async def equations_to_amr(data: schema.EquationImagesToAMR):
+async def equations_to_amr(data: schema.EquationImagesToAMR, client: httpx.AsyncClient = Depends(utils.get_client)):
     """
     Converts images of equations to AMR.
 
@@ -57,7 +57,7 @@ async def equations_to_amr(data: schema.EquationImagesToAMR):
     ]
     payload = {"mathml": mml, "model": data.model}
     # FIXME: why is this a PUT?
-    res = requests.put(f"{SKEMA_RS_ADDESS}/mathml/amr", json=payload)
+    res = await client.put(f"{SKEMA_RS_ADDESS}/mathml/amr", json=payload)
     if res.status_code != 200:
         return JSONResponse(
             status_code=400,
@@ -71,7 +71,7 @@ async def equations_to_amr(data: schema.EquationImagesToAMR):
 
 # equation images -> mml -> latex
 @router.post("/images/equations-to-latex", summary="Equations (images) → MML → LaTeX")
-async def equations_to_latex(data: UploadFile):
+async def equations_to_latex(data: UploadFile, client: httpx.AsyncClient = Depends(utils.get_client)):
     """
     Converts images of equations to LaTeX.
 
@@ -97,7 +97,7 @@ async def equations_to_latex(data: UploadFile):
     mml_res = get_mathml_from_bytes(image_bytes, image2mathml_db)
     proxy_url = f"{SKEMA_RS_ADDESS}/mathml/latex"
     print(f"Proxying request to {proxy_url}")
-    response = requests.post(proxy_url, data=mml_res)
+    response = await client.post(proxy_url, data=mml_res)
     # Check the response
     if response.status_code == 200:
         # The request was successful
@@ -111,7 +111,7 @@ async def equations_to_latex(data: UploadFile):
 
 # tex equations -> pmml -> amr
 @router.post("/latex/equations-to-amr", summary="Equations (LaTeX) → pMML → AMR")
-async def equations_to_amr(data: schema.EquationLatexToAMR):
+async def equations_to_amr(data: schema.EquationLatexToAMR, client: httpx.AsyncClient = Depends(utils.get_client)):
     """
     Converts equations (in LaTeX) to AMR.
 
@@ -131,7 +131,7 @@ async def equations_to_amr(data: schema.EquationLatexToAMR):
         utils.clean_mml(eqn2mml.get_mathml_from_latex(tex)) for tex in data.equations
     ]
     payload = {"mathml": mml, "model": data.model}
-    res = requests.put(f"{SKEMA_RS_ADDESS}/mathml/amr", json=payload)
+    res = await client.put(f"{SKEMA_RS_ADDESS}/mathml/amr", json=payload)
     if res.status_code != 200:
         return JSONResponse(
             status_code=400,
@@ -145,9 +145,9 @@ async def equations_to_amr(data: schema.EquationLatexToAMR):
 
 # pmml -> amr
 @router.post("/pmml/equations-to-amr", summary="Equations pMML → AMR")
-async def equations_to_amr(data: schema.MmlToAMR):
+async def equations_to_amr(data: schema.MmlToAMR, client: httpx.AsyncClient = Depends(utils.get_client)):
     payload = {"mathml": data.equations, "model": data.model}
-    res = requests.put(f"{SKEMA_RS_ADDESS}/mathml/amr", json=payload)
+    res = await client.put(f"{SKEMA_RS_ADDESS}/mathml/amr", json=payload)
     if res.status_code != 200:
         return JSONResponse(
             status_code=400,
@@ -161,10 +161,10 @@ async def equations_to_amr(data: schema.MmlToAMR):
 
 # code snippets -> fn -> petrinet amr
 @router.post("/code/snippets-to-pn-amr", summary="Code snippets → PetriNet AMR")
-async def code_snippets_to_pn_amr(system: code2fn.System):
+async def code_snippets_to_pn_amr(system: code2fn.System, client: httpx.AsyncClient = Depends(utils.get_client)):
     gromet = await code2fn.fn_given_filepaths(system)
     gromet, logs = utils.fn_preprocessor(gromet)
-    res = requests.put(f"{SKEMA_RS_ADDESS}/models/PN", json=gromet)
+    res = await client.put(f"{SKEMA_RS_ADDESS}/models/PN", json=gromet)
     if res.status_code != 200:
         return JSONResponse(
             status_code=400,
@@ -199,10 +199,10 @@ async def code_snippets_to_rn_amr(system: code2fn.System):
 @router.post(
     "/code/codebase-to-pn-amr", summary="Code repo (zip archive) → PetriNet AMR"
 )
-async def repo_to_pn_amr(zip_file: UploadFile = File()):
+async def repo_to_pn_amr(zip_file: UploadFile = File(), client: httpx.AsyncClient = Depends(utils.get_client)):
     gromet = await code2fn.fn_given_filepaths_zip(zip_file)
     gromet, logs = utils.fn_preprocessor(gromet)
-    res = requests.put(f"{SKEMA_RS_ADDESS}/models/PN", json=gromet)
+    res = await client.put(f"{SKEMA_RS_ADDESS}/models/PN", json=gromet)
     if res.status_code != 200:
         return JSONResponse(
             status_code=400,

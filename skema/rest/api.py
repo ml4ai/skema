@@ -1,7 +1,7 @@
 import os
 from typing import Dict
 
-from fastapi import FastAPI, Response, status
+from fastapi import Depends, FastAPI, Response, status
 from fastapi.responses import PlainTextResponse
 
 from skema.rest import (
@@ -12,12 +12,14 @@ from skema.rest import (
     morae_proxy,
     metal_proxy,
     llm_proxy,
+    utils
 )
 from skema.isa import isa_service
 from skema.img2mml import eqn2mml
 from skema.skema_py import server as code2fn
 from skema.gromet.execution_engine import server as execution_engine
 from skema.program_analysis.comment_extractor import server as comment_service
+import httpx
 
 VERSION: str = os.environ.get("APP_VERSION", "????")
 
@@ -170,7 +172,7 @@ app.include_router(
     summary="API version",
     status_code=status.HTTP_200_OK
 )
-async def version() -> str:
+def version() -> str:
     return PlainTextResponse(VERSION)
 
 
@@ -190,8 +192,8 @@ async def version() -> str:
         },
     },
 )
-async def healthcheck(response: Response) -> schema.HealthStatus:
-    morae_status = await morae_proxy.healthcheck()
+async def healthcheck(response: Response, client: httpx.AsyncClient = Depends(utils.get_client)) -> schema.HealthStatus:
+    morae_status = await morae_proxy.healthcheck(client)
     mathjax_status = eqn2mml.latex2mml_healthcheck()
     eqn2mml_status = eqn2mml.img2mml_healthcheck()
     code2fn_status = code2fn.healthcheck()

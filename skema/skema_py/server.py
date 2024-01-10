@@ -7,7 +7,6 @@ from pathlib import Path
 from typing import List, Dict, Optional
 from io import BytesIO
 from zipfile import ZipFile
-from urllib.request import urlopen
 from fastapi import APIRouter, FastAPI, status, Body, File, UploadFile
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
