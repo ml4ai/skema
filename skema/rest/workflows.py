@@ -58,7 +58,7 @@ async def equations_to_amr(data: schema.EquationImagesToAMR, client: httpx.Async
     ]
     payload = {"mathml": mml, "model": data.model}
     # FIXME: why is this a PUT?
-    res = await client.put(f"{SKEMA_RS_ADDESS}/mathml/amr", data=payload)
+    res = await client.put(f"{SKEMA_RS_ADDESS}/mathml/amr", json=payload)
     if res.status_code != 200:
         return JSONResponse(
             status_code=400,
@@ -98,7 +98,7 @@ async def equations_to_latex(data: UploadFile, client: httpx.AsyncClient = Depen
     mml_res = get_mathml_from_bytes(image_bytes, image2mathml_db)
     proxy_url = f"{SKEMA_RS_ADDESS}/mathml/latex"
     print(f"Proxying request to {proxy_url}")
-    response = await client.post(proxy_url, data=mml_res)
+    response = await client.post(proxy_url, json=mml_res)
     # Check the response
     if response.status_code == 200:
         # The request was successful
@@ -132,7 +132,7 @@ async def equations_to_amr(data: schema.EquationLatexToAMR, client: httpx.AsyncC
         utils.clean_mml(eqn2mml.get_mathml_from_latex(tex)) for tex in data.equations
     ]
     payload = {"mathml": mml, "model": data.model}
-    res = await client.put(f"{SKEMA_RS_ADDESS}/mathml/amr", data=payload)
+    res = await client.put(f"{SKEMA_RS_ADDESS}/mathml/amr", json=payload)
     if res.status_code != 200:
         return JSONResponse(
             status_code=400,
@@ -148,7 +148,7 @@ async def equations_to_amr(data: schema.EquationLatexToAMR, client: httpx.AsyncC
 @router.post("/pmml/equations-to-amr", summary="Equations pMML → AMR")
 async def equations_to_amr(data: schema.MmlToAMR, client: httpx.AsyncClient = Depends(utils.get_client)):
     payload = {"mathml": data.equations, "model": data.model}
-    res = await client.put(f"{SKEMA_RS_ADDESS}/mathml/amr", data=payload)
+    res = await client.put(f"{SKEMA_RS_ADDESS}/mathml/amr", json=payload)
     if res.status_code != 200:
         return JSONResponse(
             status_code=400,
@@ -165,7 +165,7 @@ async def equations_to_amr(data: schema.MmlToAMR, client: httpx.AsyncClient = De
 async def code_snippets_to_pn_amr(system: code2fn.System, client: httpx.AsyncClient = Depends(utils.get_client)):
     gromet = await code2fn.fn_given_filepaths(system)
     gromet, logs = utils.fn_preprocessor(gromet)
-    res = await client.put(f"{SKEMA_RS_ADDESS}/models/PN", data=gromet)
+    res = await client.put(f"{SKEMA_RS_ADDESS}/models/PN", json=gromet)
     if res.status_code != 200:
         return JSONResponse(
             status_code=400,
@@ -202,8 +202,8 @@ async def code_snippets_to_rn_amr(system: code2fn.System):
 )
 async def repo_to_pn_amr(zip_file: UploadFile = File(), client: httpx.AsyncClient = Depends(utils.get_client)):
     gromet = await code2fn.fn_given_filepaths_zip(zip_file)
-    gromet, logs = utils.fn_preprocessor(gromet)
-    res = await client.put(f"{SKEMA_RS_ADDESS}/models/PN", data=gromet)
+    gromet, _ = utils.fn_preprocessor(gromet)
+    res = await client.put(f"{SKEMA_RS_ADDESS}/models/PN", json=gromet)
     if res.status_code != 200:
         return JSONResponse(
             status_code=400,

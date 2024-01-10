@@ -12,9 +12,8 @@ from skema.rest.workflows import (
 )
 from skema.rest.llm_proxy import Dynamics
 from skema.rest.proxies import SKEMA_RS_ADDESS
-from skema.rest import utils
 from skema.skema_py import server as code2fn
-import time
+import json
 import httpx
 import pytest
 
@@ -94,6 +93,8 @@ async def test_any_amr_chime_sir():
                       ),
                       client=client
                   )
+                  # code_snippet_response = json.loads(code_snippet_response.body)
+                  # print(f"code_snippet_response for test_any_amr_chime_sir: {code_snippet_response}")
                 if "model" in code_snippet_response:
                     code_snippet_response["header"]["name"] = "LLM-assisted code to amr model"
                     code_snippet_response["header"]["description"] = f"This model came from code file: {files[i]}"
