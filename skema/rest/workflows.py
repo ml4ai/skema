@@ -164,7 +164,10 @@ async def equations_to_amr(data: schema.MmlToAMR, client: httpx.AsyncClient = De
 @router.post("/code/snippets-to-pn-amr", summary="Code snippets → PetriNet AMR")
 async def code_snippets_to_pn_amr(system: code2fn.System, client: httpx.AsyncClient = Depends(utils.get_client)):
     gromet = await code2fn.fn_given_filepaths(system)
-    gromet, logs = utils.fn_preprocessor(gromet)
+    gromet, _ = utils.fn_preprocessor(gromet)
+    # print(f"gromet:{gromet}")
+    # print(f"client.follow_redirects:\t{client.follow_redirects}")
+    # print(f"client.timeout:\t{client.timeout}")
     res = await client.put(f"{SKEMA_RS_ADDESS}/models/PN", json=gromet)
     if res.status_code != 200:
         return JSONResponse(
