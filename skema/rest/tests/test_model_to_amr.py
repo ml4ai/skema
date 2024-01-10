@@ -12,6 +12,7 @@ from skema.rest.workflows import (
 )
 from skema.rest.llm_proxy import Dynamics
 from skema.rest.proxies import SKEMA_RS_ADDESS
+from skema.rest import utils
 from skema.skema_py.server import System
 import time
 
@@ -85,10 +86,11 @@ def test_any_amr_chime_sir():
                 time.sleep(0.5)
                 code_snippet_response = asyncio.run(
                         code_snippets_to_pn_amr(
-                            System(
+                            system=System(
                                 files=[files[i]],
                                 blobs=[blobs[i]],
-                            )
+                            ),
+                            client=utils.get_client()
                         )
                     )
                 if "model" in code_snippet_response:
@@ -182,10 +184,11 @@ def test_any_amr_sidarthe():
                 time.sleep(0.5)
                 code_snippet_response = asyncio.run(
                         code_snippets_to_pn_amr(
-                            System(
+                            system=System(
                                 files=[files[i]],
                                 blobs=[blobs[i]],
-                            )
+                            ),
+                            client=utils.get_client()
                         )
                     )
                 if "model" in code_snippet_response:
