@@ -122,7 +122,7 @@ async def get_lines_of_model(zip_file: UploadFile = File()) -> List[Dynamics]:
             function_name = parsed_output['model_function']
 
             # FIXME: we should rewrite things to avoid this need
-            time.sleep(0.5)
+            #time.sleep(0.5)
             system = code2fn.System(**single_snippet_payload)
             print(f"System:\t{system}")
             response_zip = await code2fn.fn_given_filepaths(system)
@@ -140,23 +140,25 @@ async def get_lines_of_model(zip_file: UploadFile = File()) -> List[Dynamics]:
                 if i == (metadata_idx - 1):
                     line_begin = metadata[0]['line_begin']
                     line_end =  metadata[0]['line_end']
+                    # if the line_begin of meta entry 2 (base 0) and meta entry 3 (base 0) are we add a slice from [meta2.line_begin, meta3.line_begin)
+            # to capture all the imports, return a Dynamics.block with 2 entries, both of which need to be concatenated to pass forward
+            file_line_begin = response_zip['modules'][0]['metadata_collection'][2][0]['line_begin']
+
+            code_line_begin = response_zip['modules'][0]['metadata_collection'][3][0]['line_begin'] - 1
+
+            if (file_line_begin != code_line_begin) and (code_line_begin > file_line_begin):
+                block.append(f"L{file_line_begin}-L{code_line_begin}")
+
+            block.append(f"L{line_begin}-L{line_end}")
         except Exception as e:
             print("Failed to parse dynamics")
             print(f"e:\t{e}")
             description = "Failed to parse dynamics"
             line_begin = 0
             line_end = 0
+            block.append(f"L{line_begin}-L{line_end}")
 
-        # if the line_begin of meta entry 2 (base 0) and meta entry 3 (base 0) are we add a slice from [meta2.line_begin, meta3.line_begin)
-        # to capture all the imports, return a Dynamics.block with 2 entries, both of which need to be concatenated to pass forward
-        file_line_begin = response_zip['modules'][0]['metadata_collection'][2][0]['line_begin']
 
-        code_line_begin = response_zip['modules'][0]['metadata_collection'][3][0]['line_begin'] - 1
-
-        if file_line_begin != code_line_begin:
-            block.append(f"L{file_line_begin}-L{code_line_begin}")
-
-        block.append(f"L{line_begin}-L{line_end}")
 
 
         output = Dynamics(name=file, description=description, block=block)

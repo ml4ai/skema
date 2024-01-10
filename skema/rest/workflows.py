@@ -281,7 +281,7 @@ async def llm_assisted_codebase_to_pn_amr(zip_file: UploadFile = File()):
             else:
                 blobs[i] = "".join(blobs[i].splitlines(keepends=True)[line_begin[i]:line_end[i]])
             try:
-                time.sleep(0.5)
+                #time.sleep(0.5)
                 print(f"Time call code-snippets: {time.time()}")
                 print(blobs[i])
                 code_snippet_response = await code_snippets_to_pn_amr(
