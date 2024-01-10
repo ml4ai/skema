@@ -5,6 +5,7 @@ from fastapi import Depends, FastAPI, Response, status
 from fastapi.responses import PlainTextResponse
 
 from skema.rest import (
+    config,
     schema,
     workflows,
     proxies,
@@ -232,6 +233,7 @@ async def environment_variables() -> Dict:
         "SKEMA_GRAPH_DB_HOST": proxies.SKEMA_GRAPH_DB_HOST,
         "SKEMA_GRAPH_DB_PORT": proxies.SKEMA_GRAPH_DB_PORT,
         "SKEMA_RS_ADDRESS": proxies.SKEMA_RS_ADDESS,
+        "SKEMA_RS_DEFAULT_TIMEOUT": config.SKEMA_RS_DEFAULT_TIMEOUT,
         
         "SKEMA_MATHJAX_PROTOCOL": proxies.SKEMA_MATHJAX_PROTOCOL,
         "SKEMA_MATHJAX_HOST": proxies.SKEMA_MATHJAX_HOST,

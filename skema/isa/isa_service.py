@@ -49,7 +49,7 @@ async def align_eqns(
         "mml2": {isa_data.mml}
     }}
 
-    response=client.post("/isa/align-eqns", json=request)
+    response=requests.post("/isa/align-eqns", json=request)
     res = response.json()
     """
     (

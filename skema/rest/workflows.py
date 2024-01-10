@@ -17,7 +17,7 @@ from starlette.responses import JSONResponse
 from skema.img2mml import eqn2mml
 from skema.img2mml.eqn2mml import image2mathml_db
 from skema.img2mml.api import get_mathml_from_bytes
-from skema.rest import schema, utils, llm_proxy
+from skema.rest import config, schema, utils, llm_proxy
 from skema.rest.proxies import SKEMA_RS_ADDESS
 from skema.skema_py import server as code2fn
 
@@ -58,7 +58,7 @@ async def equations_to_amr(data: schema.EquationImagesToAMR, client: httpx.Async
     ]
     payload = {"mathml": mml, "model": data.model}
     # FIXME: why is this a PUT?
-    res = await client.put(f"{SKEMA_RS_ADDESS}/mathml/amr", json=payload)
+    res = await client.put(f"{SKEMA_RS_ADDESS}/mathml/amr", data=payload)
     if res.status_code != 200:
         return JSONResponse(
             status_code=400,
@@ -132,7 +132,7 @@ async def equations_to_amr(data: schema.EquationLatexToAMR, client: httpx.AsyncC
         utils.clean_mml(eqn2mml.get_mathml_from_latex(tex)) for tex in data.equations
     ]
     payload = {"mathml": mml, "model": data.model}
-    res = await client.put(f"{SKEMA_RS_ADDESS}/mathml/amr", json=payload)
+    res = await client.put(f"{SKEMA_RS_ADDESS}/mathml/amr", data=payload)
     if res.status_code != 200:
         return JSONResponse(
             status_code=400,
@@ -148,7 +148,7 @@ async def equations_to_amr(data: schema.EquationLatexToAMR, client: httpx.AsyncC
 @router.post("/pmml/equations-to-amr", summary="Equations pMML → AMR")
 async def equations_to_amr(data: schema.MmlToAMR, client: httpx.AsyncClient = Depends(utils.get_client)):
     payload = {"mathml": data.equations, "model": data.model}
-    res = await client.put(f"{SKEMA_RS_ADDESS}/mathml/amr", json=payload)
+    res = await client.put(f"{SKEMA_RS_ADDESS}/mathml/amr", data=payload)
     if res.status_code != 200:
         return JSONResponse(
             status_code=400,
@@ -165,12 +165,12 @@ async def equations_to_amr(data: schema.MmlToAMR, client: httpx.AsyncClient = De
 async def code_snippets_to_pn_amr(system: code2fn.System, client: httpx.AsyncClient = Depends(utils.get_client)):
     gromet = await code2fn.fn_given_filepaths(system)
     gromet, logs = utils.fn_preprocessor(gromet)
-    res = await client.put(f"{SKEMA_RS_ADDESS}/models/PN", json=gromet)
+    res = await client.put(f"{SKEMA_RS_ADDESS}/models/PN", data=gromet)
     if res.status_code != 200:
         return JSONResponse(
             status_code=400,
             content={
-                "error": f"MORAE PUT /models/PN failed to process payload",
+                "error": f"MORAE PUT /models/PN failed to process payload ({res.text})",
                 "payload": gromet,
             },
         )
@@ -203,7 +203,7 @@ async def code_snippets_to_rn_amr(system: code2fn.System):
 async def repo_to_pn_amr(zip_file: UploadFile = File(), client: httpx.AsyncClient = Depends(utils.get_client)):
     gromet = await code2fn.fn_given_filepaths_zip(zip_file)
     gromet, logs = utils.fn_preprocessor(gromet)
-    res = await client.put(f"{SKEMA_RS_ADDESS}/models/PN", json=gromet)
+    res = await client.put(f"{SKEMA_RS_ADDESS}/models/PN", data=gromet)
     if res.status_code != 200:
         return JSONResponse(
             status_code=400,
