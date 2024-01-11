@@ -97,8 +97,9 @@ async def equations_to_latex(data: UploadFile, client: httpx.AsyncClient = Depen
     # pass image bytes to get_mathml_from_bytes function
     mml_res = get_mathml_from_bytes(image_bytes, image2mathml_db)
     proxy_url = f"{SKEMA_RS_ADDESS}/mathml/latex"
+    print(f"MMML:\t{mml_res}")
     print(f"Proxying request to {proxy_url}")
-    response = await client.post(proxy_url, json=mml_res)
+    response = await client.post(proxy_url, data=mml_res)
     # Check the response
     if response.status_code == 200:
         # The request was successful
