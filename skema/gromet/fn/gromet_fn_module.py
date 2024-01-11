@@ -191,7 +191,7 @@ class GrometFNModule(GrometObject):
     def metadata_collection(self):
         """Gets the metadata_collection of this GrometFNModule.  # noqa: E501
 
-        Table (array) of lists (arrays) of metadata, where each list in the Table-array represents the collection of metadata associated with a GroMEt object.   # noqa: E501
+        Table (array) of lists (arrays) of metadata, where each list in the Table-array represents the collection of metadata associated with a GrometFNModule object.   # noqa: E501
 
         :return: The metadata_collection of this GrometFNModule.  # noqa: E501
         :rtype: list[list[Metadata]]
@@ -202,7 +202,7 @@ class GrometFNModule(GrometObject):
     def metadata_collection(self, metadata_collection):
         """Sets the metadata_collection of this GrometFNModule.
 
-        Table (array) of lists (arrays) of metadata, where each list in the Table-array represents the collection of metadata associated with a GroMEt object.   # noqa: E501
+        Table (array) of lists (arrays) of metadata, where each list in the Table-array represents the collection of metadata associated with a GrometFNModule object.   # noqa: E501
 
         :param metadata_collection: The metadata_collection of this GrometFNModule.  # noqa: E501
         :type: list[list[Metadata]]
