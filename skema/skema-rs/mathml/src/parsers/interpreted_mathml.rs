@@ -746,6 +746,58 @@ pub fn change_in_variable(input: Span) -> IResult<Ci> {
     Ok((s, change_in_var))
 }
 
+/// Parser handles vector identity notation.
+/// E.g. (v ⋅ ∇) u
+pub fn gradient_with_closed_paren(input: Span) -> IResult<Vec<MathExpression>> {
+    /*let(s,(mi, mi2)) = ws(tuple((
+        preceded(tag("<mo>(</mo>"), mi),
+        preceded(ws(tag("<mo>&#x22c5;</mo><mi>&#x2207;</mi><mo>)</mo>")), mi)
+        ))
+    )(input)?;*/
+    println!(".");
+    //println!("input={:?}", input);
+    /*for bvar in bound_vars {
+        let b = Mi(bvar.to_string());
+        expression.push(b.clone());
+    }*/
+    /*let(s, (mi, dd)) = ws(delimited(tag("<mo>(</mo>"),
+                                         pair(mi, dot),
+                                         pair(gradient,tag("<mo>)</mo>")))
+    )(input)?;*/
+    let (s, (lp, (mi, (op, gg)))) = ws(pair(tag("<mo>(</mo>"),
+                                      pair(mi, pair(ws(delimited(stag!("mo"), dot, etag!("mo"))), terminated(gradient, tag("<mo>)</mo>"))))
+    ))(input)?;
+    println!("..");
+    println!("mi={:?}", mi);
+    //let (s, _) = ws(delimited(stag!("mo"), dot, etag!("mo")))(input)?;
+    println!("cdot={:?}", op);
+    println!("gg={:?}", gg);
+    println!("...");
+
+    //let(s, (lp,mi, cdot, grad,rp)) = ws(tuple(( delimited(stag!("mo"), lparen, etag!("mo")),
+                                      //        mi, dot,  delimited(stag!("mi"), tag("∇"), etag!("mi")),
+                                                //delimited(stag!("mo"), rparen, etag!("mo")))))(input)?;
+    //let (s, (op, _)) = ws(pair(gradient, rparen))(input)?;
+    //println!("mi={:?}", mi);
+   // println!("cdot={:?}", dd);
+    //println!("mi2={:?}", mi2);
+    let mut expression: Vec<MathExpression> = Vec::new();
+    expression.push(MathExpression::Mi(mi));
+    println!("expression={:?}", expression);
+    expression.push(MathExpression::Mo(op));
+    println!("expression={:?}", expression);
+    println!("---");
+    let ci = Ci::new(
+        Some(Type::Real),
+        Box::new(MathExpression::Mi(Mi("Grad".to_string()))),
+        None,
+    );
+    expression.push(MathExpression::Ci(ci.clone()));
+    println!("expression={:?}", expression);
+    //let mi = Mi::new("Grad".to_string());
+    Ok((s, expression))
+}
+
 /// Parser handles e.g. `...` in the equation
 pub fn multiple_dots(input: Span) -> IResult<Ci> {
     let (s, x) = ws(delimited(tag("<mo>"), tag("…"), tag("</mo>")))(input)?;
@@ -791,6 +843,7 @@ pub fn munderover_summation(input: Span) -> IResult<(SumUnderOver, Mrow)> {
 /// assumes that expressions such as S(t) are actually univariate functions.
 pub fn math_expression(input: Span) -> IResult<MathExpression> {
     ws(alt((
+        map(gradient_with_closed_paren, |row| MathExpression::Mrow(Mrow(row))),
         alt((
             map(div, MathExpression::Mo),
             map(hat_operator, |(op, row)| {

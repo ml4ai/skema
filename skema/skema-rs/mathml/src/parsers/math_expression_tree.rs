@@ -2614,3 +2614,70 @@ fn test_vector_invariant_form() {
     let s_exp = exp.to_string();
     assert_eq!(s_exp, "(= (+ (PD(1, t) u) (× (+ (Hat(z) ζ) f) u)) (- (Grad (+ (* g (+ h b)) (* (/ 1 2) (⋅ u u))))))");
 }
+
+#[test]
+fn test_mi_dot_gradient() {
+    let input = "<math>
+    <mo>(</mo>
+    <mi>v</mi>
+    <mo>&#x22c5;</mo>
+    <mi>&#x2207;</mi>
+    <mo>)</mo>
+    <mi>u</mi>
+    </math>";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", exp);
+    let s_exp = exp.to_string();
+    println!("s_exp={:?}", s_exp);
+    assert_eq!(s_exp, "(* (⋅ v Grad) u)");
+}
+
+#[test]
+fn test_momentum_conservation() {
+    let input = "<math>
+    <msub>
+    <mi>∂</mi>
+    <mi>t</mi>
+    </msub>
+    <mi>u</mi>
+    <mo>=</mo>
+    <mo>−</mo>
+    <mo>(</mo>
+    <mi>v</mi>
+    <mo>⋅</mo>
+    <mi>∇</mi>
+    <mo>)</mo>
+    <mi>u</mi>
+    <mo>−</mo>
+    <mi>f</mi>
+    <mo>&#x00D7;</mo>
+    <mi>u</mi>
+    <mo>−</mo>
+    <msub>
+    <mi>∇</mi>
+    <mi>h</mi>
+    </msub>
+    <mo>(</mo>
+    <mi>p</mi>
+    <mo>+</mo>
+    <mi>g</mi>
+    <mi>η</mi>
+    <mo>)</mo>
+    <mo>−</mo>
+    <mi>∇</mi>
+    <mo>⋅</mo>
+    <mi>τ</mi>
+    <mo>+</mo>
+    <msub>
+    <mi>F</mi>
+    <mrow>
+    <mi>u</mi>
+    </mrow>
+    </msub>
+    </math>";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", exp);
+    let s_exp = exp.to_string();
+    println!("s_exp={:?}", s_exp);
+    assert_eq!(s_exp, "(= (PD(1, t) u) (+ (- (- (- (* (- (⋅ v Grad)) u) (× f u)) (* ∇_{h} (+ p (* g η)))) (Div τ)) F_{u}))");
+}
