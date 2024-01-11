@@ -3,7 +3,7 @@
 
 use crate::{
     ast::{
-        operator::{Derivative, HatOp, GradSub, Operator, PartialDerivative, SumUnderOver},
+        operator::{Derivative, GradSub, HatOp, Operator, PartialDerivative, SumUnderOver},
         Math, MathExpression, Mi, Mrow,
     },
     parsers::interpreted_mathml::interpreted_math,
@@ -246,7 +246,7 @@ fn unicode_to_latex(input: &str) -> String {
 }
 
 fn is_unary_operator(op: &Operator) -> bool {
-    match op {
+    matches!(op,
         Operator::Sqrt
         | Operator::Factorial
         | Operator::Exp
@@ -267,9 +267,7 @@ fn is_unary_operator(op: &Operator) -> bool {
         | Operator::Arcsec
         | Operator::Arccsc
         | Operator::Arccot
-        | Operator::Mean => true,
-        _ => false,
-    }
+        | Operator::Mean)
 }
 
 // Process parentheses in an expression and update the LaTeX string.
@@ -2543,6 +2541,8 @@ fn test_dry_static_energy() {
         <mn>1</mn>
       </mrow>
     </msub>
+    <mo>,</mo>
+    <mo>…</mo>
     <mo>)</mo>
   </mrow>
     </math>";
@@ -2627,9 +2627,7 @@ fn test_mi_dot_gradient() {
     <mi>u</mi>
     </math>";
     let exp = input.parse::<MathExpressionTree>().unwrap();
-    println!("exp={:?}", exp);
     let s_exp = exp.to_string();
-    println!("s_exp={:?}", s_exp);
     assert_eq!(s_exp, "(* (⋅ v Grad) u)");
 }
 
@@ -2677,8 +2675,6 @@ fn test_momentum_conservation() {
     </msub>
     </math>";
     let exp = input.parse::<MathExpressionTree>().unwrap();
-    println!("exp={:?}", exp);
     let s_exp = exp.to_string();
-    println!("s_exp={:?}", s_exp);
     assert_eq!(s_exp, "(= (PD(1, t) u) (+ (- (- (- (* (- (⋅ v Grad)) u) (× f u)) (Grad_h) (+ p (* g η)))) (Div τ)) F_{u}))");
 }

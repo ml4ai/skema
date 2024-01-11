@@ -6,7 +6,7 @@
 
 use crate::{
     ast::{
-        operator::{Derivative, HatOp, Operator, PartialDerivative, SumUnderOver, GradSub},
+        operator::{Derivative, GradSub, HatOp, Operator, PartialDerivative, SumUnderOver},
         Ci, Differential, HatComp, Math, MathExpression, Mi, Mrow, SummationMath, Type,
     },
     parsers::generic_mathml::{
@@ -58,7 +58,7 @@ fn parenthesized_msub_identifier(input: Span) -> IResult<Vec<Mi>> {
     let mo_comma = delimited(stag!("mo"), ws(tag(",")), etag!("mo"));
     let (s, bound_vars) = delimited(
         alt((mo_lparen, mo_mrow_lparen)),
-        separated_list1(mo_comma, msub),
+        separated_list1(mo_comma, alt((msub, multiple_dots))),
         alt((mo_mrow_rparen, mo_rparen)),
     )(input)?;
     let mut mi_func_of: Vec<Mi> = Vec::new();
@@ -745,7 +745,7 @@ pub fn change_in_variable(input: Span) -> IResult<Ci> {
         alt((tag("<mi>Δ</mi>"), tag("<mi>&#x0394;</mi>"))),
         math_expression,
     ))(input)?;
-    let temp_sum = format!("Δ{}", elements.to_string());
+    let temp_sum = format!("Δ{}", elements);
     let change_in_var = Ci::new(
         Some(Type::Real),
         Box::new(MathExpression::Mi(Mi(temp_sum.to_string()))),
@@ -757,64 +757,38 @@ pub fn change_in_variable(input: Span) -> IResult<Ci> {
 /// Parser handles vector identity notation.
 /// E.g. (v ⋅ ∇) u
 pub fn gradient_with_closed_paren(input: Span) -> IResult<Vec<MathExpression>> {
-    /*let(s,(mi, mi2)) = ws(tuple((
-        preceded(tag("<mo>(</mo>"), mi),
-        preceded(ws(tag("<mo>&#x22c5;</mo><mi>&#x2207;</mi><mo>)</mo>")), mi)
-        ))
-    )(input)?;*/
-    println!(".");
-    //println!("input={:?}", input);
-    /*for bvar in bound_vars {
-        let b = Mi(bvar.to_string());
-        expression.push(b.clone());
-    }*/
-    /*let(s, (mi, dd)) = ws(delimited(tag("<mo>(</mo>"),
-                                         pair(mi, dot),
-                                         pair(gradient,tag("<mo>)</mo>")))
-    )(input)?;*/
-    let (s, (lp, (mi, (op, gg)))) = ws(pair(tag("<mo>(</mo>"),
-                                      pair(mi, pair(ws(delimited(stag!("mo"), dot, etag!("mo"))), terminated(gradient, tag("<mo>)</mo>"))))
+    let (s, (_lp, (mi, (op, _gg)))) = ws(pair(
+        tag("<mo>(</mo>"),
+        pair(
+            mi,
+            pair(
+                ws(delimited(stag!("mo"), dot, etag!("mo"))),
+                terminated(gradient, tag("<mo>)</mo>")),
+            ),
+        ),
     ))(input)?;
-    println!("..");
-    println!("mi={:?}", mi);
-    //let (s, _) = ws(delimited(stag!("mo"), dot, etag!("mo")))(input)?;
-    println!("cdot={:?}", op);
-    println!("gg={:?}", gg);
-    println!("...");
-
-    //let(s, (lp,mi, cdot, grad,rp)) = ws(tuple(( delimited(stag!("mo"), lparen, etag!("mo")),
-                                      //        mi, dot,  delimited(stag!("mi"), tag("∇"), etag!("mi")),
-                                                //delimited(stag!("mo"), rparen, etag!("mo")))))(input)?;
-    //let (s, (op, _)) = ws(pair(gradient, rparen))(input)?;
-    //println!("mi={:?}", mi);
-   // println!("cdot={:?}", dd);
-    //println!("mi2={:?}", mi2);
     let mut expression: Vec<MathExpression> = Vec::new();
     expression.push(MathExpression::Mi(mi));
-    println!("expression={:?}", expression);
     expression.push(MathExpression::Mo(op));
-    println!("expression={:?}", expression);
-    println!("---");
     let ci = Ci::new(
         Some(Type::Real),
         Box::new(MathExpression::Mi(Mi("Grad".to_string()))),
         None,
     );
     expression.push(MathExpression::Ci(ci.clone()));
-    println!("expression={:?}", expression);
-    //let mi = Mi::new("Grad".to_string());
     Ok((s, expression))
 }
 
 /// Parser handles e.g. `...` in the equation
-pub fn multiple_dots(input: Span) -> IResult<Ci> {
+/// E.g. Q_i(s_{i-1}, T_{i-1}, ... )
+pub fn multiple_dots(input: Span) -> IResult<MathExpression> {
     let (s, x) = ws(delimited(tag("<mo>"), tag("…"), tag("</mo>")))(input)?;
     let ci = Ci::new(
         Some(Type::List),
         Box::new(MathExpression::Mi(Mi(x.to_string()))),
         None,
     );
-    Ok((s, ci))
+    Ok((s, MathExpression::Ci(ci)))
 }
 
 /// Handles summation as operator
@@ -851,8 +825,11 @@ pub fn munderover_summation(input: Span) -> IResult<(SumUnderOver, Mrow)> {
 /// assumes that expressions such as S(t) are actually univariate functions.
 pub fn math_expression(input: Span) -> IResult<MathExpression> {
     ws(alt((
-        alt((map(gradient_with_closed_paren, |row| MathExpression::Mrow(Mrow(row))),
-        map(gradient_subscript, MathExpression::Mo),
+        alt((
+            map(gradient_with_closed_paren, |row| {
+                MathExpression::Mrow(Mrow(row))
+            }),
+            map(gradient_subscript, MathExpression::Mo),
         )),
         alt((
             map(div, MathExpression::Mo),
@@ -1092,7 +1069,6 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
         }),
         map(ci_univariate_without_bounds, MathExpression::Ci),
         map(ci_subscript, MathExpression::Ci),
-        map(multiple_dots, MathExpression::Ci),
         map(
             ci_unknown_with_bounds,
             |Ci {
@@ -1128,300 +1104,6 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
         msubsup,
     )))(input)
 }
-/*pub fn math_expression(input: Span) -> IResult<MathExpression> {
-    ws(alt((
-        map(div, MathExpression::Mo),
-        map(
-            first_order_partial_derivative_partial_func,
-            |(
-                PartialDerivative {
-                    order,
-                    var_index,
-                    bound_var,
-                },
-                Ci {
-                    r#type,
-                    content,
-                    func_of,
-                },
-            )| {
-                MathExpression::Differential(Differential {
-                    diff: Box::new(MathExpression::Mo(Operator::PartialDerivative(
-                        PartialDerivative {
-                            order,
-                            var_index,
-                            bound_var,
-                        },
-                    ))),
-                    func: Box::new(MathExpression::Ci(Ci {
-                        r#type,
-                        content,
-                        func_of,
-                    })),
-                })
-            },
-        ),
-        alt((
-            ws(absolute_with_msup),
-            ws(paren_as_msup),
-            map(change_in_variable, MathExpression::Ci),
-            //sqrt,
-            map(
-                munderover_summation,
-                |(SumUnderOver { op, under, over }, comp)| {
-                    MathExpression::SummationMath(SummationMath {
-                        op: Box::new(MathExpression::Mo(Operator::SumUnderOver(SumUnderOver {
-                            op,
-                            under,
-                            over,
-                        }))),
-                        func: Box::new(MathExpression::Mrow(comp)),
-                    })
-                },
-            ),
-            map(
-                grad_func,
-                |(
-                    op,
-                    Ci {
-                        r#type,
-                        content,
-                        func_of,
-                    },
-                )| {
-                    MathExpression::Differential(Differential {
-                        diff: Box::new(MathExpression::Mo(op)),
-                        func: Box::new(MathExpression::Ci(Ci {
-                            r#type,
-                            content,
-                            func_of,
-                        })),
-                    })
-                },
-            ),
-            map(functions_of_grad, |(op, comp)| {
-                MathExpression::Differential(Differential {
-                    diff: Box::new(MathExpression::Mo(op)),
-                    func: Box::new(MathExpression::Mrow(comp)),
-                })
-            }),
-            map(hat_operator, |(op, row)| {
-                MathExpression::HatComp(HatComp {
-                    op: Box::new(op),
-                    comp: Box::new(row),
-                })
-            }),
-        )),
-        map(
-            first_order_derivative_leibniz_notation,
-            |(
-                Derivative {
-                    order,
-                    var_index,
-                    bound_var,
-                },
-                Ci {
-                    r#type,
-                    content,
-                    func_of,
-                },
-            )| {
-                MathExpression::Differential(Differential {
-                    diff: Box::new(MathExpression::Mo(Operator::Derivative(Derivative {
-                        order,
-                        var_index,
-                        bound_var,
-                    }))),
-                    func: Box::new(MathExpression::Ci(Ci {
-                        r#type,
-                        content,
-                        func_of,
-                    })),
-                })
-            },
-        ),
-        map(
-            first_order_partial_derivative_leibniz_notation,
-            |(
-                PartialDerivative {
-                    order,
-                    var_index,
-                    bound_var,
-                },
-                Ci {
-                    r#type,
-                    content,
-                    func_of,
-                },
-            )| {
-                MathExpression::Differential(Differential {
-                    diff: Box::new(MathExpression::Mo(Operator::PartialDerivative(
-                        PartialDerivative {
-                            order,
-                            var_index,
-                            bound_var,
-                        },
-                    ))),
-                    func: Box::new(MathExpression::Ci(Ci {
-                        r#type,
-                        content,
-                        func_of,
-                    })),
-                })
-            },
-        ),
-        map(
-            newtonian_derivative,
-            |(
-                Derivative {
-                    order,
-                    var_index,
-                    bound_var,
-                },
-                Ci {
-                    r#type,
-                    content,
-                    func_of,
-                },
-            )| {
-                MathExpression::Differential(Differential {
-                    diff: Box::new(MathExpression::Mo(Operator::Derivative(Derivative {
-                        order,
-                        var_index,
-                        bound_var,
-                    }))),
-                    func: Box::new(MathExpression::Ci(Ci {
-                        r#type,
-                        content,
-                        func_of,
-                    })),
-                })
-            },
-        ),
-        map(
-            ci_univariate_with_bounds,
-            |Ci {
-                 content, func_of, ..
-             }| {
-                MathExpression::Ci(Ci {
-                    r#type: Some(Type::Real),
-                    content,
-                    func_of,
-                })
-            },
-        ),
-        map(
-            ci_subscript_func,
-            |Ci {
-                 content, func_of, ..
-             }| {
-                MathExpression::Ci(Ci {
-                    r#type: Some(Type::Real),
-                    content,
-                    func_of,
-                })
-            },
-        ),
-        map(
-            first_order_with_func_in_parenthesis,
-            |(
-                Derivative {
-                    order,
-                    var_index,
-                    bound_var,
-                },
-                comp,
-            )| {
-                MathExpression::Differential(Differential {
-                    diff: Box::new(MathExpression::Mo(Operator::Derivative(Derivative {
-                        order,
-                        var_index,
-                        bound_var,
-                    }))),
-                    func: Box::new(MathExpression::Mrow(comp)),
-                })
-            },
-        ),
-        map(
-            first_order_partial_with_func_in_parenthesis,
-            |(
-                PartialDerivative {
-                    order,
-                    var_index,
-                    bound_var,
-                },
-                comp,
-            )| {
-                MathExpression::Differential(Differential {
-                    diff: Box::new(MathExpression::Mo(Operator::PartialDerivative(
-                        PartialDerivative {
-                            order,
-                            var_index,
-                            bound_var,
-                        },
-                    ))),
-                    func: Box::new(MathExpression::Mrow(comp)),
-                })
-            },
-        ),
-        map(ci_univariate_without_bounds, MathExpression::Ci),
-        map(ci_subscript, MathExpression::Ci),
-        map(multiple_dots, MathExpression::Ci),
-        map(
-            ci_unknown_with_bounds,
-            |Ci {
-                 content, func_of, ..
-             }| {
-                MathExpression::Ci(Ci {
-                    r#type: Some(Type::Real),
-                    content,
-                    func_of,
-                })
-            },
-        ),
-        map(ci_unknown_without_bounds, |Ci { content, .. }| {
-            MathExpression::Ci(Ci {
-                r#type: Some(Type::Real),
-                content,
-                func_of: None,
-            })
-        }),
-        alt((
-            map(
-                grad_func,
-                |(
-                    op,
-                    Ci {
-                        r#type,
-                        content,
-                        func_of,
-                    },
-                )| {
-                    MathExpression::Differential(Differential {
-                        diff: Box::new(MathExpression::Mo(op)),
-                        func: Box::new(MathExpression::Ci(Ci {
-                            r#type,
-                            content,
-                            func_of,
-                        })),
-                    })
-                },
-            ),
-            absolute,
-            sqrt,
-            map(operator, MathExpression::Mo),
-            map(gradient, MathExpression::Mo),
-            mn,
-            msub,
-            superscript,
-            mfrac,
-            mtext,
-            over_term,
-            map(mrow, MathExpression::Mrow),
-            msubsup,
-        )),
-    )))(input)
-}*/
 
 /// Parser for interpreted math expressions.
 /// testing MathML documents
