@@ -246,28 +246,30 @@ fn unicode_to_latex(input: &str) -> String {
 }
 
 fn is_unary_operator(op: &Operator) -> bool {
-    matches!(op,
+    matches!(
+        op,
         Operator::Sqrt
-        | Operator::Factorial
-        | Operator::Exp
-        | Operator::Power
-        | Operator::Grad
-        | Operator::Div
-        | Operator::Abs
-        | Operator::Derivative(_)
-        | Operator::Sin
-        | Operator::Cos
-        | Operator::Tan
-        | Operator::Sec
-        | Operator::Csc
-        | Operator::Cot
-        | Operator::Arcsin
-        | Operator::Arccos
-        | Operator::Arctan
-        | Operator::Arcsec
-        | Operator::Arccsc
-        | Operator::Arccot
-        | Operator::Mean)
+            | Operator::Factorial
+            | Operator::Exp
+            | Operator::Power
+            | Operator::Grad
+            | Operator::Div
+            | Operator::Abs
+            | Operator::Derivative(_)
+            | Operator::Sin
+            | Operator::Cos
+            | Operator::Tan
+            | Operator::Sec
+            | Operator::Csc
+            | Operator::Cot
+            | Operator::Arcsin
+            | Operator::Arccos
+            | Operator::Arctan
+            | Operator::Arcsec
+            | Operator::Arccsc
+            | Operator::Arccot
+            | Operator::Mean
+    )
 }
 
 // Process parentheses in an expression and update the LaTeX string.
@@ -415,6 +417,11 @@ impl MathExpressionTree {
                     Operator::Divide => content_mathml.push_str("<divide/>"),
                     Operator::Power => content_mathml.push_str("<power/>"),
                     Operator::Exp => content_mathml.push_str("<exp/>"),
+                    Operator::Abs => content_mathml.push_str("<abs/>"),
+                    Operator::Grad => content_mathml.push_str("<grad/>"),
+                    Operator::Div => content_mathml.push_str("<divergence/>"),
+                    Operator::Cos => content_mathml.push_str("<cos/>"),
+                    Operator::Sin => content_mathml.push_str("<sin/>"),
                     Operator::Derivative(Derivative {
                         order,
                         var_index,
@@ -1477,6 +1484,8 @@ fn test_trig_cos() {
     </math>
     ";
     let exp = input.parse::<MathExpressionTree>().unwrap();
+    let cmml = exp.to_cmml();
+    assert_eq!(cmml, "<apply><cos/><ci>x</ci></apply>");
     let s_exp = exp.to_string();
     assert_eq!(s_exp, "(Cos x)");
 }
@@ -1620,6 +1629,8 @@ fn test_grad() {
         </math>
     ";
     let exp = input.parse::<MathExpressionTree>().unwrap();
+    let cmml = exp.to_cmml();
+    assert_eq!(cmml, "<apply><grad/><ci>H</ci></apply>");
     let s_exp = exp.to_string();
     assert_eq!(s_exp, "(Grad H)");
 }
@@ -1748,6 +1759,8 @@ fn test_divergence() {
     </math>
     ";
     let exp = input.parse::<MathExpressionTree>().unwrap();
+    let cmml = exp.to_cmml();
+    assert_eq!(cmml, "<apply><divergence/><ci>H</ci></apply>");
     let s_exp = exp.to_string();
     assert_eq!(s_exp, "(Div H)");
 }
