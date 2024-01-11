@@ -33,6 +33,12 @@ pub struct HatOp {
     pub comp: Box<MathExpression>,
 }
 
+/// Handles grad operations with subscript. E.g. ∇_{x}
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
+pub struct GradSub {
+    pub sub: Box<MathExpression>,
+}
+
 #[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
 pub enum Operator {
     Add,
@@ -49,6 +55,7 @@ pub enum Operator {
     Power,
     Comma,
     Grad,
+    GradSub(GradSub),
     Dot,
     Period,
     Div,
@@ -122,6 +129,9 @@ impl fmt::Display for Operator {
             Operator::Arccot => write!(f, "Arccot"),
             Operator::Mean => write!(f, "Mean"),
             Operator::Grad => write!(f, "Grad"),
+            Operator::GradSub(GradSub {sub}) =>{
+                write!(f, "Grad_{sub})")
+            }
             Operator::Dot => write!(f, "⋅"),
             Operator::Period => write!(f, ""),
             Operator::Div => write!(f, "Div"),

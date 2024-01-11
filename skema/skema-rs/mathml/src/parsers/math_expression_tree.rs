@@ -3,7 +3,7 @@
 
 use crate::{
     ast::{
-        operator::{Derivative, HatOp, Operator, PartialDerivative, SumUnderOver},
+        operator::{Derivative, HatOp, GradSub, Operator, PartialDerivative, SumUnderOver},
         Math, MathExpression, Mi, Mrow,
     },
     parsers::interpreted_mathml::interpreted_math,
@@ -1029,6 +1029,7 @@ fn prefix_binding_power(op: &Operator) -> ((), u8) {
         Operator::Hat => ((), 25),
         //Operator::Cross => ((), 25),
         Operator::Grad => ((), 25),
+        Operator::GradSub(GradSub { .. }) => ((), 25),
         Operator::Derivative(Derivative { .. }) => ((), 25),
         Operator::PartialDerivative(PartialDerivative { .. }) => ((), 25),
         Operator::Div => ((), 25),
@@ -2679,5 +2680,5 @@ fn test_momentum_conservation() {
     println!("exp={:?}", exp);
     let s_exp = exp.to_string();
     println!("s_exp={:?}", s_exp);
-    assert_eq!(s_exp, "(= (PD(1, t) u) (+ (- (- (- (* (- (⋅ v Grad)) u) (× f u)) (* ∇_{h} (+ p (* g η)))) (Div τ)) F_{u}))");
+    assert_eq!(s_exp, "(= (PD(1, t) u) (+ (- (- (- (* (- (⋅ v Grad)) u) (× f u)) (Grad_h) (+ p (* g η)))) (Div τ)) F_{u}))");
 }

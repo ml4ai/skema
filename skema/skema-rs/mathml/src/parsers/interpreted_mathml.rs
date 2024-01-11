@@ -6,7 +6,7 @@
 
 use crate::{
     ast::{
-        operator::{Derivative, HatOp, Operator, PartialDerivative, SumUnderOver},
+        operator::{Derivative, HatOp, Operator, PartialDerivative, SumUnderOver, GradSub},
         Ci, Differential, HatComp, Math, MathExpression, Mi, Mrow, SummationMath, Type,
     },
     parsers::generic_mathml::{
@@ -672,6 +672,14 @@ pub fn gradient(input: Span) -> IResult<Operator> {
     Ok((s, op))
 }
 
+/// Gradient sub  E.g. ∇_{x}
+pub fn gradient_subscript(input: Span) -> IResult<Operator> {
+    let (s, _) = tuple((stag!("msub"), gradient))(input)?;
+    let (s, mi) = ws(terminated(mi, etag!("msub")))(s)?;
+    let grad_sub = Operator::GradSub(GradSub::new(Box::new(MathExpression::Mi(mi.clone()))));
+    Ok((s, grad_sub))
+}
+
 pub fn grad_func(input: Span) -> IResult<(Operator, Ci)> {
     let (s, (op, id)) = ws(pair(gradient, mi))(input)?;
     let ci = Ci::new(Some(Type::Real), Box::new(MathExpression::Mi(id)), None);
@@ -843,7 +851,9 @@ pub fn munderover_summation(input: Span) -> IResult<(SumUnderOver, Mrow)> {
 /// assumes that expressions such as S(t) are actually univariate functions.
 pub fn math_expression(input: Span) -> IResult<MathExpression> {
     ws(alt((
-        map(gradient_with_closed_paren, |row| MathExpression::Mrow(Mrow(row))),
+        alt((map(gradient_with_closed_paren, |row| MathExpression::Mrow(Mrow(row))),
+        map(gradient_subscript, MathExpression::Mo),
+        )),
         alt((
             map(div, MathExpression::Mo),
             map(hat_operator, |(op, row)| {
