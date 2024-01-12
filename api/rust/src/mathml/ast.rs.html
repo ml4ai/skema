@@ -127,14 +127,39 @@
 <a href="#127" id="127">127</a>
 <a href="#128" id="128">128</a>
 <a href="#129" id="129">129</a>
+<a href="#130" id="130">130</a>
+<a href="#131" id="131">131</a>
+<a href="#132" id="132">132</a>
+<a href="#133" id="133">133</a>
+<a href="#134" id="134">134</a>
+<a href="#135" id="135">135</a>
+<a href="#136" id="136">136</a>
+<a href="#137" id="137">137</a>
+<a href="#138" id="138">138</a>
+<a href="#139" id="139">139</a>
+<a href="#140" id="140">140</a>
+<a href="#141" id="141">141</a>
+<a href="#142" id="142">142</a>
+<a href="#143" id="143">143</a>
+<a href="#144" id="144">144</a>
+<a href="#145" id="145">145</a>
+<a href="#146" id="146">146</a>
+<a href="#147" id="147">147</a>
+<a href="#148" id="148">148</a>
+<a href="#149" id="149">149</a>
+<a href="#150" id="150">150</a>
+<a href="#151" id="151">151</a>
+<a href="#152" id="152">152</a>
+<a href="#153" id="153">153</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>derive_new::new;
 <span class="kw">use </span>std::fmt;
 
 <span class="kw">pub mod </span>operator;
 
 <span class="kw">use </span>operator::Operator;
+<span class="comment">//use crate::ast::MathExpression::SummationOp;
 
-<span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
+</span><span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
 </span><span class="kw">pub struct </span>Mi(<span class="kw">pub </span>String);
 
 <span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
@@ -169,6 +194,19 @@
     <span class="kw">pub </span>func: Box&lt;MathExpression&gt;,
 }
 
+<span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
+</span><span class="kw">pub struct </span>SummationMath {
+    <span class="kw">pub </span>op: Box&lt;MathExpression&gt;,
+    <span class="kw">pub </span>func: Box&lt;MathExpression&gt;,
+}
+
+<span class="doccomment">/// Hat operation
+</span><span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
+</span><span class="kw">pub struct </span>HatComp {
+    <span class="kw">pub </span>op: Box&lt;MathExpression&gt;,
+    <span class="kw">pub </span>comp: Box&lt;MathExpression&gt;,
+}
+
 <span class="doccomment">/// The MathExpression enum is not faithful to the corresponding element type in MathML 3
 /// (https://www.w3.org/TR/MathML3/appendixa.html#parsing_MathExpression)
 </span><span class="attr">#[derive(Debug, PartialOrd, Ord, PartialEq, Eq, Clone, Hash, Default, new)]
@@ -195,8 +233,10 @@
     <span class="comment">//GroupTuple(Vec&lt;MathExpression&gt;),
     </span>Ci(Ci),
     Differential(Differential),
+    SummationMath(SummationMath),
     AbsoluteSup(Box&lt;MathExpression&gt;, Box&lt;MathExpression&gt;),
     Absolute(Box&lt;MathExpression&gt;, Box&lt;MathExpression&gt;),
+    HatComp(HatComp),
     <span class="comment">//Differential(Box&lt;MathExpression&gt;, Box&lt;MathExpression&gt;),
     </span><span class="attr">#[default]
     </span><span class="prelude-val">None</span>,
@@ -239,6 +279,14 @@
                 <span class="macro">write!</span>(f, <span class="string">&quot;{superscript:?}&quot;</span>)
             }
             MathExpression::Mtext(text) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, text),
+            MathExpression::SummationMath(SummationMath { op, func }) =&gt; {
+                <span class="macro">write!</span>(f, <span class="string">&quot;{op}&quot;</span>)<span class="question-mark">?</span>;
+                <span class="macro">write!</span>(f, <span class="string">&quot;{func}&quot;</span>)
+            }
+            MathExpression::HatComp(HatComp { op, comp }) =&gt; {
+                <span class="macro">write!</span>(f, <span class="string">&quot;{op}&quot;</span>)<span class="question-mark">?</span>;
+                <span class="macro">write!</span>(f, <span class="string">&quot;{comp}&quot;</span>)
+            }
             expression =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{expression:?}&quot;</span>),
         }
     }

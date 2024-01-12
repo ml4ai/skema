@@ -639,6 +639,24 @@
 <a href="#639" id="639">639</a>
 <a href="#640" id="640">640</a>
 <a href="#641" id="641">641</a>
+<a href="#642" id="642">642</a>
+<a href="#643" id="643">643</a>
+<a href="#644" id="644">644</a>
+<a href="#645" id="645">645</a>
+<a href="#646" id="646">646</a>
+<a href="#647" id="647">647</a>
+<a href="#648" id="648">648</a>
+<a href="#649" id="649">649</a>
+<a href="#650" id="650">650</a>
+<a href="#651" id="651">651</a>
+<a href="#652" id="652">652</a>
+<a href="#653" id="653">653</a>
+<a href="#654" id="654">654</a>
+<a href="#655" id="655">655</a>
+<a href="#656" id="656">656</a>
+<a href="#657" id="657">657</a>
+<a href="#658" id="658">658</a>
+<a href="#659" id="659">659</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::ast::{
     operator::Operator,
     Math, MathExpression,
@@ -839,6 +857,11 @@
     <span class="prelude-val">Ok</span>((s, op))
 }
 
+<span class="kw">pub fn </span>divide(input: Span) -&gt; IResult&lt;Operator&gt; {
+    <span class="kw">let </span>(s, op) = value(Operator::Divide, alt((ws(tag(<span class="string">&quot;∕&quot;</span>)), ws(tag(<span class="string">&quot;&amp;#x2215;&quot;</span>)))))(input)<span class="question-mark">?</span>;
+    <span class="prelude-val">Ok</span>((s, op))
+}
+
 <span class="kw">pub fn </span>equals(input: Span) -&gt; IResult&lt;Operator&gt; {
     <span class="kw">let </span>(s, op) = value(Operator::Equals, ws(tag(<span class="string">&quot;=&quot;</span>)))(input)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((s, op))
@@ -869,12 +892,22 @@
     <span class="prelude-val">Ok</span>((s, op))
 }
 
+<span class="kw">pub fn </span>hat(input: Span) -&gt; IResult&lt;Operator&gt; {
+    <span class="kw">let </span>(s, op) = value(Operator::Hat, alt((ws(tag(<span class="string">&quot;^&quot;</span>)), ws(tag(<span class="string">&quot;&amp;#x5E;&quot;</span>)))))(input)<span class="question-mark">?</span>;
+    <span class="prelude-val">Ok</span>((s, op))
+}
+
 <span class="kw">pub fn </span>grad(input: Span) -&gt; IResult&lt;Operator&gt; {
     <span class="kw">let </span>(s, op) = value(Operator::Grad, alt((ws(tag(<span class="string">&quot;∇&quot;</span>)), ws(tag(<span class="string">&quot;&amp;#x2207;&quot;</span>)))))(input)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((s, op))
 }
 <span class="kw">pub fn </span>dot(input: Span) -&gt; IResult&lt;Operator&gt; {
     <span class="kw">let </span>(s, op) = value(Operator::Dot, alt((ws(tag(<span class="string">&quot;⋅&quot;</span>)), ws(tag(<span class="string">&quot;&amp;#x22c5;&quot;</span>)))))(input)<span class="question-mark">?</span>;
+    <span class="prelude-val">Ok</span>((s, op))
+}
+
+<span class="kw">pub fn </span>cross(input: Span) -&gt; IResult&lt;Operator&gt; {
+    <span class="kw">let </span>(s, op) = value(Operator::Cross, alt((ws(tag(<span class="string">&quot;×&quot;</span>)), ws(tag(<span class="string">&quot;&amp;#x00D7;&quot;</span>)))))(input)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((s, op))
 }
 
@@ -892,9 +925,12 @@
         lparen,
         rparen,
         mean,
+        hat,
         multiply,
+        divide,
         grad,
         dot,
+        cross,
         period,
         operator_other,
     ))(input)<span class="question-mark">?</span>;

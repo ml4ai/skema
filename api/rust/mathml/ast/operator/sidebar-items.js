@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["Operator"],"struct":["Derivative","PartialDerivative"]};
+window.SIDEBAR_ITEMS = {"enum":["Operator"],"struct":["Derivative","GradSub","HatOp","PartialDerivative","SumUnderOver"]};
