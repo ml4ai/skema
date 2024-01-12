@@ -129,7 +129,7 @@ impl fmt::Display for Operator {
             Operator::Arccot => write!(f, "Arccot"),
             Operator::Mean => write!(f, "Mean"),
             Operator::Grad => write!(f, "Grad"),
-            Operator::GradSub(GradSub {sub}) =>{
+            Operator::GradSub(GradSub { sub }) => {
                 write!(f, "Grad_{sub})")
             }
             Operator::Dot => write!(f, "⋅"),
