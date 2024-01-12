@@ -13,6 +13,11 @@ from skema.program_analysis.CAST2FN.model.cast import (
     Name,
     Var
 )
+from skema.program_analysis.CAST2FN.visitors.cast_to_agraph_visitor import (
+    CASTToAGraphVisitor,
+)
+from skema.program_analysis.CAST2FN.cast import CAST
+
 
 def check(result, expected = None):
     """ Test for match with the same datatypes. """
@@ -60,9 +65,21 @@ def cast(source):
     """ Return the MatlabToCast output """
     # there should only be one CAST object in the cast output list
     cast = MatlabToCast(source = source).out_cast
+    # the cast should be parsable
+    # assert validate(cast) == True
     # there should be one module in the CAST object
     assert len(cast.nodes) == 1
     module = cast.nodes[0]
     assert isinstance(module, Module)
     # return the module body node list
     return module.body
+
+def validate(cast):
+    """ Test that the cast can be parsed """
+    try:
+        foo = CASTToAGraphVisitor(cast)
+        foo.to_pdf("/dev/null")
+        return True
+    except:
+        return False
+
