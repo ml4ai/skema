@@ -1,3 +1,4 @@
+import itertools
 from typing import List, Dict
 from skema.program_analysis.CAST2FN.model.cast import SourceRef
 
@@ -24,6 +25,34 @@ CONTROL_CHARACTERS = [
     "not"
 ]
 
+# Whatever constructs we see in the left
+# part of the for loop construct
+# for LEFT in RIGHT: 
+FOR_LOOP_LEFT_TYPES = [
+    "identifier",
+    "tuple_pattern",
+    "pattern_list",
+    "list_pattern"
+]
+
+# Whatever constructs we see in the right
+# part of the for loop construct
+# for LEFT in RIGHT: 
+FOR_LOOP_RIGHT_TYPES = [
+    "call",
+    "identifier",
+    "list",
+    "tuple"
+]
+
+# Whatever constructs we see in the conditional
+# part of the while loop
+WHILE_COND_TYPES = [
+    "boolean_operator",
+    "call",
+    "comparison_operator"
+]
+
 class NodeHelper():
     def __init__(self, source: str, source_file_name: str):
         self.source = source
@@ -32,14 +61,16 @@ class NodeHelper():
         # get_identifier optimization variables
         self.source_lines = source.splitlines(keepends=True)
         self.line_lengths = [len(line) for line in self.source_lines]
-        self.line_length_sums = [sum(self.line_lengths[:i+1]) for i in range(len(self.source_lines))]
-        
+        self.line_length_sums = [0] + list(itertools.accumulate(self.line_lengths))
+    
     def get_identifier(self, node: Node) -> str:
         """Given a node, return the identifier it represents. ie. The code between node.start_point and node.end_point"""
         start_line, start_column = node.start_point
         end_line, end_column = node.end_point
 
-        start_index = self.line_length_sums[start_line-1] + start_column
+        # Edge case for when an identifier is on the very first line of the code
+        # We can't index into the line_length_sums
+        start_index = self.line_length_sums[start_line] + start_column        
         if start_line == end_line:
             end_index = start_index + (end_column-start_column)
         else:
