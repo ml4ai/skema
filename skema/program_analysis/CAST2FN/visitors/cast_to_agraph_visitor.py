@@ -596,7 +596,10 @@ class CASTToAGraphVisitor(CASTVisitor):
             return node_uid
         elif node.value_type == StructureType.TUPLE:
             node_uid = uuid.uuid4()
-            self.G.add_node(node_uid, label=f"Tuple (...)")
+            self.G.add_node(node_uid, label=f"Tuple")
+            tuple_elems = self.visit_list(node.value)
+            for elem_uid in tuple_elems:
+                self.G.add_edge(node_uid, elem_uid)
             return node_uid
         elif node.value_type == None:
             node_uid = uuid.uuid4()
