@@ -185,15 +185,16 @@ class MatlabToCast(object):
 
     def visit_boolean(self, node):
         &#34;&#34;&#34; Translate Tree-sitter boolean node &#34;&#34;&#34;
+        value_type = &#34;Boolean&#34;
         for child in node.children:
             # set the first letter to upper case for python
             value = child.type
             value = value[0].upper() + value[1:].lower()
             # store as string, use Python Boolean capitalization.
             return LiteralValue(
-                value_type=&#34;Boolean&#34;,
+                value_type=value_type,
                 value = value,
-                source_code_data_type=[&#34;matlab&#34;, MATLAB_VERSION, &#34;boolean&#34;],
+                source_code_data_type=[&#34;matlab&#34;, MATLAB_VERSION, value_type],
                 source_refs=[self.node_helper.get_source_ref(node)],
             )
 
@@ -423,10 +424,11 @@ class MatlabToCast(object):
         if len(values) &gt; 0:
             value = values[0]
 
+        value_type=&#34;List&#34;,
         return LiteralValue(
-            value_type=&#34;List&#34;,
+            value_type=value_type,
             value = value,
-            source_code_data_type=[&#34;matlab&#34;, MATLAB_VERSION, &#34;matrix&#34;],
+            source_code_data_type=[&#34;matlab&#34;, MATLAB_VERSION, value_type],
             source_refs=[self.node_helper.get_source_ref(node)],
         )
 
@@ -466,16 +468,18 @@ class MatlabToCast(object):
         literal_value = self.node_helper.get_identifier(node)
         # Check if this is a real value, or an Integer
         if &#34;e&#34; in literal_value.lower() or &#34;.&#34; in literal_value:
+            value_type = &#34;AbstractFloat&#34;
             return LiteralValue(
-                value_type=&#34;AbstractFloat&#34;,
+                value_type=value_type,
                 value=float(literal_value),
-                source_code_data_type=[&#34;matlab&#34;, MATLAB_VERSION, &#34;real&#34;],
+                source_code_data_type=[&#34;matlab&#34;, MATLAB_VERSION, value_type],
                 source_refs=[self.node_helper.get_source_ref(node)]
             )
+        value_type = &#34;Integer&#34;
         return LiteralValue(
-            value_type=&#34;Integer&#34;,
+            value_type=value_type,
             value=int(literal_value),
-            source_code_data_type=[&#34;matlab&#34;, MATLAB_VERSION, &#34;integer&#34;],
+            source_code_data_type=[&#34;matlab&#34;, MATLAB_VERSION, value_type],
             source_refs=[self.node_helper.get_source_ref(node)]
         )
 
@@ -494,10 +498,11 @@ class MatlabToCast(object):
         )
 
     def visit_string(self, node):
+        value_type = &#34;Character&#34;
         return LiteralValue(
-            value_type=&#34;Character&#34;,
+            value_type=value_type,
             value=self.node_helper.get_identifier(node),
-            source_code_data_type=[&#34;matlab&#34;, MATLAB_VERSION, &#34;character&#34;],
+            source_code_data_type=[&#34;matlab&#34;, MATLAB_VERSION, value_type],
             source_refs=[self.node_helper.get_source_ref(node)]
         )
 
@@ -519,10 +524,11 @@ class MatlabToCast(object):
             cell_node = get_first_child_by_type(case_node, &#34;cell&#34;)
             # multiple case arguments
             if (cell_node):
+                value_type=&#34;List&#34;,
                 operand = LiteralValue(
-                    value_type=&#34;List&#34;,
+                    value_type=value_type,
                     value = self.visit(cell_node),
-                    source_code_data_type=[&#34;matlab&#34;, MATLAB_VERSION, &#34;unknown&#34;],
+                    source_code_data_type=[&#34;matlab&#34;, MATLAB_VERSION, value_type],
                     source_refs=[self.node_helper.get_source_ref(cell_node)]
                 )
                 return self.get_operator(
@@ -731,15 +737,16 @@ class MatlabToCast(object):
 
     def visit_boolean(self, node):
         &#34;&#34;&#34; Translate Tree-sitter boolean node &#34;&#34;&#34;
+        value_type = &#34;Boolean&#34;
         for child in node.children:
             # set the first letter to upper case for python
             value = child.type
             value = value[0].upper() + value[1:].lower()
             # store as string, use Python Boolean capitalization.
             return LiteralValue(
-                value_type=&#34;Boolean&#34;,
+                value_type=value_type,
                 value = value,
-                source_code_data_type=[&#34;matlab&#34;, MATLAB_VERSION, &#34;boolean&#34;],
+                source_code_data_type=[&#34;matlab&#34;, MATLAB_VERSION, value_type],
                 source_refs=[self.node_helper.get_source_ref(node)],
             )
 
@@ -969,10 +976,11 @@ class MatlabToCast(object):
         if len(values) &gt; 0:
             value = values[0]
 
+        value_type=&#34;List&#34;,
         return LiteralValue(
-            value_type=&#34;List&#34;,
+            value_type=value_type,
             value = value,
-            source_code_data_type=[&#34;matlab&#34;, MATLAB_VERSION, &#34;matrix&#34;],
+            source_code_data_type=[&#34;matlab&#34;, MATLAB_VERSION, value_type],
             source_refs=[self.node_helper.get_source_ref(node)],
         )
 
@@ -1012,16 +1020,18 @@ class MatlabToCast(object):
         literal_value = self.node_helper.get_identifier(node)
         # Check if this is a real value, or an Integer
         if &#34;e&#34; in literal_value.lower() or &#34;.&#34; in literal_value:
+            value_type = &#34;AbstractFloat&#34;
             return LiteralValue(
-                value_type=&#34;AbstractFloat&#34;,
+                value_type=value_type,
                 value=float(literal_value),
-                source_code_data_type=[&#34;matlab&#34;, MATLAB_VERSION, &#34;real&#34;],
+                source_code_data_type=[&#34;matlab&#34;, MATLAB_VERSION, value_type],
                 source_refs=[self.node_helper.get_source_ref(node)]
             )
+        value_type = &#34;Integer&#34;
         return LiteralValue(
-            value_type=&#34;Integer&#34;,
+            value_type=value_type,
             value=int(literal_value),
-            source_code_data_type=[&#34;matlab&#34;, MATLAB_VERSION, &#34;integer&#34;],
+            source_code_data_type=[&#34;matlab&#34;, MATLAB_VERSION, value_type],
             source_refs=[self.node_helper.get_source_ref(node)]
         )
 
@@ -1040,10 +1050,11 @@ class MatlabToCast(object):
         )
 
     def visit_string(self, node):
+        value_type = &#34;Character&#34;
         return LiteralValue(
-            value_type=&#34;Character&#34;,
+            value_type=value_type,
             value=self.node_helper.get_identifier(node),
-            source_code_data_type=[&#34;matlab&#34;, MATLAB_VERSION, &#34;character&#34;],
+            source_code_data_type=[&#34;matlab&#34;, MATLAB_VERSION, value_type],
             source_refs=[self.node_helper.get_source_ref(node)]
         )
 
@@ -1065,10 +1076,11 @@ class MatlabToCast(object):
             cell_node = get_first_child_by_type(case_node, &#34;cell&#34;)
             # multiple case arguments
             if (cell_node):
+                value_type=&#34;List&#34;,
                 operand = LiteralValue(
-                    value_type=&#34;List&#34;,
+                    value_type=value_type,
                     value = self.visit(cell_node),
-                    source_code_data_type=[&#34;matlab&#34;, MATLAB_VERSION, &#34;unknown&#34;],
+                    source_code_data_type=[&#34;matlab&#34;, MATLAB_VERSION, value_type],
                     source_refs=[self.node_helper.get_source_ref(cell_node)]
                 )
                 return self.get_operator(
@@ -1333,15 +1345,16 @@ class MatlabToCast(object):
 </summary>
 <pre><code class="python">def visit_boolean(self, node):
     &#34;&#34;&#34; Translate Tree-sitter boolean node &#34;&#34;&#34;
+    value_type = &#34;Boolean&#34;
     for child in node.children:
         # set the first letter to upper case for python
         value = child.type
         value = value[0].upper() + value[1:].lower()
         # store as string, use Python Boolean capitalization.
         return LiteralValue(
-            value_type=&#34;Boolean&#34;,
+            value_type=value_type,
             value = value,
-            source_code_data_type=[&#34;matlab&#34;, MATLAB_VERSION, &#34;boolean&#34;],
+            source_code_data_type=[&#34;matlab&#34;, MATLAB_VERSION, value_type],
             source_refs=[self.node_helper.get_source_ref(node)],
         )</code></pre>
 </details>
@@ -1643,10 +1656,11 @@ class MatlabToCast(object):
     if len(values) &gt; 0:
         value = values[0]
 
+    value_type=&#34;List&#34;,
     return LiteralValue(
-        value_type=&#34;List&#34;,
+        value_type=value_type,
         value = value,
-        source_code_data_type=[&#34;matlab&#34;, MATLAB_VERSION, &#34;matrix&#34;],
+        source_code_data_type=[&#34;matlab&#34;, MATLAB_VERSION, value_type],
         source_refs=[self.node_helper.get_source_ref(node)],
     )</code></pre>
 </details>
@@ -1716,16 +1730,18 @@ class MatlabToCast(object):
     literal_value = self.node_helper.get_identifier(node)
     # Check if this is a real value, or an Integer
     if &#34;e&#34; in literal_value.lower() or &#34;.&#34; in literal_value:
+        value_type = &#34;AbstractFloat&#34;
         return LiteralValue(
-            value_type=&#34;AbstractFloat&#34;,
+            value_type=value_type,
             value=float(literal_value),
-            source_code_data_type=[&#34;matlab&#34;, MATLAB_VERSION, &#34;real&#34;],
+            source_code_data_type=[&#34;matlab&#34;, MATLAB_VERSION, value_type],
             source_refs=[self.node_helper.get_source_ref(node)]
         )
+    value_type = &#34;Integer&#34;
     return LiteralValue(
-        value_type=&#34;Integer&#34;,
+        value_type=value_type,
         value=int(literal_value),
-        source_code_data_type=[&#34;matlab&#34;, MATLAB_VERSION, &#34;integer&#34;],
+        source_code_data_type=[&#34;matlab&#34;, MATLAB_VERSION, value_type],
         source_refs=[self.node_helper.get_source_ref(node)]
     )</code></pre>
 </details>
@@ -1777,10 +1793,11 @@ class MatlabToCast(object):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def visit_string(self, node):
+    value_type = &#34;Character&#34;
     return LiteralValue(
-        value_type=&#34;Character&#34;,
+        value_type=value_type,
         value=self.node_helper.get_identifier(node),
-        source_code_data_type=[&#34;matlab&#34;, MATLAB_VERSION, &#34;character&#34;],
+        source_code_data_type=[&#34;matlab&#34;, MATLAB_VERSION, value_type],
         source_refs=[self.node_helper.get_source_ref(node)]
     )</code></pre>
 </details>
@@ -1812,10 +1829,11 @@ class MatlabToCast(object):
         cell_node = get_first_child_by_type(case_node, &#34;cell&#34;)
         # multiple case arguments
         if (cell_node):
+            value_type=&#34;List&#34;,
             operand = LiteralValue(
-                value_type=&#34;List&#34;,
+                value_type=value_type,
                 value = self.visit(cell_node),
-                source_code_data_type=[&#34;matlab&#34;, MATLAB_VERSION, &#34;unknown&#34;],
+                source_code_data_type=[&#34;matlab&#34;, MATLAB_VERSION, value_type],
                 source_refs=[self.node_helper.get_source_ref(cell_node)]
             )
             return self.get_operator(
