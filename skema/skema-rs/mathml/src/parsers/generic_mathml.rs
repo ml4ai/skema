@@ -198,6 +198,11 @@ pub fn multiply(input: Span) -> IResult<Operator> {
     Ok((s, op))
 }
 
+pub fn divide(input: Span) -> IResult<Operator> {
+    let (s, op) = value(Operator::Divide, alt((ws(tag("∕")), ws(tag("&#x2215;")))))(input)?;
+    Ok((s, op))
+}
+
 pub fn equals(input: Span) -> IResult<Operator> {
     let (s, op) = value(Operator::Equals, ws(tag("=")))(input)?;
     Ok((s, op))
@@ -228,12 +233,22 @@ pub fn mean(input: Span) -> IResult<Operator> {
     Ok((s, op))
 }
 
+pub fn hat(input: Span) -> IResult<Operator> {
+    let (s, op) = value(Operator::Hat, alt((ws(tag("^")), ws(tag("&#x5E;")))))(input)?;
+    Ok((s, op))
+}
+
 pub fn grad(input: Span) -> IResult<Operator> {
     let (s, op) = value(Operator::Grad, alt((ws(tag("∇")), ws(tag("&#x2207;")))))(input)?;
     Ok((s, op))
 }
 pub fn dot(input: Span) -> IResult<Operator> {
     let (s, op) = value(Operator::Dot, alt((ws(tag("⋅")), ws(tag("&#x22c5;")))))(input)?;
+    Ok((s, op))
+}
+
+pub fn cross(input: Span) -> IResult<Operator> {
+    let (s, op) = value(Operator::Cross, alt((ws(tag("×")), ws(tag("&#x00D7;")))))(input)?;
     Ok((s, op))
 }
 
@@ -251,9 +266,12 @@ pub fn operator(input: Span) -> IResult<Operator> {
         lparen,
         rparen,
         mean,
+        hat,
         multiply,
+        divide,
         grad,
         dot,
+        cross,
         period,
         operator_other,
     ))(input)?;
