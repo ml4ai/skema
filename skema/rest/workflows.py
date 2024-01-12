@@ -10,6 +10,7 @@ from typing import List
 from pathlib import Path
 import httpx
 import json
+import requests
 
 from fastapi import APIRouter, Depends, File, UploadFile, FastAPI
 from starlette.responses import JSONResponse
@@ -161,7 +162,7 @@ async def equations_to_amr(data: schema.MmlToAMR, client: httpx.AsyncClient = De
     return res.json()
 
 
-# code snippets -> fn -> petrinet amr
+# code snippets -> fn -> petrinet amr 
 @router.post("/code/snippets-to-pn-amr", summary="Code snippets → PetriNet AMR")
 async def code_snippets_to_pn_amr(system: code2fn.System, client: httpx.AsyncClient = Depends(utils.get_client)):
     gromet = await code2fn.fn_given_filepaths(system)
@@ -289,22 +290,14 @@ async def llm_assisted_codebase_to_pn_amr(zip_file: UploadFile = File(), client:
                 blobs[i] = "".join(blobs[i].splitlines(keepends=True)[line_begin[i]:line_end[i]])
             try:
                 print(f"Time call code-snippets: {time.time()}")
-                print(blobs[i])
-                code_snippet_response = await code_snippets_to_pn_amr(
-                        code2fn.System(
-                            files=[files[i]],
-                            blobs=[blobs[i]],
-                        ),
-                        client
-                    )
-                
-                code_snippet_response = json.loads(code_snippet_response.body)
+                gromet = await code2fn.fn_given_filepaths(code2fn.System(
+                             files=[files[i]],
+                             blobs=[blobs[i]],
+                         ))
+                gromet, _ = utils.fn_preprocessor(gromet)
+                code_snippet_response = await client.put(f"{SKEMA_RS_ADDESS}/models/PN", json=gromet)
+                code_snippet_response = code_snippet_response.json()
                 print(f"Time response code-snippets: {time.time()}")
-                print("-------------------")
-                print("-------------------")
-                print(code_snippet_response)
-                print("-------------------")
-                print("-------------------")
                 if "model" in code_snippet_response:
                     code_snippet_response["header"]["name"] = "LLM-assisted code to amr model"
                     code_snippet_response["header"]["description"] = f"This model came from code file: {files[i]}"
