@@ -345,7 +345,7 @@ async def repo_to_rn_amr(zip_file: UploadFile = File()):
         )
     return res.json()
 """
-
+"""
 # code snippets -> fn -> Vec<MET> -> ????
 @router.post("/isa/code-align", summary="ISA aided inference")
 async def code_snippets_to_isa_align(system: code2fn.System, client: httpx.AsyncClient = Depends(utils.get_client)):
@@ -372,7 +372,7 @@ async def code_snippets_to_isa_align(system: code2fn.System, client: httpx.Async
     #
     #
     return res.json()
-
+"""
 
 app = FastAPI()
 app.include_router(router)
