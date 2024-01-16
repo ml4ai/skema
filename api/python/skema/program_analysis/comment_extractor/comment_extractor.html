@@ -274,7 +274,7 @@ def extract_comments_multi(
     request: MultiFileCommentRequest,
 ) -&gt; MultiFileCommentResponse:
     &#34;&#34;&#34;Wrapper for processing multiple source files at a time.&#34;&#34;&#34;
-    return MultiFileCommentResponse.parse_obj(
+    return MultiFileCommentResponse(**
         {
             &#34;files&#34;: {
                 file_name: extract_comments_single(file_request)
@@ -335,7 +335,7 @@ def get_supported_languages() -&gt; SupportedLanguageResponse:
     request: MultiFileCommentRequest,
 ) -&gt; MultiFileCommentResponse:
     &#34;&#34;&#34;Wrapper for processing multiple source files at a time.&#34;&#34;&#34;
-    return MultiFileCommentResponse.parse_obj(
+    return MultiFileCommentResponse(**
         {
             &#34;files&#34;: {
                 file_name: extract_comments_single(file_request)

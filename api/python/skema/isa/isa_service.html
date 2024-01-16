@@ -29,11 +29,12 @@
 </summary>
 <pre><code class="python"># -*- coding: utf-8 -*-
 
-from fastapi import FastAPI, APIRouter, status
+from fastapi import Depends, FastAPI, APIRouter, status
 from skema.isa.lib import align_mathml_eqs
 import skema.isa.data as isa_data
+from skema.rest import utils
 from pydantic import BaseModel
-import requests
+import httpx
 
 from skema.rest.proxies import SKEMA_RS_ADDESS
 
@@ -52,8 +53,9 @@ class ISA_Result(BaseModel):
     response_model=int,
     status_code=status.HTTP_200_OK
 )
-async def healthcheck() -&gt; int:
-    return requests.get(f&#34;{SKEMA_RS_ADDESS}/ping&#34;).status_code
+async def healthcheck(client: httpx.AsyncClient = Depends(utils.get_client)) -&gt; int:
+    res = await client.get(f&#34;{SKEMA_RS_ADDESS}/ping&#34;)
+    return res.status_code
 
 
 @router.post(
@@ -76,7 +78,7 @@ async def align_eqns(
         &#34;mml2&#34;: {isa_data.mml}
     }}
 
-    response=client.post(&#34;/isa/align-eqns&#34;, json=request)
+    response=requests.post(&#34;/isa/align-eqns&#34;, json=request)
     res = response.json()
     &#34;&#34;&#34;
     (
@@ -139,7 +141,7 @@ async def align_eqns(
         &#34;mml2&#34;: {isa_data.mml}
     }}
 
-    response=client.post(&#34;/isa/align-eqns&#34;, json=request)
+    response=requests.post(&#34;/isa/align-eqns&#34;, json=request)
     res = response.json()
     &#34;&#34;&#34;
     (
@@ -159,7 +161,7 @@ async def align_eqns(
 </details>
 </dd>
 <dt id="skema.isa.isa_service.healthcheck"><code class="name flex">
-<span>async def <span class="ident">healthcheck</span></span>(<span>) ‑> int</span>
+<span>async def <span class="ident">healthcheck</span></span>(<span>client: httpx.AsyncClient = Depends(get_client)) ‑> int</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -173,8 +175,9 @@ async def align_eqns(
     response_model=int,
     status_code=status.HTTP_200_OK
 )
-async def healthcheck() -&gt; int:
-    return requests.get(f&#34;{SKEMA_RS_ADDESS}/ping&#34;).status_code</code></pre>
+async def healthcheck(client: httpx.AsyncClient = Depends(utils.get_client)) -&gt; int:
+    res = await client.get(f&#34;{SKEMA_RS_ADDESS}/ping&#34;)
+    return res.status_code</code></pre>
 </details>
 </dd>
 </dl>
