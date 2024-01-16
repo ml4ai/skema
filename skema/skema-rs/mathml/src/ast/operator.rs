@@ -1,4 +1,5 @@
 use crate::ast::Ci;
+use crate::ast::MathExpression;
 use derive_new::new;
 use std::fmt;
 use serde::Deserialize;
@@ -10,12 +11,33 @@ pub struct Derivative {
     pub var_index: u8,
     pub bound_var: Ci,
 }
+
 /// Partial derivative operator
 #[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize)]
 pub struct PartialDerivative {
     pub order: u8,
     pub var_index: u8,
     pub bound_var: Ci,
+}
+
+/// Summation operator with under and over components
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
+pub struct SumUnderOver {
+    pub op: Box<MathExpression>,
+    pub under: Box<MathExpression>,
+    pub over: Box<MathExpression>,
+}
+
+/// Hat operation
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
+pub struct HatOp {
+    pub comp: Box<MathExpression>,
+}
+
+/// Handles grad operations with subscript. E.g. ∇_{x}
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
+pub struct GradSub {
+    pub sub: Box<MathExpression>,
 }
 
 #[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize)]
@@ -34,6 +56,7 @@ pub enum Operator {
     Power,
     Comma,
     Grad,
+    GradSub(GradSub),
     Dot,
     Period,
     Div,
@@ -53,6 +76,11 @@ pub enum Operator {
     Arccsc,
     Arccot,
     Mean,
+    Sum,
+    SumUnderOver(SumUnderOver),
+    Cross,
+    Hat,
+    HatOp(HatOp),
     // Catchall for operators we haven't explicitly defined as enum variants yet.
     Other(String),
 }
@@ -69,7 +97,7 @@ impl fmt::Display for Operator {
             Operator::Lparen => write!(f, "("),
             Operator::Rparen => write!(f, ")"),
             Operator::Compose => write!(f, "."),
-            Operator::Comma => write!(f, ""),
+            Operator::Comma => write!(f, ","),
             Operator::Factorial => write!(f, "!"),
             Operator::Derivative(Derivative {
                 order,
@@ -102,10 +130,20 @@ impl fmt::Display for Operator {
             Operator::Arccot => write!(f, "Arccot"),
             Operator::Mean => write!(f, "Mean"),
             Operator::Grad => write!(f, "Grad"),
-            Operator::Dot => write!(f, "Dot"),
+            Operator::GradSub(GradSub {sub}) =>{
+                write!(f, "Grad_{sub})")
+            }
+            Operator::Dot => write!(f, "⋅"),
             Operator::Period => write!(f, ""),
             Operator::Div => write!(f, "Div"),
             Operator::Abs => write!(f, "Abs"),
+            Operator::Sum => write!(f, "∑"),
+            Operator::SumUnderOver(SumUnderOver { op, under, over }) => {
+                write!(f, "{op}_{{{under}}}^{{{over}}}")
+            }
+            Operator::Cross => write!(f, "×"),
+            Operator::Hat => write!(f, "Hat"),
+            Operator::HatOp(HatOp { comp }) => write!(f, "Hat({comp})"),
         }
     }
 }

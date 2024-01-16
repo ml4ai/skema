@@ -5,6 +5,7 @@ use serde::Deserialize;
 pub mod operator;
 
 use operator::Operator;
+//use crate::ast::MathExpression::SummationOp;
 
 #[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize)]
 pub struct Mi(pub String);
@@ -41,6 +42,19 @@ pub struct Differential {
     pub func: Box<MathExpression>,
 }
 
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
+pub struct SummationMath {
+    pub op: Box<MathExpression>,
+    pub func: Box<MathExpression>,
+}
+
+/// Hat operation
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
+pub struct HatComp {
+    pub op: Box<MathExpression>,
+    pub comp: Box<MathExpression>,
+}
+
 /// The MathExpression enum is not faithful to the corresponding element type in MathML 3
 /// (https://www.w3.org/TR/MathML3/appendixa.html#parsing_MathExpression)
 #[derive(Debug, PartialOrd, Ord, PartialEq, Eq, Clone, Hash, Default, new, Deserialize)]
@@ -67,8 +81,10 @@ pub enum MathExpression {
     //GroupTuple(Vec<MathExpression>),
     Ci(Ci),
     Differential(Differential),
+    SummationMath(SummationMath),
     AbsoluteSup(Box<MathExpression>, Box<MathExpression>),
     Absolute(Box<MathExpression>, Box<MathExpression>),
+    HatComp(HatComp),
     //Differential(Box<MathExpression>, Box<MathExpression>),
     #[default]
     None,
@@ -111,6 +127,14 @@ impl fmt::Display for MathExpression {
                 write!(f, "{superscript:?}")
             }
             MathExpression::Mtext(text) => write!(f, "{}", text),
+            MathExpression::SummationMath(SummationMath { op, func }) => {
+                write!(f, "{op}")?;
+                write!(f, "{func}")
+            }
+            MathExpression::HatComp(HatComp { op, comp }) => {
+                write!(f, "{op}")?;
+                write!(f, "{comp}")
+            }
             expression => write!(f, "{expression:?}"),
         }
     }

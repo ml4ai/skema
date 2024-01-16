@@ -14,7 +14,7 @@ def test_comments_get_supported_languages():
     response = client.get("/comment_service/comments-get-supported-languages")
     assert response.status_code == 200
     
-    languages = comment_service.SupportedLanguageResponse.parse_obj(response.json())
+    languages = comment_service.SupportedLanguageResponse(**response.json())
     assert isinstance(languages, comment_service.SupportedLanguageResponse)
     assert len(languages.languages) > 0
 
@@ -37,7 +37,7 @@ def test_comments_extract():
     response = client.post("/comment_service/comments-extract", json=request)
     assert response.status_code == 200
 
-    comments = comment_service.SingleFileCommentResponse.parse_obj(response.json())
+    comments = comment_service.SingleFileCommentResponse(**response.json())
     assert isinstance(comments, comment_service.SingleFileCommentResponse)
     
 
@@ -72,5 +72,5 @@ def test_comments_extract_zip():
         )
         assert response.status_code == 200
         
-        comments = comment_service.MultiFileCommentResponse.parse_obj(response.json())
+        comments = comment_service.MultiFileCommentResponse(**response.json())
         assert isinstance(comments, comment_service.MultiFileCommentResponse)
