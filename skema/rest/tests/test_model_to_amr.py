@@ -12,8 +12,10 @@ from skema.rest.workflows import (
 )
 from skema.rest.llm_proxy import Dynamics
 from skema.rest.proxies import SKEMA_RS_ADDESS
-from skema.skema_py.server import System
-import time
+from skema.skema_py import server as code2fn
+import json
+import httpx
+import pytest
 
 CHIME_SIR_URL = (
     "https://artifacts.askem.lum.ai/askem/data/models/zip-archives/CHIME-SIR-model.zip"
@@ -23,7 +25,8 @@ SIDARTHE_URL = (
     "https://artifacts.askem.lum.ai/askem/data/models/zip-archives/SIDARTHE.zip"
 )
 
-def test_any_amr_chime_sir():
+@pytest.mark.asyncio
+async def test_any_amr_chime_sir():
     """
     Unit test for checking that Chime-SIR model produces any AMR. This test zip contains 4 versions of CHIME SIR.
     This will test if just the core dynamics works, the whole script, and also rewritten scripts work. 
@@ -82,15 +85,16 @@ def test_any_amr_chime_sir():
             else:
                 blobs[i] = "".join(blobs[i].splitlines(keepends=True)[line_begin[i]:line_end[i]])
             try:
-                time.sleep(0.5)
-                code_snippet_response = asyncio.run(
-                        code_snippets_to_pn_amr(
-                            System(
-                                files=[files[i]],
-                                blobs=[blobs[i]],
-                            )
-                        )
-                    )
+                async with httpx.AsyncClient() as client:
+                  code_snippet_response = await code_snippets_to_pn_amr(
+                      system=code2fn.System(
+                          files=[files[i]],
+                          blobs=[blobs[i]],
+                      ),
+                      client=client
+                  )
+                  # code_snippet_response = json.loads(code_snippet_response.body)
+                  # print(f"code_snippet_response for test_any_amr_chime_sir: {code_snippet_response}")
                 if "model" in code_snippet_response:
                     code_snippet_response["header"]["name"] = "LLM-assisted code to amr model"
                     code_snippet_response["header"]["description"] = f"This model came from code file: {files[i]}"
@@ -99,8 +103,9 @@ def test_any_amr_chime_sir():
                 else:
                     print("snippets failure")
                     logging.append(f"{files[i]} failed to parse an AMR from the dynamics")
-            except:
+            except Exception as e:
                 print("Hit except to snippets failure")
+                print(f"Exception for test_any_amr_chime_sir:\t{e}")
                 logging.append(f"{files[i]} failed to parse an AMR from the dynamics")
     # we will return the amr with most states, in assumption it is the most "correct"
     # by default it returns the first entry
@@ -115,13 +120,15 @@ def test_any_amr_chime_sir():
                     amr = temp_amr
             except:
                 continue
-    except:
+    except Exception as e:
+        print(f"Exception for test_any_amr_chime_sir:\t{e}")
         amr = logging
     print(f"final amr: {amr}\n")
     # For this test, we are just checking that AMR was generated without crashing. We are not checking for accuracy.
     assert "model" in amr, f"'model' should be in AMR response, but got {amr}"
 
-def test_any_amr_sidarthe():
+@pytest.mark.asyncio
+async def test_any_amr_sidarthe():
     """
     Unit test for checking that Chime-SIR model produces any AMR. This test zip contains 4 versions of CHIME SIR.
     This will test if just the core dynamics works, the whole script, and also rewritten scripts work. 
@@ -179,15 +186,14 @@ def test_any_amr_sidarthe():
             else:
                 blobs[i] = "".join(blobs[i].splitlines(keepends=True)[line_begin[i]:line_end[i]])
             try:
-                time.sleep(0.5)
-                code_snippet_response = asyncio.run(
-                        code_snippets_to_pn_amr(
-                            System(
-                                files=[files[i]],
-                                blobs=[blobs[i]],
-                            )
-                        )
-                    )
+                async with httpx.AsyncClient() as client:
+                  code_snippet_response = await code_snippets_to_pn_amr(
+                      system=code2fn.System(
+                          files=[files[i]],
+                          blobs=[blobs[i]],
+                      ),
+                      client=client
+                  )
                 if "model" in code_snippet_response:
                     code_snippet_response["header"]["name"] = "LLM-assisted code to amr model"
                     code_snippet_response["header"]["description"] = f"This model came from code file: {files[i]}"
@@ -196,8 +202,9 @@ def test_any_amr_sidarthe():
                 else:
                     print("snippets failure")
                     logging.append(f"{files[i]} failed to parse an AMR from the dynamics")
-            except:
+            except Exception as e:
                 print("Hit except to snippets failure")
+                print(f"Exception for test_any_amr_sidarthe:\t{e}")
                 logging.append(f"{files[i]} failed to parse an AMR from the dynamics")
     # we will return the amr with most states, in assumption it is the most "correct"
     # by default it returns the first entry
@@ -212,7 +219,8 @@ def test_any_amr_sidarthe():
                     amr = temp_amr
             except:
                 continue
-    except:
+    except Exception as e:
+        print(f"Exception for final amr of test_any_amr_sidarthe:\t{e}")
         amr = logging
     print(f"final amr: {amr}\n")
     # For this test, we are just checking that AMR was generated without crashing. We are not checking for accuracy.

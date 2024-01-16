@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 
-from fastapi import FastAPI, APIRouter, status
+from fastapi import Depends, FastAPI, APIRouter, status
 from skema.isa.lib import align_mathml_eqs
 import skema.isa.data as isa_data
+from skema.rest import utils
 from pydantic import BaseModel
-import requests
+import httpx
 
 from skema.rest.proxies import SKEMA_RS_ADDESS
 
@@ -23,8 +24,9 @@ class ISA_Result(BaseModel):
     response_model=int,
     status_code=status.HTTP_200_OK
 )
-async def healthcheck() -> int:
-    return requests.get(f"{SKEMA_RS_ADDESS}/ping").status_code
+async def healthcheck(client: httpx.AsyncClient = Depends(utils.get_client)) -> int:
+    res = await client.get(f"{SKEMA_RS_ADDESS}/ping")
+    return res.status_code
 
 
 @router.post(
@@ -47,7 +49,7 @@ async def align_eqns(
         "mml2": {isa_data.mml}
     }}
 
-    response=client.post("/isa/align-eqns", json=request)
+    response=requests.post("/isa/align-eqns", json=request)
     res = response.json()
     """
     (

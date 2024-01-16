@@ -7,7 +7,6 @@ from pathlib import Path
 from typing import List, Dict, Optional
 from io import BytesIO
 from zipfile import ZipFile
-from urllib.request import urlopen
 from fastapi import APIRouter, FastAPI, status, Body, File, UploadFile
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
@@ -131,11 +130,11 @@ async def system_to_enriched_system(system: System) -> System:
     comments = {"files": {}}
     for file_path, result in zip(file_paths, results):
         comments["files"][str(file_path)] = result
-    system.comments = MultiFileCommentResponse.parse_obj(comments)
+    system.comments = MultiFileCommentResponse(**comments)
 
     return system
 
-
+# returns an abbreviated Dict representing a GrometFNModuleCollection
 async def system_to_gromet(system: System):
     """Convert a System to Gromet JSON"""
 

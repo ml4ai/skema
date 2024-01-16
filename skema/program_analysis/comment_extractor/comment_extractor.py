@@ -245,7 +245,7 @@ def extract_comments_multi(
     request: MultiFileCommentRequest,
 ) -> MultiFileCommentResponse:
     """Wrapper for processing multiple source files at a time."""
-    return MultiFileCommentResponse.parse_obj(
+    return MultiFileCommentResponse(**
         {
             "files": {
                 file_name: extract_comments_single(file_request)
