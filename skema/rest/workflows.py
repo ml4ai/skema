@@ -346,9 +346,9 @@ async def repo_to_rn_amr(zip_file: UploadFile = File()):
     return res.json()
 """
 
-# code snippets -> fn -> MET -> ????
+# code snippets -> fn -> Vec<MET> -> ????
 @router.post("/isa/code-align", summary="ISA aided inference")
-async def code_snippets_to_pn_amr(system: code2fn.System, client: httpx.AsyncClient = Depends(utils.get_client)):
+async def code_snippets_to_isa_align(system: code2fn.System, client: httpx.AsyncClient = Depends(utils.get_client)):
     gromet = await code2fn.fn_given_filepaths(system)
     gromet, _ = utils.fn_preprocessor(gromet)
     # print(f"gromet:{gromet}")
