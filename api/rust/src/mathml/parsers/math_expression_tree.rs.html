@@ -2704,7 +2704,7 @@
 <span class="kw">use </span>derive_new::new;
 <span class="kw">use </span>nom::error::Error;
 <span class="kw">use </span>regex::Regex;
-
+<span class="kw">use </span>serde::{Deserialize, Serialize};
 <span class="kw">use </span>std::{fmt, str::FromStr};
 
 <span class="attr">#[cfg(test)]
@@ -2712,7 +2712,7 @@
 <span class="doccomment">///New whitespace handler before parsing
 
 /// An S-expression like structure to represent mathematical expressions.
-</span><span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
+</span><span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
 </span><span class="kw">pub enum </span>MathExpressionTree {
     Atom(MathExpression),
     Cons(Operator, Vec&lt;MathExpressionTree&gt;),

@@ -155,17 +155,17 @@
 <span class="kw">use </span>std::fmt;
 
 <span class="kw">pub mod </span>operator;
-
+<span class="kw">use </span>serde::{Deserialize, Serialize};
 <span class="kw">use </span>operator::Operator;
 <span class="comment">//use crate::ast::MathExpression::SummationOp;
 
-</span><span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
+</span><span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
 </span><span class="kw">pub struct </span>Mi(<span class="kw">pub </span>String);
 
-<span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
+<span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
 </span><span class="kw">pub struct </span>Mrow(<span class="kw">pub </span>Vec&lt;MathExpression&gt;);
 
-<span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
+<span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
 </span><span class="kw">pub enum </span>Type {
     Integer,
     Rational,
@@ -181,27 +181,27 @@
     Matrix,
 }
 
-<span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
+<span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
 </span><span class="kw">pub struct </span>Ci {
     <span class="kw">pub </span>r#type: <span class="prelude-ty">Option</span>&lt;Type&gt;,
     <span class="kw">pub </span>content: Box&lt;MathExpression&gt;,
     <span class="kw">pub </span>func_of: <span class="prelude-ty">Option</span>&lt;Vec&lt;Ci&gt;&gt;,
 }
 
-<span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
+<span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
 </span><span class="kw">pub struct </span>Differential {
     <span class="kw">pub </span>diff: Box&lt;MathExpression&gt;,
     <span class="kw">pub </span>func: Box&lt;MathExpression&gt;,
 }
 
-<span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
+<span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
 </span><span class="kw">pub struct </span>SummationMath {
     <span class="kw">pub </span>op: Box&lt;MathExpression&gt;,
     <span class="kw">pub </span>func: Box&lt;MathExpression&gt;,
 }
 
 <span class="doccomment">/// Hat operation
-</span><span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
+</span><span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
 </span><span class="kw">pub struct </span>HatComp {
     <span class="kw">pub </span>op: Box&lt;MathExpression&gt;,
     <span class="kw">pub </span>comp: Box&lt;MathExpression&gt;,
@@ -209,7 +209,7 @@
 
 <span class="doccomment">/// The MathExpression enum is not faithful to the corresponding element type in MathML 3
 /// (https://www.w3.org/TR/MathML3/appendixa.html#parsing_MathExpression)
-</span><span class="attr">#[derive(Debug, PartialOrd, Ord, PartialEq, Eq, Clone, Hash, Default, new)]
+</span><span class="attr">#[derive(Debug, PartialOrd, Ord, PartialEq, Eq, Clone, Hash, Default, new, Deserialize, Serialize)]
 </span><span class="kw">pub enum </span>MathExpression {
     Mi(Mi),
     Mo(Operator),

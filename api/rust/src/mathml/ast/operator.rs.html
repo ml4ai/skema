@@ -146,13 +146,15 @@
 <a href="#146" id="146">146</a>
 <a href="#147" id="147">147</a>
 <a href="#148" id="148">148</a>
+<a href="#149" id="149">149</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::ast::Ci;
 <span class="kw">use </span><span class="kw">crate</span>::ast::MathExpression;
 <span class="kw">use </span>derive_new::new;
 <span class="kw">use </span>std::fmt;
+<span class="kw">use </span>serde::{Deserialize, Serialize};
 
 <span class="doccomment">/// Derivative operator, in line with Spivak notation: http://ceres-solver.org/spivak_notation.html
-</span><span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
+</span><span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
 </span><span class="kw">pub struct </span>Derivative {
     <span class="kw">pub </span>order: u8,
     <span class="kw">pub </span>var_index: u8,
@@ -160,7 +162,7 @@
 }
 
 <span class="doccomment">/// Partial derivative operator
-</span><span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
+</span><span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
 </span><span class="kw">pub struct </span>PartialDerivative {
     <span class="kw">pub </span>order: u8,
     <span class="kw">pub </span>var_index: u8,
@@ -168,7 +170,7 @@
 }
 
 <span class="doccomment">/// Summation operator with under and over components
-</span><span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
+</span><span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
 </span><span class="kw">pub struct </span>SumUnderOver {
     <span class="kw">pub </span>op: Box&lt;MathExpression&gt;,
     <span class="kw">pub </span>under: Box&lt;MathExpression&gt;,
@@ -176,18 +178,18 @@
 }
 
 <span class="doccomment">/// Hat operation
-</span><span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
+</span><span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
 </span><span class="kw">pub struct </span>HatOp {
     <span class="kw">pub </span>comp: Box&lt;MathExpression&gt;,
 }
 
 <span class="doccomment">/// Handles grad operations with subscript. E.g. ∇_{x}
-</span><span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
+</span><span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
 </span><span class="kw">pub struct </span>GradSub {
     <span class="kw">pub </span>sub: Box&lt;MathExpression&gt;,
 }
 
-<span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
+<span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
 </span><span class="kw">pub enum </span>Operator {
     Add,
     Multiply,

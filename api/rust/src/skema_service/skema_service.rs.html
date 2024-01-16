@@ -149,6 +149,8 @@
 <a href="#149" id="149">149</a>
 <a href="#150" id="150">150</a>
 <a href="#151" id="151">151</a>
+<a href="#152" id="152">152</a>
+<a href="#153" id="153">153</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>actix_web::{get, http::header::ContentType, web::Data, App, HttpResponse, HttpServer};
 <span class="kw">use </span>skema::config::Config;
 <span class="kw">use </span>skema::services::gromet;
@@ -209,6 +211,7 @@
             gromet::get_model_RN,
             gromet::model2PN,
             gromet::model2RN,
+            gromet::model2MET,
             ping,
             version
         ),
@@ -292,6 +295,7 @@
             .service(gromet::get_model_RN)
             .service(gromet::model2PN)
             .service(gromet::model2RN)
+            .service(gromet::model2MET)
             .service(ping)
             .service(version)
             .service(SwaggerUi::new(<span class="string">&quot;/docs/{_:.*}&quot;</span>).url(<span class="string">&quot;/api-doc/openapi.json&quot;</span>, openapi.clone()))
