@@ -330,14 +330,13 @@ pub async fn model2RN(
     ))
 }
 
-/// This returns a RegNet AMR from a gromet.
+/// This returns a MET vector from a gromet.
 #[allow(non_snake_case)]
 #[utoipa::path(
     request_body = ModuleCollection,
     responses(
         (
-            status = 200, description = "Successfully retrieved RN AMR",
-            body = Vec<MathExpressionTree>
+            status = 200, description = "Successfully retrieved MET"
         )
     )
 )]
