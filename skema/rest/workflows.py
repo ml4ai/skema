@@ -346,5 +346,33 @@ async def repo_to_rn_amr(zip_file: UploadFile = File()):
     return res.json()
 """
 
+# code snippets -> fn -> MET -> ????
+@router.post("/isa/code-align", summary="ISA aided inference")
+async def code_snippets_to_pn_amr(system: code2fn.System, client: httpx.AsyncClient = Depends(utils.get_client)):
+    gromet = await code2fn.fn_given_filepaths(system)
+    gromet, _ = utils.fn_preprocessor(gromet)
+    # print(f"gromet:{gromet}")
+    # print(f"client.follow_redirects:\t{client.follow_redirects}")
+    # print(f"client.timeout:\t{client.timeout}")
+    res = await client.put(f"{SKEMA_RS_ADDESS}/models/MET", json=gromet)
+    # res is a vector of MET's from the code (assuming it could extract correctly)
+    if res.status_code != 200:
+        return JSONResponse(
+            status_code=400,
+            content={
+                "error": f"MORAE PUT /models/PN failed to process payload ({res.text})",
+                "payload": gromet,
+            },
+        )
+    
+    # Liang, if you want to put your ISA portion here?
+    # ISA:
+    #
+    #
+    #
+    #
+    return res.json()
+
+
 app = FastAPI()
 app.include_router(router)
