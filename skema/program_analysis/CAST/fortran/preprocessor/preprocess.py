@@ -184,8 +184,10 @@ def run_c_preprocessor(source: str, include_base_path: Path) -> str:
 
 
 def convert_assigned(source: str) -> str:
-    """Convered ASSIGNED GO TO to COMPUTED GO TO"""
-    pass
+    """Convered ASSIGNED GO TO to a traditional GO TO"""
+    assign_regex = "assign (.*?) to (.*?)"
+    for match in re.finditer(assign_regex, source, re.IGNORECASE):
+        pass
 
 
 def convert_to_free_form(source: str) -> str:

@@ -142,18 +142,44 @@ async def system_to_gromet(system: System):
     # We maintain a log of warnings and error to pass back to the user.
     # This allows us to warn the user about unsupported file extensions.
     server_log = []
+    to_remove = []
+    for index, (file, blob) in enumerate(zip(system.files, system.blobs)):
+        valid = True
 
-    # Check for unsupported files before processing. They will be removed and the user will be warned.
-    unsupported_files = [
-        file
-        for file in system.files
-        if Path(file).suffix not in SUPPORTED_FILE_EXTENSIONS
-    ]
-    for file in unsupported_files:
-        unsupported_file_str = f"WARNING: Ingestion of file extension {Path(file).suffix} for file {file} is not supported and will be skipped."
-        print(unsupported_file_str)
-        system.files.remove(file)
-        server_log.append(unsupported_file_str)
+        # Itterate over parent directories to check for unsupported file paths
+        path_obj = Path(file)
+        while path_obj != path_obj.root:
+            if path_obj.is_dir():
+                if path_obj.name == "_MACOS":
+                    unsupported_file_str = f"WARNING: Ingestion of files in _MACOSX directory not supported. File {file} will be skipped. "
+                    valid = False
+                elif path_obj.name.startswith("."):
+                    unsupported_file_str = f"WARNING: File {file} is in a hidden directory and will be skipped."
+                    valid = False
+            path_obj = path_obj.parent
+
+        # Check file extension is in the list of supported file extensions
+        if Path(file).suffix not in SUPPORTED_FILE_EXTENSIONS:
+            unsupported_file_str = f"WARNING: Ingestion of file extension {Path(file).suffix} for file {file} is not supported and will be skipped."
+            valid = False
+        else:
+            # Check if source file is utf-8 encoded
+            try:
+                blob.decode("utf-8")
+            except:
+                unsupported_file_str = f"WARNING: File {file} is not utf-8 encoded and will be skipped"
+                valid = False
+        
+        if not valid:
+            to_remove.append(index)
+            print(unsupported_file_str)
+            server_log.append(unsupported_file_str)
+
+    # Remove files to prevent ingestion. Removed in reverse sorted order since each removal shifts the indecies.
+    for index in sorted(to_remove, reverse=True):
+        system.files.pop(index)
+        system.blobs.pop(index)
+    
 
     # If there are no supported files, then we will return an empty GrometFNModuleCollection with a top-level Debug metadata
     if len(system.files) == 0:
