@@ -611,9 +611,22 @@ impl MathExpressionTree {
                         process_expression_parentheses(&mut expression, &rest[0]);
                         expression.push('}');
                     }
+                    Operator::GradSub(x) => {
+                        expression.push_str("\\nabla_{");
+                        process_math_expression(&x.sub, &mut expression);
+                        expression.push('}');
+                        expression.push('{');
+                        process_expression_parentheses(&mut expression, &rest[0]);
+                        expression.push('}');
+                    }
                     Operator::Dot => {
                         process_expression_parentheses(&mut expression, &rest[0]);
                         expression.push_str(" \\cdot ");
+                        process_expression_parentheses(&mut expression, &rest[1]);
+                    }
+                    Operator::Cross => {
+                        process_expression_parentheses(&mut expression, &rest[0]);
+                        expression.push_str(" \\cross ");
                         process_expression_parentheses(&mut expression, &rest[1]);
                     }
                     Operator::Div => {
@@ -628,6 +641,13 @@ impl MathExpressionTree {
                         expression.push_str("\\frac{d ");
                         process_expression_parentheses(&mut expression, &rest[0]);
                         expression.push_str("}{d");
+                        process_math_expression(&d.bound_var.content, &mut expression);
+                        expression.push('}');
+                    }
+                    Operator::PartialDerivative(d) => {
+                        expression.push_str("\\frac{\\partial ");
+                        process_expression_parentheses(&mut expression, &rest[0]);
+                        expression.push_str("}{\\partial");
                         process_math_expression(&d.bound_var.content, &mut expression);
                         expression.push('}');
                     }
@@ -669,6 +689,13 @@ impl MathExpressionTree {
                     }
                     Operator::Mean => {
                         expression.push_str(&format!("\\langle {} \\rangle", rest[0].to_latex()));
+                    }
+                    Operator::HatOp(x) => {
+                        process_expression_parentheses(&mut expression, &rest[0]);
+                        expression.push_str("\\hat{");
+                        process_math_expression(&x.comp, &mut expression);
+                        expression.push('}');
+                        //expression.push_str( &rest[0].to_latex());
                     }
                     _ => {
                         expression = "".to_string();
@@ -1607,7 +1634,9 @@ fn test_absolute_value() {
     ";
     let exp = input.parse::<MathExpressionTree>().unwrap();
     let s_exp = exp.to_string();
+    let latex_exp= exp.to_latex();
     assert_eq!(s_exp, "(Abs (Grad H))");
+    assert_eq!(latex_exp, "\\left|\\nabla{H}\\right|");
 }
 #[test]
 fn test_another_absolute() {
@@ -2288,6 +2317,18 @@ fn test_sidarthe_equation() {
 }
 
 #[test]
+fn test_change_in_variable() {
+    let input = "<math>
+    <mi>&#x0394;</mi>
+    <mi>t</mi>
+</math>
+    ";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    let s_exp = exp.to_string();
+    println!("latex_exp = {:?}", exp.to_latex());
+    assert_eq!(s_exp, "Δt");
+}
+#[test]
 fn test_heating_rate() {
     let input = "<math>
     <msub>
@@ -2465,6 +2506,7 @@ fn test_cross_product() {
     let exp = input.parse::<MathExpressionTree>().unwrap();
     let s_exp = exp.to_string();
     assert_eq!(s_exp, "(× f u)");
+    assert_eq!(exp.to_latex(), "f \\cross u")
 }
 #[test]
 fn test_dot_product() {
@@ -2476,6 +2518,7 @@ fn test_dot_product() {
     let exp = input.parse::<MathExpressionTree>().unwrap();
     let s_exp = exp.to_string();
     assert_eq!(s_exp, "(⋅ f u)");
+    assert_eq!(exp.to_latex(), "f \\cdot u")
 }
 
 #[test]
@@ -2577,7 +2620,9 @@ fn test_hat_operator() {
     </math>";
     let exp = input.parse::<MathExpressionTree>().unwrap();
     let s_exp = exp.to_string();
+    println!("{:?}",exp.to_latex());
     assert_eq!(s_exp, "(Hat(z) ζ)");
+    assert_eq!(exp.to_latex(), "\\zeta\\hat{z}");
 }
 
 #[test]
@@ -2642,6 +2687,26 @@ fn test_mi_dot_gradient() {
     let exp = input.parse::<MathExpressionTree>().unwrap();
     let s_exp = exp.to_string();
     assert_eq!(s_exp, "(* (⋅ v Grad) u)");
+}
+
+#[test]
+fn test_gradient_sub(){
+    let input = "<math>
+    <msub>
+    <mi>∇</mi>
+    <mi>h</mi>
+    </msub>
+    <mo>(</mo>
+    <mi>p</mi>
+    <mo>+</mo>
+    <mi>g</mi>
+    <mi>η</mi>
+    <mo>)</mo>
+    </math>";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    let s_exp = exp.to_string();
+    assert_eq!(s_exp, "(Grad_h) (+ p (* g η)))");
+    assert_eq!(exp.to_latex(), "\\nabla_{h}{(p+(g*\\eta))}");
 }
 
 #[test]
