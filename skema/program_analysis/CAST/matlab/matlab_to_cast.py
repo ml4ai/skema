@@ -395,11 +395,10 @@ class MatlabToCast(object):
         if len(values) > 0:
             value = values[0]
 
-        value_type="List",
         return LiteralValue(
-            value_type=value_type,
+            value_type=StructureType.LIST,
             value = value,
-            source_code_data_type=["matlab", MATLAB_VERSION, value_type],
+            source_code_data_type=["matlab", MATLAB_VERSION, StructureType.LIST],
             source_refs=[self.node_helper.get_source_ref(node)],
         )
 
@@ -495,11 +494,10 @@ class MatlabToCast(object):
             cell_node = get_first_child_by_type(case_node, "cell")
             # multiple case arguments
             if (cell_node):
-                value_type="List",
                 operand = LiteralValue(
-                    value_type=value_type,
+                    value_type=StructureType.LIST,
                     value = self.visit(cell_node),
-                    source_code_data_type=["matlab", MATLAB_VERSION, value_type],
+                    source_code_data_type=["matlab", MATLAB_VERSION, StructureType.LIST],
                     source_refs=[self.node_helper.get_source_ref(cell_node)]
                 )
                 return self.get_operator(
