@@ -51,7 +51,7 @@ var srcIndex = JSON.parse('{\
 "dirs_sys":["",[],["lib.rs","xdg_user_dirs.rs"]],\
 "dyn_clone":["",[],["lib.rs","macros.rs"]],\
 "encoding_rs":["",[],["ascii.rs","big5.rs","data.rs","euc_jp.rs","euc_kr.rs","gb18030.rs","handles.rs","iso_2022_jp.rs","lib.rs","macros.rs","mem.rs","replacement.rs","shift_jis.rs","single_byte.rs","utf_16.rs","utf_8.rs","variant.rs","x_user_defined.rs"]],\
-"env_logger":["",[["filter",[],["mod.rs","regex.rs"]],["fmt",[["humantime",[],["extern_impl.rs","mod.rs"]],["writer",[["termcolor",[],["extern_impl.rs","mod.rs"]]],["atty.rs","mod.rs"]]],["mod.rs"]]],["lib.rs"]],\
+"env_logger":["",[["filter",[],["mod.rs","regex.rs"]],["fmt",[["writer",[["buffer",[],["mod.rs","termcolor.rs"]]],["atty.rs","mod.rs"]]],["humantime.rs","mod.rs","style.rs"]]],["lib.rs","logger.rs"]],\
 "equivalent":["",[],["lib.rs"]],\
 "fixedbitset":["",[],["lib.rs","range.rs"]],\
 "flate2":["",[["deflate",[],["bufread.rs","mod.rs","read.rs","write.rs"]],["ffi",[],["mod.rs","rust.rs"]],["gz",[],["bufread.rs","mod.rs","read.rs","write.rs"]],["zlib",[],["bufread.rs","mod.rs","read.rs","write.rs"]]],["bufreader.rs","crc.rs","lib.rs","mem.rs","zio.rs"]],\
