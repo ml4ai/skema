@@ -65,21 +65,20 @@ def cast(source):
     """ Return the MatlabToCast output """
     # there should only be one CAST object in the cast output list
     cast = MatlabToCast(source = source).out_cast
-    # the cast should be parsable
-    # assert validate(cast) == True
-    # there should be one module in the CAST object
+    # the CAST should be parsable into a graph
+    assert validate_graph_visit(cast) == True
+    # there should be one Module object in the CAST object
     assert len(cast.nodes) == 1
     module = cast.nodes[0]
     assert isinstance(module, Module)
     # return the module body node list
     return module.body
 
-def validate(cast):
-    """ Test that the cast can be parsed """
+def validate_graph_visit(cast):
+    """ Test that the graph visitor can fully traverse the CAST object """
     try:
-        foo = CASTToAGraphVisitor(cast)
-        foo.to_pdf("/dev/null")
+        foo = CASTToAGraphVisitor(cast).to_agraph()
         return True
-    except:
+    except Exception as e:
+        print(f"EXCEPTION: {e}")
         return False
-
