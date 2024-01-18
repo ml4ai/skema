@@ -1,14 +1,15 @@
 from pathlib import Path
-from fastapi.testclient import TestClient
+from httpx import AsyncClient
 from skema.rest.workflows import app
 import pytest
 import json
 
-client = TestClient(app)
+
 
 
 @pytest.mark.ci_only
-def test_post_image_to_latex():
+@pytest.mark.asyncio
+async def test_post_image_to_latex():
     """Test case for /images/equations-to-latex endpoint."""
 
     cwd = Path(__file__).parents[0]
@@ -18,7 +19,9 @@ def test_post_image_to_latex():
     }
 
     endpoint = "/images/equations-to-latex"
-    response = client.post(endpoint, files=files)
+    # see https://fastapi.tiangolo.com/advanced/async-tests/#async-tests
+    async with AsyncClient(app=app, base_url="http://eqn-to-latex-test") as ac:
+      response = await ac.post(endpoint, files=files)
     expected = "\\frac{d H}{dt}=\\nabla \\cdot {(\\Gamma*H^{n+2}*\\left|\\nabla{H}\\right|^{n-1}*\\nabla{H})}"
     # check for route's existence
     assert (

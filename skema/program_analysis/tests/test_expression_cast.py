@@ -66,3 +66,6 @@ def test_exp1():
     assert isinstance(asg_node.right, LiteralValue)
     assert asg_node.right.value_type == "Integer"
     assert asg_node.right.value == '3'
+
+if __name__ == "__main__": 
+    cast = generate_cast(exp0())

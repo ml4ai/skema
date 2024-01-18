@@ -1,11 +1,22 @@
 import itertools as it
+import httpx
 from collections import defaultdict
 from typing import Any, Dict
 
 from askem_extractions.data_model import AttributeCollection, AttributeType, AnchoredEntity
 from bs4 import BeautifulSoup, Comment
 
+from skema.rest import config
 from skema.rest.schema import TextReadingEvaluationResults, AMRLinkingEvaluationResults
+
+
+# see https://stackoverflow.com/a/74401249
+async def get_client():
+    # create a new client for each request
+    async with httpx.AsyncClient(timeout=config.SKEMA_RS_DEFAULT_TIMEOUT, follow_redirects=True) as client:
+        # yield the client to the endpoint function
+        yield client
+        # close the client when the request is done
 
 
 def fn_preprocessor(function_network: Dict[str, Any]):
@@ -170,23 +181,32 @@ def compute_text_reading_evaluation(gt_data: list, attributes: AttributeCollecti
             page = a["page"]
             annotations_by_page[page].append(a)
 
+    def annotation_key(a: Dict):
+        return a['page'], tuple(a['start_xy']), a['text']
+
     # Count the matches
     tp, tn, fp, fn = 0, 0, 0, 0
+    matched_annotations = set()
     for e in extractions:
+        matched = False
         for m in e.mentions:
-            if m.extraction_source is not None:
-                te = m.extraction_source
-                if te.page is not None:
-                    e_page = te.page
-                    page_annotations = annotations_by_page[e_page]
-                    matched = False
-                    for a in page_annotations:
-                        if extraction_matches_annotation(m, a, json_contents):
-                            matched = True
-                            tp += 1
-                            break
-                    if not matched:
-                        fp += 1
+            if not matched:
+                if m.extraction_source is not None:
+                    te = m.extraction_source
+                    if te.page is not None:
+                        e_page = te.page
+                        page_annotations = annotations_by_page[e_page]
+
+                        for a in page_annotations:
+                            key = annotation_key(a)
+                            if key not in matched_annotations:
+                                if extraction_matches_annotation(m, a, json_contents):
+                                    matched_annotations.add(key)
+                                    matched = True
+                                    tp += 1
+                                    break
+                        if not matched:
+                            fp += 1
 
     recall = tp / len(gt_data)
     precision = tp / (tp + fp + 0.00000000001)

@@ -2,9 +2,10 @@ use crate::ast::Ci;
 use crate::ast::MathExpression;
 use derive_new::new;
 use std::fmt;
+use serde::{Deserialize, Serialize};
 
 /// Derivative operator, in line with Spivak notation: http://ceres-solver.org/spivak_notation.html
-#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
 pub struct Derivative {
     pub order: u8,
     pub var_index: u8,
@@ -12,7 +13,7 @@ pub struct Derivative {
 }
 
 /// Partial derivative operator
-#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
 pub struct PartialDerivative {
     pub order: u8,
     pub var_index: u8,
@@ -20,7 +21,7 @@ pub struct PartialDerivative {
 }
 
 /// Summation operator with under and over components
-#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
 pub struct SumUnderOver {
     pub op: Box<MathExpression>,
     pub under: Box<MathExpression>,
@@ -28,18 +29,19 @@ pub struct SumUnderOver {
 }
 
 /// Hat operation
-#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
 pub struct HatOp {
     pub comp: Box<MathExpression>,
 }
 
 /// Handles grad operations with subscript. E.g. ∇_{x}
-#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
 pub struct GradSub {
     pub sub: Box<MathExpression>,
 }
 
-#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
+
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
 pub enum Operator {
     Add,
     Multiply,
@@ -129,7 +131,11 @@ impl fmt::Display for Operator {
             Operator::Arccot => write!(f, "Arccot"),
             Operator::Mean => write!(f, "Mean"),
             Operator::Grad => write!(f, "Grad"),
+<<<<<<< HEAD
             Operator::GradSub(GradSub { sub }) => {
+=======
+            Operator::GradSub(GradSub {sub}) =>{
+>>>>>>> 2af61215ddd7d4257345ef258b7470b012597485
                 write!(f, "Grad_{sub})")
             }
             Operator::Dot => write!(f, "⋅"),
