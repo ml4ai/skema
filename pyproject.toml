@@ -23,6 +23,7 @@ dependencies=[
     "typing_extensions", # see https://github.com/pydantic/pydantic/issues/5821#issuecomment-1559196859
     "fastapi~=0.100.0",
     "starlette",
+    "httpx",
     "pydantic>=2.0.0",
     "uvicorn",
     "python-multipart",
@@ -42,7 +43,7 @@ dynamic = ["readme"]
 #   Pygraphviz is often tricky to install, so we reserve it for the dev extras
 #   list.
 # - six: Required by auto-generated Swagger models
-dev = ["pytest", "pytest-cov", "pytest-xdist", "httpx", "black", "mypy", "coverage", "pygraphviz", "six"]
+dev = ["pytest", "pytest-cov", "pytest-xdist", "pytest-asyncio", "black", "mypy", "coverage", "pygraphviz", "six"]
 
 demo = ["notebook"]
 

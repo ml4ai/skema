@@ -58,6 +58,7 @@ async fn main() -> std::io::Result<()> {
             gromet::get_model_RN,
             gromet::model2PN,
             gromet::model2RN,
+            gromet::model2MET,
             ping,
             version
         ),
@@ -141,6 +142,7 @@ async fn main() -> std::io::Result<()> {
             .service(gromet::get_model_RN)
             .service(gromet::model2PN)
             .service(gromet::model2RN)
+            .service(gromet::model2MET)
             .service(ping)
             .service(version)
             .service(SwaggerUi::new("/docs/{_:.*}").url("/api-doc/openapi.json", openapi.clone()))

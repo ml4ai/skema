@@ -11,10 +11,10 @@ from langchain.output_parsers import (
 from fastapi import APIRouter, FastAPI, File, UploadFile
 from io import BytesIO
 from zipfile import ZipFile
-import requests
 from pathlib import Path
 from pydantic import BaseModel, Field
 from typing import List, Optional
+from skema.skema_py import server as code2fn
 from skema.rest.proxies import SKEMA_OPENAI_KEY
 import time
 
@@ -121,13 +121,14 @@ async def get_lines_of_model(zip_file: UploadFile = File()) -> List[Dynamics]:
 
             function_name = parsed_output['model_function']
 
-            # Get the FN from it
-            url = "https://api.askem.lum.ai/code2fn/fn-given-filepaths"
-            time.sleep(0.5)
-            response_zip = requests.post(url, json=single_snippet_payload)
-
+            # FIXME: we should rewrite things to avoid this need
+            #time.sleep(0.5)
+            system = code2fn.System(**single_snippet_payload)
+            print(f"System:\t{system}")
+            response_zip = await code2fn.fn_given_filepaths(system)
+            #print(f"response_zip:\t{response_zip}")
             # get metadata entry for function
-            for entry in response_zip.json()['modules'][0]['fn_array']:
+            for entry in response_zip['modules'][0]['fn_array']:
                 try:
                     if entry['b'][0]['name'][0:len(function_name)] == function_name:
                         metadata_idx = entry['b'][0]['metadata']
@@ -135,26 +136,29 @@ async def get_lines_of_model(zip_file: UploadFile = File()) -> List[Dynamics]:
                     continue
 
             # get line span using metadata
-            for (i,metadata) in enumerate(response_zip.json()['modules'][0]['metadata_collection']):
+            for (i,metadata) in enumerate(response_zip['modules'][0]['metadata_collection']):
                 if i == (metadata_idx - 1):
                     line_begin = metadata[0]['line_begin']
                     line_end =  metadata[0]['line_end']
-        except:
+                    # if the line_begin of meta entry 2 (base 0) and meta entry 3 (base 0) are we add a slice from [meta2.line_begin, meta3.line_begin)
+            # to capture all the imports, return a Dynamics.block with 2 entries, both of which need to be concatenated to pass forward
+            file_line_begin = response_zip['modules'][0]['metadata_collection'][2][0]['line_begin']
+
+            code_line_begin = response_zip['modules'][0]['metadata_collection'][3][0]['line_begin'] - 1
+
+            if (file_line_begin != code_line_begin) and (code_line_begin > file_line_begin):
+                block.append(f"L{file_line_begin}-L{code_line_begin}")
+
+            block.append(f"L{line_begin}-L{line_end}")
+        except Exception as e:
             print("Failed to parse dynamics")
+            print(f"e:\t{e}")
             description = "Failed to parse dynamics"
             line_begin = 0
             line_end = 0
+            block.append(f"L{line_begin}-L{line_end}")
 
-        # if the line_begin of meta entry 2 (base 0) and meta entry 3 (base 0) are we add a slice from [meta2.line_begin, meta3.line_begin)
-        # to capture all the imports, return a Dynamics.block with 2 entries, both of which need to be concatenated to pass forward
-        file_line_begin = response_zip.json()['modules'][0]['metadata_collection'][2][0]['line_begin']
 
-        code_line_begin = response_zip.json()['modules'][0]['metadata_collection'][3][0]['line_begin'] - 1
-
-        if file_line_begin != code_line_begin:
-            block.append(f"L{file_line_begin}-L{code_line_begin}")
-
-        block.append(f"L{line_begin}-L{line_end}")
 
 
         output = Dynamics(name=file, description=description, block=block)
