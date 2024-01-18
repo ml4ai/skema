@@ -21,7 +21,7 @@ pub struct PartialDerivative {
 }
 
 /// Summation operator with under and over components
-#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize)]
 pub struct SumUnderOver {
     pub op: Box<MathExpression>,
     pub under: Box<MathExpression>,
@@ -29,13 +29,13 @@ pub struct SumUnderOver {
 }
 
 /// Hat operation
-#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize)]
 pub struct HatOp {
     pub comp: Box<MathExpression>,
 }
 
 /// Handles grad operations with subscript. E.g. ∇_{x}
-#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize)]
 pub struct GradSub {
     pub sub: Box<MathExpression>,
 }

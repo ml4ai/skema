@@ -42,14 +42,14 @@ pub struct Differential {
     pub func: Box<MathExpression>,
 }
 
-#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize)]
 pub struct SummationMath {
     pub op: Box<MathExpression>,
     pub func: Box<MathExpression>,
 }
 
 /// Hat operation
-#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize)]
 pub struct HatComp {
     pub op: Box<MathExpression>,
     pub comp: Box<MathExpression>,
