@@ -2,16 +2,17 @@ use derive_new::new;
 use std::fmt;
 
 pub mod operator;
-
+use serde::{Deserialize, Serialize};
 use operator::Operator;
+//use crate::ast::MathExpression::SummationOp;
 
-#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
 pub struct Mi(pub String);
 
-#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
 pub struct Mrow(pub Vec<MathExpression>);
 
-#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
 pub enum Type {
     Integer,
     Rational,
@@ -27,22 +28,35 @@ pub enum Type {
     Matrix,
 }
 
-#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
 pub struct Ci {
     pub r#type: Option<Type>,
     pub content: Box<MathExpression>,
     pub func_of: Option<Vec<Ci>>,
 }
 
-#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
 pub struct Differential {
     pub diff: Box<MathExpression>,
     pub func: Box<MathExpression>,
 }
 
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
+pub struct SummationMath {
+    pub op: Box<MathExpression>,
+    pub func: Box<MathExpression>,
+}
+
+/// Hat operation
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
+pub struct HatComp {
+    pub op: Box<MathExpression>,
+    pub comp: Box<MathExpression>,
+}
+
 /// The MathExpression enum is not faithful to the corresponding element type in MathML 3
 /// (https://www.w3.org/TR/MathML3/appendixa.html#parsing_MathExpression)
-#[derive(Debug, PartialOrd, Ord, PartialEq, Eq, Clone, Hash, Default, new)]
+#[derive(Debug, PartialOrd, Ord, PartialEq, Eq, Clone, Hash, Default, new, Deserialize, Serialize)]
 pub enum MathExpression {
     Mi(Mi),
     Mo(Operator),
@@ -66,8 +80,10 @@ pub enum MathExpression {
     //GroupTuple(Vec<MathExpression>),
     Ci(Ci),
     Differential(Differential),
+    SummationMath(SummationMath),
     AbsoluteSup(Box<MathExpression>, Box<MathExpression>),
     Absolute(Box<MathExpression>, Box<MathExpression>),
+    HatComp(HatComp),
     //Differential(Box<MathExpression>, Box<MathExpression>),
     #[default]
     None,
@@ -110,6 +126,14 @@ impl fmt::Display for MathExpression {
                 write!(f, "{superscript:?}")
             }
             MathExpression::Mtext(text) => write!(f, "{}", text),
+            MathExpression::SummationMath(SummationMath { op, func }) => {
+                write!(f, "{op}")?;
+                write!(f, "{func}")
+            }
+            MathExpression::HatComp(HatComp { op, comp }) => {
+                write!(f, "{op}")?;
+                write!(f, "{comp}")
+            }
             expression => write!(f, "{expression:?}"),
         }
     }

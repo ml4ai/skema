@@ -11,9 +11,10 @@ from zipfile import ZipFile
 
 import pandas as pd
 import requests
+import httpx
 from askem_extractions.data_model import AttributeCollection
 from askem_extractions.importers import import_arizona
-from fastapi import APIRouter, FastAPI, UploadFile, Response, status
+from fastapi import APIRouter, Depends, FastAPI, UploadFile, Response, status
 
 from skema.rest.proxies import SKEMA_TR_ADDRESS, MIT_TR_ADDRESS, OPENAI_KEY, COSMOS_ADDRESS
 from skema.rest.schema import (
@@ -22,7 +23,7 @@ from skema.rest.schema import (
     TextReadingDocumentResults,
     TextReadingError, MiraGroundingInputs, MiraGroundingOutputItem, TextReadingEvaluationResults,
 )
-from skema.rest.utils import compute_text_reading_evaluation
+from skema.rest import utils
 
 router = APIRouter()
 
@@ -676,7 +677,7 @@ def quantitative_eval() -> TextReadingEvaluationResults:
     # Read the SKEMA extractions
     extractions = AttributeCollection.from_json(Path(__file__).parents[0] / "data" / "extractions_sidarthe_skema.json")
 
-    return compute_text_reading_evaluation(gt_data, extractions)
+    return utils.compute_text_reading_evaluation(gt_data, extractions)
 
 
 @router.post("/eval", response_model=TextReadingEvaluationResults, status_code=200)
@@ -716,7 +717,7 @@ def quantitative_eval(extractions_file: UploadFile,
         extractions = AttributeCollection(
             attributes=list(it.chain.from_iterable(c.attributes for c in collections)))
 
-    return compute_text_reading_evaluation(gt_data, extractions, json_contents)
+    return utils.compute_text_reading_evaluation(gt_data, extractions, json_contents)
 
 
 app = FastAPI()
