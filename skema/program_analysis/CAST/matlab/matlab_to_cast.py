@@ -211,6 +211,12 @@ class MatlabToCast(object):
             val = self.visit_name(node),
             type = self.variable_context.get_type(identifier) if
                 self.variable_context.is_variable(identifier) else "Unknown",
+            default_value = LiteralValue(
+                value_type=ScalarType.CHARACTER,
+                value=self.node_helper.get_identifier(node),
+                source_code_data_type=["matlab", MATLAB_VERSION, ScalarType.CHARACTER],
+                source_refs=[self.node_helper.get_source_ref(node)]
+            ),
             source_refs = [self.node_helper.get_source_ref(node)],
         )
 
@@ -324,13 +330,17 @@ class MatlabToCast(object):
             start = numbers[0]
             step = 1
             stop = 0
+
+            # two values mean the step is implicitely defined as 1
             if len(numbers) == 2:
                 stop = numbers[1]
 
+            # three values mean the step is explictely defined
             elif len(numbers) == 3:
                 step = numbers[1]
                 stop = numbers[2]
 
+            # create the itrerator based on the range limits and step
             range_name_node = self.variable_context.get_gromet_function_node("range")
             iter_name_node = self.variable_context.get_gromet_function_node("iter")
             next_name_node = self.variable_context.get_gromet_function_node("next")
@@ -381,7 +391,7 @@ class MatlabToCast(object):
     def visit_matrix(self, node):
         """ Translate the Tree-sitter cell node into a List """
 
-        def get_values(element, ret)-> List:
+        def get_values(element, ret):
             for child in get_keyword_children(element):
                 if child.type == "row": 
                     ret.append(get_values(child, []))
@@ -395,7 +405,7 @@ class MatlabToCast(object):
             value = values[0]
 
         return LiteralValue(
-            value_type=StructureType.LIST,
+            value_type = StructureType.LIST,
             value = value,
             source_code_data_type=["matlab", MATLAB_VERSION, StructureType.LIST],
             source_refs=[self.node_helper.get_source_ref(node)],
@@ -432,22 +442,22 @@ class MatlabToCast(object):
             identifier, "Unknown", [self.node_helper.get_source_ref(node)]
         )
 
-    def visit_number(self, node) -> LiteralValue:
+    def visit_number(self, node):
         """Visitor for numbers """
-        literal_value = self.node_helper.get_identifier(node)
+        number = self.node_helper.get_identifier(node)
         # Check if this is a real value, or an Integer
-        if "e" in literal_value.lower() or "." in literal_value:
+        if "e" in number.lower() or "." in number:
             return LiteralValue(
-                value_type=ScalarType.ABSTRACTFLOAT,
-                value=float(literal_value),
-                source_code_data_type=["matlab", MATLAB_VERSION, ScalarType.ABSTRACTFLOAT],
-                source_refs=[self.node_helper.get_source_ref(node)]
+                value_type = ScalarType.ABSTRACTFLOAT,
+                value = float(number),
+                source_code_data_type = ["matlab", MATLAB_VERSION, ScalarType.ABSTRACTFLOAT],
+                source_refs = [self.node_helper.get_source_ref(node)]
             )
         return LiteralValue(
-            value_type=ScalarType.INTEGER,
-            value=int(literal_value),
-            source_code_data_type=["matlab", MATLAB_VERSION, ScalarType.INTEGER],
-            source_refs=[self.node_helper.get_source_ref(node)]
+            value_type = ScalarType.INTEGER,
+            value = int(number),
+            source_code_data_type = ["matlab", MATLAB_VERSION, ScalarType.INTEGER],
+            source_refs = [self.node_helper.get_source_ref(node)]
         )
 
     def visit_operator(self, node):
@@ -542,7 +552,7 @@ class MatlabToCast(object):
 
         return model_ifs[0]
     
-    def get_block(self, node) -> List[AstNode]:
+    def get_block(self, node):
         """return all the children of the block as a list of AstNodes"""
         block = get_first_child_by_type(node, "block")
         if block:
