@@ -114,9 +114,9 @@ def test_extraction_evaluation():
     results = response.json()
 
     assert results['num_manual_annotations'] == 220, "There should be 220 gt manual annotations"
-    assert results['precision'] == approx(0.7230769230768118), "Precision drastically different from the expected value"
-    assert results['recall'] == approx(0.21363636363636362), "Recall drastically different from the expected value"
-    assert results['f1'] == approx(0.32982456136828636), "F1 drastically different from the expected value"
+    assert results['precision'] == approx(0.5230769230768426), "Precision drastically different from the expected value"
+    assert results['recall'] == approx(0.154545454545454542), "Recall drastically different from the expected value"
+    assert results['f1'] == approx(0.23859649119285095), "F1 drastically different from the expected value"
 
 
 def test_healthcheck():

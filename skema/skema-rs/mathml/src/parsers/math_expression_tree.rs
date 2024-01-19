@@ -11,16 +11,15 @@ use crate::{
 use derive_new::new;
 use nom::error::Error;
 use regex::Regex;
-
+use serde::{Deserialize, Serialize};
 use std::{fmt, str::FromStr};
 
 #[cfg(test)]
 use crate::parsers::first_order_ode::{first_order_ode, FirstOrderODE};
-use serde::Deserialize;
 ///New whitespace handler before parsing
 
 /// An S-expression like structure to represent mathematical expressions.
-#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize)]
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
 pub enum MathExpressionTree {
     Atom(MathExpression),
     Cons(Operator, Vec<MathExpressionTree>),

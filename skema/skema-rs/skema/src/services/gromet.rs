@@ -7,6 +7,8 @@ use actix_web::web::ServiceConfig;
 use actix_web::{delete, get, post, put, web, HttpResponse};
 use mathml::acset::{PetriNet, RegNet};
 
+use mathml::ast::MathExpression;
+use mathml::parsers::math_expression_tree::MathExpressionTree;
 use neo4rs;
 use neo4rs::{query, Error, Node};
 use std::collections::HashMap;
@@ -326,4 +328,40 @@ pub async fn model2RN(
     HttpResponse::Ok().json(web::Json(
         model_to_RN(payload.into_inner(), config1).await.unwrap(),
     ))
+}
+
+/// This returns a MET vector from a gromet.
+#[allow(non_snake_case)]
+#[utoipa::path(
+    request_body = ModuleCollection,
+    responses(
+        (
+            status = 200, description = "Successfully retrieved MET"
+        )
+    )
+)]
+#[put("/models/MET")]
+pub async fn model2MET(
+    payload: web::Json<ModuleCollection>,
+    config: web::Data<Config>,
+) -> HttpResponse {
+    let config1 = Config {
+        db_host: config.db_host.clone(),
+        db_port: config.db_port,
+        db_protocol: config.db_protocol.clone(),
+    };
+    let module_id = push_model_to_db(payload.into_inner(), config1.clone()).await; // pushes model to db and gets id
+    let ref_module_id1 = module_id.as_ref();
+    let ref_module_id2 = module_id.as_ref();
+    let mathml_ast = module_id2mathml_MET_ast(*ref_module_id1.unwrap(), config1.clone()).await; // turns model into mathml ast equations
+    let _del_response = delete_module(*ref_module_id2.unwrap(), config1.clone()).await; // deletes model from db
+    let mut mets = Vec::<MathExpressionTree>::new();
+    for equation in mathml_ast.iter() {
+        let mut equal_args = Vec::<MathExpressionTree>::new();
+        equal_args.push(MathExpressionTree::Atom(MathExpression::Ci(equation.lhs_var.clone())));
+        equal_args.push(equation.rhs.clone());
+        let met = MathExpressionTree::Cons(mathml::ast::operator::Operator::Equals, equal_args.clone());
+        mets.push(met.clone());
+    }
+    HttpResponse::Ok().json(web::Json(mets))
 }
