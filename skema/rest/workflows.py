@@ -272,14 +272,17 @@ async def llm_assisted_codebase_to_pn_amr(zip_file: UploadFile = File(), client:
             file_obj = Path(file)
             if file_obj.suffix in [".py"]:
                 # Skip file if located in a hidden directory or MACOSX artifact
+                valid = True
                 for parent in file_obj.parents:
                     if parent.name == "_MACOSX":
-                        continue
+                        valid = False
+                        break
                     elif parent.name.startswith("."):
-                        continue
-                
-                files.append(file)
-                blobs.append(zip.open(file).read().decode("utf-8"))
+                        valid = False
+                        break 
+                if valid:
+                    files.append(file)
+                    blobs.append(zip.open(file).read().decode("utf-8"))
 
     # The source code is a string, so to slice using the line spans, we must first convert it to a list.
     # Then we can convert it back to a string using .join

@@ -65,14 +65,17 @@ async def get_lines_of_model(zip_file: UploadFile = File()) -> List[Dynamics]:
             file_obj = Path(file)
             if file_obj.suffix in [".py"]:
                 # Skip file if located in a hidden directory or MACOSX artifact
+                valid = True
                 for parent in file_obj.parents:
                     if parent.name == "_MACOSX":
-                        continue
+                        valid = False
+                        break
                     elif parent.name.startswith("."):
-                        continue
-                
-                files.append(file)
-                blobs.append(zip.open(file).read().decode("utf-8"))
+                        valid = False
+                        break 
+                if valid:
+                    files.append(file)
+                    blobs.append(zip.open(file).read().decode("utf-8"))
 
     # this is the formatting instructions
     response_schemas = [
