@@ -64,6 +64,13 @@ async def get_lines_of_model(zip_file: UploadFile = File()) -> List[Dynamics]:
         for file in zip.namelist():
             file_obj = Path(file)
             if file_obj.suffix in [".py"]:
+                # Skip file if located in a hidden directory or MACOSX artifact
+                for parent in file_obj.parents:
+                    if parent.name == "_MACOSX":
+                        continue
+                    elif parent.name.startswith("."):
+                        continue
+                
                 files.append(file)
                 blobs.append(zip.open(file).read().decode("utf-8"))
 
