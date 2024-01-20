@@ -138,8 +138,6 @@ class MatlabToCast(object):
         ]: return self.visit_operator(node)
         elif node.type == "string":
            return self.visit_string(node)
-        elif node.type == "range":
-           return self.visit_range(node)
         elif node.type == "switch_statement":
             return self.visit_switch_statement(node)
         else:
@@ -374,10 +372,6 @@ class MatlabToCast(object):
                 post = []
             )
 
-
-    def visit_range(self, node):
-        return None
-
     def visit_for_statement(self, node) -> Loop:
         """ Translate Tree-sitter for loop node into CAST Loop node """
 
@@ -568,9 +562,9 @@ class MatlabToCast(object):
             op = op,
             operands = operands,
             source_refs = source_refs
-        )
+        ) 
 
-    def get_gromet_function_node(self, func_name: str) -> Name:
+    def get_gromet_function_node(self, func_name: str):
         if self.variable_context.is_variable(func_name):
             return self.variable_context.get_node(func_name)
 
