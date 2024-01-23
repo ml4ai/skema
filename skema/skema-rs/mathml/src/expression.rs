@@ -1183,13 +1183,14 @@ pub fn get_code_exp_graphs(expressions: Vec<MathExpressionTree>) -> String {
 
     for (index, expression) in expressions.iter().enumerate() {
         // Create a new MathExpressionTree representing the outer layer with Operator::Equals
-        let outer_layer = MathExpressionTree::Cons(
-            Operator::Equals,
-            vec![
-                MathExpressionTree::Atom(MathExpression::Mi(Mi(format!("exp_{}", index + 1)))),
-                expression.clone(),
-            ],
-        );
+        // let outer_layer = MathExpressionTree::Cons(
+        //     Operator::Equals,
+        //     vec![
+        //         MathExpressionTree::Atom(MathExpression::Mi(Mi(format!("exp_{}", index + 1)))),
+        //         expression.clone(),
+        //     ],
+        // );
+        let outer_layer = expression.clone();
         let graph = outer_layer.to_graph();
         let dot_representation = Dot::new(&graph);
         let dot_string = dot_representation.to_string();

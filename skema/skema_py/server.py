@@ -106,6 +106,17 @@ class System(BaseModel):
     )
 
 
+class MML_System(BaseModel):
+    """
+        Pydantic BaseModel representing a system with MML (MathML).
+
+        Attributes:
+            mml (str): The MML equation.
+            system (System): An instance of the System class representing system details.
+        """
+    mml: str
+    system: System
+
 async def system_to_enriched_system(system: System) -> System:
     """Takes a System as input and enriches it with comments by running the tree-sitter comment extractor."""
 
