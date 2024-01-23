@@ -46,14 +46,10 @@ async def test_post_image_to_latex_base64():
         img_bytes = infile.read()
     img_b64 = base64.b64encode(img_bytes).decode("utf-8")
 
-    files = {
-        "data": img_b64,
-    }
-
     endpoint = "/images/base64/equations-to-latex"
     # see https://fastapi.tiangolo.com/advanced/async-tests/#async-tests
     async with AsyncClient(app=app, base_url="http://eqn-to-latex-base64-test") as ac:
-        response = await ac.post(endpoint, files=files)
+        response = await ac.post(endpoint, data=img_b64)
     expected = "\\frac{d H}{dt}=\\nabla \\cdot {(\\Gamma*H^{n+2}*\\left|\\nabla{H}\\right|^{n-1}*\\nabla{H})}"
     # check for route's existence
     assert (
