@@ -188,6 +188,32 @@ def test_partial_supported_files():
     assert gromet_collection[&#34;metadata_collection&#34;][0][0][&#34;gromet_type&#34;] == &#34;Debug&#34;
     assert gromet_collection[&#34;metadata_collection&#34;][0][0][&#34;severity&#34;] == &#34;WARNING&#34;
 
+def test_hidden_files():
+    &#34;&#34;&#34;Test case for hidden files and MACOSX artifacts&#34;&#34;&#34;
+    system = {
+        &#34;files&#34;: [&#34;.hidden/source.py&#34;, &#34;root/_MACOSX/hello.py&#34;],
+        &#34;blobs&#34;: [
+            &#34;x=2&#34;,
+            &#34;print(&#39;hello world&#39;)&#34;,
+        ],
+        &#34;system_name&#34;: &#34;hidden-system&#34;,
+        &#34;root_name&#34;: &#34;hidden-system&#34;,
+    }
+
+    response = client.post(&#34;/code2fn/fn-given-filepaths&#34;, json=system)
+    assert response.status_code == 200
+
+    gromet_collection = response.json()
+    assert &#34;metadata_collection&#34; in gromet_collection
+    assert (
+        len(gromet_collection[&#34;metadata_collection&#34;]) == 1
+    )  # Only one element (GrometFNModuleCollection) should create metadata in this metadata_collection
+    assert (
+        len(gromet_collection[&#34;metadata_collection&#34;][0]) == 1
+    )  # There should only be one ERROR Debug metadata since there are no source files to process.
+    assert gromet_collection[&#34;metadata_collection&#34;][0][0][&#34;gromet_type&#34;] == &#34;Debug&#34;
+    assert gromet_collection[&#34;metadata_collection&#34;][0][0][&#34;severity&#34;] == &#34;ERROR&#34;
+
 
 def test_gromet_object_count():
     &#34;&#34;&#34;Test case for get-object-count endpoint&#34;&#34;&#34;
@@ -419,6 +445,42 @@ def test_get_pyacset():
     assert response.status_code == 200</code></pre>
 </details>
 </dd>
+<dt id="skema.skema_py.tests.test_server.test_hidden_files"><code class="name flex">
+<span>def <span class="ident">test_hidden_files</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Test case for hidden files and MACOSX artifacts</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_hidden_files():
+    &#34;&#34;&#34;Test case for hidden files and MACOSX artifacts&#34;&#34;&#34;
+    system = {
+        &#34;files&#34;: [&#34;.hidden/source.py&#34;, &#34;root/_MACOSX/hello.py&#34;],
+        &#34;blobs&#34;: [
+            &#34;x=2&#34;,
+            &#34;print(&#39;hello world&#39;)&#34;,
+        ],
+        &#34;system_name&#34;: &#34;hidden-system&#34;,
+        &#34;root_name&#34;: &#34;hidden-system&#34;,
+    }
+
+    response = client.post(&#34;/code2fn/fn-given-filepaths&#34;, json=system)
+    assert response.status_code == 200
+
+    gromet_collection = response.json()
+    assert &#34;metadata_collection&#34; in gromet_collection
+    assert (
+        len(gromet_collection[&#34;metadata_collection&#34;]) == 1
+    )  # Only one element (GrometFNModuleCollection) should create metadata in this metadata_collection
+    assert (
+        len(gromet_collection[&#34;metadata_collection&#34;][0]) == 1
+    )  # There should only be one ERROR Debug metadata since there are no source files to process.
+    assert gromet_collection[&#34;metadata_collection&#34;][0][0][&#34;gromet_type&#34;] == &#34;Debug&#34;
+    assert gromet_collection[&#34;metadata_collection&#34;][0][0][&#34;severity&#34;] == &#34;ERROR&#34;</code></pre>
+</details>
+</dd>
 <dt id="skema.skema_py.tests.test_server.test_no_supported_files"><code class="name flex">
 <span>def <span class="ident">test_no_supported_files</span></span>(<span>)</span>
 </code></dt>
@@ -514,6 +576,7 @@ def test_get_pyacset():
 <li><code><a title="skema.skema_py.tests.test_server.test_get_pyacset" href="#skema.skema_py.tests.test_server.test_get_pyacset">test_get_pyacset</a></code></li>
 <li><code><a title="skema.skema_py.tests.test_server.test_gromet_object_count" href="#skema.skema_py.tests.test_server.test_gromet_object_count">test_gromet_object_count</a></code></li>
 <li><code><a title="skema.skema_py.tests.test_server.test_healthcheck" href="#skema.skema_py.tests.test_server.test_healthcheck">test_healthcheck</a></code></li>
+<li><code><a title="skema.skema_py.tests.test_server.test_hidden_files" href="#skema.skema_py.tests.test_server.test_hidden_files">test_hidden_files</a></code></li>
 <li><code><a title="skema.skema_py.tests.test_server.test_no_supported_files" href="#skema.skema_py.tests.test_server.test_no_supported_files">test_no_supported_files</a></code></li>
 <li><code><a title="skema.skema_py.tests.test_server.test_partial_supported_files" href="#skema.skema_py.tests.test_server.test_partial_supported_files">test_partial_supported_files</a></code></li>
 </ul>
