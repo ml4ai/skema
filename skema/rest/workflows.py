@@ -12,11 +12,11 @@ import httpx
 import json
 import requests
 
-from fastapi import APIRouter, Depends, File, UploadFile, FastAPI
+from fastapi import APIRouter, Depends, File, UploadFile, FastAPI, Request
 from starlette.responses import JSONResponse
 
 from skema.img2mml import eqn2mml
-from skema.img2mml.eqn2mml import image2mathml_db
+from skema.img2mml.eqn2mml import image2mathml_db, b64_image_to_mml
 from skema.img2mml.api import get_mathml_from_bytes
 from skema.rest import config, schema, utils, llm_proxy
 from skema.rest.proxies import SKEMA_RS_ADDESS
@@ -112,6 +112,48 @@ async def equations_to_latex(data: UploadFile, client: httpx.AsyncClient = Depen
         return f"Error: {response.status_code} {response.text}"
 
 
+# equation images -> base64 -> mml -> latex
+@router.post("/images/base64/equations-to-latex", summary="Equations (images) → MML → LaTeX")
+async def equations_to_latex(request: Request, client: httpx.AsyncClient = Depends(utils.get_client)):
+    """
+    Converts images of equations to LaTeX.
+
+    ### Python example
+
+    Endpoint for generating LaTeX from an input image.
+
+    ```
+    from pathlib import Path
+    import base64
+    import requests
+
+    url = "http://127.0.0.1:8000/workflows/images/base64/equations-to-latex"
+    with Path("test.png").open("rb") as infile:
+      img_bytes = infile.read()
+    img_b64 = base64.b64encode(img_bytes).decode("utf-8")
+    r = requests.post(url, data=img_b64)
+    print(r.text)
+    ```
+    """
+    # Read image data
+    img_b64 = await request.body()
+    mml_res = b64_image_to_mml(img_b64)
+
+    # pass image bytes to get_mathml_from_bytes function
+    proxy_url = f"{SKEMA_RS_ADDESS}/mathml/latex"
+    print(f"MML:\t{mml_res}")
+    print(f"Proxying request to {proxy_url}")
+    response = await client.post(proxy_url, data=mml_res)
+    # Check the response
+    if response.status_code == 200:
+        # The request was successful
+        return response.text
+    else:
+        # The request failed
+        print(f"Error: {response.status_code}")
+        print(response.text)
+        return f"Error: {response.status_code} {response.text}"
+
 # tex equations -> pmml -> amr
 @router.post("/latex/equations-to-amr", summary="Equations (LaTeX) → pMML → AMR")
 async def equations_to_amr(data: schema.EquationLatexToAMR, client: httpx.AsyncClient = Depends(utils.get_client)):
@@ -162,7 +204,7 @@ async def equations_to_amr(data: schema.MmlToAMR, client: httpx.AsyncClient = De
     return res.json()
 
 
-# code snippets -> fn -> petrinet amr 
+# code snippets -> fn -> petrinet amr
 @router.post("/code/snippets-to-pn-amr", summary="Code snippets → PetriNet AMR")
 async def code_snippets_to_pn_amr(system: code2fn.System, client: httpx.AsyncClient = Depends(utils.get_client)):
     gromet = await code2fn.fn_given_filepaths(system)
