@@ -384,13 +384,7 @@ class TS2CAST(object):
         # NOTE: RETURN is not the only Fortran keyword. GO TO and CONTINUE are also considered keywords
         identifier = self.node_helper.get_identifier(node).lower()
         if node.type == "keyword_statement":
-            print(identifier)
             if "go to" in identifier:
-                # We need to differentiate between regular GO TO and COMPUTED GO TO
-                if len(node.children) > 1:
-                    pass
-                    #statement_labels = get_children_by_types(node, ["statement_label_reference"])
-
                 statement_label_reference = get_first_child_by_type(node, "statement_label_reference")
                 return Goto(
                     label=self.node_helper.get_identifier(statement_label_reference),
