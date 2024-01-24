@@ -3230,16 +3230,6 @@ class ToGrometPass:
     def visit_goto(
         self, node: AnnCastGoto, parent_gromet_fn, parent_cast_node 
     ):
-        parent_gromet_fn.bf = insert_gromet_object(parent_gromet_fn.bf, GrometBoxFunction(function_type=FunctionType.GOTO, name=node.label))
-        goto_idx = len(parent_gromet_fn.bf)
-        vars = self.symtab_variables()
-        for var in vars:
-            for v in vars[var]: 
-                print(v)
-                parent_gromet_fn.pif = insert_gromet_object(parent_gromet_fn.pif, GrometPort(box=goto_idx))
-                # TODO: wiring
-                # self.wire_from_var_env()
-
         # Make an expression FN for computing the label and index values of this goto
         # Insert it into the overall fn_array table
         goto_fn = GrometFN()
@@ -3249,6 +3239,17 @@ class ToGrometPass:
             goto_fn,
         )
         self.set_index()
+
+        goto_fn_idx = len(self.gromet_module.fn_array)
+
+        parent_gromet_fn.bf = insert_gromet_object(parent_gromet_fn.bf, GrometBoxFunction(function_type=FunctionType.GOTO, name=node.label, body=goto_fn_idx))
+        goto_idx_call = len(parent_gromet_fn.bf)
+        vars = self.symtab_variables()
+        for var in vars:
+            for v in vars[var]: 
+                parent_gromet_fn.pif = insert_gromet_object(parent_gromet_fn.pif, GrometPort(box=goto_idx_call))
+                # TODO: wiring
+                # self.wire_from_var_env()
 
         # Create its opis
         for var in vars:
@@ -3262,22 +3263,20 @@ class ToGrometPass:
             goto_fn.bf = insert_gromet_object(goto_fn.bf, GrometBoxFunction(function_type=FunctionType.LITERAL, value=label_index))
             index_comp_bf = len(goto_fn.bf)
             goto_fn.pof = insert_gromet_object(goto_fn.pof, GrometPort(box=index_comp_bf)) 
-            goto_fn.opo = insert_gromet_object(goto_fn.opi, GrometPort(box=len(goto_fn.b), name="fn_idx"))
+            goto_fn.opo = insert_gromet_object(goto_fn.opo, GrometPort(box=len(goto_fn.b), name="fn_idx"))
             goto_fn.wfopo = insert_gromet_object(goto_fn.wfopo, GrometWire(src=len(goto_fn.opo), tgt=len(goto_fn.pof)))
 
         goto_fn.bf = insert_gromet_object(goto_fn.bf, GrometBoxFunction(function_type=FunctionType.LITERAL, value=node.label))
         label_bf = len(goto_fn.bf)
         goto_fn.pof = insert_gromet_object(goto_fn.pof, GrometPort(box=label_bf)) 
-        goto_fn.opo = insert_gromet_object(goto_fn.opi, GrometPort(box=len(goto_fn.b), name="label"))
+        goto_fn.opo = insert_gromet_object(goto_fn.opo, GrometPort(box=len(goto_fn.b), name="label"))
         goto_fn.wfopo = insert_gromet_object(goto_fn.wfopo, GrometWire(src=len(goto_fn.opo), tgt=len(goto_fn.pof)))
 
-        print("GOTO")
 
     @_visit.register
     def visit_label(
         self, node: AnnCastLabel, parent_gromet_fn, parent_cast_node
     ):
-        # print("LABEL")
         parent_gromet_fn.bf = insert_gromet_object(parent_gromet_fn.bf, GrometBoxFunction(function_type=FunctionType.LABEL, name=node.label))
         
         # Associate this label with a particular index
@@ -3287,17 +3286,13 @@ class ToGrometPass:
         label_idx = len(parent_gromet_fn.bf)
         vars = self.symtab_variables()
 
-        print(self.labels)
-
         for var in vars:
             for v in vars[var]: 
-                parent_gromet_fn.pif = insert_gromet_object(parent_gromet_fn.pif, GrometPort(box=label_idx))
+                parent_gromet_fn.pif = insert_gromet_object(parent_gromet_fn.pif, GrometPort(box=label_idx))    
+                self.wire_from_var_env(v, parent_gromet_fn)
+
                 parent_gromet_fn.pof = insert_gromet_object(parent_gromet_fn.pof, GrometPort(box=label_idx, name=v))
-        # print(node.label)
-        
-        # Get all the variables
-        # Create the bf for the label
-        # Create all the ports, wire accordingly
+                self.add_var_to_env(v, None, parent_gromet_fn.pof[-1], len(parent_gromet_fn.pof), parent_cast_node)
 
     @_visit.register
     def visit_literal_value(
@@ -4134,13 +4129,13 @@ class ToGrometPass:
             ):  # TODO: double check this guard to see if it's necessary
                 # print(node.source_refs[0])
                 parent_gromet_fn.wcopi = insert_gromet_object(
-                    parent_gromet_fn.wcopi, GrometWire(src=-1, tgt=-1)
+                    parent_gromet_fn.wcopi, GrometWire(src=-1, tgt=-912)
                 )
-            elif parent_gromet_fn.opi == None:
+            elif parent_gromet_fn.opi == None and parent_gromet_fn.pof == None:
                 # print(node.source_refs[0])
                 parent_gromet_fn.wcopi = insert_gromet_object(
                     parent_gromet_fn.wcopi,
-                    GrometWire(src=len(parent_gromet_fn.pic), tgt=-1),
+                    GrometWire(src=len(parent_gromet_fn.pic), tgt=-913),
                 )
             elif parent_gromet_fn.pic == None:
                 # print(node.source_refs[0])
