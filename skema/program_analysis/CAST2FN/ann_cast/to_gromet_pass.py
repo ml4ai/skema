@@ -269,12 +269,43 @@ class ToGrometPass:
         # Initialize the table of function arguments
         self.function_arguments = {}
 
+        # Maintain an fn_array index stack
+        self.fn_stack = [] 
+
+        # Table of labels
+        self.labels = {}
+
         # the fullid of a AnnCastName node is a string which includes its
         # variable name, numerical id, version, and scope
         for node in self.pipeline_state.nodes:
             self.visit(node, parent_gromet_fn=None, parent_cast_node=None)
 
         pipeline_state.gromet_collection = self.gromet_module
+
+    # Interface that allows us to put what FN index is currently on the stack
+    # Used for labels
+    def push_idx(self, idx):
+        self.fn_stack.append(idx)
+
+    def peek_idx(self):
+        if len(self.fn_stack) > 0:
+            return self.fn_stack[-1]
+        return 0
+
+    def pop_idx(self):
+        if len(self.fn_stack) > 0:
+            return self.fn_stack.pop()
+        return 0
+
+    # Adds a label to the labels table, associating a label
+    # with the index into the fn_array table that label is in
+    def add_label(self, label, fn_idx):
+        self.labels[label] = fn_idx
+
+    # Clears the labels table. 
+    # NOTE: Do we need to do this everytime we leave a function definition?
+    def clear_labels(self):
+        self.labels = {}
 
     def symtab_variables(self):
         return self.symbol_table["variables"]
@@ -514,13 +545,15 @@ class ToGrometPass:
                 primitive_fn,
             )
             self.set_index()
+            
+            fn_array_idx = len(self.gromet_module.fn_array)
 
             ref = node.source_refs[0]
             # metadata = self.create_source_code_reference(ref)
             # Creates the 'call' to this primitive expression which then gets inserted into the parent's Gromet FN
             parent_primitive_call_bf = GrometBoxFunction(
                 function_type=FunctionType.EXPRESSION,
-                body=len(self.gromet_module.fn_array),
+                body=fn_array_idx,
                 metadata=self.insert_metadata(metadata),
             )
 
@@ -3040,6 +3073,8 @@ class ToGrometPass:
         else:
             new_gromet = self.gromet_module.fn_array[idx - 1]
 
+        self.push_idx(idx)
+
         # Update the functions symbol table with its index in the FN array
         # This is currently used for wiring function names as parameters to function calls
         functions = self.symtab_functions()
@@ -3184,7 +3219,85 @@ class ToGrometPass:
             node, new_gromet, node.body, parent_cast_node=parent_cast_node
         )
 
+        self.pop_idx()
+        
+        # NOTE: Do we need to do this???
+        self.clear_labels()
         var_environment["args"] = deepcopy(prev_arg_env)
+
+
+    @_visit.register
+    def visit_goto(
+        self, node: AnnCastGoto, parent_gromet_fn, parent_cast_node 
+    ):
+        parent_gromet_fn.bf = insert_gromet_object(parent_gromet_fn.bf, GrometBoxFunction(function_type=FunctionType.GOTO, name=node.label))
+        goto_idx = len(parent_gromet_fn.bf)
+        vars = self.symtab_variables()
+        for var in vars:
+            for v in vars[var]: 
+                print(v)
+                parent_gromet_fn.pif = insert_gromet_object(parent_gromet_fn.pif, GrometPort(box=goto_idx))
+                # TODO: wiring
+                # self.wire_from_var_env()
+
+        # Make an expression FN for computing the label and index values of this goto
+        # Insert it into the overall fn_array table
+        goto_fn = GrometFN()
+        goto_fn.b = insert_gromet_object(goto_fn.b, GrometBoxFunction(function_type=FunctionType.EXPRESSION))
+        self.gromet_module.fn_array = insert_gromet_object(
+            self.gromet_module.fn_array,
+            goto_fn,
+        )
+        self.set_index()
+
+        # Create its opis
+        for var in vars:
+            for v in vars[var]: 
+                goto_fn.opi = insert_gromet_object(goto_fn.opi, GrometPort(box=len(goto_fn.b)))
+
+        # The goto expression FN has two potential expressions, to determine the label and the index
+        # TODO: compute an expression for an index when expr is not None
+        if node.expr == None: 
+            label_index = self.labels[node.label]
+            goto_fn.bf = insert_gromet_object(goto_fn.bf, GrometBoxFunction(function_type=FunctionType.LITERAL, value=label_index))
+            index_comp_bf = len(goto_fn.bf)
+            goto_fn.pof = insert_gromet_object(goto_fn.pof, GrometPort(box=index_comp_bf)) 
+            goto_fn.opo = insert_gromet_object(goto_fn.opi, GrometPort(box=len(goto_fn.b), name="fn_idx"))
+            goto_fn.wfopo = insert_gromet_object(goto_fn.wfopo, GrometWire(src=len(goto_fn.opo), tgt=len(goto_fn.pof)))
+
+        goto_fn.bf = insert_gromet_object(goto_fn.bf, GrometBoxFunction(function_type=FunctionType.LITERAL, value=node.label))
+        label_bf = len(goto_fn.bf)
+        goto_fn.pof = insert_gromet_object(goto_fn.pof, GrometPort(box=label_bf)) 
+        goto_fn.opo = insert_gromet_object(goto_fn.opi, GrometPort(box=len(goto_fn.b), name="label"))
+        goto_fn.wfopo = insert_gromet_object(goto_fn.wfopo, GrometWire(src=len(goto_fn.opo), tgt=len(goto_fn.pof)))
+
+        print("GOTO")
+
+    @_visit.register
+    def visit_label(
+        self, node: AnnCastLabel, parent_gromet_fn, parent_cast_node
+    ):
+        # print("LABEL")
+        parent_gromet_fn.bf = insert_gromet_object(parent_gromet_fn.bf, GrometBoxFunction(function_type=FunctionType.LABEL, name=node.label))
+        
+        # Associate this label with a particular index
+        fn_idx = self.peek_idx()
+        self.labels[node.label] = fn_idx
+
+        label_idx = len(parent_gromet_fn.bf)
+        vars = self.symtab_variables()
+
+        print(self.labels)
+
+        for var in vars:
+            for v in vars[var]: 
+                parent_gromet_fn.pif = insert_gromet_object(parent_gromet_fn.pif, GrometPort(box=label_idx))
+                parent_gromet_fn.pof = insert_gromet_object(parent_gromet_fn.pof, GrometPort(box=label_idx, name=v))
+        # print(node.label)
+        
+        # Get all the variables
+        # Create the bf for the label
+        # Create all the ports, wire accordingly
 
     @_visit.register
     def visit_literal_value(

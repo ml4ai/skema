@@ -173,6 +173,17 @@ class IdCollapsePass:
         self.visit_node_list(node.body, at_module_scope)
 
     @_visit.register
+    def visit_goto(self, node: AnnCastGoto, at_module_scope):
+        if node.expr != None:
+            self.visit(node.expr, at_module_scope)
+        # self.visit(node.label, at_module_scope)
+
+    @_visit.register
+    def visit_label(self, node: AnnCastLabel, at_module_scope):
+        # self.visit(node.label, at_module_scope)
+        pass
+
+    @_visit.register
     def visit_literal_value(self, node: AnnCastLiteralValue, at_module_scope):
         if node.value_type == "List[Any]":
             # operator - string

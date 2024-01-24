@@ -487,6 +487,29 @@ class ContainerScopePass:
         return combine_grfn_con_src_refs([args_src_ref, body_src_ref])
 
     @_visit.register
+    def visit_goto(
+        self,
+        node: AnnCastGoto,
+        base_func_scope_str,
+        enclosing_con_scope,
+        assign_side
+    ):
+        if node.expr != None:
+            self.visit(node.expr, base_func_scope_str, enclosing_con_scope, assign_side)
+        # self.visit(node.label, base_func_scope_str, enclosing_con_scope, assign_side)
+
+    @_visit.register
+    def visit_label(
+        self,
+        node: AnnCastLabel,
+        base_func_scope_str,
+        enclosing_con_scope,
+        assign_side
+    ):
+        # self.visit(node.label, base_func_scope_str, enclosing_con_scope, assign_side)
+        pass
+
+    @_visit.register
     def visit_literal_value(
         self,
         node: AnnCastLiteralValue,
