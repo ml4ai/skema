@@ -3,7 +3,7 @@ package org.ml4ai.skema.text_reading.scenario_context
 import org.clulab.odin.{EventMention, Mention, RelationMention, TextBoundMention}
 import org.ml4ai.skema.text_reading.attachments.{LocationContextAttachment, TimeContextAttachment}
 
-class ContextEngine(windowSize:Int, documentMentions:Iterable[Mention], orderer: MentionOrderer) {
+class ContextEngine(windowSize:Int, documentMentions:Iterable[Mention], orderer: MentionOrderer, useLLM: Boolean = false) {
 
 
   private val contextLabels = Set("Location", "Date")
@@ -34,8 +34,8 @@ class ContextEngine(windowSize:Int, documentMentions:Iterable[Mention], orderer:
             contextMentions
         }.groupBy(_.label).collect {
           case ("Location", mentions) =>
-            new LocationContextAttachment(mentions)
-          case ("Date", mentions) => new TimeContextAttachment(mentions)
+            new LocationContextAttachment(mentions.map(_.text))
+          case ("Date", mentions) => new TimeContextAttachment(mentions.map(_.text))
         }.toSeq.distinct
 
       m match {

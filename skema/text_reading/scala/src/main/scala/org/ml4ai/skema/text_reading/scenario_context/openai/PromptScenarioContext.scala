@@ -22,6 +22,7 @@ object TestPromptScenarioContext extends App {
   val focus = "P value < 0.001"
   val right = ") Pearson correlations of 0.92, 0.9, and Japan, and Shanghai Province, respectively. 0.8 for France, 4 NATURE COMMUNICATIONS |   (2021) 12:323  | https://doi.org/10.1038/s41467-020-20544-y | www.nature.com/naturecommunications        "
   prompter.promptForLocationContext(left, focus, right) foreach println
+  prompter.closeAll()
 }
 class PromptScenarioContext {
 
@@ -30,22 +31,23 @@ class PromptScenarioContext {
     .asInstanceOf[Logger]
     .setLevel(Level.INFO)
 
+  implicit val system: ActorSystem = ActorSystem()
+  implicit val materializer: Materializer = Materializer(system)
+  implicit val ec: ExecutionContext = ExecutionContext.Implicits.global
+  val service: OpenAIService = OpenAIServiceFactory()
 
+  def closeAll() = {
+    service.close()
+    system.terminate()
+  }
+
+  def promptForTemporalContext(left:String, focus:String, right:String):List[String] = Nil
   def promptForLocationContext(left:String, focus:String, right: String):List[String] = {
     val messages = Seq(
       SystemMessage("You are a scientist that reads research articles looking for the relevant geographical location that is context to a specific model variable or variable and its value."),
       UserMessage(s"You are a scientist that reads research articles looking for the relevant geographical location that is context to a specific model variable or variable and its value. Consider the the target model variable between triple quotes within the passage. Create a bulleted list with the most specific relevant locations on which the model variable holds. Be as specific as possible. If there is no relevant geographical context, say NO CONTEXT. After listing the geographic location contexts, write an explanation of why you arrived to the conclusion and why you didn't choose other geographic locations mentioned on the passage.\n\nHere is a relevant example to guide you:\n\n'''\nPassage:  NATURE COMMUNICATIONS | https://doi.org/10.1038/s41467-020-20544-y ARTICLE Fig. 6 Epidemic impact. a Scatter plot of the attack rate and the ```reproduction number R0```  from an age-structured SIR model using the contact matrix for each subnational location. European countries are included. The black line shows the results of the classic homogeneous mixing SIR model (no age groups). b Scatter plot of attack rates and the average age in each location. The black line represents the best-fitting linear model demonstrating a negative linear correlation between attack rates and the average age of the population. c Scatter plot of attack rates and percentage of the population attending educational institutions in each location. The black line represents the best-fitting linear model. from what are different is observed in all other locations (including their respective countries). A more detailed discussion is reported in Supplementary Information. If we consider the US state of New York as a reference and compute the distance from all other locations to it, a geographical pattern clearly emerges (Fig. 5b). Indeed, the contact patterns in most states of the US, and the urbanized areas of Canada and Australia appear to be very closely related to the one inferred for New York. In contrast, most of India, South Africa, and of the territories in Canada, Russia, and Australia have contact patterns noticeably different from those obtained for the state of New York. into after coming Epidemiological relevance. To investigate the effect of the computed contact matrices on infection transmission dynamics, we develop an age-structured SIR model to describe influenza transmission dynamics in the sites considered. The SIR model describes the spread of influenza in terms of the transition of individuals between different epidemiological compartments. Susceptible individuals (i.e., those at risk of acquiring the infection—S) can become infectious (i.e., capable to transmit the infection—I) contact with infectious individuals. Subsequently, infectious individuals recover from the infection and become removed (R) after a certain amount of time (the infectious period). In an age-structured implementa\n\nLocation Context: \n - European countries\n\nExplanation: European countries is the only relevant location in the same sentence where reproduction number R0 is mentioned. The rest of the geographic locations, such as Canada, India, etc., correspond to other independent statements\n'''\n\nFor this example, the relevant location context is ```European countries``` but it is not any other location according to the text.\n\nNow do it for the next example:\n\n'''\nPassage:  $left```$focus```$right\n\nLocation Context:\n'''")
     )
 
-    implicit val system: ActorSystem = ActorSystem()
-    implicit val materializer: Materializer = Materializer(system)
-    implicit val ec: ExecutionContext = ExecutionContext.Implicits.global
-    val service: OpenAIService = OpenAIServiceFactory()
-
-    def closeAll() = {
-      service.close()
-      system.terminate()
-    }
 
     val future = service
       .createChatCompletion(
@@ -63,10 +65,10 @@ class PromptScenarioContext {
         case Some(s:Success[ChatCompletionResponse]) =>
           val msg = s.value.choices.head.message.content
           val resp = msg.split("\n").withFilter(_.startsWith("- ")).map(_.drop(2)).toList
-          closeAll()
+//          closeAll()
           resp
         case _ =>
-          closeAll()
+//          closeAll()
           List.empty[String]
       }
   }
