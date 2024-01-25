@@ -3248,8 +3248,7 @@ class ToGrometPass:
         for var in vars:
             for v in vars[var]: 
                 parent_gromet_fn.pif = insert_gromet_object(parent_gromet_fn.pif, GrometPort(box=goto_idx_call))
-                # TODO: wiring
-                # self.wire_from_var_env()
+                self.wire_from_var_env(v, parent_gromet_fn)
 
         # Create its opis
         for var in vars:
