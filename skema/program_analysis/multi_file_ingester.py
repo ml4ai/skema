@@ -80,7 +80,6 @@ def process_file_system(
                 cast_list = [cast]
 
             for cast_module in cast_list:
-                #cur_dir = os.getcwd()
                 os.chdir(os.path.join(os.getcwd(), path))
                 generated_gromet = ann_cast_pipeline(
                     cast_module, gromet=True, to_file=False, from_obj=True
