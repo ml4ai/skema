@@ -274,6 +274,7 @@ class ToGrometPass:
 
         # Table of labels
         self.labels = {}
+        self.placeholder_gotos = {}
 
         # the fullid of a AnnCastName node is a string which includes its
         # variable name, numerical id, version, and scope
@@ -2939,6 +2940,17 @@ class ToGrometPass:
             GrometWire(src=len(gromet_fn.opo), tgt=len(gromet_fn.pof)),
         )
 
+    def resolve_placeholder_gotos(self):
+        # When we generate GOTOs, often we will see GOTOs referring to labels
+        # that we haven't seen in the pipeline yet. Here we resolve any
+        # GOTOs for which the labels we haven't seen yet.
+        for label in self.placeholder_gotos.keys():
+            for label_bf in self.placeholder_gotos[label]:
+                label_bf.value = self.labels[label]
+        self.placeholder_gotos = {}
+
+        self.clear_labels()
+
     def wire_return_node(self, node, gromet_fn):
         """Return statements have many ways in which they can be wired, and thus
         we use this recursive function to handle all the possible cases
@@ -3226,9 +3238,7 @@ class ToGrometPass:
         )
 
         self.pop_idx()
-        
-        # NOTE: Do we need to do this???
-        self.clear_labels()
+        self.resolve_placeholder_gotos()
         var_environment["args"] = deepcopy(prev_arg_env)
 
 
@@ -3251,21 +3261,40 @@ class ToGrometPass:
         parent_gromet_fn.bf = insert_gromet_object(parent_gromet_fn.bf, GrometBoxFunction(function_type=FunctionType.GOTO, name=node.label, body=goto_fn_idx))
         goto_idx_call = len(parent_gromet_fn.bf)
         vars = self.symtab_variables()
+        added_vars = []
         for var in vars:
             for v in vars[var]: 
-                parent_gromet_fn.pif = insert_gromet_object(parent_gromet_fn.pif, GrometPort(box=goto_idx_call))
-                self.wire_from_var_env(v, parent_gromet_fn)
+                if v not in added_vars: 
+                    parent_gromet_fn.pif = insert_gromet_object(parent_gromet_fn.pif, GrometPort(box=goto_idx_call))
+                    self.wire_from_var_env(v, parent_gromet_fn)
+                    added_vars.append(v)
 
-        # Create its opis
+        added_vars = []
         for var in vars:
             for v in vars[var]: 
-                goto_fn.opi = insert_gromet_object(goto_fn.opi, GrometPort(box=len(goto_fn.b)))
+                if v not in added_vars: 
+                    goto_fn.opi = insert_gromet_object(goto_fn.opi, GrometPort(box=len(goto_fn.b)))
+                    added_vars.append(v)
 
         # The goto expression FN has two potential expressions, to determine the label and the index
         # TODO: compute an expression for an index when expr is not None
         if node.expr == None: 
-            label_index = self.labels[node.label]
-            goto_fn.bf = insert_gromet_object(goto_fn.bf, GrometBoxFunction(function_type=FunctionType.LITERAL, value=label_index))
+            # When a GOTO references a label that we have not seen yet 
+            # We put a place holder that we can go fill out later
+            label_index_bf = GrometBoxFunction(function_type=FunctionType.LITERAL)
+            if node.label in self.labels:
+                label_index = self.labels[node.label]
+            else:
+                label_index = -1
+
+                # Multiple gotos could reference the same label that we haven't seen
+                # So we maintain a list that we can update later
+                if node.label not in self.placeholder_gotos.keys():
+                    self.placeholder_gotos[node.label] = []
+                self.placeholder_gotos[node.label].append(label_index_bf)
+            label_index_bf.value = label_index
+            goto_fn.bf = insert_gromet_object(goto_fn.bf, label_index_bf)
+
             index_comp_bf = len(goto_fn.bf)
             goto_fn.pof = insert_gromet_object(goto_fn.pof, GrometPort(box=index_comp_bf)) 
             goto_fn.opo = insert_gromet_object(goto_fn.opo, GrometPort(box=len(goto_fn.b), name="fn_idx"))
@@ -3291,13 +3320,16 @@ class ToGrometPass:
         label_idx = len(parent_gromet_fn.bf)
         vars = self.symtab_variables()
 
+        added_vars = []
         for var in vars:
             for v in vars[var]: 
-                parent_gromet_fn.pif = insert_gromet_object(parent_gromet_fn.pif, GrometPort(box=label_idx))    
-                self.wire_from_var_env(v, parent_gromet_fn)
+                if v not in added_vars: 
+                    parent_gromet_fn.pif = insert_gromet_object(parent_gromet_fn.pif, GrometPort(box=label_idx))    
+                    self.wire_from_var_env(v, parent_gromet_fn)
 
-                parent_gromet_fn.pof = insert_gromet_object(parent_gromet_fn.pof, GrometPort(box=label_idx, name=v))
-                self.add_var_to_env(v, None, parent_gromet_fn.pof[-1], len(parent_gromet_fn.pof), parent_cast_node)
+                    parent_gromet_fn.pof = insert_gromet_object(parent_gromet_fn.pof, GrometPort(box=label_idx, name=v))
+                    self.add_var_to_env(v, None, parent_gromet_fn.pof[-1], len(parent_gromet_fn.pof), parent_cast_node)
+                    added_vars.append(v)
 
     @_visit.register
     def visit_literal_value(
@@ -4136,7 +4168,7 @@ class ToGrometPass:
                 parent_gromet_fn.wcopi = insert_gromet_object(
                     parent_gromet_fn.wcopi, GrometWire(src=-1, tgt=-912)
                 )
-            elif parent_gromet_fn.opi == None and parent_gromet_fn.pof == None:
+            elif parent_gromet_fn.opi == None: # and parent_gromet_fn.pof == None:
                 # print(node.source_refs[0])
                 parent_gromet_fn.wcopi = insert_gromet_object(
                     parent_gromet_fn.wcopi,
