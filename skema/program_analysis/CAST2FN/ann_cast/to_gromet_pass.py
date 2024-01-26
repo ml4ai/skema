@@ -4168,7 +4168,7 @@ class ToGrometPass:
                 parent_gromet_fn.wcopi = insert_gromet_object(
                     parent_gromet_fn.wcopi, GrometWire(src=-1, tgt=-912)
                 )
-            elif parent_gromet_fn.opi == None: # and parent_gromet_fn.pof == None:
+            elif parent_gromet_fn.opi == None and parent_gromet_fn.pof == None:
                 # print(node.source_refs[0])
                 parent_gromet_fn.wcopi = insert_gromet_object(
                     parent_gromet_fn.wcopi,

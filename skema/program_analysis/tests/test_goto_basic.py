@@ -92,9 +92,9 @@ def test_goto0():
     assert label_fn.wff[1].src == 2
     assert label_fn.wff[1].tgt == 2
 
-    # assert len(label_fn.wfc) == 1
-    # assert label_fn.wfc[0].src == 1
-    # assert label_fn.wfc[0].tgt == 3
+    assert len(label_fn.wfc) == 1
+    assert label_fn.wfc[0].src == 1
+    assert label_fn.wfc[0].tgt == 3
     
     assert len(label_fn.bc) == 1
     assert label_fn.bc[0].condition == 5
