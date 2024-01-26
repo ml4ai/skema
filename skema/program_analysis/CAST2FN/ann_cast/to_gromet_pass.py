@@ -4170,32 +4170,10 @@ class ToGrometPass:
                 )
             elif parent_gromet_fn.opi == None: # and parent_gromet_fn.pof == None:
                 # print(node.source_refs[0])
-                if parent_gromet_fn.pof != None:
-                    for pic_idx, pic in enumerate(parent_gromet_fn.pic, 1):
-                        if pic.box == bc_index:
-                            port = self.retrieve_var_port(pic.name)
-                            if port != -1:
-                                if self.check_var_location(pic.name, "local"):
-                                    parent_gromet_fn.wfc = insert_gromet_object(
-                                        parent_gromet_fn.wfc,
-                                        GrometWire(src=pic_idx, tgt=port),
-                                    )
-                                elif self.check_var_location(pic.name, "args"):
-                                    parent_gromet_fn.wcopi = insert_gromet_object(
-                                        parent_gromet_fn.wcopi,
-                                        GrometWire(src=pic_idx, tgt=port),
-                                    )
-                                elif self.check_var_location(pic.name, "global"):
-                                    parent_gromet_fn.wfc = insert_gromet_object(
-                                        parent_gromet_fn.wfc,
-                                        GrometWire(src=pic_idx, tgt=port),
-                                    )
-                else:
-                    parent_gromet_fn.wcopi = insert_gromet_object(
-                        parent_gromet_fn.wcopi,
-                        GrometWire(src=len(parent_gromet_fn.pic), tgt=-913),
-                    )
-
+                parent_gromet_fn.wcopi = insert_gromet_object(
+                    parent_gromet_fn.wcopi,
+                    GrometWire(src=len(parent_gromet_fn.pic), tgt=-913),
+                )
             elif parent_gromet_fn.pic == None:
                 # print(node.source_refs[0])
                 parent_gromet_fn.wcopi = insert_gromet_object(
