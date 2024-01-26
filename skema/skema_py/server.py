@@ -147,27 +147,18 @@ async def system_to_gromet(system: System):
 
         # Itterate over parent directories to check for unsupported file paths
         path_obj = Path(file)
-        while path_obj != path_obj.root:
-            if path_obj.is_dir():
-                if path_obj.name == "_MACOS":
-                    unsupported_file_str = f"WARNING: Ingestion of files in _MACOSX directory not supported. File {file} will be skipped. "
-                    valid = False
-                elif path_obj.name.startswith("."):
-                    unsupported_file_str = f"WARNING: File {file} is in a hidden directory and will be skipped."
-                    valid = False
-            path_obj = path_obj.parent
+        for parent in path_obj.parents:
+            if parent.name == "_MACOSX":
+                unsupported_file_str = f"WARNING: Ingestion of files in _MACOSX directory not supported. File {file} will be skipped. "
+                valid = False
+            elif parent.name.startswith("."):
+                unsupported_file_str = f"WARNING: File {file} is in a hidden directory and will be skipped."
+                valid = False
 
         # Check file extension is in the list of supported file extensions
         if Path(file).suffix not in SUPPORTED_FILE_EXTENSIONS:
             unsupported_file_str = f"WARNING: Ingestion of file extension {Path(file).suffix} for file {file} is not supported and will be skipped."
             valid = False
-        else:
-            # Check if source file is utf-8 encoded
-            try:
-                blob.decode("utf-8")
-            except:
-                unsupported_file_str = f"WARNING: File {file} is not utf-8 encoded and will be skipped"
-                valid = False
         
         if not valid:
             to_remove.append(index)
