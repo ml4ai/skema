@@ -35,7 +35,7 @@ from skema.program_analysis.CAST2FN.model.cast import (
     Var,
     Call,
     Name,
-    LiteralValue,
+    CASTLiteralValue,
     ModelIf,
     Loop,
     Operator
@@ -82,7 +82,7 @@ def test_for1():
     assert isinstance(asg_node.left.val, Name)
     assert asg_node.left.val.name == &#34;x&#34;
 
-    assert isinstance(asg_node.right, LiteralValue)
+    assert isinstance(asg_node.right, CASTLiteralValue)
     assert asg_node.right.value_type == &#34;Integer&#34;
     assert asg_node.right.value == &#39;7&#39;
 
@@ -104,15 +104,15 @@ def test_for1():
     assert iter_args[0].func.name == &#34;range&#34;
     assert len(iter_args[0].arguments) == 3
 
-    assert isinstance(iter_args[0].arguments[0], LiteralValue)
+    assert isinstance(iter_args[0].arguments[0], CASTLiteralValue)
     assert iter_args[0].arguments[0].value == &#34;1&#34;
-    assert isinstance(iter_args[0].arguments[1], LiteralValue)
+    assert isinstance(iter_args[0].arguments[1], CASTLiteralValue)
     assert iter_args[0].arguments[1].value == &#34;10&#34;
-    assert isinstance(iter_args[0].arguments[2], LiteralValue)
+    assert isinstance(iter_args[0].arguments[2], CASTLiteralValue)
     assert iter_args[0].arguments[2].value == &#34;1&#34;
 
     assert isinstance(loop_pre[1], Assignment)
-    assert isinstance(loop_pre[1].left, LiteralValue)
+    assert isinstance(loop_pre[1].left, CASTLiteralValue)
     assert loop_pre[1].left.value_type == &#34;Tuple&#34;
 
     assert isinstance(loop_pre[1].left.value[0], Var)
@@ -134,7 +134,7 @@ def test_for1():
     assert isinstance(loop_test.operands[0], Name)
     assert loop_test.operands[0].name == &#34;sc_0&#34;
 
-    assert isinstance(loop_test.operands[1], LiteralValue)
+    assert isinstance(loop_test.operands[1], CASTLiteralValue)
     assert loop_test.operands[1].value_type == &#34;Boolean&#34;
 
     # Loop Body
@@ -157,7 +157,7 @@ def test_for2():
     assert isinstance(asg_node.left.val, Name)
     assert asg_node.left.val.name == &#34;x&#34;
 
-    assert isinstance(asg_node.right, LiteralValue)
+    assert isinstance(asg_node.right, CASTLiteralValue)
     assert asg_node.right.value_type == &#34;Integer&#34;
     assert asg_node.right.value == &#39;1&#39;
 
@@ -179,18 +179,18 @@ def test_for2():
     assert iter_args[0].func.name == &#34;range&#34;
     assert len(iter_args[0].arguments) == 3
 
-    assert isinstance(iter_args[0].arguments[0], LiteralValue)
+    assert isinstance(iter_args[0].arguments[0], CASTLiteralValue)
     assert iter_args[0].arguments[0].value == &#34;1&#34;
-    assert isinstance(iter_args[0].arguments[1], LiteralValue)
+    assert isinstance(iter_args[0].arguments[1], CASTLiteralValue)
     assert iter_args[0].arguments[1].value == &#34;10&#34;
-    assert isinstance(iter_args[0].arguments[2], LiteralValue)
+    assert isinstance(iter_args[0].arguments[2], CASTLiteralValue)
     assert iter_args[0].arguments[2].value == &#34;1&#34;
 
     assert isinstance(loop_pre[1], Assignment)
-    assert isinstance(loop_pre[1].left, LiteralValue)
+    assert isinstance(loop_pre[1].left, CASTLiteralValue)
     assert loop_pre[1].left.value_type == &#34;Tuple&#34;
 
-    assert isinstance(loop_pre[1].left.value[0], LiteralValue)
+    assert isinstance(loop_pre[1].left.value[0], CASTLiteralValue)
     assert loop_pre[1].left.value[0].value_type == &#34;Tuple&#34;
 
     assert isinstance(loop_pre[1].left.value[0].value[0], Var)
@@ -215,7 +215,7 @@ def test_for2():
     assert isinstance(loop_test.operands[0], Name)
     assert loop_test.operands[0].name == &#34;sc_0&#34;
 
-    assert isinstance(loop_test.operands[1], LiteralValue)
+    assert isinstance(loop_test.operands[1], CASTLiteralValue)
     assert loop_test.operands[1].value_type == &#34;Boolean&#34;
 
     # Loop Body
@@ -253,7 +253,7 @@ def test_for3():
     assert isinstance(asg_node.left.val, Name)
     assert asg_node.left.val.name == &#34;x&#34;
 
-    assert isinstance(asg_node.right, LiteralValue)
+    assert isinstance(asg_node.right, CASTLiteralValue)
     assert asg_node.right.value_type == &#34;Integer&#34;
     assert asg_node.right.value == &#39;1&#39;
 
@@ -264,7 +264,7 @@ def test_for3():
     assert isinstance(list_node.left, Var)
     assert list_node.left.val.name == &#34;L&#34;
 
-    assert isinstance(list_node.right, LiteralValue)
+    assert isinstance(list_node.right, CASTLiteralValue)
     assert list_node.right.value_type == &#34;List&#34;
 
     # Loop Pre
@@ -282,7 +282,7 @@ def test_for3():
     assert iter_args[0].val.name == &#34;L&#34;
 
     assert isinstance(loop_pre[1], Assignment)
-    assert isinstance(loop_pre[1].left, LiteralValue)
+    assert isinstance(loop_pre[1].left, CASTLiteralValue)
     assert loop_pre[1].left.value_type == &#34;Tuple&#34;
 
     assert isinstance(loop_pre[1].left.value[0], Var)
@@ -304,7 +304,7 @@ def test_for3():
     assert isinstance(loop_test.operands[0], Name)
     assert loop_test.operands[0].name == &#34;sc_0&#34;
 
-    assert isinstance(loop_test.operands[1], LiteralValue)
+    assert isinstance(loop_test.operands[1], CASTLiteralValue)
     assert loop_test.operands[1].value_type == &#34;Boolean&#34;
 
     # Loop Body
@@ -413,7 +413,7 @@ for i in L:
     assert isinstance(asg_node.left.val, Name)
     assert asg_node.left.val.name == &#34;x&#34;
 
-    assert isinstance(asg_node.right, LiteralValue)
+    assert isinstance(asg_node.right, CASTLiteralValue)
     assert asg_node.right.value_type == &#34;Integer&#34;
     assert asg_node.right.value == &#39;7&#39;
 
@@ -435,15 +435,15 @@ for i in L:
     assert iter_args[0].func.name == &#34;range&#34;
     assert len(iter_args[0].arguments) == 3
 
-    assert isinstance(iter_args[0].arguments[0], LiteralValue)
+    assert isinstance(iter_args[0].arguments[0], CASTLiteralValue)
     assert iter_args[0].arguments[0].value == &#34;1&#34;
-    assert isinstance(iter_args[0].arguments[1], LiteralValue)
+    assert isinstance(iter_args[0].arguments[1], CASTLiteralValue)
     assert iter_args[0].arguments[1].value == &#34;10&#34;
-    assert isinstance(iter_args[0].arguments[2], LiteralValue)
+    assert isinstance(iter_args[0].arguments[2], CASTLiteralValue)
     assert iter_args[0].arguments[2].value == &#34;1&#34;
 
     assert isinstance(loop_pre[1], Assignment)
-    assert isinstance(loop_pre[1].left, LiteralValue)
+    assert isinstance(loop_pre[1].left, CASTLiteralValue)
     assert loop_pre[1].left.value_type == &#34;Tuple&#34;
 
     assert isinstance(loop_pre[1].left.value[0], Var)
@@ -465,7 +465,7 @@ for i in L:
     assert isinstance(loop_test.operands[0], Name)
     assert loop_test.operands[0].name == &#34;sc_0&#34;
 
-    assert isinstance(loop_test.operands[1], LiteralValue)
+    assert isinstance(loop_test.operands[1], CASTLiteralValue)
     assert loop_test.operands[1].value_type == &#34;Boolean&#34;
 
     # Loop Body
@@ -497,7 +497,7 @@ for i in L:
     assert isinstance(asg_node.left.val, Name)
     assert asg_node.left.val.name == &#34;x&#34;
 
-    assert isinstance(asg_node.right, LiteralValue)
+    assert isinstance(asg_node.right, CASTLiteralValue)
     assert asg_node.right.value_type == &#34;Integer&#34;
     assert asg_node.right.value == &#39;1&#39;
 
@@ -519,18 +519,18 @@ for i in L:
     assert iter_args[0].func.name == &#34;range&#34;
     assert len(iter_args[0].arguments) == 3
 
-    assert isinstance(iter_args[0].arguments[0], LiteralValue)
+    assert isinstance(iter_args[0].arguments[0], CASTLiteralValue)
     assert iter_args[0].arguments[0].value == &#34;1&#34;
-    assert isinstance(iter_args[0].arguments[1], LiteralValue)
+    assert isinstance(iter_args[0].arguments[1], CASTLiteralValue)
     assert iter_args[0].arguments[1].value == &#34;10&#34;
-    assert isinstance(iter_args[0].arguments[2], LiteralValue)
+    assert isinstance(iter_args[0].arguments[2], CASTLiteralValue)
     assert iter_args[0].arguments[2].value == &#34;1&#34;
 
     assert isinstance(loop_pre[1], Assignment)
-    assert isinstance(loop_pre[1].left, LiteralValue)
+    assert isinstance(loop_pre[1].left, CASTLiteralValue)
     assert loop_pre[1].left.value_type == &#34;Tuple&#34;
 
-    assert isinstance(loop_pre[1].left.value[0], LiteralValue)
+    assert isinstance(loop_pre[1].left.value[0], CASTLiteralValue)
     assert loop_pre[1].left.value[0].value_type == &#34;Tuple&#34;
 
     assert isinstance(loop_pre[1].left.value[0].value[0], Var)
@@ -555,7 +555,7 @@ for i in L:
     assert isinstance(loop_test.operands[0], Name)
     assert loop_test.operands[0].name == &#34;sc_0&#34;
 
-    assert isinstance(loop_test.operands[1], LiteralValue)
+    assert isinstance(loop_test.operands[1], CASTLiteralValue)
     assert loop_test.operands[1].value_type == &#34;Boolean&#34;
 
     # Loop Body
@@ -602,7 +602,7 @@ for i in L:
     assert isinstance(asg_node.left.val, Name)
     assert asg_node.left.val.name == &#34;x&#34;
 
-    assert isinstance(asg_node.right, LiteralValue)
+    assert isinstance(asg_node.right, CASTLiteralValue)
     assert asg_node.right.value_type == &#34;Integer&#34;
     assert asg_node.right.value == &#39;1&#39;
 
@@ -613,7 +613,7 @@ for i in L:
     assert isinstance(list_node.left, Var)
     assert list_node.left.val.name == &#34;L&#34;
 
-    assert isinstance(list_node.right, LiteralValue)
+    assert isinstance(list_node.right, CASTLiteralValue)
     assert list_node.right.value_type == &#34;List&#34;
 
     # Loop Pre
@@ -631,7 +631,7 @@ for i in L:
     assert iter_args[0].val.name == &#34;L&#34;
 
     assert isinstance(loop_pre[1], Assignment)
-    assert isinstance(loop_pre[1].left, LiteralValue)
+    assert isinstance(loop_pre[1].left, CASTLiteralValue)
     assert loop_pre[1].left.value_type == &#34;Tuple&#34;
 
     assert isinstance(loop_pre[1].left.value[0], Var)
@@ -653,7 +653,7 @@ for i in L:
     assert isinstance(loop_test.operands[0], Name)
     assert loop_test.operands[0].name == &#34;sc_0&#34;
 
-    assert isinstance(loop_test.operands[1], LiteralValue)
+    assert isinstance(loop_test.operands[1], CASTLiteralValue)
     assert loop_test.operands[1].value_type == &#34;Boolean&#34;
 
     # Loop Body

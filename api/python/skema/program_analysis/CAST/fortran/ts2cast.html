@@ -41,7 +41,7 @@ from skema.program_analysis.CAST2FN.model.cast import (
     SourceRef,
     ModelBreak,
     Assignment,
-    LiteralValue,
+    CASTLiteralValue,
     Var,
     VarType,
     Name,
@@ -56,6 +56,8 @@ from skema.program_analysis.CAST2FN.model.cast import (
     ModelIf,
     RecordDef,
     Attribute,
+    Label,
+    Goto,
 )
 
 from skema.program_analysis.CAST.fortran.variable_context import VariableContext
@@ -107,7 +109,7 @@ class TS2CAST(object):
 
         # Start visiting
         self.out_cast = self.generate_cast()
-        # print(self.out_cast[0].to_json_str())
+        #print(self.out_cast[0].to_json_str())
 
     def generate_cast(self) -&gt; List[CAST]:
         &#34;&#34;&#34;Interface for generating CAST.&#34;&#34;&#34;
@@ -183,6 +185,8 @@ class TS2CAST(object):
             return self.visit_literal(node)
         elif node.type == &#34;keyword_statement&#34;:
             return self.visit_keyword_statement(node)
+        elif node.type == &#34;statement_label&#34;:
+            return self.visit_statement_label(node)
         elif node.type in builtin_statements:
             return self.visit_fortran_builtin_statement(node)
         elif node.type == &#34;extent_specifier&#34;:
@@ -406,11 +410,16 @@ class TS2CAST(object):
         )
 
     def visit_keyword_statement(self, node):
-        # NOTE: RETURN is not the only Fortran keyword. GO TO and CONTINUE are also considered keywords.
-        # TODO: Handle GO TO and CONTINUE
+        # NOTE: RETURN is not the only Fortran keyword. GO TO and CONTINUE are also considered keywords
         identifier = self.node_helper.get_identifier(node).lower()
         if node.type == &#34;keyword_statement&#34;:
-            if &#34;continue&#34; in identifier or &#34;go to&#34; in identifier:
+            if &#34;go to&#34; in identifier:
+                statement_label_reference = get_first_child_by_type(node, &#34;statement_label_reference&#34;)
+                return Goto(
+                    label=self.node_helper.get_identifier(statement_label_reference),
+                    expr=None
+                )
+            if &#34;continue&#34; in identifier:
                 return self._visit_no_op(node)
             if &#34;exit&#34; in identifier:
                 return ModelBreak(source_refs=[self.node_helper.get_source_ref(node)])
@@ -424,19 +433,25 @@ class TS2CAST(object):
         if len(return_values) == 1:
             value = self.variable_context.get_node(list(return_values)[0])
         elif len(return_values) &gt; 1:
-            value = LiteralValue(
+            value = CASTLiteralValue(
                 value_type=&#34;Tuple&#34;,
                 value=[self.variable_context.get_node(ret) for ret in return_values],
                 source_code_data_type=None,
                 source_refs=None,
             )
         else:
-            value = LiteralValue(value=None, value_type=None, source_refs=None)
+            value = CASTLiteralValue(value=None, value_type=None, source_refs=None)
 
         return ModelReturn(
             value=value, source_refs=[self.node_helper.get_source_ref(node)]
         )
 
+    def visit_statement_label(self, node):
+        &#34;&#34;&#34;Visitor for fortran statement labels&#34;&#34;&#34;
+        return Label(
+            label=self.node_helper.get_identifier(node)
+        )
+    
     def visit_fortran_builtin_statement(self, node):
         &#34;&#34;&#34;Visitor for Fortran keywords that are not classified as keyword_statement by tree-sitter&#34;&#34;&#34;
         # All of the node types that fall into this category end with _statment.
@@ -543,7 +558,7 @@ class TS2CAST(object):
             itterator, start, stop = [
                 self.visit(child) for child in loop_control_children
             ]
-            step = LiteralValue(&#34;Integer&#34;, &#34;1&#34;)
+            step = CASTLiteralValue(&#34;Integer&#34;, &#34;1&#34;)
         elif len(loop_control_children) == 4:
             itterator, start, stop, step = [
                 self.visit(child) for child in loop_control_children
@@ -575,7 +590,7 @@ class TS2CAST(object):
         # (i, generated_iter_0, sc_0) = next(generated_iter_0)
         pre.append(
             Assignment(
-                left=LiteralValue(
+                left=CASTLiteralValue(
                     &#34;Tuple&#34;,
                     [
                         itterator,
@@ -596,7 +611,7 @@ class TS2CAST(object):
             op=&#34;!=&#34;,  # TODO: Should this be == or !=
             operands=[
                 Var(stop_condition_name_node, &#34;Boolean&#34;),
-                LiteralValue(&#34;Boolean&#34;, True),
+                CASTLiteralValue(&#34;Boolean&#34;, True),
             ],
         )
 
@@ -605,7 +620,7 @@ class TS2CAST(object):
         # We just need to append the iterator next call
         body.append(
             Assignment(
-                left=LiteralValue(
+                left=CASTLiteralValue(
                     &#34;Tuple&#34;,
                     [
                         itterator,
@@ -692,8 +707,8 @@ class TS2CAST(object):
         if len(node.children) &lt; 3:
             return self.visit_math_expression(node)
 
-        literal_value_false = LiteralValue(&#34;Boolean&#34;, False)
-        literal_value_true = LiteralValue(&#34;Boolean&#34;, True)
+        literal_value_false = CASTLiteralValue(&#34;Boolean&#34;, False)
+        literal_value_true = CASTLiteralValue(&#34;Boolean&#34;, True)
 
         # AND: Right side goes in body if, left side in condition
         # OR: Right side goes in body else, left side in condition
@@ -731,8 +746,8 @@ class TS2CAST(object):
             source_refs=[self.node_helper.get_source_ref(node)],
         )
 
-    def visit_literal(self, node) -&gt; LiteralValue:
-        &#34;&#34;&#34;Visitor for literals. Returns a LiteralValue&#34;&#34;&#34;
+    def visit_literal(self, node) -&gt; CASTLiteralValue:
+        &#34;&#34;&#34;Visitor for literals. Returns a CASTLiteralValue&#34;&#34;&#34;
         literal_type = node.type
         literal_value = self.node_helper.get_identifier(node)
         literal_source_ref = self.node_helper.get_source_ref(node)
@@ -740,14 +755,14 @@ class TS2CAST(object):
         if literal_type == &#34;number_literal&#34;:
             # Check if this is a real value, or an Integer
             if &#34;e&#34; in literal_value.lower() or &#34;.&#34; in literal_value:
-                return LiteralValue(
+                return CASTLiteralValue(
                     value_type=&#34;AbstractFloat&#34;,
                     value=literal_value,
                     source_code_data_type=[&#34;Fortran&#34;, &#34;Fortran95&#34;, &#34;real&#34;],
                     source_refs=[literal_source_ref],
                 )
             else:
-                return LiteralValue(
+                return CASTLiteralValue(
                     value_type=&#34;Integer&#34;,
                     value=literal_value,
                     source_code_data_type=[&#34;Fortran&#34;, &#34;Fortran95&#34;, &#34;integer&#34;],
@@ -755,7 +770,7 @@ class TS2CAST(object):
                 )
 
         elif literal_type == &#34;string_literal&#34;:
-            return LiteralValue(
+            return CASTLiteralValue(
                 value_type=&#34;Character&#34;,
                 value=literal_value,
                 source_code_data_type=[&#34;Fortran&#34;, &#34;Fortran95&#34;, &#34;character&#34;],
@@ -763,7 +778,7 @@ class TS2CAST(object):
             )
 
         elif literal_type == &#34;boolean_literal&#34;:
-            return LiteralValue(
+            return CASTLiteralValue(
                 value_type=&#34;Boolean&#34;,
                 value=literal_value,
                 source_code_data_type=[&#34;Fortran&#34;, &#34;Fortran95&#34;, &#34;logical&#34;],
@@ -779,7 +794,7 @@ class TS2CAST(object):
             if implied_do_loop_expression_node:
                 return self._visit_implied_do_loop(implied_do_loop_expression_node)
 
-            return LiteralValue(
+            return CASTLiteralValue(
                 value_type=&#34;List&#34;,
                 value=[
                     self.visit(element) for element in get_non_control_children(node)
@@ -948,9 +963,9 @@ class TS2CAST(object):
         # Fortran uses the character &#39;:&#39; to differentiate these values
         argument_pointer = 0
         arguments = [
-            LiteralValue(&#34;None&#34;, &#34;None&#34;),
-            LiteralValue(&#34;None&#34;, &#34;None&#34;),
-            LiteralValue(&#34;None&#34;, &#34;None&#34;),
+            CASTLiteralValue(&#34;None&#34;, &#34;None&#34;),
+            CASTLiteralValue(&#34;None&#34;, &#34;None&#34;),
+            CASTLiteralValue(&#34;None&#34;, &#34;None&#34;),
         ]
         for child in node.children:
             if child.type == &#34;:&#34;:
@@ -1102,7 +1117,7 @@ class TS2CAST(object):
 
         # If there are more than one arguments, then this is a multi dimensional array and we need to use an extended slice
         if len(argument_nodes) &gt; 1:
-            dimension_list = LiteralValue()
+            dimension_list = CASTLiteralValue()
             dimension_list.value_type = &#34;List&#34;
             dimension_list.value = []
             for argument in argument_nodes:
@@ -1157,7 +1172,7 @@ class TS2CAST(object):
         # Fortran has certain while(True) constructs that won&#39;t contain a while_statement node
         if not while_statement_node:
             body_start_index = 0
-            expr = LiteralValue(
+            expr = CASTLiteralValue(
                 value_type=&#34;Boolean&#34;,
                 value=&#34;True&#34;,
             )
@@ -1192,7 +1207,7 @@ class TS2CAST(object):
             itterator, start, stop = [
                 self.visit(child) for child in loop_control_children
             ]
-            step = LiteralValue(&#34;Integer&#34;, &#34;1&#34;)
+            step = CASTLiteralValue(&#34;Integer&#34;, &#34;1&#34;)
         elif len(loop_control_children) == 4:
             itterator, start, stop, step = [
                 self.visit(child) for child in loop_control_children
@@ -1292,7 +1307,7 @@ class TS2CAST(object):
 
         # Start visiting
         self.out_cast = self.generate_cast()
-        # print(self.out_cast[0].to_json_str())
+        #print(self.out_cast[0].to_json_str())
 
     def generate_cast(self) -&gt; List[CAST]:
         &#34;&#34;&#34;Interface for generating CAST.&#34;&#34;&#34;
@@ -1368,6 +1383,8 @@ class TS2CAST(object):
             return self.visit_literal(node)
         elif node.type == &#34;keyword_statement&#34;:
             return self.visit_keyword_statement(node)
+        elif node.type == &#34;statement_label&#34;:
+            return self.visit_statement_label(node)
         elif node.type in builtin_statements:
             return self.visit_fortran_builtin_statement(node)
         elif node.type == &#34;extent_specifier&#34;:
@@ -1591,11 +1608,16 @@ class TS2CAST(object):
         )
 
     def visit_keyword_statement(self, node):
-        # NOTE: RETURN is not the only Fortran keyword. GO TO and CONTINUE are also considered keywords.
-        # TODO: Handle GO TO and CONTINUE
+        # NOTE: RETURN is not the only Fortran keyword. GO TO and CONTINUE are also considered keywords
         identifier = self.node_helper.get_identifier(node).lower()
         if node.type == &#34;keyword_statement&#34;:
-            if &#34;continue&#34; in identifier or &#34;go to&#34; in identifier:
+            if &#34;go to&#34; in identifier:
+                statement_label_reference = get_first_child_by_type(node, &#34;statement_label_reference&#34;)
+                return Goto(
+                    label=self.node_helper.get_identifier(statement_label_reference),
+                    expr=None
+                )
+            if &#34;continue&#34; in identifier:
                 return self._visit_no_op(node)
             if &#34;exit&#34; in identifier:
                 return ModelBreak(source_refs=[self.node_helper.get_source_ref(node)])
@@ -1609,19 +1631,25 @@ class TS2CAST(object):
         if len(return_values) == 1:
             value = self.variable_context.get_node(list(return_values)[0])
         elif len(return_values) &gt; 1:
-            value = LiteralValue(
+            value = CASTLiteralValue(
                 value_type=&#34;Tuple&#34;,
                 value=[self.variable_context.get_node(ret) for ret in return_values],
                 source_code_data_type=None,
                 source_refs=None,
             )
         else:
-            value = LiteralValue(value=None, value_type=None, source_refs=None)
+            value = CASTLiteralValue(value=None, value_type=None, source_refs=None)
 
         return ModelReturn(
             value=value, source_refs=[self.node_helper.get_source_ref(node)]
         )
 
+    def visit_statement_label(self, node):
+        &#34;&#34;&#34;Visitor for fortran statement labels&#34;&#34;&#34;
+        return Label(
+            label=self.node_helper.get_identifier(node)
+        )
+    
     def visit_fortran_builtin_statement(self, node):
         &#34;&#34;&#34;Visitor for Fortran keywords that are not classified as keyword_statement by tree-sitter&#34;&#34;&#34;
         # All of the node types that fall into this category end with _statment.
@@ -1728,7 +1756,7 @@ class TS2CAST(object):
             itterator, start, stop = [
                 self.visit(child) for child in loop_control_children
             ]
-            step = LiteralValue(&#34;Integer&#34;, &#34;1&#34;)
+            step = CASTLiteralValue(&#34;Integer&#34;, &#34;1&#34;)
         elif len(loop_control_children) == 4:
             itterator, start, stop, step = [
                 self.visit(child) for child in loop_control_children
@@ -1760,7 +1788,7 @@ class TS2CAST(object):
         # (i, generated_iter_0, sc_0) = next(generated_iter_0)
         pre.append(
             Assignment(
-                left=LiteralValue(
+                left=CASTLiteralValue(
                     &#34;Tuple&#34;,
                     [
                         itterator,
@@ -1781,7 +1809,7 @@ class TS2CAST(object):
             op=&#34;!=&#34;,  # TODO: Should this be == or !=
             operands=[
                 Var(stop_condition_name_node, &#34;Boolean&#34;),
-                LiteralValue(&#34;Boolean&#34;, True),
+                CASTLiteralValue(&#34;Boolean&#34;, True),
             ],
         )
 
@@ -1790,7 +1818,7 @@ class TS2CAST(object):
         # We just need to append the iterator next call
         body.append(
             Assignment(
-                left=LiteralValue(
+                left=CASTLiteralValue(
                     &#34;Tuple&#34;,
                     [
                         itterator,
@@ -1877,8 +1905,8 @@ class TS2CAST(object):
         if len(node.children) &lt; 3:
             return self.visit_math_expression(node)
 
-        literal_value_false = LiteralValue(&#34;Boolean&#34;, False)
-        literal_value_true = LiteralValue(&#34;Boolean&#34;, True)
+        literal_value_false = CASTLiteralValue(&#34;Boolean&#34;, False)
+        literal_value_true = CASTLiteralValue(&#34;Boolean&#34;, True)
 
         # AND: Right side goes in body if, left side in condition
         # OR: Right side goes in body else, left side in condition
@@ -1916,8 +1944,8 @@ class TS2CAST(object):
             source_refs=[self.node_helper.get_source_ref(node)],
         )
 
-    def visit_literal(self, node) -&gt; LiteralValue:
-        &#34;&#34;&#34;Visitor for literals. Returns a LiteralValue&#34;&#34;&#34;
+    def visit_literal(self, node) -&gt; CASTLiteralValue:
+        &#34;&#34;&#34;Visitor for literals. Returns a CASTLiteralValue&#34;&#34;&#34;
         literal_type = node.type
         literal_value = self.node_helper.get_identifier(node)
         literal_source_ref = self.node_helper.get_source_ref(node)
@@ -1925,14 +1953,14 @@ class TS2CAST(object):
         if literal_type == &#34;number_literal&#34;:
             # Check if this is a real value, or an Integer
             if &#34;e&#34; in literal_value.lower() or &#34;.&#34; in literal_value:
-                return LiteralValue(
+                return CASTLiteralValue(
                     value_type=&#34;AbstractFloat&#34;,
                     value=literal_value,
                     source_code_data_type=[&#34;Fortran&#34;, &#34;Fortran95&#34;, &#34;real&#34;],
                     source_refs=[literal_source_ref],
                 )
             else:
-                return LiteralValue(
+                return CASTLiteralValue(
                     value_type=&#34;Integer&#34;,
                     value=literal_value,
                     source_code_data_type=[&#34;Fortran&#34;, &#34;Fortran95&#34;, &#34;integer&#34;],
@@ -1940,7 +1968,7 @@ class TS2CAST(object):
                 )
 
         elif literal_type == &#34;string_literal&#34;:
-            return LiteralValue(
+            return CASTLiteralValue(
                 value_type=&#34;Character&#34;,
                 value=literal_value,
                 source_code_data_type=[&#34;Fortran&#34;, &#34;Fortran95&#34;, &#34;character&#34;],
@@ -1948,7 +1976,7 @@ class TS2CAST(object):
             )
 
         elif literal_type == &#34;boolean_literal&#34;:
-            return LiteralValue(
+            return CASTLiteralValue(
                 value_type=&#34;Boolean&#34;,
                 value=literal_value,
                 source_code_data_type=[&#34;Fortran&#34;, &#34;Fortran95&#34;, &#34;logical&#34;],
@@ -1964,7 +1992,7 @@ class TS2CAST(object):
             if implied_do_loop_expression_node:
                 return self._visit_implied_do_loop(implied_do_loop_expression_node)
 
-            return LiteralValue(
+            return CASTLiteralValue(
                 value_type=&#34;List&#34;,
                 value=[
                     self.visit(element) for element in get_non_control_children(node)
@@ -2133,9 +2161,9 @@ class TS2CAST(object):
         # Fortran uses the character &#39;:&#39; to differentiate these values
         argument_pointer = 0
         arguments = [
-            LiteralValue(&#34;None&#34;, &#34;None&#34;),
-            LiteralValue(&#34;None&#34;, &#34;None&#34;),
-            LiteralValue(&#34;None&#34;, &#34;None&#34;),
+            CASTLiteralValue(&#34;None&#34;, &#34;None&#34;),
+            CASTLiteralValue(&#34;None&#34;, &#34;None&#34;),
+            CASTLiteralValue(&#34;None&#34;, &#34;None&#34;),
         ]
         for child in node.children:
             if child.type == &#34;:&#34;:
@@ -2287,7 +2315,7 @@ class TS2CAST(object):
 
         # If there are more than one arguments, then this is a multi dimensional array and we need to use an extended slice
         if len(argument_nodes) &gt; 1:
-            dimension_list = LiteralValue()
+            dimension_list = CASTLiteralValue()
             dimension_list.value_type = &#34;List&#34;
             dimension_list.value = []
             for argument in argument_nodes:
@@ -2342,7 +2370,7 @@ class TS2CAST(object):
         # Fortran has certain while(True) constructs that won&#39;t contain a while_statement node
         if not while_statement_node:
             body_start_index = 0
-            expr = LiteralValue(
+            expr = CASTLiteralValue(
                 value_type=&#34;Boolean&#34;,
                 value=&#34;True&#34;,
             )
@@ -2377,7 +2405,7 @@ class TS2CAST(object):
             itterator, start, stop = [
                 self.visit(child) for child in loop_control_children
             ]
-            step = LiteralValue(&#34;Integer&#34;, &#34;1&#34;)
+            step = CASTLiteralValue(&#34;Integer&#34;, &#34;1&#34;)
         elif len(loop_control_children) == 4:
             itterator, start, stop, step = [
                 self.visit(child) for child in loop_control_children
@@ -2587,6 +2615,8 @@ class TS2CAST(object):
         return self.visit_literal(node)
     elif node.type == &#34;keyword_statement&#34;:
         return self.visit_keyword_statement(node)
+    elif node.type == &#34;statement_label&#34;:
+        return self.visit_statement_label(node)
     elif node.type in builtin_statements:
         return self.visit_fortran_builtin_statement(node)
     elif node.type == &#34;extent_specifier&#34;:
@@ -2817,7 +2847,7 @@ The do while loop will be passed off to a seperate visitor. Returns a Loop objec
         itterator, start, stop = [
             self.visit(child) for child in loop_control_children
         ]
-        step = LiteralValue(&#34;Integer&#34;, &#34;1&#34;)
+        step = CASTLiteralValue(&#34;Integer&#34;, &#34;1&#34;)
     elif len(loop_control_children) == 4:
         itterator, start, stop, step = [
             self.visit(child) for child in loop_control_children
@@ -2849,7 +2879,7 @@ The do while loop will be passed off to a seperate visitor. Returns a Loop objec
     # (i, generated_iter_0, sc_0) = next(generated_iter_0)
     pre.append(
         Assignment(
-            left=LiteralValue(
+            left=CASTLiteralValue(
                 &#34;Tuple&#34;,
                 [
                     itterator,
@@ -2870,7 +2900,7 @@ The do while loop will be passed off to a seperate visitor. Returns a Loop objec
         op=&#34;!=&#34;,  # TODO: Should this be == or !=
         operands=[
             Var(stop_condition_name_node, &#34;Boolean&#34;),
-            LiteralValue(&#34;Boolean&#34;, True),
+            CASTLiteralValue(&#34;Boolean&#34;, True),
         ],
     )
 
@@ -2879,7 +2909,7 @@ The do while loop will be passed off to a seperate visitor. Returns a Loop objec
     # We just need to append the iterator next call
     body.append(
         Assignment(
-            left=LiteralValue(
+            left=CASTLiteralValue(
                 &#34;Tuple&#34;,
                 [
                     itterator,
@@ -2932,9 +2962,9 @@ The do while loop will be passed off to a seperate visitor. Returns a Loop objec
     # Fortran uses the character &#39;:&#39; to differentiate these values
     argument_pointer = 0
     arguments = [
-        LiteralValue(&#34;None&#34;, &#34;None&#34;),
-        LiteralValue(&#34;None&#34;, &#34;None&#34;),
-        LiteralValue(&#34;None&#34;, &#34;None&#34;),
+        CASTLiteralValue(&#34;None&#34;, &#34;None&#34;),
+        CASTLiteralValue(&#34;None&#34;, &#34;None&#34;),
+        CASTLiteralValue(&#34;None&#34;, &#34;None&#34;),
     ]
     for child in node.children:
         if child.type == &#34;:&#34;:
@@ -3280,11 +3310,16 @@ The do while loop will be passed off to a seperate visitor. Returns a Loop objec
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def visit_keyword_statement(self, node):
-    # NOTE: RETURN is not the only Fortran keyword. GO TO and CONTINUE are also considered keywords.
-    # TODO: Handle GO TO and CONTINUE
+    # NOTE: RETURN is not the only Fortran keyword. GO TO and CONTINUE are also considered keywords
     identifier = self.node_helper.get_identifier(node).lower()
     if node.type == &#34;keyword_statement&#34;:
-        if &#34;continue&#34; in identifier or &#34;go to&#34; in identifier:
+        if &#34;go to&#34; in identifier:
+            statement_label_reference = get_first_child_by_type(node, &#34;statement_label_reference&#34;)
+            return Goto(
+                label=self.node_helper.get_identifier(statement_label_reference),
+                expr=None
+            )
+        if &#34;continue&#34; in identifier:
             return self._visit_no_op(node)
         if &#34;exit&#34; in identifier:
             return ModelBreak(source_refs=[self.node_helper.get_source_ref(node)])
@@ -3298,14 +3333,14 @@ The do while loop will be passed off to a seperate visitor. Returns a Loop objec
     if len(return_values) == 1:
         value = self.variable_context.get_node(list(return_values)[0])
     elif len(return_values) &gt; 1:
-        value = LiteralValue(
+        value = CASTLiteralValue(
             value_type=&#34;Tuple&#34;,
             value=[self.variable_context.get_node(ret) for ret in return_values],
             source_code_data_type=None,
             source_refs=None,
         )
     else:
-        value = LiteralValue(value=None, value_type=None, source_refs=None)
+        value = CASTLiteralValue(value=None, value_type=None, source_refs=None)
 
     return ModelReturn(
         value=value, source_refs=[self.node_helper.get_source_ref(node)]
@@ -3313,16 +3348,16 @@ The do while loop will be passed off to a seperate visitor. Returns a Loop objec
 </details>
 </dd>
 <dt id="skema.program_analysis.CAST.fortran.ts2cast.TS2CAST.visit_literal"><code class="name flex">
-<span>def <span class="ident">visit_literal</span></span>(<span>self, node) ‑> <a title="skema.program_analysis.CAST2FN.model.cast.literal_value.LiteralValue" href="../../CAST2FN/model/cast/literal_value.html#skema.program_analysis.CAST2FN.model.cast.literal_value.LiteralValue">LiteralValue</a></span>
+<span>def <span class="ident">visit_literal</span></span>(<span>self, node) ‑> <a title="skema.program_analysis.CAST2FN.model.cast.cast_literal_value.CASTLiteralValue" href="../../CAST2FN/model/cast/cast_literal_value.html#skema.program_analysis.CAST2FN.model.cast.cast_literal_value.CASTLiteralValue">CASTLiteralValue</a></span>
 </code></dt>
 <dd>
-<div class="desc"><p>Visitor for literals. Returns a LiteralValue</p></div>
+<div class="desc"><p>Visitor for literals. Returns a CASTLiteralValue</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def visit_literal(self, node) -&gt; LiteralValue:
-    &#34;&#34;&#34;Visitor for literals. Returns a LiteralValue&#34;&#34;&#34;
+<pre><code class="python">def visit_literal(self, node) -&gt; CASTLiteralValue:
+    &#34;&#34;&#34;Visitor for literals. Returns a CASTLiteralValue&#34;&#34;&#34;
     literal_type = node.type
     literal_value = self.node_helper.get_identifier(node)
     literal_source_ref = self.node_helper.get_source_ref(node)
@@ -3330,14 +3365,14 @@ The do while loop will be passed off to a seperate visitor. Returns a Loop objec
     if literal_type == &#34;number_literal&#34;:
         # Check if this is a real value, or an Integer
         if &#34;e&#34; in literal_value.lower() or &#34;.&#34; in literal_value:
-            return LiteralValue(
+            return CASTLiteralValue(
                 value_type=&#34;AbstractFloat&#34;,
                 value=literal_value,
                 source_code_data_type=[&#34;Fortran&#34;, &#34;Fortran95&#34;, &#34;real&#34;],
                 source_refs=[literal_source_ref],
             )
         else:
-            return LiteralValue(
+            return CASTLiteralValue(
                 value_type=&#34;Integer&#34;,
                 value=literal_value,
                 source_code_data_type=[&#34;Fortran&#34;, &#34;Fortran95&#34;, &#34;integer&#34;],
@@ -3345,7 +3380,7 @@ The do while loop will be passed off to a seperate visitor. Returns a Loop objec
             )
 
     elif literal_type == &#34;string_literal&#34;:
-        return LiteralValue(
+        return CASTLiteralValue(
             value_type=&#34;Character&#34;,
             value=literal_value,
             source_code_data_type=[&#34;Fortran&#34;, &#34;Fortran95&#34;, &#34;character&#34;],
@@ -3353,7 +3388,7 @@ The do while loop will be passed off to a seperate visitor. Returns a Loop objec
         )
 
     elif literal_type == &#34;boolean_literal&#34;:
-        return LiteralValue(
+        return CASTLiteralValue(
             value_type=&#34;Boolean&#34;,
             value=literal_value,
             source_code_data_type=[&#34;Fortran&#34;, &#34;Fortran95&#34;, &#34;logical&#34;],
@@ -3369,7 +3404,7 @@ The do while loop will be passed off to a seperate visitor. Returns a Loop objec
         if implied_do_loop_expression_node:
             return self._visit_implied_do_loop(implied_do_loop_expression_node)
 
-        return LiteralValue(
+        return CASTLiteralValue(
             value_type=&#34;List&#34;,
             value=[
                 self.visit(element) for element in get_non_control_children(node)
@@ -3394,8 +3429,8 @@ The do while loop will be passed off to a seperate visitor. Returns a Loop objec
     if len(node.children) &lt; 3:
         return self.visit_math_expression(node)
 
-    literal_value_false = LiteralValue(&#34;Boolean&#34;, False)
-    literal_value_true = LiteralValue(&#34;Boolean&#34;, True)
+    literal_value_false = CASTLiteralValue(&#34;Boolean&#34;, False)
+    literal_value_true = CASTLiteralValue(&#34;Boolean&#34;, True)
 
     # AND: Right side goes in body if, left side in condition
     # OR: Right side goes in body else, left side in condition
@@ -3523,6 +3558,22 @@ The do while loop will be passed off to a seperate visitor. Returns a Loop objec
         arguments=arguments,
         source_language=None,
         source_language_version=None,
+    )</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST.fortran.ts2cast.TS2CAST.visit_statement_label"><code class="name flex">
+<span>def <span class="ident">visit_statement_label</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Visitor for fortran statement labels</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def visit_statement_label(self, node):
+    &#34;&#34;&#34;Visitor for fortran statement labels&#34;&#34;&#34;
+    return Label(
+        label=self.node_helper.get_identifier(node)
     )</code></pre>
 </details>
 </dd>
@@ -3735,6 +3786,7 @@ The do while loop will be passed off to a seperate visitor. Returns a Loop objec
 <li><code><a title="skema.program_analysis.CAST.fortran.ts2cast.TS2CAST.visit_module" href="#skema.program_analysis.CAST.fortran.ts2cast.TS2CAST.visit_module">visit_module</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.fortran.ts2cast.TS2CAST.visit_name" href="#skema.program_analysis.CAST.fortran.ts2cast.TS2CAST.visit_name">visit_name</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.fortran.ts2cast.TS2CAST.visit_print_statement" href="#skema.program_analysis.CAST.fortran.ts2cast.TS2CAST.visit_print_statement">visit_print_statement</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.fortran.ts2cast.TS2CAST.visit_statement_label" href="#skema.program_analysis.CAST.fortran.ts2cast.TS2CAST.visit_statement_label">visit_statement_label</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.fortran.ts2cast.TS2CAST.visit_use_statement" href="#skema.program_analysis.CAST.fortran.ts2cast.TS2CAST.visit_use_statement">visit_use_statement</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.fortran.ts2cast.TS2CAST.visit_variable_declaration" href="#skema.program_analysis.CAST.fortran.ts2cast.TS2CAST.visit_variable_declaration">visit_variable_declaration</a></code></li>
 </ul>

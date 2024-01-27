@@ -85,6 +85,7 @@ def process_file_system(
     )
 
     language_yaml_obj = yaml.safe_load(LANGUAGES_YAML_FILEPATH.read_text())
+    cur_dir = os.getcwd()
     for f in file_list:
         full_file = os.path.join(os.path.normpath(root_dir), f.strip(&#34;\n&#34;))
         full_file_obj = Path(full_file)
@@ -108,7 +109,6 @@ def process_file_system(
                 cast_list = [cast]
 
             for cast_module in cast_list:
-                cur_dir = os.getcwd()
                 os.chdir(os.path.join(os.getcwd(), path))
                 generated_gromet = ann_cast_pipeline(
                     cast_module, gromet=True, to_file=False, from_obj=True
@@ -159,9 +159,9 @@ def process_file_system(
                         len(module_collection.module_index)
                     )
 
-        except ImportError as e:
-            print(&#34;FAILURE&#34;)
-            raise e
+        except (Exception,SystemExit) as e:
+            os.chdir(cur_dir)
+            print(e)
 
     if write_to_file:
         with open(f&#34;{system_name}--Gromet-FN-auto.json&#34;, &#34;w&#34;) as f:
@@ -250,6 +250,7 @@ if __name__ == &#34;__main__&#34;:
     )
 
     language_yaml_obj = yaml.safe_load(LANGUAGES_YAML_FILEPATH.read_text())
+    cur_dir = os.getcwd()
     for f in file_list:
         full_file = os.path.join(os.path.normpath(root_dir), f.strip(&#34;\n&#34;))
         full_file_obj = Path(full_file)
@@ -273,7 +274,6 @@ if __name__ == &#34;__main__&#34;:
                 cast_list = [cast]
 
             for cast_module in cast_list:
-                cur_dir = os.getcwd()
                 os.chdir(os.path.join(os.getcwd(), path))
                 generated_gromet = ann_cast_pipeline(
                     cast_module, gromet=True, to_file=False, from_obj=True
@@ -324,9 +324,9 @@ if __name__ == &#34;__main__&#34;:
                         len(module_collection.module_index)
                     )
 
-        except ImportError as e:
-            print(&#34;FAILURE&#34;)
-            raise e
+        except (Exception,SystemExit) as e:
+            os.chdir(cur_dir)
+            print(e)
 
     if write_to_file:
         with open(f&#34;{system_name}--Gromet-FN-auto.json&#34;, &#34;w&#34;) as f:

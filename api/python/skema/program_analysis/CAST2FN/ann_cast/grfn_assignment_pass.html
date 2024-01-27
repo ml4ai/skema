@@ -225,6 +225,17 @@ class GrfnAssignmentPass:
         self.visit_node_list(node.body, add_to)
 
     @_visit.register
+    def visit_goto(self, node: AnnCastGoto, add_to):
+        if node.expr != None:
+            self.visit(node.expr, add_to)
+        # self.visit(node.label, add_to)
+
+    @_visit.register
+    def visit_label(self, node: AnnCastLabel, add_to):
+        # self.visit(node.label, add_to)
+        pass
+
+    @_visit.register
     def visit_literal_value(
         self, node: AnnCastLiteralValue, add_to: typing.Dict
     ):
@@ -538,6 +549,17 @@ class GrfnAssignmentPass:
         # interface is handled during VariableVersionPass, so we don&#39;t need to visit
         # func_args here
         self.visit_node_list(node.body, add_to)
+
+    @_visit.register
+    def visit_goto(self, node: AnnCastGoto, add_to):
+        if node.expr != None:
+            self.visit(node.expr, add_to)
+        # self.visit(node.label, add_to)
+
+    @_visit.register
+    def visit_label(self, node: AnnCastLabel, add_to):
+        # self.visit(node.label, add_to)
+        pass
 
     @_visit.register
     def visit_literal_value(
@@ -870,6 +892,37 @@ def visit_function_def(
     self.visit_node_list(node.body, add_to)</code></pre>
 </details>
 </dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.grfn_assignment_pass.GrfnAssignmentPass.visit_goto"><code class="name flex">
+<span>def <span class="ident">visit_goto</span></span>(<span>self, node: <a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastGoto" href="annotated_cast.html#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastGoto">AnnCastGoto</a>, add_to)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@_visit.register
+def visit_goto(self, node: AnnCastGoto, add_to):
+    if node.expr != None:
+        self.visit(node.expr, add_to)
+    # self.visit(node.label, add_to)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.grfn_assignment_pass.GrfnAssignmentPass.visit_label"><code class="name flex">
+<span>def <span class="ident">visit_label</span></span>(<span>self, node: <a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastLabel" href="annotated_cast.html#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastLabel">AnnCastLabel</a>, add_to)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@_visit.register
+def visit_label(self, node: AnnCastLabel, add_to):
+    # self.visit(node.label, add_to)
+    pass</code></pre>
+</details>
+</dd>
 <dt id="skema.program_analysis.CAST2FN.ann_cast.grfn_assignment_pass.GrfnAssignmentPass.visit_literal_value"><code class="name flex">
 <span>def <span class="ident">visit_literal_value</span></span>(<span>self, node: <a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastLiteralValue" href="annotated_cast.html#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastLiteralValue">AnnCastLiteralValue</a>, add_to: Dict[~KT, ~VT])</span>
 </code></dt>
@@ -1176,6 +1229,8 @@ def visit_var(self, node: AnnCastVar, add_to: typing.Dict):
 <li><code><a title="skema.program_analysis.CAST2FN.ann_cast.grfn_assignment_pass.GrfnAssignmentPass.visit_call" href="#skema.program_analysis.CAST2FN.ann_cast.grfn_assignment_pass.GrfnAssignmentPass.visit_call">visit_call</a></code></li>
 <li><code><a title="skema.program_analysis.CAST2FN.ann_cast.grfn_assignment_pass.GrfnAssignmentPass.visit_call_grfn_2_2" href="#skema.program_analysis.CAST2FN.ann_cast.grfn_assignment_pass.GrfnAssignmentPass.visit_call_grfn_2_2">visit_call_grfn_2_2</a></code></li>
 <li><code><a title="skema.program_analysis.CAST2FN.ann_cast.grfn_assignment_pass.GrfnAssignmentPass.visit_function_def" href="#skema.program_analysis.CAST2FN.ann_cast.grfn_assignment_pass.GrfnAssignmentPass.visit_function_def">visit_function_def</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.grfn_assignment_pass.GrfnAssignmentPass.visit_goto" href="#skema.program_analysis.CAST2FN.ann_cast.grfn_assignment_pass.GrfnAssignmentPass.visit_goto">visit_goto</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.grfn_assignment_pass.GrfnAssignmentPass.visit_label" href="#skema.program_analysis.CAST2FN.ann_cast.grfn_assignment_pass.GrfnAssignmentPass.visit_label">visit_label</a></code></li>
 <li><code><a title="skema.program_analysis.CAST2FN.ann_cast.grfn_assignment_pass.GrfnAssignmentPass.visit_literal_value" href="#skema.program_analysis.CAST2FN.ann_cast.grfn_assignment_pass.GrfnAssignmentPass.visit_literal_value">visit_literal_value</a></code></li>
 <li><code><a title="skema.program_analysis.CAST2FN.ann_cast.grfn_assignment_pass.GrfnAssignmentPass.visit_loop" href="#skema.program_analysis.CAST2FN.ann_cast.grfn_assignment_pass.GrfnAssignmentPass.visit_loop">visit_loop</a></code></li>
 <li><code><a title="skema.program_analysis.CAST2FN.ann_cast.grfn_assignment_pass.GrfnAssignmentPass.visit_model_break" href="#skema.program_analysis.CAST2FN.ann_cast.grfn_assignment_pass.GrfnAssignmentPass.visit_model_break">visit_model_break</a></code></li>

@@ -37,7 +37,7 @@
                             },
                             "node_type": "Assignment",
                             "right": {
-                                "node_type": "LiteralValue",
+                                "node_type": "CASTLiteralValue",
                                 "source_code_data_type": [
                                     "Python",
                                     "3.8",
@@ -79,7 +79,7 @@
                                                     "op": "ast.Mod",
                                                     "operands": [
                                                         {
-                                                            "node_type": "LiteralValue",
+                                                            "node_type": "CASTLiteralValue",
                                                             "source_code_data_type": [
                                                                 "Python",
                                                                 "3.8",
@@ -145,7 +145,7 @@
                                                             ]
                                                         },
                                                         {
-                                                            "node_type": "LiteralValue",
+                                                            "node_type": "CASTLiteralValue",
                                                             "source_code_data_type": [
                                                                 "Python",
                                                                 "3.8",
@@ -166,7 +166,7 @@
                                                         }
                                                     ],
                                                     "func": {
-                                                        "id": 10,
+                                                        "id": 11,
                                                         "name": "_get",
                                                         "node_type": "Name",
                                                         "source_refs": [
@@ -229,7 +229,7 @@
                                                     "right": {
                                                         "arguments": [
                                                             {
-                                                                "node_type": "LiteralValue",
+                                                                "node_type": "CASTLiteralValue",
                                                                 "source_code_data_type": [
                                                                     "Python",
                                                                     "3.8",
@@ -322,7 +322,7 @@
                                                     },
                                                     "node_type": "Assignment",
                                                     "right": {
-                                                        "node_type": "LiteralValue",
+                                                        "node_type": "CASTLiteralValue",
                                                         "source_code_data_type": [
                                                             "Python",
                                                             "3.8",
@@ -385,7 +385,7 @@
                                                     },
                                                     "node_type": "Assignment",
                                                     "right": {
-                                                        "node_type": "LiteralValue",
+                                                        "node_type": "CASTLiteralValue",
                                                         "source_code_data_type": [
                                                             "Python",
                                                             "3.8",
@@ -448,7 +448,7 @@
                                     ],
                                     "func": {
                                         "attr": {
-                                            "id": 11,
+                                            "id": 12,
                                             "name": "append",
                                             "node_type": "Name",
                                             "source_refs": [
@@ -505,7 +505,7 @@
                                 },
                                 {
                                     "left": {
-                                        "node_type": "LiteralValue",
+                                        "node_type": "CASTLiteralValue",
                                         "source_code_data_type": [
                                             "Python",
                                             "3.8",
@@ -523,7 +523,7 @@
                                         ],
                                         "value": [
                                             {
-                                                "node_type": "LiteralValue",
+                                                "node_type": "CASTLiteralValue",
                                                 "source_code_data_type": [
                                                     "Python",
                                                     "3.8",
@@ -618,7 +618,7 @@
                                                 ],
                                                 "type": "iterator",
                                                 "val": {
-                                                    "id": 12,
+                                                    "id": 13,
                                                     "name": "generated_iter_0",
                                                     "node_type": "Name",
                                                     "source_refs": [
@@ -648,7 +648,7 @@
                                                 ],
                                                 "type": "boolean",
                                                 "val": {
-                                                    "id": 15,
+                                                    "id": 16,
                                                     "name": "sc_1",
                                                     "node_type": "Name",
                                                     "source_refs": [
@@ -684,7 +684,7 @@
                                                 ],
                                                 "type": "iterator",
                                                 "val": {
-                                                    "id": 12,
+                                                    "id": 13,
                                                     "name": "generated_iter_0",
                                                     "node_type": "Name",
                                                     "source_refs": [
@@ -701,7 +701,7 @@
                                             }
                                         ],
                                         "func": {
-                                            "id": 14,
+                                            "id": 15,
                                             "name": "next",
                                             "node_type": "Name",
                                             "source_refs": [
@@ -761,7 +761,7 @@
                                         ],
                                         "type": "boolean",
                                         "val": {
-                                            "id": 15,
+                                            "id": 16,
                                             "name": "sc_1",
                                             "node_type": "Name",
                                             "source_refs": [
@@ -777,7 +777,7 @@
                                         }
                                     },
                                     {
-                                        "node_type": "LiteralValue",
+                                        "node_type": "CASTLiteralValue",
                                         "source_code_data_type": [
                                             "Python",
                                             "3.8",
@@ -829,7 +829,7 @@
                                         ],
                                         "type": "iterator",
                                         "val": {
-                                            "id": 12,
+                                            "id": 13,
                                             "name": "generated_iter_0",
                                             "node_type": "Name",
                                             "source_refs": [
@@ -848,16 +848,59 @@
                                     "right": {
                                         "arguments": [
                                             {
-                                                "arguments": [],
-                                                "func": {
-                                                    "attr": {
-                                                        "id": 9,
-                                                        "name": "items",
-                                                        "node_type": "Name",
+                                                "arguments": [
+                                                    {
+                                                        "arguments": [],
+                                                        "func": {
+                                                            "attr": {
+                                                                "id": 9,
+                                                                "name": "items",
+                                                                "node_type": "Name",
+                                                                "source_refs": [
+                                                                    {
+                                                                        "col_end": 47,
+                                                                        "col_start": 26,
+                                                                        "node_type": "SourceRef",
+                                                                        "row_end": 168,
+                                                                        "row_start": 168,
+                                                                        "source_file_name": "metrics"
+                                                                    }
+                                                                ]
+                                                            },
+                                                            "node_type": "Attribute",
+                                                            "source_refs": [
+                                                                {
+                                                                    "col_end": 47,
+                                                                    "col_start": 26,
+                                                                    "node_type": "SourceRef",
+                                                                    "row_end": 168,
+                                                                    "row_start": 168,
+                                                                    "source_file_name": "metrics"
+                                                                }
+                                                            ],
+                                                            "value": {
+                                                                "id": 8,
+                                                                "name": "MOBILITY_PLACES",
+                                                                "node_type": "Name",
+                                                                "source_refs": [
+                                                                    {
+                                                                        "col_end": 41,
+                                                                        "col_start": 26,
+                                                                        "node_type": "SourceRef",
+                                                                        "row_end": 168,
+                                                                        "row_start": 168,
+                                                                        "source_file_name": "metrics"
+                                                                    }
+                                                                ]
+                                                            }
+                                                        },
+                                                        "node_type": "Call",
+                                                        "source_language": null,
+                                                        "source_language_version": null,
                                                         "source_refs": [
                                                             {
-                                                                "col_end": 42,
-                                                                "col_start": 21,
+                                                                "col_end": 49,
+                                                                "col_start": 26,
                                                                 "node_type": "SourceRef",
                                                                 "row_end": 168,
                                                                 "row_start": 168,
@@ -865,39 +908,48 @@
                                                             }
                                                         ]
                                                     },
-                                                    "node_type": "Attribute",
-                                                    "source_refs": [
-                                                        {
-                                                            "col_end": 42,
-                                                            "col_start": 21,
-                                                            "node_type": "SourceRef",
-                                                            "row_end": 168,
-                                                            "row_start": 168,
-                                                            "source_file_name": "metrics"
-                                                        }
-                                                    ],
-                                                    "value": {
-                                                        "id": 8,
-                                                        "name": "MOBILITY_PLACES",
-                                                        "node_type": "Name",
+                                                    {
+                                                        "node_type": "CASTLiteralValue",
+                                                        "source_code_data_type": [
+                                                            "Python",
+                                                            "3.8",
+                                                            "List"
+                                                        ],
                                                         "source_refs": [
                                                             {
-                                                                "col_end": 36,
+                                                                "col_end": 50,
                                                                 "col_start": 21,
                                                                 "node_type": "SourceRef",
                                                                 "row_end": 168,
                                                                 "row_start": 168,
                                                                 "source_file_name": "metrics"
                                                             }
-                                                        ]
+                                                        ],
+                                                        "value": "list",
+                                                        "value_type": "List"
                                                     }
+                                                ],
+                                                "func": {
+                                                    "id": 10,
+                                                    "name": "cast",
+                                                    "node_type": "Name",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 50,
+                                                            "col_start": 21,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 168,
+                                                            "row_start": 168,
+                                                            "source_file_name": "metrics"
+                                                        }
+                                                    ]
                                                 },
                                                 "node_type": "Call",
                                                 "source_language": null,
                                                 "source_language_version": null,
                                                 "source_refs": [
                                                     {
-                                                        "col_end": 44,
+                                                        "col_end": 50,
                                                         "col_start": 21,
                                                         "node_type": "SourceRef",
                                                         "row_end": 168,
@@ -908,7 +960,7 @@
                                             }
                                         ],
                                         "func": {
-                                            "id": 13,
+                                            "id": 14,
                                             "name": "iter",
                                             "node_type": "Name",
                                             "source_refs": [
@@ -949,7 +1001,7 @@
                                 },
                                 {
                                     "left": {
-                                        "node_type": "LiteralValue",
+                                        "node_type": "CASTLiteralValue",
                                         "source_code_data_type": [
                                             "Python",
                                             "3.8",
@@ -967,7 +1019,7 @@
                                         ],
                                         "value": [
                                             {
-                                                "node_type": "LiteralValue",
+                                                "node_type": "CASTLiteralValue",
                                                 "source_code_data_type": [
                                                     "Python",
                                                     "3.8",
@@ -1062,7 +1114,7 @@
                                                 ],
                                                 "type": "iterator",
                                                 "val": {
-                                                    "id": 12,
+                                                    "id": 13,
                                                     "name": "generated_iter_0",
                                                     "node_type": "Name",
                                                     "source_refs": [
@@ -1092,7 +1144,7 @@
                                                 ],
                                                 "type": "boolean",
                                                 "val": {
-                                                    "id": 15,
+                                                    "id": 16,
                                                     "name": "sc_1",
                                                     "node_type": "Name",
                                                     "source_refs": [
@@ -1128,7 +1180,7 @@
                                                 ],
                                                 "type": "iterator",
                                                 "val": {
-                                                    "id": 12,
+                                                    "id": 13,
                                                     "name": "generated_iter_0",
                                                     "node_type": "Name",
                                                     "source_refs": [
@@ -1145,7 +1197,7 @@
                                             }
                                         ],
                                         "func": {
-                                            "id": 14,
+                                            "id": 15,
                                             "name": "next",
                                             "node_type": "Name",
                                             "source_refs": [
@@ -1369,7 +1421,7 @@
                     },
                     "node_type": "Assignment",
                     "right": {
-                        "node_type": "LiteralValue",
+                        "node_type": "CASTLiteralValue",
                         "source_code_data_type": [
                             "Python",
                             "3.8",
@@ -1389,7 +1441,7 @@
                             {
                                 "arguments": [
                                     {
-                                        "node_type": "LiteralValue",
+                                        "node_type": "CASTLiteralValue",
                                         "source_code_data_type": [
                                             "Python",
                                             "3.8",
@@ -1411,7 +1463,7 @@
                                     {
                                         "arguments": [
                                             {
-                                                "node_type": "LiteralValue",
+                                                "node_type": "CASTLiteralValue",
                                                 "source_code_data_type": [
                                                     "Python",
                                                     "3.8",
@@ -1461,7 +1513,7 @@
                                         ]
                                     },
                                     {
-                                        "node_type": "LiteralValue",
+                                        "node_type": "CASTLiteralValue",
                                         "source_code_data_type": [
                                             "Python",
                                             "3.8",
@@ -1483,7 +1535,7 @@
                                     {
                                         "arguments": [
                                             {
-                                                "node_type": "LiteralValue",
+                                                "node_type": "CASTLiteralValue",
                                                 "source_code_data_type": [
                                                     "Python",
                                                     "3.8",
@@ -1565,7 +1617,7 @@
                                         },
                                         "node_type": "Assignment",
                                         "right": {
-                                            "node_type": "LiteralValue",
+                                            "node_type": "CASTLiteralValue",
                                             "source_code_data_type": [
                                                 "Python",
                                                 "3.8",
@@ -1628,7 +1680,7 @@
                                         },
                                         "node_type": "Assignment",
                                         "right": {
-                                            "node_type": "LiteralValue",
+                                            "node_type": "CASTLiteralValue",
                                             "source_code_data_type": [
                                                 "Python",
                                                 "3.8",
@@ -1691,7 +1743,7 @@
                             {
                                 "arguments": [
                                     {
-                                        "node_type": "LiteralValue",
+                                        "node_type": "CASTLiteralValue",
                                         "source_code_data_type": [
                                             "Python",
                                             "3.8",
@@ -1713,7 +1765,7 @@
                                     {
                                         "arguments": [
                                             {
-                                                "node_type": "LiteralValue",
+                                                "node_type": "CASTLiteralValue",
                                                 "source_code_data_type": [
                                                     "Python",
                                                     "3.8",
@@ -1763,7 +1815,7 @@
                                         ]
                                     },
                                     {
-                                        "node_type": "LiteralValue",
+                                        "node_type": "CASTLiteralValue",
                                         "source_code_data_type": [
                                             "Python",
                                             "3.8",
@@ -1785,7 +1837,7 @@
                                     {
                                         "arguments": [
                                             {
-                                                "node_type": "LiteralValue",
+                                                "node_type": "CASTLiteralValue",
                                                 "source_code_data_type": [
                                                     "Python",
                                                     "3.8",
@@ -1867,7 +1919,7 @@
                                         },
                                         "node_type": "Assignment",
                                         "right": {
-                                            "node_type": "LiteralValue",
+                                            "node_type": "CASTLiteralValue",
                                             "source_code_data_type": [
                                                 "Python",
                                                 "3.8",
@@ -1930,7 +1982,7 @@
                                         },
                                         "node_type": "Assignment",
                                         "right": {
-                                            "node_type": "LiteralValue",
+                                            "node_type": "CASTLiteralValue",
                                             "source_code_data_type": [
                                                 "Python",
                                                 "3.8",
@@ -1993,7 +2045,7 @@
                                         },
                                         "node_type": "Assignment",
                                         "right": {
-                                            "node_type": "LiteralValue",
+                                            "node_type": "CASTLiteralValue",
                                             "source_code_data_type": [
                                                 "Python",
                                                 "3.8",
@@ -2056,7 +2108,7 @@
                             {
                                 "arguments": [
                                     {
-                                        "node_type": "LiteralValue",
+                                        "node_type": "CASTLiteralValue",
                                         "source_code_data_type": [
                                             "Python",
                                             "3.8",
@@ -2078,7 +2130,7 @@
                                     {
                                         "arguments": [
                                             {
-                                                "node_type": "LiteralValue",
+                                                "node_type": "CASTLiteralValue",
                                                 "source_code_data_type": [
                                                     "Python",
                                                     "3.8",
@@ -2128,7 +2180,7 @@
                                         ]
                                     },
                                     {
-                                        "node_type": "LiteralValue",
+                                        "node_type": "CASTLiteralValue",
                                         "source_code_data_type": [
                                             "Python",
                                             "3.8",
@@ -2150,7 +2202,7 @@
                                     {
                                         "arguments": [
                                             {
-                                                "node_type": "LiteralValue",
+                                                "node_type": "CASTLiteralValue",
                                                 "source_code_data_type": [
                                                     "Python",
                                                     "3.8",
@@ -2200,7 +2252,7 @@
                                         ]
                                     },
                                     {
-                                        "node_type": "LiteralValue",
+                                        "node_type": "CASTLiteralValue",
                                         "source_code_data_type": [
                                             "Python",
                                             "3.8",
@@ -2252,7 +2304,7 @@
                                         },
                                         "node_type": "Assignment",
                                         "right": {
-                                            "node_type": "LiteralValue",
+                                            "node_type": "CASTLiteralValue",
                                             "source_code_data_type": [
                                                 "Python",
                                                 "3.8",
@@ -2315,7 +2367,7 @@
                             {
                                 "arguments": [
                                     {
-                                        "node_type": "LiteralValue",
+                                        "node_type": "CASTLiteralValue",
                                         "source_code_data_type": [
                                             "Python",
                                             "3.8",
@@ -2337,7 +2389,7 @@
                                     {
                                         "arguments": [
                                             {
-                                                "node_type": "LiteralValue",
+                                                "node_type": "CASTLiteralValue",
                                                 "source_code_data_type": [
                                                     "Python",
                                                     "3.8",
@@ -2387,7 +2439,7 @@
                                         ]
                                     },
                                     {
-                                        "node_type": "LiteralValue",
+                                        "node_type": "CASTLiteralValue",
                                         "source_code_data_type": [
                                             "Python",
                                             "3.8",
@@ -2409,7 +2461,7 @@
                                     {
                                         "arguments": [
                                             {
-                                                "node_type": "LiteralValue",
+                                                "node_type": "CASTLiteralValue",
                                                 "source_code_data_type": [
                                                     "Python",
                                                     "3.8",
@@ -2459,7 +2511,7 @@
                                         ]
                                     },
                                     {
-                                        "node_type": "LiteralValue",
+                                        "node_type": "CASTLiteralValue",
                                         "source_code_data_type": [
                                             "Python",
                                             "3.8",
@@ -2511,7 +2563,7 @@
                                         },
                                         "node_type": "Assignment",
                                         "right": {
-                                            "node_type": "LiteralValue",
+                                            "node_type": "CASTLiteralValue",
                                             "source_code_data_type": [
                                                 "Python",
                                                 "3.8",
@@ -2574,7 +2626,7 @@
                             {
                                 "arguments": [
                                     {
-                                        "node_type": "LiteralValue",
+                                        "node_type": "CASTLiteralValue",
                                         "source_code_data_type": [
                                             "Python",
                                             "3.8",
@@ -2596,7 +2648,7 @@
                                     {
                                         "arguments": [
                                             {
-                                                "node_type": "LiteralValue",
+                                                "node_type": "CASTLiteralValue",
                                                 "source_code_data_type": [
                                                     "Python",
                                                     "3.8",
@@ -2646,7 +2698,7 @@
                                         ]
                                     },
                                     {
-                                        "node_type": "LiteralValue",
+                                        "node_type": "CASTLiteralValue",
                                         "source_code_data_type": [
                                             "Python",
                                             "3.8",
@@ -2668,7 +2720,7 @@
                                     {
                                         "arguments": [
                                             {
-                                                "node_type": "LiteralValue",
+                                                "node_type": "CASTLiteralValue",
                                                 "source_code_data_type": [
                                                     "Python",
                                                     "3.8",
@@ -2718,7 +2770,7 @@
                                         ]
                                     },
                                     {
-                                        "node_type": "LiteralValue",
+                                        "node_type": "CASTLiteralValue",
                                         "source_code_data_type": [
                                             "Python",
                                             "3.8",
@@ -2770,7 +2822,7 @@
                                         },
                                         "node_type": "Assignment",
                                         "right": {
-                                            "node_type": "LiteralValue",
+                                            "node_type": "CASTLiteralValue",
                                             "source_code_data_type": [
                                                 "Python",
                                                 "3.8",
@@ -2833,7 +2885,7 @@
                             {
                                 "arguments": [
                                     {
-                                        "node_type": "LiteralValue",
+                                        "node_type": "CASTLiteralValue",
                                         "source_code_data_type": [
                                             "Python",
                                             "3.8",
@@ -2855,7 +2907,7 @@
                                     {
                                         "arguments": [
                                             {
-                                                "node_type": "LiteralValue",
+                                                "node_type": "CASTLiteralValue",
                                                 "source_code_data_type": [
                                                     "Python",
                                                     "3.8",
@@ -2905,7 +2957,7 @@
                                         ]
                                     },
                                     {
-                                        "node_type": "LiteralValue",
+                                        "node_type": "CASTLiteralValue",
                                         "source_code_data_type": [
                                             "Python",
                                             "3.8",
@@ -2927,7 +2979,7 @@
                                     {
                                         "arguments": [
                                             {
-                                                "node_type": "LiteralValue",
+                                                "node_type": "CASTLiteralValue",
                                                 "source_code_data_type": [
                                                     "Python",
                                                     "3.8",
@@ -2977,7 +3029,7 @@
                                         ]
                                     },
                                     {
-                                        "node_type": "LiteralValue",
+                                        "node_type": "CASTLiteralValue",
                                         "source_code_data_type": [
                                             "Python",
                                             "3.8",
@@ -3029,7 +3081,7 @@
                                         },
                                         "node_type": "Assignment",
                                         "right": {
-                                            "node_type": "LiteralValue",
+                                            "node_type": "CASTLiteralValue",
                                             "source_code_data_type": [
                                                 "Python",
                                                 "3.8",
@@ -3092,7 +3144,7 @@
                             {
                                 "arguments": [
                                     {
-                                        "node_type": "LiteralValue",
+                                        "node_type": "CASTLiteralValue",
                                         "source_code_data_type": [
                                             "Python",
                                             "3.8",
@@ -3114,7 +3166,7 @@
                                     {
                                         "arguments": [
                                             {
-                                                "node_type": "LiteralValue",
+                                                "node_type": "CASTLiteralValue",
                                                 "source_code_data_type": [
                                                     "Python",
                                                     "3.8",
@@ -3164,7 +3216,7 @@
                                         ]
                                     },
                                     {
-                                        "node_type": "LiteralValue",
+                                        "node_type": "CASTLiteralValue",
                                         "source_code_data_type": [
                                             "Python",
                                             "3.8",
@@ -3186,7 +3238,7 @@
                                     {
                                         "arguments": [
                                             {
-                                                "node_type": "LiteralValue",
+                                                "node_type": "CASTLiteralValue",
                                                 "source_code_data_type": [
                                                     "Python",
                                                     "3.8",
@@ -3236,7 +3288,7 @@
                                         ]
                                     },
                                     {
-                                        "node_type": "LiteralValue",
+                                        "node_type": "CASTLiteralValue",
                                         "source_code_data_type": [
                                             "Python",
                                             "3.8",
@@ -3288,7 +3340,7 @@
                                         },
                                         "node_type": "Assignment",
                                         "right": {
-                                            "node_type": "LiteralValue",
+                                            "node_type": "CASTLiteralValue",
                                             "source_code_data_type": [
                                                 "Python",
                                                 "3.8",
@@ -3351,7 +3403,7 @@
                             {
                                 "arguments": [
                                     {
-                                        "node_type": "LiteralValue",
+                                        "node_type": "CASTLiteralValue",
                                         "source_code_data_type": [
                                             "Python",
                                             "3.8",
@@ -3373,7 +3425,7 @@
                                     {
                                         "arguments": [
                                             {
-                                                "node_type": "LiteralValue",
+                                                "node_type": "CASTLiteralValue",
                                                 "source_code_data_type": [
                                                     "Python",
                                                     "3.8",
@@ -3423,7 +3475,7 @@
                                         ]
                                     },
                                     {
-                                        "node_type": "LiteralValue",
+                                        "node_type": "CASTLiteralValue",
                                         "source_code_data_type": [
                                             "Python",
                                             "3.8",
@@ -3445,7 +3497,7 @@
                                     {
                                         "arguments": [
                                             {
-                                                "node_type": "LiteralValue",
+                                                "node_type": "CASTLiteralValue",
                                                 "source_code_data_type": [
                                                     "Python",
                                                     "3.8",
@@ -3495,7 +3547,7 @@
                                         ]
                                     },
                                     {
-                                        "node_type": "LiteralValue",
+                                        "node_type": "CASTLiteralValue",
                                         "source_code_data_type": [
                                             "Python",
                                             "3.8",
@@ -3547,7 +3599,7 @@
                                         },
                                         "node_type": "Assignment",
                                         "right": {
-                                            "node_type": "LiteralValue",
+                                            "node_type": "CASTLiteralValue",
                                             "source_code_data_type": [
                                                 "Python",
                                                 "3.8",
@@ -3610,7 +3662,7 @@
                             {
                                 "arguments": [
                                     {
-                                        "node_type": "LiteralValue",
+                                        "node_type": "CASTLiteralValue",
                                         "source_code_data_type": [
                                             "Python",
                                             "3.8",
@@ -3632,7 +3684,7 @@
                                     {
                                         "arguments": [
                                             {
-                                                "node_type": "LiteralValue",
+                                                "node_type": "CASTLiteralValue",
                                                 "source_code_data_type": [
                                                     "Python",
                                                     "3.8",
@@ -3682,7 +3734,7 @@
                                         ]
                                     },
                                     {
-                                        "node_type": "LiteralValue",
+                                        "node_type": "CASTLiteralValue",
                                         "source_code_data_type": [
                                             "Python",
                                             "3.8",
@@ -3704,7 +3756,7 @@
                                     {
                                         "arguments": [
                                             {
-                                                "node_type": "LiteralValue",
+                                                "node_type": "CASTLiteralValue",
                                                 "source_code_data_type": [
                                                     "Python",
                                                     "3.8",
@@ -3754,7 +3806,7 @@
                                         ]
                                     },
                                     {
-                                        "node_type": "LiteralValue",
+                                        "node_type": "CASTLiteralValue",
                                         "source_code_data_type": [
                                             "Python",
                                             "3.8",
@@ -3806,7 +3858,7 @@
                                         },
                                         "node_type": "Assignment",
                                         "right": {
-                                            "node_type": "LiteralValue",
+                                            "node_type": "CASTLiteralValue",
                                             "source_code_data_type": [
                                                 "Python",
                                                 "3.8",
@@ -3869,7 +3921,7 @@
                             {
                                 "arguments": [
                                     {
-                                        "node_type": "LiteralValue",
+                                        "node_type": "CASTLiteralValue",
                                         "source_code_data_type": [
                                             "Python",
                                             "3.8",
@@ -3891,7 +3943,7 @@
                                     {
                                         "arguments": [
                                             {
-                                                "node_type": "LiteralValue",
+                                                "node_type": "CASTLiteralValue",
                                                 "source_code_data_type": [
                                                     "Python",
                                                     "3.8",
@@ -3941,7 +3993,7 @@
                                         ]
                                     },
                                     {
-                                        "node_type": "LiteralValue",
+                                        "node_type": "CASTLiteralValue",
                                         "source_code_data_type": [
                                             "Python",
                                             "3.8",
@@ -3963,7 +4015,7 @@
                                     {
                                         "arguments": [
                                             {
-                                                "node_type": "LiteralValue",
+                                                "node_type": "CASTLiteralValue",
                                                 "source_code_data_type": [
                                                     "Python",
                                                     "3.8",
@@ -4013,7 +4065,7 @@
                                         ]
                                     },
                                     {
-                                        "node_type": "LiteralValue",
+                                        "node_type": "CASTLiteralValue",
                                         "source_code_data_type": [
                                             "Python",
                                             "3.8",
@@ -4065,7 +4117,7 @@
                                         },
                                         "node_type": "Assignment",
                                         "right": {
-                                            "node_type": "LiteralValue",
+                                            "node_type": "CASTLiteralValue",
                                             "source_code_data_type": [
                                                 "Python",
                                                 "3.8",
@@ -4128,7 +4180,7 @@
                             {
                                 "arguments": [
                                     {
-                                        "node_type": "LiteralValue",
+                                        "node_type": "CASTLiteralValue",
                                         "source_code_data_type": [
                                             "Python",
                                             "3.8",
@@ -4150,7 +4202,7 @@
                                     {
                                         "arguments": [
                                             {
-                                                "node_type": "LiteralValue",
+                                                "node_type": "CASTLiteralValue",
                                                 "source_code_data_type": [
                                                     "Python",
                                                     "3.8",
@@ -4200,7 +4252,7 @@
                                         ]
                                     },
                                     {
-                                        "node_type": "LiteralValue",
+                                        "node_type": "CASTLiteralValue",
                                         "source_code_data_type": [
                                             "Python",
                                             "3.8",
@@ -4222,7 +4274,7 @@
                                     {
                                         "arguments": [
                                             {
-                                                "node_type": "LiteralValue",
+                                                "node_type": "CASTLiteralValue",
                                                 "source_code_data_type": [
                                                     "Python",
                                                     "3.8",
@@ -4272,7 +4324,7 @@
                                         ]
                                     },
                                     {
-                                        "node_type": "LiteralValue",
+                                        "node_type": "CASTLiteralValue",
                                         "source_code_data_type": [
                                             "Python",
                                             "3.8",
@@ -4324,7 +4376,7 @@
                                         },
                                         "node_type": "Assignment",
                                         "right": {
-                                            "node_type": "LiteralValue",
+                                            "node_type": "CASTLiteralValue",
                                             "source_code_data_type": [
                                                 "Python",
                                                 "3.8",
@@ -4387,7 +4439,7 @@
                             {
                                 "arguments": [
                                     {
-                                        "node_type": "LiteralValue",
+                                        "node_type": "CASTLiteralValue",
                                         "source_code_data_type": [
                                             "Python",
                                             "3.8",
@@ -4409,7 +4461,7 @@
                                     {
                                         "arguments": [
                                             {
-                                                "node_type": "LiteralValue",
+                                                "node_type": "CASTLiteralValue",
                                                 "source_code_data_type": [
                                                     "Python",
                                                     "3.8",
@@ -4459,7 +4511,7 @@
                                         ]
                                     },
                                     {
-                                        "node_type": "LiteralValue",
+                                        "node_type": "CASTLiteralValue",
                                         "source_code_data_type": [
                                             "Python",
                                             "3.8",
@@ -4481,7 +4533,7 @@
                                     {
                                         "arguments": [
                                             {
-                                                "node_type": "LiteralValue",
+                                                "node_type": "CASTLiteralValue",
                                                 "source_code_data_type": [
                                                     "Python",
                                                     "3.8",
@@ -4563,7 +4615,7 @@
                                         },
                                         "node_type": "Assignment",
                                         "right": {
-                                            "node_type": "LiteralValue",
+                                            "node_type": "CASTLiteralValue",
                                             "source_code_data_type": [
                                                 "Python",
                                                 "3.8",
@@ -4626,7 +4678,7 @@
                             {
                                 "arguments": [
                                     {
-                                        "node_type": "LiteralValue",
+                                        "node_type": "CASTLiteralValue",
                                         "source_code_data_type": [
                                             "Python",
                                             "3.8",
@@ -4648,7 +4700,7 @@
                                     {
                                         "arguments": [
                                             {
-                                                "node_type": "LiteralValue",
+                                                "node_type": "CASTLiteralValue",
                                                 "source_code_data_type": [
                                                     "Python",
                                                     "3.8",
@@ -4698,7 +4750,7 @@
                                         ]
                                     },
                                     {
-                                        "node_type": "LiteralValue",
+                                        "node_type": "CASTLiteralValue",
                                         "source_code_data_type": [
                                             "Python",
                                             "3.8",
@@ -4720,7 +4772,7 @@
                                     {
                                         "arguments": [
                                             {
-                                                "node_type": "LiteralValue",
+                                                "node_type": "CASTLiteralValue",
                                                 "source_code_data_type": [
                                                     "Python",
                                                     "3.8",
@@ -4802,7 +4854,7 @@
                                         },
                                         "node_type": "Assignment",
                                         "right": {
-                                            "node_type": "LiteralValue",
+                                            "node_type": "CASTLiteralValue",
                                             "source_code_data_type": [
                                                 "Python",
                                                 "3.8",
@@ -4865,7 +4917,7 @@
                             {
                                 "arguments": [
                                     {
-                                        "node_type": "LiteralValue",
+                                        "node_type": "CASTLiteralValue",
                                         "source_code_data_type": [
                                             "Python",
                                             "3.8",
@@ -4887,7 +4939,7 @@
                                     {
                                         "arguments": [
                                             {
-                                                "node_type": "LiteralValue",
+                                                "node_type": "CASTLiteralValue",
                                                 "source_code_data_type": [
                                                     "Python",
                                                     "3.8",
@@ -4969,7 +5021,7 @@
                                         },
                                         "node_type": "Assignment",
                                         "right": {
-                                            "node_type": "LiteralValue",
+                                            "node_type": "CASTLiteralValue",
                                             "source_code_data_type": [
                                                 "Python",
                                                 "3.8",
@@ -5032,7 +5084,7 @@
                                         },
                                         "node_type": "Assignment",
                                         "right": {
-                                            "node_type": "LiteralValue",
+                                            "node_type": "CASTLiteralValue",
                                             "source_code_data_type": [
                                                 "Python",
                                                 "3.8",
@@ -5095,7 +5147,7 @@
                                         },
                                         "node_type": "Assignment",
                                         "right": {
-                                            "node_type": "LiteralValue",
+                                            "node_type": "CASTLiteralValue",
                                             "source_code_data_type": [
                                                 "Python",
                                                 "3.8",
@@ -5158,7 +5210,7 @@
                                         },
                                         "node_type": "Assignment",
                                         "right": {
-                                            "node_type": "LiteralValue",
+                                            "node_type": "CASTLiteralValue",
                                             "source_code_data_type": [
                                                 "Python",
                                                 "3.8",
@@ -5221,7 +5273,7 @@
                             {
                                 "arguments": [
                                     {
-                                        "node_type": "LiteralValue",
+                                        "node_type": "CASTLiteralValue",
                                         "source_code_data_type": [
                                             "Python",
                                             "3.8",
@@ -5243,7 +5295,7 @@
                                     {
                                         "arguments": [
                                             {
-                                                "node_type": "LiteralValue",
+                                                "node_type": "CASTLiteralValue",
                                                 "source_code_data_type": [
                                                     "Python",
                                                     "3.8",
@@ -5325,7 +5377,7 @@
                                         },
                                         "node_type": "Assignment",
                                         "right": {
-                                            "node_type": "LiteralValue",
+                                            "node_type": "CASTLiteralValue",
                                             "source_code_data_type": [
                                                 "Python",
                                                 "3.8",
@@ -5388,7 +5440,7 @@
                                         },
                                         "node_type": "Assignment",
                                         "right": {
-                                            "node_type": "LiteralValue",
+                                            "node_type": "CASTLiteralValue",
                                             "source_code_data_type": [
                                                 "Python",
                                                 "3.8",
@@ -5451,7 +5503,7 @@
                                         },
                                         "node_type": "Assignment",
                                         "right": {
-                                            "node_type": "LiteralValue",
+                                            "node_type": "CASTLiteralValue",
                                             "source_code_data_type": [
                                                 "Python",
                                                 "3.8",
@@ -5514,7 +5566,7 @@
                                         },
                                         "node_type": "Assignment",
                                         "right": {
-                                            "node_type": "LiteralValue",
+                                            "node_type": "CASTLiteralValue",
                                             "source_code_data_type": [
                                                 "Python",
                                                 "3.8",
@@ -5577,7 +5629,7 @@
                             {
                                 "arguments": [
                                     {
-                                        "node_type": "LiteralValue",
+                                        "node_type": "CASTLiteralValue",
                                         "source_code_data_type": [
                                             "Python",
                                             "3.8",
@@ -5599,7 +5651,7 @@
                                     {
                                         "arguments": [
                                             {
-                                                "node_type": "LiteralValue",
+                                                "node_type": "CASTLiteralValue",
                                                 "source_code_data_type": [
                                                     "Python",
                                                     "3.8",
@@ -5681,7 +5733,7 @@
                                         },
                                         "node_type": "Assignment",
                                         "right": {
-                                            "node_type": "LiteralValue",
+                                            "node_type": "CASTLiteralValue",
                                             "source_code_data_type": [
                                                 "Python",
                                                 "3.8",
@@ -5744,7 +5796,7 @@
                                         },
                                         "node_type": "Assignment",
                                         "right": {
-                                            "node_type": "LiteralValue",
+                                            "node_type": "CASTLiteralValue",
                                             "source_code_data_type": [
                                                 "Python",
                                                 "3.8",
@@ -5807,7 +5859,7 @@
                                         },
                                         "node_type": "Assignment",
                                         "right": {
-                                            "node_type": "LiteralValue",
+                                            "node_type": "CASTLiteralValue",
                                             "source_code_data_type": [
                                                 "Python",
                                                 "3.8",
@@ -5870,7 +5922,7 @@
                                         },
                                         "node_type": "Assignment",
                                         "right": {
-                                            "node_type": "LiteralValue",
+                                            "node_type": "CASTLiteralValue",
                                             "source_code_data_type": [
                                                 "Python",
                                                 "3.8",
@@ -6129,7 +6181,7 @@
                                                 }
                                             ],
                                             "value": {
-                                                "id": 18,
+                                                "id": 19,
                                                 "name": "m",
                                                 "node_type": "Name",
                                                 "source_refs": [
@@ -6152,7 +6204,7 @@
                                         "operands": [
                                             {
                                                 "attr": {
-                                                    "id": 19,
+                                                    "id": 20,
                                                     "name": "id",
                                                     "node_type": "Name",
                                                     "source_refs": [
@@ -6178,7 +6230,7 @@
                                                     }
                                                 ],
                                                 "value": {
-                                                    "id": 18,
+                                                    "id": 19,
                                                     "name": "m",
                                                     "node_type": "Name",
                                                     "source_refs": [
@@ -6194,7 +6246,7 @@
                                                 }
                                             },
                                             {
-                                                "id": 17,
+                                                "id": 18,
                                                 "name": "metric_id",
                                                 "node_type": "Name",
                                                 "source_refs": [
@@ -6248,7 +6300,7 @@
                                         }
                                     ],
                                     "value": {
-                                        "node_type": "LiteralValue",
+                                        "node_type": "CASTLiteralValue",
                                         "source_code_data_type": [
                                             "Python",
                                             "3.8",
@@ -6270,7 +6322,7 @@
                                 },
                                 {
                                     "left": {
-                                        "node_type": "LiteralValue",
+                                        "node_type": "CASTLiteralValue",
                                         "source_code_data_type": [
                                             "Python",
                                             "3.8",
@@ -6302,7 +6354,7 @@
                                                 ],
                                                 "type": "float",
                                                 "val": {
-                                                    "id": 18,
+                                                    "id": 19,
                                                     "name": "m",
                                                     "node_type": "Name",
                                                     "source_refs": [
@@ -6332,7 +6384,7 @@
                                                 ],
                                                 "type": "iterator",
                                                 "val": {
-                                                    "id": 20,
+                                                    "id": 21,
                                                     "name": "generated_iter_2",
                                                     "node_type": "Name",
                                                     "source_refs": [
@@ -6362,7 +6414,7 @@
                                                 ],
                                                 "type": "boolean",
                                                 "val": {
-                                                    "id": 21,
+                                                    "id": 22,
                                                     "name": "sc_3",
                                                     "node_type": "Name",
                                                     "source_refs": [
@@ -6398,7 +6450,7 @@
                                                 ],
                                                 "type": "iterator",
                                                 "val": {
-                                                    "id": 20,
+                                                    "id": 21,
                                                     "name": "generated_iter_2",
                                                     "node_type": "Name",
                                                     "source_refs": [
@@ -6415,7 +6467,7 @@
                                             }
                                         ],
                                         "func": {
-                                            "id": 14,
+                                            "id": 15,
                                             "name": "next",
                                             "node_type": "Name",
                                             "source_refs": [
@@ -6475,7 +6527,7 @@
                                         ],
                                         "type": "boolean",
                                         "val": {
-                                            "id": 21,
+                                            "id": 22,
                                             "name": "sc_3",
                                             "node_type": "Name",
                                             "source_refs": [
@@ -6491,7 +6543,7 @@
                                         }
                                     },
                                     {
-                                        "node_type": "LiteralValue",
+                                        "node_type": "CASTLiteralValue",
                                         "source_code_data_type": [
                                             "Python",
                                             "3.8",
@@ -6543,7 +6595,7 @@
                                         ],
                                         "type": "iterator",
                                         "val": {
-                                            "id": 20,
+                                            "id": 21,
                                             "name": "generated_iter_2",
                                             "node_type": "Name",
                                             "source_refs": [
@@ -6578,7 +6630,7 @@
                                             }
                                         ],
                                         "func": {
-                                            "id": 13,
+                                            "id": 14,
                                             "name": "iter",
                                             "node_type": "Name",
                                             "source_refs": [
@@ -6619,7 +6671,7 @@
                                 },
                                 {
                                     "left": {
-                                        "node_type": "LiteralValue",
+                                        "node_type": "CASTLiteralValue",
                                         "source_code_data_type": [
                                             "Python",
                                             "3.8",
@@ -6651,7 +6703,7 @@
                                                 ],
                                                 "type": "float",
                                                 "val": {
-                                                    "id": 18,
+                                                    "id": 19,
                                                     "name": "m",
                                                     "node_type": "Name",
                                                     "source_refs": [
@@ -6681,7 +6733,7 @@
                                                 ],
                                                 "type": "iterator",
                                                 "val": {
-                                                    "id": 20,
+                                                    "id": 21,
                                                     "name": "generated_iter_2",
                                                     "node_type": "Name",
                                                     "source_refs": [
@@ -6711,7 +6763,7 @@
                                                 ],
                                                 "type": "boolean",
                                                 "val": {
-                                                    "id": 21,
+                                                    "id": 22,
                                                     "name": "sc_3",
                                                     "node_type": "Name",
                                                     "source_refs": [
@@ -6747,7 +6799,7 @@
                                                 ],
                                                 "type": "iterator",
                                                 "val": {
-                                                    "id": 20,
+                                                    "id": 21,
                                                     "name": "generated_iter_2",
                                                     "node_type": "Name",
                                                     "source_refs": [
@@ -6764,7 +6816,7 @@
                                             }
                                         ],
                                         "func": {
-                                            "id": 14,
+                                            "id": 15,
                                             "name": "next",
                                             "node_type": "Name",
                                             "source_refs": [
@@ -6832,7 +6884,7 @@
                             ],
                             "type": "float",
                             "val": {
-                                "id": 17,
+                                "id": 18,
                                 "name": "metric_id",
                                 "node_type": "Name",
                                 "source_refs": [
@@ -6849,7 +6901,7 @@
                         }
                     ],
                     "name": {
-                        "id": 16,
+                        "id": 17,
                         "name": "get_metric",
                         "node_type": "Name",
                         "source_refs": [

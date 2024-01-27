@@ -146,7 +146,7 @@
                     },
                     "node_type": "Assignment",
                     "right": {
-                        "node_type": "LiteralValue",
+                        "node_type": "CASTLiteralValue",
                         "source_code_data_type": [
                             "Fortran",
                             "Fortran95",
@@ -690,7 +690,7 @@
                                 }
                             ],
                             "value": {
-                                "node_type": "LiteralValue",
+                                "node_type": "CASTLiteralValue",
                                 "source_code_data_type": [
                                     "Fortran",
                                     "Fotran95",
@@ -924,7 +924,7 @@
                             },
                             "node_type": "Assignment",
                             "right": {
-                                "node_type": "LiteralValue",
+                                "node_type": "CASTLiteralValue",
                                 "source_code_data_type": [
                                     "Fortran",
                                     "Fortran95",
@@ -1018,7 +1018,7 @@
                             },
                             "node_type": "Assignment",
                             "right": {
-                                "node_type": "LiteralValue",
+                                "node_type": "CASTLiteralValue",
                                 "source_code_data_type": [
                                     "Fortran",
                                     "Fortran95",
@@ -1045,6 +1045,20 @@
                                     "row_end": 60,
                                     "row_start": 60,
                                     "source_file_name": "dispose.F"
+                                }
+                            ]
+                        },
+                        {
+                            "label": "100",
+                            "node_type": "Label",
+                            "source_refs": [
+                                {
+                                    "col_end": -1,
+                                    "col_start": -1,
+                                    "node_type": "SourceRef",
+                                    "row_end": -1,
+                                    "row_start": -1,
+                                    "source_file_name": ""
                                 }
                             ]
                         },
@@ -1175,7 +1189,7 @@
                                         }
                                     },
                                     {
-                                        "node_type": "LiteralValue",
+                                        "node_type": "CASTLiteralValue",
                                         "source_code_data_type": [
                                             "Fortran",
                                             "Fortran95",
@@ -1323,7 +1337,7 @@
                                         }
                                     ],
                                     "value": {
-                                        "node_type": "LiteralValue",
+                                        "node_type": "CASTLiteralValue",
                                         "source_code_data_type": [
                                             "Fortran",
                                             "Fotran95",
@@ -1356,21 +1370,6 @@
                                                 ]
                                             },
                                             {
-                                                "id": 12,
-                                                "name": "putfile",
-                                                "node_type": "Name",
-                                                "source_refs": [
-                                                    {
-                                                        "col_end": 40,
-                                                        "col_start": 33,
-                                                        "node_type": "SourceRef",
-                                                        "row_end": 49,
-                                                        "row_start": 49,
-                                                        "source_file_name": "dispose.F"
-                                                    }
-                                                ]
-                                            },
-                                            {
                                                 "id": 11,
                                                 "name": "isput_in_script",
                                                 "node_type": "Name",
@@ -1382,6 +1381,21 @@
                                                         "row_end": -1,
                                                         "row_start": -1,
                                                         "source_file_name": ""
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "id": 12,
+                                                "name": "putfile",
+                                                "node_type": "Name",
+                                                "source_refs": [
+                                                    {
+                                                        "col_end": 40,
+                                                        "col_start": 33,
+                                                        "node_type": "SourceRef",
+                                                        "row_end": 49,
+                                                        "row_start": 49,
+                                                        "source_file_name": "dispose.F"
                                                     }
                                                 ]
                                             }
@@ -1522,7 +1536,7 @@
                                                 ]
                                             },
                                             {
-                                                "node_type": "LiteralValue",
+                                                "node_type": "CASTLiteralValue",
                                                 "source_code_data_type": [
                                                     "Fortran",
                                                     "Fortran95",
@@ -1577,7 +1591,7 @@
                                             ]
                                         },
                                         {
-                                            "node_type": "LiteralValue",
+                                            "node_type": "CASTLiteralValue",
                                             "source_code_data_type": [
                                                 "Fortran",
                                                 "Fortran95",
@@ -1613,7 +1627,7 @@
                                 "node_type": "ModelIf",
                                 "orelse": [
                                     {
-                                        "node_type": "LiteralValue",
+                                        "node_type": "CASTLiteralValue",
                                         "source_code_data_type": [
                                             "Fortran",
                                             "Fotran95",
@@ -1710,7 +1724,7 @@
                                         ]
                                     },
                                     {
-                                        "node_type": "LiteralValue",
+                                        "node_type": "CASTLiteralValue",
                                         "source_code_data_type": [
                                             "Fortran",
                                             "Fortran95",
@@ -1767,7 +1781,7 @@
                                 }
                             ],
                             "value": {
-                                "node_type": "LiteralValue",
+                                "node_type": "CASTLiteralValue",
                                 "source_code_data_type": [
                                     "Fortran",
                                     "Fotran95",
@@ -1800,21 +1814,6 @@
                                         ]
                                     },
                                     {
-                                        "id": 12,
-                                        "name": "putfile",
-                                        "node_type": "Name",
-                                        "source_refs": [
-                                            {
-                                                "col_end": 40,
-                                                "col_start": 33,
-                                                "node_type": "SourceRef",
-                                                "row_end": 49,
-                                                "row_start": 49,
-                                                "source_file_name": "dispose.F"
-                                            }
-                                        ]
-                                    },
-                                    {
                                         "id": 11,
                                         "name": "isput_in_script",
                                         "node_type": "Name",
@@ -1828,10 +1827,39 @@
                                                 "source_file_name": ""
                                             }
                                         ]
+                                    },
+                                    {
+                                        "id": 12,
+                                        "name": "putfile",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 40,
+                                                "col_start": 33,
+                                                "node_type": "SourceRef",
+                                                "row_end": 49,
+                                                "row_start": 49,
+                                                "source_file_name": "dispose.F"
+                                            }
+                                        ]
                                     }
                                 ],
                                 "value_type": "Tuple"
                             }
+                        },
+                        {
+                            "label": "900",
+                            "node_type": "Label",
+                            "source_refs": [
+                                {
+                                    "col_end": -1,
+                                    "col_start": -1,
+                                    "node_type": "SourceRef",
+                                    "row_end": -1,
+                                    "row_start": -1,
+                                    "source_file_name": ""
+                                }
+                            ]
                         },
                         {
                             "arguments": [],
@@ -1853,6 +1881,20 @@
                             "node_type": "Call",
                             "source_language": null,
                             "source_language_version": null,
+                            "source_refs": [
+                                {
+                                    "col_end": -1,
+                                    "col_start": -1,
+                                    "node_type": "SourceRef",
+                                    "row_end": -1,
+                                    "row_start": -1,
+                                    "source_file_name": ""
+                                }
+                            ]
+                        },
+                        {
+                            "label": "101",
+                            "node_type": "Label",
                             "source_refs": [
                                 {
                                     "col_end": -1,
@@ -2605,7 +2647,7 @@
                             },
                             "node_type": "Assignment",
                             "right": {
-                                "node_type": "LiteralValue",
+                                "node_type": "CASTLiteralValue",
                                 "source_code_data_type": [
                                     "Fortran",
                                     "Fortran95",
@@ -2668,7 +2710,7 @@
                             },
                             "node_type": "Assignment",
                             "right": {
-                                "node_type": "LiteralValue",
+                                "node_type": "CASTLiteralValue",
                                 "source_code_data_type": [
                                     "Fortran",
                                     "Fortran95",
@@ -2695,6 +2737,20 @@
                                     "row_end": 95,
                                     "row_start": 95,
                                     "source_file_name": "dispose.F"
+                                }
+                            ]
+                        },
+                        {
+                            "label": "100",
+                            "node_type": "Label",
+                            "source_refs": [
+                                {
+                                    "col_end": -1,
+                                    "col_start": -1,
+                                    "node_type": "SourceRef",
+                                    "row_end": -1,
+                                    "row_start": -1,
+                                    "source_file_name": ""
                                 }
                             ]
                         },
@@ -2940,7 +2996,7 @@
                                     },
                                     "node_type": "Assignment",
                                     "right": {
-                                        "node_type": "LiteralValue",
+                                        "node_type": "CASTLiteralValue",
                                         "source_code_data_type": [
                                             "Fortran",
                                             "Fortran95",
@@ -3035,7 +3091,7 @@
                                         ]
                                     },
                                     {
-                                        "node_type": "LiteralValue",
+                                        "node_type": "CASTLiteralValue",
                                         "source_code_data_type": [
                                             "Fortran",
                                             "Fortran95",
@@ -3092,7 +3148,7 @@
                                 }
                             ],
                             "value": {
-                                "node_type": "LiteralValue",
+                                "node_type": "CASTLiteralValue",
                                 "source_code_data_type": [
                                     "Fortran",
                                     "Fotran95",
@@ -3142,6 +3198,20 @@
                                 ],
                                 "value_type": "Tuple"
                             }
+                        },
+                        {
+                            "label": "900",
+                            "node_type": "Label",
+                            "source_refs": [
+                                {
+                                    "col_end": -1,
+                                    "col_start": -1,
+                                    "node_type": "SourceRef",
+                                    "row_end": -1,
+                                    "row_start": -1,
+                                    "source_file_name": ""
+                                }
+                            ]
                         },
                         {
                             "arguments": [],
@@ -3877,7 +3947,7 @@
                             },
                             "node_type": "Assignment",
                             "right": {
-                                "node_type": "LiteralValue",
+                                "node_type": "CASTLiteralValue",
                                 "source_code_data_type": [
                                     "Fortran",
                                     "Fortran95",
@@ -4366,7 +4436,7 @@
                             },
                             "node_type": "Assignment",
                             "right": {
-                                "node_type": "LiteralValue",
+                                "node_type": "CASTLiteralValue",
                                 "source_code_data_type": [
                                     "Fortran",
                                     "Fortran95",
@@ -4460,7 +4530,7 @@
                             },
                             "node_type": "Assignment",
                             "right": {
-                                "node_type": "LiteralValue",
+                                "node_type": "CASTLiteralValue",
                                 "source_code_data_type": [
                                     "Fortran",
                                     "Fortran95",
@@ -4554,7 +4624,7 @@
                             },
                             "node_type": "Assignment",
                             "right": {
-                                "node_type": "LiteralValue",
+                                "node_type": "CASTLiteralValue",
                                 "source_code_data_type": [
                                     "Fortran",
                                     "Fortran95",
@@ -4827,7 +4897,7 @@
                                     },
                                     "node_type": "Assignment",
                                     "right": {
-                                        "node_type": "LiteralValue",
+                                        "node_type": "CASTLiteralValue",
                                         "source_code_data_type": [
                                             "Fortran",
                                             "Fortran95",
@@ -5016,7 +5086,7 @@
                                         ]
                                     },
                                     {
-                                        "node_type": "LiteralValue",
+                                        "node_type": "CASTLiteralValue",
                                         "source_code_data_type": [
                                             "Fortran",
                                             "Fortran95",
@@ -5232,7 +5302,7 @@
                                     },
                                     "node_type": "Assignment",
                                     "right": {
-                                        "node_type": "LiteralValue",
+                                        "node_type": "CASTLiteralValue",
                                         "source_code_data_type": [
                                             "Fortran",
                                             "Fortran95",
@@ -5295,7 +5365,7 @@
                                     },
                                     "node_type": "Assignment",
                                     "right": {
-                                        "node_type": "LiteralValue",
+                                        "node_type": "CASTLiteralValue",
                                         "source_code_data_type": [
                                             "Fortran",
                                             "Fortran95",
@@ -5558,7 +5628,7 @@
                                                     ]
                                                 },
                                                 {
-                                                    "node_type": "LiteralValue",
+                                                    "node_type": "CASTLiteralValue",
                                                     "source_code_data_type": [
                                                         "Fortran",
                                                         "Fortran95",
@@ -5705,7 +5775,7 @@
                                         ]
                                     },
                                     {
-                                        "node_type": "LiteralValue",
+                                        "node_type": "CASTLiteralValue",
                                         "source_code_data_type": [
                                             "Fortran",
                                             "Fortran95",
@@ -5779,7 +5849,7 @@
                                 }
                             ],
                             "value": {
-                                "node_type": "LiteralValue",
+                                "node_type": "CASTLiteralValue",
                                 "source_code_data_type": [
                                     "Fortran",
                                     "Fotran95",
@@ -5797,13 +5867,13 @@
                                 ],
                                 "value": [
                                     {
-                                        "id": 38,
-                                        "name": "annotation",
+                                        "id": 37,
+                                        "name": "diskfile",
                                         "node_type": "Name",
                                         "source_refs": [
                                             {
-                                                "col_end": 42,
-                                                "col_start": 32,
+                                                "col_end": 31,
+                                                "col_start": 23,
                                                 "node_type": "SourceRef",
                                                 "row_end": 123,
                                                 "row_start": 123,
@@ -5812,13 +5882,13 @@
                                         ]
                                     },
                                     {
-                                        "id": 37,
-                                        "name": "diskfile",
+                                        "id": 38,
+                                        "name": "annotation",
                                         "node_type": "Name",
                                         "source_refs": [
                                             {
-                                                "col_end": 31,
-                                                "col_start": 23,
+                                                "col_end": 42,
+                                                "col_start": 32,
                                                 "node_type": "SourceRef",
                                                 "row_end": 123,
                                                 "row_start": 123,

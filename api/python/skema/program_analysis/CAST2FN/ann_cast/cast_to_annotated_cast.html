@@ -38,7 +38,9 @@ from skema.program_analysis.CAST2FN.model.cast import (
     Attribute,
     Call,
     FunctionDef,
-    LiteralValue,
+    Goto,
+    Label,
+    CASTLiteralValue,
     Loop,
     ModelBreak,
     ModelContinue,
@@ -140,7 +142,18 @@ class CastToAnnotatedCastVisitor:
         return AnnCastFunctionDef(name, args, body, node.source_refs)
         
     @_visit.register
-    def visit_literal_value(self, node: LiteralValue):
+    def visit_goto(self, node: Goto):
+        expr = node.expr
+        label = node.label
+        return AnnCastGoto(expr, label, node.source_refs)
+        
+    @_visit.register
+    def visit_label(self, node: Label):
+        label = node.label
+        return AnnCastLabel(label, node.source_refs)
+        
+    @_visit.register
+    def visit_literal_value(self, node: CASTLiteralValue):
         if node.value_type == &#34;List[Any]&#34;:
             node.value.size = self.visit(
                 node.value.size
@@ -355,7 +368,18 @@ in a later pass to maintain scoping information for GrFN containers.</p></div>
         return AnnCastFunctionDef(name, args, body, node.source_refs)
         
     @_visit.register
-    def visit_literal_value(self, node: LiteralValue):
+    def visit_goto(self, node: Goto):
+        expr = node.expr
+        label = node.label
+        return AnnCastGoto(expr, label, node.source_refs)
+        
+    @_visit.register
+    def visit_label(self, node: Label):
+        label = node.label
+        return AnnCastLabel(label, node.source_refs)
+        
+    @_visit.register
+    def visit_literal_value(self, node: CASTLiteralValue):
         if node.value_type == &#34;List[Any]&#34;:
             node.value.size = self.visit(
                 node.value.size
@@ -544,8 +568,8 @@ def visit_function_def(self, node: FunctionDef):
     return AnnCastFunctionDef(name, args, body, node.source_refs)</code></pre>
 </details>
 </dd>
-<dt id="skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CastToAnnotatedCastVisitor.visit_literal_value"><code class="name flex">
-<span>def <span class="ident">visit_literal_value</span></span>(<span>self, node: <a title="skema.program_analysis.CAST2FN.model.cast.literal_value.LiteralValue" href="../model/cast/literal_value.html#skema.program_analysis.CAST2FN.model.cast.literal_value.LiteralValue">LiteralValue</a>)</span>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CastToAnnotatedCastVisitor.visit_goto"><code class="name flex">
+<span>def <span class="ident">visit_goto</span></span>(<span>self, node: <a title="skema.program_analysis.CAST2FN.model.cast.goto.Goto" href="../model/cast/goto.html#skema.program_analysis.CAST2FN.model.cast.goto.Goto">Goto</a>)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -554,7 +578,38 @@ def visit_function_def(self, node: FunctionDef):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">@_visit.register
-def visit_literal_value(self, node: LiteralValue):
+def visit_goto(self, node: Goto):
+    expr = node.expr
+    label = node.label
+    return AnnCastGoto(expr, label, node.source_refs)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CastToAnnotatedCastVisitor.visit_label"><code class="name flex">
+<span>def <span class="ident">visit_label</span></span>(<span>self, node: <a title="skema.program_analysis.CAST2FN.model.cast.label.Label" href="../model/cast/label.html#skema.program_analysis.CAST2FN.model.cast.label.Label">Label</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@_visit.register
+def visit_label(self, node: Label):
+    label = node.label
+    return AnnCastLabel(label, node.source_refs)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CastToAnnotatedCastVisitor.visit_literal_value"><code class="name flex">
+<span>def <span class="ident">visit_literal_value</span></span>(<span>self, node: <a title="skema.program_analysis.CAST2FN.model.cast.cast_literal_value.CASTLiteralValue" href="../model/cast/cast_literal_value.html#skema.program_analysis.CAST2FN.model.cast.cast_literal_value.CASTLiteralValue">CASTLiteralValue</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@_visit.register
+def visit_literal_value(self, node: CASTLiteralValue):
     if node.value_type == &#34;List[Any]&#34;:
         node.value.size = self.visit(
             node.value.size
@@ -807,6 +862,8 @@ def visit_var(self, node: Var):
 <li><code><a title="skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CastToAnnotatedCastVisitor.visit_attribute" href="#skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CastToAnnotatedCastVisitor.visit_attribute">visit_attribute</a></code></li>
 <li><code><a title="skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CastToAnnotatedCastVisitor.visit_call" href="#skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CastToAnnotatedCastVisitor.visit_call">visit_call</a></code></li>
 <li><code><a title="skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CastToAnnotatedCastVisitor.visit_function_def" href="#skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CastToAnnotatedCastVisitor.visit_function_def">visit_function_def</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CastToAnnotatedCastVisitor.visit_goto" href="#skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CastToAnnotatedCastVisitor.visit_goto">visit_goto</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CastToAnnotatedCastVisitor.visit_label" href="#skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CastToAnnotatedCastVisitor.visit_label">visit_label</a></code></li>
 <li><code><a title="skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CastToAnnotatedCastVisitor.visit_literal_value" href="#skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CastToAnnotatedCastVisitor.visit_literal_value">visit_literal_value</a></code></li>
 <li><code><a title="skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CastToAnnotatedCastVisitor.visit_loop" href="#skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CastToAnnotatedCastVisitor.visit_loop">visit_loop</a></code></li>
 <li><code><a title="skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CastToAnnotatedCastVisitor.visit_model_break" href="#skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CastToAnnotatedCastVisitor.visit_model_break">visit_model_break</a></code></li>

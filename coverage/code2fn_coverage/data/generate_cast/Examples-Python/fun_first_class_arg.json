@@ -37,7 +37,7 @@
                                         ]
                                     },
                                     {
-                                        "node_type": "LiteralValue",
+                                        "node_type": "CASTLiteralValue",
                                         "source_code_data_type": [
                                             "Python",
                                             "3.8",
@@ -164,7 +164,7 @@
                     },
                     "node_type": "Assignment",
                     "right": {
-                        "node_type": "LiteralValue",
+                        "node_type": "CASTLiteralValue",
                         "source_code_data_type": [
                             "Python",
                             "3.8",
@@ -182,7 +182,7 @@
                         ],
                         "value": [
                             {
-                                "node_type": "LiteralValue",
+                                "node_type": "CASTLiteralValue",
                                 "source_code_data_type": [
                                     "Python",
                                     "3.8",
@@ -202,7 +202,7 @@
                                 "value_type": "Integer"
                             },
                             {
-                                "node_type": "LiteralValue",
+                                "node_type": "CASTLiteralValue",
                                 "source_code_data_type": [
                                     "Python",
                                     "3.8",
@@ -222,7 +222,7 @@
                                 "value_type": "Integer"
                             },
                             {
-                                "node_type": "LiteralValue",
+                                "node_type": "CASTLiteralValue",
                                 "source_code_data_type": [
                                     "Python",
                                     "3.8",
@@ -290,13 +290,60 @@
                     "right": {
                         "arguments": [
                             {
-                                "id": 4,
-                                "name": "foo",
-                                "node_type": "Name",
+                                "arguments": [
+                                    {
+                                        "id": 4,
+                                        "name": "foo",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 16,
+                                                "col_start": 13,
+                                                "node_type": "SourceRef",
+                                                "row_end": 4,
+                                                "row_start": 4,
+                                                "source_file_name": "fun_first_class_arg"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "id": 0,
+                                        "name": "x",
+                                        "node_type": "Name",
+                                        "source_refs": [
+                                            {
+                                                "col_end": 18,
+                                                "col_start": 17,
+                                                "node_type": "SourceRef",
+                                                "row_end": 4,
+                                                "row_start": 4,
+                                                "source_file_name": "fun_first_class_arg"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "func": {
+                                    "id": 5,
+                                    "name": "map",
+                                    "node_type": "Name",
+                                    "source_refs": [
+                                        {
+                                            "col_end": 19,
+                                            "col_start": 9,
+                                            "node_type": "SourceRef",
+                                            "row_end": 4,
+                                            "row_start": 4,
+                                            "source_file_name": "fun_first_class_arg"
+                                        }
+                                    ]
+                                },
+                                "node_type": "Call",
+                                "source_language": null,
+                                "source_language_version": null,
                                 "source_refs": [
                                     {
-                                        "col_end": 11,
-                                        "col_start": 8,
+                                        "col_end": 19,
+                                        "col_start": 9,
                                         "node_type": "SourceRef",
                                         "row_end": 4,
                                         "row_start": 4,
@@ -305,28 +352,33 @@
                                 ]
                             },
                             {
-                                "id": 0,
-                                "name": "x",
-                                "node_type": "Name",
+                                "node_type": "CASTLiteralValue",
+                                "source_code_data_type": [
+                                    "Python",
+                                    "3.8",
+                                    "List"
+                                ],
                                 "source_refs": [
                                     {
-                                        "col_end": 13,
-                                        "col_start": 12,
+                                        "col_end": 20,
+                                        "col_start": 4,
                                         "node_type": "SourceRef",
                                         "row_end": 4,
                                         "row_start": 4,
                                         "source_file_name": "fun_first_class_arg"
                                     }
-                                ]
+                                ],
+                                "value": "list",
+                                "value_type": "List"
                             }
                         ],
                         "func": {
-                            "id": 5,
-                            "name": "map",
+                            "id": 6,
+                            "name": "cast",
                             "node_type": "Name",
                             "source_refs": [
                                 {
-                                    "col_end": 14,
+                                    "col_end": 20,
                                     "col_start": 4,
                                     "node_type": "SourceRef",
                                     "row_end": 4,
@@ -340,7 +392,7 @@
                         "source_language_version": null,
                         "source_refs": [
                             {
-                                "col_end": 14,
+                                "col_end": 20,
                                 "col_start": 4,
                                 "node_type": "SourceRef",
                                 "row_end": 4,
@@ -351,7 +403,7 @@
                     },
                     "source_refs": [
                         {
-                            "col_end": 14,
+                            "col_end": 20,
                             "col_start": 0,
                             "node_type": "SourceRef",
                             "row_end": 4,

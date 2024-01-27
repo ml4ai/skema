@@ -28,14 +28,14 @@
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">from typing import List
-from skema.program_analysis.CAST2FN.model.cast import AstNode, LiteralValue, SourceRef
+from skema.program_analysis.CAST2FN.model.cast import AstNode, CASTLiteralValue, SourceRef
 
 DUMMY_SOURCE_REF = [SourceRef(&#34;&#34;, -1, -1, -1, -1)]
 DUMMY_SOURCE_CODE_DATA_TYPE = [&#34;Fortran&#34;, &#34;Fotran95&#34;, &#34;None&#34;]
 
 def generate_dummy_source_refs(node: AstNode) -&gt; AstNode:
     &#34;&#34;&#34;Walks a tree of AstNodes replacing any null SourceRefs with a dummy value&#34;&#34;&#34;
-    if isinstance(node, LiteralValue) and not node.source_code_data_type:
+    if isinstance(node, CASTLiteralValue) and not node.source_code_data_type:
         node.source_code_data_type = DUMMY_SOURCE_CODE_DATA_TYPE
     if not node.source_refs:
         node.source_refs = DUMMY_SOURCE_REF
@@ -70,7 +70,7 @@ def generate_dummy_source_refs(node: AstNode) -&gt; AstNode:
 </summary>
 <pre><code class="python">def generate_dummy_source_refs(node: AstNode) -&gt; AstNode:
     &#34;&#34;&#34;Walks a tree of AstNodes replacing any null SourceRefs with a dummy value&#34;&#34;&#34;
-    if isinstance(node, LiteralValue) and not node.source_code_data_type:
+    if isinstance(node, CASTLiteralValue) and not node.source_code_data_type:
         node.source_code_data_type = DUMMY_SOURCE_CODE_DATA_TYPE
     if not node.source_refs:
         node.source_refs = DUMMY_SOURCE_REF

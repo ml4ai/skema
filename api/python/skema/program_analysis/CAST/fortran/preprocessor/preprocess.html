@@ -202,7 +202,7 @@ def fix_include_directives(source: str) -&gt; str:
 def run_c_preprocessor(source: str, include_base_path: Path) -&gt; str:
     &#34;&#34;&#34;Run the gcc c-preprocessor. Its run from the context of the include_base_path, so that it can find all included files&#34;&#34;&#34;
     result = run(
-        [&#34;gcc&#34;, &#34;-cpp&#34;, &#34;-E&#34;, &#34;-x&#34;, &#34;f95&#34;, &#34;-&#34;],
+        [&#34;gfortran&#34;, &#34;-cpp&#34;, &#34;-E&#34;, &#34;-x&#34;, &#34;f95&#34;, &#34;-&#34;],
         input=source,
         text=True,
         capture_output=True,
@@ -213,8 +213,10 @@ def run_c_preprocessor(source: str, include_base_path: Path) -&gt; str:
 
 
 def convert_assigned(source: str) -&gt; str:
-    &#34;&#34;&#34;Convered ASSIGNED GO TO to COMPUTED GO TO&#34;&#34;&#34;
-    pass
+    &#34;&#34;&#34;Convered ASSIGNED GO TO to a traditional GO TO&#34;&#34;&#34;
+    assign_regex = &#34;assign (.*?) to (.*?)&#34;
+    for match in re.finditer(assign_regex, source, re.IGNORECASE):
+        pass
 
 
 def convert_to_free_form(source: str) -&gt; str:
@@ -343,14 +345,16 @@ if __name__ == &#34;__main__&#34;:
 <span>def <span class="ident">convert_assigned</span></span>(<span>source: str) ‑> str</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Convered ASSIGNED GO TO to COMPUTED GO TO</p></div>
+<div class="desc"><p>Convered ASSIGNED GO TO to a traditional GO TO</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def convert_assigned(source: str) -&gt; str:
-    &#34;&#34;&#34;Convered ASSIGNED GO TO to COMPUTED GO TO&#34;&#34;&#34;
-    pass</code></pre>
+    &#34;&#34;&#34;Convered ASSIGNED GO TO to a traditional GO TO&#34;&#34;&#34;
+    assign_regex = &#34;assign (.*?) to (.*?)&#34;
+    for match in re.finditer(assign_regex, source, re.IGNORECASE):
+        pass</code></pre>
 </details>
 </dd>
 <dt id="skema.program_analysis.CAST.fortran.preprocessor.preprocess.convert_to_free_form"><code class="name flex">
@@ -597,7 +601,7 @@ An intermediary directory will also be created containing:
 <pre><code class="python">def run_c_preprocessor(source: str, include_base_path: Path) -&gt; str:
     &#34;&#34;&#34;Run the gcc c-preprocessor. Its run from the context of the include_base_path, so that it can find all included files&#34;&#34;&#34;
     result = run(
-        [&#34;gcc&#34;, &#34;-cpp&#34;, &#34;-E&#34;, &#34;-x&#34;, &#34;f95&#34;, &#34;-&#34;],
+        [&#34;gfortran&#34;, &#34;-cpp&#34;, &#34;-E&#34;, &#34;-x&#34;, &#34;f95&#34;, &#34;-&#34;],
         input=source,
         text=True,
         capture_output=True,

@@ -298,12 +298,44 @@ class ToGrometPass:
         # Initialize the table of function arguments
         self.function_arguments = {}
 
+        # Maintain an fn_array index stack
+        self.fn_stack = [] 
+
+        # Table of labels
+        self.labels = {}
+        self.placeholder_gotos = {}
+
         # the fullid of a AnnCastName node is a string which includes its
         # variable name, numerical id, version, and scope
         for node in self.pipeline_state.nodes:
             self.visit(node, parent_gromet_fn=None, parent_cast_node=None)
 
         pipeline_state.gromet_collection = self.gromet_module
+
+    # Interface that allows us to put what FN index is currently on the stack
+    # Used for labels
+    def push_idx(self, idx):
+        self.fn_stack.append(idx)
+
+    def peek_idx(self):
+        if len(self.fn_stack) &gt; 0:
+            return self.fn_stack[-1]
+        return 0
+
+    def pop_idx(self):
+        if len(self.fn_stack) &gt; 0:
+            return self.fn_stack.pop()
+        return 0
+
+    # Adds a label to the labels table, associating a label
+    # with the index into the fn_array table that label is in
+    def add_label(self, label, fn_idx):
+        self.labels[label] = fn_idx
+
+    # Clears the labels table. 
+    # NOTE: Do we need to do this everytime we leave a function definition?
+    def clear_labels(self):
+        self.labels = {}
 
     def symtab_variables(self):
         return self.symbol_table[&#34;variables&#34;]
@@ -543,13 +575,15 @@ class ToGrometPass:
                 primitive_fn,
             )
             self.set_index()
+            
+            fn_array_idx = len(self.gromet_module.fn_array)
 
             ref = node.source_refs[0]
             # metadata = self.create_source_code_reference(ref)
             # Creates the &#39;call&#39; to this primitive expression which then gets inserted into the parent&#39;s Gromet FN
             parent_primitive_call_bf = GrometBoxFunction(
                 function_type=FunctionType.EXPRESSION,
-                body=len(self.gromet_module.fn_array),
+                body=fn_array_idx,
                 metadata=self.insert_metadata(metadata),
             )
 
@@ -2935,6 +2969,17 @@ class ToGrometPass:
             GrometWire(src=len(gromet_fn.opo), tgt=len(gromet_fn.pof)),
         )
 
+    def resolve_placeholder_gotos(self):
+        # When we generate GOTOs, often we will see GOTOs referring to labels
+        # that we haven&#39;t seen in the pipeline yet. Here we resolve any
+        # GOTOs for which the labels we haven&#39;t seen yet.
+        for label in self.placeholder_gotos.keys():
+            for label_bf in self.placeholder_gotos[label]:
+                label_bf.value = self.labels[label]
+        self.placeholder_gotos = {}
+
+        self.clear_labels()
+
     def wire_return_node(self, node, gromet_fn):
         &#34;&#34;&#34;Return statements have many ways in which they can be wired, and thus
         we use this recursive function to handle all the possible cases
@@ -3074,6 +3119,8 @@ class ToGrometPass:
             )
         else:
             new_gromet = self.gromet_module.fn_array[idx - 1]
+
+        self.push_idx(idx)
 
         # Update the functions symbol table with its index in the FN array
         # This is currently used for wiring function names as parameters to function calls
@@ -3219,7 +3266,99 @@ class ToGrometPass:
             node, new_gromet, node.body, parent_cast_node=parent_cast_node
         )
 
+        self.pop_idx()
+        self.resolve_placeholder_gotos()
         var_environment[&#34;args&#34;] = deepcopy(prev_arg_env)
+
+
+    @_visit.register
+    def visit_goto(
+        self, node: AnnCastGoto, parent_gromet_fn, parent_cast_node 
+    ):
+        # Make an expression FN for computing the label and index values of this goto
+        # Insert it into the overall fn_array table
+        goto_fn = GrometFN()
+        goto_fn.b = insert_gromet_object(goto_fn.b, GrometBoxFunction(function_type=FunctionType.EXPRESSION))
+        self.gromet_module.fn_array = insert_gromet_object(
+            self.gromet_module.fn_array,
+            goto_fn,
+        )
+        self.set_index()
+
+        goto_fn_idx = len(self.gromet_module.fn_array)
+
+        parent_gromet_fn.bf = insert_gromet_object(parent_gromet_fn.bf, GrometBoxFunction(function_type=FunctionType.GOTO, name=node.label, body=goto_fn_idx))
+        goto_idx_call = len(parent_gromet_fn.bf)
+        vars = self.symtab_variables()
+        added_vars = []
+        for var in vars:
+            for v in vars[var]: 
+                if v not in added_vars: 
+                    parent_gromet_fn.pif = insert_gromet_object(parent_gromet_fn.pif, GrometPort(box=goto_idx_call))
+                    self.wire_from_var_env(v, parent_gromet_fn)
+                    added_vars.append(v)
+
+        added_vars = []
+        for var in vars:
+            for v in vars[var]: 
+                if v not in added_vars: 
+                    goto_fn.opi = insert_gromet_object(goto_fn.opi, GrometPort(box=len(goto_fn.b)))
+                    added_vars.append(v)
+
+        # The goto expression FN has two potential expressions, to determine the label and the index
+        # TODO: compute an expression for an index when expr is not None
+        if node.expr == None: 
+            # When a GOTO references a label that we have not seen yet 
+            # We put a place holder that we can go fill out later
+            label_index_bf = GrometBoxFunction(function_type=FunctionType.LITERAL)
+            if node.label in self.labels:
+                label_index = self.labels[node.label]
+            else:
+                label_index = -1
+
+                # Multiple gotos could reference the same label that we haven&#39;t seen
+                # So we maintain a list that we can update later
+                if node.label not in self.placeholder_gotos.keys():
+                    self.placeholder_gotos[node.label] = []
+                self.placeholder_gotos[node.label].append(label_index_bf)
+            label_index_bf.value = label_index
+            goto_fn.bf = insert_gromet_object(goto_fn.bf, label_index_bf)
+
+            index_comp_bf = len(goto_fn.bf)
+            goto_fn.pof = insert_gromet_object(goto_fn.pof, GrometPort(box=index_comp_bf)) 
+            goto_fn.opo = insert_gromet_object(goto_fn.opo, GrometPort(box=len(goto_fn.b), name=&#34;fn_idx&#34;))
+            goto_fn.wfopo = insert_gromet_object(goto_fn.wfopo, GrometWire(src=len(goto_fn.opo), tgt=len(goto_fn.pof)))
+
+        goto_fn.bf = insert_gromet_object(goto_fn.bf, GrometBoxFunction(function_type=FunctionType.LITERAL, value=node.label))
+        label_bf = len(goto_fn.bf)
+        goto_fn.pof = insert_gromet_object(goto_fn.pof, GrometPort(box=label_bf)) 
+        goto_fn.opo = insert_gromet_object(goto_fn.opo, GrometPort(box=len(goto_fn.b), name=&#34;label&#34;))
+        goto_fn.wfopo = insert_gromet_object(goto_fn.wfopo, GrometWire(src=len(goto_fn.opo), tgt=len(goto_fn.pof)))
+
+
+    @_visit.register
+    def visit_label(
+        self, node: AnnCastLabel, parent_gromet_fn, parent_cast_node
+    ):
+        parent_gromet_fn.bf = insert_gromet_object(parent_gromet_fn.bf, GrometBoxFunction(function_type=FunctionType.LABEL, name=node.label))
+        
+        # Associate this label with a particular index
+        fn_idx = self.peek_idx()
+        self.labels[node.label] = fn_idx
+
+        label_idx = len(parent_gromet_fn.bf)
+        vars = self.symtab_variables()
+
+        added_vars = []
+        for var in vars:
+            for v in vars[var]: 
+                if v not in added_vars: 
+                    parent_gromet_fn.pif = insert_gromet_object(parent_gromet_fn.pif, GrometPort(box=label_idx))    
+                    self.wire_from_var_env(v, parent_gromet_fn)
+
+                    parent_gromet_fn.pof = insert_gromet_object(parent_gromet_fn.pof, GrometPort(box=label_idx, name=v))
+                    self.add_var_to_env(v, None, parent_gromet_fn.pof[-1], len(parent_gromet_fn.pof), parent_cast_node)
+                    added_vars.append(v)
 
     @_visit.register
     def visit_literal_value(
@@ -4056,13 +4195,13 @@ class ToGrometPass:
             ):  # TODO: double check this guard to see if it&#39;s necessary
                 # print(node.source_refs[0])
                 parent_gromet_fn.wcopi = insert_gromet_object(
-                    parent_gromet_fn.wcopi, GrometWire(src=-1, tgt=-1)
+                    parent_gromet_fn.wcopi, GrometWire(src=-1, tgt=-912)
                 )
-            elif parent_gromet_fn.opi == None:
+            elif parent_gromet_fn.opi == None and parent_gromet_fn.pof == None:
                 # print(node.source_refs[0])
                 parent_gromet_fn.wcopi = insert_gromet_object(
                     parent_gromet_fn.wcopi,
-                    GrometWire(src=len(parent_gromet_fn.pic), tgt=-1),
+                    GrometWire(src=len(parent_gromet_fn.pic), tgt=-913),
                 )
             elif parent_gromet_fn.pic == None:
                 # print(node.source_refs[0])
@@ -5041,12 +5180,44 @@ AnnCastAttribute</p></div>
         # Initialize the table of function arguments
         self.function_arguments = {}
 
+        # Maintain an fn_array index stack
+        self.fn_stack = [] 
+
+        # Table of labels
+        self.labels = {}
+        self.placeholder_gotos = {}
+
         # the fullid of a AnnCastName node is a string which includes its
         # variable name, numerical id, version, and scope
         for node in self.pipeline_state.nodes:
             self.visit(node, parent_gromet_fn=None, parent_cast_node=None)
 
         pipeline_state.gromet_collection = self.gromet_module
+
+    # Interface that allows us to put what FN index is currently on the stack
+    # Used for labels
+    def push_idx(self, idx):
+        self.fn_stack.append(idx)
+
+    def peek_idx(self):
+        if len(self.fn_stack) &gt; 0:
+            return self.fn_stack[-1]
+        return 0
+
+    def pop_idx(self):
+        if len(self.fn_stack) &gt; 0:
+            return self.fn_stack.pop()
+        return 0
+
+    # Adds a label to the labels table, associating a label
+    # with the index into the fn_array table that label is in
+    def add_label(self, label, fn_idx):
+        self.labels[label] = fn_idx
+
+    # Clears the labels table. 
+    # NOTE: Do we need to do this everytime we leave a function definition?
+    def clear_labels(self):
+        self.labels = {}
 
     def symtab_variables(self):
         return self.symbol_table[&#34;variables&#34;]
@@ -5286,13 +5457,15 @@ AnnCastAttribute</p></div>
                 primitive_fn,
             )
             self.set_index()
+            
+            fn_array_idx = len(self.gromet_module.fn_array)
 
             ref = node.source_refs[0]
             # metadata = self.create_source_code_reference(ref)
             # Creates the &#39;call&#39; to this primitive expression which then gets inserted into the parent&#39;s Gromet FN
             parent_primitive_call_bf = GrometBoxFunction(
                 function_type=FunctionType.EXPRESSION,
-                body=len(self.gromet_module.fn_array),
+                body=fn_array_idx,
                 metadata=self.insert_metadata(metadata),
             )
 
@@ -7678,6 +7851,17 @@ AnnCastAttribute</p></div>
             GrometWire(src=len(gromet_fn.opo), tgt=len(gromet_fn.pof)),
         )
 
+    def resolve_placeholder_gotos(self):
+        # When we generate GOTOs, often we will see GOTOs referring to labels
+        # that we haven&#39;t seen in the pipeline yet. Here we resolve any
+        # GOTOs for which the labels we haven&#39;t seen yet.
+        for label in self.placeholder_gotos.keys():
+            for label_bf in self.placeholder_gotos[label]:
+                label_bf.value = self.labels[label]
+        self.placeholder_gotos = {}
+
+        self.clear_labels()
+
     def wire_return_node(self, node, gromet_fn):
         &#34;&#34;&#34;Return statements have many ways in which they can be wired, and thus
         we use this recursive function to handle all the possible cases
@@ -7817,6 +8001,8 @@ AnnCastAttribute</p></div>
             )
         else:
             new_gromet = self.gromet_module.fn_array[idx - 1]
+
+        self.push_idx(idx)
 
         # Update the functions symbol table with its index in the FN array
         # This is currently used for wiring function names as parameters to function calls
@@ -7962,7 +8148,99 @@ AnnCastAttribute</p></div>
             node, new_gromet, node.body, parent_cast_node=parent_cast_node
         )
 
+        self.pop_idx()
+        self.resolve_placeholder_gotos()
         var_environment[&#34;args&#34;] = deepcopy(prev_arg_env)
+
+
+    @_visit.register
+    def visit_goto(
+        self, node: AnnCastGoto, parent_gromet_fn, parent_cast_node 
+    ):
+        # Make an expression FN for computing the label and index values of this goto
+        # Insert it into the overall fn_array table
+        goto_fn = GrometFN()
+        goto_fn.b = insert_gromet_object(goto_fn.b, GrometBoxFunction(function_type=FunctionType.EXPRESSION))
+        self.gromet_module.fn_array = insert_gromet_object(
+            self.gromet_module.fn_array,
+            goto_fn,
+        )
+        self.set_index()
+
+        goto_fn_idx = len(self.gromet_module.fn_array)
+
+        parent_gromet_fn.bf = insert_gromet_object(parent_gromet_fn.bf, GrometBoxFunction(function_type=FunctionType.GOTO, name=node.label, body=goto_fn_idx))
+        goto_idx_call = len(parent_gromet_fn.bf)
+        vars = self.symtab_variables()
+        added_vars = []
+        for var in vars:
+            for v in vars[var]: 
+                if v not in added_vars: 
+                    parent_gromet_fn.pif = insert_gromet_object(parent_gromet_fn.pif, GrometPort(box=goto_idx_call))
+                    self.wire_from_var_env(v, parent_gromet_fn)
+                    added_vars.append(v)
+
+        added_vars = []
+        for var in vars:
+            for v in vars[var]: 
+                if v not in added_vars: 
+                    goto_fn.opi = insert_gromet_object(goto_fn.opi, GrometPort(box=len(goto_fn.b)))
+                    added_vars.append(v)
+
+        # The goto expression FN has two potential expressions, to determine the label and the index
+        # TODO: compute an expression for an index when expr is not None
+        if node.expr == None: 
+            # When a GOTO references a label that we have not seen yet 
+            # We put a place holder that we can go fill out later
+            label_index_bf = GrometBoxFunction(function_type=FunctionType.LITERAL)
+            if node.label in self.labels:
+                label_index = self.labels[node.label]
+            else:
+                label_index = -1
+
+                # Multiple gotos could reference the same label that we haven&#39;t seen
+                # So we maintain a list that we can update later
+                if node.label not in self.placeholder_gotos.keys():
+                    self.placeholder_gotos[node.label] = []
+                self.placeholder_gotos[node.label].append(label_index_bf)
+            label_index_bf.value = label_index
+            goto_fn.bf = insert_gromet_object(goto_fn.bf, label_index_bf)
+
+            index_comp_bf = len(goto_fn.bf)
+            goto_fn.pof = insert_gromet_object(goto_fn.pof, GrometPort(box=index_comp_bf)) 
+            goto_fn.opo = insert_gromet_object(goto_fn.opo, GrometPort(box=len(goto_fn.b), name=&#34;fn_idx&#34;))
+            goto_fn.wfopo = insert_gromet_object(goto_fn.wfopo, GrometWire(src=len(goto_fn.opo), tgt=len(goto_fn.pof)))
+
+        goto_fn.bf = insert_gromet_object(goto_fn.bf, GrometBoxFunction(function_type=FunctionType.LITERAL, value=node.label))
+        label_bf = len(goto_fn.bf)
+        goto_fn.pof = insert_gromet_object(goto_fn.pof, GrometPort(box=label_bf)) 
+        goto_fn.opo = insert_gromet_object(goto_fn.opo, GrometPort(box=len(goto_fn.b), name=&#34;label&#34;))
+        goto_fn.wfopo = insert_gromet_object(goto_fn.wfopo, GrometWire(src=len(goto_fn.opo), tgt=len(goto_fn.pof)))
+
+
+    @_visit.register
+    def visit_label(
+        self, node: AnnCastLabel, parent_gromet_fn, parent_cast_node
+    ):
+        parent_gromet_fn.bf = insert_gromet_object(parent_gromet_fn.bf, GrometBoxFunction(function_type=FunctionType.LABEL, name=node.label))
+        
+        # Associate this label with a particular index
+        fn_idx = self.peek_idx()
+        self.labels[node.label] = fn_idx
+
+        label_idx = len(parent_gromet_fn.bf)
+        vars = self.symtab_variables()
+
+        added_vars = []
+        for var in vars:
+            for v in vars[var]: 
+                if v not in added_vars: 
+                    parent_gromet_fn.pif = insert_gromet_object(parent_gromet_fn.pif, GrometPort(box=label_idx))    
+                    self.wire_from_var_env(v, parent_gromet_fn)
+
+                    parent_gromet_fn.pof = insert_gromet_object(parent_gromet_fn.pof, GrometPort(box=label_idx, name=v))
+                    self.add_var_to_env(v, None, parent_gromet_fn.pof[-1], len(parent_gromet_fn.pof), parent_cast_node)
+                    added_vars.append(v)
 
     @_visit.register
     def visit_literal_value(
@@ -8799,13 +9077,13 @@ AnnCastAttribute</p></div>
             ):  # TODO: double check this guard to see if it&#39;s necessary
                 # print(node.source_refs[0])
                 parent_gromet_fn.wcopi = insert_gromet_object(
-                    parent_gromet_fn.wcopi, GrometWire(src=-1, tgt=-1)
+                    parent_gromet_fn.wcopi, GrometWire(src=-1, tgt=-912)
                 )
-            elif parent_gromet_fn.opi == None:
+            elif parent_gromet_fn.opi == None and parent_gromet_fn.pof == None:
                 # print(node.source_refs[0])
                 parent_gromet_fn.wcopi = insert_gromet_object(
                     parent_gromet_fn.wcopi,
-                    GrometWire(src=len(parent_gromet_fn.pic), tgt=-1),
+                    GrometWire(src=len(parent_gromet_fn.pic), tgt=-913),
                 )
             elif parent_gromet_fn.pic == None:
                 # print(node.source_refs[0])
@@ -9494,6 +9772,19 @@ be used in this file</p></div>
     )</code></pre>
 </details>
 </dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass.add_label"><code class="name flex">
+<span>def <span class="ident">add_label</span></span>(<span>self, label, fn_idx)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_label(self, label, fn_idx):
+    self.labels[label] = fn_idx</code></pre>
+</details>
+</dd>
 <dt id="skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass.add_var_to_env"><code class="name flex">
 <span>def <span class="ident">add_var_to_env</span></span>(<span>self, var_name, var_cast, var_pof, var_pof_idx, parent_cast_node)</span>
 </code></dt>
@@ -9590,6 +9881,19 @@ index in the FN array</p>
     # check if that variable is in that environment
     var_environment = self.symtab_variables()
     return var_name in var_environment[env]</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass.clear_labels"><code class="name flex">
+<span>def <span class="ident">clear_labels</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def clear_labels(self):
+    self.labels = {}</code></pre>
 </details>
 </dd>
 <dt id="skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass.create_implicit_unpack"><code class="name flex">
@@ -10519,13 +10823,15 @@ Then it gets wired up to its parent_gromet_fn appropriately</p></div>
             primitive_fn,
         )
         self.set_index()
+        
+        fn_array_idx = len(self.gromet_module.fn_array)
 
         ref = node.source_refs[0]
         # metadata = self.create_source_code_reference(ref)
         # Creates the &#39;call&#39; to this primitive expression which then gets inserted into the parent&#39;s Gromet FN
         parent_primitive_call_bf = GrometBoxFunction(
             function_type=FunctionType.EXPRESSION,
-            body=len(self.gromet_module.fn_array),
+            body=fn_array_idx,
             metadata=self.insert_metadata(metadata),
         )
 
@@ -11325,6 +11631,70 @@ that gets returned</p></div>
         gromet_fn.wfopo,
         GrometWire(src=len(gromet_fn.opo), tgt=len(gromet_fn.pof)),
     )</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass.peek_idx"><code class="name flex">
+<span>def <span class="ident">peek_idx</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def peek_idx(self):
+    if len(self.fn_stack) &gt; 0:
+        return self.fn_stack[-1]
+    return 0</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass.pop_idx"><code class="name flex">
+<span>def <span class="ident">pop_idx</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def pop_idx(self):
+    if len(self.fn_stack) &gt; 0:
+        return self.fn_stack.pop()
+    return 0</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass.push_idx"><code class="name flex">
+<span>def <span class="ident">push_idx</span></span>(<span>self, idx)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def push_idx(self, idx):
+    self.fn_stack.append(idx)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass.resolve_placeholder_gotos"><code class="name flex">
+<span>def <span class="ident">resolve_placeholder_gotos</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def resolve_placeholder_gotos(self):
+    # When we generate GOTOs, often we will see GOTOs referring to labels
+    # that we haven&#39;t seen in the pipeline yet. Here we resolve any
+    # GOTOs for which the labels we haven&#39;t seen yet.
+    for label in self.placeholder_gotos.keys():
+        for label_bf in self.placeholder_gotos[label]:
+            label_bf.value = self.labels[label]
+    self.placeholder_gotos = {}
+
+    self.clear_labels()</code></pre>
 </details>
 </dd>
 <dt id="skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass.retrieve_var_port"><code class="name flex">
@@ -12929,6 +13299,8 @@ def visit_function_def(
     else:
         new_gromet = self.gromet_module.fn_array[idx - 1]
 
+    self.push_idx(idx)
+
     # Update the functions symbol table with its index in the FN array
     # This is currently used for wiring function names as parameters to function calls
     functions = self.symtab_functions()
@@ -13073,7 +13445,117 @@ def visit_function_def(
         node, new_gromet, node.body, parent_cast_node=parent_cast_node
     )
 
+    self.pop_idx()
+    self.resolve_placeholder_gotos()
     var_environment[&#34;args&#34;] = deepcopy(prev_arg_env)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass.visit_goto"><code class="name flex">
+<span>def <span class="ident">visit_goto</span></span>(<span>self, node: <a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastGoto" href="annotated_cast.html#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastGoto">AnnCastGoto</a>, parent_gromet_fn, parent_cast_node)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@_visit.register
+def visit_goto(
+    self, node: AnnCastGoto, parent_gromet_fn, parent_cast_node 
+):
+    # Make an expression FN for computing the label and index values of this goto
+    # Insert it into the overall fn_array table
+    goto_fn = GrometFN()
+    goto_fn.b = insert_gromet_object(goto_fn.b, GrometBoxFunction(function_type=FunctionType.EXPRESSION))
+    self.gromet_module.fn_array = insert_gromet_object(
+        self.gromet_module.fn_array,
+        goto_fn,
+    )
+    self.set_index()
+
+    goto_fn_idx = len(self.gromet_module.fn_array)
+
+    parent_gromet_fn.bf = insert_gromet_object(parent_gromet_fn.bf, GrometBoxFunction(function_type=FunctionType.GOTO, name=node.label, body=goto_fn_idx))
+    goto_idx_call = len(parent_gromet_fn.bf)
+    vars = self.symtab_variables()
+    added_vars = []
+    for var in vars:
+        for v in vars[var]: 
+            if v not in added_vars: 
+                parent_gromet_fn.pif = insert_gromet_object(parent_gromet_fn.pif, GrometPort(box=goto_idx_call))
+                self.wire_from_var_env(v, parent_gromet_fn)
+                added_vars.append(v)
+
+    added_vars = []
+    for var in vars:
+        for v in vars[var]: 
+            if v not in added_vars: 
+                goto_fn.opi = insert_gromet_object(goto_fn.opi, GrometPort(box=len(goto_fn.b)))
+                added_vars.append(v)
+
+    # The goto expression FN has two potential expressions, to determine the label and the index
+    # TODO: compute an expression for an index when expr is not None
+    if node.expr == None: 
+        # When a GOTO references a label that we have not seen yet 
+        # We put a place holder that we can go fill out later
+        label_index_bf = GrometBoxFunction(function_type=FunctionType.LITERAL)
+        if node.label in self.labels:
+            label_index = self.labels[node.label]
+        else:
+            label_index = -1
+
+            # Multiple gotos could reference the same label that we haven&#39;t seen
+            # So we maintain a list that we can update later
+            if node.label not in self.placeholder_gotos.keys():
+                self.placeholder_gotos[node.label] = []
+            self.placeholder_gotos[node.label].append(label_index_bf)
+        label_index_bf.value = label_index
+        goto_fn.bf = insert_gromet_object(goto_fn.bf, label_index_bf)
+
+        index_comp_bf = len(goto_fn.bf)
+        goto_fn.pof = insert_gromet_object(goto_fn.pof, GrometPort(box=index_comp_bf)) 
+        goto_fn.opo = insert_gromet_object(goto_fn.opo, GrometPort(box=len(goto_fn.b), name=&#34;fn_idx&#34;))
+        goto_fn.wfopo = insert_gromet_object(goto_fn.wfopo, GrometWire(src=len(goto_fn.opo), tgt=len(goto_fn.pof)))
+
+    goto_fn.bf = insert_gromet_object(goto_fn.bf, GrometBoxFunction(function_type=FunctionType.LITERAL, value=node.label))
+    label_bf = len(goto_fn.bf)
+    goto_fn.pof = insert_gromet_object(goto_fn.pof, GrometPort(box=label_bf)) 
+    goto_fn.opo = insert_gromet_object(goto_fn.opo, GrometPort(box=len(goto_fn.b), name=&#34;label&#34;))
+    goto_fn.wfopo = insert_gromet_object(goto_fn.wfopo, GrometWire(src=len(goto_fn.opo), tgt=len(goto_fn.pof)))</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass.visit_label"><code class="name flex">
+<span>def <span class="ident">visit_label</span></span>(<span>self, node: <a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastLabel" href="annotated_cast.html#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastLabel">AnnCastLabel</a>, parent_gromet_fn, parent_cast_node)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@_visit.register
+def visit_label(
+    self, node: AnnCastLabel, parent_gromet_fn, parent_cast_node
+):
+    parent_gromet_fn.bf = insert_gromet_object(parent_gromet_fn.bf, GrometBoxFunction(function_type=FunctionType.LABEL, name=node.label))
+    
+    # Associate this label with a particular index
+    fn_idx = self.peek_idx()
+    self.labels[node.label] = fn_idx
+
+    label_idx = len(parent_gromet_fn.bf)
+    vars = self.symtab_variables()
+
+    added_vars = []
+    for var in vars:
+        for v in vars[var]: 
+            if v not in added_vars: 
+                parent_gromet_fn.pif = insert_gromet_object(parent_gromet_fn.pif, GrometPort(box=label_idx))    
+                self.wire_from_var_env(v, parent_gromet_fn)
+
+                parent_gromet_fn.pof = insert_gromet_object(parent_gromet_fn.pof, GrometPort(box=label_idx, name=v))
+                self.add_var_to_env(v, None, parent_gromet_fn.pof[-1], len(parent_gromet_fn.pof), parent_cast_node)
+                added_vars.append(v)</code></pre>
 </details>
 </dd>
 <dt id="skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass.visit_literal_value"><code class="name flex">
@@ -13506,13 +13988,13 @@ def visit_model_if(
         ):  # TODO: double check this guard to see if it&#39;s necessary
             # print(node.source_refs[0])
             parent_gromet_fn.wcopi = insert_gromet_object(
-                parent_gromet_fn.wcopi, GrometWire(src=-1, tgt=-1)
+                parent_gromet_fn.wcopi, GrometWire(src=-1, tgt=-912)
             )
-        elif parent_gromet_fn.opi == None:
+        elif parent_gromet_fn.opi == None and parent_gromet_fn.pof == None:
             # print(node.source_refs[0])
             parent_gromet_fn.wcopi = insert_gromet_object(
                 parent_gromet_fn.wcopi,
-                GrometWire(src=len(parent_gromet_fn.pic), tgt=-1),
+                GrometWire(src=len(parent_gromet_fn.pic), tgt=-913),
             )
         elif parent_gromet_fn.pic == None:
             # print(node.source_refs[0])
@@ -14465,9 +14947,11 @@ we use this recursive function to handle all the possible cases</p></div>
 <h4><code><a title="skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass" href="#skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass">ToGrometPass</a></code></h4>
 <ul class="">
 <li><code><a title="skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass.add_import_symbol_to_env" href="#skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass.add_import_symbol_to_env">add_import_symbol_to_env</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass.add_label" href="#skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass.add_label">add_label</a></code></li>
 <li><code><a title="skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass.add_var_to_env" href="#skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass.add_var_to_env">add_var_to_env</a></code></li>
 <li><code><a title="skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass.build_function_arguments_table" href="#skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass.build_function_arguments_table">build_function_arguments_table</a></code></li>
 <li><code><a title="skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass.check_var_location" href="#skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass.check_var_location">check_var_location</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass.clear_labels" href="#skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass.clear_labels">clear_labels</a></code></li>
 <li><code><a title="skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass.create_implicit_unpack" href="#skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass.create_implicit_unpack">create_implicit_unpack</a></code></li>
 <li><code><a title="skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass.create_pack" href="#skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass.create_pack">create_pack</a></code></li>
 <li><code><a title="skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass.create_source_code_reference" href="#skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass.create_source_code_reference">create_source_code_reference</a></code></li>
@@ -14488,6 +14972,10 @@ we use this recursive function to handle all the possible cases</p></div>
 <li><code><a title="skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass.loop_create_condition" href="#skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass.loop_create_condition">loop_create_condition</a></code></li>
 <li><code><a title="skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass.loop_create_post" href="#skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass.loop_create_post">loop_create_post</a></code></li>
 <li><code><a title="skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass.pack_return_tuple" href="#skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass.pack_return_tuple">pack_return_tuple</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass.peek_idx" href="#skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass.peek_idx">peek_idx</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass.pop_idx" href="#skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass.pop_idx">pop_idx</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass.push_idx" href="#skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass.push_idx">push_idx</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass.resolve_placeholder_gotos" href="#skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass.resolve_placeholder_gotos">resolve_placeholder_gotos</a></code></li>
 <li><code><a title="skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass.retrieve_var_port" href="#skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass.retrieve_var_port">retrieve_var_port</a></code></li>
 <li><code><a title="skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass.set_index" href="#skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass.set_index">set_index</a></code></li>
 <li><code><a title="skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass.symtab_functions" href="#skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass.symtab_functions">symtab_functions</a></code></li>
@@ -14499,6 +14987,8 @@ we use this recursive function to handle all the possible cases</p></div>
 <li><code><a title="skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass.visit_attribute" href="#skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass.visit_attribute">visit_attribute</a></code></li>
 <li><code><a title="skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass.visit_call" href="#skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass.visit_call">visit_call</a></code></li>
 <li><code><a title="skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass.visit_function_def" href="#skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass.visit_function_def">visit_function_def</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass.visit_goto" href="#skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass.visit_goto">visit_goto</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass.visit_label" href="#skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass.visit_label">visit_label</a></code></li>
 <li><code><a title="skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass.visit_literal_value" href="#skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass.visit_literal_value">visit_literal_value</a></code></li>
 <li><code><a title="skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass.visit_loop" href="#skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass.visit_loop">visit_loop</a></code></li>
 <li><code><a title="skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass.visit_model_break" href="#skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass.visit_model_break">visit_model_break</a></code></li>

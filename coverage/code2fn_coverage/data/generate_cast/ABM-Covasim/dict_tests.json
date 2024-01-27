@@ -37,7 +37,7 @@
                             },
                             "node_type": "Assignment",
                             "right": {
-                                "node_type": "LiteralValue",
+                                "node_type": "CASTLiteralValue",
                                 "source_code_data_type": [
                                     "Python",
                                     "3.8",
@@ -121,7 +121,7 @@
                                             {
                                                 "arguments": [
                                                     {
-                                                        "node_type": "LiteralValue",
+                                                        "node_type": "CASTLiteralValue",
                                                         "source_code_data_type": [
                                                             "Python",
                                                             "3.8",
@@ -141,7 +141,7 @@
                                                         "value_type": "List"
                                                     },
                                                     {
-                                                        "node_type": "LiteralValue",
+                                                        "node_type": "CASTLiteralValue",
                                                         "source_code_data_type": [
                                                             "Python",
                                                             "3.8",
@@ -264,7 +264,7 @@
                                 },
                                 {
                                     "left": {
-                                        "node_type": "LiteralValue",
+                                        "node_type": "CASTLiteralValue",
                                         "source_code_data_type": [
                                             "Python",
                                             "3.8",
@@ -485,7 +485,7 @@
                                         }
                                     },
                                     {
-                                        "node_type": "LiteralValue",
+                                        "node_type": "CASTLiteralValue",
                                         "source_code_data_type": [
                                             "Python",
                                             "3.8",
@@ -645,7 +645,7 @@
                                 },
                                 {
                                     "left": {
-                                        "node_type": "LiteralValue",
+                                        "node_type": "CASTLiteralValue",
                                         "source_code_data_type": [
                                             "Python",
                                             "3.8",
@@ -948,7 +948,7 @@
                     "right": {
                         "arguments": [
                             {
-                                "node_type": "LiteralValue",
+                                "node_type": "CASTLiteralValue",
                                 "source_code_data_type": [
                                     "Python",
                                     "3.8",
@@ -1043,7 +1043,7 @@
                     "right": {
                         "arguments": [
                             {
-                                "node_type": "LiteralValue",
+                                "node_type": "CASTLiteralValue",
                                 "source_code_data_type": [
                                     "Python",
                                     "3.8",
@@ -1664,7 +1664,7 @@
                                                 ]
                                             },
                                             {
-                                                "node_type": "LiteralValue",
+                                                "node_type": "CASTLiteralValue",
                                                 "source_code_data_type": [
                                                     "Python",
                                                     "3.8",
@@ -1866,7 +1866,7 @@
                                                 ]
                                             },
                                             {
-                                                "node_type": "LiteralValue",
+                                                "node_type": "CASTLiteralValue",
                                                 "source_code_data_type": [
                                                     "Python",
                                                     "3.8",
@@ -2068,7 +2068,7 @@
                                                 ]
                                             },
                                             {
-                                                "node_type": "LiteralValue",
+                                                "node_type": "CASTLiteralValue",
                                                 "source_code_data_type": [
                                                     "Python",
                                                     "3.8",
@@ -2667,7 +2667,7 @@
                                                 ]
                                             },
                                             {
-                                                "node_type": "LiteralValue",
+                                                "node_type": "CASTLiteralValue",
                                                 "source_code_data_type": [
                                                     "Python",
                                                     "3.8",
@@ -2743,7 +2743,7 @@
                         },
                         {
                             "left": {
-                                "node_type": "LiteralValue",
+                                "node_type": "CASTLiteralValue",
                                 "source_code_data_type": [
                                     "Python",
                                     "3.8",
@@ -2964,7 +2964,7 @@
                                 }
                             },
                             {
-                                "node_type": "LiteralValue",
+                                "node_type": "CASTLiteralValue",
                                 "source_code_data_type": [
                                     "Python",
                                     "3.8",
@@ -3035,16 +3035,59 @@
                             "right": {
                                 "arguments": [
                                     {
-                                        "arguments": [],
-                                        "func": {
-                                            "attr": {
-                                                "id": 20,
-                                                "name": "keys",
-                                                "node_type": "Name",
+                                        "arguments": [
+                                            {
+                                                "arguments": [],
+                                                "func": {
+                                                    "attr": {
+                                                        "id": 20,
+                                                        "name": "keys",
+                                                        "node_type": "Name",
+                                                        "source_refs": [
+                                                            {
+                                                                "col_end": 21,
+                                                                "col_start": 14,
+                                                                "node_type": "SourceRef",
+                                                                "row_end": 58,
+                                                                "row_start": 58,
+                                                                "source_file_name": "dict_tests"
+                                                            }
+                                                        ]
+                                                    },
+                                                    "node_type": "Attribute",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 21,
+                                                            "col_start": 14,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 58,
+                                                            "row_start": 58,
+                                                            "source_file_name": "dict_tests"
+                                                        }
+                                                    ],
+                                                    "value": {
+                                                        "id": 2,
+                                                        "name": "d1",
+                                                        "node_type": "Name",
+                                                        "source_refs": [
+                                                            {
+                                                                "col_end": 16,
+                                                                "col_start": 14,
+                                                                "node_type": "SourceRef",
+                                                                "row_end": 58,
+                                                                "row_start": 58,
+                                                                "source_file_name": "dict_tests"
+                                                            }
+                                                        ]
+                                                    }
+                                                },
+                                                "node_type": "Call",
+                                                "source_language": null,
+                                                "source_language_version": null,
                                                 "source_refs": [
                                                     {
-                                                        "col_end": 16,
-                                                        "col_start": 9,
+                                                        "col_end": 23,
+                                                        "col_start": 14,
                                                         "node_type": "SourceRef",
                                                         "row_end": 58,
                                                         "row_start": 58,
@@ -3052,39 +3095,48 @@
                                                     }
                                                 ]
                                             },
-                                            "node_type": "Attribute",
-                                            "source_refs": [
-                                                {
-                                                    "col_end": 16,
-                                                    "col_start": 9,
-                                                    "node_type": "SourceRef",
-                                                    "row_end": 58,
-                                                    "row_start": 58,
-                                                    "source_file_name": "dict_tests"
-                                                }
-                                            ],
-                                            "value": {
-                                                "id": 2,
-                                                "name": "d1",
-                                                "node_type": "Name",
+                                            {
+                                                "node_type": "CASTLiteralValue",
+                                                "source_code_data_type": [
+                                                    "Python",
+                                                    "3.8",
+                                                    "List"
+                                                ],
                                                 "source_refs": [
                                                     {
-                                                        "col_end": 11,
+                                                        "col_end": 24,
                                                         "col_start": 9,
                                                         "node_type": "SourceRef",
                                                         "row_end": 58,
                                                         "row_start": 58,
                                                         "source_file_name": "dict_tests"
                                                     }
-                                                ]
+                                                ],
+                                                "value": "list",
+                                                "value_type": "List"
                                             }
+                                        ],
+                                        "func": {
+                                            "id": 21,
+                                            "name": "cast",
+                                            "node_type": "Name",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 24,
+                                                    "col_start": 9,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 58,
+                                                    "row_start": 58,
+                                                    "source_file_name": "dict_tests"
+                                                }
+                                            ]
                                         },
                                         "node_type": "Call",
                                         "source_language": null,
                                         "source_language_version": null,
                                         "source_refs": [
                                             {
-                                                "col_end": 18,
+                                                "col_end": 24,
                                                 "col_start": 9,
                                                 "node_type": "SourceRef",
                                                 "row_end": 58,
@@ -3136,7 +3188,7 @@
                         },
                         {
                             "left": {
-                                "node_type": "LiteralValue",
+                                "node_type": "CASTLiteralValue",
                                 "source_code_data_type": [
                                     "Python",
                                     "3.8",
@@ -3584,7 +3636,7 @@
                                                 ]
                                             },
                                             {
-                                                "node_type": "LiteralValue",
+                                                "node_type": "CASTLiteralValue",
                                                 "source_code_data_type": [
                                                     "Python",
                                                     "3.8",
@@ -3660,7 +3712,7 @@
                         },
                         {
                             "left": {
-                                "node_type": "LiteralValue",
+                                "node_type": "CASTLiteralValue",
                                 "source_code_data_type": [
                                     "Python",
                                     "3.8",
@@ -3881,7 +3933,7 @@
                                 }
                             },
                             {
-                                "node_type": "LiteralValue",
+                                "node_type": "CASTLiteralValue",
                                 "source_code_data_type": [
                                     "Python",
                                     "3.8",
@@ -3952,16 +4004,59 @@
                             "right": {
                                 "arguments": [
                                     {
-                                        "arguments": [],
-                                        "func": {
-                                            "attr": {
-                                                "id": 20,
-                                                "name": "keys",
-                                                "node_type": "Name",
+                                        "arguments": [
+                                            {
+                                                "arguments": [],
+                                                "func": {
+                                                    "attr": {
+                                                        "id": 20,
+                                                        "name": "keys",
+                                                        "node_type": "Name",
+                                                        "source_refs": [
+                                                            {
+                                                                "col_end": 21,
+                                                                "col_start": 14,
+                                                                "node_type": "SourceRef",
+                                                                "row_end": 63,
+                                                                "row_start": 63,
+                                                                "source_file_name": "dict_tests"
+                                                            }
+                                                        ]
+                                                    },
+                                                    "node_type": "Attribute",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 21,
+                                                            "col_start": 14,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 63,
+                                                            "row_start": 63,
+                                                            "source_file_name": "dict_tests"
+                                                        }
+                                                    ],
+                                                    "value": {
+                                                        "id": 3,
+                                                        "name": "d2",
+                                                        "node_type": "Name",
+                                                        "source_refs": [
+                                                            {
+                                                                "col_end": 16,
+                                                                "col_start": 14,
+                                                                "node_type": "SourceRef",
+                                                                "row_end": 63,
+                                                                "row_start": 63,
+                                                                "source_file_name": "dict_tests"
+                                                            }
+                                                        ]
+                                                    }
+                                                },
+                                                "node_type": "Call",
+                                                "source_language": null,
+                                                "source_language_version": null,
                                                 "source_refs": [
                                                     {
-                                                        "col_end": 16,
-                                                        "col_start": 9,
+                                                        "col_end": 23,
+                                                        "col_start": 14,
                                                         "node_type": "SourceRef",
                                                         "row_end": 63,
                                                         "row_start": 63,
@@ -3969,39 +4064,48 @@
                                                     }
                                                 ]
                                             },
-                                            "node_type": "Attribute",
-                                            "source_refs": [
-                                                {
-                                                    "col_end": 16,
-                                                    "col_start": 9,
-                                                    "node_type": "SourceRef",
-                                                    "row_end": 63,
-                                                    "row_start": 63,
-                                                    "source_file_name": "dict_tests"
-                                                }
-                                            ],
-                                            "value": {
-                                                "id": 3,
-                                                "name": "d2",
-                                                "node_type": "Name",
+                                            {
+                                                "node_type": "CASTLiteralValue",
+                                                "source_code_data_type": [
+                                                    "Python",
+                                                    "3.8",
+                                                    "List"
+                                                ],
                                                 "source_refs": [
                                                     {
-                                                        "col_end": 11,
+                                                        "col_end": 24,
                                                         "col_start": 9,
                                                         "node_type": "SourceRef",
                                                         "row_end": 63,
                                                         "row_start": 63,
                                                         "source_file_name": "dict_tests"
                                                     }
-                                                ]
+                                                ],
+                                                "value": "list",
+                                                "value_type": "List"
                                             }
+                                        ],
+                                        "func": {
+                                            "id": 21,
+                                            "name": "cast",
+                                            "node_type": "Name",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 24,
+                                                    "col_start": 9,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 63,
+                                                    "row_start": 63,
+                                                    "source_file_name": "dict_tests"
+                                                }
+                                            ]
                                         },
                                         "node_type": "Call",
                                         "source_language": null,
                                         "source_language_version": null,
                                         "source_refs": [
                                             {
-                                                "col_end": 18,
+                                                "col_end": 24,
                                                 "col_start": 9,
                                                 "node_type": "SourceRef",
                                                 "row_end": 63,
@@ -4053,7 +4157,7 @@
                         },
                         {
                             "left": {
-                                "node_type": "LiteralValue",
+                                "node_type": "CASTLiteralValue",
                                 "source_code_data_type": [
                                     "Python",
                                     "3.8",
@@ -4501,7 +4605,7 @@
                                                 ]
                                             },
                                             {
-                                                "node_type": "LiteralValue",
+                                                "node_type": "CASTLiteralValue",
                                                 "source_code_data_type": [
                                                     "Python",
                                                     "3.8",
@@ -4577,7 +4681,7 @@
                         },
                         {
                             "left": {
-                                "node_type": "LiteralValue",
+                                "node_type": "CASTLiteralValue",
                                 "source_code_data_type": [
                                     "Python",
                                     "3.8",
@@ -4798,7 +4902,7 @@
                                 }
                             },
                             {
-                                "node_type": "LiteralValue",
+                                "node_type": "CASTLiteralValue",
                                 "source_code_data_type": [
                                     "Python",
                                     "3.8",
@@ -4869,16 +4973,59 @@
                             "right": {
                                 "arguments": [
                                     {
-                                        "arguments": [],
-                                        "func": {
-                                            "attr": {
-                                                "id": 20,
-                                                "name": "keys",
-                                                "node_type": "Name",
+                                        "arguments": [
+                                            {
+                                                "arguments": [],
+                                                "func": {
+                                                    "attr": {
+                                                        "id": 20,
+                                                        "name": "keys",
+                                                        "node_type": "Name",
+                                                        "source_refs": [
+                                                            {
+                                                                "col_end": 21,
+                                                                "col_start": 14,
+                                                                "node_type": "SourceRef",
+                                                                "row_end": 68,
+                                                                "row_start": 68,
+                                                                "source_file_name": "dict_tests"
+                                                            }
+                                                        ]
+                                                    },
+                                                    "node_type": "Attribute",
+                                                    "source_refs": [
+                                                        {
+                                                            "col_end": 21,
+                                                            "col_start": 14,
+                                                            "node_type": "SourceRef",
+                                                            "row_end": 68,
+                                                            "row_start": 68,
+                                                            "source_file_name": "dict_tests"
+                                                        }
+                                                    ],
+                                                    "value": {
+                                                        "id": 4,
+                                                        "name": "d3",
+                                                        "node_type": "Name",
+                                                        "source_refs": [
+                                                            {
+                                                                "col_end": 16,
+                                                                "col_start": 14,
+                                                                "node_type": "SourceRef",
+                                                                "row_end": 68,
+                                                                "row_start": 68,
+                                                                "source_file_name": "dict_tests"
+                                                            }
+                                                        ]
+                                                    }
+                                                },
+                                                "node_type": "Call",
+                                                "source_language": null,
+                                                "source_language_version": null,
                                                 "source_refs": [
                                                     {
-                                                        "col_end": 16,
-                                                        "col_start": 9,
+                                                        "col_end": 23,
+                                                        "col_start": 14,
                                                         "node_type": "SourceRef",
                                                         "row_end": 68,
                                                         "row_start": 68,
@@ -4886,39 +5033,48 @@
                                                     }
                                                 ]
                                             },
-                                            "node_type": "Attribute",
-                                            "source_refs": [
-                                                {
-                                                    "col_end": 16,
-                                                    "col_start": 9,
-                                                    "node_type": "SourceRef",
-                                                    "row_end": 68,
-                                                    "row_start": 68,
-                                                    "source_file_name": "dict_tests"
-                                                }
-                                            ],
-                                            "value": {
-                                                "id": 4,
-                                                "name": "d3",
-                                                "node_type": "Name",
+                                            {
+                                                "node_type": "CASTLiteralValue",
+                                                "source_code_data_type": [
+                                                    "Python",
+                                                    "3.8",
+                                                    "List"
+                                                ],
                                                 "source_refs": [
                                                     {
-                                                        "col_end": 11,
+                                                        "col_end": 24,
                                                         "col_start": 9,
                                                         "node_type": "SourceRef",
                                                         "row_end": 68,
                                                         "row_start": 68,
                                                         "source_file_name": "dict_tests"
                                                     }
-                                                ]
+                                                ],
+                                                "value": "list",
+                                                "value_type": "List"
                                             }
+                                        ],
+                                        "func": {
+                                            "id": 21,
+                                            "name": "cast",
+                                            "node_type": "Name",
+                                            "source_refs": [
+                                                {
+                                                    "col_end": 24,
+                                                    "col_start": 9,
+                                                    "node_type": "SourceRef",
+                                                    "row_end": 68,
+                                                    "row_start": 68,
+                                                    "source_file_name": "dict_tests"
+                                                }
+                                            ]
                                         },
                                         "node_type": "Call",
                                         "source_language": null,
                                         "source_language_version": null,
                                         "source_refs": [
                                             {
-                                                "col_end": 18,
+                                                "col_end": 24,
                                                 "col_start": 9,
                                                 "node_type": "SourceRef",
                                                 "row_end": 68,
@@ -4970,7 +5126,7 @@
                         },
                         {
                             "left": {
-                                "node_type": "LiteralValue",
+                                "node_type": "CASTLiteralValue",
                                 "source_code_data_type": [
                                     "Python",
                                     "3.8",

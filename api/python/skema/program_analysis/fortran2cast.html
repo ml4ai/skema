@@ -119,7 +119,7 @@ def fortran_to_cast(
                 out_name = file_name.split(&#34;.&#34;)[0]
                 print(&#34;Writing CAST to &#34; + out_name + &#34;--CAST.json&#34;)
                 out_handle = open(out_name + &#34;--CAST.json&#34;, &#34;w&#34;)
-                out_handle.write(out_cast.to_json_str())
+                out_handle.write(out_cast[0].to_json_str())
 
 if __name__ == &#34;__main__&#34;:
     args = get_args()
@@ -221,7 +221,7 @@ returns None.</p></div>
                 out_name = file_name.split(&#34;.&#34;)[0]
                 print(&#34;Writing CAST to &#34; + out_name + &#34;--CAST.json&#34;)
                 out_handle = open(out_name + &#34;--CAST.json&#34;, &#34;w&#34;)
-                out_handle.write(out_cast.to_json_str())</code></pre>
+                out_handle.write(out_cast[0].to_json_str())</code></pre>
 </details>
 </dd>
 <dt id="skema.program_analysis.fortran2cast.get_args"><code class="name flex">

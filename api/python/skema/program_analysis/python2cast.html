@@ -32,6 +32,8 @@ import sys
 import ast
 import json
 import argparse
+from pathlib import Path
+from tempfile import TemporaryDirectory
 
 from skema.program_analysis.CAST.pythonAST import py_ast_to_cast
 from skema.program_analysis.CAST2FN import cast
@@ -42,9 +44,8 @@ from skema.program_analysis.CAST2FN.visitors.cast_to_agraph_visitor import (
 )
 
 from skema.program_analysis.CAST.python.ts2cast import TS2CAST
-
+from skema.program_analysis.python_preprocessor import preprocess
 from typing import Optional
-
 
 def get_args():
     parser = argparse.ArgumentParser(
@@ -107,75 +108,84 @@ def python_to_cast(
         returns None.
     &#34;&#34;&#34;
 
-    if not tree_sitter:
-        # Open Python file as a giant string
-        with open(pyfile_path) as f:
-            file_contents = f.read()
+    # Run the Python preprocessor to convert Python 2 to Python 3
+    source_filename = Path(pyfile_path).name
+    python2_source = Path(pyfile_path).read_text()
+    python3_source = preprocess(python2_source)
+    with TemporaryDirectory() as tmp:
+        new_path = Path(tmp) / source_filename
+        new_path.write_text(python3_source)
+        pyfile_path = str(new_path)
 
-        file_name = pyfile_path.split(&#34;/&#34;)[-1]
+        if not tree_sitter:
+            # Open Python file as a giant string
+            with open(pyfile_path) as f:
+                file_contents = f.read()
 
-        # Count the number of lines in the file
-        with open(pyfile_path) as f:
-            file_list = f.readlines()
-            line_count = len(file_list)
+            file_name = pyfile_path.split(&#34;/&#34;)[-1]
 
-        # Create a PyASTToCAST Object
-        if legacy:
-            convert = py_ast_to_cast.PyASTToCAST(file_name, legacy=True)
-        else:
-            convert = py_ast_to_cast.PyASTToCAST(file_name)
+            # Count the number of lines in the file
+            with open(pyfile_path) as f:
+                file_list = f.readlines()
+                line_count = len(file_list)
 
-        # &#39;Root&#39; the current working directory so that it&#39;s where the
-        # Source file we&#39;re generating CAST for is (for Import statements)
-        old_path = os.getcwd()
-        try:
-            idx = pyfile_path.rfind(&#34;/&#34;)
-
-            if idx &gt; -1:
-                curr_path = pyfile_path[0:idx]
-                os.chdir(curr_path)
+            # Create a PyASTToCAST Object
+            if legacy:
+                convert = py_ast_to_cast.PyASTToCAST(file_name, legacy=True)
             else:
-                curr_path = &#34;./&#34; + pyfile_path
+                convert = py_ast_to_cast.PyASTToCAST(file_name)
 
-            # Parse the Python program&#39;s AST and create the CAST
-            contents = ast.parse(file_contents)
-            C = convert.visit(contents, {}, {})
-            C.source_refs = [SourceRef(file_name, None, None, 1, line_count)]
-        finally:
-            os.chdir(old_path)
+            # &#39;Root&#39; the current working directory so that it&#39;s where the
+            # Source file we&#39;re generating CAST for is (for Import statements)
+            old_path = os.getcwd()
+            try:
+                idx = pyfile_path.rfind(&#34;/&#34;)
 
-        out_cast = cast.CAST([C], &#34;python&#34;)
-    else:
-        file_name = pyfile_path.split(&#34;/&#34;)[-1]
-        out_cast = TS2CAST(pyfile_path).out_cast
+                if idx &gt; -1:
+                    curr_path = pyfile_path[0:idx]
+                    os.chdir(curr_path)
+                else:
+                    curr_path = &#34;./&#34; + pyfile_path
 
-    if agraph:
-        V = CASTToAGraphVisitor(out_cast)
-        last_slash_idx = file_name.rfind(&#34;/&#34;)
-        file_ending_idx = file_name.rfind(&#34;.&#34;)
-        pdf_file_name = (
-            f&#34;{file_name[last_slash_idx + 1 : file_ending_idx]}.pdf&#34;
-        )
-        V.to_pdf(pdf_file_name)
+                # Parse the Python program&#39;s AST and create the CAST
+                contents = ast.parse(file_contents)
+                C = convert.visit(contents, {}, {})
+                C.source_refs = [SourceRef(file_name, None, None, 1, line_count)]
+            finally:
+                os.chdir(old_path)
 
-    # Then, print CAST as JSON
-    if cast_obj:
-        return out_cast
-    else:
-        if rawjson:
-            print(
-                json.dumps(
-                    out_cast.to_json_object(), sort_keys=True, indent=None
-                )
+            out_cast = cast.CAST([C], &#34;python&#34;)
+        else:
+            file_name = pyfile_path.split(&#34;/&#34;)[-1]
+            out_cast = TS2CAST(pyfile_path).out_cast
+
+        if agraph:
+            V = CASTToAGraphVisitor(out_cast)
+            last_slash_idx = file_name.rfind(&#34;/&#34;)
+            file_ending_idx = file_name.rfind(&#34;.&#34;)
+            pdf_file_name = (
+                f&#34;{file_name[last_slash_idx + 1 : file_ending_idx]}.pdf&#34;
             )
+            V.to_pdf(pdf_file_name)
+
+        # Then, print CAST as JSON
+        if cast_obj:
+            return out_cast
         else:
-            if std_out:
-                print(out_cast.to_json_str())
+            if rawjson:
+                print(
+                    json.dumps(
+                        out_cast.to_json_object(), sort_keys=True, indent=None
+                    )
+                )
             else:
-                out_name = file_name.split(&#34;.&#34;)[0]
-                print(&#34;Writing CAST to &#34; + out_name + &#34;--CAST.json&#34;)
-                out_handle = open(out_name + &#34;--CAST.json&#34;, &#34;w&#34;)
-                out_handle.write(out_cast.to_json_str())
+                if std_out:
+                    print(out_cast.to_json_str())
+                else:
+                    out_name = file_name.split(&#34;.&#34;)[0]
+                    print(&#34;Writing CAST to &#34; + out_name + &#34;--CAST.json&#34;)
+                    out_handle = open(out_name + &#34;--CAST.json&#34;, &#34;w&#34;)
+                    out_handle.write(out_cast.to_json_str())
 
 
 if __name__ == &#34;__main__&#34;:
@@ -296,75 +306,84 @@ returns None.</p></div>
         returns None.
     &#34;&#34;&#34;
 
-    if not tree_sitter:
-        # Open Python file as a giant string
-        with open(pyfile_path) as f:
-            file_contents = f.read()
+    # Run the Python preprocessor to convert Python 2 to Python 3
+    source_filename = Path(pyfile_path).name
+    python2_source = Path(pyfile_path).read_text()
+    python3_source = preprocess(python2_source)
+    with TemporaryDirectory() as tmp:
+        new_path = Path(tmp) / source_filename
+        new_path.write_text(python3_source)
+        pyfile_path = str(new_path)
 
-        file_name = pyfile_path.split(&#34;/&#34;)[-1]
+        if not tree_sitter:
+            # Open Python file as a giant string
+            with open(pyfile_path) as f:
+                file_contents = f.read()
 
-        # Count the number of lines in the file
-        with open(pyfile_path) as f:
-            file_list = f.readlines()
-            line_count = len(file_list)
+            file_name = pyfile_path.split(&#34;/&#34;)[-1]
 
-        # Create a PyASTToCAST Object
-        if legacy:
-            convert = py_ast_to_cast.PyASTToCAST(file_name, legacy=True)
-        else:
-            convert = py_ast_to_cast.PyASTToCAST(file_name)
+            # Count the number of lines in the file
+            with open(pyfile_path) as f:
+                file_list = f.readlines()
+                line_count = len(file_list)
 
-        # &#39;Root&#39; the current working directory so that it&#39;s where the
-        # Source file we&#39;re generating CAST for is (for Import statements)
-        old_path = os.getcwd()
-        try:
-            idx = pyfile_path.rfind(&#34;/&#34;)
-
-            if idx &gt; -1:
-                curr_path = pyfile_path[0:idx]
-                os.chdir(curr_path)
+            # Create a PyASTToCAST Object
+            if legacy:
+                convert = py_ast_to_cast.PyASTToCAST(file_name, legacy=True)
             else:
-                curr_path = &#34;./&#34; + pyfile_path
+                convert = py_ast_to_cast.PyASTToCAST(file_name)
 
-            # Parse the Python program&#39;s AST and create the CAST
-            contents = ast.parse(file_contents)
-            C = convert.visit(contents, {}, {})
-            C.source_refs = [SourceRef(file_name, None, None, 1, line_count)]
-        finally:
-            os.chdir(old_path)
+            # &#39;Root&#39; the current working directory so that it&#39;s where the
+            # Source file we&#39;re generating CAST for is (for Import statements)
+            old_path = os.getcwd()
+            try:
+                idx = pyfile_path.rfind(&#34;/&#34;)
 
-        out_cast = cast.CAST([C], &#34;python&#34;)
-    else:
-        file_name = pyfile_path.split(&#34;/&#34;)[-1]
-        out_cast = TS2CAST(pyfile_path).out_cast
+                if idx &gt; -1:
+                    curr_path = pyfile_path[0:idx]
+                    os.chdir(curr_path)
+                else:
+                    curr_path = &#34;./&#34; + pyfile_path
 
-    if agraph:
-        V = CASTToAGraphVisitor(out_cast)
-        last_slash_idx = file_name.rfind(&#34;/&#34;)
-        file_ending_idx = file_name.rfind(&#34;.&#34;)
-        pdf_file_name = (
-            f&#34;{file_name[last_slash_idx + 1 : file_ending_idx]}.pdf&#34;
-        )
-        V.to_pdf(pdf_file_name)
+                # Parse the Python program&#39;s AST and create the CAST
+                contents = ast.parse(file_contents)
+                C = convert.visit(contents, {}, {})
+                C.source_refs = [SourceRef(file_name, None, None, 1, line_count)]
+            finally:
+                os.chdir(old_path)
 
-    # Then, print CAST as JSON
-    if cast_obj:
-        return out_cast
-    else:
-        if rawjson:
-            print(
-                json.dumps(
-                    out_cast.to_json_object(), sort_keys=True, indent=None
-                )
+            out_cast = cast.CAST([C], &#34;python&#34;)
+        else:
+            file_name = pyfile_path.split(&#34;/&#34;)[-1]
+            out_cast = TS2CAST(pyfile_path).out_cast
+
+        if agraph:
+            V = CASTToAGraphVisitor(out_cast)
+            last_slash_idx = file_name.rfind(&#34;/&#34;)
+            file_ending_idx = file_name.rfind(&#34;.&#34;)
+            pdf_file_name = (
+                f&#34;{file_name[last_slash_idx + 1 : file_ending_idx]}.pdf&#34;
             )
+            V.to_pdf(pdf_file_name)
+
+        # Then, print CAST as JSON
+        if cast_obj:
+            return out_cast
         else:
-            if std_out:
-                print(out_cast.to_json_str())
+            if rawjson:
+                print(
+                    json.dumps(
+                        out_cast.to_json_object(), sort_keys=True, indent=None
+                    )
+                )
             else:
-                out_name = file_name.split(&#34;.&#34;)[0]
-                print(&#34;Writing CAST to &#34; + out_name + &#34;--CAST.json&#34;)
-                out_handle = open(out_name + &#34;--CAST.json&#34;, &#34;w&#34;)
-                out_handle.write(out_cast.to_json_str())</code></pre>
+                if std_out:
+                    print(out_cast.to_json_str())
+                else:
+                    out_name = file_name.split(&#34;.&#34;)[0]
+                    print(&#34;Writing CAST to &#34; + out_name + &#34;--CAST.json&#34;)
+                    out_handle = open(out_name + &#34;--CAST.json&#34;, &#34;w&#34;)
+                    out_handle.write(out_cast.to_json_str())</code></pre>
 </details>
 </dd>
 </dl>

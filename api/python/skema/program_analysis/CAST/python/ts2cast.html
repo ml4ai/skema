@@ -39,7 +39,7 @@ from skema.program_analysis.CAST2FN.model.cast import (
     Module,
     SourceRef,
     Assignment,
-    LiteralValue,
+    CASTLiteralValue,
     Var,
     VarType,
     Name,
@@ -268,7 +268,7 @@ class TS2CAST(object):
                 func_args.append(cast)
 
         if func_name.val.name == &#34;range&#34;:
-            start_step_value = LiteralValue(
+            start_step_value = CASTLiteralValue(
                 ScalarType.INTEGER, 
                 value=&#34;1&#34;,
                 source_code_data_type=[&#34;Python&#34;, PYTHON_VERSION, str(type(1))],
@@ -438,7 +438,7 @@ class TS2CAST(object):
             elif isinstance(cast, AstNode):
                 pattern_cast.append(cast)
 
-        return LiteralValue(value_type=StructureType.TUPLE, value=pattern_cast) 
+        return CASTLiteralValue(value_type=StructureType.TUPLE, value=pattern_cast) 
 
     def visit_identifier(self, node: Node) -&gt; Var:
         identifier = self.node_helper.get_identifier(node)
@@ -466,21 +466,21 @@ class TS2CAST(object):
         literal_source_ref = self.node_helper.get_source_ref(node)
 
         if literal_type == &#34;integer&#34;:
-            return LiteralValue(
+            return CASTLiteralValue(
                 value_type=ScalarType.INTEGER,
                 value=literal_value,
                 source_code_data_type=[&#34;Python&#34;, PYTHON_VERSION, str(type(1))],
                 source_refs=[literal_source_ref]
             )
         elif literal_type == &#34;float&#34;:
-            return LiteralValue(
+            return CASTLiteralValue(
                 value_type=ScalarType.ABSTRACTFLOAT,
                 value=literal_value,
                 source_code_data_type=[&#34;Python&#34;, PYTHON_VERSION, str(type(1.0))],
                 source_refs=[literal_source_ref]
             )
         elif literal_type == &#34;true&#34; or literal_type == &#34;false&#34;:
-            return LiteralValue(
+            return CASTLiteralValue(
                 value_type=ScalarType.BOOLEAN,
                 value=&#34;True&#34; if literal_type == &#34;true&#34; else &#34;False&#34;,
                 source_code_data_type=[&#34;Python&#34;, PYTHON_VERSION, str(type(True))],
@@ -495,7 +495,7 @@ class TS2CAST(object):
                 elif isinstance(cast, AstNode):
                     list_items.append(cast)
 
-            return LiteralValue(
+            return CASTLiteralValue(
                 value_type=StructureType.LIST,
                 value = list_items,
                 source_code_data_type=[&#34;Python&#34;, PYTHON_VERSION, str(type([0]))],
@@ -510,7 +510,7 @@ class TS2CAST(object):
                 elif isinstance(cast, AstNode):
                     tuple_items.append(cast)
 
-            return LiteralValue(
+            return CASTLiteralValue(
                 value_type=StructureType.LIST,
                 value = tuple_items,
                 source_code_data_type=[&#34;Python&#34;, PYTHON_VERSION, str(type((0)))],
@@ -581,7 +581,7 @@ class TS2CAST(object):
 
         loop_pre.append(
             Assignment(
-                left=LiteralValue(
+                left=CASTLiteralValue(
                     &#34;Tuple&#34;,
                     [
                         loop_cond_left_cast,
@@ -606,7 +606,7 @@ class TS2CAST(object):
             op=&#34;ast.Eq&#34;, 
             operands=[
                 stop_cond_name,
-                LiteralValue(
+                CASTLiteralValue(
                     ScalarType.BOOLEAN,
                     False,
                     [&#34;Python&#34;, PYTHON_VERSION, &#34;boolean&#34;],
@@ -629,7 +629,7 @@ class TS2CAST(object):
         # to facilitate looping in GroMEt 
         loop_body.append(
             Assignment(
-                left=LiteralValue(
+                left=CASTLiteralValue(
                     &#34;Tuple&#34;,
                     [
                         loop_cond_left_cast,
@@ -925,7 +925,7 @@ def get_name_node(node):
                 func_args.append(cast)
 
         if func_name.val.name == &#34;range&#34;:
-            start_step_value = LiteralValue(
+            start_step_value = CASTLiteralValue(
                 ScalarType.INTEGER, 
                 value=&#34;1&#34;,
                 source_code_data_type=[&#34;Python&#34;, PYTHON_VERSION, str(type(1))],
@@ -1095,7 +1095,7 @@ def get_name_node(node):
             elif isinstance(cast, AstNode):
                 pattern_cast.append(cast)
 
-        return LiteralValue(value_type=StructureType.TUPLE, value=pattern_cast) 
+        return CASTLiteralValue(value_type=StructureType.TUPLE, value=pattern_cast) 
 
     def visit_identifier(self, node: Node) -&gt; Var:
         identifier = self.node_helper.get_identifier(node)
@@ -1123,21 +1123,21 @@ def get_name_node(node):
         literal_source_ref = self.node_helper.get_source_ref(node)
 
         if literal_type == &#34;integer&#34;:
-            return LiteralValue(
+            return CASTLiteralValue(
                 value_type=ScalarType.INTEGER,
                 value=literal_value,
                 source_code_data_type=[&#34;Python&#34;, PYTHON_VERSION, str(type(1))],
                 source_refs=[literal_source_ref]
             )
         elif literal_type == &#34;float&#34;:
-            return LiteralValue(
+            return CASTLiteralValue(
                 value_type=ScalarType.ABSTRACTFLOAT,
                 value=literal_value,
                 source_code_data_type=[&#34;Python&#34;, PYTHON_VERSION, str(type(1.0))],
                 source_refs=[literal_source_ref]
             )
         elif literal_type == &#34;true&#34; or literal_type == &#34;false&#34;:
-            return LiteralValue(
+            return CASTLiteralValue(
                 value_type=ScalarType.BOOLEAN,
                 value=&#34;True&#34; if literal_type == &#34;true&#34; else &#34;False&#34;,
                 source_code_data_type=[&#34;Python&#34;, PYTHON_VERSION, str(type(True))],
@@ -1152,7 +1152,7 @@ def get_name_node(node):
                 elif isinstance(cast, AstNode):
                     list_items.append(cast)
 
-            return LiteralValue(
+            return CASTLiteralValue(
                 value_type=StructureType.LIST,
                 value = list_items,
                 source_code_data_type=[&#34;Python&#34;, PYTHON_VERSION, str(type([0]))],
@@ -1167,7 +1167,7 @@ def get_name_node(node):
                 elif isinstance(cast, AstNode):
                     tuple_items.append(cast)
 
-            return LiteralValue(
+            return CASTLiteralValue(
                 value_type=StructureType.LIST,
                 value = tuple_items,
                 source_code_data_type=[&#34;Python&#34;, PYTHON_VERSION, str(type((0)))],
@@ -1238,7 +1238,7 @@ def get_name_node(node):
 
         loop_pre.append(
             Assignment(
-                left=LiteralValue(
+                left=CASTLiteralValue(
                     &#34;Tuple&#34;,
                     [
                         loop_cond_left_cast,
@@ -1263,7 +1263,7 @@ def get_name_node(node):
             op=&#34;ast.Eq&#34;, 
             operands=[
                 stop_cond_name,
-                LiteralValue(
+                CASTLiteralValue(
                     ScalarType.BOOLEAN,
                     False,
                     [&#34;Python&#34;, PYTHON_VERSION, &#34;boolean&#34;],
@@ -1286,7 +1286,7 @@ def get_name_node(node):
         # to facilitate looping in GroMEt 
         loop_body.append(
             Assignment(
-                left=LiteralValue(
+                left=CASTLiteralValue(
                     &#34;Tuple&#34;,
                     [
                         loop_cond_left_cast,
@@ -1520,7 +1520,7 @@ where left and right can either be operators or literals</p></div>
             func_args.append(cast)
 
     if func_name.val.name == &#34;range&#34;:
-        start_step_value = LiteralValue(
+        start_step_value = CASTLiteralValue(
             ScalarType.INTEGER, 
             value=&#34;1&#34;,
             source_code_data_type=[&#34;Python&#34;, PYTHON_VERSION, str(type(1))],
@@ -1631,7 +1631,7 @@ where left and right can either be operators or literals</p></div>
 
     loop_pre.append(
         Assignment(
-            left=LiteralValue(
+            left=CASTLiteralValue(
                 &#34;Tuple&#34;,
                 [
                     loop_cond_left_cast,
@@ -1656,7 +1656,7 @@ where left and right can either be operators or literals</p></div>
         op=&#34;ast.Eq&#34;, 
         operands=[
             stop_cond_name,
-            LiteralValue(
+            CASTLiteralValue(
                 ScalarType.BOOLEAN,
                 False,
                 [&#34;Python&#34;, PYTHON_VERSION, &#34;boolean&#34;],
@@ -1679,7 +1679,7 @@ where left and right can either be operators or literals</p></div>
     # to facilitate looping in GroMEt 
     loop_body.append(
         Assignment(
-            left=LiteralValue(
+            left=CASTLiteralValue(
                 &#34;Tuple&#34;,
                 [
                     loop_cond_left_cast,
@@ -1876,21 +1876,21 @@ where left and right can either be operators or literals</p></div>
     literal_source_ref = self.node_helper.get_source_ref(node)
 
     if literal_type == &#34;integer&#34;:
-        return LiteralValue(
+        return CASTLiteralValue(
             value_type=ScalarType.INTEGER,
             value=literal_value,
             source_code_data_type=[&#34;Python&#34;, PYTHON_VERSION, str(type(1))],
             source_refs=[literal_source_ref]
         )
     elif literal_type == &#34;float&#34;:
-        return LiteralValue(
+        return CASTLiteralValue(
             value_type=ScalarType.ABSTRACTFLOAT,
             value=literal_value,
             source_code_data_type=[&#34;Python&#34;, PYTHON_VERSION, str(type(1.0))],
             source_refs=[literal_source_ref]
         )
     elif literal_type == &#34;true&#34; or literal_type == &#34;false&#34;:
-        return LiteralValue(
+        return CASTLiteralValue(
             value_type=ScalarType.BOOLEAN,
             value=&#34;True&#34; if literal_type == &#34;true&#34; else &#34;False&#34;,
             source_code_data_type=[&#34;Python&#34;, PYTHON_VERSION, str(type(True))],
@@ -1905,7 +1905,7 @@ where left and right can either be operators or literals</p></div>
             elif isinstance(cast, AstNode):
                 list_items.append(cast)
 
-        return LiteralValue(
+        return CASTLiteralValue(
             value_type=StructureType.LIST,
             value = list_items,
             source_code_data_type=[&#34;Python&#34;, PYTHON_VERSION, str(type([0]))],
@@ -1920,7 +1920,7 @@ where left and right can either be operators or literals</p></div>
             elif isinstance(cast, AstNode):
                 tuple_items.append(cast)
 
-        return LiteralValue(
+        return CASTLiteralValue(
             value_type=StructureType.LIST,
             value = tuple_items,
             source_code_data_type=[&#34;Python&#34;, PYTHON_VERSION, str(type((0)))],
@@ -1997,7 +1997,7 @@ where left and right can either be operators or literals</p></div>
         elif isinstance(cast, AstNode):
             pattern_cast.append(cast)
 
-    return LiteralValue(value_type=StructureType.TUPLE, value=pattern_cast) </code></pre>
+    return CASTLiteralValue(value_type=StructureType.TUPLE, value=pattern_cast) </code></pre>
 </details>
 </dd>
 <dt id="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_return"><code class="name flex">

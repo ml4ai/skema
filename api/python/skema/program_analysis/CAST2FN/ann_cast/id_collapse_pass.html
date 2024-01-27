@@ -202,6 +202,17 @@ class IdCollapsePass:
         self.visit_node_list(node.body, at_module_scope)
 
     @_visit.register
+    def visit_goto(self, node: AnnCastGoto, at_module_scope):
+        if node.expr != None:
+            self.visit(node.expr, at_module_scope)
+        # self.visit(node.label, at_module_scope)
+
+    @_visit.register
+    def visit_label(self, node: AnnCastLabel, at_module_scope):
+        # self.visit(node.label, at_module_scope)
+        pass
+
+    @_visit.register
     def visit_literal_value(self, node: AnnCastLiteralValue, at_module_scope):
         if node.value_type == &#34;List[Any]&#34;:
             # operator - string
@@ -461,6 +472,17 @@ class IdCollapsePass:
         at_module_scope = False
         self.visit_node_list(node.func_args, at_module_scope)
         self.visit_node_list(node.body, at_module_scope)
+
+    @_visit.register
+    def visit_goto(self, node: AnnCastGoto, at_module_scope):
+        if node.expr != None:
+            self.visit(node.expr, at_module_scope)
+        # self.visit(node.label, at_module_scope)
+
+    @_visit.register
+    def visit_label(self, node: AnnCastLabel, at_module_scope):
+        # self.visit(node.label, at_module_scope)
+        pass
 
     @_visit.register
     def visit_literal_value(self, node: AnnCastLiteralValue, at_module_scope):
@@ -749,6 +771,37 @@ def visit_function_def(self, node: AnnCastFunctionDef, at_module_scope):
     self.visit_node_list(node.body, at_module_scope)</code></pre>
 </details>
 </dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.visit_goto"><code class="name flex">
+<span>def <span class="ident">visit_goto</span></span>(<span>self, node: <a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastGoto" href="annotated_cast.html#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastGoto">AnnCastGoto</a>, at_module_scope)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@_visit.register
+def visit_goto(self, node: AnnCastGoto, at_module_scope):
+    if node.expr != None:
+        self.visit(node.expr, at_module_scope)
+    # self.visit(node.label, at_module_scope)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.visit_label"><code class="name flex">
+<span>def <span class="ident">visit_label</span></span>(<span>self, node: <a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastLabel" href="annotated_cast.html#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastLabel">AnnCastLabel</a>, at_module_scope)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@_visit.register
+def visit_label(self, node: AnnCastLabel, at_module_scope):
+    # self.visit(node.label, at_module_scope)
+    pass</code></pre>
+</details>
+</dd>
 <dt id="skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.visit_literal_value"><code class="name flex">
 <span>def <span class="ident">visit_literal_value</span></span>(<span>self, node: <a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastLiteralValue" href="annotated_cast.html#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastLiteralValue">AnnCastLiteralValue</a>, at_module_scope)</span>
 </code></dt>
@@ -1020,6 +1073,8 @@ def visit_var(self, node: AnnCastVar, at_module_scope):
 <li><code><a title="skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.visit_attribute" href="#skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.visit_attribute">visit_attribute</a></code></li>
 <li><code><a title="skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.visit_call" href="#skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.visit_call">visit_call</a></code></li>
 <li><code><a title="skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.visit_function_def" href="#skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.visit_function_def">visit_function_def</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.visit_goto" href="#skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.visit_goto">visit_goto</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.visit_label" href="#skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.visit_label">visit_label</a></code></li>
 <li><code><a title="skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.visit_literal_value" href="#skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.visit_literal_value">visit_literal_value</a></code></li>
 <li><code><a title="skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.visit_loop" href="#skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.visit_loop">visit_loop</a></code></li>
 <li><code><a title="skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.visit_model_break" href="#skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.visit_model_break">visit_model_break</a></code></li>

@@ -1194,6 +1194,18 @@ class VariableVersionPass:
         # Visit the function defs within this class to make sure
         # Everything is versioned correctly
         self.visit_node_list(node.funcs, assign_lhs)
+    
+    @_visit.register
+    def visit_goto(self, node: AnnCastGoto, assign_lhs):
+        if node.expr != None:
+            self.visit(node.expr, assign_lhs)
+        # self.visit(node.label, at_module_scope, assign_lhs)
+        pass
+
+    @_visit.register
+    def visit_label(self, node: AnnCastLabel, assign_lhs):
+        # self.visit(node.label, at_module_scope, assign_lhs)
+        pass
 
     def visit_function_def_copy(
         self, node: AnnCastFunctionDef, assign_lhs: bool
@@ -2597,6 +2609,18 @@ class VariableVersionPass:
         # Visit the function defs within this class to make sure
         # Everything is versioned correctly
         self.visit_node_list(node.funcs, assign_lhs)
+    
+    @_visit.register
+    def visit_goto(self, node: AnnCastGoto, assign_lhs):
+        if node.expr != None:
+            self.visit(node.expr, assign_lhs)
+        # self.visit(node.label, at_module_scope, assign_lhs)
+        pass
+
+    @_visit.register
+    def visit_label(self, node: AnnCastLabel, assign_lhs):
+        # self.visit(node.label, at_module_scope, assign_lhs)
+        pass
 
     def visit_function_def_copy(
         self, node: AnnCastFunctionDef, assign_lhs: bool
@@ -4375,6 +4399,38 @@ def visit_function_def(self, node: AnnCastFunctionDef, assign_lhs: bool):
         print(f&#34;  BodyHighestVers: {node.body_highest_var_vers}&#34;)</code></pre>
 </details>
 </dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.variable_version_pass.VariableVersionPass.visit_goto"><code class="name flex">
+<span>def <span class="ident">visit_goto</span></span>(<span>self, node: <a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastGoto" href="annotated_cast.html#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastGoto">AnnCastGoto</a>, assign_lhs)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@_visit.register
+def visit_goto(self, node: AnnCastGoto, assign_lhs):
+    if node.expr != None:
+        self.visit(node.expr, assign_lhs)
+    # self.visit(node.label, at_module_scope, assign_lhs)
+    pass</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.variable_version_pass.VariableVersionPass.visit_label"><code class="name flex">
+<span>def <span class="ident">visit_label</span></span>(<span>self, node: <a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastLabel" href="annotated_cast.html#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastLabel">AnnCastLabel</a>, assign_lhs)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@_visit.register
+def visit_label(self, node: AnnCastLabel, assign_lhs):
+    # self.visit(node.label, at_module_scope, assign_lhs)
+    pass</code></pre>
+</details>
+</dd>
 <dt id="skema.program_analysis.CAST2FN.ann_cast.variable_version_pass.VariableVersionPass.visit_literal_value"><code class="name flex">
 <span>def <span class="ident">visit_literal_value</span></span>(<span>self, node: <a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastLiteralValue" href="annotated_cast.html#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastLiteralValue">AnnCastLiteralValue</a>, assign_side)</span>
 </code></dt>
@@ -4776,6 +4832,8 @@ def visit_var(self, node: AnnCastVar, assign_lhs: bool):
 <li><code><a title="skema.program_analysis.CAST2FN.ann_cast.variable_version_pass.VariableVersionPass.visit_call_grfn_2_2" href="#skema.program_analysis.CAST2FN.ann_cast.variable_version_pass.VariableVersionPass.visit_call_grfn_2_2">visit_call_grfn_2_2</a></code></li>
 <li><code><a title="skema.program_analysis.CAST2FN.ann_cast.variable_version_pass.VariableVersionPass.visit_function_def" href="#skema.program_analysis.CAST2FN.ann_cast.variable_version_pass.VariableVersionPass.visit_function_def">visit_function_def</a></code></li>
 <li><code><a title="skema.program_analysis.CAST2FN.ann_cast.variable_version_pass.VariableVersionPass.visit_function_def_copy" href="#skema.program_analysis.CAST2FN.ann_cast.variable_version_pass.VariableVersionPass.visit_function_def_copy">visit_function_def_copy</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.variable_version_pass.VariableVersionPass.visit_goto" href="#skema.program_analysis.CAST2FN.ann_cast.variable_version_pass.VariableVersionPass.visit_goto">visit_goto</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.variable_version_pass.VariableVersionPass.visit_label" href="#skema.program_analysis.CAST2FN.ann_cast.variable_version_pass.VariableVersionPass.visit_label">visit_label</a></code></li>
 <li><code><a title="skema.program_analysis.CAST2FN.ann_cast.variable_version_pass.VariableVersionPass.visit_literal_value" href="#skema.program_analysis.CAST2FN.ann_cast.variable_version_pass.VariableVersionPass.visit_literal_value">visit_literal_value</a></code></li>
 <li><code><a title="skema.program_analysis.CAST2FN.ann_cast.variable_version_pass.VariableVersionPass.visit_loop" href="#skema.program_analysis.CAST2FN.ann_cast.variable_version_pass.VariableVersionPass.visit_loop">visit_loop</a></code></li>
 <li><code><a title="skema.program_analysis.CAST2FN.ann_cast.variable_version_pass.VariableVersionPass.visit_model_break" href="#skema.program_analysis.CAST2FN.ann_cast.variable_version_pass.VariableVersionPass.visit_model_break">visit_model_break</a></code></li>

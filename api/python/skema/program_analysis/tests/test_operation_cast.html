@@ -35,7 +35,7 @@ from skema.program_analysis.CAST2FN.model.cast import (
     Var,
     Name,
     Operator,
-    LiteralValue
+    CASTLiteralValue
 )
 
 def binop1():
@@ -87,11 +87,11 @@ def test_binop1():
     assert isinstance(binop_node.right, Operator)
     assert binop_node.right.op == &#34;ast.Add&#34;
 
-    assert isinstance(binop_node.right.operands[0], LiteralValue)
+    assert isinstance(binop_node.right.operands[0], CASTLiteralValue)
     assert binop_node.right.operands[0].value == &#39;2&#39;
     assert binop_node.right.operands[0].value_type == &#39;Integer&#39;
 
-    assert isinstance(binop_node.right.operands[1], LiteralValue)
+    assert isinstance(binop_node.right.operands[1], CASTLiteralValue)
     assert binop_node.right.operands[1].value == &#39;3&#39;
     assert binop_node.right.operands[1].value_type == &#39;Integer&#39;
 
@@ -106,7 +106,7 @@ def test_binop2():
     assert binop_node.left.val.name == &#34;x&#34;
     assert binop_node.left.val.id == 0
 
-    assert isinstance(binop_node.right, LiteralValue)
+    assert isinstance(binop_node.right, CASTLiteralValue)
     assert binop_node.right.value_type == &#34;Integer&#34;
     assert binop_node.right.value == &#39;2&#39;
     
@@ -125,7 +125,7 @@ def test_binop2():
     assert binop_node.right.operands[0].name == &#39;x&#39;
     assert binop_node.right.operands[0].id == 0
 
-    assert isinstance(binop_node.right.operands[1], LiteralValue)
+    assert isinstance(binop_node.right.operands[1], CASTLiteralValue)
     assert binop_node.right.operands[1].value == &#39;3&#39;
     assert binop_node.right.operands[1].value_type == &#39;Integer&#39;
 
@@ -140,7 +140,7 @@ def test_binop3():
     assert binop_node.left.val.name == &#34;x&#34;
     assert binop_node.left.val.id == 0
 
-    assert isinstance(binop_node.right, LiteralValue)
+    assert isinstance(binop_node.right, CASTLiteralValue)
     assert binop_node.right.value_type == &#34;Integer&#34;
     assert binop_node.right.value == &#39;1&#39;
     
@@ -152,7 +152,7 @@ def test_binop3():
     assert binop_node.left.val.name == &#34;y&#34;
     assert binop_node.left.val.id == 1
 
-    assert isinstance(binop_node.right, LiteralValue)
+    assert isinstance(binop_node.right, CASTLiteralValue)
     assert binop_node.right.value_type == &#34;Integer&#34;
     assert binop_node.right.value == &#39;2&#39;
     
@@ -211,7 +211,7 @@ def test_unary1():
     assert isinstance(unary_node.right, Operator)
     assert unary_node.right.op == &#34;ast.USub&#34;
 
-    assert isinstance(unary_node.right.operands[0], LiteralValue)
+    assert isinstance(unary_node.right.operands[0], CASTLiteralValue)
     assert unary_node.right.operands[0].value == &#39;1&#39;
     assert unary_node.right.operands[0].value_type == &#39;Integer&#39;
 
@@ -226,7 +226,7 @@ def test_unary2():
     assert unary_node.left.val.name == &#34;x&#34;
     assert unary_node.left.val.id == 0
 
-    assert isinstance(unary_node.right, LiteralValue)
+    assert isinstance(unary_node.right, CASTLiteralValue)
     assert unary_node.right.value == &#39;1&#39;
     assert unary_node.right.value_type == &#39;Integer&#39;
 
@@ -339,11 +339,11 @@ z = x + y - (y * x) / x
     assert isinstance(binop_node.right, Operator)
     assert binop_node.right.op == &#34;ast.Add&#34;
 
-    assert isinstance(binop_node.right.operands[0], LiteralValue)
+    assert isinstance(binop_node.right.operands[0], CASTLiteralValue)
     assert binop_node.right.operands[0].value == &#39;2&#39;
     assert binop_node.right.operands[0].value_type == &#39;Integer&#39;
 
-    assert isinstance(binop_node.right.operands[1], LiteralValue)
+    assert isinstance(binop_node.right.operands[1], CASTLiteralValue)
     assert binop_node.right.operands[1].value == &#39;3&#39;
     assert binop_node.right.operands[1].value_type == &#39;Integer&#39;</code></pre>
 </details>
@@ -368,7 +368,7 @@ z = x + y - (y * x) / x
     assert binop_node.left.val.name == &#34;x&#34;
     assert binop_node.left.val.id == 0
 
-    assert isinstance(binop_node.right, LiteralValue)
+    assert isinstance(binop_node.right, CASTLiteralValue)
     assert binop_node.right.value_type == &#34;Integer&#34;
     assert binop_node.right.value == &#39;2&#39;
     
@@ -387,7 +387,7 @@ z = x + y - (y * x) / x
     assert binop_node.right.operands[0].name == &#39;x&#39;
     assert binop_node.right.operands[0].id == 0
 
-    assert isinstance(binop_node.right.operands[1], LiteralValue)
+    assert isinstance(binop_node.right.operands[1], CASTLiteralValue)
     assert binop_node.right.operands[1].value == &#39;3&#39;
     assert binop_node.right.operands[1].value_type == &#39;Integer&#39;</code></pre>
 </details>
@@ -412,7 +412,7 @@ z = x + y - (y * x) / x
     assert binop_node.left.val.name == &#34;x&#34;
     assert binop_node.left.val.id == 0
 
-    assert isinstance(binop_node.right, LiteralValue)
+    assert isinstance(binop_node.right, CASTLiteralValue)
     assert binop_node.right.value_type == &#34;Integer&#34;
     assert binop_node.right.value == &#39;1&#39;
     
@@ -424,7 +424,7 @@ z = x + y - (y * x) / x
     assert binop_node.left.val.name == &#34;y&#34;
     assert binop_node.left.val.id == 1
 
-    assert isinstance(binop_node.right, LiteralValue)
+    assert isinstance(binop_node.right, CASTLiteralValue)
     assert binop_node.right.value_type == &#34;Integer&#34;
     assert binop_node.right.value == &#39;2&#39;
     
@@ -493,7 +493,7 @@ z = x + y - (y * x) / x
     assert isinstance(unary_node.right, Operator)
     assert unary_node.right.op == &#34;ast.USub&#34;
 
-    assert isinstance(unary_node.right.operands[0], LiteralValue)
+    assert isinstance(unary_node.right.operands[0], CASTLiteralValue)
     assert unary_node.right.operands[0].value == &#39;1&#39;
     assert unary_node.right.operands[0].value_type == &#39;Integer&#39;</code></pre>
 </details>
@@ -518,7 +518,7 @@ z = x + y - (y * x) / x
     assert unary_node.left.val.name == &#34;x&#34;
     assert unary_node.left.val.id == 0
 
-    assert isinstance(unary_node.right, LiteralValue)
+    assert isinstance(unary_node.right, CASTLiteralValue)
     assert unary_node.right.value == &#39;1&#39;
     assert unary_node.right.value_type == &#39;Integer&#39;
 

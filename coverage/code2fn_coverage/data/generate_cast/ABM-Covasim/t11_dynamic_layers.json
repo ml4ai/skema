@@ -81,7 +81,7 @@
                             ],
                             "type": "float",
                             "val": {
-                                "id": 36,
+                                "id": 37,
                                 "name": "contact_data",
                                 "node_type": "Name",
                                 "source_refs": [
@@ -183,7 +183,7 @@
                                                     }
                                                 ],
                                                 "func": {
-                                                    "id": 12,
+                                                    "id": 13,
                                                     "name": "_set",
                                                     "node_type": "Name",
                                                     "source_refs": [
@@ -224,7 +224,7 @@
                                         },
                                         {
                                             "left": {
-                                                "node_type": "LiteralValue",
+                                                "node_type": "CASTLiteralValue",
                                                 "source_code_data_type": [
                                                     "Python",
                                                     "3.8",
@@ -242,7 +242,7 @@
                                                 ],
                                                 "value": [
                                                     {
-                                                        "node_type": "LiteralValue",
+                                                        "node_type": "CASTLiteralValue",
                                                         "source_code_data_type": [
                                                             "Python",
                                                             "3.8",
@@ -337,7 +337,7 @@
                                                         ],
                                                         "type": "iterator",
                                                         "val": {
-                                                            "id": 13,
+                                                            "id": 14,
                                                             "name": "generated_iter_0",
                                                             "node_type": "Name",
                                                             "source_refs": [
@@ -367,7 +367,7 @@
                                                         ],
                                                         "type": "boolean",
                                                         "val": {
-                                                            "id": 16,
+                                                            "id": 17,
                                                             "name": "sc_1",
                                                             "node_type": "Name",
                                                             "source_refs": [
@@ -403,7 +403,7 @@
                                                         ],
                                                         "type": "iterator",
                                                         "val": {
-                                                            "id": 13,
+                                                            "id": 14,
                                                             "name": "generated_iter_0",
                                                             "node_type": "Name",
                                                             "source_refs": [
@@ -420,7 +420,7 @@
                                                     }
                                                 ],
                                                 "func": {
-                                                    "id": 15,
+                                                    "id": 16,
                                                     "name": "next",
                                                     "node_type": "Name",
                                                     "source_refs": [
@@ -480,7 +480,7 @@
                                                 ],
                                                 "type": "boolean",
                                                 "val": {
-                                                    "id": 16,
+                                                    "id": 17,
                                                     "name": "sc_1",
                                                     "node_type": "Name",
                                                     "source_refs": [
@@ -496,7 +496,7 @@
                                                 }
                                             },
                                             {
-                                                "node_type": "LiteralValue",
+                                                "node_type": "CASTLiteralValue",
                                                 "source_code_data_type": [
                                                     "Python",
                                                     "3.8",
@@ -548,7 +548,7 @@
                                                 ],
                                                 "type": "iterator",
                                                 "val": {
-                                                    "id": 13,
+                                                    "id": 14,
                                                     "name": "generated_iter_0",
                                                     "node_type": "Name",
                                                     "source_refs": [
@@ -567,16 +567,59 @@
                                             "right": {
                                                 "arguments": [
                                                     {
-                                                        "arguments": [],
-                                                        "func": {
-                                                            "attr": {
-                                                                "id": 11,
-                                                                "name": "items",
-                                                                "node_type": "Name",
+                                                        "arguments": [
+                                                            {
+                                                                "arguments": [],
+                                                                "func": {
+                                                                    "attr": {
+                                                                        "id": 11,
+                                                                        "name": "items",
+                                                                        "node_type": "Name",
+                                                                        "source_refs": [
+                                                                            {
+                                                                                "col_end": 35,
+                                                                                "col_start": 24,
+                                                                                "node_type": "SourceRef",
+                                                                                "row_end": 14,
+                                                                                "row_start": 14,
+                                                                                "source_file_name": "t11_dynamic_layers"
+                                                                            }
+                                                                        ]
+                                                                    },
+                                                                    "node_type": "Attribute",
+                                                                    "source_refs": [
+                                                                        {
+                                                                            "col_end": 35,
+                                                                            "col_start": 24,
+                                                                            "node_type": "SourceRef",
+                                                                            "row_end": 14,
+                                                                            "row_start": 14,
+                                                                            "source_file_name": "t11_dynamic_layers"
+                                                                        }
+                                                                    ],
+                                                                    "value": {
+                                                                        "id": 6,
+                                                                        "name": "layer",
+                                                                        "node_type": "Name",
+                                                                        "source_refs": [
+                                                                            {
+                                                                                "col_end": 29,
+                                                                                "col_start": 24,
+                                                                                "node_type": "SourceRef",
+                                                                                "row_end": 14,
+                                                                                "row_start": 14,
+                                                                                "source_file_name": "t11_dynamic_layers"
+                                                                            }
+                                                                        ]
+                                                                    }
+                                                                },
+                                                                "node_type": "Call",
+                                                                "source_language": null,
+                                                                "source_language_version": null,
                                                                 "source_refs": [
                                                                     {
-                                                                        "col_end": 30,
-                                                                        "col_start": 19,
+                                                                        "col_end": 37,
+                                                                        "col_start": 24,
                                                                         "node_type": "SourceRef",
                                                                         "row_end": 14,
                                                                         "row_start": 14,
@@ -584,39 +627,48 @@
                                                                     }
                                                                 ]
                                                             },
-                                                            "node_type": "Attribute",
-                                                            "source_refs": [
-                                                                {
-                                                                    "col_end": 30,
-                                                                    "col_start": 19,
-                                                                    "node_type": "SourceRef",
-                                                                    "row_end": 14,
-                                                                    "row_start": 14,
-                                                                    "source_file_name": "t11_dynamic_layers"
-                                                                }
-                                                            ],
-                                                            "value": {
-                                                                "id": 6,
-                                                                "name": "layer",
-                                                                "node_type": "Name",
+                                                            {
+                                                                "node_type": "CASTLiteralValue",
+                                                                "source_code_data_type": [
+                                                                    "Python",
+                                                                    "3.8",
+                                                                    "List"
+                                                                ],
                                                                 "source_refs": [
                                                                     {
-                                                                        "col_end": 24,
+                                                                        "col_end": 38,
                                                                         "col_start": 19,
                                                                         "node_type": "SourceRef",
                                                                         "row_end": 14,
                                                                         "row_start": 14,
                                                                         "source_file_name": "t11_dynamic_layers"
                                                                     }
-                                                                ]
+                                                                ],
+                                                                "value": "list",
+                                                                "value_type": "List"
                                                             }
+                                                        ],
+                                                        "func": {
+                                                            "id": 12,
+                                                            "name": "cast",
+                                                            "node_type": "Name",
+                                                            "source_refs": [
+                                                                {
+                                                                    "col_end": 38,
+                                                                    "col_start": 19,
+                                                                    "node_type": "SourceRef",
+                                                                    "row_end": 14,
+                                                                    "row_start": 14,
+                                                                    "source_file_name": "t11_dynamic_layers"
+                                                                }
+                                                            ]
                                                         },
                                                         "node_type": "Call",
                                                         "source_language": null,
                                                         "source_language_version": null,
                                                         "source_refs": [
                                                             {
-                                                                "col_end": 32,
+                                                                "col_end": 38,
                                                                 "col_start": 19,
                                                                 "node_type": "SourceRef",
                                                                 "row_end": 14,
@@ -627,7 +679,7 @@
                                                     }
                                                 ],
                                                 "func": {
-                                                    "id": 14,
+                                                    "id": 15,
                                                     "name": "iter",
                                                     "node_type": "Name",
                                                     "source_refs": [
@@ -668,7 +720,7 @@
                                         },
                                         {
                                             "left": {
-                                                "node_type": "LiteralValue",
+                                                "node_type": "CASTLiteralValue",
                                                 "source_code_data_type": [
                                                     "Python",
                                                     "3.8",
@@ -686,7 +738,7 @@
                                                 ],
                                                 "value": [
                                                     {
-                                                        "node_type": "LiteralValue",
+                                                        "node_type": "CASTLiteralValue",
                                                         "source_code_data_type": [
                                                             "Python",
                                                             "3.8",
@@ -781,7 +833,7 @@
                                                         ],
                                                         "type": "iterator",
                                                         "val": {
-                                                            "id": 13,
+                                                            "id": 14,
                                                             "name": "generated_iter_0",
                                                             "node_type": "Name",
                                                             "source_refs": [
@@ -811,7 +863,7 @@
                                                         ],
                                                         "type": "boolean",
                                                         "val": {
-                                                            "id": 16,
+                                                            "id": 17,
                                                             "name": "sc_1",
                                                             "node_type": "Name",
                                                             "source_refs": [
@@ -847,7 +899,7 @@
                                                         ],
                                                         "type": "iterator",
                                                         "val": {
-                                                            "id": 13,
+                                                            "id": 14,
                                                             "name": "generated_iter_0",
                                                             "node_type": "Name",
                                                             "source_refs": [
@@ -864,7 +916,7 @@
                                                     }
                                                 ],
                                                 "func": {
-                                                    "id": 15,
+                                                    "id": 16,
                                                     "name": "next",
                                                     "node_type": "Name",
                                                     "source_refs": [
@@ -999,7 +1051,7 @@
                                         }
                                     ],
                                     "value": {
-                                        "node_type": "LiteralValue",
+                                        "node_type": "CASTLiteralValue",
                                         "source_code_data_type": [
                                             "Python",
                                             "3.8",
@@ -1113,7 +1165,7 @@
                                 }
                             ],
                             "name": {
-                                "id": 17,
+                                "id": 18,
                                 "name": "__init__",
                                 "node_type": "Name",
                                 "source_refs": [
@@ -1157,7 +1209,7 @@
                                         ],
                                         "type": "float",
                                         "val": {
-                                            "id": 21,
+                                            "id": 22,
                                             "name": "pop_size",
                                             "node_type": "Name",
                                             "source_refs": [
@@ -1176,7 +1228,7 @@
                                     "right": {
                                         "arguments": [
                                             {
-                                                "id": 20,
+                                                "id": 21,
                                                 "name": "people",
                                                 "node_type": "Name",
                                                 "source_refs": [
@@ -1192,7 +1244,7 @@
                                             }
                                         ],
                                         "func": {
-                                            "id": 26,
+                                            "id": 27,
                                             "name": "len",
                                             "node_type": "Name",
                                             "source_refs": [
@@ -1247,7 +1299,7 @@
                                         ],
                                         "type": "float",
                                         "val": {
-                                            "id": 22,
+                                            "id": 23,
                                             "name": "n_new",
                                             "node_type": "Name",
                                             "source_refs": [
@@ -1293,7 +1345,7 @@
                                                     }
                                                 ],
                                                 "value": {
-                                                    "id": 25,
+                                                    "id": 26,
                                                     "name": "self",
                                                     "node_type": "Name",
                                                     "source_refs": [
@@ -1310,7 +1362,7 @@
                                             },
                                             {
                                                 "attr": {
-                                                    "id": 28,
+                                                    "id": 29,
                                                     "name": "t",
                                                     "node_type": "Name",
                                                     "source_refs": [
@@ -1336,7 +1388,7 @@
                                                     }
                                                 ],
                                                 "value": {
-                                                    "id": 20,
+                                                    "id": 21,
                                                     "name": "people",
                                                     "node_type": "Name",
                                                     "source_refs": [
@@ -1353,7 +1405,7 @@
                                             }
                                         ],
                                         "func": {
-                                            "id": 27,
+                                            "id": 28,
                                             "name": "_get",
                                             "node_type": "Name",
                                             "source_refs": [
@@ -1408,7 +1460,7 @@
                                         ],
                                         "type": "Any",
                                         "val": {
-                                            "id": 25,
+                                            "id": 26,
                                             "name": "self",
                                             "node_type": "Name",
                                             "source_refs": [
@@ -1427,7 +1479,7 @@
                                     "right": {
                                         "arguments": [
                                             {
-                                                "id": 25,
+                                                "id": 26,
                                                 "name": "self",
                                                 "node_type": "Name",
                                                 "source_refs": [
@@ -1442,7 +1494,7 @@
                                                 ]
                                             },
                                             {
-                                                "node_type": "LiteralValue",
+                                                "node_type": "CASTLiteralValue",
                                                 "source_code_data_type": [
                                                     "Python",
                                                     "3.8",
@@ -1498,7 +1550,7 @@
                                                                 },
                                                                 "node_type": "Assignment",
                                                                 "right": {
-                                                                    "id": 21,
+                                                                    "id": 22,
                                                                     "name": "pop_size",
                                                                     "node_type": "Name",
                                                                     "source_refs": [
@@ -1556,7 +1608,7 @@
                                                                 },
                                                                 "node_type": "Assignment",
                                                                 "right": {
-                                                                    "id": 22,
+                                                                    "id": 23,
                                                                     "name": "n_new",
                                                                     "node_type": "Name",
                                                                     "source_refs": [
@@ -1584,7 +1636,7 @@
                                                         ],
                                                         "func": {
                                                             "attr": {
-                                                                "id": 29,
+                                                                "id": 30,
                                                                 "name": "choose_r",
                                                                 "node_type": "Name",
                                                                 "source_refs": [
@@ -1673,7 +1725,7 @@
                                                         "node_type": "Assignment",
                                                         "right": {
                                                             "attr": {
-                                                                "id": 30,
+                                                                "id": 31,
                                                                 "name": "default_int",
                                                                 "node_type": "Name",
                                                                 "source_refs": [
@@ -1728,7 +1780,7 @@
                                                 ],
                                                 "func": {
                                                     "attr": {
-                                                        "id": 31,
+                                                        "id": 32,
                                                         "name": "array",
                                                         "node_type": "Name",
                                                         "source_refs": [
@@ -1785,7 +1837,7 @@
                                             }
                                         ],
                                         "func": {
-                                            "id": 12,
+                                            "id": 13,
                                             "name": "_set",
                                             "node_type": "Name",
                                             "source_refs": [
@@ -1840,7 +1892,7 @@
                                         ],
                                         "type": "Any",
                                         "val": {
-                                            "id": 25,
+                                            "id": 26,
                                             "name": "self",
                                             "node_type": "Name",
                                             "source_refs": [
@@ -1859,7 +1911,7 @@
                                     "right": {
                                         "arguments": [
                                             {
-                                                "id": 25,
+                                                "id": 26,
                                                 "name": "self",
                                                 "node_type": "Name",
                                                 "source_refs": [
@@ -1874,7 +1926,7 @@
                                                 ]
                                             },
                                             {
-                                                "node_type": "LiteralValue",
+                                                "node_type": "CASTLiteralValue",
                                                 "source_code_data_type": [
                                                     "Python",
                                                     "3.8",
@@ -1930,7 +1982,7 @@
                                                                 },
                                                                 "node_type": "Assignment",
                                                                 "right": {
-                                                                    "id": 21,
+                                                                    "id": 22,
                                                                     "name": "pop_size",
                                                                     "node_type": "Name",
                                                                     "source_refs": [
@@ -1988,7 +2040,7 @@
                                                                 },
                                                                 "node_type": "Assignment",
                                                                 "right": {
-                                                                    "id": 22,
+                                                                    "id": 23,
                                                                     "name": "n_new",
                                                                     "node_type": "Name",
                                                                     "source_refs": [
@@ -2016,7 +2068,7 @@
                                                         ],
                                                         "func": {
                                                             "attr": {
-                                                                "id": 29,
+                                                                "id": 30,
                                                                 "name": "choose_r",
                                                                 "node_type": "Name",
                                                                 "source_refs": [
@@ -2105,7 +2157,7 @@
                                                         "node_type": "Assignment",
                                                         "right": {
                                                             "attr": {
-                                                                "id": 30,
+                                                                "id": 31,
                                                                 "name": "default_int",
                                                                 "node_type": "Name",
                                                                 "source_refs": [
@@ -2160,7 +2212,7 @@
                                                 ],
                                                 "func": {
                                                     "attr": {
-                                                        "id": 31,
+                                                        "id": 32,
                                                         "name": "array",
                                                         "node_type": "Name",
                                                         "source_refs": [
@@ -2217,7 +2269,7 @@
                                             }
                                         ],
                                         "func": {
-                                            "id": 12,
+                                            "id": 13,
                                             "name": "_set",
                                             "node_type": "Name",
                                             "source_refs": [
@@ -2272,7 +2324,7 @@
                                         ],
                                         "type": "Any",
                                         "val": {
-                                            "id": 25,
+                                            "id": 26,
                                             "name": "self",
                                             "node_type": "Name",
                                             "source_refs": [
@@ -2291,7 +2343,7 @@
                                     "right": {
                                         "arguments": [
                                             {
-                                                "id": 25,
+                                                "id": 26,
                                                 "name": "self",
                                                 "node_type": "Name",
                                                 "source_refs": [
@@ -2306,7 +2358,7 @@
                                                 ]
                                             },
                                             {
-                                                "node_type": "LiteralValue",
+                                                "node_type": "CASTLiteralValue",
                                                 "source_code_data_type": [
                                                     "Python",
                                                     "3.8",
@@ -2328,7 +2380,7 @@
                                             {
                                                 "arguments": [
                                                     {
-                                                        "id": 22,
+                                                        "id": 23,
                                                         "name": "n_new",
                                                         "node_type": "Name",
                                                         "source_refs": [
@@ -2376,7 +2428,7 @@
                                                         "node_type": "Assignment",
                                                         "right": {
                                                             "attr": {
-                                                                "id": 32,
+                                                                "id": 33,
                                                                 "name": "default_float",
                                                                 "node_type": "Name",
                                                                 "source_refs": [
@@ -2431,7 +2483,7 @@
                                                 ],
                                                 "func": {
                                                     "attr": {
-                                                        "id": 33,
+                                                        "id": 34,
                                                         "name": "ones",
                                                         "node_type": "Name",
                                                         "source_refs": [
@@ -2488,7 +2540,7 @@
                                             }
                                         ],
                                         "func": {
-                                            "id": 12,
+                                            "id": 13,
                                             "name": "_set",
                                             "node_type": "Name",
                                             "source_refs": [
@@ -2540,7 +2592,7 @@
                                         }
                                     ],
                                     "value": {
-                                        "node_type": "LiteralValue",
+                                        "node_type": "CASTLiteralValue",
                                         "source_code_data_type": [
                                             "Python",
                                             "3.8",
@@ -2577,7 +2629,7 @@
                                     ],
                                     "type": "float",
                                     "val": {
-                                        "id": 19,
+                                        "id": 20,
                                         "name": "self",
                                         "node_type": "Name",
                                         "source_refs": [
@@ -2607,7 +2659,7 @@
                                     ],
                                     "type": "float",
                                     "val": {
-                                        "id": 20,
+                                        "id": 21,
                                         "name": "people",
                                         "node_type": "Name",
                                         "source_refs": [
@@ -2624,7 +2676,7 @@
                                 }
                             ],
                             "name": {
-                                "id": 34,
+                                "id": 35,
                                 "name": "update",
                                 "node_type": "Name",
                                 "source_refs": [
@@ -2731,7 +2783,7 @@
                                 },
                                 "node_type": "Assignment",
                                 "right": {
-                                    "node_type": "LiteralValue",
+                                    "node_type": "CASTLiteralValue",
                                     "source_code_data_type": [
                                         "Python",
                                         "3.8",
@@ -2794,7 +2846,7 @@
                                 },
                                 "node_type": "Assignment",
                                 "right": {
-                                    "node_type": "LiteralValue",
+                                    "node_type": "CASTLiteralValue",
                                     "source_code_data_type": [
                                         "Python",
                                         "3.8",
@@ -2827,7 +2879,7 @@
                         ],
                         "func": {
                             "attr": {
-                                "id": 37,
+                                "id": 38,
                                 "name": "objdict",
                                 "node_type": "Name",
                                 "source_refs": [
@@ -2975,7 +3027,7 @@
                                 },
                                 "node_type": "Assignment",
                                 "right": {
-                                    "node_type": "LiteralValue",
+                                    "node_type": "CASTLiteralValue",
                                     "source_code_data_type": [
                                         "Python",
                                         "3.8",
@@ -3008,7 +3060,7 @@
                         ],
                         "func": {
                             "attr": {
-                                "id": 38,
+                                "id": 39,
                                 "name": "Sim",
                                 "node_type": "Name",
                                 "source_refs": [
@@ -3156,7 +3208,7 @@
                                 },
                                 "node_type": "Assignment",
                                 "right": {
-                                    "node_type": "LiteralValue",
+                                    "node_type": "CASTLiteralValue",
                                     "source_code_data_type": [
                                         "Python",
                                         "3.8",
@@ -3219,7 +3271,7 @@
                                 },
                                 "node_type": "Assignment",
                                 "right": {
-                                    "node_type": "LiteralValue",
+                                    "node_type": "CASTLiteralValue",
                                     "source_code_data_type": [
                                         "Python",
                                         "3.8",
@@ -3252,7 +3304,7 @@
                         ],
                         "func": {
                             "attr": {
-                                "id": 38,
+                                "id": 39,
                                 "name": "Sim",
                                 "node_type": "Name",
                                 "source_refs": [
@@ -3322,7 +3374,7 @@
                     "arguments": [],
                     "func": {
                         "attr": {
-                            "id": 39,
+                            "id": 40,
                             "name": "initialize",
                             "node_type": "Name",
                             "source_refs": [
@@ -3395,7 +3447,7 @@
                                 ],
                                 "type": "float",
                                 "val": {
-                                    "id": 36,
+                                    "id": 37,
                                     "name": "contact_data",
                                     "node_type": "Name",
                                     "source_refs": [
@@ -3420,7 +3472,7 @@
                                         "operands": [
                                             {
                                                 "attr": {
-                                                    "id": 21,
+                                                    "id": 22,
                                                     "name": "pop_size",
                                                     "node_type": "Name",
                                                     "source_refs": [
@@ -3462,7 +3514,7 @@
                                                 }
                                             },
                                             {
-                                                "node_type": "LiteralValue",
+                                                "node_type": "CASTLiteralValue",
                                                 "source_code_data_type": [
                                                     "Python",
                                                     "3.8",
@@ -3502,7 +3554,7 @@
                                         "operands": [
                                             {
                                                 "attr": {
-                                                    "id": 21,
+                                                    "id": 22,
                                                     "name": "pop_size",
                                                     "node_type": "Name",
                                                     "source_refs": [
@@ -3544,7 +3596,7 @@
                                                 }
                                             },
                                             {
-                                                "node_type": "LiteralValue",
+                                                "node_type": "CASTLiteralValue",
                                                 "source_code_data_type": [
                                                     "Python",
                                                     "3.8",
@@ -3616,7 +3668,7 @@
                                             "operands": [
                                                 {
                                                     "attr": {
-                                                        "id": 42,
+                                                        "id": 43,
                                                         "name": "n_days",
                                                         "node_type": "Name",
                                                         "source_refs": [
@@ -3658,7 +3710,7 @@
                                                     }
                                                 },
                                                 {
-                                                    "node_type": "LiteralValue",
+                                                    "node_type": "CASTLiteralValue",
                                                     "source_code_data_type": [
                                                         "Python",
                                                         "3.8",
@@ -3705,7 +3757,7 @@
                                 ],
                                 "func": {
                                     "attr": {
-                                        "id": 44,
+                                        "id": 45,
                                         "name": "randint",
                                         "node_type": "Name",
                                         "source_refs": [
@@ -3732,7 +3784,7 @@
                                     ],
                                     "value": {
                                         "attr": {
-                                            "id": 43,
+                                            "id": 44,
                                             "name": "random",
                                             "node_type": "Name",
                                             "source_refs": [
@@ -3816,7 +3868,7 @@
                                 "type": "Any",
                                 "val": {
                                     "attr": {
-                                        "id": 45,
+                                        "id": 46,
                                         "name": "contacts",
                                         "node_type": "Name",
                                         "source_refs": [
@@ -3843,7 +3895,7 @@
                                     ],
                                     "value": {
                                         "attr": {
-                                            "id": 20,
+                                            "id": 21,
                                             "name": "people",
                                             "node_type": "Name",
                                             "source_refs": [
@@ -3891,7 +3943,7 @@
                                 "arguments": [
                                     {
                                         "attr": {
-                                            "id": 45,
+                                            "id": 46,
                                             "name": "contacts",
                                             "node_type": "Name",
                                             "source_refs": [
@@ -3918,7 +3970,7 @@
                                         ],
                                         "value": {
                                             "attr": {
-                                                "id": 20,
+                                                "id": 21,
                                                 "name": "people",
                                                 "node_type": "Name",
                                                 "source_refs": [
@@ -3961,7 +4013,7 @@
                                         }
                                     },
                                     {
-                                        "id": 40,
+                                        "id": 41,
                                         "name": "key",
                                         "node_type": "Name",
                                         "source_refs": [
@@ -3981,7 +4033,7 @@
                                                 "arguments": [
                                                     {
                                                         "attr": {
-                                                            "id": 45,
+                                                            "id": 46,
                                                             "name": "contacts",
                                                             "node_type": "Name",
                                                             "source_refs": [
@@ -4008,7 +4060,7 @@
                                                         ],
                                                         "value": {
                                                             "attr": {
-                                                                "id": 20,
+                                                                "id": 21,
                                                                 "name": "people",
                                                                 "node_type": "Name",
                                                                 "source_refs": [
@@ -4051,7 +4103,7 @@
                                                         }
                                                     },
                                                     {
-                                                        "id": 40,
+                                                        "id": 41,
                                                         "name": "key",
                                                         "node_type": "Name",
                                                         "source_refs": [
@@ -4067,7 +4119,7 @@
                                                     }
                                                 ],
                                                 "func": {
-                                                    "id": 27,
+                                                    "id": 28,
                                                     "name": "_get",
                                                     "node_type": "Name",
                                                     "source_refs": [
@@ -4128,7 +4180,7 @@
                                                 },
                                                 "node_type": "Assignment",
                                                 "right": {
-                                                    "id": 36,
+                                                    "id": 37,
                                                     "name": "contact_data",
                                                     "node_type": "Name",
                                                     "source_refs": [
@@ -4155,7 +4207,7 @@
                                             }
                                         ],
                                         "func": {
-                                            "id": 46,
+                                            "id": 47,
                                             "name": "CustomLayer",
                                             "node_type": "Name",
                                             "source_refs": [
@@ -4185,7 +4237,7 @@
                                     }
                                 ],
                                 "func": {
-                                    "id": 12,
+                                    "id": 13,
                                     "name": "_set",
                                     "node_type": "Name",
                                     "source_refs": [
@@ -4226,7 +4278,7 @@
                         },
                         {
                             "left": {
-                                "node_type": "LiteralValue",
+                                "node_type": "CASTLiteralValue",
                                 "source_code_data_type": [
                                     "Python",
                                     "3.8",
@@ -4258,7 +4310,7 @@
                                         ],
                                         "type": "float",
                                         "val": {
-                                            "id": 40,
+                                            "id": 41,
                                             "name": "key",
                                             "node_type": "Name",
                                             "source_refs": [
@@ -4288,7 +4340,7 @@
                                         ],
                                         "type": "iterator",
                                         "val": {
-                                            "id": 47,
+                                            "id": 48,
                                             "name": "generated_iter_2",
                                             "node_type": "Name",
                                             "source_refs": [
@@ -4318,7 +4370,7 @@
                                         ],
                                         "type": "boolean",
                                         "val": {
-                                            "id": 48,
+                                            "id": 49,
                                             "name": "sc_3",
                                             "node_type": "Name",
                                             "source_refs": [
@@ -4354,7 +4406,7 @@
                                         ],
                                         "type": "iterator",
                                         "val": {
-                                            "id": 47,
+                                            "id": 48,
                                             "name": "generated_iter_2",
                                             "node_type": "Name",
                                             "source_refs": [
@@ -4371,7 +4423,7 @@
                                     }
                                 ],
                                 "func": {
-                                    "id": 15,
+                                    "id": 16,
                                     "name": "next",
                                     "node_type": "Name",
                                     "source_refs": [
@@ -4431,7 +4483,7 @@
                                 ],
                                 "type": "boolean",
                                 "val": {
-                                    "id": 48,
+                                    "id": 49,
                                     "name": "sc_3",
                                     "node_type": "Name",
                                     "source_refs": [
@@ -4447,7 +4499,7 @@
                                 }
                             },
                             {
-                                "node_type": "LiteralValue",
+                                "node_type": "CASTLiteralValue",
                                 "source_code_data_type": [
                                     "Python",
                                     "3.8",
@@ -4499,7 +4551,7 @@
                                 ],
                                 "type": "iterator",
                                 "val": {
-                                    "id": 47,
+                                    "id": 48,
                                     "name": "generated_iter_2",
                                     "node_type": "Name",
                                     "source_refs": [
@@ -4521,7 +4573,7 @@
                                         "arguments": [],
                                         "func": {
                                             "attr": {
-                                                "id": 41,
+                                                "id": 42,
                                                 "name": "layer_keys",
                                                 "node_type": "Name",
                                                 "source_refs": [
@@ -4578,7 +4630,7 @@
                                     }
                                 ],
                                 "func": {
-                                    "id": 14,
+                                    "id": 15,
                                     "name": "iter",
                                     "node_type": "Name",
                                     "source_refs": [
@@ -4619,7 +4671,7 @@
                         },
                         {
                             "left": {
-                                "node_type": "LiteralValue",
+                                "node_type": "CASTLiteralValue",
                                 "source_code_data_type": [
                                     "Python",
                                     "3.8",
@@ -4651,7 +4703,7 @@
                                         ],
                                         "type": "float",
                                         "val": {
-                                            "id": 40,
+                                            "id": 41,
                                             "name": "key",
                                             "node_type": "Name",
                                             "source_refs": [
@@ -4681,7 +4733,7 @@
                                         ],
                                         "type": "iterator",
                                         "val": {
-                                            "id": 47,
+                                            "id": 48,
                                             "name": "generated_iter_2",
                                             "node_type": "Name",
                                             "source_refs": [
@@ -4711,7 +4763,7 @@
                                         ],
                                         "type": "boolean",
                                         "val": {
-                                            "id": 48,
+                                            "id": 49,
                                             "name": "sc_3",
                                             "node_type": "Name",
                                             "source_refs": [
@@ -4747,7 +4799,7 @@
                                         ],
                                         "type": "iterator",
                                         "val": {
-                                            "id": 47,
+                                            "id": 48,
                                             "name": "generated_iter_2",
                                             "node_type": "Name",
                                             "source_refs": [
@@ -4764,7 +4816,7 @@
                                     }
                                 ],
                                 "func": {
-                                    "id": 15,
+                                    "id": 16,
                                     "name": "next",
                                     "node_type": "Name",
                                     "source_refs": [
@@ -4833,7 +4885,7 @@
                                 ],
                                 "type": "float",
                                 "val": {
-                                    "id": 50,
+                                    "id": 51,
                                     "name": "msim",
                                     "node_type": "Name",
                                     "source_refs": [
@@ -4884,7 +4936,7 @@
                                 ],
                                 "func": {
                                     "attr": {
-                                        "id": 51,
+                                        "id": 52,
                                         "name": "parallel",
                                         "node_type": "Name",
                                         "source_refs": [
@@ -4954,7 +5006,7 @@
                             "arguments": [],
                             "func": {
                                 "attr": {
-                                    "id": 52,
+                                    "id": 53,
                                     "name": "plot",
                                     "node_type": "Name",
                                     "source_refs": [
@@ -4980,7 +5032,7 @@
                                     }
                                 ],
                                 "value": {
-                                    "id": 50,
+                                    "id": 51,
                                     "name": "msim",
                                     "node_type": "Name",
                                     "source_refs": [
@@ -5016,7 +5068,7 @@
                         "op": "ast.Eq",
                         "operands": [
                             {
-                                "id": 49,
+                                "id": 50,
                                 "name": "__name__",
                                 "node_type": "Name",
                                 "source_refs": [
@@ -5031,7 +5083,7 @@
                                 ]
                             },
                             {
-                                "node_type": "LiteralValue",
+                                "node_type": "CASTLiteralValue",
                                 "source_code_data_type": [
                                     "Python",
                                     "3.8",

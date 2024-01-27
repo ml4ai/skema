@@ -3,23 +3,6 @@
         {
             "body": [
                 {
-                    "alias": null,
-                    "all": false,
-                    "name": "__future__",
-                    "node_type": "ModelImport",
-                    "source_refs": [
-                        {
-                            "col_end": 31,
-                            "col_start": 0,
-                            "node_type": "SourceRef",
-                            "row_end": 1,
-                            "row_start": 1,
-                            "source_file_name": "energy_budget"
-                        }
-                    ],
-                    "symbol": "division"
-                },
-                {
                     "alias": "np",
                     "all": false,
                     "name": "numpy",
@@ -304,7 +287,7 @@
                                     },
                                     "node_type": "Assignment",
                                     "right": {
-                                        "node_type": "LiteralValue",
+                                        "node_type": "CASTLiteralValue",
                                         "source_code_data_type": [
                                             "Python",
                                             "3.8",
@@ -380,7 +363,7 @@
                                     },
                                     "node_type": "Assignment",
                                     "right": {
-                                        "node_type": "LiteralValue",
+                                        "node_type": "CASTLiteralValue",
                                         "source_code_data_type": [
                                             "Python",
                                             "3.8",
@@ -720,7 +703,7 @@
                                                                 ]
                                                             },
                                                             {
-                                                                "node_type": "LiteralValue",
+                                                                "node_type": "CASTLiteralValue",
                                                                 "source_code_data_type": [
                                                                     "Python",
                                                                     "3.8",
@@ -796,7 +779,7 @@
                                         },
                                         {
                                             "left": {
-                                                "node_type": "LiteralValue",
+                                                "node_type": "CASTLiteralValue",
                                                 "source_code_data_type": [
                                                     "Python",
                                                     "3.8",
@@ -1017,7 +1000,7 @@
                                                 }
                                             },
                                             {
-                                                "node_type": "LiteralValue",
+                                                "node_type": "CASTLiteralValue",
                                                 "source_code_data_type": [
                                                     "Python",
                                                     "3.8",
@@ -1177,7 +1160,7 @@
                                                                 ]
                                                             },
                                                             {
-                                                                "node_type": "LiteralValue",
+                                                                "node_type": "CASTLiteralValue",
                                                                 "source_code_data_type": [
                                                                     "Python",
                                                                     "3.8",
@@ -1269,7 +1252,7 @@
                                         },
                                         {
                                             "left": {
-                                                "node_type": "LiteralValue",
+                                                "node_type": "CASTLiteralValue",
                                                 "source_code_data_type": [
                                                     "Python",
                                                     "3.8",
@@ -1619,7 +1602,7 @@
                                     },
                                     "node_type": "Assignment",
                                     "right": {
-                                        "node_type": "LiteralValue",
+                                        "node_type": "CASTLiteralValue",
                                         "source_code_data_type": [
                                             "Python",
                                             "3.8",
@@ -1996,7 +1979,7 @@
                                         },
                                         {
                                             "left": {
-                                                "node_type": "LiteralValue",
+                                                "node_type": "CASTLiteralValue",
                                                 "source_code_data_type": [
                                                     "Python",
                                                     "3.8",
@@ -2014,7 +1997,7 @@
                                                 ],
                                                 "value": [
                                                     {
-                                                        "node_type": "LiteralValue",
+                                                        "node_type": "CASTLiteralValue",
                                                         "source_code_data_type": [
                                                             "Python",
                                                             "3.8",
@@ -2268,7 +2251,7 @@
                                                 }
                                             },
                                             {
-                                                "node_type": "LiteralValue",
+                                                "node_type": "CASTLiteralValue",
                                                 "source_code_data_type": [
                                                     "Python",
                                                     "3.8",
@@ -2339,16 +2322,87 @@
                                             "right": {
                                                 "arguments": [
                                                     {
-                                                        "arguments": [],
-                                                        "func": {
-                                                            "attr": {
-                                                                "id": 32,
-                                                                "name": "items",
-                                                                "node_type": "Name",
+                                                        "arguments": [
+                                                            {
+                                                                "arguments": [],
+                                                                "func": {
+                                                                    "attr": {
+                                                                        "id": 32,
+                                                                        "name": "items",
+                                                                        "node_type": "Name",
+                                                                        "source_refs": [
+                                                                            {
+                                                                                "col_end": 51,
+                                                                                "col_start": 35,
+                                                                                "node_type": "SourceRef",
+                                                                                "row_end": 62,
+                                                                                "row_start": 62,
+                                                                                "source_file_name": "energy_budget"
+                                                                            }
+                                                                        ]
+                                                                    },
+                                                                    "node_type": "Attribute",
+                                                                    "source_refs": [
+                                                                        {
+                                                                            "col_end": 51,
+                                                                            "col_start": 35,
+                                                                            "node_type": "SourceRef",
+                                                                            "row_end": 62,
+                                                                            "row_start": 62,
+                                                                            "source_file_name": "energy_budget"
+                                                                        }
+                                                                    ],
+                                                                    "value": {
+                                                                        "attr": {
+                                                                            "id": 15,
+                                                                            "name": "state",
+                                                                            "node_type": "Name",
+                                                                            "source_refs": [
+                                                                                {
+                                                                                    "col_end": 45,
+                                                                                    "col_start": 35,
+                                                                                    "node_type": "SourceRef",
+                                                                                    "row_end": 62,
+                                                                                    "row_start": 62,
+                                                                                    "source_file_name": "energy_budget"
+                                                                                }
+                                                                            ]
+                                                                        },
+                                                                        "node_type": "Attribute",
+                                                                        "source_refs": [
+                                                                            {
+                                                                                "col_end": 45,
+                                                                                "col_start": 35,
+                                                                                "node_type": "SourceRef",
+                                                                                "row_end": 62,
+                                                                                "row_start": 62,
+                                                                                "source_file_name": "energy_budget"
+                                                                            }
+                                                                        ],
+                                                                        "value": {
+                                                                            "id": 27,
+                                                                            "name": "self",
+                                                                            "node_type": "Name",
+                                                                            "source_refs": [
+                                                                                {
+                                                                                    "col_end": 39,
+                                                                                    "col_start": 35,
+                                                                                    "node_type": "SourceRef",
+                                                                                    "row_end": 62,
+                                                                                    "row_start": 62,
+                                                                                    "source_file_name": "energy_budget"
+                                                                                }
+                                                                            ]
+                                                                        }
+                                                                    }
+                                                                },
+                                                                "node_type": "Call",
+                                                                "source_language": null,
+                                                                "source_language_version": null,
                                                                 "source_refs": [
                                                                     {
-                                                                        "col_end": 46,
-                                                                        "col_start": 30,
+                                                                        "col_end": 53,
+                                                                        "col_start": 35,
                                                                         "node_type": "SourceRef",
                                                                         "row_end": 62,
                                                                         "row_start": 62,
@@ -2356,37 +2410,16 @@
                                                                     }
                                                                 ]
                                                             },
-                                                            "node_type": "Attribute",
-                                                            "source_refs": [
-                                                                {
-                                                                    "col_end": 46,
-                                                                    "col_start": 30,
-                                                                    "node_type": "SourceRef",
-                                                                    "row_end": 62,
-                                                                    "row_start": 62,
-                                                                    "source_file_name": "energy_budget"
-                                                                }
-                                                            ],
-                                                            "value": {
-                                                                "attr": {
-                                                                    "id": 15,
-                                                                    "name": "state",
-                                                                    "node_type": "Name",
-                                                                    "source_refs": [
-                                                                        {
-                                                                            "col_end": 40,
-                                                                            "col_start": 30,
-                                                                            "node_type": "SourceRef",
-                                                                            "row_end": 62,
-                                                                            "row_start": 62,
-                                                                            "source_file_name": "energy_budget"
-                                                                        }
-                                                                    ]
-                                                                },
-                                                                "node_type": "Attribute",
+                                                            {
+                                                                "node_type": "CASTLiteralValue",
+                                                                "source_code_data_type": [
+                                                                    "Python",
+                                                                    "3.8",
+                                                                    "List"
+                                                                ],
                                                                 "source_refs": [
                                                                     {
-                                                                        "col_end": 40,
+                                                                        "col_end": 54,
                                                                         "col_start": 30,
                                                                         "node_type": "SourceRef",
                                                                         "row_end": 62,
@@ -2394,29 +2427,31 @@
                                                                         "source_file_name": "energy_budget"
                                                                     }
                                                                 ],
-                                                                "value": {
-                                                                    "id": 27,
-                                                                    "name": "self",
-                                                                    "node_type": "Name",
-                                                                    "source_refs": [
-                                                                        {
-                                                                            "col_end": 34,
-                                                                            "col_start": 30,
-                                                                            "node_type": "SourceRef",
-                                                                            "row_end": 62,
-                                                                            "row_start": 62,
-                                                                            "source_file_name": "energy_budget"
-                                                                        }
-                                                                    ]
-                                                                }
+                                                                "value": "list",
+                                                                "value_type": "List"
                                                             }
+                                                        ],
+                                                        "func": {
+                                                            "id": 17,
+                                                            "name": "cast",
+                                                            "node_type": "Name",
+                                                            "source_refs": [
+                                                                {
+                                                                    "col_end": 54,
+                                                                    "col_start": 30,
+                                                                    "node_type": "SourceRef",
+                                                                    "row_end": 62,
+                                                                    "row_start": 62,
+                                                                    "source_file_name": "energy_budget"
+                                                                }
+                                                            ]
                                                         },
                                                         "node_type": "Call",
                                                         "source_language": null,
                                                         "source_language_version": null,
                                                         "source_refs": [
                                                             {
-                                                                "col_end": 48,
+                                                                "col_end": 54,
                                                                 "col_start": 30,
                                                                 "node_type": "SourceRef",
                                                                 "row_end": 62,
@@ -2468,7 +2503,7 @@
                                         },
                                         {
                                             "left": {
-                                                "node_type": "LiteralValue",
+                                                "node_type": "CASTLiteralValue",
                                                 "source_code_data_type": [
                                                     "Python",
                                                     "3.8",
@@ -2486,7 +2521,7 @@
                                                 ],
                                                 "value": [
                                                     {
-                                                        "node_type": "LiteralValue",
+                                                        "node_type": "CASTLiteralValue",
                                                         "source_code_data_type": [
                                                             "Python",
                                                             "3.8",
@@ -3371,7 +3406,7 @@
                                                                 ]
                                                             },
                                                             {
-                                                                "node_type": "LiteralValue",
+                                                                "node_type": "CASTLiteralValue",
                                                                 "source_code_data_type": [
                                                                     "Python",
                                                                     "3.8",
@@ -3447,7 +3482,7 @@
                                         },
                                         {
                                             "left": {
-                                                "node_type": "LiteralValue",
+                                                "node_type": "CASTLiteralValue",
                                                 "source_code_data_type": [
                                                     "Python",
                                                     "3.8",
@@ -3668,7 +3703,7 @@
                                                 }
                                             },
                                             {
-                                                "node_type": "LiteralValue",
+                                                "node_type": "CASTLiteralValue",
                                                 "source_code_data_type": [
                                                     "Python",
                                                     "3.8",
@@ -3828,7 +3863,7 @@
                                                                 ]
                                                             },
                                                             {
-                                                                "node_type": "LiteralValue",
+                                                                "node_type": "CASTLiteralValue",
                                                                 "source_code_data_type": [
                                                                     "Python",
                                                                     "3.8",
@@ -3920,7 +3955,7 @@
                                         },
                                         {
                                             "left": {
-                                                "node_type": "LiteralValue",
+                                                "node_type": "CASTLiteralValue",
                                                 "source_code_data_type": [
                                                     "Python",
                                                     "3.8",
@@ -4209,7 +4244,7 @@
                         {
                             "body": [
                                 {
-                                    "node_type": "LiteralValue",
+                                    "node_type": "CASTLiteralValue",
                                     "source_code_data_type": [
                                         "Python",
                                         "3.8",
