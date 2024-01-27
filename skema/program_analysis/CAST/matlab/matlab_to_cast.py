@@ -10,7 +10,7 @@ from skema.program_analysis.CAST2FN.model.cast import (
     Attribute,
     Call,
     FunctionDef,
-    LiteralValue,
+    CASTLiteralValue,
     Loop,
     ModelBreak,
     ModelContinue,
@@ -162,7 +162,7 @@ class MatlabToCast(object):
             value = child.type
             value = value[0].upper() + value[1:].lower()
             # store as string, use Python Boolean capitalization.
-            return LiteralValue(
+            return CASTLiteralValue(
                 value_type=value_type,
                 value = value,
                 source_code_data_type=["matlab", MATLAB_VERSION, value_type],
@@ -396,7 +396,7 @@ class MatlabToCast(object):
             value = values[0]
 
         value_type="List",
-        return LiteralValue(
+        return CASTLiteralValue(
             value_type=value_type,
             value = value,
             source_code_data_type=["matlab", MATLAB_VERSION, value_type],
@@ -434,20 +434,20 @@ class MatlabToCast(object):
             identifier, "Unknown", [self.node_helper.get_source_ref(node)]
         )
 
-    def visit_number(self, node) -> LiteralValue:
+    def visit_number(self, node) -> CASTLiteralValue:
         """Visitor for numbers """
         literal_value = self.node_helper.get_identifier(node)
         # Check if this is a real value, or an Integer
         if "e" in literal_value.lower() or "." in literal_value:
             value_type = "AbstractFloat"
-            return LiteralValue(
+            return CASTLiteralValue(
                 value_type=value_type,
                 value=float(literal_value),
                 source_code_data_type=["matlab", MATLAB_VERSION, value_type],
                 source_refs=[self.node_helper.get_source_ref(node)]
             )
         value_type = "Integer"
-        return LiteralValue(
+        return CASTLiteralValue(
             value_type=value_type,
             value=int(literal_value),
             source_code_data_type=["matlab", MATLAB_VERSION, value_type],
@@ -470,7 +470,7 @@ class MatlabToCast(object):
 
     def visit_string(self, node):
         value_type = "Character"
-        return LiteralValue(
+        return CASTLiteralValue(
             value_type=value_type,
             value=self.node_helper.get_identifier(node),
             source_code_data_type=["matlab", MATLAB_VERSION, value_type],
@@ -496,7 +496,7 @@ class MatlabToCast(object):
             # multiple case arguments
             if (cell_node):
                 value_type="List",
-                operand = LiteralValue(
+                operand = CASTLiteralValue(
                     value_type=value_type,
                     value = self.visit(cell_node),
                     source_code_data_type=["matlab", MATLAB_VERSION, value_type],

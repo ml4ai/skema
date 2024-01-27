@@ -10,7 +10,7 @@ from skema.program_analysis.CAST2FN.model.cast import (
     Module,
     SourceRef,
     Assignment,
-    LiteralValue,
+    CASTLiteralValue,
     Var,
     VarType,
     Name,
@@ -239,7 +239,7 @@ class TS2CAST(object):
                 func_args.append(cast)
 
         if func_name.val.name == "range":
-            start_step_value = LiteralValue(
+            start_step_value = CASTLiteralValue(
                 ScalarType.INTEGER, 
                 value="1",
                 source_code_data_type=["Python", PYTHON_VERSION, str(type(1))],
@@ -409,7 +409,7 @@ class TS2CAST(object):
             elif isinstance(cast, AstNode):
                 pattern_cast.append(cast)
 
-        return LiteralValue(value_type=StructureType.TUPLE, value=pattern_cast) 
+        return CASTLiteralValue(value_type=StructureType.TUPLE, value=pattern_cast) 
 
     def visit_identifier(self, node: Node) -> Var:
         identifier = self.node_helper.get_identifier(node)
@@ -437,21 +437,21 @@ class TS2CAST(object):
         literal_source_ref = self.node_helper.get_source_ref(node)
 
         if literal_type == "integer":
-            return LiteralValue(
+            return CASTLiteralValue(
                 value_type=ScalarType.INTEGER,
                 value=literal_value,
                 source_code_data_type=["Python", PYTHON_VERSION, str(type(1))],
                 source_refs=[literal_source_ref]
             )
         elif literal_type == "float":
-            return LiteralValue(
+            return CASTLiteralValue(
                 value_type=ScalarType.ABSTRACTFLOAT,
                 value=literal_value,
                 source_code_data_type=["Python", PYTHON_VERSION, str(type(1.0))],
                 source_refs=[literal_source_ref]
             )
         elif literal_type == "true" or literal_type == "false":
-            return LiteralValue(
+            return CASTLiteralValue(
                 value_type=ScalarType.BOOLEAN,
                 value="True" if literal_type == "true" else "False",
                 source_code_data_type=["Python", PYTHON_VERSION, str(type(True))],
@@ -466,7 +466,7 @@ class TS2CAST(object):
                 elif isinstance(cast, AstNode):
                     list_items.append(cast)
 
-            return LiteralValue(
+            return CASTLiteralValue(
                 value_type=StructureType.LIST,
                 value = list_items,
                 source_code_data_type=["Python", PYTHON_VERSION, str(type([0]))],
@@ -481,7 +481,7 @@ class TS2CAST(object):
                 elif isinstance(cast, AstNode):
                     tuple_items.append(cast)
 
-            return LiteralValue(
+            return CASTLiteralValue(
                 value_type=StructureType.LIST,
                 value = tuple_items,
                 source_code_data_type=["Python", PYTHON_VERSION, str(type((0)))],
@@ -552,7 +552,7 @@ class TS2CAST(object):
 
         loop_pre.append(
             Assignment(
-                left=LiteralValue(
+                left=CASTLiteralValue(
                     "Tuple",
                     [
                         loop_cond_left_cast,
@@ -577,7 +577,7 @@ class TS2CAST(object):
             op="ast.Eq", 
             operands=[
                 stop_cond_name,
-                LiteralValue(
+                CASTLiteralValue(
                     ScalarType.BOOLEAN,
                     False,
                     ["Python", PYTHON_VERSION, "boolean"],
@@ -600,7 +600,7 @@ class TS2CAST(object):
         # to facilitate looping in GroMEt 
         loop_body.append(
             Assignment(
-                left=LiteralValue(
+                left=CASTLiteralValue(
                     "Tuple",
                     [
                         loop_cond_left_cast,
