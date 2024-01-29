@@ -202,9 +202,9 @@ def test_gromet_object_count():
     assert response.status_code == 200
     gromet_object_count = response.json()
     assert sum([value for key, value in gromet_object_count.items()]) > 0
-    assert gromet_object_count["boxes"] == 7
-    assert gromet_object_count["wires"] == 4
-    assert gromet_object_count["ports"] == 9
+    assert gromet_object_count["boxes"] == 16
+    assert gromet_object_count["wires"] == 6
+    assert gromet_object_count["ports"] == 14
 
 
 # TODO: Add more complex test case to test_get_pyacset
