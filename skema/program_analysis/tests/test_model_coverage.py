@@ -20,7 +20,7 @@ ALL_MODELS = {
     "Climlab-v1": [4306, 4306], 
     "Generated-Halfar": [128, 128], 
     "SV2AIR3-Waterloo-MATLAB": [0, 1020], 
-    "Bucky": [7503, 7537], 
+    "Bucky": [7537, 7537], 
     "ABM-REINA": [2622, 7078], 
     "Cornell-COVID19-sim-Frazier": [7250, 8725], 
     "ABM-Covasim": [14734, 31042], 
