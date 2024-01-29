@@ -47,6 +47,14 @@ pub struct SummationMath {
     pub func: Box<MathExpression>,
 }
 
+/// Integral operation
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
+pub struct Integral {
+    pub op: Box<MathExpression>,
+    pub integrand: Box<MathExpression>,
+    pub integration_variable: Box<MathExpression>,
+}
+
 /// Hat operation
 #[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
 pub struct HatComp {
@@ -84,6 +92,7 @@ pub enum MathExpression {
     AbsoluteSup(Box<MathExpression>, Box<MathExpression>),
     Absolute(Box<MathExpression>, Box<MathExpression>),
     HatComp(HatComp),
+    Integral(Integral),
     //Differential(Box<MathExpression>, Box<MathExpression>),
     #[default]
     None,
@@ -133,6 +142,11 @@ impl fmt::Display for MathExpression {
             MathExpression::HatComp(HatComp { op, comp }) => {
                 write!(f, "{op}")?;
                 write!(f, "{comp}")
+            }
+            MathExpression::Integral(Integral { op, integrand, integration_variable }) => {
+                write!(f, "{op}")?;
+                write!(f, "{integrand}")?;
+                write!(f, "{integration_variable}")
             }
             expression => write!(f, "{expression:?}"),
         }

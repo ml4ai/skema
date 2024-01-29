@@ -3,7 +3,7 @@
 
 use crate::{
     ast::{
-        operator::{Derivative, GradSub, HatOp, Operator, PartialDerivative, SumUnderOver},
+        operator::{Derivative, GradSub, HatOp, MsubsupInt, Operator, PartialDerivative, SumUnderOver},
         Math, MathExpression, Mi, Mrow,
     },
     parsers::interpreted_mathml::interpreted_math,
@@ -786,7 +786,16 @@ impl MathExpression {
             }
             /// Insert implicit `exponential` and `power` operators
             MathExpression::Msup(base, superscript) => {
-                if let MathExpression::Ci(x) = &**base {
+                println!("=========");
+                if let MathExpression::Mo(Operator::DownArrow) = &**superscript{
+                    println!("=------");
+                    //tokens.push(MathExpression::Mo(Operator::Lparen));
+                    base.flatten(tokens);
+                    //tokens.push(MathExpression::Mo(Operator::Rparen));
+                    tokens.push(MathExpression::Mo(Operator::DownArrow));
+
+                }
+                else if let MathExpression::Ci(x) = &**base {
                     if x.content == Box::new(MathExpression::Mi(Mi("e".to_string()))) {
                         tokens.push(MathExpression::Mo(Operator::Exp));
                         tokens.push(MathExpression::Mo(Operator::Lparen));
@@ -1061,6 +1070,7 @@ fn prefix_binding_power(op: &Operator) -> ((), u8) {
         Operator::Hat => ((), 25),
         //Operator::Cross => ((), 25),
         Operator::Grad => ((), 25),
+        Operator::Int => ((), 25),
         Operator::GradSub(GradSub { .. }) => ((), 25),
         Operator::Derivative(Derivative { .. }) => ((), 25),
         Operator::PartialDerivative(PartialDerivative { .. }) => ((), 25),
@@ -1069,6 +1079,7 @@ fn prefix_binding_power(op: &Operator) -> ((), u8) {
         Operator::Sqrt => ((), 25),
         Operator::SumUnderOver(SumUnderOver { .. }) => ((), 25),
         Operator::HatOp(HatOp { .. }) => ((), 25),
+        Operator::MsubsupInt(MsubsupInt { ..}) => ((), 25),
         _ => panic!("Bad operator: {:?}", op),
     }
 }
@@ -1077,6 +1088,7 @@ fn prefix_binding_power(op: &Operator) -> ((), u8) {
 fn postfix_binding_power(op: &Operator) -> Option<(u8, ())> {
     let res = match op {
         Operator::Factorial => (11, ()),
+        Operator::DownArrow => (11, ()),
         //Operator::HatOp(HatOp { .. }) => (11, ()),
         _ => return None,
     };
@@ -2756,3 +2768,102 @@ fn test_momentum_conservation() {
     let s_exp = exp.to_string();
     assert_eq!(s_exp, "(= (PD(1, t) u) (+ (- (- (- (* (- (⋅ v Grad)) u) (× f u)) (Grad_h) (+ p (* g η)))) (Div τ)) F_{u}))");
 }
+
+#[test]
+fn test_down_arrow() {
+    let input = "<math>
+    <msup>
+        <mi>I</mi>
+          <mo>&#x2193;</mo>
+      </msup>
+    </math>";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", exp);
+    let s_exp = exp.to_string();
+    println!("s_exp={:?}", s_exp);
+    assert_eq!(s_exp, "(↓ I)");
+}
+
+#[test]
+fn test_integral1() {
+    let input = "<math>
+    <msubsup>
+        <mo>&#x222b;</mo>
+        <mrow>
+          <msub>
+            <mi>λ</mi>
+            <mn>1</mn>
+          </msub>
+        </mrow>
+        <mrow>
+          <msub>
+            <mi>λ</mi>
+            <mn>2</mn>
+          </msub>
+        </mrow>
+      </msubsup>
+    <mi>x</mi>
+    <mi>d</mi>
+    <mi>x</mi>
+    </math>";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", exp);
+    let s_exp = exp.to_string();
+    println!("s_exp={:?}", s_exp);
+    //assert_eq!(s_exp, "Int_{λ_{1}}^{λ_{2}}");
+}
+
+
+
+#[test]
+fn test_integral2() {
+    let input = "<math>
+    <mrow>
+      <msubsup>
+        <mo>&#x222b;</mo>
+        <mrow>
+          <msub>
+            <mi>λ</mi>
+            <mn>1</mn>
+          </msub>
+        </mrow>
+        <mrow>
+          <msub>
+            <mi>λ</mi>
+            <mn>2</mn>
+          </msub>
+        </mrow>
+      </msubsup>
+      <mi>ω</mi>
+      <mo >(</mo>
+      <mi>λ</mi>
+      <mo>)</mo>
+      <msup>
+        <mi>I</mi>
+        <mrow>
+          <mo>↓</mo>
+        </mrow>
+      </msup>
+      <mo>(</mo>
+      <mi>λ</mi>
+      <mo>)</mo>
+      <msub>
+        <mi>α</mi>
+        <mrow>
+          <mtext>sno </mtext>
+        </mrow>
+      </msub>
+      <mo>(</mo>
+      <mi>λ</mi>
+      <mo>)</mo>
+        <mi>d</mi>
+      <mi>λ</mi>
+    </mrow>
+    </math>";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", exp);
+    let s_exp = exp.to_string();
+    println!("s_exp={:?}", s_exp);
+    //assert_eq!(s_exp, "Int_{λ_{1}}^{λ_{2}}");
+}
+

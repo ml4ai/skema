@@ -6,11 +6,11 @@
 
 use crate::{
     ast::{
-        operator::{Derivative, GradSub, HatOp, Operator, PartialDerivative, SumUnderOver},
-        Ci, Differential, HatComp, Math, MathExpression, Mi, Mrow, SummationMath, Type,
+        operator::{Derivative, GradSub, HatOp, Operator, PartialDerivative, SumUnderOver, MsubsupInt},
+        Ci, Differential, HatComp, Integral, Math, MathExpression, Mi, Mrow, SummationMath, Type,
     },
     parsers::generic_mathml::{
-        add, attribute, cross, divide, dot, elem_many0, equals, etag, grad, hat, lparen, mean, mi,
+        add, attribute, cross, divide, dot, elem_many0, equals, etag, grad, hat, down_arrow, lparen, mean, int, mi,
         mn, msub, msubsup, mtext, multiply, rparen, stag, subtract, tag_parser, ws,
         xml_declaration, IResult, ParseError, Span,
     },
@@ -31,7 +31,7 @@ pub fn operator(input: Span) -> IResult<Operator> {
     let (s, op) = ws(delimited(
         stag!("mo"),
         alt((
-            add, subtract, multiply, divide, equals, lparen, rparen, mean, dot, cross, hat,
+            add, subtract, multiply, divide, equals, lparen, rparen, mean, dot, cross, hat, down_arrow, int,
         )),
         etag!("mo"),
     ))(input)?;
@@ -821,10 +821,135 @@ pub fn munderover_summation(input: Span) -> IResult<(SumUnderOver, Mrow)> {
     Ok((s, (operator, other_comps)))
 }
 
+/// Parser for msubsup_int
+pub fn msub_sup_int(input: Span) -> IResult<Operator> {
+    println!("----");
+    let (s, (sub, sup)) = ws(delimited(
+        tag("<mrow><msubsup><mo>&#x222b;</mo>"),
+        pair(
+            ws(delimited(
+                tag("<mrow>"),
+                math_expression,
+                tag("</mrow>"),
+            )),
+            math_expression,
+        ),
+        tag("</msubsup>"),
+    ))(input)?;
+    /*let (s, (_int, (sub, (sup, _)))) = ws(pair(
+        alt((tag("<mrow><msubsup><mo>&#x222b;</mo>"), tag("<msubsup><mo>&#x222b;</mo>"))),
+        pair(
+           ws(math_expression),
+            pair(
+                ws(math_expression),
+                alt((tag("</msubsup></mrow>"), tag("</msubsup>"))),
+            ),
+        ),
+    ))(input)?;
+    let (s, _) = ws(
+        alt((tag("<mrow><msubsup><mo>&#x222b;</mo>"), tag("<msubsup><mo>&#x222b;</mo>"))),
+    )(input)?;*/
+    println!("--");
+    /*let (s, ( sub, sup)) = ws(terminated(pair(
+        ws(alt((
+            delimited(
+                tag("<mrow>"),
+                math_expression,
+                tag("</mrow>"),
+            ),
+            math_expression))),
+        ws(alt((
+            delimited(
+                tag("<mrow>"),
+                math_expression,
+                tag("</mrow>"),
+            ),
+            math_expression)))
+    ), alt((tag("</msubsup></mrow>"), tag("</msubsup>"))),
+    ))(s)?;*/
+    /*let (s, ( sub, sup)) = ws(delimited(
+        alt((tag("<mrow><msubsup><mo>&#x222b;</mo>"), tag("<msubsup><mo>&#x222b;</mo>"))),
+        pair(
+            ws(alt((
+                delimited(
+                    tag("<mrow>"),
+                    math_expression,
+                    tag("</mrow>"),
+                ),
+                math_expression))),
+            ws(alt((
+                delimited(
+                    tag("<mrow>"),
+                    math_expression,
+                    tag("</mrow>"),
+                ),
+                math_expression)))
+        ),
+        alt((tag("</msubsup></mrow>"), tag("</msubsup>"))),
+    ))(input)?;*/
+    println!("----");
+    println!("sub={:?}",sub);
+    println!("sup={:?}",sup);
+    println!("===");
+    let operator = MsubsupInt::new(
+        Box::new(sub),
+        Box::new(sup),
+    );
+    println!("....");
+    let op = Operator::MsubsupInt(operator);
+    println!("op={:?}",op);
+    Ok((s, op))
+}
+
+/// Parser for integral
+pub fn integral(input: Span) -> IResult<(Operator, Mrow, MathExpression)> {
+    println!("+");
+    //let (s, op) = ws(alt((tag("<mrow><msubsup><mo>&#x222b;</mo>"),tag("<msubsup><mo>&#x222b;</mo>"),
+         //                 )))(input)?;
+    let (s, (sub, sup)) = ws(delimited(
+        tag("<mrow><msubsup><mo>&#x222b;</mo>"),
+        pair(
+            ws(delimited(
+                tag("<mrow>"),
+                math_expression,
+                tag("</mrow>"),
+            )),
+            math_expression,
+        ),
+        tag("</msubsup>"),
+    ))(input)?;
+
+    //let (s, op) = ws(alt((tag("<mrow><msubsup><mo>&#x222b;</mo>"),tag("<msubsup><mo>&#x222b;</mo>"),
+    //)))(input)?;
+    //println!("op={:?}",op);
+    println!("++");
+    let(s, (integrand, int_var)) = ws(pair(many0(math_expression), preceded(d, math_expression)))(s)?;
+    let operator = MsubsupInt::new(
+        Box::new(sub),
+        Box::new(sup),
+    );
+    println!("....");
+    let op = Operator::MsubsupInt(operator);
+    println!("integrand={:?}",integrand);
+    println!("int_var={:?}",int_var);
+    let integrand_comp = Mrow::new(integrand);
+
+    Ok((s, (op, integrand_comp, int_var)))
+}
+
+
 /// Parser for math expressions. This varies from the one in the generic_mathml module, since it
 /// assumes that expressions such as S(t) are actually univariate functions.
 pub fn math_expression(input: Span) -> IResult<MathExpression> {
     ws(alt((
+        map(integral, |(operator, comp, var)| {
+            MathExpression::Integral(Integral {
+                op: Box::new(MathExpression::Mo(operator)),
+                integrand: Box::new(MathExpression::Mrow(comp)),
+                integration_variable: Box::new(var),
+            })
+        },
+        ),
         alt((
             map(gradient_with_closed_paren, |row| {
                 MathExpression::Mrow(Mrow(row))
@@ -839,6 +964,13 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                     comp: Box::new(row),
                 })
             }),
+            /*map(msub_sup_int, |MsubsupInt {sub, sup }| {
+                MathExpression::Mo(Operator::MsubsupInt(MsubsupInt {
+                    sub,
+                    sup,
+                }))
+            }),*/
+            map(msub_sup_int, |op| MathExpression::Mo(op)),
         )),
         map(
             first_order_partial_derivative_partial_func,

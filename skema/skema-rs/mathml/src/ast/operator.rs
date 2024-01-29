@@ -34,10 +34,18 @@ pub struct HatOp {
     pub comp: Box<MathExpression>,
 }
 
+
 /// Handles grad operations with subscript. E.g. ∇_{x}
 #[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
 pub struct GradSub {
     pub sub: Box<MathExpression>,
+}
+
+/// Integral
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
+pub struct MsubsupInt{
+    pub sub: Box<MathExpression>,
+    pub sup: Box<MathExpression>,
 }
 
 
@@ -82,6 +90,9 @@ pub enum Operator {
     Cross,
     Hat,
     HatOp(HatOp),
+    DownArrow,
+    Int,
+    MsubsupInt(MsubsupInt),
     // Catchall for operators we haven't explicitly defined as enum variants yet.
     Other(String),
 }
@@ -145,6 +156,11 @@ impl fmt::Display for Operator {
             Operator::Cross => write!(f, "×"),
             Operator::Hat => write!(f, "Hat"),
             Operator::HatOp(HatOp { comp }) => write!(f, "Hat({comp})"),
+            Operator::DownArrow =>write!(f, "↓"),
+            Operator::Int =>write!(f, "Int"),
+            Operator::MsubsupInt(MsubsupInt { sub, sup }) => {
+                write!(f, "Int_{{{sub}}}^{{{sup}}}")
+            }
         }
     }
 }
