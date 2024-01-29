@@ -231,9 +231,9 @@ def test_gromet_object_count():
     assert response.status_code == 200
     gromet_object_count = response.json()
     assert sum([value for key, value in gromet_object_count.items()]) &gt; 0
-    assert gromet_object_count[&#34;boxes&#34;] == 7
-    assert gromet_object_count[&#34;wires&#34;] == 4
-    assert gromet_object_count[&#34;ports&#34;] == 9
+    assert gromet_object_count[&#34;boxes&#34;] == 16
+    assert gromet_object_count[&#34;wires&#34;] == 6
+    assert gromet_object_count[&#34;ports&#34;] == 14
 
 
 # TODO: Add more complex test case to test_get_pyacset
@@ -425,9 +425,9 @@ def test_get_pyacset():
     assert response.status_code == 200
     gromet_object_count = response.json()
     assert sum([value for key, value in gromet_object_count.items()]) &gt; 0
-    assert gromet_object_count[&#34;boxes&#34;] == 7
-    assert gromet_object_count[&#34;wires&#34;] == 4
-    assert gromet_object_count[&#34;ports&#34;] == 9</code></pre>
+    assert gromet_object_count[&#34;boxes&#34;] == 16
+    assert gromet_object_count[&#34;wires&#34;] == 6
+    assert gromet_object_count[&#34;ports&#34;] == 14</code></pre>
 </details>
 </dd>
 <dt id="skema.skema_py.tests.test_server.test_healthcheck"><code class="name flex">

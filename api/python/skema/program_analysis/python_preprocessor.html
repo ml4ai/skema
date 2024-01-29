@@ -41,15 +41,16 @@ def convert_python2_to_python3(source: str):
         temp_file.write(source)
 
     # Run 2to3 on the temporary file
-    subprocess.run([&#39;2to3&#39;, &#39;--write&#39;, &#39;--nobackups&#39;, str(temp_file_path)], check=True)
-
-    # Read the converted Python 3 code
-    python3_code = temp_file_path.read_text()
-
+    try:
+        subprocess.run([&#39;2to3&#39;, &#39;--write&#39;, &#39;--nobackups&#39;, str(temp_file_path)], check=True)
+        preprocessed_code = temp_file_path.read_text()
+    except subprocess.CalledProcessError:
+        preprocessed_code = source
+    
     # Clean up the temporary file
     temp_file_path.unlink()
 
-    return python3_code</code></pre>
+    return preprocessed_code</code></pre>
 </details>
 </section>
 <section>
@@ -75,15 +76,16 @@ def convert_python2_to_python3(source: str):
         temp_file.write(source)
 
     # Run 2to3 on the temporary file
-    subprocess.run([&#39;2to3&#39;, &#39;--write&#39;, &#39;--nobackups&#39;, str(temp_file_path)], check=True)
-
-    # Read the converted Python 3 code
-    python3_code = temp_file_path.read_text()
-
+    try:
+        subprocess.run([&#39;2to3&#39;, &#39;--write&#39;, &#39;--nobackups&#39;, str(temp_file_path)], check=True)
+        preprocessed_code = temp_file_path.read_text()
+    except subprocess.CalledProcessError:
+        preprocessed_code = source
+    
     # Clean up the temporary file
     temp_file_path.unlink()
 
-    return python3_code</code></pre>
+    return preprocessed_code</code></pre>
 </details>
 </dd>
 <dt id="skema.program_analysis.python_preprocessor.preprocess"><code class="name flex">

@@ -76,7 +76,7 @@ CodeComments = Union[SingleFileCodeComments, MultiFileCodeComments]</code></pre>
 <span>(</span><span>**data: Any)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Usage docs: <a href="https://docs.pydantic.dev/2.5/concepts/models/">https://docs.pydantic.dev/2.5/concepts/models/</a></p>
+<div class="desc"><p>Usage docs: <a href="https://docs.pydantic.dev/2.6/concepts/models/">https://docs.pydantic.dev/2.6/concepts/models/</a></p>
 <p>A base class for creating Pydantic models.</p>
 <h2 id="attributes">Attributes</h2>
 <dl>
@@ -119,8 +119,7 @@ This replaces <code>Model.__validators__</code> and <code>Model.__root_validator
 <p>Create a new model by parsing and validating input data from keyword arguments.</p>
 <p>Raises [<code>ValidationError</code>][pydantic_core.ValidationError] if the input data cannot be
 validated to form a valid model.</p>
-<p><code>__init__</code> uses <code>__pydantic_self__</code> instead of the more common <code>self</code> for the first arg to
-allow <code>self</code> as a field name.</p></div>
+<p><code>self</code> is explicitly positional-only to allow <code>self</code> as a field name.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -146,6 +145,10 @@ allow <code>self</code> as a field name.</p></div>
 <dd>
 <div class="desc"></div>
 </dd>
+<dt id="skema.program_analysis.comments.MultiFileCodeComments.model_computed_fields"><code class="name">var <span class="ident">model_computed_fields</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
 <dt id="skema.program_analysis.comments.MultiFileCodeComments.model_config"><code class="name">var <span class="ident">model_config</span></code></dt>
 <dd>
 <div class="desc"></div>
@@ -161,7 +164,7 @@ allow <code>self</code> as a field name.</p></div>
 <span>(</span><span>**data: Any)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Usage docs: <a href="https://docs.pydantic.dev/2.5/concepts/models/">https://docs.pydantic.dev/2.5/concepts/models/</a></p>
+<div class="desc"><p>Usage docs: <a href="https://docs.pydantic.dev/2.6/concepts/models/">https://docs.pydantic.dev/2.6/concepts/models/</a></p>
 <p>A base class for creating Pydantic models.</p>
 <h2 id="attributes">Attributes</h2>
 <dl>
@@ -204,8 +207,7 @@ This replaces <code>Model.__validators__</code> and <code>Model.__root_validator
 <p>Create a new model by parsing and validating input data from keyword arguments.</p>
 <p>Raises [<code>ValidationError</code>][pydantic_core.ValidationError] if the input data cannot be
 validated to form a valid model.</p>
-<p><code>__init__</code> uses <code>__pydantic_self__</code> instead of the more common <code>self</code> for the first arg to
-allow <code>self</code> as a field name.</p></div>
+<p><code>self</code> is explicitly positional-only to allow <code>self</code> as a field name.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -234,6 +236,10 @@ allow <code>self</code> as a field name.</p></div>
 <dd>
 <div class="desc"></div>
 </dd>
+<dt id="skema.program_analysis.comments.SingleFileCodeComments.model_computed_fields"><code class="name">var <span class="ident">model_computed_fields</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
 <dt id="skema.program_analysis.comments.SingleFileCodeComments.model_config"><code class="name">var <span class="ident">model_config</span></code></dt>
 <dd>
 <div class="desc"></div>
@@ -249,7 +255,7 @@ allow <code>self</code> as a field name.</p></div>
 <span>(</span><span>**data: Any)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Usage docs: <a href="https://docs.pydantic.dev/2.5/concepts/models/">https://docs.pydantic.dev/2.5/concepts/models/</a></p>
+<div class="desc"><p>Usage docs: <a href="https://docs.pydantic.dev/2.6/concepts/models/">https://docs.pydantic.dev/2.6/concepts/models/</a></p>
 <p>A base class for creating Pydantic models.</p>
 <h2 id="attributes">Attributes</h2>
 <dl>
@@ -292,8 +298,7 @@ This replaces <code>Model.__validators__</code> and <code>Model.__root_validator
 <p>Create a new model by parsing and validating input data from keyword arguments.</p>
 <p>Raises [<code>ValidationError</code>][pydantic_core.ValidationError] if the input data cannot be
 validated to form a valid model.</p>
-<p><code>__init__</code> uses <code>__pydantic_self__</code> instead of the more common <code>self</code> for the first arg to
-allow <code>self</code> as a field name.</p></div>
+<p><code>self</code> is explicitly positional-only to allow <code>self</code> as a field name.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -313,6 +318,10 @@ allow <code>self</code> as a field name.</p></div>
 <div class="desc"></div>
 </dd>
 <dt id="skema.program_analysis.comments.SingleLineComment.line_number"><code class="name">var <span class="ident">line_number</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.program_analysis.comments.SingleLineComment.model_computed_fields"><code class="name">var <span class="ident">model_computed_fields</span></code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
@@ -346,6 +355,7 @@ allow <code>self</code> as a field name.</p></div>
 <h4><code><a title="skema.program_analysis.comments.MultiFileCodeComments" href="#skema.program_analysis.comments.MultiFileCodeComments">MultiFileCodeComments</a></code></h4>
 <ul class="">
 <li><code><a title="skema.program_analysis.comments.MultiFileCodeComments.files" href="#skema.program_analysis.comments.MultiFileCodeComments.files">files</a></code></li>
+<li><code><a title="skema.program_analysis.comments.MultiFileCodeComments.model_computed_fields" href="#skema.program_analysis.comments.MultiFileCodeComments.model_computed_fields">model_computed_fields</a></code></li>
 <li><code><a title="skema.program_analysis.comments.MultiFileCodeComments.model_config" href="#skema.program_analysis.comments.MultiFileCodeComments.model_config">model_config</a></code></li>
 <li><code><a title="skema.program_analysis.comments.MultiFileCodeComments.model_fields" href="#skema.program_analysis.comments.MultiFileCodeComments.model_fields">model_fields</a></code></li>
 </ul>
@@ -355,6 +365,7 @@ allow <code>self</code> as a field name.</p></div>
 <ul class="">
 <li><code><a title="skema.program_analysis.comments.SingleFileCodeComments.comments" href="#skema.program_analysis.comments.SingleFileCodeComments.comments">comments</a></code></li>
 <li><code><a title="skema.program_analysis.comments.SingleFileCodeComments.docstrings" href="#skema.program_analysis.comments.SingleFileCodeComments.docstrings">docstrings</a></code></li>
+<li><code><a title="skema.program_analysis.comments.SingleFileCodeComments.model_computed_fields" href="#skema.program_analysis.comments.SingleFileCodeComments.model_computed_fields">model_computed_fields</a></code></li>
 <li><code><a title="skema.program_analysis.comments.SingleFileCodeComments.model_config" href="#skema.program_analysis.comments.SingleFileCodeComments.model_config">model_config</a></code></li>
 <li><code><a title="skema.program_analysis.comments.SingleFileCodeComments.model_fields" href="#skema.program_analysis.comments.SingleFileCodeComments.model_fields">model_fields</a></code></li>
 </ul>
@@ -364,6 +375,7 @@ allow <code>self</code> as a field name.</p></div>
 <ul class="">
 <li><code><a title="skema.program_analysis.comments.SingleLineComment.contents" href="#skema.program_analysis.comments.SingleLineComment.contents">contents</a></code></li>
 <li><code><a title="skema.program_analysis.comments.SingleLineComment.line_number" href="#skema.program_analysis.comments.SingleLineComment.line_number">line_number</a></code></li>
+<li><code><a title="skema.program_analysis.comments.SingleLineComment.model_computed_fields" href="#skema.program_analysis.comments.SingleLineComment.model_computed_fields">model_computed_fields</a></code></li>
 <li><code><a title="skema.program_analysis.comments.SingleLineComment.model_config" href="#skema.program_analysis.comments.SingleLineComment.model_config">model_config</a></code></li>
 <li><code><a title="skema.program_analysis.comments.SingleLineComment.model_fields" href="#skema.program_analysis.comments.SingleLineComment.model_fields">model_fields</a></code></li>
 </ul>

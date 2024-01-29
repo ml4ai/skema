@@ -199,7 +199,7 @@ def amr_enrichment(request: EnrichmentReqest):
 <span>(</span><span>**data: Any)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Usage docs: <a href="https://docs.pydantic.dev/2.5/concepts/models/">https://docs.pydantic.dev/2.5/concepts/models/</a></p>
+<div class="desc"><p>Usage docs: <a href="https://docs.pydantic.dev/2.6/concepts/models/">https://docs.pydantic.dev/2.6/concepts/models/</a></p>
 <p>A base class for creating Pydantic models.</p>
 <h2 id="attributes">Attributes</h2>
 <dl>
@@ -242,8 +242,7 @@ This replaces <code>Model.__validators__</code> and <code>Model.__root_validator
 <p>Create a new model by parsing and validating input data from keyword arguments.</p>
 <p>Raises [<code>ValidationError</code>][pydantic_core.ValidationError] if the input data cannot be
 validated to form a valid model.</p>
-<p><code>__init__</code> uses <code>__pydantic_self__</code> instead of the more common <code>self</code> for the first arg to
-allow <code>self</code> as a field name.</p></div>
+<p><code>self</code> is explicitly positional-only to allow <code>self</code> as a field name.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -283,6 +282,10 @@ allow <code>self</code> as a field name.</p></div>
 <div class="desc"></div>
 </dd>
 <dt id="skema.gromet.execution_engine.server.EnrichmentReqest.filename"><code class="name">var <span class="ident">filename</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.server.EnrichmentReqest.model_computed_fields"><code class="name">var <span class="ident">model_computed_fields</span></code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
@@ -326,6 +329,7 @@ allow <code>self</code> as a field name.</p></div>
 <ul class="">
 <li><code><a title="skema.gromet.execution_engine.server.EnrichmentReqest.amr" href="#skema.gromet.execution_engine.server.EnrichmentReqest.amr">amr</a></code></li>
 <li><code><a title="skema.gromet.execution_engine.server.EnrichmentReqest.filename" href="#skema.gromet.execution_engine.server.EnrichmentReqest.filename">filename</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.server.EnrichmentReqest.model_computed_fields" href="#skema.gromet.execution_engine.server.EnrichmentReqest.model_computed_fields">model_computed_fields</a></code></li>
 <li><code><a title="skema.gromet.execution_engine.server.EnrichmentReqest.model_config" href="#skema.gromet.execution_engine.server.EnrichmentReqest.model_config">model_config</a></code></li>
 <li><code><a title="skema.gromet.execution_engine.server.EnrichmentReqest.model_fields" href="#skema.gromet.execution_engine.server.EnrichmentReqest.model_fields">model_fields</a></code></li>
 <li><code><a title="skema.gromet.execution_engine.server.EnrichmentReqest.source" href="#skema.gromet.execution_engine.server.EnrichmentReqest.source">source</a></code></li>
