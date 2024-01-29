@@ -6,7 +6,7 @@ from skema.program_analysis.CAST2FN.model.cast import (
     Var,
     Call,
     Name,
-    LiteralValue,
+    CASTLiteralValue,
     ModelIf,
     Loop,
     Operator
@@ -46,7 +46,7 @@ def test_while1():
     assert isinstance(asg_node.left.val, Name)
     assert asg_node.left.val.name == "x"
 
-    assert isinstance(asg_node.right, LiteralValue)
+    assert isinstance(asg_node.right, CASTLiteralValue)
     assert asg_node.right.value_type == "Integer"
     assert asg_node.right.value == '2'
 
@@ -60,7 +60,7 @@ def test_while1():
     assert isinstance(loop_test.operands[0], Name)
     assert loop_test.operands[0].name == "x"
 
-    assert isinstance(loop_test.operands[1], LiteralValue)
+    assert isinstance(loop_test.operands[1], CASTLiteralValue)
     assert loop_test.operands[1].value_type == "Integer"
     assert loop_test.operands[1].value == "5"
 
@@ -74,7 +74,7 @@ def test_while1():
     assert isinstance(asg.right, Operator)
     assert asg.right.op == "ast.Add"
     assert isinstance(asg.right.operands[0], Name)
-    assert isinstance(asg.right.operands[1], LiteralValue)
+    assert isinstance(asg.right.operands[1], CASTLiteralValue)
     assert asg.right.operands[1].value == "1"
 
 def test_while2():
@@ -89,7 +89,7 @@ def test_while2():
     assert isinstance(asg_node.left.val, Name)
     assert asg_node.left.val.name == "x"
 
-    assert isinstance(asg_node.right, LiteralValue)
+    assert isinstance(asg_node.right, CASTLiteralValue)
     assert asg_node.right.value_type == "Integer"
     assert asg_node.right.value == '2'
 
@@ -98,7 +98,7 @@ def test_while2():
     assert isinstance(asg_node_2.left.val, Name)
     assert asg_node_2.left.val.name == "y"
 
-    assert isinstance(asg_node_2.right, LiteralValue)
+    assert isinstance(asg_node_2.right, CASTLiteralValue)
     assert asg_node_2.right.value_type == "Integer"
     assert asg_node_2.right.value == '3'
 
@@ -112,7 +112,7 @@ def test_while2():
     assert isinstance(loop_test.operands[0], Name)
     assert loop_test.operands[0].name == "x"
 
-    assert isinstance(loop_test.operands[1], LiteralValue)
+    assert isinstance(loop_test.operands[1], CASTLiteralValue)
     assert loop_test.operands[1].value_type == "Integer"
     assert loop_test.operands[1].value == "5"
 
@@ -128,7 +128,7 @@ def test_while2():
     assert isinstance(asg.right.operands[0], Name)
     assert asg.right.operands[0].name == "x"
 
-    assert isinstance(asg.right.operands[1], LiteralValue)
+    assert isinstance(asg.right.operands[1], CASTLiteralValue)
     assert asg.right.operands[1].value == "1"
 
     asg = loop_body[1]

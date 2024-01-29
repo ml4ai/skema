@@ -10,9 +10,6 @@ from skema.program_analysis.CAST2FN import cast
 from skema.program_analysis.CAST2FN.cast import CAST
 from skema.program_analysis.run_ann_cast_pipeline import ann_cast_pipeline
 
-# NOTE: these examples are very trivial for the realm of recursion
-#       more complex ones will follow later as needed
-
 def exp0():
     return """
 x = 2

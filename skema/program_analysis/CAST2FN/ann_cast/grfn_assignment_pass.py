@@ -196,6 +196,17 @@ class GrfnAssignmentPass:
         self.visit_node_list(node.body, add_to)
 
     @_visit.register
+    def visit_goto(self, node: AnnCastGoto, add_to):
+        if node.expr != None:
+            self.visit(node.expr, add_to)
+        # self.visit(node.label, add_to)
+
+    @_visit.register
+    def visit_label(self, node: AnnCastLabel, add_to):
+        # self.visit(node.label, add_to)
+        pass
+
+    @_visit.register
     def visit_literal_value(
         self, node: AnnCastLiteralValue, add_to: typing.Dict
     ):
