@@ -208,19 +208,21 @@ async def equations_to_amr(data: schema.MmlToAMR, client: httpx.AsyncClient = De
 @router.post("/latex/equations-to-decapodes", summary="Equations (LaTeX) → pMML → Decapodes")
 async def equations_to_decapodes(data: schema.EquationLatexToDecapodes, client: httpx.AsyncClient = Depends(utils.get_client)):
     """
-    Converts equations (in LaTeX) to AMR.
+    Converts equations (in LaTeX) to Decapodes.
 
     ### Python example
     ```
     import requests
 
     equations = [
-      "\\frac{\\delta x}{\\delta t} = {\\alpha x} - {\\beta x y}",
-      "\\frac{\\delta y}{\\delta t} = {\\alpha x y} - {\\gamma y}"
+        "\\frac{\\delta x}{\\delta t} = {\\alpha x} - {\\beta x y}",
+        "\\frac{\\delta y}{\\delta t} = {\\alpha x y} - {\\gamma y}"
     ]
-    url = "0.0.0.0"
-    r = requests.post(f"{url}/workflows/latex/equations-to-amr", json={"equations": equations, "model": "regnet"})
-    r.json()
+
+    url = "http://127.0.0.1:8000"
+
+    r = requests.post(f"{url}/latex/equations-to-decapodes",  json={"equations": equations})
+    print(r.json())
     """
     mml: List[str] = [
         utils.clean_mml(eqn2mml.get_mathml_from_latex(tex)) for tex in data.equations
