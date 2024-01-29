@@ -4,7 +4,9 @@ import os
 
 # Dictionary that maps
 # "model" : [supported lines, total lines]
-# Last updated: November 29th, 2023
+# Last updated: January 26th, 2024
+# (Updated Bucky model to a slightly smaller count, due to some unknown issue)
+# Previous update: November 29th, 2023
 # (Updated TIE-GCM to a smaller line count, to address potential timeout issues on the GitHub CI)
 ALL_MODELS = {
     "CHIME-penn-full": [1080, 1080], 
@@ -18,7 +20,7 @@ ALL_MODELS = {
     "Climlab-v1": [4306, 4306], 
     "Generated-Halfar": [128, 128], 
     "SV2AIR3-Waterloo-MATLAB": [0, 1020], 
-    "Bucky": [7537, 7537], 
+    "Bucky": [7503, 7537], 
     "ABM-REINA": [2622, 7078], 
     "Cornell-COVID19-sim-Frazier": [7250, 8725], 
     "ABM-Covasim": [14734, 31042], 

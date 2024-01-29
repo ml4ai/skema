@@ -309,6 +309,17 @@ class LambdaExpressionPass:
         return node.expr_str
 
     @_visit.register
+    def visit_goto(self, node: AnnCastGoto):
+        # self.visit(node.expr)
+        # self.visit(node.label, at_module_scope)
+        return ""
+
+    @_visit.register
+    def visit_label(self, node: AnnCastLabel):
+        # self.visit(node.label, at_module_scope)
+        return ""
+
+    @_visit.register
     def visit_literal_value(self, node: AnnCastLiteralValue) -> str:
         if node.value_type == "List[Any]":
             # val has

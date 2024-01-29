@@ -1,12 +1,12 @@
 from typing import List
-from skema.program_analysis.CAST2FN.model.cast import AstNode, LiteralValue, SourceRef
+from skema.program_analysis.CAST2FN.model.cast import AstNode, CASTLiteralValue, SourceRef
 
 DUMMY_SOURCE_REF = [SourceRef("", -1, -1, -1, -1)]
 DUMMY_SOURCE_CODE_DATA_TYPE = ["Fortran", "Fotran95", "None"]
 
 def generate_dummy_source_refs(node: AstNode) -> AstNode:
     """Walks a tree of AstNodes replacing any null SourceRefs with a dummy value"""
-    if isinstance(node, LiteralValue) and not node.source_code_data_type:
+    if isinstance(node, CASTLiteralValue) and not node.source_code_data_type:
         node.source_code_data_type = DUMMY_SOURCE_CODE_DATA_TYPE
     if not node.source_refs:
         node.source_refs = DUMMY_SOURCE_REF

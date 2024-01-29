@@ -173,7 +173,7 @@ def fix_include_directives(source: str) -> str:
 def run_c_preprocessor(source: str, include_base_path: Path) -> str:
     """Run the gcc c-preprocessor. Its run from the context of the include_base_path, so that it can find all included files"""
     result = run(
-        ["gcc", "-cpp", "-E", "-x", "f95", "-"],
+        ["gfortran", "-cpp", "-E", "-x", "f95", "-"],
         input=source,
         text=True,
         capture_output=True,
@@ -184,8 +184,10 @@ def run_c_preprocessor(source: str, include_base_path: Path) -> str:
 
 
 def convert_assigned(source: str) -> str:
-    """Convered ASSIGNED GO TO to COMPUTED GO TO"""
-    pass
+    """Convered ASSIGNED GO TO to a traditional GO TO"""
+    assign_regex = "assign (.*?) to (.*?)"
+    for match in re.finditer(assign_regex, source, re.IGNORECASE):
+        pass
 
 
 def convert_to_free_form(source: str) -> str:

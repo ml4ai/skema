@@ -531,6 +531,17 @@ class GrfnVarCreationPass:
         self.visit_node_list(node.body)
 
     @_visit.register
+    def visit_goto(self, node: AnnCastGoto):
+        if node.expr != None:
+            self.visit(node.expr)
+        # self.visit(node.label)
+
+    @_visit.register
+    def visit_label(self, node: AnnCastLabel):
+        # self.visit(node.label)
+        pass
+
+    @_visit.register
     def visit_literal_value(self, node: AnnCastLiteralValue):
         if node.value_type == "List[Any]":
             # val has
