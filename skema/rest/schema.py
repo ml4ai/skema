@@ -61,6 +61,15 @@ class EquationLatexToAMR(BaseModel):
     )
 
 
+class EquationLatexToDecapodes(BaseModel):
+    equations: List[str] = Field(
+        description="Equations in LaTeX",
+        examples=[[
+            r"\frac{\partial x}{\partial t} = {\alpha x} - {\beta x y}",
+            r"\frac{\partial y}{\partial t} = {\alpha x y} - {\gamma y}",
+        ]],
+    )
+
 class MmlToAMR(BaseModel):
     equations: List[str] = Field(
         description="Equations in pMML",

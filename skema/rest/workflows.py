@@ -204,6 +204,39 @@ async def equations_to_amr(data: schema.MmlToAMR, client: httpx.AsyncClient = De
     return res.json()
 
 
+# tex equations -> pmml -> Decapodes
+@router.post("/latex/equations-to-decapodes", summary="Equations (LaTeX) → pMML → Decapodes")
+async def equations_to_decapodes(data: schema.EquationLatexToDecapodes, client: httpx.AsyncClient = Depends(utils.get_client)):
+    """
+    Converts equations (in LaTeX) to AMR.
+
+    ### Python example
+    ```
+    import requests
+
+    equations = [
+      "\\frac{\\delta x}{\\delta t} = {\\alpha x} - {\\beta x y}",
+      "\\frac{\\delta y}{\\delta t} = {\\alpha x y} - {\\gamma y}"
+    ]
+    url = "0.0.0.0"
+    r = requests.post(f"{url}/workflows/latex/equations-to-amr", json={"equations": equations, "model": "regnet"})
+    r.json()
+    """
+    mml: List[str] = [
+        utils.clean_mml(eqn2mml.get_mathml_from_latex(tex)) for tex in data.equations
+    ]
+
+    res = await client.put(f"{SKEMA_RS_ADDESS}/mathml/decapodes", json=mml)
+    if res.status_code != 200:
+        return JSONResponse(
+            status_code=400,
+            content={
+                "error": f"MORAE PUT /mathml/amr failed to process payload with error {res.text}",
+                "payload": mml,
+            },
+        )
+    return res.json()
+
 # code snippets -> fn -> petrinet amr
 @router.post("/code/snippets-to-pn-amr", summary="Code snippets → PetriNet AMR")
 async def code_snippets_to_pn_amr(system: code2fn.System, client: httpx.AsyncClient = Depends(utils.get_client)):
