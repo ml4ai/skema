@@ -419,7 +419,7 @@ class TS2CAST(object):
                     expr = Call(
                         func=self.get_gromet_function_node("_get"),
                         arguments=[
-                            CASTLiteralValue(value_type="List", value=statement_labels),
+                            CASTLiteralValue(value_type="List", value=[CASTLiteralValue(value=label, value_type="List") for label in statement_labels]),
                             self.visit(node.children[-1]),
                         ],
                     )
