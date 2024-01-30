@@ -1451,6 +1451,8 @@ class PyASTToCAST:
                     unique_name = construct_unique_name(
                         self.filenames[-1], node.func.func.id
                     )
+            elif isinstance(node.func, ast.Subscript):
+                print("Hey")
             else:
                 if node.func.id == "list":
                     unique_name = construct_unique_name(
@@ -1506,6 +1508,9 @@ class PyASTToCAST:
                             source_refs=ref,
                         )
                     ]
+            elif isinstance(node.func, ast.Subscript):
+                return []
+                print("Hello")
             else:
                 if node.func.id == "list":
                     args.append(
