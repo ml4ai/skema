@@ -14,6 +14,7 @@ from skema.rest.workflows import (
 from skema.rest.llm_proxy import Dynamics
 from skema.rest.proxies import SKEMA_RS_ADDESS
 from skema.skema_py import server as code2fn
+from schema import EquationLatexToAMR
 import json
 import httpx
 import pytest
@@ -229,13 +230,14 @@ async def test_any_amr_sidarthe():
 
 @pytest.mark.asyncio
 async def test_eq_to_regnet():
-    payload = {
-        "equations": [
+    
+    payload = EquationLatexToAMR(
+        equations = [
             "\\frac{\\partial x}{\\partial t} = {\\alpha x} - {\\beta x y}",
             "\\frac{\\partial y}{\\partial t} = {\\alpha x y} - {\\gamma y}"
         ],
-        "model": "regnet"
-        }
+        model = "regnet",
+    )
     async with httpx.AsyncClient() as client:
         regnet_amr_response = await lx_equations_to_amr(payload, client=client)
     
