@@ -156,7 +156,7 @@ async def equations_to_latex(request: Request, client: httpx.AsyncClient = Depen
 
 # tex equations -> pmml -> amr
 @router.post("/latex/equations-to-amr", summary="Equations (LaTeX) → pMML → AMR")
-async def equations_to_amr(data: schema.EquationLatexToAMR, client: httpx.AsyncClient = Depends(utils.get_client)):
+async def lx_equations_to_amr(data: schema.EquationLatexToAMR, client: httpx.AsyncClient = Depends(utils.get_client)):
     """
     Converts equations (in LaTeX) to AMR.
 
