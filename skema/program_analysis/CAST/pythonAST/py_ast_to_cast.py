@@ -12,7 +12,7 @@ from skema.program_analysis.CAST2FN.model.cast import (
     Attribute,
     Call,
     FunctionDef,
-    LiteralValue,
+    CASTLiteralValue,
     Loop,
     ModelBreak,
     ModelContinue,
@@ -132,7 +132,7 @@ def get_node_name(ast_node):
     elif isinstance(ast_node, ast.Call):
         return get_node_name(ast_node.func)
     elif (
-        isinstance(ast_node, LiteralValue)
+        isinstance(ast_node, CASTLiteralValue)
         and (ast_node.value_type == StructureType.LIST or ast_node.value_type == StructureType.TUPLE)
     ):
         names = []
@@ -385,7 +385,7 @@ class PyASTToCAST:
         )[0]
         bool_func = "bool"
         source_code_data_type = ["Python", "3.8", str(type(True))]
-        true_val = LiteralValue(
+        true_val = CASTLiteralValue(
             ScalarType.BOOLEAN,
             "True",
             source_code_data_type=source_code_data_type,
@@ -479,7 +479,7 @@ class PyASTToCAST:
             source_code_data_type = ["Python", "3.8", str(type("str"))]
             if isinstance(s, ast.Str):
                 str_pieces.append(
-                    LiteralValue(
+                    CASTLiteralValue(
                         StructureType.LIST, s.s, source_code_data_type, ref
                     )
                 )
@@ -488,7 +488,7 @@ class PyASTToCAST:
                     s.value, prev_scope_id_dict, curr_scope_id_dict
                 )
                 str_pieces.append(
-                    LiteralValue(
+                    CASTLiteralValue(
                         StructureType.LIST,
                         f_string_val,
                         source_code_data_type,
@@ -562,7 +562,7 @@ class PyASTToCAST:
             )
         ]
         return [
-            LiteralValue(
+            CASTLiteralValue(
                 StructureType.LIST,
                 "NotImplemented",
                 source_code_data_type,
@@ -588,7 +588,7 @@ class PyASTToCAST:
             )
         ]
         return [
-            LiteralValue(
+            CASTLiteralValue(
                 ScalarType.ELLIPSIS, "...", source_code_data_type, ref
             )
         ]
@@ -612,7 +612,7 @@ class PyASTToCAST:
             )
         ]
         return [
-            LiteralValue(
+            CASTLiteralValue(
                 StructureType.LIST,
                 "NotImplemented",
                 source_code_data_type,
@@ -639,7 +639,7 @@ class PyASTToCAST:
             )
         ]
         return [
-            LiteralValue(
+            CASTLiteralValue(
                 StructureType.LIST,
                 "NotImplemented",
                 source_code_data_type,
@@ -856,7 +856,7 @@ class PyASTToCAST:
                     cons.size = self.visit(
                         operand, prev_scope_id_dict, curr_scope_id_dict
                     )[0]
-                    cons.initial_value = LiteralValue(
+                    cons.initial_value = CASTLiteralValue(
                         value_type=lit_type,
                         value=list_node.elts[0].value,
                         source_code_data_type=["Python", "3.8", "Float"],
@@ -864,7 +864,7 @@ class PyASTToCAST:
                     )
 
                     # TODO: Source code data type metadata
-                    to_ret = LiteralValue(
+                    to_ret = CASTLiteralValue(
                         value_type="List[Any]",
                         value=cons,
                         source_code_data_type=["Python", "3.8", "List"],
@@ -1476,7 +1476,7 @@ class PyASTToCAST:
             if isinstance(node.func, ast.Call):
                 if node.func.func.id == "list":
                     args.append(
-                        LiteralValue(
+                        CASTLiteralValue(
                             StructureType.LIST,
                             node.func.func.id,
                             ["Python", "3.8", "List"],
@@ -1509,7 +1509,7 @@ class PyASTToCAST:
             else:
                 if node.func.id == "list":
                     args.append(
-                        LiteralValue(
+                        CASTLiteralValue(
                             StructureType.LIST,
                             node.func.id,
                             ["Python", "3.8", "List"],
@@ -1784,13 +1784,13 @@ class PyASTToCAST:
         # maintain a stack of if statements that we build up
         if_stack = []
         source_code_data_type = ["Python", "3.8", str(type(True))]
-        true_val = LiteralValue(
+        true_val = CASTLiteralValue(
             ScalarType.BOOLEAN,
             "True",
             source_code_data_type=source_code_data_type,
             source_refs=ref,
         )
-        false_val = LiteralValue(
+        false_val = CASTLiteralValue(
             ScalarType.BOOLEAN,
             "False",
             source_code_data_type=source_code_data_type,
@@ -1885,7 +1885,7 @@ class PyASTToCAST:
         # TODO: Consider using type() with a map instead of isinstance to check types
         if isinstance(node.value, bool):
             return [
-                LiteralValue(
+                CASTLiteralValue(
                     ScalarType.BOOLEAN,
                     str(node.value),
                     source_code_data_type,
@@ -1894,13 +1894,13 @@ class PyASTToCAST:
             ]
         elif isinstance(node.value, int):
             return [
-                LiteralValue(
+                CASTLiteralValue(
                     ScalarType.INTEGER, node.value, source_code_data_type, ref
                 )
             ]
         elif isinstance(node.value, float):
             return [
-                LiteralValue(
+                CASTLiteralValue(
                     ScalarType.ABSTRACTFLOAT,
                     node.value,
                     source_code_data_type,
@@ -1909,14 +1909,14 @@ class PyASTToCAST:
             ]
         elif isinstance(node.value, str):
             return [
-                LiteralValue(
+                CASTLiteralValue(
                     StructureType.LIST, node.value, source_code_data_type, ref
                 )
             ]
         elif node.value is None:
-            return [LiteralValue(None, None, source_code_data_type, ref)]
+            return [CASTLiteralValue(None, None, source_code_data_type, ref)]
         elif isinstance(node.value, type(...)):
-            return [LiteralValue(ScalarType.ELLIPSIS, "...", source_code_data_type, ref)]
+            return [CASTLiteralValue(ScalarType.ELLIPSIS, "...", source_code_data_type, ref)]
         else:
             raise TypeError(f"Type {str(type(node.value))} not supported")
 
@@ -1998,9 +1998,9 @@ class PyASTToCAST:
             )
         ]
         for key in k:
-            if isinstance(key, LiteralValue) and key.value_type == StructureType.TUPLE:
+            if isinstance(key, CASTLiteralValue) and key.value_type == StructureType.TUPLE:
                 return [
-                    LiteralValue(
+                    CASTLiteralValue(
                         StructureType.MAP,
                         "",
                         source_code_data_type=["Python", "3.8", str(dict)],
@@ -2008,9 +2008,9 @@ class PyASTToCAST:
                     )
                 ]
 
-        # return [LiteralValue(StructureType.MAP, str(dict(list(zip(k,v)))), source_code_data_type=["Python","3.8",str(dict)], source_refs=ref)]
+        # return [CASTLiteralValue(StructureType.MAP, str(dict(list(zip(k,v)))), source_code_data_type=["Python","3.8",str(dict)], source_refs=ref)]
         return [
-            LiteralValue(
+            CASTLiteralValue(
                 StructureType.MAP,
                 str(list(zip(k, v))),
                 source_code_data_type=["Python", "3.8", str(dict)],
@@ -2151,7 +2151,7 @@ class PyASTToCAST:
 
         source_code_data_type = ["Python","3.8","Tuple"]
         first_next = Assignment(
-            LiteralValue(StructureType.TUPLE, [target, iter_var_cast, stop_cond_var_cast], source_code_data_type, source_refs=ref),
+            CASTLiteralValue(StructureType.TUPLE, [target, iter_var_cast, stop_cond_var_cast], source_code_data_type, source_refs=ref),
             Call(
                 func=Name(name="next", id=next_id, source_refs=ref),
                 arguments=[
@@ -2172,7 +2172,7 @@ class PyASTToCAST:
                     version=get_python_version(), 
                     op="ast.Eq", 
                     operands=[stop_cond_var_cast,
-                    LiteralValue(
+                    CASTLiteralValue(
                         ScalarType.BOOLEAN,
                         False,
                         ["Python", "3.8", "boolean"],
@@ -2182,7 +2182,7 @@ class PyASTToCAST:
 
         source_code_data_type = ["Python","3.8","Tuple"]
         loop_assign = Assignment(
-            LiteralValue(StructureType.TUPLE, [target, iter_var_cast, stop_cond_var_cast], source_code_data_type, source_refs=ref),
+            CASTLiteralValue(StructureType.TUPLE, [target, iter_var_cast, stop_cond_var_cast], source_code_data_type, source_refs=ref),
             Call(
                 func=Name(name="next", id=next_id, source_refs=ref),
                 arguments=[
@@ -3467,16 +3467,16 @@ class PyASTToCAST:
                     self.visit(piece, prev_scope_id_dict, curr_scope_id_dict)
                 )
             # TODO: How to represent computations like '[0.0] * 1000' in some kind of type constructing system
-            # and then how could we store that in these LiteralValue nodes?
+            # and then how could we store that in these CASTLiteralValue nodes?
             return [
-                LiteralValue(
+                CASTLiteralValue(
                     StructureType.LIST, to_ret, source_code_data_type, ref
                 )
             ]
             # return [List(to_ret,source_refs=ref)]
         else:
             return [
-                LiteralValue(
+                CASTLiteralValue(
                     StructureType.LIST, [], source_code_data_type, ref
                 )
             ]
@@ -3715,7 +3715,7 @@ class PyASTToCAST:
             )
         ]
         return [
-            LiteralValue(
+            CASTLiteralValue(
                 StructureType.LIST,
                 "NotImplemented",
                 source_code_data_type,
@@ -3764,7 +3764,7 @@ class PyASTToCAST:
             Call(
                 func=Name("raise", raise_id, source_refs=ref),
                 arguments=[
-                    LiteralValue(
+                    CASTLiteralValue(
                         StructureType.LIST,
                         exc_name,
                         source_code_data_type,
@@ -3814,7 +3814,7 @@ class PyASTToCAST:
             ]
         else:
             source_code_data_type = ["Python", "3.8", str(type(node.value))]
-            val = LiteralValue(None, None, source_code_data_type, ref)
+            val = CASTLiteralValue(None, None, source_code_data_type, ref)
             return [ModelReturn(val, source_refs=ref)]
 
     @visit.register
@@ -3887,13 +3887,13 @@ class PyASTToCAST:
                     self.visit(piece, prev_scope_id_dict, curr_scope_id_dict)
                 )
             return [
-                LiteralValue(
+                CASTLiteralValue(
                     StructureType.SET, to_ret, source_code_data_type, ref
                 )
             ]
         else:
             return [
-                LiteralValue(
+                CASTLiteralValue(
                     StructureType.SET, to_ret, source_code_data_type, ref
                 )
             ]
@@ -3943,7 +3943,7 @@ class PyASTToCAST:
                     slc.lower, prev_scope_id_dict, curr_scope_id_dict
                 )[0]
             else:
-                start = LiteralValue(
+                start = CASTLiteralValue(
                     value_type=ScalarType.INTEGER,
                     value=0,
                     source_code_data_type=["Python", "3.8", "Float"],
@@ -3992,7 +3992,7 @@ class PyASTToCAST:
                     slc.step, prev_scope_id_dict, curr_scope_id_dict
                 )[0]
             else:
-                step = LiteralValue(
+                step = CASTLiteralValue(
                     value_type=ScalarType.INTEGER,
                     value=1,
                     source_code_data_type=["Python", "3.8", "Float"],
@@ -4094,7 +4094,7 @@ class PyASTToCAST:
                 )
             ]
             return [
-                LiteralValue(
+                CASTLiteralValue(
                     StructureType.LIST,
                     "NotImplemented",
                     source_code_data_type,
@@ -4157,7 +4157,7 @@ class PyASTToCAST:
                 self.visit(piece, prev_scope_id_dict, curr_scope_id_dict)
             )
         source_code_data_type = ["Python","3.8","Tuple"]
-        return [LiteralValue(StructureType.TUPLE, to_ret, source_code_data_type, source_refs=ref)]
+        return [CASTLiteralValue(StructureType.TUPLE, to_ret, source_code_data_type, source_refs=ref)]
 
     @visit.register
     def visit_Try(
@@ -4205,7 +4205,7 @@ class PyASTToCAST:
             )
         ]
         return [
-            LiteralValue(
+            CASTLiteralValue(
                 StructureType.LIST,
                 "NotImplemented",
                 source_code_data_type,
@@ -4231,7 +4231,7 @@ class PyASTToCAST:
             )
         ]
         return [
-            LiteralValue(
+            CASTLiteralValue(
                 StructureType.LIST,
                 "NotImplemented",
                 source_code_data_type,

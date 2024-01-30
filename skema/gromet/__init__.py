@@ -1,3 +1,3 @@
-GROMET_VERSION = "0.1.8"
+GROMET_VERSION = "0.1.9"
 
 __all__ = ["GROMET_VERSION"]

@@ -159,6 +159,32 @@ def test_partial_supported_files():
     assert gromet_collection["metadata_collection"][0][0]["gromet_type"] == "Debug"
     assert gromet_collection["metadata_collection"][0][0]["severity"] == "WARNING"
 
+def test_hidden_files():
+    """Test case for hidden files and MACOSX artifacts"""
+    system = {
+        "files": [".hidden/source.py", "root/_MACOSX/hello.py"],
+        "blobs": [
+            "x=2",
+            "print('hello world')",
+        ],
+        "system_name": "hidden-system",
+        "root_name": "hidden-system",
+    }
+
+    response = client.post("/code2fn/fn-given-filepaths", json=system)
+    assert response.status_code == 200
+
+    gromet_collection = response.json()
+    assert "metadata_collection" in gromet_collection
+    assert (
+        len(gromet_collection["metadata_collection"]) == 1
+    )  # Only one element (GrometFNModuleCollection) should create metadata in this metadata_collection
+    assert (
+        len(gromet_collection["metadata_collection"][0]) == 1
+    )  # There should only be one ERROR Debug metadata since there are no source files to process.
+    assert gromet_collection["metadata_collection"][0][0]["gromet_type"] == "Debug"
+    assert gromet_collection["metadata_collection"][0][0]["severity"] == "ERROR"
+
 
 def test_gromet_object_count():
     """Test case for get-object-count endpoint"""

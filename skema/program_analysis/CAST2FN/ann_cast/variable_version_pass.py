@@ -1165,6 +1165,18 @@ class VariableVersionPass:
         # Visit the function defs within this class to make sure
         # Everything is versioned correctly
         self.visit_node_list(node.funcs, assign_lhs)
+    
+    @_visit.register
+    def visit_goto(self, node: AnnCastGoto, assign_lhs):
+        if node.expr != None:
+            self.visit(node.expr, assign_lhs)
+        # self.visit(node.label, at_module_scope, assign_lhs)
+        pass
+
+    @_visit.register
+    def visit_label(self, node: AnnCastLabel, assign_lhs):
+        # self.visit(node.label, at_module_scope, assign_lhs)
+        pass
 
     def visit_function_def_copy(
         self, node: AnnCastFunctionDef, assign_lhs: bool
