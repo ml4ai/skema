@@ -1,7 +1,7 @@
 package org.ml4ai.skema.text_reading.scenario_context.openai
 
 
-import akka.actor.ActorSystem
+import akka.actor.{ActorSystem, Terminated}
 import akka.stream.Materializer
 import io.cequence.openaiscala.domain._
 import io.cequence.openaiscala.domain.response.ChatCompletionResponse
@@ -9,7 +9,7 @@ import io.cequence.openaiscala.domain.settings.CreateChatCompletionSettings
 import io.cequence.openaiscala.service.{OpenAIService, OpenAIServiceFactory}
 
 import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, ExecutionContext}
+import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.Success
 import ch.qos.logback.classic.{Level, Logger}
 import org.slf4j.LoggerFactory
@@ -36,7 +36,7 @@ class PromptScenarioContext {
   implicit val ec: ExecutionContext = ExecutionContext.Implicits.global
   val service: OpenAIService = OpenAIServiceFactory()
 
-  def closeAll() = {
+  def closeAll(): Future[Terminated] = {
     service.close()
     system.terminate()
   }
@@ -55,7 +55,7 @@ class PromptScenarioContext {
         settings = CreateChatCompletionSettings(
           model = ModelId.gpt_4_turbo_preview,
           temperature = Some(0),
-          max_tokens = Some(100)
+          max_tokens = Some(200)
         )
       )
 
@@ -65,10 +65,8 @@ class PromptScenarioContext {
         case Some(s:Success[ChatCompletionResponse]) =>
           val msg = s.value.choices.head.message.content
           val resp = msg.split("\n").withFilter(_.startsWith("- ")).map(_.drop(2)).toList
-//          closeAll()
           resp
         case _ =>
-//          closeAll()
           List.empty[String]
       }
   }
