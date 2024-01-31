@@ -131,6 +131,10 @@ class TS2CAST(object):
             return self.visit_literal(node)
         elif node.type in ["list_pattern", "pattern_list", "tuple_pattern"]:
             return self.visit_pattern(node)
+        elif node.type == "list_comprehension":
+            return None
+        elif node.type == "dictionary_comprehension":
+            return None
         elif node.type == "while_statement":
             return self.visit_while(node)
         elif node.type == "for_statement":
@@ -487,6 +491,14 @@ class TS2CAST(object):
                 source_code_data_type=["Python", PYTHON_VERSION, str(type((0)))],
                 source_refs=[literal_source_ref]
             )
+
+    def visit_list_comprehension(self, node: Node) -> Call:
+        ref = self.node_helper.get_source_ref(node)
+        temp_list_name = f"list__temp_" 
+
+
+
+        return
 
 
 
