@@ -3294,7 +3294,7 @@ class ToGrometPass:
             if node.label in self.labels:
                 label_index = self.labels[node.label]
             else:
-                label_index = -1
+                label_index = 0
 
                 # Multiple gotos could reference the same label that we haven't seen
                 # So we maintain a list that we can update later
@@ -3315,7 +3315,9 @@ class ToGrometPass:
             self.visit(node.expr, goto_fn, node)
             index_comp_bf = len(goto_fn.bf)
 
-            labels = self.retrieve_labels(node.expr)
+            for idx,_ in enumerate(goto_fn.opi, 1):
+                goto_fn.pif = insert_gromet_object(goto_fn.pif, GrometPort(box=1))
+                goto_fn.wfopi = insert_gromet_object(goto_fn.wfopi, GrometWire(src=len(goto_fn.pif), tgt=idx))
 
             goto_fn.pof = insert_gromet_object(goto_fn.pof, GrometPort(box=index_comp_bf)) 
             goto_fn.opo = insert_gromet_object(goto_fn.opo, GrometPort(box=len(goto_fn.b), name="fn_idx"))
