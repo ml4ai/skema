@@ -3241,6 +3241,15 @@ class ToGrometPass:
         self.resolve_placeholder_gotos()
         var_environment["args"] = deepcopy(prev_arg_env)
 
+    def retrieve_labels(self, node: AnnCastCall):
+        # Retrieves all the labels in node
+        # Assumes node is a Function Call to "_get" with its labels in the first argument
+        labels = []
+        arguments = node.arguments[0]
+        for arg in arguments.value:
+            labels.append(arg.value)
+
+        return labels
 
     @_visit.register
     def visit_goto(
@@ -3273,7 +3282,7 @@ class ToGrometPass:
         for var in vars:
             for v in vars[var]: 
                 if v not in added_vars: 
-                    goto_fn.opi = insert_gromet_object(goto_fn.opi, GrometPort(box=len(goto_fn.b)))
+                    goto_fn.opi = insert_gromet_object(goto_fn.opi, GrometPort(box=len(goto_fn.b), name=v))
                     added_vars.append(v)
 
         # The goto expression FN has two potential expressions, to determine the label and the index
@@ -3300,8 +3309,21 @@ class ToGrometPass:
             goto_fn.opo = insert_gromet_object(goto_fn.opo, GrometPort(box=len(goto_fn.b), name="fn_idx"))
             goto_fn.wfopo = insert_gromet_object(goto_fn.wfopo, GrometWire(src=len(goto_fn.opo), tgt=len(goto_fn.pof)))
 
-        goto_fn.bf = insert_gromet_object(goto_fn.bf, GrometBoxFunction(function_type=FunctionType.LITERAL, value=node.label))
-        label_bf = len(goto_fn.bf)
+            goto_fn.bf = insert_gromet_object(goto_fn.bf, GrometBoxFunction(function_type=FunctionType.LITERAL, value=node.label))
+            label_bf = len(goto_fn.bf)
+        else:
+            self.visit(node.expr, goto_fn, node)
+            index_comp_bf = len(goto_fn.bf)
+
+            labels = self.retrieve_labels(node.expr)
+
+            goto_fn.pof = insert_gromet_object(goto_fn.pof, GrometPort(box=index_comp_bf)) 
+            goto_fn.opo = insert_gromet_object(goto_fn.opo, GrometPort(box=len(goto_fn.b), name="fn_idx"))
+            goto_fn.wfopo = insert_gromet_object(goto_fn.wfopo, GrometWire(src=len(goto_fn.opo), tgt=len(goto_fn.pof)))
+
+            goto_fn.bf = insert_gromet_object(goto_fn.bf, GrometBoxFunction(function_type=FunctionType.LITERAL, value=GLiteralValue("None","None")))
+            label_bf = len(goto_fn.bf)
+
         goto_fn.pof = insert_gromet_object(goto_fn.pof, GrometPort(box=label_bf)) 
         goto_fn.opo = insert_gromet_object(goto_fn.opo, GrometPort(box=len(goto_fn.b), name="label"))
         goto_fn.wfopo = insert_gromet_object(goto_fn.wfopo, GrometWire(src=len(goto_fn.opo), tgt=len(goto_fn.pof)))
