@@ -12,12 +12,13 @@ def convert_python2_to_python3(source: str):
         temp_file.write(source)
 
     # Run 2to3 on the temporary file
-    subprocess.run(['2to3', '--write', '--nobackups', str(temp_file_path)], check=True)
-
-    # Read the converted Python 3 code
-    python3_code = temp_file_path.read_text()
-
+    try:
+        subprocess.run(['2to3', '--write', '--nobackups', str(temp_file_path)], check=True)
+        preprocessed_code = temp_file_path.read_text()
+    except subprocess.CalledProcessError:
+        preprocessed_code = source
+    
     # Clean up the temporary file
     temp_file_path.unlink()
 
-    return python3_code
+    return preprocessed_code
