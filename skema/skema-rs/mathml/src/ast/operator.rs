@@ -1,8 +1,8 @@
 use crate::ast::Ci;
 use crate::ast::MathExpression;
 use derive_new::new;
-use std::fmt;
 use serde::{Deserialize, Serialize};
+use std::fmt;
 
 /// Derivative operator, in line with Spivak notation: http://ceres-solver.org/spivak_notation.html
 #[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
@@ -34,7 +34,6 @@ pub struct HatOp {
     pub comp: Box<MathExpression>,
 }
 
-
 /// Handles grad operations with subscript. E.g. ∇_{x}
 #[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
 pub struct GradSub {
@@ -43,11 +42,11 @@ pub struct GradSub {
 
 /// Integral
 #[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
-pub struct MsubsupInt{
+pub struct MsubsupInt {
     pub sub: Box<MathExpression>,
     pub sup: Box<MathExpression>,
+    pub integration_variable: Box<MathExpression>,
 }
-
 
 #[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
 pub enum Operator {
@@ -142,7 +141,7 @@ impl fmt::Display for Operator {
             Operator::Arccot => write!(f, "Arccot"),
             Operator::Mean => write!(f, "Mean"),
             Operator::Grad => write!(f, "Grad"),
-            Operator::GradSub(GradSub {sub}) =>{
+            Operator::GradSub(GradSub { sub }) => {
                 write!(f, "Grad_{sub})")
             }
             Operator::Dot => write!(f, "⋅"),
@@ -156,10 +155,14 @@ impl fmt::Display for Operator {
             Operator::Cross => write!(f, "×"),
             Operator::Hat => write!(f, "Hat"),
             Operator::HatOp(HatOp { comp }) => write!(f, "Hat({comp})"),
-            Operator::DownArrow =>write!(f, "↓"),
-            Operator::Int =>write!(f, "Int"),
-            Operator::MsubsupInt(MsubsupInt { sub, sup }) => {
-                write!(f, "Int_{{{sub}}}^{{{sup}}}")
+            Operator::DownArrow => write!(f, "↓"),
+            Operator::Int => write!(f, "Int"),
+            Operator::MsubsupInt(MsubsupInt {
+                sub,
+                sup,
+                integration_variable,
+            }) => {
+                write!(f, "Int_{{{sub}}}^{{{sup}}}({integration_variable})")
             }
         }
     }

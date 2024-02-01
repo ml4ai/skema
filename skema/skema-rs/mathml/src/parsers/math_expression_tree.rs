@@ -3,7 +3,9 @@
 
 use crate::{
     ast::{
-        operator::{Derivative, GradSub, HatOp, MsubsupInt, Operator, PartialDerivative, SumUnderOver},
+        operator::{
+            Derivative, GradSub, HatOp, MsubsupInt, Operator, PartialDerivative, SumUnderOver,
+        },
         Math, MathExpression, Mi, Mrow,
     },
     parsers::interpreted_mathml::interpreted_math,
@@ -784,18 +786,12 @@ impl MathExpression {
                 denominator.flatten(tokens);
                 tokens.push(MathExpression::Mo(Operator::Rparen));
             }
-            /// Insert implicit `exponential` and `power` operators
+            // Insert implicit `exponential` and `power` operators
             MathExpression::Msup(base, superscript) => {
-                println!("=========");
-                if let MathExpression::Mo(Operator::DownArrow) = &**superscript{
-                    println!("=------");
-                    //tokens.push(MathExpression::Mo(Operator::Lparen));
+                if let MathExpression::Mo(Operator::DownArrow) = &**superscript {
                     base.flatten(tokens);
-                    //tokens.push(MathExpression::Mo(Operator::Rparen));
                     tokens.push(MathExpression::Mo(Operator::DownArrow));
-
-                }
-                else if let MathExpression::Ci(x) = &**base {
+                } else if let MathExpression::Ci(x) = &**base {
                     if x.content == Box::new(MathExpression::Mi(Mi("e".to_string()))) {
                         tokens.push(MathExpression::Mo(Operator::Exp));
                         tokens.push(MathExpression::Mo(Operator::Lparen));
@@ -854,17 +850,25 @@ impl MathExpression {
                     tokens.push(MathExpression::Mo(Operator::Rparen));
                 }
             }
+            // Handles `Summation` operator with MathExpression
             MathExpression::SummationMath(x) => {
                 tokens.push(MathExpression::Mo(Operator::Lparen));
                 x.op.flatten(tokens);
                 x.func.flatten(tokens);
                 tokens.push(MathExpression::Mo(Operator::Rparen));
             }
+            // Handles `Hat` operator with MathExpression
             MathExpression::HatComp(x) => {
-                //tokens.push(MathExpression::Mo(Operator::Lparen));
                 x.op.flatten(tokens);
                 tokens.push(MathExpression::Mo(Operator::Lparen));
                 x.comp.flatten(tokens);
+                tokens.push(MathExpression::Mo(Operator::Rparen));
+            }
+            // Handles `Integral` operator with MathExpression
+            MathExpression::Integral(x) => {
+                x.op.flatten(tokens);
+                tokens.push(MathExpression::Mo(Operator::Lparen));
+                x.integrand.flatten(tokens);
                 tokens.push(MathExpression::Mo(Operator::Rparen));
             }
             t => tokens.push(t.clone()),
@@ -1079,7 +1083,7 @@ fn prefix_binding_power(op: &Operator) -> ((), u8) {
         Operator::Sqrt => ((), 25),
         Operator::SumUnderOver(SumUnderOver { .. }) => ((), 25),
         Operator::HatOp(HatOp { .. }) => ((), 25),
-        Operator::MsubsupInt(MsubsupInt { ..}) => ((), 25),
+        Operator::MsubsupInt(MsubsupInt { .. }) => ((), 25),
         _ => panic!("Bad operator: {:?}", op),
     }
 }
@@ -1646,7 +1650,7 @@ fn test_absolute_value() {
     ";
     let exp = input.parse::<MathExpressionTree>().unwrap();
     let s_exp = exp.to_string();
-    let latex_exp= exp.to_latex();
+    let latex_exp = exp.to_latex();
     assert_eq!(s_exp, "(Abs (Grad H))");
     assert_eq!(latex_exp, "\\left|\\nabla{H}\\right|");
 }
@@ -1881,6 +1885,7 @@ fn test_sexp2latex_derivative() {
     </math>
     ";
     let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", exp);
     let latex_exp = exp.to_latex();
     assert_eq!(latex_exp, "\\frac{d S}{dt}");
 }
@@ -2632,7 +2637,7 @@ fn test_hat_operator() {
     </math>";
     let exp = input.parse::<MathExpressionTree>().unwrap();
     let s_exp = exp.to_string();
-    println!("{:?}",exp.to_latex());
+    println!("{:?}", exp.to_latex());
     assert_eq!(s_exp, "(Hat(z) ζ)");
     assert_eq!(exp.to_latex(), "\\zeta\\hat{z}");
 }
@@ -2702,7 +2707,7 @@ fn test_mi_dot_gradient() {
 }
 
 #[test]
-fn test_gradient_sub(){
+fn test_gradient_sub() {
     let input = "<math>
     <msub>
     <mi>∇</mi>
@@ -2784,6 +2789,24 @@ fn test_down_arrow() {
     assert_eq!(s_exp, "(↓ I)");
 }
 
+/*#[test]
+fn test_down_arrow2() {
+    let input = "<math>
+    <msup>
+        <mi>I</mi>
+          <mo>&#x2193;</mo>
+           <mo>(</mo>
+      <mi>λ</mi>
+      <mo>)</mo>
+      </msup>
+    </math>";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", exp);
+    let s_exp = exp.to_string();
+    println!("s_exp={:?}", s_exp);
+    assert_eq!(s_exp, "(↓ I)");
+}*/
+
 #[test]
 fn test_integral1() {
     let input = "<math>
@@ -2802,7 +2825,10 @@ fn test_integral1() {
           </msub>
         </mrow>
       </msubsup>
+    <msup>
     <mi>x</mi>
+    <mn>2</mn>
+    </msup>
     <mi>d</mi>
     <mi>x</mi>
     </math>";
@@ -2810,10 +2836,8 @@ fn test_integral1() {
     println!("exp={:?}", exp);
     let s_exp = exp.to_string();
     println!("s_exp={:?}", s_exp);
-    //assert_eq!(s_exp, "Int_{λ_{1}}^{λ_{2}}");
+    assert_eq!(s_exp, "(Int_{λ_{1}}^{λ_{2}}(x) (^ x 2))");
 }
-
-
 
 #[test]
 fn test_integral2() {
@@ -2835,15 +2859,10 @@ fn test_integral2() {
         </mrow>
       </msubsup>
       <mi>ω</mi>
-      <mo >(</mo>
+      <mo>(</mo>
       <mi>λ</mi>
       <mo>)</mo>
-      <msup>
         <mi>I</mi>
-        <mrow>
-          <mo>↓</mo>
-        </mrow>
-      </msup>
       <mo>(</mo>
       <mi>λ</mi>
       <mo>)</mo>
@@ -2864,6 +2883,5 @@ fn test_integral2() {
     println!("exp={:?}", exp);
     let s_exp = exp.to_string();
     println!("s_exp={:?}", s_exp);
-    //assert_eq!(s_exp, "Int_{λ_{1}}^{λ_{2}}");
+    assert_eq!(s_exp, "(Int_{λ_{1}}^{λ_{2}}(λ) (* (* ω I) α_{sno}))");
 }
-

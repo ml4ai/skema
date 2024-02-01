@@ -2,8 +2,8 @@ use derive_new::new;
 use std::fmt;
 
 pub mod operator;
-use serde::{Deserialize, Serialize};
 use operator::Operator;
+use serde::{Deserialize, Serialize};
 //use crate::ast::MathExpression::SummationOp;
 
 #[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
@@ -64,7 +64,9 @@ pub struct HatComp {
 
 /// The MathExpression enum is not faithful to the corresponding element type in MathML 3
 /// (https://www.w3.org/TR/MathML3/appendixa.html#parsing_MathExpression)
-#[derive(Debug, PartialOrd, Ord, PartialEq, Eq, Clone, Hash, Default, new, Deserialize, Serialize)]
+#[derive(
+    Debug, PartialOrd, Ord, PartialEq, Eq, Clone, Hash, Default, new, Deserialize, Serialize,
+)]
 pub enum MathExpression {
     Mi(Mi),
     Mo(Operator),
@@ -143,7 +145,11 @@ impl fmt::Display for MathExpression {
                 write!(f, "{op}")?;
                 write!(f, "{comp}")
             }
-            MathExpression::Integral(Integral { op, integrand, integration_variable }) => {
+            MathExpression::Integral(Integral {
+                op,
+                integrand,
+                integration_variable,
+            }) => {
                 write!(f, "{op}")?;
                 write!(f, "{integrand}")?;
                 write!(f, "{integration_variable}")

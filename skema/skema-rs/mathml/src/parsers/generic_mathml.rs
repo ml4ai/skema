@@ -253,7 +253,10 @@ pub fn cross(input: Span) -> IResult<Operator> {
 }
 
 pub fn down_arrow(input: Span) -> IResult<Operator> {
-    let (s, op) = value(Operator::DownArrow, alt((ws(tag("↓")), ws(tag("&#x2193;")))))(input)?;
+    let (s, op) = value(
+        Operator::DownArrow,
+        alt((ws(tag("↓")), ws(tag("&#x2193;")))),
+    )(input)?;
     Ok((s, op))
 }
 
