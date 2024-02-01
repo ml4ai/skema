@@ -124,6 +124,26 @@ pub async fn get_decapodes(payload: web::Json<Vec<String>>) -> HttpResponse {
     HttpResponse::Ok().json(web::Json(decapodes_collection))
 }
 
+/// Return a JSON representation of a METCollection from
+/// an array of MathML strings.
+#[utoipa::path(
+request_body = Vec<String>,
+responses(
+(
+status = 200,
+body = Vec<String>
+)
+)
+)]
+#[put("/mathml/met")]
+pub async fn get_met(payload: web::Json<Vec<String>>) -> HttpResponse {
+    let met_vec: Vec<MathExpressionTree> = payload
+        .iter()
+        .map(|x| x.parse::<MathExpressionTree>().unwrap())
+        .collect();
+    HttpResponse::Ok().json(web::Json(met_vec))
+}
+
 /// Return a JSON representation of a PetriNet ModelRep constructed from an array of MathML strings.
 #[utoipa::path(
     request_body = Vec<String>,

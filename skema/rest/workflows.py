@@ -204,37 +204,42 @@ async def equations_to_amr(data: schema.MmlToAMR, client: httpx.AsyncClient = De
     return res.json()
 
 
-# tex equations -> pmml -> Decapodes
-@router.post("/latex/equations-to-decapodes", summary="Equations (LaTeX) → pMML → Decapodes")
-async def equations_to_decapodes(data: schema.EquationLatexToDecapodes, client: httpx.AsyncClient = Depends(utils.get_client)):
+# equations(pmml or latex) -> MathExpressionTree
+@router.post("/latex/equations-to-met", summary="Equations (LaTeX/pMML) → MathExpressionTree")
+async def equations_to_met(data: schema.EquationToMET, client: httpx.AsyncClient = Depends(utils.get_client)):
     """
-    Converts equations (in LaTeX) to Decapodes.
+    Converts equations (in LaTeX or pMathML) to MathExpressionTree (JSON).
 
     ### Python example
     ```
     import requests
 
     equations = [
-        "\\frac{\\delta x}{\\delta t} = {\\alpha x} - {\\beta x y}",
-        "\\frac{\\delta y}{\\delta t} = {\\alpha x y} - {\\gamma y}"
+        "E=mc^2",
+        "c=\\frac{a}{b}"
     ]
 
     url = "http://127.0.0.1:8000"
 
-    r = requests.post(f"{url}/latex/equations-to-decapodes",  json={"equations": equations})
+    r = requests.post(f"{url}/latex/equations-to-met",  json={"equations": equations})
     print(r.json())
     """
-    mml: List[str] = [
-        utils.clean_mml(eqn2mml.get_mathml_from_latex(tex)) for tex in data.equations
-    ]
+    if "</math>" in data.equations[0]:
+        eqns: List[str] = [
+            utils.clean_mml(mml) for mml in data.equations
+        ]
+    else:
+        eqns: List[str] = [
+            utils.clean_mml(eqn2mml.get_mathml_from_latex(tex)) for tex in data.equations
+        ]
 
-    res = await client.put(f"{SKEMA_RS_ADDESS}/mathml/decapodes", json=mml)
+    res = await client.put(f"{SKEMA_RS_ADDESS}/mathml/met", json=eqns)
     if res.status_code != 200:
         return JSONResponse(
             status_code=400,
             content={
-                "error": f"MORAE PUT /mathml/amr failed to process payload with error {res.text}",
-                "payload": mml,
+                "error": f"PUT /mathml/met failed to process payload with error {res.text}",
+                "payload": eqns,
             },
         )
     return res.json()

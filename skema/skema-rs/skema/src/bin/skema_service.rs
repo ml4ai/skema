@@ -49,6 +49,7 @@ async fn main() -> std::io::Result<()> {
             skema::services::mathml::get_regnet,
             skema::services::mathml::get_amr,
             skema::services::mathml::get_decapodes,
+            skema::services::mathml::get_met,
             gromet::get_model_ids,
             gromet::post_model,
             gromet::delete_model,
@@ -139,6 +140,7 @@ async fn main() -> std::io::Result<()> {
             .service(skema::services::mathml::get_regnet)
             .service(skema::services::mathml::get_amr)
             .service(skema::services::mathml::get_decapodes)
+            .service(skema::services::mathml::get_met)
             .service(gromet::get_model_RN)
             .service(gromet::model2PN)
             .service(gromet::model2RN)
