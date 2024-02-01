@@ -176,7 +176,7 @@ def generate_graph(file: str = "", render: bool = False) -> pydot.Dot:
         with open(file) as f:
             content = f.read()
 
-    SKEMA_RS_ADDESS = "http://localhost:8080"
+    #SKEMA_RS_ADDESS = "http://localhost:8080"
     digraph = requests.put(
         f"{SKEMA_RS_ADDESS}/mathml/math-exp-graph", data=content.encode("utf-8")
     )
