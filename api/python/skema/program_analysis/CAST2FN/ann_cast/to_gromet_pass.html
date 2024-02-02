@@ -3270,6 +3270,15 @@ class ToGrometPass:
         self.resolve_placeholder_gotos()
         var_environment[&#34;args&#34;] = deepcopy(prev_arg_env)
 
+    def retrieve_labels(self, node: AnnCastCall):
+        # Retrieves all the labels in node
+        # Assumes node is a Function Call to &#34;_get&#34; with its labels in the first argument
+        labels = []
+        arguments = node.arguments[0]
+        for arg in arguments.value:
+            labels.append(arg.value)
+
+        return labels
 
     @_visit.register
     def visit_goto(
@@ -3302,7 +3311,7 @@ class ToGrometPass:
         for var in vars:
             for v in vars[var]: 
                 if v not in added_vars: 
-                    goto_fn.opi = insert_gromet_object(goto_fn.opi, GrometPort(box=len(goto_fn.b)))
+                    goto_fn.opi = insert_gromet_object(goto_fn.opi, GrometPort(box=len(goto_fn.b), name=v))
                     added_vars.append(v)
 
         # The goto expression FN has two potential expressions, to determine the label and the index
@@ -3314,7 +3323,7 @@ class ToGrometPass:
             if node.label in self.labels:
                 label_index = self.labels[node.label]
             else:
-                label_index = -1
+                label_index = 0
 
                 # Multiple gotos could reference the same label that we haven&#39;t seen
                 # So we maintain a list that we can update later
@@ -3329,8 +3338,23 @@ class ToGrometPass:
             goto_fn.opo = insert_gromet_object(goto_fn.opo, GrometPort(box=len(goto_fn.b), name=&#34;fn_idx&#34;))
             goto_fn.wfopo = insert_gromet_object(goto_fn.wfopo, GrometWire(src=len(goto_fn.opo), tgt=len(goto_fn.pof)))
 
-        goto_fn.bf = insert_gromet_object(goto_fn.bf, GrometBoxFunction(function_type=FunctionType.LITERAL, value=node.label))
-        label_bf = len(goto_fn.bf)
+            goto_fn.bf = insert_gromet_object(goto_fn.bf, GrometBoxFunction(function_type=FunctionType.LITERAL, value=node.label))
+            label_bf = len(goto_fn.bf)
+        else:
+            self.visit(node.expr, goto_fn, node)
+            index_comp_bf = len(goto_fn.bf)
+
+            for idx,_ in enumerate(goto_fn.opi, 1):
+                goto_fn.pif = insert_gromet_object(goto_fn.pif, GrometPort(box=1))
+                goto_fn.wfopi = insert_gromet_object(goto_fn.wfopi, GrometWire(src=len(goto_fn.pif), tgt=idx))
+
+            goto_fn.pof = insert_gromet_object(goto_fn.pof, GrometPort(box=index_comp_bf)) 
+            goto_fn.opo = insert_gromet_object(goto_fn.opo, GrometPort(box=len(goto_fn.b), name=&#34;fn_idx&#34;))
+            goto_fn.wfopo = insert_gromet_object(goto_fn.wfopo, GrometWire(src=len(goto_fn.opo), tgt=len(goto_fn.pof)))
+
+            goto_fn.bf = insert_gromet_object(goto_fn.bf, GrometBoxFunction(function_type=FunctionType.LITERAL, value=GLiteralValue(&#34;None&#34;,&#34;None&#34;)))
+            label_bf = len(goto_fn.bf)
+
         goto_fn.pof = insert_gromet_object(goto_fn.pof, GrometPort(box=label_bf)) 
         goto_fn.opo = insert_gromet_object(goto_fn.opo, GrometPort(box=len(goto_fn.b), name=&#34;label&#34;))
         goto_fn.wfopo = insert_gromet_object(goto_fn.wfopo, GrometWire(src=len(goto_fn.opo), tgt=len(goto_fn.pof)))
@@ -8152,6 +8176,15 @@ AnnCastAttribute</p></div>
         self.resolve_placeholder_gotos()
         var_environment[&#34;args&#34;] = deepcopy(prev_arg_env)
 
+    def retrieve_labels(self, node: AnnCastCall):
+        # Retrieves all the labels in node
+        # Assumes node is a Function Call to &#34;_get&#34; with its labels in the first argument
+        labels = []
+        arguments = node.arguments[0]
+        for arg in arguments.value:
+            labels.append(arg.value)
+
+        return labels
 
     @_visit.register
     def visit_goto(
@@ -8184,7 +8217,7 @@ AnnCastAttribute</p></div>
         for var in vars:
             for v in vars[var]: 
                 if v not in added_vars: 
-                    goto_fn.opi = insert_gromet_object(goto_fn.opi, GrometPort(box=len(goto_fn.b)))
+                    goto_fn.opi = insert_gromet_object(goto_fn.opi, GrometPort(box=len(goto_fn.b), name=v))
                     added_vars.append(v)
 
         # The goto expression FN has two potential expressions, to determine the label and the index
@@ -8196,7 +8229,7 @@ AnnCastAttribute</p></div>
             if node.label in self.labels:
                 label_index = self.labels[node.label]
             else:
-                label_index = -1
+                label_index = 0
 
                 # Multiple gotos could reference the same label that we haven&#39;t seen
                 # So we maintain a list that we can update later
@@ -8211,8 +8244,23 @@ AnnCastAttribute</p></div>
             goto_fn.opo = insert_gromet_object(goto_fn.opo, GrometPort(box=len(goto_fn.b), name=&#34;fn_idx&#34;))
             goto_fn.wfopo = insert_gromet_object(goto_fn.wfopo, GrometWire(src=len(goto_fn.opo), tgt=len(goto_fn.pof)))
 
-        goto_fn.bf = insert_gromet_object(goto_fn.bf, GrometBoxFunction(function_type=FunctionType.LITERAL, value=node.label))
-        label_bf = len(goto_fn.bf)
+            goto_fn.bf = insert_gromet_object(goto_fn.bf, GrometBoxFunction(function_type=FunctionType.LITERAL, value=node.label))
+            label_bf = len(goto_fn.bf)
+        else:
+            self.visit(node.expr, goto_fn, node)
+            index_comp_bf = len(goto_fn.bf)
+
+            for idx,_ in enumerate(goto_fn.opi, 1):
+                goto_fn.pif = insert_gromet_object(goto_fn.pif, GrometPort(box=1))
+                goto_fn.wfopi = insert_gromet_object(goto_fn.wfopi, GrometWire(src=len(goto_fn.pif), tgt=idx))
+
+            goto_fn.pof = insert_gromet_object(goto_fn.pof, GrometPort(box=index_comp_bf)) 
+            goto_fn.opo = insert_gromet_object(goto_fn.opo, GrometPort(box=len(goto_fn.b), name=&#34;fn_idx&#34;))
+            goto_fn.wfopo = insert_gromet_object(goto_fn.wfopo, GrometWire(src=len(goto_fn.opo), tgt=len(goto_fn.pof)))
+
+            goto_fn.bf = insert_gromet_object(goto_fn.bf, GrometBoxFunction(function_type=FunctionType.LITERAL, value=GLiteralValue(&#34;None&#34;,&#34;None&#34;)))
+            label_bf = len(goto_fn.bf)
+
         goto_fn.pof = insert_gromet_object(goto_fn.pof, GrometPort(box=label_bf)) 
         goto_fn.opo = insert_gromet_object(goto_fn.opo, GrometPort(box=len(goto_fn.b), name=&#34;label&#34;))
         goto_fn.wfopo = insert_gromet_object(goto_fn.wfopo, GrometWire(src=len(goto_fn.opo), tgt=len(goto_fn.pof)))
@@ -11697,6 +11745,26 @@ that gets returned</p></div>
     self.clear_labels()</code></pre>
 </details>
 </dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass.retrieve_labels"><code class="name flex">
+<span>def <span class="ident">retrieve_labels</span></span>(<span>self, node: <a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastCall" href="annotated_cast.html#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastCall">AnnCastCall</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def retrieve_labels(self, node: AnnCastCall):
+    # Retrieves all the labels in node
+    # Assumes node is a Function Call to &#34;_get&#34; with its labels in the first argument
+    labels = []
+    arguments = node.arguments[0]
+    for arg in arguments.value:
+        labels.append(arg.value)
+
+    return labels</code></pre>
+</details>
+</dd>
 <dt id="skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass.retrieve_var_port"><code class="name flex">
 <span>def <span class="ident">retrieve_var_port</span></span>(<span>self, var_name)</span>
 </code></dt>
@@ -13490,7 +13558,7 @@ def visit_goto(
     for var in vars:
         for v in vars[var]: 
             if v not in added_vars: 
-                goto_fn.opi = insert_gromet_object(goto_fn.opi, GrometPort(box=len(goto_fn.b)))
+                goto_fn.opi = insert_gromet_object(goto_fn.opi, GrometPort(box=len(goto_fn.b), name=v))
                 added_vars.append(v)
 
     # The goto expression FN has two potential expressions, to determine the label and the index
@@ -13502,7 +13570,7 @@ def visit_goto(
         if node.label in self.labels:
             label_index = self.labels[node.label]
         else:
-            label_index = -1
+            label_index = 0
 
             # Multiple gotos could reference the same label that we haven&#39;t seen
             # So we maintain a list that we can update later
@@ -13517,8 +13585,23 @@ def visit_goto(
         goto_fn.opo = insert_gromet_object(goto_fn.opo, GrometPort(box=len(goto_fn.b), name=&#34;fn_idx&#34;))
         goto_fn.wfopo = insert_gromet_object(goto_fn.wfopo, GrometWire(src=len(goto_fn.opo), tgt=len(goto_fn.pof)))
 
-    goto_fn.bf = insert_gromet_object(goto_fn.bf, GrometBoxFunction(function_type=FunctionType.LITERAL, value=node.label))
-    label_bf = len(goto_fn.bf)
+        goto_fn.bf = insert_gromet_object(goto_fn.bf, GrometBoxFunction(function_type=FunctionType.LITERAL, value=node.label))
+        label_bf = len(goto_fn.bf)
+    else:
+        self.visit(node.expr, goto_fn, node)
+        index_comp_bf = len(goto_fn.bf)
+
+        for idx,_ in enumerate(goto_fn.opi, 1):
+            goto_fn.pif = insert_gromet_object(goto_fn.pif, GrometPort(box=1))
+            goto_fn.wfopi = insert_gromet_object(goto_fn.wfopi, GrometWire(src=len(goto_fn.pif), tgt=idx))
+
+        goto_fn.pof = insert_gromet_object(goto_fn.pof, GrometPort(box=index_comp_bf)) 
+        goto_fn.opo = insert_gromet_object(goto_fn.opo, GrometPort(box=len(goto_fn.b), name=&#34;fn_idx&#34;))
+        goto_fn.wfopo = insert_gromet_object(goto_fn.wfopo, GrometWire(src=len(goto_fn.opo), tgt=len(goto_fn.pof)))
+
+        goto_fn.bf = insert_gromet_object(goto_fn.bf, GrometBoxFunction(function_type=FunctionType.LITERAL, value=GLiteralValue(&#34;None&#34;,&#34;None&#34;)))
+        label_bf = len(goto_fn.bf)
+
     goto_fn.pof = insert_gromet_object(goto_fn.pof, GrometPort(box=label_bf)) 
     goto_fn.opo = insert_gromet_object(goto_fn.opo, GrometPort(box=len(goto_fn.b), name=&#34;label&#34;))
     goto_fn.wfopo = insert_gromet_object(goto_fn.wfopo, GrometWire(src=len(goto_fn.opo), tgt=len(goto_fn.pof)))</code></pre>
@@ -14976,6 +15059,7 @@ we use this recursive function to handle all the possible cases</p></div>
 <li><code><a title="skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass.pop_idx" href="#skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass.pop_idx">pop_idx</a></code></li>
 <li><code><a title="skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass.push_idx" href="#skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass.push_idx">push_idx</a></code></li>
 <li><code><a title="skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass.resolve_placeholder_gotos" href="#skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass.resolve_placeholder_gotos">resolve_placeholder_gotos</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass.retrieve_labels" href="#skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass.retrieve_labels">retrieve_labels</a></code></li>
 <li><code><a title="skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass.retrieve_var_port" href="#skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass.retrieve_var_port">retrieve_var_port</a></code></li>
 <li><code><a title="skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass.set_index" href="#skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass.set_index">set_index</a></code></li>
 <li><code><a title="skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass.symtab_functions" href="#skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass.ToGrometPass.symtab_functions">symtab_functions</a></code></li>
