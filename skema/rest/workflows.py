@@ -451,9 +451,11 @@ async def code_snippets_to_isa_align(
             },
         )
     else:
+        print("DEBUGGING......")
+        print(res.json())
         # Further processing and communication with the code-exp-graphs service
         code_graph_res = await client.put(
-            f"http://localhost:8080/mathml/code-exp-graphs", json=res.json()
+            f"{SKEMA_RS_ADDESS}/mathml/code-exp-graphs", json=res.json()
         )
 
         # Checking the response status and handling errors if any
