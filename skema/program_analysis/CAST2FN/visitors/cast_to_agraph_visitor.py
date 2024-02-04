@@ -91,7 +91,10 @@ class CASTToAGraphVisitor(CASTVisitor):
         """Visits the entire CAST object to populate the graph G
         and returns an AGraph of the graph G as a result.
         """
-        self.visit_list(self.cast.nodes)
+        if isinstance(self.cast, list):
+            self.visit_list(self.cast[0].nodes)
+        else:
+            self.visit_list(self.cast.nodes)
         A = nx.nx_agraph.to_agraph(self.G)
         A.graph_attr.update(
             {"dpi": 227, "fontsize": 20, "fontname": "Menlo", "rankdir": "TB"}
@@ -472,6 +475,22 @@ class CASTToAGraphVisitor(CASTVisitor):
         for n in body:
             self.G.add_edge(body_node, n)
 
+        return node_uid
+
+    @visit.register
+    def _(self, node: Goto):
+        node_uid = uuid.uuid4()
+        if node.expr == None:
+            self.G.add_node(node_uid, label=f"Goto {node.label}")
+        else:
+            self.G.add_node(node_uid, label="Goto (Computed)")
+        
+        return node_uid
+
+    @visit.register
+    def _(self, node: Label):
+        node_uid = uuid.uuid4()
+        self.G.add_node(node_uid, label=f"Label {node.label}")
         return node_uid
 
     @visit.register
@@ -950,7 +969,8 @@ class CASTToAGraphVisitor(CASTVisitor):
         node_uid = uuid.uuid4()
 
         class_init = False
-        for n in self.cast.nodes[0].body:
+        body = self.cast[0].nodes[0].body if isinstance(self.cast, list) else self.cast.nodes[0].body
+        for n in body:
             if isinstance(n, RecordDef) and n.name == node.name:
                 class_init = True
                 self.G.add_node(node_uid, label=node.name + " Init()")
