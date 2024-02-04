@@ -402,7 +402,7 @@ async def repo_to_rn_amr(zip_file: UploadFile = File()):
 
 # code snippets -> fn -> Vec<MET> -> alignment result
 #              mathml ->    MET   ->
-@router.post("/isa/code-align", summary="ISA aided inference")
+@router.post("/isa/code-eqn-align", summary="ISA aided inference")
 async def code_snippets_to_isa_align(
     mml_system: code2fn.MML_System,
     client: httpx.AsyncClient = Depends(utils.get_client)
@@ -451,8 +451,6 @@ async def code_snippets_to_isa_align(
             },
         )
     else:
-        print("DEBUGGING......")
-        print(res.json())
         # Further processing and communication with the code-exp-graphs service
         code_graph_res = await client.put(
             f"{SKEMA_RS_ADDESS}/mathml/code-exp-graphs", json=res.json()
@@ -469,7 +467,7 @@ async def code_snippets_to_isa_align(
             )
 
         # Aligning equation and code
-        alignment_res = align_eqn_code(mml_system.mml, code_graph_res.text)
+        alignment_res = align_eqn_code(utils.clean_mml(mml_system.mml), code_graph_res.text)
 
         # Converting numpy arrays to dictionaries for deserialization
         converted_alignment_res = convert_to_dict(alignment_res)
