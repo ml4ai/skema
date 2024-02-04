@@ -1,7 +1,7 @@
 import json
 
 from fastapi.testclient import TestClient
-from skema.isa.isa_service import app
+from skema.rest.workflows import app
 import skema.isa.data as isa_data
 import pytest
 
