@@ -825,107 +825,6 @@ pub fn munderover_summation(input: Span) -> IResult<(SumUnderOver, Mrow)> {
     Ok((s, (operator, other_comps)))
 }
 
-/// Parser for msubsup_int
-/*pub fn msub_sup_int(input: Span) -> IResult<(Operator, MathExpression, MathExpression)> {
-    println!("----");
-    let (s, x) = ws(msubsup)(input)?;
-    println!("x={:?}", x);
-    //println!("s={:?}", s);
-    if let MathExpression::Msubsup(op, sub, sup) = x
-    {
-        println!(",");
-        if MathExpression::Mo(Operator::Int) == *op {
-            println!(",,");
-            let operator = MsubsupInt::new(
-                sub.clone(),
-                sup.clone()
-            );
-            let int_op = Operator::MsubsupInt(operator);
-
-
-            println!("sssss={:?}", s);
-            let (s, (integrand, _d)) = ws(pair(math_expression, d))(s)?;
-            println!(",,,");
-            let (s, int_var) = ws(math_expression)(s)?;
-            println!(",,,,,,");
-            //let comps = Mrow::new(row);
-            println!("comps={:?}", integrand);
-            println!("int_var={:?}", int_var);
-            return Ok((s, (int_op, integrand, int_var)))
-        }
-    }
-
-    /*let (s, (_int, (sub, (sup, _)))) = ws(pair(
-        alt((tag("<mrow><msubsup><mo>&#x222b;</mo>"), tag("<msubsup><mo>&#x222b;</mo>"))),
-        pair(
-           ws(math_expression),
-            pair(
-                ws(math_expression),
-                alt((tag("</msubsup></mrow>"), tag("</msubsup>"))),
-            ),
-        ),
-    ))(input)?;
-    let (s, _) = ws(
-        alt((tag("<mrow><msubsup><mo>&#x222b;</mo>"), tag("<msubsup><mo>&#x222b;</mo>"))),
-    )(input)?;*/
-    //println!("--");
-    /*let (s, ( sub, sup)) = ws(terminated(pair(
-        ws(alt((
-            delimited(
-                tag("<mrow>"),
-                math_expression,
-                tag("</mrow>"),
-            ),
-            math_expression))),
-        ws(alt((
-            delimited(
-                tag("<mrow>"),
-                math_expression,
-                tag("</mrow>"),
-            ),
-            math_expression)))
-    ), alt((tag("</msubsup></mrow>"), tag("</msubsup>"))),
-    ))(s)?;*/
-    /*let (s, ( sub, sup)) = ws(delimited(
-        alt((tag("<mrow><msubsup><mo>&#x222b;</mo>"), tag("<msubsup><mo>&#x222b;</mo>"))),
-        pair(
-            ws(alt((
-                delimited(
-                    tag("<mrow>"),
-                    math_expression,
-                    tag("</mrow>"),
-                ),
-                math_expression))),
-            ws(alt((
-                delimited(
-                    tag("<mrow>"),
-                    math_expression,
-                    tag("</mrow>"),
-                ),
-                math_expression)))
-        ),
-        alt((tag("</msubsup></mrow>"), tag("</msubsup>"))),
-    ))(input)?;*/
-    //println!("----");
-    /*println!("sub={:?}",sub);
-    println!("sup={:?}",sup);
-    println!("===");
-    let operator = MsubsupInt::new(
-        Box::new(sub),
-        Box::new(sup),
-    );*/
-    //println!("....");
-    //let op = Operator::MsubsupInt(operator);
-    //let yy = MathExpression::Mo(Operator::Int);
-    //let op = Operator::MsubsupInt(yy);
-    //println!("op={:?}",yy);
-    //Ok((s, Operator::Int))
-    Err(nom::Err::Error(ParseError::new(
-        "Unable to parse Msubsup integral".to_string(),
-        input,
-    )))
-}*/
-
 /// Parser for Msubsup integral that handles integrand with MathExpression
 /// E.g. \int_a^b x^2  dx
 pub fn integral_with_math_expression_integrand(
@@ -1013,13 +912,6 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                     comp: Box::new(row),
                 })
             }),
-            /*map(msub_sup_int, |MsubsupInt {sub, sup }| {
-                MathExpression::Mo(Operator::MsubsupInt(MsubsupInt {
-                    sub,
-                    sup,
-                }))
-            }),*/
-            //map(msub_sup_int, |op| MathExpression::Mo(op)),
         )),
         map(
             first_order_partial_derivative_partial_func,

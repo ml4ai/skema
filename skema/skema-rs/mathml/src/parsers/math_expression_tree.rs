@@ -699,6 +699,29 @@ impl MathExpressionTree {
                         expression.push('}');
                         //expression.push_str( &rest[0].to_latex());
                     }
+                    Operator::SumUnderOver(x) => {
+                        expression.push_str("\\sum_{");
+                        expression.push_str(&format!("{}",x.under));
+                        //process_math_expression(&x.under, &mut expression);
+                        expression.push_str("}^{");
+                        expression.push_str(&format!("{}",x.over));
+                        //process_math_expression(&x.over, &mut expression);
+                        expression.push('}');
+                        expression.push_str( &rest[0].to_latex());
+                    }
+                    Operator::DownArrow => {
+                        process_expression_parentheses(&mut expression, &rest[0]);
+                        expression.push_str("\\downarrow");
+                    }
+                    Operator::MsubsupInt(x) => {
+                        expression.push_str("\\int_{");
+                        process_math_expression(&x.sub, &mut expression);
+                        expression.push_str("}^{");
+                        process_math_expression(&x.sup, &mut expression);
+                        expression.push('}');
+                        expression.push_str( &rest[0].to_latex());
+                        expression.push_str(&*format!(" d{}", &*x.integration_variable));
+                    }
                     _ => {
                         expression = "".to_string();
                         return "Contain unsupported operators.".to_string();
@@ -2405,6 +2428,8 @@ fn test_sum_munderover() {
     let exp = input.parse::<MathExpressionTree>().unwrap();
     let s_exp = exp.to_string();
     assert_eq!(s_exp, "(∑_{l=k}^{K} S)");
+    println!("exp.to_latex()={:?}", exp.to_latex());
+    assert_eq!(exp.to_latex(), "\\sum_{l=k}^{K}S");
 }
 
 #[test]
@@ -2452,6 +2477,8 @@ fn test_hydrostatic() {
         s_exp,
         "(= Φ_{k} (+ Φ_{s} (* R (∑_{l=k}^{K} (* H_{kl} T_{vl})))))"
     );
+    println!("exp.to_latex()={:?}", exp.to_latex());
+    assert_eq!(exp.to_latex(), "\\Phi_{k}=\\Phi_{s}+(R*(\\sum_{l=k}^{K}H_{kl}*T_{vl}))")
 }
 
 #[test]
@@ -2787,6 +2814,7 @@ fn test_down_arrow() {
     let s_exp = exp.to_string();
     println!("s_exp={:?}", s_exp);
     assert_eq!(s_exp, "(↓ I)");
+    println!("exp.to_latex()={:?}", exp.to_latex());
 }
 
 /*#[test]
@@ -2837,6 +2865,8 @@ fn test_integral1() {
     let s_exp = exp.to_string();
     println!("s_exp={:?}", s_exp);
     assert_eq!(s_exp, "(Int_{λ_{1}}^{λ_{2}}(x) (^ x 2))");
+    println!("exp.to_latex()={:?}", exp.to_latex());
+    assert_eq!(exp.to_latex(), "\\int_{\\lambda_{1}}^{\\lambda_{2}}x^{2} dx");
 }
 
 #[test]
@@ -2884,4 +2914,6 @@ fn test_integral2() {
     let s_exp = exp.to_string();
     println!("s_exp={:?}", s_exp);
     assert_eq!(s_exp, "(Int_{λ_{1}}^{λ_{2}}(λ) (* (* ω I) α_{sno}))");
+    println!("exp.to_latex()={:?}", exp.to_latex());
+    assert_eq!(exp.to_latex(), "\\int_{\\lambda_{1}}^{\\lambda_{2}}\\omega(\\lambda)*I(\\lambda)*\\alpha_{sno}(\\lambda) dλ");
 }
