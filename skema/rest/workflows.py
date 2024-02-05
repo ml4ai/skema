@@ -380,6 +380,24 @@ async def llm_assisted_codebase_to_pn_amr(zip_file: UploadFile = File(), client:
 
     return amr
 
+# code snippets -> fn -> petrinet amr
+@router.post("/code/snippets-to-MET", summary="Code snippets → MET")
+async def code_snippets_to_MET(system: code2fn.System, client: httpx.AsyncClient = Depends(utils.get_client)):
+    gromet = await code2fn.fn_given_filepaths(system)
+    gromet, _ = utils.fn_preprocessor(gromet)
+    # print(f"gromet:{gromet}")
+    # print(f"client.follow_redirects:\t{client.follow_redirects}")
+    # print(f"client.timeout:\t{client.timeout}")
+    res = await client.put(f"{SKEMA_RS_ADDESS}/models/MET", json=gromet)
+    if res.status_code != 200:
+        return JSONResponse(
+            status_code=400,
+            content={
+                "error": f"MORAE PUT /models/PN failed to process payload ({res.text})",
+                "payload": gromet,
+            },
+        )
+    return res.json()
 
 """ TODO: The regnet endpoints are currently outdated
 # zip archive -> fn -> regnet amr
