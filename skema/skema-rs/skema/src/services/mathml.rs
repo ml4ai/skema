@@ -12,6 +12,7 @@ use mathml::parsers::math_expression_tree::{
 use mathml::{
     acset::{AMRmathml, PetriNet, RegNet},
     parsers::first_order_ode::{first_order_ode, FirstOrderODE},
+    expression::get_code_exp_graphs,
 };
 use petgraph::dot::{Config, Dot};
 use utoipa;
@@ -59,6 +60,25 @@ pub async fn get_math_exp_graph(payload: String) -> String {
     let g = exp.to_graph();
     let dot_representation = Dot::new(&g);
     dot_representation.to_string()
+}
+
+/// Parse a MathML representation of the code implementation and return a DOT representation of the math
+/// expression graph (MEG), which can be used to perform structural alignment with the scientific
+/// model code that corresponds to the equation.
+#[utoipa::path(
+request_body = Vec<MathExpressionTree>,
+responses(
+(
+status = 200,
+body = String
+)
+)
+)]
+#[put("/mathml/code-exp-graphs")]
+pub async fn get_code_exp_graph_set(payload: web::Json<Vec<MathExpressionTree>>) -> String {
+    let content = payload.clone();
+    let json_result = get_code_exp_graphs(content);
+    json_result
 }
 
 /// Parse a presentation MathML representation of an equation and

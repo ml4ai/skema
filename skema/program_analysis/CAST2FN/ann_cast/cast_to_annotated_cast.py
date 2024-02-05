@@ -114,7 +114,7 @@ class CastToAnnotatedCastVisitor:
         
     @_visit.register
     def visit_goto(self, node: Goto):
-        expr = node.expr
+        expr = self.visit(node.expr) if node.expr != None else None
         label = node.label
         return AnnCastGoto(expr, label, node.source_refs)
         
