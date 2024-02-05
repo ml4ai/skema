@@ -89,5 +89,5 @@ def test_align_code_eqn():
     ), f"Request was unsuccessful (status code was {response.status_code} instead of 200)"
     # check response of matching_ratio
     assert (
-        json.loads(response.text) == expected
+        response.text == expected
     ), f"Response should be {expected}, but instead received {response.text}"
