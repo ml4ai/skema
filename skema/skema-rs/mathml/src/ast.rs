@@ -62,6 +62,14 @@ pub struct HatComp {
     pub comp: Box<MathExpression>,
 }
 
+/// DownArrow
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
+pub struct DownArrowComp {
+    pub op: Box<MathExpression>,
+    pub comp: Box<MathExpression>,
+    pub func_of: Vec<Ci>,
+}
+
 /// The MathExpression enum is not faithful to the corresponding element type in MathML 3
 /// (https://www.w3.org/TR/MathML3/appendixa.html#parsing_MathExpression)
 #[derive(
@@ -94,6 +102,7 @@ pub enum MathExpression {
     AbsoluteSup(Box<MathExpression>, Box<MathExpression>),
     Absolute(Box<MathExpression>, Box<MathExpression>),
     HatComp(HatComp),
+    DownArrowComp(DownArrowComp),
     Integral(Integral),
     //Differential(Box<MathExpression>, Box<MathExpression>),
     #[default]
@@ -142,6 +151,14 @@ impl fmt::Display for MathExpression {
                 write!(f, "{func}")
             }
             MathExpression::HatComp(HatComp { op, comp }) => {
+                write!(f, "{op}")?;
+                write!(f, "{comp}")
+            }
+            MathExpression::DownArrowComp(DownArrowComp {
+                op,
+                comp,
+                func_of: _,
+            }) => {
                 write!(f, "{op}")?;
                 write!(f, "{comp}")
             }

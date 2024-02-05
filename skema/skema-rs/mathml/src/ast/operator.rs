@@ -48,6 +48,12 @@ pub struct MsubsupInt {
     pub integration_variable: Box<MathExpression>,
 }
 
+/// MsupDownArrow operation
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
+pub struct MsupDownArrow {
+    pub comp: Box<MathExpression>,
+}
+
 #[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
 pub enum Operator {
     Add,
@@ -89,6 +95,7 @@ pub enum Operator {
     Cross,
     Hat,
     HatOp(HatOp),
+    MsupDownArrow(MsupDownArrow),
     DownArrow,
     Int,
     MsubsupInt(MsubsupInt),
@@ -155,6 +162,7 @@ impl fmt::Display for Operator {
             Operator::Cross => write!(f, "×"),
             Operator::Hat => write!(f, "Hat"),
             Operator::HatOp(HatOp { comp }) => write!(f, "Hat({comp})"),
+            Operator::MsupDownArrow(MsupDownArrow { comp }) => write!(f, "{comp}↓"),
             Operator::DownArrow => write!(f, "↓"),
             Operator::Int => write!(f, "Int"),
             Operator::MsubsupInt(MsubsupInt {

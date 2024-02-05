@@ -4,7 +4,8 @@
 use crate::{
     ast::{
         operator::{
-            Derivative, GradSub, HatOp, MsubsupInt, Operator, PartialDerivative, SumUnderOver,
+            Derivative, GradSub, HatOp, MsubsupInt, MsupDownArrow, Operator, PartialDerivative,
+            SumUnderOver,
         },
         Math, MathExpression, Mi, Mrow,
     },
@@ -385,6 +386,10 @@ fn process_math_expression(expr: &MathExpression, expression: &mut String) {
                 process_math_expression(me, expression);
             }
         }
+        MathExpression::Mo(Operator::MsupDownArrow(MsupDownArrow { comp })) => {
+            process_math_expression(comp, expression);
+            expression.push_str("^{\\downarrow}");
+        }
         t => panic!("Unhandled MathExpression: {:?}", t),
     }
 }
@@ -701,17 +706,13 @@ impl MathExpressionTree {
                     }
                     Operator::SumUnderOver(x) => {
                         expression.push_str("\\sum_{");
-                        expression.push_str(&format!("{}",x.under));
+                        expression.push_str(&format!("{}", x.under));
                         //process_math_expression(&x.under, &mut expression);
                         expression.push_str("}^{");
-                        expression.push_str(&format!("{}",x.over));
+                        expression.push_str(&format!("{}", x.over));
                         //process_math_expression(&x.over, &mut expression);
                         expression.push('}');
-                        expression.push_str( &rest[0].to_latex());
-                    }
-                    Operator::DownArrow => {
-                        process_expression_parentheses(&mut expression, &rest[0]);
-                        expression.push_str("\\downarrow");
+                        expression.push_str(&rest[0].to_latex());
                     }
                     Operator::MsubsupInt(x) => {
                         expression.push_str("\\int_{");
@@ -719,7 +720,7 @@ impl MathExpressionTree {
                         expression.push_str("}^{");
                         process_math_expression(&x.sup, &mut expression);
                         expression.push('}');
-                        expression.push_str( &rest[0].to_latex());
+                        expression.push_str(&rest[0].to_latex());
                         expression.push_str(&*format!(" d{}", &*x.integration_variable));
                     }
                     _ => {
@@ -887,6 +888,7 @@ impl MathExpression {
                 x.comp.flatten(tokens);
                 tokens.push(MathExpression::Mo(Operator::Rparen));
             }
+
             // Handles `Integral` operator with MathExpression
             MathExpression::Integral(x) => {
                 x.op.flatten(tokens);
@@ -1107,6 +1109,7 @@ fn prefix_binding_power(op: &Operator) -> ((), u8) {
         Operator::SumUnderOver(SumUnderOver { .. }) => ((), 25),
         Operator::HatOp(HatOp { .. }) => ((), 25),
         Operator::MsubsupInt(MsubsupInt { .. }) => ((), 25),
+        Operator::MsupDownArrow(MsupDownArrow { .. }) => ((), 25),
         _ => panic!("Bad operator: {:?}", op),
     }
 }
@@ -1116,7 +1119,6 @@ fn postfix_binding_power(op: &Operator) -> Option<(u8, ())> {
     let res = match op {
         Operator::Factorial => (11, ()),
         Operator::DownArrow => (11, ()),
-        //Operator::HatOp(HatOp { .. }) => (11, ()),
         _ => return None,
     };
     Some(res)
@@ -2478,7 +2480,10 @@ fn test_hydrostatic() {
         "(= Φ_{k} (+ Φ_{s} (* R (∑_{l=k}^{K} (* H_{kl} T_{vl})))))"
     );
     println!("exp.to_latex()={:?}", exp.to_latex());
-    assert_eq!(exp.to_latex(), "\\Phi_{k}=\\Phi_{s}+(R*(\\sum_{l=k}^{K}H_{kl}*T_{vl}))")
+    assert_eq!(
+        exp.to_latex(),
+        "\\Phi_{k}=\\Phi_{s}+(R*(\\sum_{l=k}^{K}H_{kl}*T_{vl}))"
+    )
 }
 
 #[test]
@@ -2806,34 +2811,36 @@ fn test_down_arrow() {
     let input = "<math>
     <msup>
         <mi>I</mi>
-          <mo>&#x2193;</mo>
+        <mo>&#x2193;</mo>
       </msup>
     </math>";
     let exp = input.parse::<MathExpressionTree>().unwrap();
     println!("exp={:?}", exp);
     let s_exp = exp.to_string();
     println!("s_exp={:?}", s_exp);
-    assert_eq!(s_exp, "(↓ I)");
+    assert_eq!(s_exp, "I↓");
     println!("exp.to_latex()={:?}", exp.to_latex());
 }
 
-/*#[test]
+#[test]
 fn test_down_arrow2() {
     let input = "<math>
     <msup>
         <mi>I</mi>
-          <mo>&#x2193;</mo>
-           <mo>(</mo>
+        <mo>&#x2193;</mo>
+      </msup>
+      <mo>(</mo>
       <mi>λ</mi>
       <mo>)</mo>
-      </msup>
     </math>";
     let exp = input.parse::<MathExpressionTree>().unwrap();
     println!("exp={:?}", exp);
     let s_exp = exp.to_string();
     println!("s_exp={:?}", s_exp);
-    assert_eq!(s_exp, "(↓ I)");
-}*/
+    println!("exp.to_latex()={:?}", exp.to_latex());
+    assert_eq!(s_exp, "I↓");
+    assert_eq!(exp.to_latex(), "I^{\\downarrow}(\\lambda)");
+}
 
 #[test]
 fn test_integral1() {
@@ -2866,7 +2873,10 @@ fn test_integral1() {
     println!("s_exp={:?}", s_exp);
     assert_eq!(s_exp, "(Int_{λ_{1}}^{λ_{2}}(x) (^ x 2))");
     println!("exp.to_latex()={:?}", exp.to_latex());
-    assert_eq!(exp.to_latex(), "\\int_{\\lambda_{1}}^{\\lambda_{2}}x^{2} dx");
+    assert_eq!(
+        exp.to_latex(),
+        "\\int_{\\lambda_{1}}^{\\lambda_{2}}x^{2} dx"
+    );
 }
 
 #[test]

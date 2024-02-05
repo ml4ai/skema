@@ -7,9 +7,11 @@
 use crate::{
     ast::{
         operator::{
-            Derivative, GradSub, HatOp, MsubsupInt, Operator, PartialDerivative, SumUnderOver,
+            Derivative, GradSub, HatOp, MsubsupInt, MsupDownArrow, Operator, PartialDerivative,
+            SumUnderOver,
         },
-        Ci, Differential, HatComp, Integral, Math, MathExpression, Mi, Mrow, SummationMath, Type,
+        Ci, Differential, DownArrowComp, HatComp, Integral, Math, MathExpression, Mi, Mrow,
+        SummationMath, Type,
     },
     parsers::generic_mathml::{
         add, attribute, cross, divide, dot, down_arrow, elem_many0, equals, etag, grad, hat, int,
@@ -102,6 +104,28 @@ pub fn ci_univariate_with_bounds(input: Span) -> IResult<Ci> {
     ))
 }
 
+/// Parses function of identifiers
+/// Example: S↓(t,x) identifies (t,x) as identifiers.
+pub fn ci_downarrow_with_bounds(input: Span) -> IResult<Ci> {
+    let (s, ((Mi(x), _op), bound_vars)) = tuple((
+        delimited(stag!("msup"), pair(mi, down_arrow), etag!("msup")),
+        alt((parenthesized_identifier, parenthesized_msub_identifier)),
+    ))(input)?;
+    let mut ci_func_of: Vec<Ci> = Vec::new();
+    for bvar in bound_vars {
+        let b = Ci::new(Some(Type::Real), Box::new(MathExpression::Mi(bvar)), None);
+        ci_func_of.push(b.clone());
+    }
+    Ok((
+        s,
+        Ci::new(
+            Some(Type::Function),
+            Box::new(MathExpression::Mi(Mi(x.trim().to_string()))),
+            Some(ci_func_of),
+        ),
+    ))
+}
+
 /// Parse content identifiers
 /// Example: S
 pub fn ci_univariate_without_bounds(input: Span) -> IResult<Ci> {
@@ -176,7 +200,18 @@ pub fn superscript(input: Span) -> IResult<MathExpression> {
         tag_parser!("msup", pair(math_expression, math_expression)),
         |(x, y)| MathExpression::Msup(Box::new(x), Box::new(y)),
     ))(input)?;
-    Ok((s, sup))
+    if let MathExpression::Msup(ref x, ref y) = sup.clone() {
+        if MathExpression::Mo(Operator::DownArrow) == **y {
+            let new_op = Operator::MsupDownArrow(MsupDownArrow::new(x.clone()));
+            return Ok((s, MathExpression::Mo(new_op)));
+        } else {
+            return Ok((s, sup));
+        }
+    }
+    Err(nom::Err::Error(ParseError::new(
+        "Unable to obtain Msup term".to_string(),
+        input,
+    )))
 }
 
 /// Parse Mover
@@ -210,6 +245,67 @@ pub fn over_term(input: Span) -> IResult<MathExpression> {
 pub fn hat_operator(input: Span) -> IResult<(MathExpression, MathExpression)> {
     let (s, (comp, op)) = pair(mi, over_term)(input)?;
     Ok((s, (op, MathExpression::Mi(comp))))
+}
+
+/// Parse Hat operator with components. Example: r \hat{x}
+pub fn downarrow_operator_with_bounds(input: Span) -> IResult<Ci> {
+    //let (s, ((comp, op), bound_vars)) = pair(pair(mi, over_term), alt((parenthesized_identifier, parenthesized_msub_identifier)))(input)?;
+    //print!("bound_vars={:?}", bound_vars);
+    let (s, (comp, op)) = ws(delimited(
+        stag!("msup"),
+        pair(mi, delimited(stag!("mo"), down_arrow, etag!("mo"))),
+        etag!("msup"),
+    ))(input)?;
+
+    let (s, bound_vars) = ws(alt((
+        parenthesized_identifier,
+        parenthesized_msub_identifier,
+    )))(s)?;
+    let operator = Operator::MsupDownArrow(MsupDownArrow::new(Box::new(MathExpression::Mi(
+        comp.clone(),
+    ))));
+
+    let mut ci_func_of: Vec<Ci> = Vec::new();
+    for bvar in bound_vars {
+        let b = Ci::new(Some(Type::Real), Box::new(MathExpression::Mi(bvar)), None);
+        ci_func_of.push(b.clone());
+    }
+    println!("DownArrow");
+    //Ok((s, (MathExpression::Mo(operator), MathExpression::Mi(comp),  ci_func_of) ))
+    Ok((
+        s,
+        Ci::new(
+            Some(Type::Function),
+            Box::new(MathExpression::Mo(operator)),
+            Some(ci_func_of),
+        ),
+    ))
+}
+
+pub fn downarrow_operator_no_bounds(input: Span) -> IResult<Ci> {
+    //let (s, ((comp, op), bound_vars)) = pair(pair(mi, over_term), alt((parenthesized_identifier, parenthesized_msub_identifier)))(input)?;
+    //print!("bound_vars={:?}", bound_vars);
+    let (s, (comp, op)) = ws(delimited(
+        stag!("msup"),
+        pair(mi, delimited(stag!("mo"), down_arrow, etag!("mo"))),
+        etag!("msup"),
+    ))(input)?;
+
+    let operator = Operator::MsupDownArrow(MsupDownArrow::new(Box::new(MathExpression::Mi(
+        comp.clone(),
+    ))));
+
+    let mut ci_func_of: Vec<Ci> = Vec::new();
+    println!("--DownArrow");
+    //Ok((s, (MathExpression::Mo(operator), MathExpression::Mi(comp),  ci_func_of) ))
+    Ok((
+        s,
+        Ci::new(
+            Some(Type::Function),
+            Box::new(MathExpression::Mo(operator)),
+            None,
+        ),
+    ))
 }
 
 /// Parse the identifier 'd'
@@ -903,8 +999,6 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                 MathExpression::Mrow(Mrow(row))
             }),
             map(gradient_subscript, MathExpression::Mo),
-        )),
-        alt((
             map(div, MathExpression::Mo),
             map(hat_operator, |(op, row)| {
                 MathExpression::HatComp(HatComp {
@@ -912,6 +1006,8 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                     comp: Box::new(row),
                 })
             }),
+            map(downarrow_operator_with_bounds, MathExpression::Ci),
+            map(downarrow_operator_no_bounds, MathExpression::Ci),
         )),
         map(
             first_order_partial_derivative_partial_func,
@@ -947,7 +1043,6 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
             ws(absolute_with_msup),
             ws(paren_as_msup),
             map(change_in_variable, MathExpression::Ci),
-            //sqrt,
             map(
                 munderover_summation,
                 |(SumUnderOver { op, under, over }, comp)| {
@@ -1070,6 +1165,18 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
         ),
         map(
             ci_univariate_with_bounds,
+            |Ci {
+                 content, func_of, ..
+             }| {
+                MathExpression::Ci(Ci {
+                    r#type: Some(Type::Real),
+                    content,
+                    func_of,
+                })
+            },
+        ),
+        map(
+            ci_downarrow_with_bounds,
             |Ci {
                  content, func_of, ..
              }| {
