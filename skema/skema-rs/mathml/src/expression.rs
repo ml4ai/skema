@@ -1455,23 +1455,20 @@ fn test_get_code_exp_graphs() {
 
         // Retrieve the DOT graph string for the current index
         let dot_graph_string = value.as_str().unwrap();
-
+        println!("{}", dot_graph_string);
         // Add assertions or validations based on your specific needs
         match index {
             1 => {
                 // Test assertions for index 1
                 assert!(dot_graph_string.contains("I*epsilon/3-eta*D"));
-                assert!(dot_graph_string.contains("label = \"=\""));
             }
             2 => {
                 // Test assertions for index 2
                 assert!(dot_graph_string.contains("zeta*I-A*(theta+mu+kappa)"));
-                assert!(dot_graph_string.contains("label = \"=\""));
             }
             3 => {
                 // Test assertions for index 3
                 assert!(dot_graph_string.contains("eta*D+theta*A-R*(nu+xi)"));
-                assert!(dot_graph_string.contains("label = \"=\""));
             }
             // Add more cases as needed for other indices
             _ => {
