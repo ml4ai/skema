@@ -247,13 +247,18 @@ pub fn hat_operator(input: Span) -> IResult<(MathExpression, MathExpression)> {
     Ok((s, (op, MathExpression::Mi(comp))))
 }
 
-/// Parse Hat operator with components. Example: r \hat{x}
+/// Handles downarrow operation (↓) in Superscript with includes function of content
+/// E.g. T^↓(x)
 pub fn downarrow_operator_with_bounds(input: Span) -> IResult<Ci> {
-    //let (s, ((comp, op), bound_vars)) = pair(pair(mi, over_term), alt((parenthesized_identifier, parenthesized_msub_identifier)))(input)?;
-    //print!("bound_vars={:?}", bound_vars);
     let (s, (comp, op)) = ws(delimited(
         stag!("msup"),
-        pair(mi, delimited(stag!("mo"), down_arrow, etag!("mo"))),
+        pair(
+            mi,
+            alt((
+                delimited(tag("<mrow><mo>"), down_arrow, tag("</mo></mrow>")),
+                delimited(stag!("mo"), down_arrow, etag!("mo")),
+            )),
+        ),
         etag!("msup"),
     ))(input)?;
 
@@ -270,8 +275,6 @@ pub fn downarrow_operator_with_bounds(input: Span) -> IResult<Ci> {
         let b = Ci::new(Some(Type::Real), Box::new(MathExpression::Mi(bvar)), None);
         ci_func_of.push(b.clone());
     }
-    println!("DownArrow");
-    //Ok((s, (MathExpression::Mo(operator), MathExpression::Mi(comp),  ci_func_of) ))
     Ok((
         s,
         Ci::new(
@@ -282,9 +285,9 @@ pub fn downarrow_operator_with_bounds(input: Span) -> IResult<Ci> {
     ))
 }
 
+/// Handles downarrow operation (↓) in Superscript
+/// E.g. T^↓
 pub fn downarrow_operator_no_bounds(input: Span) -> IResult<Ci> {
-    //let (s, ((comp, op), bound_vars)) = pair(pair(mi, over_term), alt((parenthesized_identifier, parenthesized_msub_identifier)))(input)?;
-    //print!("bound_vars={:?}", bound_vars);
     let (s, (comp, op)) = ws(delimited(
         stag!("msup"),
         pair(mi, delimited(stag!("mo"), down_arrow, etag!("mo"))),
@@ -297,7 +300,6 @@ pub fn downarrow_operator_no_bounds(input: Span) -> IResult<Ci> {
 
     let mut ci_func_of: Vec<Ci> = Vec::new();
     println!("--DownArrow");
-    //Ok((s, (MathExpression::Mo(operator), MathExpression::Mi(comp),  ci_func_of) ))
     Ok((
         s,
         Ci::new(
@@ -926,13 +928,14 @@ pub fn munderover_summation(input: Span) -> IResult<(SumUnderOver, Mrow)> {
 pub fn integral_with_math_expression_integrand(
     input: Span,
 ) -> IResult<(Operator, MathExpression, MathExpression)> {
-    let (s, x) = ws(msubsup)(input)?;
+    let (s, x) = ws(alt((msubsup, preceded(stag!("mrow"), msubsup))))(input)?;
     if let MathExpression::Msubsup(op, sub, sup) = x {
         if MathExpression::Mo(Operator::Int) == *op {
             let (s, (integrand, _d)) = ws(pair(math_expression, d))(s)?;
             let (s, int_var) = ws(math_expression)(s)?;
             let operator = MsubsupInt::new(sub.clone(), sup.clone(), Box::new(int_var.clone()));
             let int_op = Operator::MsubsupInt(operator);
+            let (s, _) = ws(alt((etag!("mrow"), tag(""))))(s)?;
 
             return Ok((s, (int_op, integrand, int_var)));
         }
@@ -949,7 +952,7 @@ pub fn integral_with_math_expression_integrand(
 pub fn integral_with_many_math_expression_integrand(
     input: Span,
 ) -> IResult<(Operator, MathExpression, MathExpression)> {
-    let (s, x) = ws(msubsup)(input)?;
+    let (s, x) = ws(alt((msubsup, preceded(stag!("mrow"), msubsup))))(input)?;
     if let MathExpression::Msubsup(op, sub, sup) = x {
         if MathExpression::Mo(Operator::Int) == *op {
             let (s, row) = ws(many_till(math_expression, d))(s)?;
@@ -957,6 +960,7 @@ pub fn integral_with_many_math_expression_integrand(
             let integrand = MathExpression::Mrow(Mrow::new(row.0));
             let operator = MsubsupInt::new(sub.clone(), sup.clone(), Box::new(int_var.clone()));
             let int_op = Operator::MsubsupInt(operator);
+            let (s, _) = ws(etag!("mrow"))(s)?;
 
             return Ok((s, (int_op, integrand, int_var)));
         }
