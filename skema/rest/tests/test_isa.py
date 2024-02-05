@@ -1,12 +1,13 @@
 import json
 
 from fastapi.testclient import TestClient
-from skema.rest.workflows import app
+from skema.isa.isa_service import app
+from skema.rest.workflows import app as workflow_app
 import skema.isa.data as isa_data
 import pytest
 
 client = TestClient(app)
-
+workflow_client = TestClient(workflow_app)
 
 @pytest.mark.ci_only
 def test_align_eqns():
@@ -78,7 +79,7 @@ def test_align_code_eqn():
     }
 
     endpoint = "/isa/code-eqn-align"
-    response = client.post(endpoint, json=single_snippet_payload)
+    response = workflow_client.post(endpoint, json=single_snippet_payload)
 
     # check status code
     assert (
