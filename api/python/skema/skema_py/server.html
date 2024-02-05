@@ -135,6 +135,17 @@ class System(BaseModel):
     )
 
 
+class MML_System(BaseModel):
+    &#34;&#34;&#34;
+        Pydantic BaseModel representing a system with MML (MathML).
+
+        Attributes:
+            mml (str): The MML equation.
+            system (System): An instance of the System class representing system details.
+        &#34;&#34;&#34;
+    mml: str
+    system: System
+
 async def system_to_enriched_system(system: System) -&gt; System:
     &#34;&#34;&#34;Takes a System as input and enriches it with comments by running the tree-sitter comment extractor.&#34;&#34;&#34;
 
@@ -1025,6 +1036,66 @@ def healthcheck() -&gt; int:
 <section>
 <h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
+<dt id="skema.skema_py.server.MML_System"><code class="flex name class">
+<span>class <span class="ident">MML_System</span></span>
+<span>(</span><span>**data: Any)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Pydantic BaseModel representing a system with MML (MathML).</p>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>mml</code></strong> :&ensp;<code>str</code></dt>
+<dd>The MML equation.</dd>
+<dt><strong><code>system</code></strong> :&ensp;<code><a title="skema.skema_py.server.System" href="#skema.skema_py.server.System">System</a></code></dt>
+<dd>An instance of the System class representing system details.</dd>
+</dl>
+<p>Create a new model by parsing and validating input data from keyword arguments.</p>
+<p>Raises [<code>ValidationError</code>][pydantic_core.ValidationError] if the input data cannot be
+validated to form a valid model.</p>
+<p><code>self</code> is explicitly positional-only to allow <code>self</code> as a field name.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class MML_System(BaseModel):
+    &#34;&#34;&#34;
+        Pydantic BaseModel representing a system with MML (MathML).
+
+        Attributes:
+            mml (str): The MML equation.
+            system (System): An instance of the System class representing system details.
+        &#34;&#34;&#34;
+    mml: str
+    system: System</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>pydantic.main.BaseModel</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="skema.skema_py.server.MML_System.mml"><code class="name">var <span class="ident">mml</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.skema_py.server.MML_System.model_computed_fields"><code class="name">var <span class="ident">model_computed_fields</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.skema_py.server.MML_System.model_config"><code class="name">var <span class="ident">model_config</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.skema_py.server.MML_System.model_fields"><code class="name">var <span class="ident">model_fields</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.skema_py.server.MML_System.system"><code class="name">var <span class="ident">system</span> : <a title="skema.skema_py.server.System" href="#skema.skema_py.server.System">System</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
 <dt id="skema.skema_py.server.Ports"><code class="flex name class">
 <span>class <span class="ident">Ports</span></span>
 <span>(</span><span>**data: Any)</span>
@@ -1278,6 +1349,16 @@ validated to form a valid model.</p>
 </li>
 <li><h3><a href="#header-classes">Classes</a></h3>
 <ul>
+<li>
+<h4><code><a title="skema.skema_py.server.MML_System" href="#skema.skema_py.server.MML_System">MML_System</a></code></h4>
+<ul class="">
+<li><code><a title="skema.skema_py.server.MML_System.mml" href="#skema.skema_py.server.MML_System.mml">mml</a></code></li>
+<li><code><a title="skema.skema_py.server.MML_System.model_computed_fields" href="#skema.skema_py.server.MML_System.model_computed_fields">model_computed_fields</a></code></li>
+<li><code><a title="skema.skema_py.server.MML_System.model_config" href="#skema.skema_py.server.MML_System.model_config">model_config</a></code></li>
+<li><code><a title="skema.skema_py.server.MML_System.model_fields" href="#skema.skema_py.server.MML_System.model_fields">model_fields</a></code></li>
+<li><code><a title="skema.skema_py.server.MML_System.system" href="#skema.skema_py.server.MML_System.system">system</a></code></li>
+</ul>
+</li>
 <li>
 <h4><code><a title="skema.skema_py.server.Ports" href="#skema.skema_py.server.Ports">Ports</a></code></h4>
 <ul class="">

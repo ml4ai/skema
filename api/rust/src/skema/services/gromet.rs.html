@@ -365,6 +365,31 @@
 <a href="#365" id="365">365</a>
 <a href="#366" id="366">366</a>
 <a href="#367" id="367">367</a>
+<a href="#368" id="368">368</a>
+<a href="#369" id="369">369</a>
+<a href="#370" id="370">370</a>
+<a href="#371" id="371">371</a>
+<a href="#372" id="372">372</a>
+<a href="#373" id="373">373</a>
+<a href="#374" id="374">374</a>
+<a href="#375" id="375">375</a>
+<a href="#376" id="376">376</a>
+<a href="#377" id="377">377</a>
+<a href="#378" id="378">378</a>
+<a href="#379" id="379">379</a>
+<a href="#380" id="380">380</a>
+<a href="#381" id="381">381</a>
+<a href="#382" id="382">382</a>
+<a href="#383" id="383">383</a>
+<a href="#384" id="384">384</a>
+<a href="#385" id="385">385</a>
+<a href="#386" id="386">386</a>
+<a href="#387" id="387">387</a>
+<a href="#388" id="388">388</a>
+<a href="#389" id="389">389</a>
+<a href="#390" id="390">390</a>
+<a href="#391" id="391">391</a>
+<a href="#392" id="392">392</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! REST API endpoints related to CRUD operations and other queries on GroMEt objects.
 </span><span class="kw">use </span><span class="kw">crate</span>::config::Config;
 <span class="kw">use </span><span class="kw">crate</span>::database::{parse_gromet_queries, run_queries};
@@ -374,7 +399,7 @@
 <span class="kw">use </span>actix_web::{delete, get, post, put, web, HttpResponse};
 <span class="kw">use </span>mathml::acset::{PetriNet, RegNet};
 
-<span class="kw">use </span>mathml::ast::MathExpression;
+<span class="kw">use </span>mathml::ast::{MathExpression, Mi, <span class="self">self</span>};
 <span class="kw">use </span>mathml::parsers::math_expression_tree::MathExpressionTree;
 <span class="kw">use </span>neo4rs;
 <span class="kw">use </span>neo4rs::{query, Error, Node};
@@ -722,10 +747,35 @@
     <span class="kw">let </span>ref_module_id2 = module_id.as_ref();
     <span class="kw">let </span>mathml_ast = module_id2mathml_MET_ast(<span class="kw-2">*</span>ref_module_id1.unwrap(), config1.clone()).<span class="kw">await</span>; <span class="comment">// turns model into mathml ast equations
     </span><span class="kw">let </span>_del_response = delete_module(<span class="kw-2">*</span>ref_module_id2.unwrap(), config1.clone()).<span class="kw">await</span>; <span class="comment">// deletes model from db
+    // now we convert each firstorderode into a MET. The RHS is just ported over, but we need to create the LHS as a derivative and put it into an equation
     </span><span class="kw">let </span><span class="kw-2">mut </span>mets = Vec::&lt;MathExpressionTree&gt;::new();
     <span class="kw">for </span>equation <span class="kw">in </span>mathml_ast.iter() {
         <span class="kw">let </span><span class="kw-2">mut </span>equal_args = Vec::&lt;MathExpressionTree&gt;::new();
-        equal_args.push(MathExpressionTree::Atom(MathExpression::Ci(equation.lhs_var.clone())));
+        <span class="kw">let </span>lhs_mi1 = mathml::ast::Mi(<span class="string">&quot;&quot;</span>.to_string()); <span class="comment">// blank
+        </span><span class="kw">let </span>lhs_mi2 = mathml::ast::Mi(<span class="string">&quot;t&quot;</span>.to_string()); <span class="comment">// differentiation variable
+        </span><span class="kw">let </span>lhs_mi3 = mathml::ast::Mi(equation.lhs_var.to_string()); <span class="comment">// state function
+        </span><span class="kw">let </span>lhs_ci1 = mathml::ast::Ci { <span class="comment">// blank
+            </span>r#type: <span class="prelude-val">Some</span>(ast::Type::Real),
+            content: Box::new(mathml::ast::MathExpression::Mi(lhs_mi1)),
+            func_of: <span class="prelude-val">None</span>,
+        };
+        <span class="kw">let </span>lhs_ci2 = mathml::ast::Ci { <span class="comment">// differentiation variable
+            </span>r#type: <span class="prelude-val">Some</span>(ast::Type::Real),
+            content: Box::new(mathml::ast::MathExpression::Mi(lhs_mi2)),
+            func_of: <span class="prelude-val">None</span>,
+        };
+        <span class="kw">let </span>lhs_ci3 = mathml::ast::Ci { <span class="comment">// state function
+            </span>r#type: <span class="prelude-val">Some</span>(ast::Type::Function),
+            content: Box::new(mathml::ast::MathExpression::Mi(lhs_mi3)),
+            func_of: <span class="prelude-val">Some</span>([lhs_ci1].to_vec()),
+        };
+        <span class="kw">let </span>lhs_deriv = mathml::ast::operator::Derivative {
+            order: <span class="number">1</span>,
+            var_index: <span class="number">1</span>,
+            bound_var: lhs_ci2,
+        };
+        <span class="kw">let </span>lhs = MathExpressionTree::Cons(mathml::ast::operator::Operator::Derivative(lhs_deriv), [MathExpressionTree::Atom(MathExpression::Ci(lhs_ci3))].to_vec());
+        equal_args.push(lhs.clone());
         equal_args.push(equation.rhs.clone());
         <span class="kw">let </span>met = MathExpressionTree::Cons(mathml::ast::operator::Operator::Equals, equal_args.clone());
         mets.push(met.clone());

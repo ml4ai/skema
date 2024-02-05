@@ -40,7 +40,7 @@ Updated date: December 18, 2023
 &#34;&#34;&#34;
 import json
 import warnings
-from typing import List, Any, Union, Dict
+from typing import List, Any, Union, Dict, Tuple
 from numpy import ndarray
 from pydot import Dot
 from skema.rest.proxies import SKEMA_RS_ADDESS
@@ -59,6 +59,9 @@ import re
 import xml.etree.ElementTree as ET
 import html
 from sentence_transformers import SentenceTransformer, util
+import json
+import ast
+
 
 # Set up the random seed
 np.random.seed(4)
@@ -207,6 +210,7 @@ def generate_graph(file: str = &#34;&#34;, render: bool = False) -&gt; pydot.Dot
         with open(file) as f:
             content = f.read()
 
+    #SKEMA_RS_ADDESS = &#34;http://localhost:8080&#34;
     digraph = requests.put(
         f&#34;{SKEMA_RS_ADDESS}/mathml/math-exp-graph&#34;, data=content.encode(&#34;utf-8&#34;)
     )
@@ -217,6 +221,23 @@ def generate_graph(file: str = &#34;&#34;, render: bool = False) -&gt; pydot.Dot
     graph = pydot.graph_from_dot_data(str(digraph.text))[0]
     return graph
 
+
+def generate_code_graphs(graph_string: str = &#34;&#34;) -&gt; Dict[str, pydot.Dot]:
+    &#34;&#34;&#34;
+    Call the REST API of code-exp-graphs to convert the code input to its GraphViz representation
+    Ensure running the REST API before calling this function
+    Input: file directory
+    Output: a dictionary of the GraphViz representation (pydot.Dot)
+    &#34;&#34;&#34;
+
+    # Safely evaluate the string as a literal Python expression
+    code_exp_graphs_dict = ast.literal_eval(graph_string)
+
+    # Convert the string representations to pydot.Dot objects
+    for key, value in code_exp_graphs_dict.items():
+        code_exp_graphs_dict[key] = pydot.graph_from_dot_data(value)[0]
+
+    return code_exp_graphs_dict
 
 def generate_amatrix(graph: pydot.Dot) -&gt; Tuple[ndarray, List[str]]:
     &#34;&#34;&#34;
@@ -279,8 +300,8 @@ def heuristic_compare_variable_names(var1: str, var2: str) -&gt; bool:
     }
 
     # Convert Unicode representations to English letter representations
-    var1 = re.sub(r&#34;&amp;#x(\w+);?&#34;, lambda m: chr(int(m.group(1), 16)), var1)
-    var2 = re.sub(r&#34;&amp;#x(\w+);?&#34;, lambda m: chr(int(m.group(1), 16)), var2)
+    var1 = re.sub(r&#34;&amp;#x(\w+);?&#34;, lambda m: chr(int(m.group(1), 16)), var1).lower()
+    var2 = re.sub(r&#34;&amp;#x(\w+);?&#34;, lambda m: chr(int(m.group(1), 16)), var2).lower()
 
     # Convert Greek letter representations to English letter representations
     for greek_letter, english_letter in greek_letters.items():
@@ -836,6 +857,129 @@ def align_mathml_eqs(
     )
 
 
+def align_eqn_code(
+    eqn_mml: str = &#34;&#34;,
+    code: str = &#34;&#34;,
+    mode: int = 1,
+) -&gt; Dict[
+    Any,
+    Tuple[Any, Any, List[str], List[str], Union[int, Any], Union[int, Any], str, List[int]],
+]:
+    &#34;&#34;&#34;
+    align the mathml equation graph and the code graphs using the seeded graph matching (SGD) algorithm [1].
+
+    [1] Fishkind, D. E., Adali, S., Patsolic, H. G., Meng, L., Singh, D., Lyzinski, V., &amp; Priebe, C. E. (2019).
+    Seeded graph matching. Pattern recognition, 87, 203-215.
+
+    Input:  eqn_mml: the equation mathml
+            code: the file path of the code input;
+            mode 0: without considering any priors; mode 1: having a heuristic prior
+            with the similarity of node labels;
+    Output:
+        The dictionary of the following data structure
+            matching_ratio: the matching ratio between the equations 1 and the equation 2
+            num_diff_edges: the number of different edges between the equations 1 and the equation 2
+            node_labels1: the name list of the variables and terms in the equation 1
+            node_labels2: the name list of the variables and terms in the equation 2
+            aligned_indices1: the aligned indices in the name list of the equation 1
+            aligned_indices2: the aligned indices in the name list of the equation 2
+            union_graph: the visualization of the alignment result
+            perfectly_matched_indices1: strictly matched node indices in Graph 1
+    &#34;&#34;&#34;
+    eqn_graph = generate_graph(eqn_mml)
+    code_graphs = generate_code_graphs(code)
+
+    amatrix1, node_labels1 = generate_amatrix(eqn_graph)
+    matching_results = {}
+
+    for exp_idx, exp_graph in code_graphs.items():
+        amatrix2, node_labels2 = generate_amatrix(exp_graph)
+
+        if mode == 0:
+            seed1 = []
+            seed2 = []
+        else:
+            seed1, seed2 = get_seeds(node_labels1, node_labels2)
+
+        partial_match = np.column_stack((seed1, seed2))
+
+        matched_indices1, matched_indices2, _, _ = graph_match(
+            amatrix1,
+            amatrix2,
+            partial_match=partial_match,
+            padding=&#34;adopted&#34;,
+            rng=rng,
+            max_iter=50,
+        )
+
+        big_graph_idx = 0 if len(node_labels1) &gt;= len(node_labels2) else 1
+        if big_graph_idx == 0:
+            big_graph = amatrix1
+            big_graph_matched_indices = matched_indices1
+            small_graph = amatrix2
+            small_graph_matched_indices = matched_indices2
+        else:
+            big_graph = amatrix2
+            big_graph_matched_indices = matched_indices2
+            small_graph = amatrix1
+            small_graph_matched_indices = matched_indices1
+
+        small_graph_aligned = small_graph[small_graph_matched_indices][
+            :, small_graph_matched_indices
+        ]
+        small_graph_aligned_full = np.zeros(big_graph.shape)
+        small_graph_aligned_full[
+            np.ix_(big_graph_matched_indices, big_graph_matched_indices)
+        ] = small_graph_aligned
+
+        num_edges = ((big_graph + small_graph_aligned_full) &gt; 0).sum()
+        diff_edges = abs(big_graph - small_graph_aligned_full)
+        diff_edges[diff_edges &gt; 0] = 1
+        perfectly_matched_indices1 = check_square_array(
+            diff_edges
+        )  # strictly aligned node indices of Graph 1
+        num_diff_edges = np.sum(diff_edges)
+        matching_ratio = round(1 - (num_diff_edges / num_edges), 2)
+
+        long_len = (
+            len(node_labels1)
+            if len(node_labels1) &gt;= len(node_labels2)
+            else len(node_labels2)
+        )
+        aligned_indices1 = np.zeros((long_len)) - 1
+        aligned_indices2 = np.zeros((long_len)) - 1
+        for i in range(long_len):
+            if i &lt; len(node_labels1):
+                if i in matched_indices1:
+                    aligned_indices1[i] = matched_indices2[
+                        np.where(matched_indices1 == i)[0][0]
+                    ]
+                    aligned_indices2[
+                        matched_indices2[np.where(matched_indices1 == i)[0][0]]
+                    ] = i
+
+        # The visualization of the alignment result.
+        union_graph = get_union_graph(
+            eqn_graph,
+            exp_graph,
+            [int(i) for i in matched_indices1.tolist()],
+            [int(i) for i in matched_indices2.tolist()],
+        )
+
+        matching_results[exp_idx] = (
+            matching_ratio,
+            num_diff_edges,
+            node_labels1,
+            node_labels2,
+            aligned_indices1,
+            aligned_indices2,
+            union_graph.to_string(),
+            perfectly_matched_indices1,
+        )
+
+    return matching_results
+
+
 def extract_variables_with_subsup(mathml_str: str) -&gt; List[str]:
     # Function to extract variable names from MathML
     root = ET.fromstring(mathml_str)
@@ -1014,7 +1158,33 @@ def generate_variable_dict(mathml_string):
         variable_dict = create_variable_dictionary(variables)
         return variable_dict
     except:
-        return {}</code></pre>
+        return {}
+
+def convert_to_dict(obj: Any) -&gt; Union[List[Any], Dict[Any, Any], np.ndarray, Any]:
+    &#34;&#34;&#34;
+    Recursively converts an object to a dictionary, handling numpy arrays and nested structures.
+
+    Args:
+        obj (Any): The input object to be converted.
+
+    Returns:
+        Union[List[Any], Dict[Any, Any], np.ndarray, Any]: The converted object in dictionary form.
+
+    Note:
+        This function recursively processes the input object and converts it to a dictionary.
+        - If the input is a numpy array, it is converted to a Python list.
+        - If the input is a list or tuple, each element is processed recursively.
+        - If the input is a dictionary, each value is processed recursively.
+        - Other types are returned as is.
+    &#34;&#34;&#34;
+    if isinstance(obj, np.ndarray):
+        return obj.tolist()
+    elif isinstance(obj, (list, tuple)):
+        return [convert_to_dict(item) for item in obj]
+    elif isinstance(obj, dict):
+        return {key: convert_to_dict(value) for key, value in obj.items()}
+    else:
+        return obj</code></pre>
 </details>
 </section>
 <section>
@@ -1024,6 +1194,155 @@ def generate_variable_dict(mathml_string):
 <section>
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
+<dt id="skema.isa.lib.align_eqn_code"><code class="name flex">
+<span>def <span class="ident">align_eqn_code</span></span>(<span>eqn_mml: str = '', code: str = '', mode: int = 1) ‑> Dict[Any, Tuple[Any, Any, List[str], List[str], Union[int, Any], Union[int, Any], str, List[int]]]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>align the mathml equation graph and the code graphs using the seeded graph matching (SGD) algorithm [1].</p>
+<p>[1] Fishkind, D. E., Adali, S., Patsolic, H. G., Meng, L., Singh, D., Lyzinski, V., &amp; Priebe, C. E. (2019).
+Seeded graph matching. Pattern recognition, 87, 203-215.</p>
+<p>Input:
+eqn_mml: the equation mathml
+code: the file path of the code input;
+mode 0: without considering any priors; mode 1: having a heuristic prior
+with the similarity of node labels;</p>
+<h2 id="output">Output</h2>
+<p>The dictionary of the following data structure
+matching_ratio: the matching ratio between the equations 1 and the equation 2
+num_diff_edges: the number of different edges between the equations 1 and the equation 2
+node_labels1: the name list of the variables and terms in the equation 1
+node_labels2: the name list of the variables and terms in the equation 2
+aligned_indices1: the aligned indices in the name list of the equation 1
+aligned_indices2: the aligned indices in the name list of the equation 2
+union_graph: the visualization of the alignment result
+perfectly_matched_indices1: strictly matched node indices in Graph 1</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def align_eqn_code(
+    eqn_mml: str = &#34;&#34;,
+    code: str = &#34;&#34;,
+    mode: int = 1,
+) -&gt; Dict[
+    Any,
+    Tuple[Any, Any, List[str], List[str], Union[int, Any], Union[int, Any], str, List[int]],
+]:
+    &#34;&#34;&#34;
+    align the mathml equation graph and the code graphs using the seeded graph matching (SGD) algorithm [1].
+
+    [1] Fishkind, D. E., Adali, S., Patsolic, H. G., Meng, L., Singh, D., Lyzinski, V., &amp; Priebe, C. E. (2019).
+    Seeded graph matching. Pattern recognition, 87, 203-215.
+
+    Input:  eqn_mml: the equation mathml
+            code: the file path of the code input;
+            mode 0: without considering any priors; mode 1: having a heuristic prior
+            with the similarity of node labels;
+    Output:
+        The dictionary of the following data structure
+            matching_ratio: the matching ratio between the equations 1 and the equation 2
+            num_diff_edges: the number of different edges between the equations 1 and the equation 2
+            node_labels1: the name list of the variables and terms in the equation 1
+            node_labels2: the name list of the variables and terms in the equation 2
+            aligned_indices1: the aligned indices in the name list of the equation 1
+            aligned_indices2: the aligned indices in the name list of the equation 2
+            union_graph: the visualization of the alignment result
+            perfectly_matched_indices1: strictly matched node indices in Graph 1
+    &#34;&#34;&#34;
+    eqn_graph = generate_graph(eqn_mml)
+    code_graphs = generate_code_graphs(code)
+
+    amatrix1, node_labels1 = generate_amatrix(eqn_graph)
+    matching_results = {}
+
+    for exp_idx, exp_graph in code_graphs.items():
+        amatrix2, node_labels2 = generate_amatrix(exp_graph)
+
+        if mode == 0:
+            seed1 = []
+            seed2 = []
+        else:
+            seed1, seed2 = get_seeds(node_labels1, node_labels2)
+
+        partial_match = np.column_stack((seed1, seed2))
+
+        matched_indices1, matched_indices2, _, _ = graph_match(
+            amatrix1,
+            amatrix2,
+            partial_match=partial_match,
+            padding=&#34;adopted&#34;,
+            rng=rng,
+            max_iter=50,
+        )
+
+        big_graph_idx = 0 if len(node_labels1) &gt;= len(node_labels2) else 1
+        if big_graph_idx == 0:
+            big_graph = amatrix1
+            big_graph_matched_indices = matched_indices1
+            small_graph = amatrix2
+            small_graph_matched_indices = matched_indices2
+        else:
+            big_graph = amatrix2
+            big_graph_matched_indices = matched_indices2
+            small_graph = amatrix1
+            small_graph_matched_indices = matched_indices1
+
+        small_graph_aligned = small_graph[small_graph_matched_indices][
+            :, small_graph_matched_indices
+        ]
+        small_graph_aligned_full = np.zeros(big_graph.shape)
+        small_graph_aligned_full[
+            np.ix_(big_graph_matched_indices, big_graph_matched_indices)
+        ] = small_graph_aligned
+
+        num_edges = ((big_graph + small_graph_aligned_full) &gt; 0).sum()
+        diff_edges = abs(big_graph - small_graph_aligned_full)
+        diff_edges[diff_edges &gt; 0] = 1
+        perfectly_matched_indices1 = check_square_array(
+            diff_edges
+        )  # strictly aligned node indices of Graph 1
+        num_diff_edges = np.sum(diff_edges)
+        matching_ratio = round(1 - (num_diff_edges / num_edges), 2)
+
+        long_len = (
+            len(node_labels1)
+            if len(node_labels1) &gt;= len(node_labels2)
+            else len(node_labels2)
+        )
+        aligned_indices1 = np.zeros((long_len)) - 1
+        aligned_indices2 = np.zeros((long_len)) - 1
+        for i in range(long_len):
+            if i &lt; len(node_labels1):
+                if i in matched_indices1:
+                    aligned_indices1[i] = matched_indices2[
+                        np.where(matched_indices1 == i)[0][0]
+                    ]
+                    aligned_indices2[
+                        matched_indices2[np.where(matched_indices1 == i)[0][0]]
+                    ] = i
+
+        # The visualization of the alignment result.
+        union_graph = get_union_graph(
+            eqn_graph,
+            exp_graph,
+            [int(i) for i in matched_indices1.tolist()],
+            [int(i) for i in matched_indices2.tolist()],
+        )
+
+        matching_results[exp_idx] = (
+            matching_ratio,
+            num_diff_edges,
+            node_labels1,
+            node_labels2,
+            aligned_indices1,
+            aligned_indices2,
+            union_graph.to_string(),
+            perfectly_matched_indices1,
+        )
+
+    return matching_results</code></pre>
+</details>
+</dd>
 <dt id="skema.isa.lib.align_mathml_eqs"><code class="name flex">
 <span>def <span class="ident">align_mathml_eqs</span></span>(<span>mml1: str = '', mml2: str = '', mention_json1: str = '', mention_json2: str = '', mode: int = 2) ‑> Tuple[Any, Any, List[str], List[str], Union[int, Any], Union[int, Any], pydot.Dot, List[int]]</span>
 </code></dt>
@@ -1264,6 +1583,58 @@ List[int]: a list of 0s and 1s</p></div>
         else:
             result.append(1)  # otherwise, append 1 to the result list
     return result</code></pre>
+</details>
+</dd>
+<dt id="skema.isa.lib.convert_to_dict"><code class="name flex">
+<span>def <span class="ident">convert_to_dict</span></span>(<span>obj: Any) ‑> Union[List[Any], Dict[Any, Any], numpy.ndarray, Any]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Recursively converts an object to a dictionary, handling numpy arrays and nested structures.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>obj</code></strong> :&ensp;<code>Any</code></dt>
+<dd>The input object to be converted.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Union[List[Any], Dict[Any, Any], np.ndarray, Any]</code></dt>
+<dd>The converted object in dictionary form.</dd>
+</dl>
+<h2 id="note">Note</h2>
+<p>This function recursively processes the input object and converts it to a dictionary.
+- If the input is a numpy array, it is converted to a Python list.
+- If the input is a list or tuple, each element is processed recursively.
+- If the input is a dictionary, each value is processed recursively.
+- Other types are returned as is.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def convert_to_dict(obj: Any) -&gt; Union[List[Any], Dict[Any, Any], np.ndarray, Any]:
+    &#34;&#34;&#34;
+    Recursively converts an object to a dictionary, handling numpy arrays and nested structures.
+
+    Args:
+        obj (Any): The input object to be converted.
+
+    Returns:
+        Union[List[Any], Dict[Any, Any], np.ndarray, Any]: The converted object in dictionary form.
+
+    Note:
+        This function recursively processes the input object and converts it to a dictionary.
+        - If the input is a numpy array, it is converted to a Python list.
+        - If the input is a list or tuple, each element is processed recursively.
+        - If the input is a dictionary, each value is processed recursively.
+        - Other types are returned as is.
+    &#34;&#34;&#34;
+    if isinstance(obj, np.ndarray):
+        return obj.tolist()
+    elif isinstance(obj, (list, tuple)):
+        return [convert_to_dict(item) for item in obj]
+    elif isinstance(obj, dict):
+        return {key: convert_to_dict(value) for key, value in obj.items()}
+    else:
+        return obj</code></pre>
 </details>
 </dd>
 <dt id="skema.isa.lib.cosine_similarity"><code class="name flex">
@@ -1630,6 +2001,36 @@ Output: the adjacency matrix and the list of the names of variables and terms ap
     return amatrix, node_labels</code></pre>
 </details>
 </dd>
+<dt id="skema.isa.lib.generate_code_graphs"><code class="name flex">
+<span>def <span class="ident">generate_code_graphs</span></span>(<span>graph_string: str = '') ‑> Dict[str, pydot.Dot]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Call the REST API of code-exp-graphs to convert the code input to its GraphViz representation
+Ensure running the REST API before calling this function
+Input: file directory
+Output: a dictionary of the GraphViz representation (pydot.Dot)</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def generate_code_graphs(graph_string: str = &#34;&#34;) -&gt; Dict[str, pydot.Dot]:
+    &#34;&#34;&#34;
+    Call the REST API of code-exp-graphs to convert the code input to its GraphViz representation
+    Ensure running the REST API before calling this function
+    Input: file directory
+    Output: a dictionary of the GraphViz representation (pydot.Dot)
+    &#34;&#34;&#34;
+
+    # Safely evaluate the string as a literal Python expression
+    code_exp_graphs_dict = ast.literal_eval(graph_string)
+
+    # Convert the string representations to pydot.Dot objects
+    for key, value in code_exp_graphs_dict.items():
+        code_exp_graphs_dict[key] = pydot.graph_from_dot_data(value)[0]
+
+    return code_exp_graphs_dict</code></pre>
+</details>
+</dd>
 <dt id="skema.isa.lib.generate_graph"><code class="name flex">
 <span>def <span class="ident">generate_graph</span></span>(<span>file: str = '', render: bool = False) ‑> pydot.Dot</span>
 </code></dt>
@@ -1655,6 +2056,7 @@ Output: the GraphViz representation (pydot.Dot)</p></div>
         with open(file) as f:
             content = f.read()
 
+    #SKEMA_RS_ADDESS = &#34;http://localhost:8080&#34;
     digraph = requests.put(
         f&#34;{SKEMA_RS_ADDESS}/mathml/math-exp-graph&#34;, data=content.encode(&#34;utf-8&#34;)
     )
@@ -1996,8 +2398,8 @@ Convert the variable names to English letter representations before comparison.<
     }
 
     # Convert Unicode representations to English letter representations
-    var1 = re.sub(r&#34;&amp;#x(\w+);?&#34;, lambda m: chr(int(m.group(1), 16)), var1)
-    var2 = re.sub(r&#34;&amp;#x(\w+);?&#34;, lambda m: chr(int(m.group(1), 16)), var2)
+    var1 = re.sub(r&#34;&amp;#x(\w+);?&#34;, lambda m: chr(int(m.group(1), 16)), var1).lower()
+    var2 = re.sub(r&#34;&amp;#x(\w+);?&#34;, lambda m: chr(int(m.group(1), 16)), var2).lower()
 
     # Convert Greek letter representations to English letter representations
     for greek_letter, english_letter in greek_letters.items():
@@ -2301,9 +2703,11 @@ The Levenshtein similarity is the ratio of the Levenshtein distance to the maxim
 </li>
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
+<li><code><a title="skema.isa.lib.align_eqn_code" href="#skema.isa.lib.align_eqn_code">align_eqn_code</a></code></li>
 <li><code><a title="skema.isa.lib.align_mathml_eqs" href="#skema.isa.lib.align_mathml_eqs">align_mathml_eqs</a></code></li>
 <li><code><a title="skema.isa.lib.calculate_similarity" href="#skema.isa.lib.calculate_similarity">calculate_similarity</a></code></li>
 <li><code><a title="skema.isa.lib.check_square_array" href="#skema.isa.lib.check_square_array">check_square_array</a></code></li>
+<li><code><a title="skema.isa.lib.convert_to_dict" href="#skema.isa.lib.convert_to_dict">convert_to_dict</a></code></li>
 <li><code><a title="skema.isa.lib.cosine_similarity" href="#skema.isa.lib.cosine_similarity">cosine_similarity</a></code></li>
 <li><code><a title="skema.isa.lib.create_variable_dictionary" href="#skema.isa.lib.create_variable_dictionary">create_variable_dictionary</a></code></li>
 <li><code><a title="skema.isa.lib.extract_var_defs_from_metions" href="#skema.isa.lib.extract_var_defs_from_metions">extract_var_defs_from_metions</a></code></li>
@@ -2312,6 +2716,7 @@ The Levenshtein similarity is the ratio of the Levenshtein distance to the maxim
 <li><code><a title="skema.isa.lib.find_definition" href="#skema.isa.lib.find_definition">find_definition</a></code></li>
 <li><code><a title="skema.isa.lib.format_subscripts_and_superscripts" href="#skema.isa.lib.format_subscripts_and_superscripts">format_subscripts_and_superscripts</a></code></li>
 <li><code><a title="skema.isa.lib.generate_amatrix" href="#skema.isa.lib.generate_amatrix">generate_amatrix</a></code></li>
+<li><code><a title="skema.isa.lib.generate_code_graphs" href="#skema.isa.lib.generate_code_graphs">generate_code_graphs</a></code></li>
 <li><code><a title="skema.isa.lib.generate_graph" href="#skema.isa.lib.generate_graph">generate_graph</a></code></li>
 <li><code><a title="skema.isa.lib.generate_variable_dict" href="#skema.isa.lib.generate_variable_dict">generate_variable_dict</a></code></li>
 <li><code><a title="skema.isa.lib.get_seeds" href="#skema.isa.lib.get_seeds">get_seeds</a></code></li>
