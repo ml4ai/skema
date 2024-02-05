@@ -87,4 +87,4 @@ def test_align_code_eqn():
     # check response of matching_ratio
     assert (
         json.loads(response.text)["1"][0] == 0.8
-    ), f"Matching ratio should be 0.8, but instead received {json.loads(response.text)["1"][0]}"
+    ), f"Matching ratio should be 0.8, but instead received {json.loads(response.text)}"
