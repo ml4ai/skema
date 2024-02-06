@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Coverage for skema/rest/utils.py: 54%</title>
+    <title>Coverage for skema/rest/utils.py: 55%</title>
     <link rel="icon" sizes="32x32" href="favicon_32.png">
     <link rel="stylesheet" href="style.css" type="text/css">
     <script type="text/javascript" src="coverage_html.js" defer></script>
@@ -12,7 +12,7 @@
     <div class="content">
         <h1>
             <span class="text">Coverage for </span><b>skema/rest/utils.py</b>:
-            <span class="pc_cov">54%</span>
+            <span class="pc_cov">55%</span>
         </h1>
         <aside id="help_panel_wrapper">
             <input id="help_panel_state" type="checkbox">
@@ -55,8 +55,8 @@
         </aside>
         <h2>
             <span class="text">212 statements &nbsp;</span>
-            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">115<span class="text"> run</span></button>
-            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">97<span class="text"> missing</span></button>
+            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">117<span class="text"> run</span></button>
+            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">95<span class="text"> missing</span></button>
             <button type="button" class="exc show_exc button_toggle_exc" value="exc" data-shortcut="x" title="Toggle lines excluded">0<span class="text"> excluded</span></button>
         </h2>
         <p class="text">
@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="d_c15069ffeed03932_workflows_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.4.1">coverage.py v7.4.1</a>,
-            created at 2024-02-05 16:27 +0000
+            created at 2024-02-06 19:40 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"/>
@@ -225,12 +225,12 @@
     <p class="run"><span class="n"><a id="t143" href="#t143">143</a></span><span class="t">    <span class="nam">soup</span> <span class="op">=</span> <span class="nam">BeautifulSoup</span><span class="op">(</span><span class="nam">mml</span><span class="op">,</span> <span class="str">"html.parser"</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t144" href="#t144">144</a></span><span class="t">    <span class="com"># remove comments</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t145" href="#t145">145</a></span><span class="t">    <span class="key">for</span> <span class="nam">comment</span> <span class="key">in</span> <span class="nam">soup</span><span class="op">(</span><span class="nam">text</span><span class="op">=</span><span class="key">lambda</span> <span class="nam">text</span><span class="op">:</span> <span class="nam">isinstance</span><span class="op">(</span><span class="nam">text</span><span class="op">,</span> <span class="nam">Comment</span><span class="op">)</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t146" href="#t146">146</a></span><span class="t">        <span class="nam">comment</span><span class="op">.</span><span class="nam">extract</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t146" href="#t146">146</a></span><span class="t">        <span class="nam">comment</span><span class="op">.</span><span class="nam">extract</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t147" href="#t147">147</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t148" href="#t148">148</a></span><span class="t">    <span class="com"># prune attributes</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t149" href="#t149">149</a></span><span class="t">    <span class="key">for</span> <span class="nam">attr</span> <span class="key">in</span> <span class="nam">to_remove</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t150" href="#t150">150</a></span><span class="t">        <span class="key">for</span> <span class="nam">tag</span> <span class="key">in</span> <span class="nam">soup</span><span class="op">.</span><span class="nam">find_all</span><span class="op">(</span><span class="nam">attrs</span><span class="op">=</span><span class="op">{</span><span class="nam">attr</span><span class="op">:</span> <span class="key">True</span><span class="op">}</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t151" href="#t151">151</a></span><span class="t">            <span class="key">del</span> <span class="nam">tag</span><span class="op">[</span><span class="nam">attr</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t151" href="#t151">151</a></span><span class="t">            <span class="key">del</span> <span class="nam">tag</span><span class="op">[</span><span class="nam">attr</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t152" href="#t152">152</a></span><span class="t">    <span class="key">return</span> <span class="nam">str</span><span class="op">(</span><span class="nam">soup</span><span class="op">)</span><span class="op">.</span><span class="nam">replace</span><span class="op">(</span><span class="str">"\n"</span><span class="op">,</span> <span class="str">""</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t153" href="#t153">153</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t154" href="#t154">154</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
@@ -452,7 +452,7 @@
             <a id="nextFileLink" class="nav" href="d_c15069ffeed03932_workflows_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.4.1">coverage.py v7.4.1</a>,
-            created at 2024-02-05 16:27 +0000
+            created at 2024-02-06 19:40 +0000
         </p>
     </div>
 </footer>

@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Coverage for skema/img2mml/api.py: 74%</title>
+    <title>Coverage for skema/img2mml/api.py: 78%</title>
     <link rel="icon" sizes="32x32" href="favicon_32.png">
     <link rel="stylesheet" href="style.css" type="text/css">
     <script type="text/javascript" src="coverage_html.js" defer></script>
@@ -12,7 +12,7 @@
     <div class="content">
         <h1>
             <span class="text">Coverage for </span><b>skema/img2mml/api.py</b>:
-            <span class="pc_cov">74%</span>
+            <span class="pc_cov">78%</span>
         </h1>
         <aside id="help_panel_wrapper">
             <input id="help_panel_state" type="checkbox">
@@ -55,8 +55,8 @@
         </aside>
         <h2>
             <span class="text">118 statements &nbsp;</span>
-            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">87<span class="text"> run</span></button>
-            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">31<span class="text"> missing</span></button>
+            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">92<span class="text"> run</span></button>
+            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">26<span class="text"> missing</span></button>
             <button type="button" class="exc show_exc button_toggle_exc" value="exc" data-shortcut="x" title="Toggle lines excluded">0<span class="text"> excluded</span></button>
         </h2>
         <p class="text">
@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="d_834bd4b005cce69b_eqn2mml_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.4.1">coverage.py v7.4.1</a>,
-            created at 2024-02-05 16:27 +0000
+            created at 2024-02-06 19:40 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"/>
@@ -342,17 +342,17 @@
     <p class="pln"><span class="n"><a id="t260" href="#t260">260</a></span><span class="t">    <span class="str">"""Read a LaTeX equation string and convert it to presentation MathML"""</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t261" href="#t261">261</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t262" href="#t262">262</a></span><span class="t">    <span class="com"># Define the webservice address from the MathJAX service</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t263" href="#t263">263</a></span><span class="t">    <span class="nam">webservice</span> <span class="op">=</span> <span class="nam">SKEMA_MATHJAX_ADDRESS</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t264" href="#t264">264</a></span><span class="t">    <span class="nam">print</span><span class="op">(</span><span class="str">f"Connecting to {webservice}"</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t263" href="#t263">263</a></span><span class="t">    <span class="nam">webservice</span> <span class="op">=</span> <span class="nam">SKEMA_MATHJAX_ADDRESS</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t264" href="#t264">264</a></span><span class="t">    <span class="nam">print</span><span class="op">(</span><span class="str">f"Connecting to {webservice}"</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t265" href="#t265">265</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t266" href="#t266">266</a></span><span class="t">    <span class="com"># Translate and save each LaTeX string using the NodeJS service for MathJax</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t267" href="#t267">267</a></span><span class="t">    <span class="nam">res</span> <span class="op">=</span> <span class="nam">requests</span><span class="op">.</span><span class="nam">post</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t267" href="#t267">267</a></span><span class="t">    <span class="nam">res</span> <span class="op">=</span> <span class="nam">requests</span><span class="op">.</span><span class="nam">post</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t268" href="#t268">268</a></span><span class="t">        <span class="str">f"{webservice}/tex2mml"</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t269" href="#t269">269</a></span><span class="t">        <span class="nam">headers</span><span class="op">=</span><span class="op">{</span><span class="str">"Content-type"</span><span class="op">:</span> <span class="str">"application/json"</span><span class="op">}</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t270" href="#t270">270</a></span><span class="t">        <span class="nam">json</span><span class="op">=</span><span class="op">{</span><span class="str">"tex_src"</span><span class="op">:</span> <span class="nam">eqn</span><span class="op">}</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t271" href="#t271">271</a></span><span class="t">    <span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t272" href="#t272">272</a></span><span class="t">    <span class="key">if</span> <span class="nam">res</span><span class="op">.</span><span class="nam">status_code</span> <span class="op">==</span> <span class="num">200</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t273" href="#t273">273</a></span><span class="t">        <span class="key">return</span> <span class="nam">res</span><span class="op">.</span><span class="nam">text</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t272" href="#t272">272</a></span><span class="t">    <span class="key">if</span> <span class="nam">res</span><span class="op">.</span><span class="nam">status_code</span> <span class="op">==</span> <span class="num">200</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t273" href="#t273">273</a></span><span class="t">        <span class="key">return</span> <span class="nam">res</span><span class="op">.</span><span class="nam">text</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t274" href="#t274">274</a></span><span class="t">    <span class="key">else</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t275" href="#t275">275</a></span><span class="t">        <span class="key">try</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t276" href="#t276">276</a></span><span class="t">            <span class="nam">res</span><span class="op">.</span><span class="nam">raise_for_status</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
@@ -377,7 +377,7 @@
             <a id="nextFileLink" class="nav" href="d_834bd4b005cce69b_eqn2mml_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.4.1">coverage.py v7.4.1</a>,
-            created at 2024-02-05 16:27 +0000
+            created at 2024-02-06 19:40 +0000
         </p>
     </div>
 </footer>
