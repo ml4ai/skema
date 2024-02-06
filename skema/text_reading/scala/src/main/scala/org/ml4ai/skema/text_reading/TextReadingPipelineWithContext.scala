@@ -3,7 +3,7 @@ package org.ml4ai.skema.text_reading
 import org.clulab.odin.Mention
 import org.clulab.processors.Processor
 import org.ml4ai.skema.text_reading.grounding.Grounder
-import org.ml4ai.skema.text_reading.scenario_context.{ContextEngine, SentenceIndexOrderer}
+import org.ml4ai.skema.text_reading.scenario_context.{HeuristicContextEngine, SentenceIndexOrderer}
 import org.ml4ai.skema.text_reading.serializer.SkemaJSONSerializer
 
 /**
@@ -20,7 +20,7 @@ class TextReadingPipelineWithContext(processorOpt: Option[Processor] = None, odi
     */
   def extractMentionsWithContext(inputText: String, contextWindowSize: Int): Seq[Mention] = {
     val mentions = extractMentions(inputText, None)._2
-    val scenarioContextEngine = new ContextEngine(contextWindowSize, mentions, SentenceIndexOrderer)
+    val scenarioContextEngine = new HeuristicContextEngine(contextWindowSize, mentions, SentenceIndexOrderer)
     val mentionsWithScenarioContext = mentions.map(scenarioContextEngine.resolveContext)
 
     mentionsWithScenarioContext

@@ -3,7 +3,11 @@ package org.ml4ai.skema.text_reading.scenario_context
 import org.clulab.odin.{EventMention, Mention, RelationMention, TextBoundMention}
 import org.ml4ai.skema.text_reading.attachments.{LocationContextAttachment, TimeContextAttachment}
 
-class ContextEngine(windowSize:Int, documentMentions:Iterable[Mention], orderer: MentionOrderer, useLLM: Boolean = false) {
+trait ContextEngine{
+  def resolveContext(m:Mention): Mention
+}
+
+class HeuristicContextEngine(windowSize:Int, documentMentions:Iterable[Mention], orderer: MentionOrderer) extends ContextEngine {
 
 
   private val contextLabels = Set("Location", "Date")

@@ -2,9 +2,9 @@ package org.ml4ai.skema.text_reading.scenario_context.openai
 
 import org.clulab.odin.{EventMention, Mention, RelationMention, TextBoundMention}
 import org.ml4ai.skema.text_reading.attachments.{LocationContextAttachment, TimeContextAttachment}
-import org.ml4ai.skema.text_reading.scenario_context.MentionOrderer
+import org.ml4ai.skema.text_reading.scenario_context.{ContextEngine, MentionOrderer}
 
-class ContextEngine(windowSize:Int, documentMentions:Iterable[Mention], orderer: MentionOrderer) {
+class DecoderContextEngine(windowSize:Int, documentMentions:Iterable[Mention], orderer: MentionOrderer) extends ContextEngine {
 
 
   private val contextLabels = Set("Location", "Date")
