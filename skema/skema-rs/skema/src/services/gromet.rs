@@ -7,7 +7,7 @@ use actix_web::web::ServiceConfig;
 use actix_web::{delete, get, post, put, web, HttpResponse};
 use mathml::acset::{PetriNet, RegNet};
 
-use mathml::ast::{MathExpression, Mi, self};
+use mathml::ast::{MathExpression, self};
 use mathml::parsers::math_expression_tree::MathExpressionTree;
 use neo4rs;
 use neo4rs::{query, Error, Node};
