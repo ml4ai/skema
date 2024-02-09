@@ -25,6 +25,7 @@ class VariableContext(object):
         self.variable_id = 0
         self.iterator_id = 0
         self.stop_condition_id = 0
+        self.function_name_id = 0
 
     def push_context(self):
         """Create a new variable context and add it to the stack"""
@@ -125,6 +126,12 @@ class VariableContext(object):
         self.stop_condition_id += 1
 
         return self.add_variable(symbol, "boolean", None)
+
+    def generate_func(self, name):
+        symbol = f"{name}_{self.function_name_id}"
+        self.function_name_id += 1
+
+        return self.add_variable(symbol, "unknown", None)
 
     def enter_record_definition(self, name: str):
         """Enter a record definition. Updates the prefix to the name of the record"""

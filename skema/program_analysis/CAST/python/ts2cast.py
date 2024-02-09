@@ -39,7 +39,8 @@ from skema.program_analysis.CAST.python.node_helper import (
     get_non_control_children,
     FOR_LOOP_LEFT_TYPES,
     FOR_LOOP_RIGHT_TYPES,
-    WHILE_COND_TYPES
+    WHILE_COND_TYPES,
+    COMPREHENSION_OPERATORS
 )
 from skema.program_analysis.CAST.python.util import (
     generate_dummy_source_refs,
@@ -74,6 +75,9 @@ class TS2CAST(object):
                 "python"
             )
         )
+
+        # Generated FNs by comprehensions/lambdas
+        self.generated_fns = []
 
         # Additional variables used in generation
         self.var_count = 0
@@ -132,9 +136,13 @@ class TS2CAST(object):
         elif node.type in ["list_pattern", "pattern_list", "tuple_pattern"]:
             return self.visit_pattern(node)
         elif node.type == "list_comprehension":
-            return None
+            return self.visit_list_comprehension(node)
         elif node.type == "dictionary_comprehension":
-            return None
+            return self.visit_dict_comprehension(node)
+        elif node.type == "lambda":
+            return self.visit_lambda(node)
+        elif node.type == "pair":
+            return self.visit_pair(node)
         elif node.type == "while_statement":
             return self.visit_while(node)
         elif node.type == "for_statement":
@@ -159,7 +167,7 @@ class TS2CAST(object):
         
         return Module(
             name=None,
-            body=body,
+            body=self.generated_fns + body,
             source_refs = [self.node_helper.get_source_ref(node)]
         )
 
@@ -186,11 +194,11 @@ class TS2CAST(object):
         # Create new variable context
         self.variable_context.push_context()
 
-        parameters = get_children_by_types(node, "parameters")[0]
+        parameters = get_children_by_types(node, ["parameters"])[0]
         parameters = get_non_control_children(parameters)
         
         # The body of the function is stored in a 'block' type node
-        body = get_children_by_types(node, "block")[0].children
+        body = get_children_by_types(node, ["block"])[0].children
         
 
         func_params = []
@@ -282,7 +290,7 @@ class TS2CAST(object):
         if_condition = self.visit(get_first_child_by_type(node, "comparison_operator"))
 
         # Get the body of the if true part
-        if_true = get_children_by_types(node, "block")[0].children
+        if_true = get_children_by_types(node, ["block"])[0].children
 
         # Because in tree-sitter the else if, and else aren't nested, but they're 
         # in a flat level order, we need to do some arranging of the pieces
@@ -308,7 +316,7 @@ class TS2CAST(object):
         if len(alternatives) > 0:
             final_else = alternatives.pop() 
             alternatives.reverse()
-            final_else_body = get_children_by_types(final_else, "block")[0].children
+            final_else_body = get_children_by_types(final_else, ["block"])[0].children
             for node in final_else_body:
                 cast = self.visit(node)
                 if isinstance(cast, List):
@@ -492,15 +500,202 @@ class TS2CAST(object):
                 source_refs=[literal_source_ref]
             )
 
-    def visit_list_comprehension(self, node: Node) -> Call:
+    def handle_for_clause(self, node: Node):
+        # Given the "for x in seq" clause of a list comprehension
+        # we translate it to a CAST for loop, leaving the actual
+        # computation of the body node for the main comprehension handler
+        assert node.type == "for_in_clause"
         ref = self.node_helper.get_source_ref(node)
-        temp_list_name = f"list__temp_" 
 
+        # NOTE: Assumes the left part with the variable is always the 2nd
+        # element in the children and the right part with the actual
+        # function call is on the 4th (last) element of the children
+        left = self.visit(node.children[1])
+        right = self.visit(node.children[-1])
 
+        iterator_name = self.variable_context.generate_iterator()
+        stop_cond_name = self.variable_context.generate_stop_condition()
+        iter_func = self.get_gromet_function_node("iter")
+        next_func = self.get_gromet_function_node("next")
+        
+        iter_call = Assignment(
+            left = Var(iterator_name, "Iterator"),
+            right = Call(
+                iter_func,
+                arguments=[right]
+            )
+        )
 
-        return
+        next_call = Call(
+            next_func,
+            arguments=[Var(iterator_name, "Iterator")]
+        )
 
+        next_assign = Assignment(
+            left=LiteralValue(
+                "Tuple",
+                [
+                    left,
+                    Var(iterator_name, "Iterator"),
+                    Var(stop_cond_name, "Boolean"),
+                ],
+                source_code_data_type = ["Python",PYTHON_VERSION,"Tuple"],
+                source_refs=ref
+            ),
+            right=next_call
+        )
 
+        loop_pre = []
+        loop_pre.append(iter_call)
+        loop_pre.append(next_assign)
+
+        loop_expr = Operator(
+            source_language="Python", 
+            interpreter="Python", 
+            version=PYTHON_VERSION, 
+            op="ast.Eq", 
+            operands=[
+                stop_cond_name,
+                LiteralValue(
+                    ScalarType.BOOLEAN,
+                    False,
+                    ["Python", PYTHON_VERSION, "boolean"],
+                    source_refs=ref,
+                )
+            ], 
+            source_refs=ref
+        )
+
+        loop_body = [None, next_assign]
+
+        return Loop(pre=loop_pre, expr=loop_expr, body=loop_body, post=[])
+
+    def handle_if_clause(self, node: Node):
+        assert node.type == "if_clause"
+        ref = self.node_helper.get_source_ref(node)
+        conditional = get_children_by_types(node, WHILE_COND_TYPES)[0]
+        cond_cast = self.visit(conditional)
+        
+        return ModelIf(expr=cond_cast,body=[],orelse=[],source_refs=ref)
+
+    def visit_list_comprehension(self, node: Node) -> Call:
+        # TODO: multiple loops, if clauses
+        ref = self.node_helper.get_source_ref(node)
+
+        temp_list_name = self.variable_context.add_variable(
+            "list__temp_", "Unknown", [ref]
+        )
+
+        temp_asg_cast = Assignment(
+            left=Var(val=temp_list_name), 
+            right=LiteralValue(value=[], value_type=StructureType.LIST),
+            source_refs = ref
+        )
+
+        for_clauses = get_children_by_types(node, ["for_in_clause"])
+
+        loop = None
+        for for_clause in for_clauses:
+            loop = self.handle_for_clause(for_clause)
+
+            if_clauses = get_children_by_types(node, ["if_clause"])
+            append_call = self.get_gromet_function_node("append") 
+            computation = get_children_by_types(node, COMPREHENSION_OPERATORS)[0]
+            computation_cast = self.visit(computation)
+
+            if len(if_clauses) > 0:
+                first_if = self.handle_if_clause(if_clauses[0])
+                curr_if = first_if
+                next_if = []
+                for if_clause in if_clauses[1:]:
+                    next_if = self.handle_if_clause(if_clause)
+                    curr_if.body = [next_if]
+                    curr_if = next_if
+                
+                curr_if.body = [Call(func=Attribute(temp_list_name, append_call), arguments=[computation_cast], source_refs=ref)]
+                loop.body[0] = curr_if
+            else:
+                loop.body[0] = Call(func=Attribute(temp_list_name, append_call), arguments=[computation_cast], source_refs=ref)
+            
+        return_cast = ModelReturn(temp_list_name)
+
+        func_name = self.variable_context.generate_func("%comprehension_list")
+        func_def_cast = FunctionDef(name=func_name, func_args=[], body=[temp_asg_cast,loop,return_cast], source_refs=ref)
+        
+        self.generated_fns.append(func_def_cast)
+
+        return Call(func=func_name, arguments=[], source_refs=ref)
+
+    def visit_pair(self, node: Node):
+        key = self.visit(node.children[0])
+        value = self.visit(node.children[2])
+
+        return key,value
+
+    def visit_dict_comprehension(self, node: Node) -> Call:
+        #TODO: multiple loops, if clauses
+        ref = self.node_helper.get_source_ref(node)
+
+        temp_dict_name = self.variable_context.add_variable(
+            "dict__temp_", "Unknown", [ref]
+        )
+
+        temp_asg_cast = Assignment(
+            left=Var(val=temp_dict_name),
+            right=LiteralValue(value={}, value_type=StructureType.MAP),
+            source_refs = ref
+        )
+
+        for_clause = get_children_by_types(node, ["for_in_clause"])[0]
+        loop = self.handle_for_clause(for_clause)
+
+        computation = get_children_by_types(node, COMPREHENSION_OPERATORS)[0]
+
+        computation_cast = self.visit(computation)
+
+        set_call = self.get_gromet_function_node("_set")
+
+        loop.body[0] = Assignment(left=temp_dict_name, right=Call(func=set_call, arguments=[temp_dict_name, computation_cast[0], computation_cast[1]], source_refs=ref), source_refs=ref)
+
+        return_cast = ModelReturn(temp_dict_name)
+
+        func_name = self.variable_context.generate_func("%comprehension_dict")
+        func_def_cast = FunctionDef(name=func_name, func_args=[], body=[temp_asg_cast,loop,return_cast])
+
+        self.generated_fns.append(func_def_cast)
+
+        return Call(func=func_name, arguments=[], source_refs=ref)
+    
+    def retrieve_outer_lambda_args(self, node, lambda_args):
+        # Retrieves all the variables that are used in the lambda expressions that are not part of the 
+        # lambda arguments
+
+        return []
+
+    def visit_lambda(self, node: Node) -> Call:
+        # TODO: we have to determine how to grab the variables that are being
+        # used in the lambda that aren't part of the lambda's arguments
+        ref=self.node_helper.get_source_ref(node)
+        params = get_children_by_types(node, ["lambda_parameters"])[0] 
+        body = get_children_by_types(node, COMPREHENSION_OPERATORS)[0]
+
+        parameters = []
+        for param in params.children:
+            cast = self.visit(param)
+            if isinstance(cast, list):
+                parameters.extend(cast)
+            else:
+                parameters.append(cast)
+
+        body_cast = self.visit(body)
+        func_body = body_cast if isinstance(body_cast, list) else [body_cast]
+
+        func_name = self.variable_context.generate_func("%lambda")
+        func_def_cast = FunctionDef(name=func_name, func_args=parameters, body=func_body, source_refs=ref)
+
+        self.generated_fns.append(func_def_cast)
+
+        return Call(func=func_name, arguments=[], source_refs=ref)
 
     def visit_while(self, node: Node) -> Loop:
         ref = self.node_helper.get_source_ref(node)
@@ -510,7 +705,7 @@ class TS2CAST(object):
         self.variable_context.push_context()
 
         loop_cond_node = get_children_by_types(node, WHILE_COND_TYPES)[0]
-        loop_body_node = get_children_by_types(node, "block")[0].children
+        loop_body_node = get_children_by_types(node, ["block"])[0].children
 
         loop_cond = self.visit(loop_cond_node)
 
@@ -579,7 +774,6 @@ class TS2CAST(object):
                     arguments=[Var(iterator_name, "Iterator")],
                 ),
             )
-
         )
 
         loop_expr = Operator(
@@ -599,7 +793,7 @@ class TS2CAST(object):
             source_refs=ref
         )
 
-        loop_body_node = get_children_by_types(node, "block")[0].children
+        loop_body_node = get_children_by_types(node, ["block"])[0].children
         loop_body = []
         for node in loop_body_node:
             cast = self.visit(node)

@@ -42,7 +42,8 @@ FOR_LOOP_RIGHT_TYPES = [
     "call",
     "identifier",
     "list",
-    "tuple"
+    "tuple",
+    "attribute"
 ]
 
 # Whatever constructs we see in the conditional
@@ -52,6 +53,17 @@ WHILE_COND_TYPES = [
     "call",
     "comparison_operator"
 ]
+
+# Whatever constructs we see in the 
+# list/dict comprehensions
+COMPREHENSION_OPERATORS = [
+    "binary_operator",
+    "call",
+    "identifier",
+    "attribute",
+    "pair"
+]
+
 
 class NodeHelper():
     def __init__(self, source: str, source_file_name: str):
