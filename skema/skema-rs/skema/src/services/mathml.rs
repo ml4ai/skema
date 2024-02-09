@@ -55,7 +55,7 @@ pub async fn get_ast_graph(payload: String) -> String {
 )]
 #[put("/mathml/math-exp-graph")]
 pub async fn get_math_exp_graph(payload: String) -> String {
-    let mut contents = payload;
+    let contents = payload;
     let exp = contents.parse::<MathExpressionTree>().unwrap();
     let g = exp.to_graph();
     let dot_representation = Dot::new(&g);
@@ -77,8 +77,8 @@ body = String
 #[put("/mathml/code-exp-graphs")]
 pub async fn get_code_exp_graph_set(payload: web::Json<Vec<MathExpressionTree>>) -> String {
     let content = payload.clone();
-    let json_result = get_code_exp_graphs(content);
-    json_result
+    
+    get_code_exp_graphs(content)
 }
 
 /// Parse a presentation MathML representation of an equation and
