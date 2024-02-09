@@ -10,7 +10,7 @@ use crate::{
             Derivative, GradSub, HatOp, MsubsupInt, MsupDownArrow, Operator, PartialDerivative,
             SumUnderOver,
         },
-        Ci, Differential, DownArrowComp, HatComp, Integral, Math, MathExpression, Mi, Mrow,
+        Ci, Differential, HatComp, Integral, LaplacianComp, Math, MathExpression, Mi, Mrow,
         SummationMath, Type,
     },
     parsers::generic_mathml::{
@@ -298,8 +298,6 @@ pub fn downarrow_operator_no_bounds(input: Span) -> IResult<Ci> {
         comp.clone(),
     ))));
 
-    let mut ci_func_of: Vec<Ci> = Vec::new();
-    println!("--DownArrow");
     Ok((
         s,
         Ci::new(
@@ -774,6 +772,13 @@ pub fn gradient(input: Span) -> IResult<Operator> {
     Ok((s, op))
 }
 
+/// Example: Laplacian
+pub fn laplacian(input: Span) -> IResult<Operator> {
+    let (s, (_grad, _mn)) = ws(delimited(stag!("msup"), pair(gradient, mn), etag!("msup")))(input)?;
+    let lap = Operator::Laplacian;
+    Ok((s, lap))
+}
+
 /// Gradient sub  E.g. ∇_{x}
 pub fn gradient_subscript(input: Span) -> IResult<Operator> {
     let (s, _) = tuple((stag!("msub"), gradient))(input)?;
@@ -972,6 +977,24 @@ pub fn integral_with_many_math_expression_integrand(
     )))
 }
 
+/// Laplacian
+/// Parse Hat operator with components. Example: r \hat{x}
+pub fn laplacian_operation(input: Span) -> IResult<(MathExpression, Ci)> {
+    let (s, (_grad, _mn)) = ws(delimited(
+        stag!("msup"),
+        ws(pair(gradient, mn)),
+        etag!("msup"),
+    ))(input)?;
+    let op = MathExpression::Mo(Operator::Laplacian);
+    let (s, mi) = ws(alt((
+        mi,
+        delimited(tag("<mo>(</mo>"), mi, tag("<mo>)</mo>")),
+    )))(s)?;
+    let comp = Ci::new(Some(Type::Vector), Box::new(MathExpression::Mi(mi)), None);
+
+    Ok((s, (op, comp)))
+}
+
 /// Parser for math expressions. This varies from the one in the generic_mathml module, since it
 /// assumes that expressions such as S(t) are actually univariate functions.
 pub fn math_expression(input: Span) -> IResult<MathExpression> {
@@ -1004,6 +1027,13 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
             }),
             map(gradient_subscript, MathExpression::Mo),
             map(div, MathExpression::Mo),
+            map(laplacian_operation, |(op, comp)| {
+                MathExpression::LaplacianComp(LaplacianComp {
+                    op: Box::new(op),
+                    comp,
+                })
+            }),
+            map(laplacian, MathExpression::Mo),
             map(hat_operator, |(op, row)| {
                 MathExpression::HatComp(HatComp {
                     op: Box::new(op),

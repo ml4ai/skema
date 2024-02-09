@@ -702,15 +702,12 @@ impl MathExpressionTree {
                         expression.push_str("\\hat{");
                         process_math_expression(&x.comp, &mut expression);
                         expression.push('}');
-                        //expression.push_str( &rest[0].to_latex());
                     }
                     Operator::SumUnderOver(x) => {
                         expression.push_str("\\sum_{");
                         expression.push_str(&format!("{}", x.under));
-                        //process_math_expression(&x.under, &mut expression);
                         expression.push_str("}^{");
                         expression.push_str(&format!("{}", x.over));
-                        //process_math_expression(&x.over, &mut expression);
                         expression.push('}');
                         expression.push_str(&rest[0].to_latex());
                     }
@@ -722,6 +719,9 @@ impl MathExpressionTree {
                         expression.push('}');
                         expression.push_str(&rest[0].to_latex());
                         expression.push_str(&*format!(" d{}", &*x.integration_variable));
+                    }
+                    Operator::Laplacian => {
+                        expression.push_str(&format!("\\nabla^2 {}", rest[0].to_latex()));
                     }
                     _ => {
                         expression = "".to_string();
@@ -797,6 +797,13 @@ impl MathExpression {
                     x.diff.flatten(tokens);
                 }
                 x.func.flatten(tokens);
+                tokens.push(MathExpression::Mo(Operator::Rparen));
+            }
+            // Handles `Laplacian` operator with MathExpression
+            MathExpression::LaplacianComp(x) => {
+                tokens.push(MathExpression::Mo(Operator::Lparen));
+                x.op.flatten(tokens);
+                x.comp.content.flatten(tokens);
                 tokens.push(MathExpression::Mo(Operator::Rparen));
             }
             // Insert implicit division operators, and wrap numerators and denominators in
@@ -1104,6 +1111,7 @@ fn prefix_binding_power(op: &Operator) -> ((), u8) {
         Operator::Derivative(Derivative { .. }) => ((), 25),
         Operator::PartialDerivative(PartialDerivative { .. }) => ((), 25),
         Operator::Div => ((), 25),
+        Operator::Laplacian => ((), 25),
         Operator::Abs => ((), 25),
         Operator::Sqrt => ((), 25),
         Operator::SumUnderOver(SumUnderOver { .. }) => ((), 25),
@@ -3022,4 +3030,37 @@ fn test_snowpack_optics() {
     assert_eq!(s_exp, "(= (Mean ω) (/ (Int_{λ_{1}}^{λ_{2}}(λ) (* (* ω I↓) α_{sno})) (Int_{λ_{1}}^{λ_{2}}(λ) (* I↓ α_{sno}))))");
     println!("exp.to_latex()={:?}", exp.to_latex());
     assert_eq!(exp.to_latex(), "\\langle \\omega \\rangle=\\frac{\\int_{\\lambda_{1}}^{\\lambda_{2}}\\omega(\\lambda)*I^{\\downarrow}(\\lambda)*\\alpha_{sno}(\\lambda) dλ}{\\int_{\\lambda_{1}}^{\\lambda_{2}}I^{\\downarrow}(\\lambda)*\\alpha_{sno}(\\lambda) dλ}");
+}
+
+#[test]
+fn test_laplacian() {
+    let input = "<math>
+    <msup><mi>&#x2207;</mi><mn>2</mn></msup>
+    <mi>T</mi>
+    </math>";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", exp);
+    let s_exp = exp.to_string();
+    println!("s_exp={:?}", s_exp);
+    //assert_eq!(s_exp, "(Laplacian T)");
+    println!("exp.to_latex()={:?}", exp.to_latex());
+    assert_eq!(exp.to_latex(), "\\nabla^2 T");
+}
+
+#[test]
+fn test_fourier_law_heat_equation_1_1() {
+    let input = "<math>
+    <mi>Q</mi>
+    <mo>=</mo>
+    <mfrac><msub><mi>k</mi><mi>T</mi></msub><mi>&#x03C1;</mi></mfrac>
+    <msup><mi>&#x2207;</mi><mn>2</mn></msup>
+    <mi>T</mi>
+    </math>";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", exp);
+    let s_exp = exp.to_string();
+    //println!("s_exp={:?}", s_exp);
+    assert_eq!(s_exp, "(= Q (* (/ k_{T} ρ) (Laplacian T)))");
+    //println!("exp.to_latex()={:?}", exp.to_latex());
+    assert_eq!(exp.to_latex(), "Q=\\frac{k_{T}}{\\rho}*(\\nabla^2 T)");
 }

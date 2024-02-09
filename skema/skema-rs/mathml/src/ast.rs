@@ -70,6 +70,13 @@ pub struct DownArrowComp {
     pub func_of: Vec<Ci>,
 }
 
+/// Laplacian
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
+pub struct LaplacianComp {
+    pub op: Box<MathExpression>,
+    pub comp: Ci,
+}
+
 /// The MathExpression enum is not faithful to the corresponding element type in MathML 3
 /// (https://www.w3.org/TR/MathML3/appendixa.html#parsing_MathExpression)
 #[derive(
@@ -104,6 +111,7 @@ pub enum MathExpression {
     HatComp(HatComp),
     DownArrowComp(DownArrowComp),
     Integral(Integral),
+    LaplacianComp(LaplacianComp),
     //Differential(Box<MathExpression>, Box<MathExpression>),
     #[default]
     None,
@@ -170,6 +178,10 @@ impl fmt::Display for MathExpression {
                 write!(f, "{op}")?;
                 write!(f, "{integrand}")?;
                 write!(f, "{integration_variable}")
+            }
+            MathExpression::LaplacianComp(LaplacianComp { op, comp }) => {
+                write!(f, "{op}(")?;
+                write!(f, "{comp})")
             }
             expression => write!(f, "{expression:?}"),
         }

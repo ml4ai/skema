@@ -99,6 +99,7 @@ pub enum Operator {
     DownArrow,
     Int,
     MsubsupInt(MsubsupInt),
+    Laplacian,
     // Catchall for operators we haven't explicitly defined as enum variants yet.
     Other(String),
 }
@@ -172,6 +173,7 @@ impl fmt::Display for Operator {
             }) => {
                 write!(f, "Int_{{{sub}}}^{{{sup}}}({integration_variable})")
             }
+            Operator::Laplacian => write!(f, "Laplacian"),
         }
     }
 }
