@@ -110,7 +110,6 @@ def process_file_system(
                 # Normalize the path across os and then convert to module dot notation
                 python_module_path = ".".join(os.path.normpath(os_module_path).split(os.path.sep))
                 python_module_path = ".".join(python_module_path.split(".")[0:-1])
-                #python_module_path = python_module_path.replace(".py", "").strip()
                 
                 module_collection.module_index.append(python_module_path)
 
