@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/nom_locate-4.2.0/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="nom_locate" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/nom_locate-4.2.0/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="nom_locate" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -856,19 +857,19 @@
 //! use nom::IResult;
 //! use nom_locate::{position, LocatedSpan};
 //!
-//! type Span&lt;&#39;a&gt; = LocatedSpan&lt;&amp;&#39;a str&gt;;
+//! type Span&lt;'a&gt; = LocatedSpan&lt;&amp;'a str&gt;;
 //!
-//! struct Token&lt;&#39;a&gt; {
-//!     pub position: Span&lt;&#39;a&gt;,
-//!     pub foo: &amp;&#39;a str,
-//!     pub bar: &amp;&#39;a str,
+//! struct Token&lt;'a&gt; {
+//!     pub position: Span&lt;'a&gt;,
+//!     pub foo: &amp;'a str,
+//!     pub bar: &amp;'a str,
 //! }
 //!
 //! fn parse_foobar(s: Span) -&gt; IResult&lt;Span, Token&gt; {
-//!     let (s, _) = take_until(&quot;foo&quot;)(s)?;
+//!     let (s, _) = take_until("foo")(s)?;
 //!     let (s, pos) = position(s)?;
-//!     let (s, foo) = tag(&quot;foo&quot;)(s)?;
-//!     let (s, bar) = tag(&quot;bar&quot;)(s)?;
+//!     let (s, foo) = tag("foo")(s)?;
+//!     let (s, bar) = tag("bar")(s)?;
 //!
 //!     Ok((
 //!         s,
@@ -881,12 +882,12 @@
 //! }
 //!
 //! fn main () {
-//!     let input = Span::new(&quot;Lorem ipsum \n foobar&quot;);
+//!     let input = Span::new("Lorem ipsum \n foobar");
 //!     let output = parse_foobar(input);
 //!     let position = output.unwrap().1.position;
 //!     assert_eq!(position.location_offset(), 14);
 //!     assert_eq!(position.location_line(), 2);
-//!     assert_eq!(position.fragment(), &amp;&quot;&quot;);
+//!     assert_eq!(position.fragment(), &amp;"");
 //!     assert_eq!(position.get_column(), 2);
 //! }
 //! ```
@@ -898,16 +899,16 @@
 //!
 //! ```ignore
 //! use nom_locate::LocatedSpan;
-//! type Span&lt;&#39;a&gt; = LocatedSpan&lt;&amp;&#39;a str, String&gt;;
+//! type Span&lt;'a&gt; = LocatedSpan&lt;&amp;'a str, String&gt;;
 //!
-//! let input = Span::new_extra(&quot;Lorem ipsum \n foobar&quot;, &quot;filename&quot;);
+//! let input = Span::new_extra("Lorem ipsum \n foobar", "filename");
 //! let output = parse_foobar(input);
 //! let extra = output.unwrap().1.extra;
 //! ```
 
-</span><span class="attr">#![cfg_attr(not(feature = <span class="string">&quot;std&quot;</span>), no_std)]
+</span><span class="attr">#![cfg_attr(not(feature = <span class="string">"std"</span>), no_std)]
 
-#[cfg(all(not(feature = <span class="string">&quot;std&quot;</span>), feature = <span class="string">&quot;alloc&quot;</span>))]
+#[cfg(all(not(feature = <span class="string">"std"</span>), feature = <span class="string">"alloc"</span>))]
 #[cfg_attr(test, macro_use)]
 </span><span class="kw">extern crate </span>alloc;
 
@@ -915,7 +916,7 @@
 </span><span class="kw">mod </span>tests;
 
 <span class="kw">mod </span>lib {
-    <span class="attr">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+    <span class="attr">#[cfg(feature = <span class="string">"std"</span>)]
     </span><span class="kw">pub mod </span>std {
         <span class="kw">pub use </span>std::fmt::{Display, Formatter, <span class="prelude-ty">Result </span><span class="kw">as </span>FmtResult};
         <span class="kw">pub use </span>std::hash::{Hash, Hasher};
@@ -928,13 +929,13 @@
         <span class="kw">pub use </span>std::vec::Vec;
     }
 
-    <span class="attr">#[cfg(not(feature = <span class="string">&quot;std&quot;</span>))]
+    <span class="attr">#[cfg(not(feature = <span class="string">"std"</span>))]
     </span><span class="kw">pub mod </span>std {
-        <span class="attr">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+        <span class="attr">#[cfg(feature = <span class="string">"alloc"</span>)]
         </span><span class="kw">pub use </span>alloc::fmt::{Display, Formatter, <span class="prelude-ty">Result </span><span class="kw">as </span>FmtResult};
-        <span class="attr">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+        <span class="attr">#[cfg(feature = <span class="string">"alloc"</span>)]
         </span><span class="kw">pub use </span>alloc::string::{String, ToString};
-        <span class="attr">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+        <span class="attr">#[cfg(feature = <span class="string">"alloc"</span>)]
         </span><span class="kw">pub use </span>alloc::vec::Vec;
         <span class="kw">pub use </span>core::hash::{Hash, Hasher};
         <span class="kw">pub use </span>core::iter::{Copied, Enumerate};
@@ -949,14 +950,14 @@
 
 <span class="kw">use </span>bytecount::{naive_num_chars, num_chars};
 <span class="kw">use </span>memchr::Memchr;
-<span class="attr">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"alloc"</span>)]
 </span><span class="kw">use </span>nom::ExtendInto;
 <span class="kw">use </span>nom::{
     error::{ErrorKind, ParseError},
     AsBytes, Compare, CompareResult, <span class="prelude-val">Err</span>, FindSubstring, FindToken, IResult, InputIter,
     InputLength, InputTake, InputTakeAtPosition, Offset, ParseTo, Slice,
 };
-<span class="attr">#[cfg(feature = <span class="string">&quot;stable-deref-trait&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"stable-deref-trait"</span>)]
 </span><span class="kw">use </span>stable_deref_trait::StableDeref;
 
 <span class="doccomment">/// A LocatedSpan is a set of meta information about the location of a token, including extra
@@ -1000,7 +1001,7 @@
     }
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;stable-deref-trait&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"stable-deref-trait"</span>)]
 </span><span class="doccomment">/// Optionally impl StableDeref so that this type works harmoniously with other
 /// crates that rely on this marker trait, such as `rental` and `lazy_static`.
 /// LocatedSpan is largely just a wrapper around the contained type `T`, so
@@ -1028,12 +1029,12 @@
     /// use nom_locate::LocatedSpan;
     ///
     /// # fn main() {
-    /// let span = LocatedSpan::new(b&quot;foobar&quot;);
+    /// let span = LocatedSpan::new(b"foobar");
     ///
     /// assert_eq!(span.location_offset(), 0);
     /// assert_eq!(span.location_line(),   1);
     /// assert_eq!(span.get_column(),      1);
-    /// assert_eq!(span.fragment(),        &amp;&amp;b&quot;foobar&quot;[..]);
+    /// assert_eq!(span.fragment(),        &amp;&amp;b"foobar"[..]);
     /// # }
     /// ```
     </span><span class="kw">pub fn </span>new(program: T) -&gt; LocatedSpan&lt;T, ()&gt; {
@@ -1065,13 +1066,13 @@
     /// use nom_locate::LocatedSpan;
     ///
     /// # fn main() {
-    /// let span = LocatedSpan::new_extra(b&quot;foobar&quot;, &quot;extra&quot;);
+    /// let span = LocatedSpan::new_extra(b"foobar", "extra");
     ///
     /// assert_eq!(span.location_offset(), 0);
     /// assert_eq!(span.location_line(),   1);
     /// assert_eq!(span.get_column(),      1);
-    /// assert_eq!(span.fragment(),        &amp;&amp;b&quot;foobar&quot;[..]);
-    /// assert_eq!(span.extra,             &quot;extra&quot;);
+    /// assert_eq!(span.fragment(),        &amp;&amp;b"foobar"[..]);
+    /// assert_eq!(span.extra,             "extra");
     /// # }
     /// ```
     </span><span class="kw">pub fn </span>new_extra(program: T, extra: X) -&gt; LocatedSpan&lt;T, X&gt; {
@@ -1136,16 +1137,16 @@
     ///
     /// fn decimal(input: LocatedSpan&lt;&amp;str&gt;) -&gt; IResult&lt;LocatedSpan&lt;&amp;str&gt;, LocatedSpan&lt;&amp;str&gt;&gt; {
     ///   recognize(
-    ///        take_while1(|c| is_digit(c as u8) || c == &#39;_&#39;)
+    ///        take_while1(|c| is_digit(c as u8) || c == '_')
     ///   )(input)
     /// }
     ///
     /// fn main() {
-    ///     let span = LocatedSpan::new(&quot;$10&quot;);
+    ///     let span = LocatedSpan::new("$10");
     ///     // matches the $ and then matches the decimal number afterwards,
     ///     // converting it into a `u8` and putting that value in the span
     ///     let (_, (_, n)) = tuple((
-    ///                         tag(&quot;$&quot;),
+    ///                         tag("$"),
     ///                         map_res(
     ///                             decimal,
     ///                             |x| x.fragment().parse::&lt;u8&gt;().map(|n| x.map_extra(|_| n))
@@ -1176,18 +1177,18 @@
     ///     combinator::rest,
     /// };
     ///
-    /// fn parse_pair&lt;&#39;a&gt;(input: LocatedSpan&lt;&amp;&#39;a str&gt;) -&gt; IResult&lt;LocatedSpan&lt;&amp;&#39;a str&gt;, (&amp;&#39;a str, &amp;&#39;a str)&gt; {
-    ///     let (input, key) = take_till(|c| c == &#39;=&#39;)(input)?;
-    ///     let (input, _) = tag(&quot;=&quot;)(input)?;
+    /// fn parse_pair&lt;'a&gt;(input: LocatedSpan&lt;&amp;'a str&gt;) -&gt; IResult&lt;LocatedSpan&lt;&amp;'a str&gt;, (&amp;'a str, &amp;'a str)&gt; {
+    ///     let (input, key) = take_till(|c| c == '=')(input)?;
+    ///     let (input, _) = tag("=")(input)?;
     ///     let (input, value) = rest(input)?;
     ///
     ///     Ok((input, (key.into_fragment(), value.into_fragment())))
     /// }
     ///
     /// fn main() {
-    ///     let span = LocatedSpan::new(&quot;key=value&quot;);
+    ///     let span = LocatedSpan::new("key=value");
     ///     let (_, pair) = parse_pair(span).unwrap();
-    ///     assert_eq!(pair, (&quot;key&quot;, &quot;value&quot;));
+    ///     assert_eq!(pair, ("key", "value"));
     /// }
     /// ```
     </span><span class="kw">pub fn </span>into_fragment(<span class="self">self</span>) -&gt; T {
@@ -1201,7 +1202,7 @@
 }
 
 <span class="kw">impl</span>&lt;T: AsBytes, X&gt; LocatedSpan&lt;T, X&gt; {
-    <span class="comment">// Attempt to get the &quot;original&quot; data slice back, by extending
+    <span class="comment">// Attempt to get the "original" data slice back, by extending
     // self.fragment backwards by self.offset.
     // Note that any bytes truncated from after self.fragment will not
     // be recovered.
@@ -1211,7 +1212,7 @@
         <span class="kw">unsafe </span>{
             <span class="macro">assert!</span>(
                 <span class="self">self</span>.offset &lt;= isize::max_value() <span class="kw">as </span>usize,
-                <span class="string">&quot;offset is too big&quot;
+                <span class="string">"offset is too big"
             </span>);
             <span class="kw">let </span>orig_input_ptr = self_ptr.offset(-(<span class="self">self</span>.offset <span class="kw">as </span>isize));
             slice::from_raw_parts(orig_input_ptr, <span class="self">self</span>.offset + self_bytes.len())
@@ -1221,7 +1222,7 @@
     <span class="kw">fn </span>get_columns_and_bytes_before(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (usize, <span class="kw-2">&amp;</span>[u8]) {
         <span class="kw">let </span>before_self = <span class="kw-2">&amp;</span><span class="self">self</span>.get_unoffsetted_slice()[..<span class="self">self</span>.offset];
 
-        <span class="kw">let </span>column = <span class="kw">match </span>memchr::memrchr(<span class="string">b&#39;\n&#39;</span>, before_self) {
+        <span class="kw">let </span>column = <span class="kw">match </span>memchr::memrchr(<span class="string">b'\n'</span>, before_self) {
             <span class="prelude-val">None </span>=&gt; <span class="self">self</span>.offset + <span class="number">1</span>,
             <span class="prelude-val">Some</span>(pos) =&gt; <span class="self">self</span>.offset - pos,
         };
@@ -1246,21 +1247,21 @@
     /// #
     /// # fn main() {
     /// let program = LocatedSpan::new(
-    ///     &quot;Hello World!\
+    ///     "Hello World!\
     ///     \nThis is a multi-line input\
-    ///     \nthat ends after this line.\n&quot;);
-    /// let multi = program.find_substring(&quot;multi&quot;).unwrap();
+    ///     \nthat ends after this line.\n");
+    /// let multi = program.find_substring("multi").unwrap();
     ///
     /// assert_eq!(
     ///     program.slice(multi..).get_line_beginning(),
-    ///     &quot;This is a multi-line input&quot;.as_bytes(),
+    ///     "This is a multi-line input".as_bytes(),
     /// );
     /// # }
     /// ```
     </span><span class="kw">pub fn </span>get_line_beginning(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u8] {
         <span class="kw">let </span>column0 = <span class="self">self</span>.get_column() - <span class="number">1</span>;
         <span class="kw">let </span>the_line = <span class="kw-2">&amp;</span><span class="self">self</span>.get_unoffsetted_slice()[<span class="self">self</span>.offset - column0..];
-        <span class="kw">match </span>memchr::memchr(<span class="string">b&#39;\n&#39;</span>, <span class="kw-2">&amp;</span>the_line[column0..]) {
+        <span class="kw">match </span>memchr::memchr(<span class="string">b'\n'</span>, <span class="kw-2">&amp;</span>the_line[column0..]) {
             <span class="prelude-val">None </span>=&gt; the_line,
             <span class="prelude-val">Some</span>(pos) =&gt; <span class="kw-2">&amp;</span>the_line[..column0 + pos],
         }
@@ -1279,7 +1280,7 @@
     /// # use nom::Slice;
     /// #
     /// # fn main() {
-    /// let span = LocatedSpan::new(&quot;foobar&quot;);
+    /// let span = LocatedSpan::new("foobar");
     ///
     /// assert_eq!(span.slice(3..).get_column(), 4);
     /// # }
@@ -1290,7 +1291,7 @@
 
     <span class="doccomment">/// Return the column index for UTF8 text. Return value is unspecified for non-utf8 text.
     ///
-    /// This version uses bytecount&#39;s hyper algorithm to count characters. This is much faster
+    /// This version uses bytecount's hyper algorithm to count characters. This is much faster
     /// for long lines, but is non-negligibly slower for short slices (below around 100 bytes).
     /// This is also sped up significantly more depending on architecture and enabling the simd
     /// feature gates. If you expect primarily short lines, you may get a noticeable speedup in
@@ -1305,8 +1306,8 @@
     /// # use nom::{Slice, FindSubstring};
     /// #
     /// # fn main() {
-    /// let span = LocatedSpan::new(&quot;メカジキ&quot;);
-    /// let indexOf3dKanji = span.find_substring(&quot;ジ&quot;).unwrap();
+    /// let span = LocatedSpan::new("メカジキ");
+    /// let indexOf3dKanji = span.find_substring("ジ").unwrap();
     ///
     /// assert_eq!(span.slice(indexOf3dKanji..).get_column(), 7);
     /// assert_eq!(span.slice(indexOf3dKanji..).get_utf8_column(), 3);
@@ -1332,8 +1333,8 @@
     /// # use nom::{Slice, FindSubstring};
     /// #
     /// # fn main() {
-    /// let span = LocatedSpan::new(&quot;メカジキ&quot;);
-    /// let indexOf3dKanji = span.find_substring(&quot;ジ&quot;).unwrap();
+    /// let span = LocatedSpan::new("メカジキ");
+    /// let indexOf3dKanji = span.find_substring("ジ").unwrap();
     ///
     /// assert_eq!(span.slice(indexOf3dKanji..).get_column(), 7);
     /// assert_eq!(span.slice(indexOf3dKanji..).naive_get_utf8_column(), 3);
@@ -1461,14 +1462,14 @@
 
 <span class="attr">#[macro_export]
 #[deprecated(
-    since = <span class="string">&quot;3.1.0&quot;</span>,
-    note = <span class="string">&quot;this implementation has been generalized and no longer requires a macro&quot;
+    since = <span class="string">"3.1.0"</span>,
+    note = <span class="string">"this implementation has been generalized and no longer requires a macro"
 </span>)]
 </span><span class="macro">macro_rules! </span>impl_input_iter {
     () =&gt; {};
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T, X&gt; InputIter <span class="kw">for </span>LocatedSpan&lt;T, X&gt;
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>, T, X&gt; InputIter <span class="kw">for </span>LocatedSpan&lt;T, X&gt;
 <span class="kw">where
     </span>T: InputIter,
 {
@@ -1510,8 +1511,8 @@
 
 <span class="attr">#[macro_export]
 #[deprecated(
-    since = <span class="string">&quot;2.1.0&quot;</span>,
-    note = <span class="string">&quot;this implementation has been generalized and no longer requires a macro&quot;
+    since = <span class="string">"2.1.0"</span>,
+    note = <span class="string">"this implementation has been generalized and no longer requires a macro"
 </span>)]
 </span><span class="macro">macro_rules! </span>impl_compare {
     ( <span class="macro-nonterminal">$fragment_type</span>:ty, <span class="macro-nonterminal">$compare_to_type</span>:ty ) =&gt; {};
@@ -1519,8 +1520,8 @@
 
 <span class="attr">#[macro_export]
 #[deprecated(
-    since = <span class="string">&quot;3.1.0&quot;</span>,
-    note = <span class="string">&quot;this implementation has been generalized and no longer requires a macro&quot;
+    since = <span class="string">"3.1.0"</span>,
+    note = <span class="string">"this implementation has been generalized and no longer requires a macro"
 </span>)]
 </span><span class="macro">macro_rules! </span>impl_slice_range {
     ( <span class="macro-nonterminal">$fragment_type</span>:ty, <span class="macro-nonterminal">$range_type</span>:ty, <span class="macro-nonterminal">$can_return_self</span>:expr ) =&gt; {};
@@ -1528,14 +1529,14 @@
 
 <span class="attr">#[macro_export]
 #[deprecated(
-    since = <span class="string">&quot;3.1.0&quot;</span>,
-    note = <span class="string">&quot;this implementation has been generalized and no longer requires a macro&quot;
+    since = <span class="string">"3.1.0"</span>,
+    note = <span class="string">"this implementation has been generalized and no longer requires a macro"
 </span>)]
 </span><span class="macro">macro_rules! </span>impl_slice_ranges {
     ( <span class="macro-nonterminal">$fragment_type</span>:ty ) =&gt; {};
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T, R, X: Clone&gt; Slice&lt;R&gt; <span class="kw">for </span>LocatedSpan&lt;T, X&gt;
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>, T, R, X: Clone&gt; Slice&lt;R&gt; <span class="kw">for </span>LocatedSpan&lt;T, X&gt;
 <span class="kw">where
     </span>T: Slice&lt;R&gt; + Offset + AsBytes + Slice&lt;RangeTo&lt;usize&gt;&gt;,
 {
@@ -1556,7 +1557,7 @@
         <span class="kw">let </span>next_offset = <span class="self">self</span>.offset + consumed_len;
 
         <span class="kw">let </span>consumed_as_bytes = consumed.as_bytes();
-        <span class="kw">let </span>iter = Memchr::new(<span class="string">b&#39;\n&#39;</span>, consumed_as_bytes);
+        <span class="kw">let </span>iter = Memchr::new(<span class="string">b'\n'</span>, consumed_as_bytes);
         <span class="kw">let </span>number_of_lines = iter.count() <span class="kw">as </span>u32;
         <span class="kw">let </span>next_line = <span class="self">self</span>.line + number_of_lines;
 
@@ -1604,7 +1605,7 @@
     }
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"alloc"</span>)]
 </span><span class="kw">impl</span>&lt;T: ToString, X&gt; Display <span class="kw">for </span>LocatedSpan&lt;T, X&gt; {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>Formatter) -&gt; FmtResult {
         fmt.write_str(<span class="kw-2">&amp;</span><span class="self">self</span>.fragment.to_string())
@@ -1613,12 +1614,12 @@
 
 <span class="attr">#[macro_export]
 #[deprecated(
-    since = <span class="string">&quot;3.1.0&quot;</span>,
-    note = <span class="string">&quot;this implementation has been generalized and no longer requires a macro&quot;
+    since = <span class="string">"3.1.0"</span>,
+    note = <span class="string">"this implementation has been generalized and no longer requires a macro"
 </span>)]
 </span><span class="macro">macro_rules! </span>impl_extend_into {
     (<span class="macro-nonterminal">$fragment_type</span>:ty, <span class="macro-nonterminal">$item</span>:ty, <span class="macro-nonterminal">$extender</span>:ty) =&gt; {
-        <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, X&gt; ExtendInto <span class="kw">for </span>LocatedSpan&lt;<span class="macro-nonterminal">$fragment_type</span>, X&gt; {
+        <span class="kw">impl</span>&lt;<span class="lifetime">'a</span>, X&gt; ExtendInto <span class="kw">for </span>LocatedSpan&lt;<span class="macro-nonterminal">$fragment_type</span>, X&gt; {
             <span class="kw">type </span>Item = <span class="macro-nonterminal">$item</span>;
             <span class="kw">type </span>Extender = <span class="macro-nonterminal">$extender</span>;
 
@@ -1635,8 +1636,8 @@
     };
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
-</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T, X&gt; ExtendInto <span class="kw">for </span>LocatedSpan&lt;T, X&gt;
+<span class="attr">#[cfg(feature = <span class="string">"alloc"</span>)]
+</span><span class="kw">impl</span>&lt;<span class="lifetime">'a</span>, T, X&gt; ExtendInto <span class="kw">for </span>LocatedSpan&lt;T, X&gt;
 <span class="kw">where
     </span>T: ExtendInto,
 {
@@ -1654,11 +1655,11 @@
     }
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"std"</span>)]
 #[macro_export]
 #[deprecated(
-    since = <span class="string">&quot;2.1.0&quot;</span>,
-    note = <span class="string">&quot;this implementation has been generalized and no longer requires a macro&quot;
+    since = <span class="string">"2.1.0"</span>,
+    note = <span class="string">"this implementation has been generalized and no longer requires a macro"
 </span>)]
 </span><span class="macro">macro_rules! </span>impl_hex_display {
     (<span class="macro-nonterminal">$fragment_type</span>:ty) =&gt; {};
@@ -1668,7 +1669,7 @@
 </span><span class="attr">#[macro_export]
 </span><span class="macro">macro_rules! </span>position {
     (<span class="macro-nonterminal">$input</span>:expr,) =&gt; {
-        <span class="macro">tag!</span>(<span class="macro-nonterminal">$input</span>, <span class="string">&quot;&quot;</span>)
+        <span class="macro">tag!</span>(<span class="macro-nonterminal">$input</span>, <span class="string">""</span>)
     };
 }
 

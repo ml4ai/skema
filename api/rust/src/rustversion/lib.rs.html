@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/rustversion-1.0.14/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="rustversion" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/rustversion-1.0.14/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="rustversion" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -265,76 +266,76 @@
 //!
 //! # Selectors
 //!
-//! - &lt;p style=&quot;margin-left:50px;text-indent:-50px&quot;&gt;
+//! - &lt;p style="margin-left:50px;text-indent:-50px"&gt;
 //!   &lt;b&gt;&lt;code&gt;#[rustversion::stable]&lt;/code&gt;&lt;/b&gt;
 //!   —&lt;br&gt;
 //!   True on any stable compiler.
 //!   &lt;/p&gt;
 //!
-//! - &lt;p style=&quot;margin-left:50px;text-indent:-50px&quot;&gt;
+//! - &lt;p style="margin-left:50px;text-indent:-50px"&gt;
 //!   &lt;b&gt;&lt;code&gt;#[rustversion::stable(1.34)]&lt;/code&gt;&lt;/b&gt;
 //!   —&lt;br&gt;
 //!   True on exactly the specified stable compiler.
 //!   &lt;/p&gt;
 //!
-//! - &lt;p style=&quot;margin-left:50px;text-indent:-50px&quot;&gt;
+//! - &lt;p style="margin-left:50px;text-indent:-50px"&gt;
 //!   &lt;b&gt;&lt;code&gt;#[rustversion::beta]&lt;/code&gt;&lt;/b&gt;
 //!   —&lt;br&gt;
 //!   True on any beta compiler.
 //!   &lt;/p&gt;
 //!
-//! - &lt;p style=&quot;margin-left:50px;text-indent:-50px&quot;&gt;
+//! - &lt;p style="margin-left:50px;text-indent:-50px"&gt;
 //!   &lt;b&gt;&lt;code&gt;#[rustversion::nightly]&lt;/code&gt;&lt;/b&gt;
 //!   —&lt;br&gt;
 //!   True on any nightly compiler or dev build.
 //!   &lt;/p&gt;
 //!
-//! - &lt;p style=&quot;margin-left:50px;text-indent:-50px&quot;&gt;
+//! - &lt;p style="margin-left:50px;text-indent:-50px"&gt;
 //!   &lt;b&gt;&lt;code&gt;#[rustversion::nightly(2019-01-01)]&lt;/code&gt;&lt;/b&gt;
 //!   —&lt;br&gt;
 //!   True on exactly one nightly.
 //!   &lt;/p&gt;
 //!
-//! - &lt;p style=&quot;margin-left:50px;text-indent:-50px&quot;&gt;
+//! - &lt;p style="margin-left:50px;text-indent:-50px"&gt;
 //!   &lt;b&gt;&lt;code&gt;#[rustversion::since(1.34)]&lt;/code&gt;&lt;/b&gt;
 //!   —&lt;br&gt;
 //!   True on that stable release and any later compiler, including beta and
 //!   nightly.
 //!   &lt;/p&gt;
 //!
-//! - &lt;p style=&quot;margin-left:50px;text-indent:-50px&quot;&gt;
+//! - &lt;p style="margin-left:50px;text-indent:-50px"&gt;
 //!   &lt;b&gt;&lt;code&gt;#[rustversion::since(2019-01-01)]&lt;/code&gt;&lt;/b&gt;
 //!   —&lt;br&gt;
 //!   True on that nightly and all newer ones.
 //!   &lt;/p&gt;
 //!
-//! - &lt;p style=&quot;margin-left:50px;text-indent:-50px&quot;&gt;
+//! - &lt;p style="margin-left:50px;text-indent:-50px"&gt;
 //!   &lt;b&gt;&lt;code&gt;#[rustversion::before(&lt;/code&gt;&lt;/b&gt;&lt;i&gt;version or date&lt;/i&gt;&lt;b&gt;&lt;code&gt;)]&lt;/code&gt;&lt;/b&gt;
 //!   —&lt;br&gt;
 //!   Negative of &lt;i&gt;#[rustversion::since(...)]&lt;/i&gt;.
 //!   &lt;/p&gt;
 //!
-//! - &lt;p style=&quot;margin-left:50px;text-indent:-50px&quot;&gt;
+//! - &lt;p style="margin-left:50px;text-indent:-50px"&gt;
 //!   &lt;b&gt;&lt;code&gt;#[rustversion::not(&lt;/code&gt;&lt;/b&gt;&lt;i&gt;selector&lt;/i&gt;&lt;b&gt;&lt;code&gt;)]&lt;/code&gt;&lt;/b&gt;
 //!   —&lt;br&gt;
 //!   Negative of any selector; for example &lt;i&gt;#[rustversion::not(nightly)]&lt;/i&gt;.
 //!   &lt;/p&gt;
 //!
-//! - &lt;p style=&quot;margin-left:50px;text-indent:-50px&quot;&gt;
+//! - &lt;p style="margin-left:50px;text-indent:-50px"&gt;
 //!   &lt;b&gt;&lt;code&gt;#[rustversion::any(&lt;/code&gt;&lt;/b&gt;&lt;i&gt;selectors...&lt;/i&gt;&lt;b&gt;&lt;code&gt;)]&lt;/code&gt;&lt;/b&gt;
 //!   —&lt;br&gt;
 //!   True if any of the comma-separated selectors is true; for example
 //!   &lt;i&gt;#[rustversion::any(stable, beta)]&lt;/i&gt;.
 //!   &lt;/p&gt;
 //!
-//! - &lt;p style=&quot;margin-left:50px;text-indent:-50px&quot;&gt;
+//! - &lt;p style="margin-left:50px;text-indent:-50px"&gt;
 //!   &lt;b&gt;&lt;code&gt;#[rustversion::all(&lt;/code&gt;&lt;/b&gt;&lt;i&gt;selectors...&lt;/i&gt;&lt;b&gt;&lt;code&gt;)]&lt;/code&gt;&lt;/b&gt;
 //!   —&lt;br&gt;
 //!   True if all of the comma-separated selectors are true; for example
 //!   &lt;i&gt;#[rustversion::all(since(1.31), before(1.34))]&lt;/i&gt;.
 //!   &lt;/p&gt;
 //!
-//! - &lt;p style=&quot;margin-left:50px;text-indent:-50px&quot;&gt;
+//! - &lt;p style="margin-left:50px;text-indent:-50px"&gt;
 //!   &lt;b&gt;&lt;code&gt;#[rustversion::attr(&lt;/code&gt;&lt;/b&gt;&lt;i&gt;selector&lt;/i&gt;&lt;b&gt;&lt;code&gt;, &lt;/code&gt;&lt;/b&gt;&lt;i&gt;attribute&lt;/i&gt;&lt;b&gt;&lt;code&gt;)]&lt;/code&gt;&lt;/b&gt;
 //!   —&lt;br&gt;
 //!   For conditional inclusion of attributes; analogous to
@@ -374,7 +375,7 @@
 //! struct Six(i16, i32);
 //!
 //! fn main() {
-//!     println!(&quot;{}&quot;, std::mem::align_of::&lt;Six&gt;());
+//!     println!("{}", std::mem::align_of::&lt;Six&gt;());
 //! }
 //! ```
 //!
@@ -393,7 +394,7 @@
 //!
 //! &lt;br&gt;
 
-</span><span class="attr">#![doc(html_root_url = <span class="string">&quot;https://docs.rs/rustversion/1.0.14&quot;</span>)]
+</span><span class="attr">#![doc(html_root_url = <span class="string">"https://docs.rs/rustversion/1.0.14"</span>)]
 #![allow(
     clippy::cast_lossless,
     clippy::cast_possible_truncation,
@@ -431,46 +432,46 @@
 <span class="kw">use </span><span class="kw">crate</span>::version::Version;
 <span class="kw">use </span>proc_macro::TokenStream;
 
-<span class="kw">const </span>RUSTVERSION: Version = <span class="macro">include!</span>(<span class="macro">concat!</span>(<span class="macro">env!</span>(<span class="string">&quot;OUT_DIR&quot;</span>), <span class="string">&quot;/version.expr&quot;</span>));
+<span class="kw">const </span>RUSTVERSION: Version = <span class="macro">include!</span>(<span class="macro">concat!</span>(<span class="macro">env!</span>(<span class="string">"OUT_DIR"</span>), <span class="string">"/version.expr"</span>));
 
 <span class="attr">#[proc_macro_attribute]
 </span><span class="kw">pub fn </span>stable(args: TokenStream, input: TokenStream) -&gt; TokenStream {
-    expand::cfg(<span class="string">&quot;stable&quot;</span>, args, input)
+    expand::cfg(<span class="string">"stable"</span>, args, input)
 }
 
 <span class="attr">#[proc_macro_attribute]
 </span><span class="kw">pub fn </span>beta(args: TokenStream, input: TokenStream) -&gt; TokenStream {
-    expand::cfg(<span class="string">&quot;beta&quot;</span>, args, input)
+    expand::cfg(<span class="string">"beta"</span>, args, input)
 }
 
 <span class="attr">#[proc_macro_attribute]
 </span><span class="kw">pub fn </span>nightly(args: TokenStream, input: TokenStream) -&gt; TokenStream {
-    expand::cfg(<span class="string">&quot;nightly&quot;</span>, args, input)
+    expand::cfg(<span class="string">"nightly"</span>, args, input)
 }
 
 <span class="attr">#[proc_macro_attribute]
 </span><span class="kw">pub fn </span>since(args: TokenStream, input: TokenStream) -&gt; TokenStream {
-    expand::cfg(<span class="string">&quot;since&quot;</span>, args, input)
+    expand::cfg(<span class="string">"since"</span>, args, input)
 }
 
 <span class="attr">#[proc_macro_attribute]
 </span><span class="kw">pub fn </span>before(args: TokenStream, input: TokenStream) -&gt; TokenStream {
-    expand::cfg(<span class="string">&quot;before&quot;</span>, args, input)
+    expand::cfg(<span class="string">"before"</span>, args, input)
 }
 
 <span class="attr">#[proc_macro_attribute]
 </span><span class="kw">pub fn </span>not(args: TokenStream, input: TokenStream) -&gt; TokenStream {
-    expand::cfg(<span class="string">&quot;not&quot;</span>, args, input)
+    expand::cfg(<span class="string">"not"</span>, args, input)
 }
 
 <span class="attr">#[proc_macro_attribute]
 </span><span class="kw">pub fn </span>any(args: TokenStream, input: TokenStream) -&gt; TokenStream {
-    expand::cfg(<span class="string">&quot;any&quot;</span>, args, input)
+    expand::cfg(<span class="string">"any"</span>, args, input)
 }
 
 <span class="attr">#[proc_macro_attribute]
 </span><span class="kw">pub fn </span>all(args: TokenStream, input: TokenStream) -&gt; TokenStream {
-    expand::cfg(<span class="string">&quot;all&quot;</span>, args, input)
+    expand::cfg(<span class="string">"all"</span>, args, input)
 }
 
 <span class="attr">#[proc_macro_attribute]

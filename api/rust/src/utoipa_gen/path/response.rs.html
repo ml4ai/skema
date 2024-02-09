@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/utoipa-gen-3.5.0/src/path/response.rs`."><title>response.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="utoipa_gen" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/utoipa-gen-3.5.0/src/path/response.rs`."><title>response.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="utoipa_gen" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -942,15 +943,15 @@
 
 <span class="kw">pub mod </span>derive;
 
-<span class="attr">#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
-</span><span class="kw">pub enum </span>Response&lt;<span class="lifetime">&#39;r</span>&gt; {
+<span class="attr">#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
+</span><span class="kw">pub enum </span>Response&lt;<span class="lifetime">'r</span>&gt; {
     <span class="doccomment">/// A type that implements `utoipa::IntoResponses`.
-    </span>IntoResponses(Cow&lt;<span class="lifetime">&#39;r</span>, TypePath&gt;),
+    </span>IntoResponses(Cow&lt;<span class="lifetime">'r</span>, TypePath&gt;),
     <span class="doccomment">/// The tuple definition of a response.
-    </span>Tuple(ResponseTuple&lt;<span class="lifetime">&#39;r</span>&gt;),
+    </span>Tuple(ResponseTuple&lt;<span class="lifetime">'r</span>&gt;),
 }
 
-<span class="kw">impl </span>Parse <span class="kw">for </span>Response&lt;<span class="lifetime">&#39;_</span>&gt; {
+<span class="kw">impl </span>Parse <span class="kw">for </span>Response&lt;<span class="lifetime">'_</span>&gt; {
     <span class="kw">fn </span>parse(input: ParseStream) -&gt; syn::Result&lt;<span class="self">Self</span>&gt; {
         <span class="kw">if </span>input.fork().parse::&lt;ExprPath&gt;().is_ok() {
             <span class="prelude-val">Ok</span>(<span class="self">Self</span>::IntoResponses(Cow::Owned(input.parse::&lt;TypePath&gt;()<span class="question-mark">?</span>)))
@@ -964,18 +965,18 @@
 
 <span class="doccomment">/// Parsed representation of response attributes from `#[utoipa::path]` attribute.
 </span><span class="attr">#[derive(Default)]
-#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
-</span><span class="kw">pub struct </span>ResponseTuple&lt;<span class="lifetime">&#39;r</span>&gt; {
+#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
+</span><span class="kw">pub struct </span>ResponseTuple&lt;<span class="lifetime">'r</span>&gt; {
     status_code: ResponseStatus,
-    inner: <span class="prelude-ty">Option</span>&lt;ResponseTupleInner&lt;<span class="lifetime">&#39;r</span>&gt;&gt;,
+    inner: <span class="prelude-ty">Option</span>&lt;ResponseTupleInner&lt;<span class="lifetime">'r</span>&gt;&gt;,
 }
 
 <span class="kw">const </span>RESPONSE_INCOMPATIBLE_ATTRIBUTES_MSG: <span class="kw-2">&amp;</span>str =
-    <span class="string">&quot;The `response` attribute may only be used in conjunction with the `status` attribute&quot;</span>;
+    <span class="string">"The `response` attribute may only be used in conjunction with the `status` attribute"</span>;
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;r</span>&gt; ResponseTuple&lt;<span class="lifetime">&#39;r</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'r</span>&gt; ResponseTuple&lt;<span class="lifetime">'r</span>&gt; {
     <span class="comment">// This will error if the `response` attribute has already been set
-    </span><span class="kw">fn </span>as_value(<span class="kw-2">&amp;mut </span><span class="self">self</span>, span: Span) -&gt; syn::Result&lt;<span class="kw-2">&amp;mut </span>ResponseValue&lt;<span class="lifetime">&#39;r</span>&gt;&gt; {
+    </span><span class="kw">fn </span>as_value(<span class="kw-2">&amp;mut </span><span class="self">self</span>, span: Span) -&gt; syn::Result&lt;<span class="kw-2">&amp;mut </span>ResponseValue&lt;<span class="lifetime">'r</span>&gt;&gt; {
         <span class="kw">if </span><span class="self">self</span>.inner.is_none() {
             <span class="self">self</span>.inner = <span class="prelude-val">Some</span>(ResponseTupleInner::Value(ResponseValue::default()));
         }
@@ -987,7 +988,7 @@
     }
 
     <span class="comment">// Use with the `response` attribute, this will fail if an incompatible attribute has already been set
-    </span><span class="kw">fn </span>set_ref_type(<span class="kw-2">&amp;mut </span><span class="self">self</span>, span: Span, ty: InlineType&lt;<span class="lifetime">&#39;r</span>&gt;) -&gt; syn::Result&lt;()&gt; {
+    </span><span class="kw">fn </span>set_ref_type(<span class="kw-2">&amp;mut </span><span class="self">self</span>, span: Span, ty: InlineType&lt;<span class="lifetime">'r</span>&gt;) -&gt; syn::Result&lt;()&gt; {
         <span class="kw">match </span><span class="kw-2">&amp;mut </span><span class="self">self</span>.inner {
             <span class="prelude-val">None </span>=&gt; <span class="self">self</span>.inner = <span class="prelude-val">Some</span>(ResponseTupleInner::Ref(ty)),
             <span class="prelude-val">Some</span>(ResponseTupleInner::Ref(r)) =&gt; <span class="kw-2">*</span>r = ty,
@@ -999,15 +1000,15 @@
     }
 }
 
-<span class="attr">#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
-</span><span class="kw">enum </span>ResponseTupleInner&lt;<span class="lifetime">&#39;r</span>&gt; {
-    Value(ResponseValue&lt;<span class="lifetime">&#39;r</span>&gt;),
-    Ref(InlineType&lt;<span class="lifetime">&#39;r</span>&gt;),
+<span class="attr">#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
+</span><span class="kw">enum </span>ResponseTupleInner&lt;<span class="lifetime">'r</span>&gt; {
+    Value(ResponseValue&lt;<span class="lifetime">'r</span>&gt;),
+    Ref(InlineType&lt;<span class="lifetime">'r</span>&gt;),
 }
 
-<span class="kw">impl </span>Parse <span class="kw">for </span>ResponseTuple&lt;<span class="lifetime">&#39;_</span>&gt; {
+<span class="kw">impl </span>Parse <span class="kw">for </span>ResponseTuple&lt;<span class="lifetime">'_</span>&gt; {
     <span class="kw">fn </span>parse(input: ParseStream) -&gt; syn::Result&lt;<span class="self">Self</span>&gt; {
-        <span class="kw">const </span>EXPECTED_ATTRIBUTE_MESSAGE: <span class="kw-2">&amp;</span>str = <span class="string">&quot;unexpected attribute, expected any of: status, description, body, content_type, headers, example, examples, response&quot;</span>;
+        <span class="kw">const </span>EXPECTED_ATTRIBUTE_MESSAGE: <span class="kw-2">&amp;</span>str = <span class="string">"unexpected attribute, expected any of: status, description, body, content_type, headers, example, examples, response"</span>;
 
         <span class="kw">let </span><span class="kw-2">mut </span>response = ResponseTuple::default();
 
@@ -1015,41 +1016,41 @@
             <span class="kw">let </span>ident = input.parse::&lt;Ident&gt;().map_err(|error| {
                 Error::new(
                     error.span(),
-                    <span class="macro">format!</span>(<span class="string">&quot;{EXPECTED_ATTRIBUTE_MESSAGE}, {error}&quot;</span>),
+                    <span class="macro">format!</span>(<span class="string">"{EXPECTED_ATTRIBUTE_MESSAGE}, {error}"</span>),
                 )
             })<span class="question-mark">?</span>;
             <span class="kw">let </span>attribute_name = <span class="kw-2">&amp;*</span>ident.to_string();
 
             <span class="kw">match </span>attribute_name {
-                <span class="string">&quot;status&quot; </span>=&gt; {
+                <span class="string">"status" </span>=&gt; {
                     response.status_code =
                         parse_utils::parse_next(input, || input.parse::&lt;ResponseStatus&gt;())<span class="question-mark">?</span>;
                 }
-                <span class="string">&quot;description&quot; </span>=&gt; {
+                <span class="string">"description" </span>=&gt; {
                     response.as_value(input.span())<span class="question-mark">?</span>.description = parse::description(input)<span class="question-mark">?</span>;
                 }
-                <span class="string">&quot;body&quot; </span>=&gt; {
+                <span class="string">"body" </span>=&gt; {
                     response.as_value(input.span())<span class="question-mark">?</span>.response_type =
                         <span class="prelude-val">Some</span>(parse_utils::parse_next(input, || input.parse())<span class="question-mark">?</span>);
                 }
-                <span class="string">&quot;content_type&quot; </span>=&gt; {
+                <span class="string">"content_type" </span>=&gt; {
                     response.as_value(input.span())<span class="question-mark">?</span>.content_type =
                         <span class="prelude-val">Some</span>(parse::content_type(input)<span class="question-mark">?</span>);
                 }
-                <span class="string">&quot;headers&quot; </span>=&gt; {
+                <span class="string">"headers" </span>=&gt; {
                     response.as_value(input.span())<span class="question-mark">?</span>.headers = parse::headers(input)<span class="question-mark">?</span>;
                 }
-                <span class="string">&quot;example&quot; </span>=&gt; {
+                <span class="string">"example" </span>=&gt; {
                     response.as_value(input.span())<span class="question-mark">?</span>.example = <span class="prelude-val">Some</span>(parse::example(input)<span class="question-mark">?</span>);
                 }
-                <span class="string">&quot;examples&quot; </span>=&gt; {
+                <span class="string">"examples" </span>=&gt; {
                     response.as_value(input.span())<span class="question-mark">?</span>.examples = <span class="prelude-val">Some</span>(parse::examples(input)<span class="question-mark">?</span>);
                 }
-                <span class="string">&quot;content&quot; </span>=&gt; {
+                <span class="string">"content" </span>=&gt; {
                     response.as_value(input.span())<span class="question-mark">?</span>.content =
                         parse_utils::parse_punctuated_within_parenthesis(input)<span class="question-mark">?</span>;
                 }
-                <span class="string">&quot;response&quot; </span>=&gt; {
+                <span class="string">"response" </span>=&gt; {
                     response.set_ref_type(
                         input.span(),
                         parse_utils::parse_next(input, || input.parse())<span class="question-mark">?</span>,
@@ -1071,8 +1072,8 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;r</span>&gt; From&lt;ResponseValue&lt;<span class="lifetime">&#39;r</span>&gt;&gt; <span class="kw">for </span>ResponseTuple&lt;<span class="lifetime">&#39;r</span>&gt; {
-    <span class="kw">fn </span>from(value: ResponseValue&lt;<span class="lifetime">&#39;r</span>&gt;) -&gt; <span class="self">Self </span>{
+<span class="kw">impl</span>&lt;<span class="lifetime">'r</span>&gt; From&lt;ResponseValue&lt;<span class="lifetime">'r</span>&gt;&gt; <span class="kw">for </span>ResponseTuple&lt;<span class="lifetime">'r</span>&gt; {
+    <span class="kw">fn </span>from(value: ResponseValue&lt;<span class="lifetime">'r</span>&gt;) -&gt; <span class="self">Self </span>{
         ResponseTuple {
             inner: <span class="prelude-val">Some</span>(ResponseTupleInner::Value(value)),
             ..Default::default()
@@ -1080,8 +1081,8 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;r</span>&gt; From&lt;(ResponseStatus, ResponseValue&lt;<span class="lifetime">&#39;r</span>&gt;)&gt; <span class="kw">for </span>ResponseTuple&lt;<span class="lifetime">&#39;r</span>&gt; {
-    <span class="kw">fn </span>from((status_code, response_value): (ResponseStatus, ResponseValue&lt;<span class="lifetime">&#39;r</span>&gt;)) -&gt; <span class="self">Self </span>{
+<span class="kw">impl</span>&lt;<span class="lifetime">'r</span>&gt; From&lt;(ResponseStatus, ResponseValue&lt;<span class="lifetime">'r</span>&gt;)&gt; <span class="kw">for </span>ResponseTuple&lt;<span class="lifetime">'r</span>&gt; {
+    <span class="kw">fn </span>from((status_code, response_value): (ResponseStatus, ResponseValue&lt;<span class="lifetime">'r</span>&gt;)) -&gt; <span class="self">Self </span>{
         ResponseTuple {
             inner: <span class="prelude-val">Some</span>(ResponseTupleInner::Value(response_value)),
             status_code,
@@ -1094,13 +1095,13 @@
     description: String,
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;r</span>&gt; From&lt;DeriveResponsesAttributes&lt;DeriveIntoResponsesValue&gt;&gt; <span class="kw">for </span>ResponseValue&lt;<span class="lifetime">&#39;r</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'r</span>&gt; From&lt;DeriveResponsesAttributes&lt;DeriveIntoResponsesValue&gt;&gt; <span class="kw">for </span>ResponseValue&lt;<span class="lifetime">'r</span>&gt; {
     <span class="kw">fn </span>from(value: DeriveResponsesAttributes&lt;DeriveIntoResponsesValue&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>::from_derive_into_responses_value(value.derive_value, value.description)
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;r</span>&gt; From&lt;DeriveResponsesAttributes&lt;<span class="prelude-ty">Option</span>&lt;DeriveToResponseValue&gt;&gt;&gt; <span class="kw">for </span>ResponseValue&lt;<span class="lifetime">&#39;r</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'r</span>&gt; From&lt;DeriveResponsesAttributes&lt;<span class="prelude-ty">Option</span>&lt;DeriveToResponseValue&gt;&gt;&gt; <span class="kw">for </span>ResponseValue&lt;<span class="lifetime">'r</span>&gt; {
     <span class="kw">fn </span>from(
         DeriveResponsesAttributes::&lt;<span class="prelude-ty">Option</span>&lt;DeriveToResponseValue&gt;&gt; {
             derive_value,
@@ -1119,18 +1120,18 @@
 }
 
 <span class="attr">#[derive(Default)]
-#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
-</span><span class="kw">pub struct </span>ResponseValue&lt;<span class="lifetime">&#39;r</span>&gt; {
+#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
+</span><span class="kw">pub struct </span>ResponseValue&lt;<span class="lifetime">'r</span>&gt; {
     description: String,
-    response_type: <span class="prelude-ty">Option</span>&lt;PathType&lt;<span class="lifetime">&#39;r</span>&gt;&gt;,
+    response_type: <span class="prelude-ty">Option</span>&lt;PathType&lt;<span class="lifetime">'r</span>&gt;&gt;,
     content_type: <span class="prelude-ty">Option</span>&lt;Vec&lt;String&gt;&gt;,
     headers: Vec&lt;Header&gt;,
     example: <span class="prelude-ty">Option</span>&lt;AnyValue&gt;,
     examples: <span class="prelude-ty">Option</span>&lt;Punctuated&lt;Example, Comma&gt;&gt;,
-    content: Punctuated&lt;Content&lt;<span class="lifetime">&#39;r</span>&gt;, Comma&gt;,
+    content: Punctuated&lt;Content&lt;<span class="lifetime">'r</span>&gt;, Comma&gt;,
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;r</span>&gt; ResponseValue&lt;<span class="lifetime">&#39;r</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'r</span>&gt; ResponseValue&lt;<span class="lifetime">'r</span>&gt; {
     <span class="kw">fn </span>from_derive_to_response_value(
         derive_value: DeriveToResponseValue,
         description: String,
@@ -1167,14 +1168,14 @@
         }
     }
 
-    <span class="kw">fn </span>response_type(<span class="kw-2">mut </span><span class="self">self</span>, response_type: <span class="prelude-ty">Option</span>&lt;PathType&lt;<span class="lifetime">&#39;r</span>&gt;&gt;) -&gt; <span class="self">Self </span>{
+    <span class="kw">fn </span>response_type(<span class="kw-2">mut </span><span class="self">self</span>, response_type: <span class="prelude-ty">Option</span>&lt;PathType&lt;<span class="lifetime">'r</span>&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.response_type = response_type;
 
         <span class="self">self
     </span>}
 }
 
-<span class="kw">impl </span>ToTokens <span class="kw">for </span>ResponseTuple&lt;<span class="lifetime">&#39;_</span>&gt; {
+<span class="kw">impl </span>ToTokens <span class="kw">for </span>ResponseTuple&lt;<span class="lifetime">'_</span>&gt; {
     <span class="kw">fn </span>to_tokens(<span class="kw-2">&amp;</span><span class="self">self</span>, tokens: <span class="kw-2">&amp;mut </span>TokenStream2) {
         <span class="kw">match </span><span class="self">self</span>.inner.as_ref().unwrap() {
             ResponseTupleInner::Ref(res) =&gt; {
@@ -1212,7 +1213,7 @@
                                 features: <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[Inline::from(path_type.is_inline).into()]),
                                 description: <span class="prelude-val">None</span>,
                                 deprecated: <span class="prelude-val">None</span>,
-                                object_name: <span class="string">&quot;&quot;</span>,
+                                object_name: <span class="string">""</span>,
                             })
                             .to_token_stream()
                         }
@@ -1258,7 +1259,7 @@
                         <span class="kw">match </span>response_type {
                             PathType::Ref(<span class="kw">_</span>) =&gt; {
                                 tokens.extend(<span class="macro">quote! </span>{
-                                    .content(<span class="string">&quot;application/json&quot;</span>, #content)
+                                    .content(<span class="string">"application/json"</span>, #content)
                                 });
                             }
                             PathType::MediaType(path_type) =&gt; {
@@ -1308,14 +1309,14 @@
     <span class="kw">fn </span>from_attributes(attributes: <span class="kw-2">&amp;</span>[Attribute]) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
         attributes
             .iter()
-            .filter(|attribute| attribute.path().get_ident().unwrap() == <span class="string">&quot;response&quot;</span>)
+            .filter(|attribute| attribute.path().get_ident().unwrap() == <span class="string">"response"</span>)
             .map(|attribute| attribute.parse_args::&lt;<span class="self">Self</span>&gt;().unwrap_or_abort())
             .reduce(|acc, item| acc.merge_from(item))
     }
 }
 
 <span class="attr">#[derive(Default)]
-#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
+#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
 </span><span class="kw">struct </span>DeriveToResponseValue {
     content_type: <span class="prelude-ty">Option</span>&lt;Vec&lt;String&gt;&gt;,
     headers: Vec&lt;Header&gt;,
@@ -1355,25 +1356,25 @@
             <span class="kw">let </span>attribute_name = <span class="kw-2">&amp;*</span>ident.to_string();
 
             <span class="kw">match </span>attribute_name {
-                <span class="string">&quot;description&quot; </span>=&gt; {
+                <span class="string">"description" </span>=&gt; {
                     response.description = parse::description(input)<span class="question-mark">?</span>;
                 }
-                <span class="string">&quot;content_type&quot; </span>=&gt; {
+                <span class="string">"content_type" </span>=&gt; {
                     response.content_type = <span class="prelude-val">Some</span>(parse::content_type(input)<span class="question-mark">?</span>);
                 }
-                <span class="string">&quot;headers&quot; </span>=&gt; {
+                <span class="string">"headers" </span>=&gt; {
                     response.headers = parse::headers(input)<span class="question-mark">?</span>;
                 }
-                <span class="string">&quot;example&quot; </span>=&gt; {
+                <span class="string">"example" </span>=&gt; {
                     response.example = <span class="prelude-val">Some</span>((parse::example(input)<span class="question-mark">?</span>, ident));
                 }
-                <span class="string">&quot;examples&quot; </span>=&gt; {
+                <span class="string">"examples" </span>=&gt; {
                     response.examples = <span class="prelude-val">Some</span>((parse::examples(input)<span class="question-mark">?</span>, ident));
                 }
                 <span class="kw">_ </span>=&gt; {
                     <span class="kw">return </span><span class="prelude-val">Err</span>(Error::new(
                         ident.span(),
-                        <span class="macro">format!</span>(<span class="string">&quot;unexpected attribute: {attribute_name}, expected any of: inline, description, content_type, headers, example&quot;</span>),
+                        <span class="macro">format!</span>(<span class="string">"unexpected attribute: {attribute_name}, expected any of: inline, description, content_type, headers, example"</span>),
                     ));
                 }
             }
@@ -1424,14 +1425,14 @@
 <span class="kw">impl </span>Parse <span class="kw">for </span>DeriveIntoResponsesValue {
     <span class="kw">fn </span>parse(input: ParseStream) -&gt; syn::Result&lt;<span class="self">Self</span>&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>response = DeriveIntoResponsesValue::default();
-        <span class="kw">const </span>MISSING_STATUS_ERROR: <span class="kw-2">&amp;</span>str = <span class="string">&quot;missing expected `status` attribute&quot;</span>;
+        <span class="kw">const </span>MISSING_STATUS_ERROR: <span class="kw-2">&amp;</span>str = <span class="string">"missing expected `status` attribute"</span>;
         <span class="kw">let </span>first_span = input.span();
 
         <span class="kw">let </span>status_ident = input
             .parse::&lt;Ident&gt;()
             .map_err(|error| Error::new(error.span(), MISSING_STATUS_ERROR))<span class="question-mark">?</span>;
 
-        <span class="kw">if </span>status_ident == <span class="string">&quot;status&quot; </span>{
+        <span class="kw">if </span>status_ident == <span class="string">"status" </span>{
             response.status = parse_utils::parse_next(input, || input.parse::&lt;ResponseStatus&gt;())<span class="question-mark">?</span>;
         } <span class="kw">else </span>{
             <span class="kw">return </span><span class="prelude-val">Err</span>(Error::new(status_ident.span(), MISSING_STATUS_ERROR));
@@ -1450,25 +1451,25 @@
             <span class="kw">let </span>attribute_name = <span class="kw-2">&amp;*</span>ident.to_string();
 
             <span class="kw">match </span>attribute_name {
-                <span class="string">&quot;description&quot; </span>=&gt; {
+                <span class="string">"description" </span>=&gt; {
                     response.description = parse::description(input)<span class="question-mark">?</span>;
                 }
-                <span class="string">&quot;content_type&quot; </span>=&gt; {
+                <span class="string">"content_type" </span>=&gt; {
                     response.content_type = <span class="prelude-val">Some</span>(parse::content_type(input)<span class="question-mark">?</span>);
                 }
-                <span class="string">&quot;headers&quot; </span>=&gt; {
+                <span class="string">"headers" </span>=&gt; {
                     response.headers = parse::headers(input)<span class="question-mark">?</span>;
                 }
-                <span class="string">&quot;example&quot; </span>=&gt; {
+                <span class="string">"example" </span>=&gt; {
                     response.example = <span class="prelude-val">Some</span>((parse::example(input)<span class="question-mark">?</span>, ident));
                 }
-                <span class="string">&quot;examples&quot; </span>=&gt; {
+                <span class="string">"examples" </span>=&gt; {
                     response.examples = <span class="prelude-val">Some</span>((parse::examples(input)<span class="question-mark">?</span>, ident));
                 }
                 <span class="kw">_ </span>=&gt; {
                     <span class="kw">return </span><span class="prelude-val">Err</span>(Error::new(
                         ident.span(),
-                        <span class="macro">format!</span>(<span class="string">&quot;unexpected attribute: {attribute_name}, expected any of: description, content_type, headers, example, examples&quot;</span>),
+                        <span class="macro">format!</span>(<span class="string">"unexpected attribute: {attribute_name}, expected any of: description, content_type, headers, example, examples"</span>),
                     ));
                 }
             }
@@ -1483,17 +1484,17 @@
 }
 
 <span class="attr">#[derive(Default)]
-#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
+#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
 </span><span class="kw">struct </span>ResponseStatus(TokenStream2);
 
 <span class="kw">impl </span>Parse <span class="kw">for </span>ResponseStatus {
     <span class="kw">fn </span>parse(input: ParseStream) -&gt; syn::Result&lt;<span class="self">Self</span>&gt; {
-        <span class="kw">fn </span>parse_lit_int(input: ParseStream) -&gt; syn::Result&lt;Cow&lt;<span class="lifetime">&#39;_</span>, str&gt;&gt; {
+        <span class="kw">fn </span>parse_lit_int(input: ParseStream) -&gt; syn::Result&lt;Cow&lt;<span class="lifetime">'_</span>, str&gt;&gt; {
             input.parse::&lt;LitInt&gt;()<span class="question-mark">?</span>.base10_parse().map(Cow::Owned)
         }
 
-        <span class="kw">fn </span>parse_lit_str_status_range(input: ParseStream) -&gt; syn::Result&lt;Cow&lt;<span class="lifetime">&#39;_</span>, str&gt;&gt; {
-            <span class="kw">const </span>VALID_STATUS_RANGES: [<span class="kw-2">&amp;</span>str; <span class="number">6</span>] = [<span class="string">&quot;default&quot;</span>, <span class="string">&quot;1XX&quot;</span>, <span class="string">&quot;2XX&quot;</span>, <span class="string">&quot;3XX&quot;</span>, <span class="string">&quot;4XX&quot;</span>, <span class="string">&quot;5XX&quot;</span>];
+        <span class="kw">fn </span>parse_lit_str_status_range(input: ParseStream) -&gt; syn::Result&lt;Cow&lt;<span class="lifetime">'_</span>, str&gt;&gt; {
+            <span class="kw">const </span>VALID_STATUS_RANGES: [<span class="kw-2">&amp;</span>str; <span class="number">6</span>] = [<span class="string">"default"</span>, <span class="string">"1XX"</span>, <span class="string">"2XX"</span>, <span class="string">"3XX"</span>, <span class="string">"4XX"</span>, <span class="string">"5XX"</span>];
 
             input
                 .parse::&lt;LitStr&gt;()
@@ -1503,8 +1504,8 @@
                         <span class="prelude-val">Err</span>(Error::new(
                             value.span(),
                             <span class="macro">format!</span>(
-                                <span class="string">&quot;Invalid status range, expected one of: {}&quot;</span>,
-                                VALID_STATUS_RANGES.join(<span class="string">&quot;, &quot;</span>),
+                                <span class="string">"Invalid status range, expected one of: {}"</span>,
+                                VALID_STATUS_RANGES.join(<span class="string">", "</span>),
                             ),
                         ))
                     } <span class="kw">else </span>{
@@ -1520,7 +1521,7 @@
                 .path
                 .segments
                 .last()
-                .expect(<span class="string">&quot;Expected at least one segment in http StatusCode&quot;</span>);
+                .expect(<span class="string">"Expected at least one segment in http StatusCode"</span>);
 
             STATUS_CODES
                 .iter()
@@ -1535,7 +1536,7 @@
                     Error::new(
                         last_segment.span(),
                         <span class="macro">format!</span>(
-                            <span class="string">&quot;No associate item `{}` found for struct `http::StatusCode`&quot;</span>,
+                            <span class="string">"No associate item `{}` found for struct `http::StatusCode`"</span>,
                             last_segment.ident
                         ),
                     )
@@ -1562,18 +1563,18 @@
 }
 
 <span class="comment">// content(
-//   (&quot;application/json&quot; = Response, example = &quot;...&quot;, examples(..., ...)),
-//   (&quot;application/json2&quot; = Response2, example = &quot;...&quot;, examples(&quot;...&quot;, &quot;...&quot;))
+//   ("application/json" = Response, example = "...", examples(..., ...)),
+//   ("application/json2" = Response2, example = "...", examples("...", "..."))
 // )
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
-</span><span class="kw">struct </span>Content&lt;<span class="lifetime">&#39;c</span>&gt;(
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
+</span><span class="kw">struct </span>Content&lt;<span class="lifetime">'c</span>&gt;(
     String,
-    PathType&lt;<span class="lifetime">&#39;c</span>&gt;,
+    PathType&lt;<span class="lifetime">'c</span>&gt;,
     <span class="prelude-ty">Option</span>&lt;AnyValue&gt;,
     <span class="prelude-ty">Option</span>&lt;Punctuated&lt;Example, Comma&gt;&gt;,
 );
 
-<span class="kw">impl </span>Parse <span class="kw">for </span>Content&lt;<span class="lifetime">&#39;_</span>&gt; {
+<span class="kw">impl </span>Parse <span class="kw">for </span>Content&lt;<span class="lifetime">'_</span>&gt; {
     <span class="kw">fn </span>parse(input: ParseStream) -&gt; syn::Result&lt;<span class="self">Self</span>&gt; {
         <span class="kw">let </span>content;
         <span class="macro">parenthesized!</span>(content <span class="kw">in </span>input);
@@ -1589,19 +1590,19 @@
             <span class="kw">let </span>ident = content.parse::&lt;Ident&gt;()<span class="question-mark">?</span>;
             <span class="kw">let </span>attribute_name = <span class="kw-2">&amp;*</span>ident.to_string();
             <span class="kw">match </span>attribute_name {
-                <span class="string">&quot;example&quot; </span>=&gt; {
+                <span class="string">"example" </span>=&gt; {
                     example = <span class="prelude-val">Some</span>(parse_utils::parse_next(<span class="kw-2">&amp;</span>content, || {
                         AnyValue::parse_json(<span class="kw-2">&amp;</span>content)
                     })<span class="question-mark">?</span>)
                 }
-                <span class="string">&quot;examples&quot; </span>=&gt; {
+                <span class="string">"examples" </span>=&gt; {
                     examples = <span class="prelude-val">Some</span>(parse_utils::parse_punctuated_within_parenthesis(<span class="kw-2">&amp;</span>content)<span class="question-mark">?</span>)
                 }
                 <span class="kw">_ </span>=&gt; {
                     <span class="kw">return </span><span class="prelude-val">Err</span>(Error::new(
                         ident.span(),
                         <span class="macro">format!</span>(
-                            <span class="string">&quot;unexpected attribute: {ident}, expected one of: example, examples&quot;
+                            <span class="string">"unexpected attribute: {ident}, expected one of: example, examples"
                         </span>),
                     ));
                 }
@@ -1616,9 +1617,9 @@
     }
 }
 
-<span class="kw">pub struct </span>Responses&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw">pub </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[Response&lt;<span class="lifetime">&#39;a</span>&gt;]);
+<span class="kw">pub struct </span>Responses&lt;<span class="lifetime">'a</span>&gt;(<span class="kw">pub </span><span class="kw-2">&amp;</span><span class="lifetime">'a </span>[Response&lt;<span class="lifetime">'a</span>&gt;]);
 
-<span class="kw">impl </span>ToTokens <span class="kw">for </span>Responses&lt;<span class="lifetime">&#39;_</span>&gt; {
+<span class="kw">impl </span>ToTokens <span class="kw">for </span>Responses&lt;<span class="lifetime">'_</span>&gt; {
     <span class="kw">fn </span>to_tokens(<span class="kw-2">&amp;</span><span class="self">self</span>, tokens: <span class="kw-2">&amp;mut </span>proc_macro2::TokenStream) {
         tokens.extend(<span class="self">self</span>.<span class="number">0</span>.iter().fold(
             <span class="macro">quote! </span>{ utoipa::openapi::ResponsesBuilder::new() },
@@ -1646,9 +1647,9 @@
 
 <span class="doccomment">/// Parsed representation of response header defined in `#[utoipa::path(..)]` attribute.
 ///
-/// Supported configuration format is `(&quot;x-my-header-name&quot; = type, description = &quot;optional description of header&quot;)`.
-/// The `= type` and the `description = &quot;..&quot;` are optional configurations thus so the same configuration
-/// could be written as follows: `(&quot;x-my-header-name&quot;)`.
+/// Supported configuration format is `("x-my-header-name" = type, description = "optional description of header")`.
+/// The `= type` and the `description = ".."` are optional configurations thus so the same configuration
+/// could be written as follows: `("x-my-header-name")`.
 ///
 /// The `type` can be any typical type supported as a header argument such as `String, i32, u64, bool` etc.
 /// and if not provided it will default to `String`.
@@ -1661,9 +1662,9 @@
 /// #[utoipa::path(
 ///     ...
 ///     responses = [
-///         (status = 200, description = &quot;success response&quot;,
+///         (status = 200, description = "success response",
 ///             headers = [
-///                 (&quot;xrfs-token&quot; = String, description = &quot;New csrf token sent back in response header&quot;)
+///                 ("xrfs-token" = String, description = "New csrf token sent back in response header")
 ///             ]
 ///         ),
 ///     ]
@@ -1675,9 +1676,9 @@
 /// #[utoipa::path(
 ///     ...
 ///     responses = [
-///         (status = 200, description = &quot;success response&quot;,
+///         (status = 200, description = "success response",
 ///             headers = [
-///                 (&quot;xrfs-token&quot;)
+///                 ("xrfs-token")
 ///             ]
 ///         ),
 ///     ]
@@ -1689,20 +1690,20 @@
 /// #[utoipa::path(
 ///     ...
 ///     responses = [
-///         (status = 200, description = &quot;success response&quot;,
+///         (status = 200, description = "success response",
 ///             headers = [
-///                 (&quot;xrfs-token&quot;),
-///                 (&quot;another-header&quot;),
+///                 ("xrfs-token"),
+///                 ("another-header"),
 ///             ]
 ///         ),
 ///     ]
 /// )]
 /// ```
 </span><span class="attr">#[derive(Default)]
-#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
+#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
 </span><span class="kw">struct </span>Header {
     name: String,
-    value_type: <span class="prelude-ty">Option</span>&lt;InlineType&lt;<span class="lifetime">&#39;static</span>&gt;&gt;,
+    value_type: <span class="prelude-ty">Option</span>&lt;InlineType&lt;<span class="lifetime">'static</span>&gt;&gt;,
     description: <span class="prelude-ty">Option</span>&lt;String&gt;,
 }
 
@@ -1719,7 +1720,7 @@
             header.value_type = <span class="prelude-val">Some</span>(input.parse().map_err(|error| {
                 Error::new(
                     error.span(),
-                    <span class="macro">format!</span>(<span class="string">&quot;unexpected token, expected type such as String, {error}&quot;</span>),
+                    <span class="macro">format!</span>(<span class="string">"unexpected token, expected type such as String, {error}"</span>),
                 )
             })<span class="question-mark">?</span>);
         }
@@ -1734,14 +1735,14 @@
                 .map_err(|error| {
                     Error::new(
                         error.span(),
-                        <span class="macro">format!</span>(<span class="string">&quot;unexpected attribute, expected: description, {error}&quot;</span>),
+                        <span class="macro">format!</span>(<span class="string">"unexpected attribute, expected: description, {error}"</span>),
                     )
                 })
                 .and_then(|ident| {
-                    <span class="kw">if </span>ident != <span class="string">&quot;description&quot; </span>{
+                    <span class="kw">if </span>ident != <span class="string">"description" </span>{
                         <span class="kw">return </span><span class="prelude-val">Err</span>(Error::new(
                             ident.span(),
-                            <span class="string">&quot;unexpected attribute, expected: description&quot;</span>,
+                            <span class="string">"unexpected attribute, expected: description"</span>,
                         ));
                     }
                     <span class="prelude-val">Ok</span>(ident)
@@ -1765,7 +1766,7 @@
                 features: <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[Inline::from(header_type.is_inline).into()]),
                 description: <span class="prelude-val">None</span>,
                 deprecated: <span class="prelude-val">None</span>,
-                object_name: <span class="string">&quot;&quot;</span>,
+                object_name: <span class="string">""</span>,
             })
             .to_token_stream();
 

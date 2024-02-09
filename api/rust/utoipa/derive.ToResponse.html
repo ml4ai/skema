@@ -1,6 +1,7 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Generate reusable OpenAPI response what can be used in `utoipa::path` or in `OpenApi`."><title>ToResponse in utoipa - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../" data-static-root-path="../static.files/" data-current-crate="utoipa" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="sidebar-items.js"></script><script defer src="../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc derive"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button></nav><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../utoipa/index.html">utoipa</a><span class="version">3.5.0</span></h2></div><div class="sidebar-elems"></div></nav><main><div class="width-limiter"><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="main-heading"><h1>Derive Macro <a href="index.html">utoipa</a>::<wbr><a class="derive" href="#">ToResponse</a><button id="copy-path" title="Copy item path to clipboard"><img src="../static.files/clipboard-7571035ce49a181d.svg" width="19" height="18" alt="Copy item path"></button></h1><span class="out-of-band"><a class="src" href="../src/utoipa_gen/lib.rs.html#1963">source</a> · <button id="toggle-all-docs" title="collapse all docs">[<span>&#x2212;</span>]</button></span></div><pre class="rust item-decl"><code>#[derive(ToResponse)]
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Generate reusable OpenAPI response what can be used in `utoipa::path` or in `OpenApi`."><title>ToResponse in utoipa - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../" data-static-root-path="../static.files/" data-current-crate="utoipa" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="sidebar-items.js"></script><script defer src="../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc derive"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button></nav><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../utoipa/index.html">utoipa</a><span class="version">3.5.0</span></h2></div><div class="sidebar-elems"></div></nav><div class="sidebar-resizer"></div>
+    <main><div class="width-limiter"><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../utoipa/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="main-heading"><h1>Derive Macro <a href="index.html">utoipa</a>::<wbr><a class="derive" href="#">ToResponse</a><button id="copy-path" title="Copy item path to clipboard"><img src="../static.files/clipboard-7571035ce49a181d.svg" width="19" height="18" alt="Copy item path"></button></h1><span class="out-of-band"><a class="src" href="../src/utoipa_gen/lib.rs.html#1963">source</a> · <button id="toggle-all-docs" title="collapse all docs">[<span>&#x2212;</span>]</button></span></div><pre class="rust item-decl"><code>#[derive(ToResponse)]
 {
-    // Attributes available to this derive:
+    <span class="comment">// Attributes available to this derive:</span>
     #[response]
     #[content]
     #[to_schema]
@@ -24,7 +25,7 @@ response with inlined schema resolved from the fields of the <code>struct</code>
 enum.</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code> <span class="attr">#[derive(ToResponse)]
- #[response(description = <span class="string">&quot;Person response returns single Person entity&quot;</span>)]
+ #[response(description = <span class="string">"Person response returns single Person entity"</span>)]
  </span><span class="kw">struct </span>Person {
      name: String,
  }</code></pre></div>
@@ -69,13 +70,13 @@ if it implements <a href="derive.ToSchema.html" title="derive utoipa::ToSchema">
  <span class="attr">#[derive(utoipa::ToResponse)]
  </span><span class="kw">enum </span>Person {
      <span class="attr">#[response(examples(
-         (<span class="string">&quot;Person1&quot; </span>= (value = <span class="macro">json!</span>({<span class="string">&quot;name&quot;</span>: <span class="string">&quot;name1&quot;</span>}))),
-         (<span class="string">&quot;Person2&quot; </span>= (value = <span class="macro">json!</span>({<span class="string">&quot;name&quot;</span>: <span class="string">&quot;name2&quot;</span>})))
+         (<span class="string">"Person1" </span>= (value = <span class="macro">json!</span>({<span class="string">"name"</span>: <span class="string">"name1"</span>}))),
+         (<span class="string">"Person2" </span>= (value = <span class="macro">json!</span>({<span class="string">"name"</span>: <span class="string">"name2"</span>})))
      ))]
-     </span>Admin(<span class="attr">#[content(<span class="string">&quot;application/vnd-custom-v1+json&quot;</span>)] </span>Admin),
+     </span>Admin(<span class="attr">#[content(<span class="string">"application/vnd-custom-v1+json"</span>)] </span>Admin),
 
-     <span class="attr">#[response(example = <span class="macro">json!</span>({<span class="string">&quot;name&quot;</span>: <span class="string">&quot;name3&quot;</span>, <span class="string">&quot;id&quot;</span>: <span class="number">1</span>}))]
-     </span>Admin2(<span class="attr">#[content(<span class="string">&quot;application/vnd-custom-v2+json&quot;</span>)] #[to_schema] </span>Admin2),
+     <span class="attr">#[response(example = <span class="macro">json!</span>({<span class="string">"name"</span>: <span class="string">"name3"</span>, <span class="string">"id"</span>: <span class="number">1</span>}))]
+     </span>Admin2(<span class="attr">#[content(<span class="string">"application/vnd-custom-v2+json"</span>)] #[to_schema] </span>Admin2),
  }</code></pre></div>
 </li>
 </ol>
@@ -134,13 +135,13 @@ the <em><code>value</code></em> attribute. Value must be literal string.</li>
 
 <span class="attr">#[utoipa::path(
     get,
-    path = <span class="string">&quot;/api/person&quot;</span>,
+    path = <span class="string">"/api/person"</span>,
     responses(
         (status = <span class="number">200</span>, response = PersonResponse)
     )
 )]
 </span><span class="kw">fn </span>get_person() -&gt; PersonResponse {
-    PersonResponse { value: <span class="string">&quot;person&quot;</span>.to_string() }
+    PersonResponse { value: <span class="string">"person"</span>.to_string() }
 }</code></pre></div>
 <p><em><strong>Create a response from named struct.</strong></em></p>
 
@@ -149,14 +150,14 @@ the <em><code>value</code></em> attribute. Value must be literal string.</li>
  /// It will also be used in `ToSchema` if present
  </span><span class="attr">#[derive(utoipa::ToSchema, utoipa::ToResponse)]
  #[response(
-     description = <span class="string">&quot;Override description for response&quot;</span>,
-     content_type = <span class="string">&quot;text/xml&quot;
+     description = <span class="string">"Override description for response"</span>,
+     content_type = <span class="string">"text/xml"
  </span>)]
  #[response(
-     example = <span class="macro">json!</span>({<span class="string">&quot;name&quot;</span>: <span class="string">&quot;the name&quot;</span>}),
+     example = <span class="macro">json!</span>({<span class="string">"name"</span>: <span class="string">"the name"</span>}),
      headers(
-         (<span class="string">&quot;csrf-token&quot;</span>, description = <span class="string">&quot;response csrf token&quot;</span>),
-         (<span class="string">&quot;random-id&quot; </span>= i32)
+         (<span class="string">"csrf-token"</span>, description = <span class="string">"response csrf token"</span>),
+         (<span class="string">"random-id" </span>= i32)
      )
  )]
  </span><span class="kw">struct </span>Person {

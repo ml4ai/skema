@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/utoipa-3.5.0/src/openapi/schema.rs`."><title>schema.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="utoipa" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/utoipa-3.5.0/src/openapi/schema.rs`."><title>schema.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="utoipa" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -2066,13 +2067,13 @@
     /// [components]: https://spec.openapis.org/oas/latest.html#components-object
     </span><span class="attr">#[non_exhaustive]
     #[derive(Serialize, Deserialize, Default, Clone, PartialEq)]
-    #[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
-    #[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+    #[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
+    #[serde(rename_all = <span class="string">"camelCase"</span>)]
     </span><span class="kw">pub struct </span>Components {
         <span class="doccomment">/// Map of reusable [OpenAPI Schema Object][schema]s.
         ///
         /// [schema]: https://spec.openapis.org/oas/latest.html#schema-object
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;BTreeMap::is_empty&quot;</span>, default)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"BTreeMap::is_empty"</span>, default)]
         </span><span class="kw">pub </span>schemas: BTreeMap&lt;String, RefOr&lt;Schema&gt;&gt;,
 
         <span class="doccomment">/// Map of reusable response name, to [OpenAPI Response Object][response]s or [OpenAPI
@@ -2080,13 +2081,13 @@
         ///
         /// [response]: https://spec.openapis.org/oas/latest.html#response-object
         /// [reference]: https://spec.openapis.org/oas/latest.html#reference-object
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;BTreeMap::is_empty&quot;</span>, default)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"BTreeMap::is_empty"</span>, default)]
         </span><span class="kw">pub </span>responses: BTreeMap&lt;String, RefOr&lt;Response&gt;&gt;,
 
         <span class="doccomment">/// Map of reusable [OpenAPI Security Scheme Object][security_scheme]s.
         ///
         /// [security_scheme]: https://spec.openapis.org/oas/latest.html#security-scheme-object
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;BTreeMap::is_empty&quot;</span>, default)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"BTreeMap::is_empty"</span>, default)]
         </span><span class="kw">pub </span>security_schemes: BTreeMap&lt;String, SecurityScheme&gt;,
     }
 }
@@ -2145,7 +2146,7 @@
         <span class="self">self
     </span>}
 
-    <span class="kw">pub fn </span>schema_from&lt;<span class="lifetime">&#39;s</span>, I: ToSchema&lt;<span class="lifetime">&#39;s</span>&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+    <span class="kw">pub fn </span>schema_from&lt;<span class="lifetime">'s</span>, I: ToSchema&lt;<span class="lifetime">'s</span>&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>aliases = I::aliases();
 
         <span class="comment">// TODO a temporal hack to add the main schema only if there are no aliases pre-defined.
@@ -2167,14 +2168,14 @@
     /// # use utoipa::openapi::schema::{ComponentsBuilder, ObjectBuilder,
     /// #    SchemaType, Schema};
     /// ComponentsBuilder::new().schemas_from_iter([(
-    ///     &quot;Pet&quot;,
+    ///     "Pet",
     ///     Schema::from(
     ///         ObjectBuilder::new()
     ///             .property(
-    ///                 &quot;name&quot;,
+    ///                 "name",
     ///                 ObjectBuilder::new().schema_type(SchemaType::String),
     ///             )
-    ///             .required(&quot;name&quot;)
+    ///             .required("name")
     ///     ),
     /// )]);
     /// ```
@@ -2204,7 +2205,7 @@
         <span class="self">self
     </span>}
 
-    <span class="kw">pub fn </span>response_from&lt;<span class="lifetime">&#39;r</span>, I: ToResponse&lt;<span class="lifetime">&#39;r</span>&gt;&gt;(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
+    <span class="kw">pub fn </span>response_from&lt;<span class="lifetime">'r</span>, I: ToResponse&lt;<span class="lifetime">'r</span>&gt;&gt;(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>(name, response) = I::response();
         <span class="self">self</span>.response(name, response)
     }
@@ -2250,8 +2251,8 @@
 /// [schemas]: https://spec.openapis.org/oas/latest.html#schema-object
 </span><span class="attr">#[non_exhaustive]
 #[derive(Serialize, Deserialize, Clone, PartialEq)]
-#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
-#[serde(untagged, rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
+#[serde(untagged, rename_all = <span class="string">"camelCase"</span>)]
 </span><span class="kw">pub enum </span>Schema {
     <span class="doccomment">/// Defines array schema from another schema. Typically used with
     /// [`Schema::Object`]. Slice and Vec types are translated to [`Schema::Array`] types.
@@ -2288,8 +2289,8 @@
 ///
 /// [discriminator]: https://spec.openapis.org/oas/latest.html#discriminator-object
 </span><span class="attr">#[derive(Serialize, Deserialize, Clone, Default, PartialEq, Eq)]
-#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
-#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
+#[serde(rename_all = <span class="string">"camelCase"</span>)]
+#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
 </span><span class="kw">pub struct </span>Discriminator {
     <span class="doccomment">/// Defines a discriminator property name which must be found within all composite
     /// objects.
@@ -2304,7 +2305,7 @@
     /// Create a new [`Discriminator`] object for `pet_type` property.
     /// ```rust
     /// # use utoipa::openapi::schema::Discriminator;
-    /// let discriminator = Discriminator::new(&quot;pet_type&quot;);
+    /// let discriminator = Discriminator::new("pet_type");
     /// ```
     </span><span class="kw">pub fn </span>new&lt;I: Into&lt;String&gt;&gt;(property_name: I) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
@@ -2323,35 +2324,35 @@
     ///
     /// [oneof]: https://spec.openapis.org/oas/latest.html#components-object
     </span><span class="attr">#[derive(Serialize, Deserialize, Clone, Default, PartialEq)]
-    #[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
+    #[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
     </span><span class="kw">pub struct </span>OneOf {
         <span class="doccomment">/// Components of _OneOf_ component.
-        </span><span class="attr">#[serde(rename = <span class="string">&quot;oneOf&quot;</span>)]
+        </span><span class="attr">#[serde(rename = <span class="string">"oneOf"</span>)]
         </span><span class="kw">pub </span>items: Vec&lt;RefOr&lt;Schema&gt;&gt;,
 
         <span class="doccomment">/// Changes the [`OneOf`] title.
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
         </span><span class="kw">pub </span>title: <span class="prelude-ty">Option</span>&lt;String&gt;,
 
         <span class="doccomment">/// Description of the [`OneOf`]. Markdown syntax is supported.
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
         </span><span class="kw">pub </span>description: <span class="prelude-ty">Option</span>&lt;String&gt;,
 
         <span class="doccomment">/// Default value which is provided when user has not provided the input in Swagger UI.
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
         </span><span class="kw">pub </span>default: <span class="prelude-ty">Option</span>&lt;Value&gt;,
 
         <span class="doccomment">/// Example shown in UI of the value for richer documentation.
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
         </span><span class="kw">pub </span>example: <span class="prelude-ty">Option</span>&lt;Value&gt;,
 
         <span class="doccomment">/// Optional discriminator field can be used to aid deserialization, serialization and validation of a
         /// specific schema.
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
         </span><span class="kw">pub </span>discriminator: <span class="prelude-ty">Option</span>&lt;Discriminator&gt;,
 
-        <span class="doccomment">/// Set `true` to allow `&quot;null&quot;` to be used as value for given type.
-        </span><span class="attr">#[serde(default, skip_serializing_if = <span class="string">&quot;is_false&quot;</span>)]
+        <span class="doccomment">/// Set `true` to allow `"null"` to be used as value for given type.
+        </span><span class="attr">#[serde(default, skip_serializing_if = <span class="string">"is_false"</span>)]
         </span><span class="kw">pub </span>nullable: bool,
     }
 }
@@ -2451,35 +2452,35 @@
     ///
     /// [allof]: https://spec.openapis.org/oas/latest.html#components-object
     </span><span class="attr">#[derive(Serialize, Deserialize, Clone, Default, PartialEq)]
-    #[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
+    #[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
     </span><span class="kw">pub struct </span>AllOf {
         <span class="doccomment">/// Components of _AllOf_ component.
-        </span><span class="attr">#[serde(rename = <span class="string">&quot;allOf&quot;</span>)]
+        </span><span class="attr">#[serde(rename = <span class="string">"allOf"</span>)]
         </span><span class="kw">pub </span>items: Vec&lt;RefOr&lt;Schema&gt;&gt;,
 
         <span class="doccomment">/// Changes the [`AllOf`] title.
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
         </span><span class="kw">pub </span>title: <span class="prelude-ty">Option</span>&lt;String&gt;,
 
         <span class="doccomment">/// Description of the [`AllOf`]. Markdown syntax is supported.
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
         </span><span class="kw">pub </span>description: <span class="prelude-ty">Option</span>&lt;String&gt;,
 
         <span class="doccomment">/// Default value which is provided when user has not provided the input in Swagger UI.
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
         </span><span class="kw">pub </span>default: <span class="prelude-ty">Option</span>&lt;Value&gt;,
 
         <span class="doccomment">/// Example shown in UI of the value for richer documentation.
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
         </span><span class="kw">pub </span>example: <span class="prelude-ty">Option</span>&lt;Value&gt;,
 
         <span class="doccomment">/// Optional discriminator field can be used to aid deserialization, serialization and validation of a
         /// specific schema.
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
         </span><span class="kw">pub </span>discriminator: <span class="prelude-ty">Option</span>&lt;Discriminator&gt;,
 
-        <span class="doccomment">/// Set `true` to allow `&quot;null&quot;` to be used as value for given type.
-        </span><span class="attr">#[serde(default, skip_serializing_if = <span class="string">&quot;is_false&quot;</span>)]
+        <span class="doccomment">/// Set `true` to allow `"null"` to be used as value for given type.
+        </span><span class="attr">#[serde(default, skip_serializing_if = <span class="string">"is_false"</span>)]
         </span><span class="kw">pub </span>nullable: bool,
     }
 }
@@ -2579,31 +2580,31 @@
     ///
     /// [anyof]: https://spec.openapis.org/oas/latest.html#components-object
     </span><span class="attr">#[derive(Serialize, Deserialize, Clone, Default, PartialEq)]
-    #[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
+    #[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
     </span><span class="kw">pub struct </span>AnyOf {
         <span class="doccomment">/// Components of _AnyOf component.
-        </span><span class="attr">#[serde(rename = <span class="string">&quot;anyOf&quot;</span>)]
+        </span><span class="attr">#[serde(rename = <span class="string">"anyOf"</span>)]
         </span><span class="kw">pub </span>items: Vec&lt;RefOr&lt;Schema&gt;&gt;,
 
         <span class="doccomment">/// Description of the [`AnyOf`]. Markdown syntax is supported.
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
         </span><span class="kw">pub </span>description: <span class="prelude-ty">Option</span>&lt;String&gt;,
 
         <span class="doccomment">/// Default value which is provided when user has not provided the input in Swagger UI.
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
         </span><span class="kw">pub </span>default: <span class="prelude-ty">Option</span>&lt;Value&gt;,
 
         <span class="doccomment">/// Example shown in UI of the value for richer documentation.
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
         </span><span class="kw">pub </span>example: <span class="prelude-ty">Option</span>&lt;Value&gt;,
 
         <span class="doccomment">/// Optional discriminator field can be used to aid deserialization, serialization and validation of a
         /// specific schema.
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
         </span><span class="kw">pub </span>discriminator: <span class="prelude-ty">Option</span>&lt;Discriminator&gt;,
 
-        <span class="doccomment">/// Set `true` to allow `&quot;null&quot;` to be used as value for given type.
-        </span><span class="attr">#[serde(default, skip_serializing_if = <span class="string">&quot;is_false&quot;</span>)]
+        <span class="doccomment">/// Set `true` to allow `"null"` to be used as value for given type.
+        </span><span class="attr">#[serde(default, skip_serializing_if = <span class="string">"is_false"</span>)]
         </span><span class="kw">pub </span>nullable: bool,
     }
 }
@@ -2688,9 +2689,9 @@
 
 <span class="macro">component_from_builder!</span>(AnyOfBuilder);
 
-<span class="attr">#[cfg(not(feature = <span class="string">&quot;preserve_order&quot;</span>))]
+<span class="attr">#[cfg(not(feature = <span class="string">"preserve_order"</span>))]
 </span><span class="kw">type </span>ObjectPropertiesMap&lt;K, V&gt; = BTreeMap&lt;K, V&gt;;
-<span class="attr">#[cfg(feature = <span class="string">&quot;preserve_order&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"preserve_order"</span>)]
 </span><span class="kw">type </span>ObjectPropertiesMap&lt;K, V&gt; = indexmap::IndexMap&lt;K, V&gt;;
 
 <span class="macro">builder! </span>{
@@ -2704,36 +2705,36 @@
     /// [schema]: https://spec.openapis.org/oas/latest.html#schema-object
     </span><span class="attr">#[non_exhaustive]
     #[derive(Serialize, Deserialize, Default, Clone, PartialEq)]
-    #[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
-    #[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+    #[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
+    #[serde(rename_all = <span class="string">"camelCase"</span>)]
     </span><span class="kw">pub struct </span>Object {
         <span class="doccomment">/// Type of [`Object`] e.g. [`SchemaType::Object`] for `object` and [`SchemaType::String`] for
         /// `string` types.
-        </span><span class="attr">#[serde(rename = <span class="string">&quot;type&quot;</span>, skip_serializing_if=<span class="string">&quot;SchemaType::is_value&quot;</span>)]
+        </span><span class="attr">#[serde(rename = <span class="string">"type"</span>, skip_serializing_if=<span class="string">"SchemaType::is_value"</span>)]
         </span><span class="kw">pub </span>schema_type: SchemaType,
 
         <span class="doccomment">/// Changes the [`Object`] title.
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
         </span><span class="kw">pub </span>title: <span class="prelude-ty">Option</span>&lt;String&gt;,
 
         <span class="doccomment">/// Additional format for detailing the schema type.
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
         </span><span class="kw">pub </span>format: <span class="prelude-ty">Option</span>&lt;SchemaFormat&gt;,
 
         <span class="doccomment">/// Description of the [`Object`]. Markdown syntax is supported.
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
         </span><span class="kw">pub </span>description: <span class="prelude-ty">Option</span>&lt;String&gt;,
 
         <span class="doccomment">/// Default value which is provided when user has not provided the input in Swagger UI.
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
         </span><span class="kw">pub </span>default: <span class="prelude-ty">Option</span>&lt;Value&gt;,
 
         <span class="doccomment">/// Enum variants of fields that can be represented as `unit` type `enums`
-        </span><span class="attr">#[serde(rename = <span class="string">&quot;enum&quot;</span>, skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="attr">#[serde(rename = <span class="string">"enum"</span>, skip_serializing_if = <span class="string">"Option::is_none"</span>)]
         </span><span class="kw">pub </span>enum_values: <span class="prelude-ty">Option</span>&lt;Vec&lt;Value&gt;&gt;,
 
         <span class="doccomment">/// Vector of required field names.
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Vec::is_empty&quot;</span>, default = <span class="string">&quot;Vec::new&quot;</span>)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Vec::is_empty"</span>, default = <span class="string">"Vec::new"</span>)]
         </span><span class="kw">pub </span>required: Vec&lt;String&gt;,
 
         <span class="doccomment">/// Map of fields with their [`Schema`] types.
@@ -2743,85 +2744,85 @@
         /// By default [`BTreeMap`] will be used.
         ///
         /// [to_schema]: crate::ToSchema
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;ObjectPropertiesMap::is_empty&quot;</span>, default = <span class="string">&quot;ObjectPropertiesMap::new&quot;</span>)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"ObjectPropertiesMap::is_empty"</span>, default = <span class="string">"ObjectPropertiesMap::new"</span>)]
         </span><span class="kw">pub </span>properties: ObjectPropertiesMap&lt;String, RefOr&lt;Schema&gt;&gt;,
 
         <span class="doccomment">/// Additional [`Schema`] for non specified fields (Useful for typed maps).
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
         </span><span class="kw">pub </span>additional_properties: <span class="prelude-ty">Option</span>&lt;Box&lt;AdditionalProperties&lt;Schema&gt;&gt;&gt;,
 
         <span class="doccomment">/// Changes the [`Object`] deprecated status.
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
         </span><span class="kw">pub </span>deprecated: <span class="prelude-ty">Option</span>&lt;Deprecated&gt;,
 
         <span class="doccomment">/// Example shown in UI of the value for richer documentation.
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
         </span><span class="kw">pub </span>example: <span class="prelude-ty">Option</span>&lt;Value&gt;,
 
         <span class="doccomment">/// Write only property will be only sent in _write_ requests like _POST, PUT_.
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
         </span><span class="kw">pub </span>write_only: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 
         <span class="doccomment">/// Read only property will be only sent in _read_ requests like _GET_.
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
         </span><span class="kw">pub </span>read_only: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 
         <span class="doccomment">/// Additional [`Xml`] formatting of the [`Object`].
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
         </span><span class="kw">pub </span>xml: <span class="prelude-ty">Option</span>&lt;Xml&gt;,
 
-        <span class="doccomment">/// Set `true` to allow `&quot;null&quot;` to be used as value for given type.
-        </span><span class="attr">#[serde(default, skip_serializing_if = <span class="string">&quot;is_false&quot;</span>)]
+        <span class="doccomment">/// Set `true` to allow `"null"` to be used as value for given type.
+        </span><span class="attr">#[serde(default, skip_serializing_if = <span class="string">"is_false"</span>)]
         </span><span class="kw">pub </span>nullable: bool,
 
         <span class="doccomment">/// Must be a number strictly greater than `0`. Numeric value is considered valid if value
         /// divided by the _`multiple_of`_ value results an integer.
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>, serialize_with = <span class="string">&quot;omit_decimal_zero&quot;</span>)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>, serialize_with = <span class="string">"omit_decimal_zero"</span>)]
         </span><span class="kw">pub </span>multiple_of: <span class="prelude-ty">Option</span>&lt;f64&gt;,
 
-        <span class="doccomment">/// Specify inclusive upper limit for the [`Object`]&#39;s value. Number is considered valid if
+        <span class="doccomment">/// Specify inclusive upper limit for the [`Object`]'s value. Number is considered valid if
         /// it is equal or less than the _`maximum`_.
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>, serialize_with = <span class="string">&quot;omit_decimal_zero&quot;</span>)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>, serialize_with = <span class="string">"omit_decimal_zero"</span>)]
         </span><span class="kw">pub </span>maximum: <span class="prelude-ty">Option</span>&lt;f64&gt;,
 
-        <span class="doccomment">/// Specify inclusive lower limit for the [`Object`]&#39;s value. Number value is considered
+        <span class="doccomment">/// Specify inclusive lower limit for the [`Object`]'s value. Number value is considered
         /// valid if it is equal or greater than the _`minimum`_.
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>, serialize_with = <span class="string">&quot;omit_decimal_zero&quot;</span>)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>, serialize_with = <span class="string">"omit_decimal_zero"</span>)]
         </span><span class="kw">pub </span>minimum: <span class="prelude-ty">Option</span>&lt;f64&gt;,
 
-        <span class="doccomment">/// Specify exclusive upper limit for the [`Object`]&#39;s value. Number value is considered
+        <span class="doccomment">/// Specify exclusive upper limit for the [`Object`]'s value. Number value is considered
         /// valid if it is strictly less than _`exclusive_maximum`_.
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>, serialize_with = <span class="string">&quot;omit_decimal_zero&quot;</span>)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>, serialize_with = <span class="string">"omit_decimal_zero"</span>)]
         </span><span class="kw">pub </span>exclusive_maximum: <span class="prelude-ty">Option</span>&lt;f64&gt;,
 
-        <span class="doccomment">/// Specify exclusive lower limit for the [`Object`]&#39;s value. Number value is considered
+        <span class="doccomment">/// Specify exclusive lower limit for the [`Object`]'s value. Number value is considered
         /// valid if it is strictly above the _`exclusive_minimum`_.
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>, serialize_with = <span class="string">&quot;omit_decimal_zero&quot;</span>)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>, serialize_with = <span class="string">"omit_decimal_zero"</span>)]
         </span><span class="kw">pub </span>exclusive_minimum: <span class="prelude-ty">Option</span>&lt;f64&gt;,
 
         <span class="doccomment">/// Specify maximum length for `string` values. _`max_length`_ cannot be a negative integer
         /// value. Value is considered valid if content length is equal or less than the _`max_length`_.
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
         </span><span class="kw">pub </span>max_length: <span class="prelude-ty">Option</span>&lt;usize&gt;,
 
         <span class="doccomment">/// Specify minimum length for `string` values. _`min_length`_ cannot be a negative integer
         /// value. Setting this to _`0`_ has the same effect as omitting this field. Value is
         /// considered valid if content length is equal or more than the _`min_length`_.
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
         </span><span class="kw">pub </span>min_length: <span class="prelude-ty">Option</span>&lt;usize&gt;,
 
         <span class="doccomment">/// Define a valid `ECMA-262` dialect regular expression. The `string` content is
         /// considered valid if the _`pattern`_ matches the value successfully.
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
         </span><span class="kw">pub </span>pattern: <span class="prelude-ty">Option</span>&lt;String&gt;,
 
         <span class="doccomment">/// Specify inclusive maximum amount of properties an [`Object`] can hold.
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
         </span><span class="kw">pub </span>max_properties: <span class="prelude-ty">Option</span>&lt;usize&gt;,
 
         <span class="doccomment">/// Specify inclusive minimum amount of properties an [`Object`] can hold. Setting this to
         /// `0` will have same effect as omitting the attribute.
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
         </span><span class="kw">pub </span>min_properties: <span class="prelude-ty">Option</span>&lt;usize&gt;,
     }
 }
@@ -3020,7 +3021,7 @@
 ///
 /// The value can either be [`RefOr`] or _`bool`_.
 </span><span class="attr">#[derive(Serialize, Deserialize, Clone, PartialEq, Eq)]
-#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
+#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
 #[serde(untagged)]
 </span><span class="kw">pub enum </span>AdditionalProperties&lt;T&gt; {
     <span class="doccomment">/// Use when value type of the map is a known [`Schema`] or [`Ref`] to the [`Schema`].
@@ -3059,10 +3060,10 @@
 /// [reference]: https://spec.openapis.org/oas/latest.html#reference-object
 </span><span class="attr">#[non_exhaustive]
 #[derive(Serialize, Deserialize, Default, Clone, PartialEq, Eq)]
-#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
+#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
 </span><span class="kw">pub struct </span>Ref {
     <span class="doccomment">/// Reference location of the actual component.
-    </span><span class="attr">#[serde(rename = <span class="string">&quot;$ref&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">"$ref"</span>)]
     </span><span class="kw">pub </span>ref_location: String,
 }
 
@@ -3078,13 +3079,13 @@
     <span class="doccomment">/// Construct a new [`Ref`] from provided schema name. This will create a [`Ref`] that
     /// references the the reusable schemas.
     </span><span class="kw">pub fn </span>from_schema_name&lt;I: Into&lt;String&gt;&gt;(schema_name: I) -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>::new(<span class="macro">format!</span>(<span class="string">&quot;#/components/schemas/{}&quot;</span>, schema_name.into()))
+        <span class="self">Self</span>::new(<span class="macro">format!</span>(<span class="string">"#/components/schemas/{}"</span>, schema_name.into()))
     }
 
     <span class="doccomment">/// Construct a new [`Ref`] from provided response name. This will create a [`Ref`] that
     /// references the reusable response.
     </span><span class="kw">pub fn </span>from_response_name&lt;I: Into&lt;String&gt;&gt;(response_name: I) -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>::new(<span class="macro">format!</span>(<span class="string">&quot;#/components/responses/{}&quot;</span>, response_name.into()))
+        <span class="self">Self</span>::new(<span class="macro">format!</span>(<span class="string">"#/components/responses/{}"</span>, response_name.into()))
     }
 
     <span class="macro">to_array_builder!</span>();
@@ -3145,55 +3146,55 @@
     /// See [`Schema::Array`] for more details.
     </span><span class="attr">#[non_exhaustive]
     #[derive(Serialize, Deserialize, Clone, PartialEq)]
-    #[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
-    #[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+    #[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
+    #[serde(rename_all = <span class="string">"camelCase"</span>)]
     </span><span class="kw">pub struct </span>Array {
         <span class="doccomment">/// Type will always be [`SchemaType::Array`]
-        </span><span class="attr">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
+        </span><span class="attr">#[serde(rename = <span class="string">"type"</span>)]
         </span><span class="kw">pub </span>schema_type: SchemaType,
 
         <span class="doccomment">/// Changes the [`Array`] title.
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
         </span><span class="kw">pub </span>title: <span class="prelude-ty">Option</span>&lt;String&gt;,
 
         <span class="doccomment">/// Schema representing the array items type.
         </span><span class="kw">pub </span>items: Box&lt;RefOr&lt;Schema&gt;&gt;,
 
         <span class="doccomment">/// Description of the [`Array`]. Markdown syntax is supported.
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
         </span><span class="kw">pub </span>description: <span class="prelude-ty">Option</span>&lt;String&gt;,
 
         <span class="doccomment">/// Marks the [`Array`] deprecated.
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
         </span><span class="kw">pub </span>deprecated: <span class="prelude-ty">Option</span>&lt;Deprecated&gt;,
 
         <span class="doccomment">/// Example shown in UI of the value for richer documentation.
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
         </span><span class="kw">pub </span>example: <span class="prelude-ty">Option</span>&lt;Value&gt;,
 
         <span class="doccomment">/// Default value which is provided when user has not provided the input in Swagger UI.
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
         </span><span class="kw">pub </span>default: <span class="prelude-ty">Option</span>&lt;Value&gt;,
 
         <span class="doccomment">/// Max length of the array.
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
         </span><span class="kw">pub </span>max_items: <span class="prelude-ty">Option</span>&lt;usize&gt;,
 
         <span class="doccomment">/// Min length of the array.
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
         </span><span class="kw">pub </span>min_items: <span class="prelude-ty">Option</span>&lt;usize&gt;,
 
         <span class="doccomment">/// Setting this to `true` will validate successfully if all elements of this [`Array`] are
         /// unique.
-        </span><span class="attr">#[serde(default, skip_serializing_if = <span class="string">&quot;is_false&quot;</span>)]
+        </span><span class="attr">#[serde(default, skip_serializing_if = <span class="string">"is_false"</span>)]
         </span><span class="kw">pub </span>unique_items: bool,
 
         <span class="doccomment">/// Xml format of the array.
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
         </span><span class="kw">pub </span>xml: <span class="prelude-ty">Option</span>&lt;Xml&gt;,
 
-        <span class="doccomment">/// Set `true` to allow `&quot;null&quot;` to be used as value for given type.
-        </span><span class="attr">#[serde(default, skip_serializing_if = <span class="string">&quot;is_false&quot;</span>)]
+        <span class="doccomment">/// Set `true` to allow `"null"` to be used as value for given type.
+        </span><span class="attr">#[serde(default, skip_serializing_if = <span class="string">"is_false"</span>)]
         </span><span class="kw">pub </span>nullable: bool,
     }
 }
@@ -3322,8 +3323,8 @@
 
 <span class="doccomment">/// Represents data type of [`Schema`].
 </span><span class="attr">#[derive(Serialize, Deserialize, Clone, PartialEq, Eq)]
-#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
-#[serde(rename_all = <span class="string">&quot;lowercase&quot;</span>)]
+#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
+#[serde(rename_all = <span class="string">"lowercase"</span>)]
 </span><span class="kw">pub enum </span>SchemaType {
     <span class="doccomment">/// Used with [`Object`] and [`ObjectBuilder`]. Objects always have
     /// _schema_type_ [`SchemaType::Object`].
@@ -3363,8 +3364,8 @@
 /// Format is an open value, so you can use any formats, even not those defined by the
 /// OpenAPI Specification.
 </span><span class="attr">#[derive(Serialize, Deserialize, Clone, PartialEq, Eq)]
-#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
-#[serde(rename_all = <span class="string">&quot;lowercase&quot;</span>, untagged)]
+#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
+#[serde(rename_all = <span class="string">"lowercase"</span>, untagged)]
 </span><span class="kw">pub enum </span>SchemaFormat {
     <span class="doccomment">/// Use to define additional detail about the value.
     </span>KnownFormat(KnownFormat),
@@ -3375,36 +3376,36 @@
 
 <span class="doccomment">/// Known schema format modifier property to provide fine detail of the primitive type.
 </span><span class="attr">#[derive(Serialize, Deserialize, Clone, PartialEq, Eq)]
-#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
-#[serde(rename_all = <span class="string">&quot;lowercase&quot;</span>)]
+#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
+#[serde(rename_all = <span class="string">"lowercase"</span>)]
 </span><span class="kw">pub enum </span>KnownFormat {
     <span class="doccomment">/// 8 bit integer.
-    </span><span class="attr">#[cfg(feature = <span class="string">&quot;non_strict_integers&quot;</span>)]
-    #[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">&quot;non_strict_integers&quot;</span>)))]
+    </span><span class="attr">#[cfg(feature = <span class="string">"non_strict_integers"</span>)]
+    #[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">"non_strict_integers"</span>)))]
     </span>Int8,
     <span class="doccomment">/// 16 bit integer.
-    </span><span class="attr">#[cfg(feature = <span class="string">&quot;non_strict_integers&quot;</span>)]
-    #[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">&quot;non_strict_integers&quot;</span>)))]
+    </span><span class="attr">#[cfg(feature = <span class="string">"non_strict_integers"</span>)]
+    #[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">"non_strict_integers"</span>)))]
     </span>Int16,
     <span class="doccomment">/// 32 bit integer.
     </span>Int32,
     <span class="doccomment">/// 64 bit integer.
     </span>Int64,
     <span class="doccomment">/// 8 bit unsigned integer.
-    </span><span class="attr">#[cfg(feature = <span class="string">&quot;non_strict_integers&quot;</span>)]
-    #[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">&quot;non_strict_integers&quot;</span>)))]
+    </span><span class="attr">#[cfg(feature = <span class="string">"non_strict_integers"</span>)]
+    #[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">"non_strict_integers"</span>)))]
     </span>UInt8,
     <span class="doccomment">/// 16 bit unsigned integer.
-    </span><span class="attr">#[cfg(feature = <span class="string">&quot;non_strict_integers&quot;</span>)]
-    #[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">&quot;non_strict_integers&quot;</span>)))]
+    </span><span class="attr">#[cfg(feature = <span class="string">"non_strict_integers"</span>)]
+    #[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">"non_strict_integers"</span>)))]
     </span>UInt16,
     <span class="doccomment">/// 32 bit unsigned integer.
-    </span><span class="attr">#[cfg(feature = <span class="string">&quot;non_strict_integers&quot;</span>)]
-    #[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">&quot;non_strict_integers&quot;</span>)))]
+    </span><span class="attr">#[cfg(feature = <span class="string">"non_strict_integers"</span>)]
+    #[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">"non_strict_integers"</span>)))]
     </span>UInt32,
     <span class="doccomment">/// 64 bit unsigned integer.
-    </span><span class="attr">#[cfg(feature = <span class="string">&quot;non_strict_integers&quot;</span>)]
-    #[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">&quot;non_strict_integers&quot;</span>)))]
+    </span><span class="attr">#[cfg(feature = <span class="string">"non_strict_integers"</span>)]
+    #[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">"non_strict_integers"</span>)))]
     </span>UInt64,
     <span class="doccomment">/// floating point number.
     </span>Float,
@@ -3417,21 +3418,21 @@
     <span class="doccomment">/// ISO-8601 full date [FRC3339](https://xml2rfc.ietf.org/public/rfc/html/rfc3339.html#anchor14).
     </span>Date,
     <span class="doccomment">/// ISO-8601 full date time [FRC3339](https://xml2rfc.ietf.org/public/rfc/html/rfc3339.html#anchor14).
-    </span><span class="attr">#[serde(rename = <span class="string">&quot;date-time&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">"date-time"</span>)]
     </span>DateTime,
     <span class="doccomment">/// Hint to UI to obscure input.
     </span>Password,
     <span class="doccomment">/// Used with [`String`] values to indicate value is in UUID format.
     ///
     /// **uuid** feature need to be enabled.
-    </span><span class="attr">#[cfg(feature = <span class="string">&quot;uuid&quot;</span>)]
-    #[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">&quot;uuid&quot;</span>)))]
+    </span><span class="attr">#[cfg(feature = <span class="string">"uuid"</span>)]
+    #[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">"uuid"</span>)))]
     </span>Uuid,
     <span class="doccomment">/// Used with [`String`] values to indicate value is in ULID format.
     ///
     /// **ulid** feature need to be enabled.
-    </span><span class="attr">#[cfg(feature = <span class="string">&quot;ulid&quot;</span>)]
-    #[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">&quot;ulid&quot;</span>)))]
+    </span><span class="attr">#[cfg(feature = <span class="string">"ulid"</span>)]
+    #[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">"ulid"</span>)))]
     </span>Ulid,
 }
 
@@ -3446,47 +3447,47 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>create_schema_serializes_json() -&gt; <span class="prelude-ty">Result</span>&lt;(), serde_json::Error&gt; {
         <span class="kw">let </span>openapi = OpenApiBuilder::new()
-            .info(Info::new(<span class="string">&quot;My api&quot;</span>, <span class="string">&quot;1.0.0&quot;</span>))
+            .info(Info::new(<span class="string">"My api"</span>, <span class="string">"1.0.0"</span>))
             .paths(Paths::new())
             .components(<span class="prelude-val">Some</span>(
                 ComponentsBuilder::new()
-                    .schema(<span class="string">&quot;Person&quot;</span>, Ref::new(<span class="string">&quot;#/components/PersonModel&quot;</span>))
+                    .schema(<span class="string">"Person"</span>, Ref::new(<span class="string">"#/components/PersonModel"</span>))
                     .schema(
-                        <span class="string">&quot;Credential&quot;</span>,
+                        <span class="string">"Credential"</span>,
                         Schema::from(
                             ObjectBuilder::new()
                                 .property(
-                                    <span class="string">&quot;id&quot;</span>,
+                                    <span class="string">"id"</span>,
                                     ObjectBuilder::new()
                                         .schema_type(SchemaType::Integer)
                                         .format(<span class="prelude-val">Some</span>(SchemaFormat::KnownFormat(KnownFormat::Int32)))
-                                        .description(<span class="prelude-val">Some</span>(<span class="string">&quot;Id of credential&quot;</span>))
+                                        .description(<span class="prelude-val">Some</span>(<span class="string">"Id of credential"</span>))
                                         .default(<span class="prelude-val">Some</span>(<span class="macro">json!</span>(<span class="number">1i32</span>))),
                                 )
                                 .property(
-                                    <span class="string">&quot;name&quot;</span>,
+                                    <span class="string">"name"</span>,
                                     ObjectBuilder::new()
                                         .schema_type(SchemaType::String)
-                                        .description(<span class="prelude-val">Some</span>(<span class="string">&quot;Name of credential&quot;</span>)),
+                                        .description(<span class="prelude-val">Some</span>(<span class="string">"Name of credential"</span>)),
                                 )
                                 .property(
-                                    <span class="string">&quot;status&quot;</span>,
+                                    <span class="string">"status"</span>,
                                     ObjectBuilder::new()
                                         .schema_type(SchemaType::String)
-                                        .default(<span class="prelude-val">Some</span>(<span class="macro">json!</span>(<span class="string">&quot;Active&quot;</span>)))
-                                        .description(<span class="prelude-val">Some</span>(<span class="string">&quot;Credential status&quot;</span>))
+                                        .default(<span class="prelude-val">Some</span>(<span class="macro">json!</span>(<span class="string">"Active"</span>)))
+                                        .description(<span class="prelude-val">Some</span>(<span class="string">"Credential status"</span>))
                                         .enum_values(<span class="prelude-val">Some</span>([
-                                            <span class="string">&quot;Active&quot;</span>,
-                                            <span class="string">&quot;NotActive&quot;</span>,
-                                            <span class="string">&quot;Locked&quot;</span>,
-                                            <span class="string">&quot;Expired&quot;</span>,
+                                            <span class="string">"Active"</span>,
+                                            <span class="string">"NotActive"</span>,
+                                            <span class="string">"Locked"</span>,
+                                            <span class="string">"Expired"</span>,
                                         ])),
                                 )
                                 .property(
-                                    <span class="string">&quot;history&quot;</span>,
-                                    Array::new(Ref::from_schema_name(<span class="string">&quot;UpdateHistory&quot;</span>)),
+                                    <span class="string">"history"</span>,
+                                    Array::new(Ref::from_schema_name(<span class="string">"UpdateHistory"</span>)),
                                 )
-                                .property(<span class="string">&quot;tags&quot;</span>, Object::with_type(SchemaType::String).to_array()),
+                                .property(<span class="string">"tags"</span>, Object::with_type(SchemaType::String).to_array()),
                         ),
                     )
                     .build(),
@@ -3494,64 +3495,64 @@
             .build();
 
         <span class="kw">let </span>serialized = serde_json::to_string_pretty(<span class="kw-2">&amp;</span>openapi)<span class="question-mark">?</span>;
-        <span class="macro">println!</span>(<span class="string">&quot;serialized json:\n {serialized}&quot;</span>);
+        <span class="macro">println!</span>(<span class="string">"serialized json:\n {serialized}"</span>);
 
         <span class="kw">let </span>value = serde_json::to_value(<span class="kw-2">&amp;</span>openapi)<span class="question-mark">?</span>;
-        <span class="kw">let </span>credential = get_json_path(<span class="kw-2">&amp;</span>value, <span class="string">&quot;components.schemas.Credential.properties&quot;</span>);
-        <span class="kw">let </span>person = get_json_path(<span class="kw-2">&amp;</span>value, <span class="string">&quot;components.schemas.Person&quot;</span>);
+        <span class="kw">let </span>credential = get_json_path(<span class="kw-2">&amp;</span>value, <span class="string">"components.schemas.Credential.properties"</span>);
+        <span class="kw">let </span>person = get_json_path(<span class="kw-2">&amp;</span>value, <span class="string">"components.schemas.Person"</span>);
 
         <span class="macro">assert!</span>(
-            credential.get(<span class="string">&quot;id&quot;</span>).is_some(),
-            <span class="string">&quot;could not find path: components.schemas.Credential.properties.id&quot;
+            credential.get(<span class="string">"id"</span>).is_some(),
+            <span class="string">"could not find path: components.schemas.Credential.properties.id"
         </span>);
         <span class="macro">assert!</span>(
-            credential.get(<span class="string">&quot;status&quot;</span>).is_some(),
-            <span class="string">&quot;could not find path: components.schemas.Credential.properties.status&quot;
+            credential.get(<span class="string">"status"</span>).is_some(),
+            <span class="string">"could not find path: components.schemas.Credential.properties.status"
         </span>);
         <span class="macro">assert!</span>(
-            credential.get(<span class="string">&quot;name&quot;</span>).is_some(),
-            <span class="string">&quot;could not find path: components.schemas.Credential.properties.name&quot;
+            credential.get(<span class="string">"name"</span>).is_some(),
+            <span class="string">"could not find path: components.schemas.Credential.properties.name"
         </span>);
         <span class="macro">assert!</span>(
-            credential.get(<span class="string">&quot;history&quot;</span>).is_some(),
-            <span class="string">&quot;could not find path: components.schemas.Credential.properties.history&quot;
+            credential.get(<span class="string">"history"</span>).is_some(),
+            <span class="string">"could not find path: components.schemas.Credential.properties.history"
         </span>);
         <span class="macro">assert_eq!</span>(
             credential
-                .get(<span class="string">&quot;id&quot;</span>)
+                .get(<span class="string">"id"</span>)
                 .unwrap_or(<span class="kw-2">&amp;</span>serde_json::value::Value::Null)
                 .to_string(),
-            <span class="string">r#&quot;{&quot;default&quot;:1,&quot;description&quot;:&quot;Id of credential&quot;,&quot;format&quot;:&quot;int32&quot;,&quot;type&quot;:&quot;integer&quot;}&quot;#</span>,
-            <span class="string">&quot;components.schemas.Credential.properties.id did not match&quot;
+            <span class="string">r#"{"default":1,"description":"Id of credential","format":"int32","type":"integer"}"#</span>,
+            <span class="string">"components.schemas.Credential.properties.id did not match"
         </span>);
         <span class="macro">assert_eq!</span>(
             credential
-                .get(<span class="string">&quot;name&quot;</span>)
+                .get(<span class="string">"name"</span>)
                 .unwrap_or(<span class="kw-2">&amp;</span>serde_json::value::Value::Null)
                 .to_string(),
-            <span class="string">r#&quot;{&quot;description&quot;:&quot;Name of credential&quot;,&quot;type&quot;:&quot;string&quot;}&quot;#</span>,
-            <span class="string">&quot;components.schemas.Credential.properties.name did not match&quot;
+            <span class="string">r#"{"description":"Name of credential","type":"string"}"#</span>,
+            <span class="string">"components.schemas.Credential.properties.name did not match"
         </span>);
         <span class="macro">assert_eq!</span>(
             credential
-                .get(<span class="string">&quot;status&quot;</span>)
+                .get(<span class="string">"status"</span>)
                 .unwrap_or(<span class="kw-2">&amp;</span>serde_json::value::Value::Null)
                 .to_string(),
-            <span class="string">r#&quot;{&quot;default&quot;:&quot;Active&quot;,&quot;description&quot;:&quot;Credential status&quot;,&quot;enum&quot;:[&quot;Active&quot;,&quot;NotActive&quot;,&quot;Locked&quot;,&quot;Expired&quot;],&quot;type&quot;:&quot;string&quot;}&quot;#</span>,
-            <span class="string">&quot;components.schemas.Credential.properties.status did not match&quot;
+            <span class="string">r#"{"default":"Active","description":"Credential status","enum":["Active","NotActive","Locked","Expired"],"type":"string"}"#</span>,
+            <span class="string">"components.schemas.Credential.properties.status did not match"
         </span>);
         <span class="macro">assert_eq!</span>(
             credential
-                .get(<span class="string">&quot;history&quot;</span>)
+                .get(<span class="string">"history"</span>)
                 .unwrap_or(<span class="kw-2">&amp;</span>serde_json::value::Value::Null)
                 .to_string(),
-            <span class="string">r###&quot;{&quot;items&quot;:{&quot;$ref&quot;:&quot;#/components/schemas/UpdateHistory&quot;},&quot;type&quot;:&quot;array&quot;}&quot;###</span>,
-            <span class="string">&quot;components.schemas.Credential.properties.history did not match&quot;
+            <span class="string">r###"{"items":{"$ref":"#/components/schemas/UpdateHistory"},"type":"array"}"###</span>,
+            <span class="string">"components.schemas.Credential.properties.history did not match"
         </span>);
         <span class="macro">assert_eq!</span>(
             person.to_string(),
-            <span class="string">r###&quot;{&quot;$ref&quot;:&quot;#/components/PersonModel&quot;}&quot;###</span>,
-            <span class="string">&quot;components.schemas.Person.ref did not match&quot;
+            <span class="string">r###"{"$ref":"#/components/PersonModel"}"###</span>,
+            <span class="string">"components.schemas.Person.ref did not match"
         </span>);
 
         <span class="prelude-val">Ok</span>(())
@@ -3562,44 +3563,44 @@
     </span><span class="kw">fn </span>test_property_order() {
         <span class="kw">let </span>json_value = ObjectBuilder::new()
             .property(
-                <span class="string">&quot;id&quot;</span>,
+                <span class="string">"id"</span>,
                 ObjectBuilder::new()
                     .schema_type(SchemaType::Integer)
                     .format(<span class="prelude-val">Some</span>(SchemaFormat::KnownFormat(KnownFormat::Int32)))
-                    .description(<span class="prelude-val">Some</span>(<span class="string">&quot;Id of credential&quot;</span>))
+                    .description(<span class="prelude-val">Some</span>(<span class="string">"Id of credential"</span>))
                     .default(<span class="prelude-val">Some</span>(<span class="macro">json!</span>(<span class="number">1i32</span>))),
             )
             .property(
-                <span class="string">&quot;name&quot;</span>,
+                <span class="string">"name"</span>,
                 ObjectBuilder::new()
                     .schema_type(SchemaType::String)
-                    .description(<span class="prelude-val">Some</span>(<span class="string">&quot;Name of credential&quot;</span>)),
+                    .description(<span class="prelude-val">Some</span>(<span class="string">"Name of credential"</span>)),
             )
             .property(
-                <span class="string">&quot;status&quot;</span>,
+                <span class="string">"status"</span>,
                 ObjectBuilder::new()
                     .schema_type(SchemaType::String)
-                    .default(<span class="prelude-val">Some</span>(<span class="macro">json!</span>(<span class="string">&quot;Active&quot;</span>)))
-                    .description(<span class="prelude-val">Some</span>(<span class="string">&quot;Credential status&quot;</span>))
-                    .enum_values(<span class="prelude-val">Some</span>([<span class="string">&quot;Active&quot;</span>, <span class="string">&quot;NotActive&quot;</span>, <span class="string">&quot;Locked&quot;</span>, <span class="string">&quot;Expired&quot;</span>])),
+                    .default(<span class="prelude-val">Some</span>(<span class="macro">json!</span>(<span class="string">"Active"</span>)))
+                    .description(<span class="prelude-val">Some</span>(<span class="string">"Credential status"</span>))
+                    .enum_values(<span class="prelude-val">Some</span>([<span class="string">"Active"</span>, <span class="string">"NotActive"</span>, <span class="string">"Locked"</span>, <span class="string">"Expired"</span>])),
             )
             .property(
-                <span class="string">&quot;history&quot;</span>,
-                Array::new(Ref::from_schema_name(<span class="string">&quot;UpdateHistory&quot;</span>)),
+                <span class="string">"history"</span>,
+                Array::new(Ref::from_schema_name(<span class="string">"UpdateHistory"</span>)),
             )
-            .property(<span class="string">&quot;tags&quot;</span>, Object::with_type(SchemaType::String).to_array())
+            .property(<span class="string">"tags"</span>, Object::with_type(SchemaType::String).to_array())
             .build();
 
-        <span class="attr">#[cfg(not(feature = <span class="string">&quot;preserve_order&quot;</span>))]
+        <span class="attr">#[cfg(not(feature = <span class="string">"preserve_order"</span>))]
         </span><span class="macro">assert_eq!</span>(
             json_value.properties.keys().collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;(),
-            <span class="macro">vec!</span>[<span class="string">&quot;history&quot;</span>, <span class="string">&quot;id&quot;</span>, <span class="string">&quot;name&quot;</span>, <span class="string">&quot;status&quot;</span>, <span class="string">&quot;tags&quot;</span>]
+            <span class="macro">vec!</span>[<span class="string">"history"</span>, <span class="string">"id"</span>, <span class="string">"name"</span>, <span class="string">"status"</span>, <span class="string">"tags"</span>]
         );
 
-        <span class="attr">#[cfg(feature = <span class="string">&quot;preserve_order&quot;</span>)]
+        <span class="attr">#[cfg(feature = <span class="string">"preserve_order"</span>)]
         </span><span class="macro">assert_eq!</span>(
             json_value.properties.keys().collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;(),
-            <span class="macro">vec!</span>[<span class="string">&quot;id&quot;</span>, <span class="string">&quot;name&quot;</span>, <span class="string">&quot;status&quot;</span>, <span class="string">&quot;history&quot;</span>, <span class="string">&quot;tags&quot;</span>]
+            <span class="macro">vec!</span>[<span class="string">"id"</span>, <span class="string">"name"</span>, <span class="string">"status"</span>, <span class="string">"history"</span>, <span class="string">"tags"</span>]
         );
     }
 
@@ -3612,22 +3613,22 @@
         <span class="macro">assert_json_eq!</span>(
             json_value,
             <span class="macro">json!</span>({
-                <span class="string">&quot;type&quot;</span>: <span class="string">&quot;object&quot;</span>,
-                <span class="string">&quot;additionalProperties&quot;</span>: {
-                    <span class="string">&quot;type&quot;</span>: <span class="string">&quot;string&quot;
+                <span class="string">"type"</span>: <span class="string">"object"</span>,
+                <span class="string">"additionalProperties"</span>: {
+                    <span class="string">"type"</span>: <span class="string">"string"
                 </span>}
             })
         );
 
         <span class="kw">let </span>json_value = ObjectBuilder::new()
-            .additional_properties(<span class="prelude-val">Some</span>(Ref::from_schema_name(<span class="string">&quot;ComplexModel&quot;</span>)))
+            .additional_properties(<span class="prelude-val">Some</span>(Ref::from_schema_name(<span class="string">"ComplexModel"</span>)))
             .build();
         <span class="macro">assert_json_eq!</span>(
             json_value,
             <span class="macro">json!</span>({
-                <span class="string">&quot;type&quot;</span>: <span class="string">&quot;object&quot;</span>,
-                <span class="string">&quot;additionalProperties&quot;</span>: {
-                    <span class="string">&quot;$ref&quot;</span>: <span class="string">&quot;#/components/schemas/ComplexModel&quot;
+                <span class="string">"type"</span>: <span class="string">"object"</span>,
+                <span class="string">"additionalProperties"</span>: {
+                    <span class="string">"$ref"</span>: <span class="string">"#/components/schemas/ComplexModel"
                 </span>}
             })
         )
@@ -3635,32 +3636,32 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_object_with_title() {
-        <span class="kw">let </span>json_value = ObjectBuilder::new().title(<span class="prelude-val">Some</span>(<span class="string">&quot;SomeName&quot;</span>)).build();
+        <span class="kw">let </span>json_value = ObjectBuilder::new().title(<span class="prelude-val">Some</span>(<span class="string">"SomeName"</span>)).build();
         <span class="macro">assert_json_eq!</span>(
             json_value,
             <span class="macro">json!</span>({
-                <span class="string">&quot;type&quot;</span>: <span class="string">&quot;object&quot;</span>,
-                <span class="string">&quot;title&quot;</span>: <span class="string">&quot;SomeName&quot;
+                <span class="string">"type"</span>: <span class="string">"object"</span>,
+                <span class="string">"title"</span>: <span class="string">"SomeName"
             </span>})
         );
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>derive_object_with_example() {
-        <span class="kw">let </span>expected = <span class="string">r#&quot;{&quot;type&quot;:&quot;object&quot;,&quot;example&quot;:{&quot;age&quot;:20,&quot;name&quot;:&quot;bob the cat&quot;}}&quot;#</span>;
+        <span class="kw">let </span>expected = <span class="string">r#"{"type":"object","example":{"age":20,"name":"bob the cat"}}"#</span>;
         <span class="kw">let </span>json_value = ObjectBuilder::new()
-            .example(<span class="prelude-val">Some</span>(<span class="macro">json!</span>({<span class="string">&quot;age&quot;</span>: <span class="number">20</span>, <span class="string">&quot;name&quot;</span>: <span class="string">&quot;bob the cat&quot;</span>})))
+            .example(<span class="prelude-val">Some</span>(<span class="macro">json!</span>({<span class="string">"age"</span>: <span class="number">20</span>, <span class="string">"name"</span>: <span class="string">"bob the cat"</span>})))
             .build();
 
         <span class="kw">let </span>value_string = serde_json::to_string(<span class="kw-2">&amp;</span>json_value).unwrap();
         <span class="macro">assert_eq!</span>(
             value_string, expected,
-            <span class="string">&quot;value string != expected string, {value_string} != {expected}&quot;
+            <span class="string">"value string != expected string, {value_string} != {expected}"
         </span>);
     }
 
-    <span class="kw">fn </span>get_json_path&lt;<span class="lifetime">&#39;a</span>&gt;(value: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Value, path: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Value {
-        path.split(<span class="string">&#39;.&#39;</span>).fold(value, |acc, fragment| {
+    <span class="kw">fn </span>get_json_path&lt;<span class="lifetime">'a</span>&gt;(value: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>Value, path: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">'a </span>Value {
+        path.split(<span class="string">'.'</span>).fold(value, |acc, fragment| {
             acc.get(fragment).unwrap_or(<span class="kw-2">&amp;</span>serde_json::value::Value::Null)
         })
     }
@@ -3669,11 +3670,11 @@
     </span><span class="kw">fn </span>test_array_new() {
         <span class="kw">let </span>array = Array::new(
             ObjectBuilder::new().property(
-                <span class="string">&quot;id&quot;</span>,
+                <span class="string">"id"</span>,
                 ObjectBuilder::new()
                     .schema_type(SchemaType::Integer)
                     .format(<span class="prelude-val">Some</span>(SchemaFormat::KnownFormat(KnownFormat::Int32)))
-                    .description(<span class="prelude-val">Some</span>(<span class="string">&quot;Id of credential&quot;</span>))
+                    .description(<span class="prelude-val">Some</span>(<span class="string">"Id of credential"</span>))
                     .default(<span class="prelude-val">Some</span>(<span class="macro">json!</span>(<span class="number">1i32</span>))),
             ),
         );
@@ -3686,11 +3687,11 @@
         <span class="kw">let </span>array: Array = ArrayBuilder::new()
             .items(
                 ObjectBuilder::new().property(
-                    <span class="string">&quot;id&quot;</span>,
+                    <span class="string">"id"</span>,
                     ObjectBuilder::new()
                         .schema_type(SchemaType::Integer)
                         .format(<span class="prelude-val">Some</span>(SchemaFormat::KnownFormat(KnownFormat::Int32)))
-                        .description(<span class="prelude-val">Some</span>(<span class="string">&quot;Id of credential&quot;</span>))
+                        .description(<span class="prelude-val">Some</span>(<span class="string">"Id of credential"</span>))
                         .default(<span class="prelude-val">Some</span>(<span class="macro">json!</span>(<span class="number">1i32</span>))),
                 ),
             )
@@ -3703,18 +3704,18 @@
     </span><span class="kw">fn </span>reserialize_deserialized_schema_components() {
         <span class="kw">let </span>components = ComponentsBuilder::new()
             .schemas_from_iter(<span class="macro">vec!</span>[(
-                <span class="string">&quot;Comp&quot;</span>,
+                <span class="string">"Comp"</span>,
                 Schema::from(
                     ObjectBuilder::new()
-                        .property(<span class="string">&quot;name&quot;</span>, ObjectBuilder::new().schema_type(SchemaType::String))
-                        .required(<span class="string">&quot;name&quot;</span>),
+                        .property(<span class="string">"name"</span>, ObjectBuilder::new().schema_type(SchemaType::String))
+                        .required(<span class="string">"name"</span>),
                 ),
             )])
             .responses_from_iter(<span class="macro">vec!</span>[(
-                <span class="string">&quot;200&quot;</span>,
-                ResponseBuilder::new().description(<span class="string">&quot;Okay&quot;</span>).build(),
+                <span class="string">"200"</span>,
+                ResponseBuilder::new().description(<span class="string">"Okay"</span>).build(),
             )])
-            .security_scheme(<span class="string">&quot;TLS&quot;</span>, SecurityScheme::MutualTls { description: <span class="prelude-val">None </span>})
+            .security_scheme(<span class="string">"TLS"</span>, SecurityScheme::MutualTls { description: <span class="prelude-val">None </span>})
             .build();
 
         <span class="kw">let </span>serialized_components = serde_json::to_string(<span class="kw-2">&amp;</span>components).unwrap();
@@ -3731,8 +3732,8 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>reserialize_deserialized_object_component() {
         <span class="kw">let </span>prop = ObjectBuilder::new()
-            .property(<span class="string">&quot;name&quot;</span>, ObjectBuilder::new().schema_type(SchemaType::String))
-            .required(<span class="string">&quot;name&quot;</span>)
+            .property(<span class="string">"name"</span>, ObjectBuilder::new().schema_type(SchemaType::String))
+            .required(<span class="string">"name"</span>)
             .build();
 
         <span class="kw">let </span>serialized_components = serde_json::to_string(<span class="kw-2">&amp;</span>prop).unwrap();
@@ -3764,12 +3765,12 @@
         <span class="kw">let </span>ref_or_schema = RefOr::T(Schema::Object(
             ObjectBuilder::new()
                 .property(
-                    <span class="string">&quot;test&quot;</span>,
+                    <span class="string">"test"</span>,
                     RefOr::T(Schema::Array(
                         ArrayBuilder::new()
                             .items(RefOr::T(Schema::Object(
                                 ObjectBuilder::new()
-                                    .property(<span class="string">&quot;element&quot;</span>, RefOr::Ref(Ref::new(<span class="string">&quot;#/test&quot;</span>)))
+                                    .property(<span class="string">"element"</span>, RefOr::Ref(Ref::new(<span class="string">"#/test"</span>)))
                                     .build(),
                             )))
                             .build(),
@@ -3778,15 +3779,15 @@
                 .build(),
         ));
 
-        <span class="kw">let </span>json_str = serde_json::to_string(<span class="kw-2">&amp;</span>ref_or_schema).expect(<span class="string">&quot;&quot;</span>);
-        <span class="macro">println!</span>(<span class="string">&quot;----------------------------&quot;</span>);
-        <span class="macro">println!</span>(<span class="string">&quot;{json_str}&quot;</span>);
+        <span class="kw">let </span>json_str = serde_json::to_string(<span class="kw-2">&amp;</span>ref_or_schema).expect(<span class="string">""</span>);
+        <span class="macro">println!</span>(<span class="string">"----------------------------"</span>);
+        <span class="macro">println!</span>(<span class="string">"{json_str}"</span>);
 
-        <span class="kw">let </span>deserialized: RefOr&lt;Schema&gt; = serde_json::from_str(<span class="kw-2">&amp;</span>json_str).expect(<span class="string">&quot;&quot;</span>);
+        <span class="kw">let </span>deserialized: RefOr&lt;Schema&gt; = serde_json::from_str(<span class="kw-2">&amp;</span>json_str).expect(<span class="string">""</span>);
 
-        <span class="kw">let </span>json_de_str = serde_json::to_string(<span class="kw-2">&amp;</span>deserialized).expect(<span class="string">&quot;&quot;</span>);
-        <span class="macro">println!</span>(<span class="string">&quot;----------------------------&quot;</span>);
-        <span class="macro">println!</span>(<span class="string">&quot;{json_de_str}&quot;</span>);
+        <span class="kw">let </span>json_de_str = serde_json::to_string(<span class="kw-2">&amp;</span>deserialized).expect(<span class="string">""</span>);
+        <span class="macro">println!</span>(<span class="string">"----------------------------"</span>);
+        <span class="macro">println!</span>(<span class="string">"{json_de_str}"</span>);
 
         <span class="macro">assert_eq!</span>(json_str, json_de_str);
     }
@@ -3796,14 +3797,14 @@
         <span class="kw">let </span>ref_or_schema = RefOr::T(Schema::Object(
             ObjectBuilder::new()
                 .property(
-                    <span class="string">&quot;test&quot;</span>,
+                    <span class="string">"test"</span>,
                     RefOr::T(Schema::OneOf(
                         OneOfBuilder::new()
                             .item(Schema::Array(
                                 ArrayBuilder::new()
                                     .items(RefOr::T(Schema::Object(
                                         ObjectBuilder::new()
-                                            .property(<span class="string">&quot;element&quot;</span>, RefOr::Ref(Ref::new(<span class="string">&quot;#/test&quot;</span>)))
+                                            .property(<span class="string">"element"</span>, RefOr::Ref(Ref::new(<span class="string">"#/test"</span>)))
                                             .build(),
                                     )))
                                     .build(),
@@ -3812,7 +3813,7 @@
                                 ArrayBuilder::new()
                                     .items(RefOr::T(Schema::Object(
                                         ObjectBuilder::new()
-                                            .property(<span class="string">&quot;foobar&quot;</span>, RefOr::Ref(Ref::new(<span class="string">&quot;#/foobar&quot;</span>)))
+                                            .property(<span class="string">"foobar"</span>, RefOr::Ref(Ref::new(<span class="string">"#/foobar"</span>)))
                                             .build(),
                                     )))
                                     .build(),
@@ -3823,15 +3824,15 @@
                 .build(),
         ));
 
-        <span class="kw">let </span>json_str = serde_json::to_string(<span class="kw-2">&amp;</span>ref_or_schema).expect(<span class="string">&quot;&quot;</span>);
-        <span class="macro">println!</span>(<span class="string">&quot;----------------------------&quot;</span>);
-        <span class="macro">println!</span>(<span class="string">&quot;{json_str}&quot;</span>);
+        <span class="kw">let </span>json_str = serde_json::to_string(<span class="kw-2">&amp;</span>ref_or_schema).expect(<span class="string">""</span>);
+        <span class="macro">println!</span>(<span class="string">"----------------------------"</span>);
+        <span class="macro">println!</span>(<span class="string">"{json_str}"</span>);
 
-        <span class="kw">let </span>deserialized: RefOr&lt;Schema&gt; = serde_json::from_str(<span class="kw-2">&amp;</span>json_str).expect(<span class="string">&quot;&quot;</span>);
+        <span class="kw">let </span>deserialized: RefOr&lt;Schema&gt; = serde_json::from_str(<span class="kw-2">&amp;</span>json_str).expect(<span class="string">""</span>);
 
-        <span class="kw">let </span>json_de_str = serde_json::to_string(<span class="kw-2">&amp;</span>deserialized).expect(<span class="string">&quot;&quot;</span>);
-        <span class="macro">println!</span>(<span class="string">&quot;----------------------------&quot;</span>);
-        <span class="macro">println!</span>(<span class="string">&quot;{json_de_str}&quot;</span>);
+        <span class="kw">let </span>json_de_str = serde_json::to_string(<span class="kw-2">&amp;</span>deserialized).expect(<span class="string">""</span>);
+        <span class="macro">println!</span>(<span class="string">"----------------------------"</span>);
+        <span class="macro">println!</span>(<span class="string">"{json_de_str}"</span>);
 
         <span class="macro">assert_eq!</span>(json_str, json_de_str);
     }
@@ -3841,21 +3842,21 @@
         <span class="kw">let </span>ref_or_schema = RefOr::T(Schema::Object(
             ObjectBuilder::new()
                 .property(
-                    <span class="string">&quot;test&quot;</span>,
+                    <span class="string">"test"</span>,
                     RefOr::T(Schema::AllOf(
                         AllOfBuilder::new()
                             .item(Schema::Array(
                                 ArrayBuilder::new()
                                     .items(RefOr::T(Schema::Object(
                                         ObjectBuilder::new()
-                                            .property(<span class="string">&quot;element&quot;</span>, RefOr::Ref(Ref::new(<span class="string">&quot;#/test&quot;</span>)))
+                                            .property(<span class="string">"element"</span>, RefOr::Ref(Ref::new(<span class="string">"#/test"</span>)))
                                             .build(),
                                     )))
                                     .build(),
                             ))
                             .item(RefOr::T(Schema::Object(
                                 ObjectBuilder::new()
-                                    .property(<span class="string">&quot;foobar&quot;</span>, RefOr::Ref(Ref::new(<span class="string">&quot;#/foobar&quot;</span>)))
+                                    .property(<span class="string">"foobar"</span>, RefOr::Ref(Ref::new(<span class="string">"#/foobar"</span>)))
                                     .build(),
                             )))
                             .build(),
@@ -3864,15 +3865,15 @@
                 .build(),
         ));
 
-        <span class="kw">let </span>json_str = serde_json::to_string(<span class="kw-2">&amp;</span>ref_or_schema).expect(<span class="string">&quot;&quot;</span>);
-        <span class="macro">println!</span>(<span class="string">&quot;----------------------------&quot;</span>);
-        <span class="macro">println!</span>(<span class="string">&quot;{json_str}&quot;</span>);
+        <span class="kw">let </span>json_str = serde_json::to_string(<span class="kw-2">&amp;</span>ref_or_schema).expect(<span class="string">""</span>);
+        <span class="macro">println!</span>(<span class="string">"----------------------------"</span>);
+        <span class="macro">println!</span>(<span class="string">"{json_str}"</span>);
 
-        <span class="kw">let </span>deserialized: RefOr&lt;Schema&gt; = serde_json::from_str(<span class="kw-2">&amp;</span>json_str).expect(<span class="string">&quot;&quot;</span>);
+        <span class="kw">let </span>deserialized: RefOr&lt;Schema&gt; = serde_json::from_str(<span class="kw-2">&amp;</span>json_str).expect(<span class="string">""</span>);
 
-        <span class="kw">let </span>json_de_str = serde_json::to_string(<span class="kw-2">&amp;</span>deserialized).expect(<span class="string">&quot;&quot;</span>);
-        <span class="macro">println!</span>(<span class="string">&quot;----------------------------&quot;</span>);
-        <span class="macro">println!</span>(<span class="string">&quot;{json_de_str}&quot;</span>);
+        <span class="kw">let </span>json_de_str = serde_json::to_string(<span class="kw-2">&amp;</span>deserialized).expect(<span class="string">""</span>);
+        <span class="macro">println!</span>(<span class="string">"----------------------------"</span>);
+        <span class="macro">println!</span>(<span class="string">"{json_de_str}"</span>);
 
         <span class="macro">assert_eq!</span>(json_str, json_de_str);
     }
@@ -3882,21 +3883,21 @@
         <span class="kw">let </span>ref_or_schema = RefOr::T(Schema::Object(
             ObjectBuilder::new()
                 .property(
-                    <span class="string">&quot;test&quot;</span>,
+                    <span class="string">"test"</span>,
                     RefOr::T(Schema::AnyOf(
                         AnyOfBuilder::new()
                             .item(Schema::Array(
                                 ArrayBuilder::new()
                                     .items(RefOr::T(Schema::Object(
                                         ObjectBuilder::new()
-                                            .property(<span class="string">&quot;element&quot;</span>, RefOr::Ref(Ref::new(<span class="string">&quot;#/test&quot;</span>)))
+                                            .property(<span class="string">"element"</span>, RefOr::Ref(Ref::new(<span class="string">"#/test"</span>)))
                                             .build(),
                                     )))
                                     .build(),
                             ))
                             .item(RefOr::T(Schema::Object(
                                 ObjectBuilder::new()
-                                    .property(<span class="string">&quot;foobar&quot;</span>, RefOr::Ref(Ref::new(<span class="string">&quot;#/foobar&quot;</span>)))
+                                    .property(<span class="string">"foobar"</span>, RefOr::Ref(Ref::new(<span class="string">"#/foobar"</span>)))
                                     .build(),
                             )))
                             .build(),
@@ -3905,16 +3906,16 @@
                 .build(),
         ));
 
-        <span class="kw">let </span>json_str = serde_json::to_string(<span class="kw-2">&amp;</span>ref_or_schema).expect(<span class="string">&quot;&quot;</span>);
-        <span class="macro">println!</span>(<span class="string">&quot;----------------------------&quot;</span>);
-        <span class="macro">println!</span>(<span class="string">&quot;{json_str}&quot;</span>);
+        <span class="kw">let </span>json_str = serde_json::to_string(<span class="kw-2">&amp;</span>ref_or_schema).expect(<span class="string">""</span>);
+        <span class="macro">println!</span>(<span class="string">"----------------------------"</span>);
+        <span class="macro">println!</span>(<span class="string">"{json_str}"</span>);
 
-        <span class="kw">let </span>deserialized: RefOr&lt;Schema&gt; = serde_json::from_str(<span class="kw-2">&amp;</span>json_str).expect(<span class="string">&quot;&quot;</span>);
+        <span class="kw">let </span>deserialized: RefOr&lt;Schema&gt; = serde_json::from_str(<span class="kw-2">&amp;</span>json_str).expect(<span class="string">""</span>);
 
-        <span class="kw">let </span>json_de_str = serde_json::to_string(<span class="kw-2">&amp;</span>deserialized).expect(<span class="string">&quot;&quot;</span>);
-        <span class="macro">println!</span>(<span class="string">&quot;----------------------------&quot;</span>);
-        <span class="macro">println!</span>(<span class="string">&quot;{json_de_str}&quot;</span>);
-        <span class="macro">assert!</span>(json_str.contains(<span class="string">&quot;\&quot;anyOf\&quot;&quot;</span>));
+        <span class="kw">let </span>json_de_str = serde_json::to_string(<span class="kw-2">&amp;</span>deserialized).expect(<span class="string">""</span>);
+        <span class="macro">println!</span>(<span class="string">"----------------------------"</span>);
+        <span class="macro">println!</span>(<span class="string">"{json_de_str}"</span>);
+        <span class="macro">assert!</span>(json_str.contains(<span class="string">"\"anyOf\""</span>));
         <span class="macro">assert_eq!</span>(json_str, json_de_str);
     }
 
@@ -3924,21 +3925,21 @@
             ArrayBuilder::new()
                 .items(RefOr::T(Schema::Object(
                     ObjectBuilder::new()
-                        .property(<span class="string">&quot;element&quot;</span>, RefOr::Ref(Ref::new(<span class="string">&quot;#/test&quot;</span>)))
+                        .property(<span class="string">"element"</span>, RefOr::Ref(Ref::new(<span class="string">"#/test"</span>)))
                         .build(),
                 )))
                 .build(),
         ));
 
-        <span class="kw">let </span>json_str = serde_json::to_string(<span class="kw-2">&amp;</span>ref_or_schema).expect(<span class="string">&quot;&quot;</span>);
-        <span class="macro">println!</span>(<span class="string">&quot;----------------------------&quot;</span>);
-        <span class="macro">println!</span>(<span class="string">&quot;{json_str}&quot;</span>);
+        <span class="kw">let </span>json_str = serde_json::to_string(<span class="kw-2">&amp;</span>ref_or_schema).expect(<span class="string">""</span>);
+        <span class="macro">println!</span>(<span class="string">"----------------------------"</span>);
+        <span class="macro">println!</span>(<span class="string">"{json_str}"</span>);
 
-        <span class="kw">let </span>deserialized: RefOr&lt;Schema&gt; = serde_json::from_str(<span class="kw-2">&amp;</span>json_str).expect(<span class="string">&quot;&quot;</span>);
+        <span class="kw">let </span>deserialized: RefOr&lt;Schema&gt; = serde_json::from_str(<span class="kw-2">&amp;</span>json_str).expect(<span class="string">""</span>);
 
-        <span class="kw">let </span>json_de_str = serde_json::to_string(<span class="kw-2">&amp;</span>deserialized).expect(<span class="string">&quot;&quot;</span>);
-        <span class="macro">println!</span>(<span class="string">&quot;----------------------------&quot;</span>);
-        <span class="macro">println!</span>(<span class="string">&quot;{json_de_str}&quot;</span>);
+        <span class="kw">let </span>json_de_str = serde_json::to_string(<span class="kw-2">&amp;</span>deserialized).expect(<span class="string">""</span>);
+        <span class="macro">println!</span>(<span class="string">"----------------------------"</span>);
+        <span class="macro">println!</span>(<span class="string">"{json_de_str}"</span>);
 
         <span class="macro">assert_eq!</span>(json_str, json_de_str);
     }
@@ -3948,20 +3949,20 @@
         <span class="kw">let </span>ref_or_schema = ArrayBuilder::new()
             .items(RefOr::T(Schema::Object(
                 ObjectBuilder::new()
-                    .property(<span class="string">&quot;element&quot;</span>, RefOr::Ref(Ref::new(<span class="string">&quot;#/test&quot;</span>)))
+                    .property(<span class="string">"element"</span>, RefOr::Ref(Ref::new(<span class="string">"#/test"</span>)))
                     .build(),
             )))
             .build();
 
-        <span class="kw">let </span>json_str = serde_json::to_string(<span class="kw-2">&amp;</span>ref_or_schema).expect(<span class="string">&quot;&quot;</span>);
-        <span class="macro">println!</span>(<span class="string">&quot;----------------------------&quot;</span>);
-        <span class="macro">println!</span>(<span class="string">&quot;{json_str}&quot;</span>);
+        <span class="kw">let </span>json_str = serde_json::to_string(<span class="kw-2">&amp;</span>ref_or_schema).expect(<span class="string">""</span>);
+        <span class="macro">println!</span>(<span class="string">"----------------------------"</span>);
+        <span class="macro">println!</span>(<span class="string">"{json_str}"</span>);
 
-        <span class="kw">let </span>deserialized: RefOr&lt;Schema&gt; = serde_json::from_str(<span class="kw-2">&amp;</span>json_str).expect(<span class="string">&quot;&quot;</span>);
+        <span class="kw">let </span>deserialized: RefOr&lt;Schema&gt; = serde_json::from_str(<span class="kw-2">&amp;</span>json_str).expect(<span class="string">""</span>);
 
-        <span class="kw">let </span>json_de_str = serde_json::to_string(<span class="kw-2">&amp;</span>deserialized).expect(<span class="string">&quot;&quot;</span>);
-        <span class="macro">println!</span>(<span class="string">&quot;----------------------------&quot;</span>);
-        <span class="macro">println!</span>(<span class="string">&quot;{json_de_str}&quot;</span>);
+        <span class="kw">let </span>json_de_str = serde_json::to_string(<span class="kw-2">&amp;</span>deserialized).expect(<span class="string">""</span>);
+        <span class="macro">println!</span>(<span class="string">"----------------------------"</span>);
+        <span class="macro">println!</span>(<span class="string">"{json_de_str}"</span>);
 
         <span class="macro">assert_eq!</span>(json_str, json_de_str);
     }
@@ -3971,7 +3972,7 @@
         <span class="kw">let </span>schema = Schema::Object(
             ObjectBuilder::new()
                 .property(
-                    <span class="string">&quot;map&quot;</span>,
+                    <span class="string">"map"</span>,
                     ObjectBuilder::new()
                         .additional_properties(<span class="prelude-val">Some</span>(AdditionalProperties::FreeForm(<span class="bool-val">true</span>))),
                 )
@@ -3979,14 +3980,14 @@
         );
 
         <span class="kw">let </span>json_str = serde_json::to_string(<span class="kw-2">&amp;</span>schema).unwrap();
-        <span class="macro">println!</span>(<span class="string">&quot;----------------------------&quot;</span>);
-        <span class="macro">println!</span>(<span class="string">&quot;{json_str}&quot;</span>);
+        <span class="macro">println!</span>(<span class="string">"----------------------------"</span>);
+        <span class="macro">println!</span>(<span class="string">"{json_str}"</span>);
 
         <span class="kw">let </span>deserialized: RefOr&lt;Schema&gt; = serde_json::from_str(<span class="kw-2">&amp;</span>json_str).unwrap();
 
         <span class="kw">let </span>json_de_str = serde_json::to_string(<span class="kw-2">&amp;</span>deserialized).unwrap();
-        <span class="macro">println!</span>(<span class="string">&quot;----------------------------&quot;</span>);
-        <span class="macro">println!</span>(<span class="string">&quot;{json_de_str}&quot;</span>);
+        <span class="macro">println!</span>(<span class="string">"----------------------------"</span>);
+        <span class="macro">println!</span>(<span class="string">"{json_de_str}"</span>);
 
         <span class="macro">assert_eq!</span>(json_str, json_de_str);
     }
@@ -3996,24 +3997,24 @@
         <span class="kw">let </span>schema = Schema::Object(
             ObjectBuilder::new()
                 .property(
-                    <span class="string">&quot;map&quot;</span>,
+                    <span class="string">"map"</span>,
                     ObjectBuilder::new().additional_properties(<span class="prelude-val">Some</span>(
                         ObjectBuilder::new()
-                            .property(<span class="string">&quot;name&quot;</span>, Object::with_type(SchemaType::String)),
+                            .property(<span class="string">"name"</span>, Object::with_type(SchemaType::String)),
                     )),
                 )
                 .build(),
         );
 
         <span class="kw">let </span>json_str = serde_json::to_string(<span class="kw-2">&amp;</span>schema).unwrap();
-        <span class="macro">println!</span>(<span class="string">&quot;----------------------------&quot;</span>);
-        <span class="macro">println!</span>(<span class="string">&quot;{json_str}&quot;</span>);
+        <span class="macro">println!</span>(<span class="string">"----------------------------"</span>);
+        <span class="macro">println!</span>(<span class="string">"{json_str}"</span>);
 
         <span class="kw">let </span>deserialized: RefOr&lt;Schema&gt; = serde_json::from_str(<span class="kw-2">&amp;</span>json_str).unwrap();
 
         <span class="kw">let </span>json_de_str = serde_json::to_string(<span class="kw-2">&amp;</span>deserialized).unwrap();
-        <span class="macro">println!</span>(<span class="string">&quot;----------------------------&quot;</span>);
-        <span class="macro">println!</span>(<span class="string">&quot;{json_de_str}&quot;</span>);
+        <span class="macro">println!</span>(<span class="string">"----------------------------"</span>);
+        <span class="macro">println!</span>(<span class="string">"{json_de_str}"</span>);
 
         <span class="macro">assert_eq!</span>(json_str, json_de_str);
     }

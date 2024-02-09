@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `skema/src/model_extraction.rs`."><title>model_extraction.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="skema" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `skema/src/model_extraction.rs`."><title>model_extraction.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="skema" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -792,11 +793,11 @@
     <span class="kw">if </span>core_id.is_empty() {
         <span class="kw">let </span>deriv = Ci {
             r#type: <span class="prelude-val">Some</span>(Function),
-            content: Box::new(MathExpression::Mi(Mi(<span class="string">&quot;temp&quot;</span>.to_string()))),
+            content: Box::new(MathExpression::Mi(Mi(<span class="string">"temp"</span>.to_string()))),
             func_of: <span class="prelude-val">None</span>,
         };
         <span class="kw">let </span>operate = Operator::Subtract;
-        <span class="kw">let </span>rhs_arg = MathExpressionTree::Atom(MathExpression::Mi(Mi(<span class="string">&quot;temp&quot;</span>.to_string())));
+        <span class="kw">let </span>rhs_arg = MathExpressionTree::Atom(MathExpression::Mi(Mi(<span class="string">"temp"</span>.to_string())));
         <span class="kw">let </span>rhs = MathExpressionTree::Cons(operate, [rhs_arg].to_vec());
         <span class="kw">let </span>fo_eq = FirstOrderODE {
             lhs_var: deriv.clone(),
@@ -815,7 +816,7 @@
 }
 
 <span class="doccomment">/**
- * This function finds the core dynamics and returns a vector of node id&#39;s that meet the criteria for identification
+ * This function finds the core dynamics and returns a vector of node id's that meet the criteria for identification
  *
  * Based on the fact we are getting in only the function we expect to have dynamics, this should just be depricated in the future
  * and replaced with a inference to move from the module_id to the top level function node id, however for now we should keep it
@@ -829,7 +830,7 @@
     <span class="comment">// 1. find each function node
     </span><span class="kw">let </span><span class="kw-2">mut </span>function_nodes = Vec::&lt;NodeIndex&gt;::new();
     <span class="kw">for </span>node <span class="kw">in </span>graph.node_indices() {
-        <span class="kw">if </span>graph[node].label == <span class="kw-2">*</span><span class="string">&quot;Function&quot; </span>{
+        <span class="kw">if </span>graph[node].label == <span class="kw-2">*</span><span class="string">"Function" </span>{
             function_nodes.push(node);
         }
     }
@@ -847,17 +848,17 @@
         <span class="kw">let </span><span class="kw-2">mut </span>expression_counter = <span class="number">0</span>;
         <span class="kw">let </span><span class="kw-2">mut </span>primitive_counter = <span class="number">0</span>;
         <span class="kw">for </span>node <span class="kw">in </span>func.node_indices() {
-            <span class="kw">if </span>func[node].label == <span class="kw-2">*</span><span class="string">&quot;Expression&quot; </span>{
+            <span class="kw">if </span>func[node].label == <span class="kw-2">*</span><span class="string">"Expression" </span>{
                 expression_counter += <span class="number">1</span>;
             }
-            <span class="kw">if </span>func[node].label == <span class="kw-2">*</span><span class="string">&quot;Primitive&quot; </span>{
-                <span class="kw">if </span><span class="kw-2">*</span>func[node].name.as_ref().unwrap() == <span class="string">&quot;ast.Mult&quot;</span>.to_string() {
+            <span class="kw">if </span>func[node].label == <span class="kw-2">*</span><span class="string">"Primitive" </span>{
+                <span class="kw">if </span><span class="kw-2">*</span>func[node].name.as_ref().unwrap() == <span class="string">"ast.Mult"</span>.to_string() {
                     primitive_counter += <span class="number">1</span>;
-                } <span class="kw">else if </span><span class="kw-2">*</span>func[node].name.as_ref().unwrap() == <span class="string">&quot;ast.Add&quot;</span>.to_string() {
+                } <span class="kw">else if </span><span class="kw-2">*</span>func[node].name.as_ref().unwrap() == <span class="string">"ast.Add"</span>.to_string() {
                     primitive_counter += <span class="number">1</span>;
-                } <span class="kw">else if </span><span class="kw-2">*</span>func[node].name.as_ref().unwrap() == <span class="string">&quot;ast.Sub&quot;</span>.to_string() {
+                } <span class="kw">else if </span><span class="kw-2">*</span>func[node].name.as_ref().unwrap() == <span class="string">"ast.Sub"</span>.to_string() {
                     primitive_counter += <span class="number">1</span>;
-                } <span class="kw">else if </span><span class="kw-2">*</span>func[node].name.as_ref().unwrap() == <span class="string">&quot;ast.USub&quot;</span>.to_string() {
+                } <span class="kw">else if </span><span class="kw-2">*</span>func[node].name.as_ref().unwrap() == <span class="string">"ast.USub"</span>.to_string() {
                     primitive_counter += <span class="number">1</span>;
                 }
             }
@@ -871,7 +872,7 @@
     </span><span class="kw">let </span><span class="kw-2">mut </span>core_id = Vec::&lt;i64&gt;::new();
     <span class="kw">for </span>c_func <span class="kw">in </span>core_func.iter() {
         <span class="kw">for </span>node <span class="kw">in </span>functions[<span class="kw-2">*</span>c_func].node_indices() {
-            <span class="kw">if </span>functions[<span class="kw-2">*</span>c_func][node].label == <span class="kw-2">*</span><span class="string">&quot;Function&quot; </span>{
+            <span class="kw">if </span>functions[<span class="kw-2">*</span>c_func][node].label == <span class="kw-2">*</span><span class="string">"Function" </span>{
                 core_id.push(functions[<span class="kw-2">*</span>c_func][node].id);
             }
         }
@@ -881,7 +882,7 @@
 }
 
 <span class="doccomment">/**
- * Once the function node has been identified, this function takes it from there to extract the vector of FirstOrderODE&#39;s
+ * Once the function node has been identified, this function takes it from there to extract the vector of FirstOrderODE's
  *
  * This is based heavily on the assumption that each equation is in a seperate expression which breaks for the vector case.
  */
@@ -896,7 +897,7 @@
     <span class="comment">// find all the expressions
     </span><span class="kw">let </span><span class="kw-2">mut </span>expression_nodes = Vec::&lt;NodeIndex&gt;::new();
     <span class="kw">for </span>node <span class="kw">in </span>graph.node_indices() {
-        <span class="kw">if </span>graph[node].label == <span class="kw-2">*</span><span class="string">&quot;Expression&quot; </span>{
+        <span class="kw">if </span>graph[node].label == <span class="kw-2">*</span><span class="string">"Expression" </span>{
             expression_nodes.push(node);
         }
     }
@@ -912,16 +913,16 @@
         <span class="kw">let </span><span class="kw-2">mut </span>prim_counter = <span class="number">0</span>;
         <span class="kw">let </span><span class="kw-2">mut </span>has_call = <span class="bool-val">false</span>;
         <span class="kw">for </span>node_index <span class="kw">in </span>sub_w.node_indices() {
-            <span class="kw">if </span>sub_w[node_index].label == <span class="kw-2">*</span><span class="string">&quot;Primitive&quot; </span>{
+            <span class="kw">if </span>sub_w[node_index].label == <span class="kw-2">*</span><span class="string">"Primitive" </span>{
                 prim_counter += <span class="number">1</span>;
-                <span class="kw">if </span><span class="kw-2">*</span>sub_w[node_index].name.as_ref().unwrap() == <span class="string">&quot;_call&quot; </span>{
+                <span class="kw">if </span><span class="kw-2">*</span>sub_w[node_index].name.as_ref().unwrap() == <span class="string">"_call" </span>{
                     has_call = <span class="bool-val">true</span>;
                 }
             }
         }
         <span class="kw">if </span>sub_w.node_count() &gt; <span class="number">3 </span>&amp;&amp; !(prim_counter == <span class="number">1 </span>&amp;&amp; has_call) &amp;&amp; prim_counter != <span class="number">0 </span>{
-            <span class="macro">println!</span>(<span class="string">&quot;--------------------&quot;</span>);
-            <span class="macro">println!</span>(<span class="string">&quot;expression: {}&quot;</span>, graph[expression_nodes[i]].id);
+            <span class="macro">println!</span>(<span class="string">"--------------------"</span>);
+            <span class="macro">println!</span>(<span class="string">"expression: {}"</span>, graph[expression_nodes[i]].id);
             <span class="comment">// the call expressions get referenced by multiple top level expressions, so deleting the nodes in it breaks the other graphs. Need to pass clone of expression subgraph so references to original has all the nodes.
             </span><span class="kw">if </span>has_call {
                 sub_w = trim_calls(sub_w.clone())
@@ -929,12 +930,12 @@
             <span class="kw">let </span>expr = trim_un_named(<span class="kw-2">&amp;mut </span>sub_w);
             <span class="kw">let </span><span class="kw-2">mut </span>root_node = Vec::&lt;NodeIndex&gt;::new();
             <span class="kw">for </span>node_index <span class="kw">in </span>expr.node_indices() {
-                <span class="kw">if </span>expr[node_index].label.clone() == <span class="kw-2">*</span><span class="string">&quot;Opo&quot; </span>{
+                <span class="kw">if </span>expr[node_index].label.clone() == <span class="kw-2">*</span><span class="string">"Opo" </span>{
                     root_node.push(node_index);
                 }
             }
             <span class="kw">if </span>root_node.len() &gt;= <span class="number">2 </span>{
-                <span class="macro">println!</span>(<span class="string">&quot;More than one Opo! Skipping Expression!&quot;</span>);
+                <span class="macro">println!</span>(<span class="string">"More than one Opo! Skipping Expression!"</span>);
             } <span class="kw">else </span>{
                 core_dynamics.push(tree_2_MET_ast(expr, root_node[<span class="number">0</span>]).unwrap());
             }
@@ -955,15 +956,15 @@
     <span class="kw">let </span><span class="kw-2">mut </span>fo_eq_vec = Vec::&lt;FirstOrderODE&gt;::new();
     <span class="kw">let </span>_math_vec = Vec::&lt;MathExpressionTree&gt;::new();
     <span class="kw">let </span><span class="kw-2">mut </span>lhs = Vec::&lt;Ci&gt;::new();
-    <span class="kw">if </span>graph[root_node].label == <span class="kw-2">*</span><span class="string">&quot;Opo&quot; </span>{
+    <span class="kw">if </span>graph[root_node].label == <span class="kw-2">*</span><span class="string">"Opo" </span>{
         <span class="comment">// we first construct the derivative of the first node
         </span><span class="kw">let </span>deriv_name: <span class="kw-2">&amp;</span>str = graph[root_node].name.as_ref().unwrap();
         <span class="comment">// this will let us know if additional trimming is needed to handle the code implementation of the equations
         // let mut step_impl = false; this will be used for step implementaion for later
         // This is very bespoke right now
-        // this check is for if it&#39;s leibniz notation or not, will need to expand as more cases are creating,
+        // this check is for if it's leibniz notation or not, will need to expand as more cases are creating,
         // currently we convert to leibniz form
-        </span><span class="kw">if </span>deriv_name[<span class="number">0</span>..<span class="number">1</span>].to_string() == <span class="string">&quot;d&quot; </span>{
+        </span><span class="kw">if </span>deriv_name[<span class="number">0</span>..<span class="number">1</span>].to_string() == <span class="string">"d" </span>{
             <span class="kw">let </span>deriv = Ci {
                 r#type: <span class="prelude-val">Some</span>(Function),
                 content: Box::new(MathExpression::Mi(Mi(deriv_name[<span class="number">1</span>..<span class="number">2</span>].to_string()))),
@@ -980,7 +981,7 @@
             lhs.push(deriv);
         }
         <span class="kw">for </span>node <span class="kw">in </span>graph.neighbors_directed(root_node, Outgoing) {
-            <span class="kw">if </span>graph[node].label.clone() == <span class="kw-2">*</span><span class="string">&quot;Primitive&quot; </span>{
+            <span class="kw">if </span>graph[node].label.clone() == <span class="kw-2">*</span><span class="string">"Primitive" </span>{
                 <span class="kw">let </span>operate = get_operator_MET(graph, node); <span class="comment">// output -&gt; Operator
                 </span><span class="kw">let </span>rhs_arg = get_args_MET(graph, node); <span class="comment">// output -&gt; Vec&lt;MathExpressionTree&gt;
                 </span><span class="kw">let </span>rhs = MathExpressionTree::Cons(operate, rhs_arg); <span class="comment">// MathExpressionTree
@@ -993,11 +994,11 @@
                 };
                 fo_eq_vec.push(fo_eq);
             } <span class="kw">else </span>{
-                <span class="macro">println!</span>(<span class="string">&quot;Error, expect RHS to have at least 1 primitive&quot;</span>);
+                <span class="macro">println!</span>(<span class="string">"Error, expect RHS to have at least 1 primitive"</span>);
             }
         }
     }
-    <span class="macro">println!</span>(<span class="string">&quot;FirstOrderODE: {:?}&quot;</span>, fo_eq_vec[<span class="number">0</span>].rhs.clone().to_string());
+    <span class="macro">println!</span>(<span class="string">"FirstOrderODE: {:?}"</span>, fo_eq_vec[<span class="number">0</span>].rhs.clone().to_string());
     <span class="prelude-val">Ok</span>(fo_eq_vec[<span class="number">0</span>].clone())
 }
 
@@ -1017,15 +1018,15 @@
     // construct vecs
     </span><span class="kw">for </span>node <span class="kw">in </span>graph.neighbors_directed(root_node, Outgoing) {
         <span class="comment">// first need to check for operator
-        </span><span class="kw">if </span>graph[node].label.clone() == <span class="kw-2">*</span><span class="string">&quot;Primitive&quot; </span>{
+        </span><span class="kw">if </span>graph[node].label.clone() == <span class="kw-2">*</span><span class="string">"Primitive" </span>{
             <span class="kw">let </span>operate = get_operator_MET(graph, node); <span class="comment">// output -&gt; Operator
             </span><span class="kw">let </span>rhs_arg = get_args_MET(graph, node); <span class="comment">// output -&gt; Vec&lt;MathExpressionTree&gt;
             </span><span class="kw">let </span>rhs = MathExpressionTree::Cons(operate, rhs_arg); <span class="comment">// MathExpressionTree
             </span>args.push(rhs.clone());
         } <span class="kw">else </span>{
             <span class="comment">// asummption it is atomic
-            </span><span class="kw">if </span>graph[node].label.clone() == <span class="kw-2">*</span><span class="string">&quot;Literal&quot; </span>{
-                <span class="kw">let </span>temp_string = graph[node].value.clone().unwrap().value.replace(<span class="string">&#39;\&quot;&#39;</span>, <span class="string">&quot;&quot;</span>);
+            </span><span class="kw">if </span>graph[node].label.clone() == <span class="kw-2">*</span><span class="string">"Literal" </span>{
+                <span class="kw">let </span>temp_string = graph[node].value.clone().unwrap().value.replace(<span class="string">'\"'</span>, <span class="string">""</span>);
                 <span class="kw">let </span>arg2 = MathExpressionTree::Atom(MathExpression::Mi(Mi(temp_string.clone())));
                 args.push(arg2.clone());
             } <span class="kw">else </span>{
@@ -1046,7 +1047,7 @@
     <span class="comment">// fix order of args
     </span><span class="kw">let </span><span class="kw-2">mut </span>ordered_args = args.clone();
     <span class="kw">for </span>(i, ind) <span class="kw">in </span>arg_order.iter().enumerate() {
-        <span class="comment">// the ind&#39;th element of order_args is the ith element of the unordered args
+        <span class="comment">// the ind'th element of order_args is the ith element of the unordered args
         </span><span class="kw">if </span>ordered_args.len() &gt; <span class="kw-2">*</span>ind <span class="kw">as </span>usize {
             <span class="kw">let </span>_temp = std::mem::replace(<span class="kw-2">&amp;mut </span>ordered_args[<span class="kw-2">*</span>ind <span class="kw">as </span>usize], args[i].clone());
         }
@@ -1063,15 +1064,15 @@
     root_node: NodeIndex,
 ) -&gt; Operator {
     <span class="kw">let </span><span class="kw-2">mut </span>op = Vec::&lt;Operator&gt;::new();
-    <span class="kw">if </span><span class="kw-2">*</span>graph[root_node].name.as_ref().unwrap() == <span class="string">&quot;ast.Mult&quot;</span>.to_string() {
+    <span class="kw">if </span><span class="kw-2">*</span>graph[root_node].name.as_ref().unwrap() == <span class="string">"ast.Mult"</span>.to_string() {
         op.push(Operator::Multiply);
-    } <span class="kw">else if </span><span class="kw-2">*</span>graph[root_node].name.as_ref().unwrap() == <span class="string">&quot;ast.Add&quot; </span>{
+    } <span class="kw">else if </span><span class="kw-2">*</span>graph[root_node].name.as_ref().unwrap() == <span class="string">"ast.Add" </span>{
         op.push(Operator::Add);
-    } <span class="kw">else if </span><span class="kw-2">*</span>graph[root_node].name.as_ref().unwrap() == <span class="string">&quot;ast.Sub&quot; </span>{
+    } <span class="kw">else if </span><span class="kw-2">*</span>graph[root_node].name.as_ref().unwrap() == <span class="string">"ast.Sub" </span>{
         op.push(Operator::Subtract);
-    } <span class="kw">else if </span><span class="kw-2">*</span>graph[root_node].name.as_ref().unwrap() == <span class="string">&quot;ast.USub&quot; </span>{
+    } <span class="kw">else if </span><span class="kw-2">*</span>graph[root_node].name.as_ref().unwrap() == <span class="string">"ast.USub" </span>{
         op.push(Operator::Subtract);
-    } <span class="kw">else if </span><span class="kw-2">*</span>graph[root_node].name.as_ref().unwrap() == <span class="string">&quot;ast.Div&quot; </span>{
+    } <span class="kw">else if </span><span class="kw-2">*</span>graph[root_node].name.as_ref().unwrap() == <span class="string">"ast.Div" </span>{
         op.push(Operator::Divide);
     } <span class="kw">else </span>{
         op.push(Operator::Other(graph[root_node].name.clone().unwrap()));
@@ -1086,8 +1087,8 @@
  * For deleting the unpacks, the assumption is they are always terminal in the subgraph and can be deleted freely.
  *
  * Concerns:
- * - I don&#39;t think this will work if there are multiple un-named nodes changed together. I haven&#39;t seen this in practice,
- * but I think it&#39;s possible. So something to keep in mind.
+ * - I don't think this will work if there are multiple un-named nodes changed together. I haven't seen this in practice,
+ * but I think it's possible. So something to keep in mind.
  */
 </span><span class="kw">fn </span>trim_un_named(
     graph: <span class="kw-2">&amp;mut </span>petgraph::Graph&lt;ModelNode, ModelEdge&gt;,
@@ -1096,7 +1097,7 @@
 
     // iterate over the graph and add a new edge to bypass the un-named nodes
     </span><span class="kw">for </span>node_index <span class="kw">in </span>graph.node_indices() {
-        <span class="kw">if </span>graph[node_index].clone().name.unwrap().clone() == <span class="kw-2">*</span><span class="string">&quot;un-named&quot; </span>{
+        <span class="kw">if </span>graph[node_index].clone().name.unwrap().clone() == <span class="kw-2">*</span><span class="string">"un-named" </span>{
             <span class="kw">let </span><span class="kw-2">mut </span>bypass = Vec::&lt;NodeIndex&gt;::new();
             <span class="kw">let </span><span class="kw-2">mut </span>outgoing_bypass = Vec::&lt;NodeIndex&gt;::new();
             <span class="kw">for </span>node1 <span class="kw">in </span>graph.neighbors_directed(node_index, Incoming) {
@@ -1139,8 +1140,8 @@
     <span class="comment">// now we remove the un-named nodes and only the bypass edge will remain to connect the nodes
     // we also remove the unpack node if it is present here as well
     </span><span class="kw">for </span>node_index <span class="kw">in </span>graph.node_indices().rev() {
-        <span class="kw">if </span>graph[node_index].name.clone().unwrap() == <span class="kw-2">*</span><span class="string">&quot;un-named&quot;
-            </span>|| graph[node_index].name.clone().unwrap() == <span class="kw-2">*</span><span class="string">&quot;unpack&quot;
+        <span class="kw">if </span>graph[node_index].name.clone().unwrap() == <span class="kw-2">*</span><span class="string">"un-named"
+            </span>|| graph[node_index].name.clone().unwrap() == <span class="kw-2">*</span><span class="string">"unpack"
         </span>{
             graph.remove_node(node_index);
         }
@@ -1164,23 +1165,23 @@
     </span><span class="kw">let </span><span class="kw-2">mut </span>result1 = graph
         .execute(
             query(
-                <span class="string">&quot;MATCH (n)-[*]-&gt;(m) WHERE id(n) = $id
+                <span class="string">"MATCH (n)-[*]-&gt;(m) WHERE id(n) = $id
         MATCH q = (l)&lt;-[r:Wire]-(m)
         WITH reduce(output = [], m IN nodes(q) | output + m ) AS nodes1
         UNWIND nodes1 AS nodes2
         WITH DISTINCT nodes2
-        return nodes2&quot;</span>,
+        return nodes2"</span>,
             )
-            .param(<span class="string">&quot;id&quot;</span>, module_id),
+            .param(<span class="string">"id"</span>, module_id),
         )
         .<span class="kw">await</span><span class="question-mark">?</span>;
     <span class="kw">while let </span><span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(row)) = result1.next().<span class="kw">await </span>{
-        <span class="kw">let </span>node: neo4rs::Node = row.get(<span class="string">&quot;nodes2&quot;</span>).unwrap();
+        <span class="kw">let </span>node: neo4rs::Node = row.get(<span class="string">"nodes2"</span>).unwrap();
         <span class="kw">let </span>modelnode = ModelNode {
             id: node.id(),
             label: node.labels()[<span class="number">0</span>].to_string(),
-            name: node.get::&lt;String&gt;(<span class="string">&quot;name&quot;</span>).ok(),
-            value: node.get::&lt;ValueL&gt;(<span class="string">&quot;value&quot;</span>).ok(),
+            name: node.get::&lt;String&gt;(<span class="string">"name"</span>).ok(),
+            value: node.get::&lt;ValueL&gt;(<span class="string">"value"</span>).ok(),
         };
         node_list.push(modelnode.clone());
     }
@@ -1188,24 +1189,24 @@
     </span><span class="kw">let </span><span class="kw-2">mut </span>result2 = graph
         .execute(
             query(
-                <span class="string">&quot;MATCH (n)-[*]-&gt;(m) WHERE id(n) = $id
+                <span class="string">"MATCH (n)-[*]-&gt;(m) WHERE id(n) = $id
         MATCH q = (l)&lt;-[r:Wire]-(m)
         WITH reduce(output = [], m IN relationships(q) | output + m ) AS edges1
         UNWIND edges1 AS edges2
         WITH DISTINCT edges2
-        return edges2&quot;</span>,
+        return edges2"</span>,
             )
-            .param(<span class="string">&quot;id&quot;</span>, module_id),
+            .param(<span class="string">"id"</span>, module_id),
         )
         .<span class="kw">await</span><span class="question-mark">?</span>;
     <span class="kw">while let </span><span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(row)) = result2.next().<span class="kw">await </span>{
-        <span class="kw">let </span>edge: neo4rs::Relation = row.get(<span class="string">&quot;edges2&quot;</span>).unwrap();
+        <span class="kw">let </span>edge: neo4rs::Relation = row.get(<span class="string">"edges2"</span>).unwrap();
         <span class="kw">let </span>modeledge = ModelEdge {
             id: edge.id(),
             src_id: edge.start_node_id(),
             tgt_id: edge.end_node_id(),
-            index: edge.get::&lt;i64&gt;(<span class="string">&quot;index&quot;</span>).ok(),
-            refer: edge.get::&lt;i64&gt;(<span class="string">&quot;refer&quot;</span>).ok(),
+            index: edge.get::&lt;i64&gt;(<span class="string">"index"</span>).ok(),
+            refer: edge.get::&lt;i64&gt;(<span class="string">"refer"</span>).ok(),
         };
         edge_list.push(modeledge);
     }
@@ -1288,22 +1289,22 @@
     </span><span class="kw">let </span><span class="kw-2">mut </span>result1 = graph
         .execute(
             query(
-                <span class="string">&quot;MATCH p = (n)-[r*]-&gt;(m) WHERE id(n) = $id
+                <span class="string">"MATCH p = (n)-[r*]-&gt;(m) WHERE id(n) = $id
         WITH reduce(output = [], n IN nodes(p) | output + n ) AS nodes1
         UNWIND nodes1 AS nodes2
         WITH DISTINCT nodes2
-        return nodes2&quot;</span>,
+        return nodes2"</span>,
             )
-            .param(<span class="string">&quot;id&quot;</span>, module_id),
+            .param(<span class="string">"id"</span>, module_id),
         )
         .<span class="kw">await</span><span class="question-mark">?</span>;
     <span class="kw">while let </span><span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(row)) = result1.next().<span class="kw">await </span>{
-        <span class="kw">let </span>node: neo4rs::Node = row.get(<span class="string">&quot;nodes2&quot;</span>).unwrap();
+        <span class="kw">let </span>node: neo4rs::Node = row.get(<span class="string">"nodes2"</span>).unwrap();
         <span class="kw">let </span>modelnode = ModelNode {
             id: node.id(),
             label: node.labels()[<span class="number">0</span>].to_string(),
-            name: node.get::&lt;String&gt;(<span class="string">&quot;name&quot;</span>).ok(),
-            value: node.get::&lt;ValueL&gt;(<span class="string">&quot;value&quot;</span>).ok(),
+            name: node.get::&lt;String&gt;(<span class="string">"name"</span>).ok(),
+            value: node.get::&lt;ValueL&gt;(<span class="string">"value"</span>).ok(),
         };
         node_list.push(modelnode);
     }
@@ -1311,23 +1312,23 @@
     </span><span class="kw">let </span><span class="kw-2">mut </span>result2 = graph
         .execute(
             query(
-                <span class="string">&quot;MATCH p = (n)-[r*]-&gt;(m) WHERE id(n) = $id
+                <span class="string">"MATCH p = (n)-[r*]-&gt;(m) WHERE id(n) = $id
         WITH reduce(output = [], n IN relationships(p) | output + n ) AS edges1
         UNWIND edges1 AS edges2
         WITH DISTINCT edges2
-        return edges2&quot;</span>,
+        return edges2"</span>,
             )
-            .param(<span class="string">&quot;id&quot;</span>, module_id),
+            .param(<span class="string">"id"</span>, module_id),
         )
         .<span class="kw">await</span><span class="question-mark">?</span>;
     <span class="kw">while let </span><span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(row)) = result2.next().<span class="kw">await </span>{
-        <span class="kw">let </span>edge: neo4rs::Relation = row.get(<span class="string">&quot;edges2&quot;</span>).unwrap();
+        <span class="kw">let </span>edge: neo4rs::Relation = row.get(<span class="string">"edges2"</span>).unwrap();
         <span class="kw">let </span>modeledge = ModelEdge {
             id: edge.id(),
             src_id: edge.start_node_id(),
             tgt_id: edge.end_node_id(),
-            index: edge.get::&lt;i64&gt;(<span class="string">&quot;index&quot;</span>).ok(),
-            refer: edge.get::&lt;i64&gt;(<span class="string">&quot;refer&quot;</span>).ok(),
+            index: edge.get::&lt;i64&gt;(<span class="string">"index"</span>).ok(),
+            refer: edge.get::&lt;i64&gt;(<span class="string">"refer"</span>).ok(),
         };
         edge_list.push(modeledge);
     }
@@ -1345,7 +1346,7 @@
     </span><span class="kw">let </span><span class="kw-2">mut </span>inner_nodes = Vec::&lt;NodeIndex&gt;::new();
     <span class="comment">// find the call nodes
     </span><span class="kw">for </span>node_index <span class="kw">in </span>graph.node_indices() {
-        <span class="kw">if </span>graph[node_index].clone().name.unwrap().clone() == <span class="kw-2">*</span><span class="string">&quot;_call&quot; </span>{
+        <span class="kw">if </span>graph[node_index].clone().name.unwrap().clone() == <span class="kw-2">*</span><span class="string">"_call" </span>{
             <span class="comment">// we now trace up the incoming path until we hit a primitive,
             // this will be the start node for the new edge.
 
@@ -1434,7 +1435,7 @@
     <span class="kw">let </span><span class="kw-2">mut </span>end_node = node_index;
     node_vec.push(node_index);
     <span class="kw">for </span>node <span class="kw">in </span>graph.neighbors_directed(node_index, Incoming) {
-        <span class="kw">if </span>graph[node].label.clone() != <span class="kw-2">*</span><span class="string">&quot;Primitive&quot; </span>{
+        <span class="kw">if </span>graph[node].label.clone() != <span class="kw-2">*</span><span class="string">"Primitive" </span>{
             <span class="kw">let </span><span class="kw-2">mut </span>temp = to_primitive(graph.clone(), node);
             end_node = temp.<span class="number">0</span>;
             node_vec.append(<span class="kw-2">&amp;mut </span>temp.<span class="number">1</span>);

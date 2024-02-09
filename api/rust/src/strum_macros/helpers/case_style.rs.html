@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/strum_macros-0.24.3/src/helpers/case_style.rs`."><title>case_style.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="strum_macros" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/strum_macros-0.24.3/src/helpers/case_style.rs`."><title>case_style.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="strum_macros" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -140,16 +141,16 @@
 }
 
 <span class="kw">const </span>VALID_CASE_STYLES: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str] = <span class="kw-2">&amp;</span>[
-    <span class="string">&quot;camelCase&quot;</span>,
-    <span class="string">&quot;PascalCase&quot;</span>,
-    <span class="string">&quot;kebab-case&quot;</span>,
-    <span class="string">&quot;snake_case&quot;</span>,
-    <span class="string">&quot;SCREAMING_SNAKE_CASE&quot;</span>,
-    <span class="string">&quot;SCREAMING-KEBAB-CASE&quot;</span>,
-    <span class="string">&quot;lowercase&quot;</span>,
-    <span class="string">&quot;UPPERCASE&quot;</span>,
-    <span class="string">&quot;title_case&quot;</span>,
-    <span class="string">&quot;mixed_case&quot;</span>,
+    <span class="string">"camelCase"</span>,
+    <span class="string">"PascalCase"</span>,
+    <span class="string">"kebab-case"</span>,
+    <span class="string">"snake_case"</span>,
+    <span class="string">"SCREAMING_SNAKE_CASE"</span>,
+    <span class="string">"SCREAMING-KEBAB-CASE"</span>,
+    <span class="string">"lowercase"</span>,
+    <span class="string">"UPPERCASE"</span>,
+    <span class="string">"title_case"</span>,
+    <span class="string">"mixed_case"</span>,
 ];
 
 <span class="kw">impl </span>Parse <span class="kw">for </span>CaseStyle {
@@ -161,7 +162,7 @@
             syn::Error::new_spanned(
                 <span class="kw-2">&amp;</span>text,
                 <span class="macro">format!</span>(
-                    <span class="string">&quot;Unexpected case style for serialize_all: `{}`. Valid values are: `{:?}`&quot;</span>,
+                    <span class="string">"Unexpected case style for serialize_all: `{}`. Valid values are: `{:?}`"</span>,
                     val, VALID_CASE_STYLES
                 ),
             )
@@ -174,18 +175,18 @@
 
     <span class="kw">fn </span>from_str(text: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, ()&gt; {
         <span class="prelude-val">Ok</span>(<span class="kw">match </span>text {
-            <span class="string">&quot;camel_case&quot; </span>| <span class="string">&quot;PascalCase&quot; </span>=&gt; CaseStyle::PascalCase,
-            <span class="string">&quot;camelCase&quot; </span>=&gt; CaseStyle::CamelCase,
-            <span class="string">&quot;snake_case&quot; </span>| <span class="string">&quot;snek_case&quot; </span>=&gt; CaseStyle::SnakeCase,
-            <span class="string">&quot;kebab_case&quot; </span>| <span class="string">&quot;kebab-case&quot; </span>=&gt; CaseStyle::KebabCase,
-            <span class="string">&quot;SCREAMING-KEBAB-CASE&quot; </span>=&gt; CaseStyle::ScreamingKebabCase,
-            <span class="string">&quot;shouty_snake_case&quot; </span>| <span class="string">&quot;shouty_snek_case&quot; </span>| <span class="string">&quot;SCREAMING_SNAKE_CASE&quot; </span>=&gt; {
+            <span class="string">"camel_case" </span>| <span class="string">"PascalCase" </span>=&gt; CaseStyle::PascalCase,
+            <span class="string">"camelCase" </span>=&gt; CaseStyle::CamelCase,
+            <span class="string">"snake_case" </span>| <span class="string">"snek_case" </span>=&gt; CaseStyle::SnakeCase,
+            <span class="string">"kebab_case" </span>| <span class="string">"kebab-case" </span>=&gt; CaseStyle::KebabCase,
+            <span class="string">"SCREAMING-KEBAB-CASE" </span>=&gt; CaseStyle::ScreamingKebabCase,
+            <span class="string">"shouty_snake_case" </span>| <span class="string">"shouty_snek_case" </span>| <span class="string">"SCREAMING_SNAKE_CASE" </span>=&gt; {
                 CaseStyle::ShoutySnakeCase
             }
-            <span class="string">&quot;title_case&quot; </span>=&gt; CaseStyle::TitleCase,
-            <span class="string">&quot;mixed_case&quot; </span>=&gt; CaseStyle::MixedCase,
-            <span class="string">&quot;lowercase&quot; </span>=&gt; CaseStyle::LowerCase,
-            <span class="string">&quot;UPPERCASE&quot; </span>=&gt; CaseStyle::UpperCase,
+            <span class="string">"title_case" </span>=&gt; CaseStyle::TitleCase,
+            <span class="string">"mixed_case" </span>=&gt; CaseStyle::MixedCase,
+            <span class="string">"lowercase" </span>=&gt; CaseStyle::LowerCase,
+            <span class="string">"UPPERCASE" </span>=&gt; CaseStyle::UpperCase,
             <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(()),
         })
     }
@@ -228,8 +229,8 @@
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_convert_case() {
-    <span class="kw">let </span>id = Ident::new(<span class="string">&quot;test_me&quot;</span>, proc_macro2::Span::call_site());
-    <span class="macro">assert_eq!</span>(<span class="string">&quot;testMe&quot;</span>, id.convert_case(<span class="prelude-val">Some</span>(CaseStyle::CamelCase)));
-    <span class="macro">assert_eq!</span>(<span class="string">&quot;TestMe&quot;</span>, id.convert_case(<span class="prelude-val">Some</span>(CaseStyle::PascalCase)));
+    <span class="kw">let </span>id = Ident::new(<span class="string">"test_me"</span>, proc_macro2::Span::call_site());
+    <span class="macro">assert_eq!</span>(<span class="string">"testMe"</span>, id.convert_case(<span class="prelude-val">Some</span>(CaseStyle::CamelCase)));
+    <span class="macro">assert_eq!</span>(<span class="string">"TestMe"</span>, id.convert_case(<span class="prelude-val">Some</span>(CaseStyle::PascalCase)));
 }
 </code></pre></div></section></main></body></html>

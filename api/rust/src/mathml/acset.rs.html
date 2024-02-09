@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `mathml/src/acset.rs`."><title>acset.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="mathml" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `mathml/src/acset.rs`."><title>acset.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="mathml" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -909,16 +910,16 @@
 </span><span class="kw">pub struct </span>PetriNet {
     <span class="kw">pub </span>header: Header,
     <span class="kw">pub </span>model: ModelPetriNet,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>semantics: <span class="prelude-ty">Option</span>&lt;Semantics&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>metadata: <span class="prelude-ty">Option</span>&lt;Metadata&gt;,
 }
 <span class="attr">#[derive(Debug, PartialEq, Eq, Clone, Serialize, Deserialize, ToSchema)]
 </span><span class="kw">pub struct </span>RegNet {
     <span class="kw">pub </span>header: Header,
     <span class="kw">pub </span>model: ModelRegNet,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>metadata: <span class="prelude-ty">Option</span>&lt;Metadata&gt;,
 }
 
@@ -937,7 +938,7 @@
     <span class="kw">pub </span>edges: BTreeSet&lt;RegTransition&gt;,
     <span class="doccomment">/// Note: parameters is a required field in the schema, but we make it optional since we want
     /// to reuse this schema for partial extractions as well.
-    </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>parameters: <span class="prelude-ty">Option</span>&lt;Vec&lt;Parameter&gt;&gt;,
 }
 <span class="attr">#[derive(Debug, PartialEq, Eq, Clone, Serialize, Deserialize, ToSchema)]
@@ -946,7 +947,7 @@
     <span class="kw">pub </span>transitions: BTreeSet&lt;Transition&gt;,
     <span class="doccomment">/// Note: parameters is a required field in the schema, but we make it optional since we want
     /// to reuse this schema for partial extractions as well.
-    </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>metadata: <span class="prelude-ty">Option</span>&lt;Metadata&gt;,
 }
 
@@ -968,15 +969,15 @@
     Debug, Default, PartialEq, Eq, Clone, PartialOrd, Ord, Serialize, Deserialize, ToSchema,
 )]
 </span><span class="kw">pub struct </span>Ode {
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>rates: <span class="prelude-ty">Option</span>&lt;Vec&lt;Rate&gt;&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>initials: <span class="prelude-ty">Option</span>&lt;Vec&lt;Initial&gt;&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>parameters: <span class="prelude-ty">Option</span>&lt;Vec&lt;Parameter&gt;&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>observables: <span class="prelude-ty">Option</span>&lt;Vec&lt;Observable&gt;&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>time: <span class="prelude-ty">Option</span>&lt;Time&gt;,
 }
 
@@ -985,13 +986,13 @@
 )]
 </span><span class="kw">pub struct </span>Observable {
     id: String,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span>name: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span>states: <span class="prelude-ty">Option</span>&lt;Vec&lt;String&gt;&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span>expression: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span>expression_mathml: <span class="prelude-ty">Option</span>&lt;String&gt;,
 }
 
@@ -1001,13 +1002,13 @@
 </span><span class="kw">pub struct </span>RegState {
     <span class="kw">pub </span>id: String,
     <span class="kw">pub </span>name: String,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>grounding: <span class="prelude-ty">Option</span>&lt;Grounding&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>initial: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>rate_constant: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>sign: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 }
 
@@ -1017,9 +1018,9 @@
 </span><span class="kw">pub struct </span>State {
     <span class="kw">pub </span>id: String,
     <span class="kw">pub </span>name: String,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>grounding: <span class="prelude-ty">Option</span>&lt;Grounding&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>units: <span class="prelude-ty">Option</span>&lt;Units&gt;,
 }
 
@@ -1071,21 +1072,21 @@
 
     <span class="doccomment">/// Note: source is a required field in the schema, but we make it optional since we want to
     /// reuse this schema for partial extractions as well.
-    </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>source: <span class="prelude-ty">Option</span>&lt;Vec&lt;String&gt;&gt;,
 
     <span class="doccomment">/// Note: target is a required field in the schema, but we make it optional since we want to
     /// reuse this schema for partial extractions as well.
-    </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>target: <span class="prelude-ty">Option</span>&lt;Vec&lt;String&gt;&gt;,
 
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>sign: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>grounding: <span class="prelude-ty">Option</span>&lt;Grounding&gt;,
 
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>properties: <span class="prelude-ty">Option</span>&lt;Properties&gt;,
 }
 
@@ -1097,21 +1098,21 @@
 
     <span class="doccomment">/// Note: input is a required field in the schema, but we make it optional since we want to
     /// reuse this schema for partial extractions as well.
-    </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>input: <span class="prelude-ty">Option</span>&lt;Vec&lt;String&gt;&gt;,
 
     <span class="doccomment">/// Note: output is a required field in the schema, but we make it optional since we want to
     /// reuse this schema for partial extractions as well.
-    </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>output: <span class="prelude-ty">Option</span>&lt;Vec&lt;String&gt;&gt;,
 
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>sign: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>grounding: <span class="prelude-ty">Option</span>&lt;Grounding&gt;,
 
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>properties: <span class="prelude-ty">Option</span>&lt;Properties&gt;,
 }
 
@@ -1120,7 +1121,7 @@
 )]
 </span><span class="kw">pub struct </span>Properties {
     <span class="kw">pub </span>name: String,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>rate_constant: <span class="prelude-ty">Option</span>&lt;String&gt;,
 }
 
@@ -1129,17 +1130,17 @@
 )]
 </span><span class="kw">pub struct </span>Parameter {
     <span class="kw">pub </span>id: String,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>name: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>description: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>value: <span class="prelude-ty">Option</span>&lt;i64&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>grounding: <span class="prelude-ty">Option</span>&lt;Grounding&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>distribution: <span class="prelude-ty">Option</span>&lt;Distribution&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>units: <span class="prelude-ty">Option</span>&lt;Units&gt;,
 }
 
@@ -1148,7 +1149,7 @@
 )]
 </span><span class="kw">pub struct </span>Time {
     id: String,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span>units: <span class="prelude-ty">Option</span>&lt;Units&gt;,
 }
 
@@ -1156,7 +1157,7 @@
     Debug, Default, PartialEq, Eq, Clone, PartialOrd, Ord, Serialize, Deserialize, ToSchema,
 )]
 </span><span class="kw">pub struct </span>Distribution {
-    <span class="attr">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
+    <span class="attr">#[serde(rename = <span class="string">"type"</span>)]
     </span><span class="kw">pub </span>r#type: String,
     <span class="kw">pub </span>parameters: String,
 }
@@ -1194,14 +1195,14 @@
             };
             <span class="kw">let </span>initials = Initial {
                 target: ode.lhs_var.to_string().clone(),
-                expression: <span class="string">&quot;&quot;</span>.to_string(),
+                expression: <span class="string">""</span>.to_string(),
                 ..Default::default()
             };
             <span class="comment">/*let parameters = Parameter {
                 id: initials.expression.clone(),
                 name: Some(initials.expression.clone()),
                 description: Some(format!(
-                    &quot;The total {} population at timestep 0&quot;,
+                    "The total {} population at timestep 0",
                     ode.lhs_var.to_string().clone()
                 )),
                 ..Default::default()
@@ -1230,7 +1231,7 @@
                 <span class="kw">let </span>parameters = Parameter {
                     id: param.clone(),
                     name: <span class="prelude-val">Some</span>(param.clone()),
-                    <span class="comment">//description: Some(format!(&quot;{} rate&quot;, param.clone())),
+                    <span class="comment">//description: Some(format!("{} rate", param.clone())),
                     </span>..Default::default()
                 };
                 parameter_vec.push(parameters.clone());
@@ -1332,26 +1333,26 @@
             <span class="kw">if </span>t.<span class="number">0</span>.exp_states.len() == <span class="number">1 </span>{
                 <span class="comment">// construct transtions for simple transtions
                 </span><span class="kw">let </span>transitions = Transition {
-                    id: <span class="macro">format!</span>(<span class="string">&quot;t{}&quot;</span>, i.clone()),
+                    id: <span class="macro">format!</span>(<span class="string">"t{}"</span>, i.clone()),
                     input: <span class="prelude-val">Some</span>([t.<span class="number">1</span>.dyn_state.clone()].to_vec()),
                     output: <span class="prelude-val">Some</span>([t.<span class="number">0</span>.dyn_state.clone()].to_vec()),
                     ..Default::default()
                 };
                 transitions_vec.insert(transitions.clone());
 
-                <span class="kw">let </span><span class="kw-2">mut </span>expression_string = <span class="string">&quot;&quot;</span>.to_string();
+                <span class="kw">let </span><span class="kw-2">mut </span>expression_string = <span class="string">""</span>.to_string();
 
                 <span class="kw">for </span>param <span class="kw">in </span>t.<span class="number">0</span>.parameters.clone().iter() {
-                    expression_string = <span class="macro">format!</span>(<span class="string">&quot;{}{}*&quot;</span>, expression_string.clone(), param.clone());
+                    expression_string = <span class="macro">format!</span>(<span class="string">"{}{}*"</span>, expression_string.clone(), param.clone());
                 }
 
                 <span class="kw">let </span>exp_len = t.<span class="number">0</span>.exp_states.len();
                 <span class="kw">for </span>(i, exp) <span class="kw">in </span>t.<span class="number">0</span>.exp_states.clone().iter().enumerate() {
                     <span class="kw">if </span>i != exp_len - <span class="number">1 </span>{
                         expression_string =
-                            <span class="macro">format!</span>(<span class="string">&quot;{}{}*&quot;</span>, expression_string.clone(), exp.clone());
+                            <span class="macro">format!</span>(<span class="string">"{}{}*"</span>, expression_string.clone(), exp.clone());
                     } <span class="kw">else </span>{
-                        expression_string = <span class="macro">format!</span>(<span class="string">&quot;{}{}&quot;</span>, expression_string.clone(), exp.clone());
+                        expression_string = <span class="macro">format!</span>(<span class="string">"{}{}"</span>, expression_string.clone(), exp.clone());
                     }
                 }
 
@@ -1373,26 +1374,26 @@
                 }
 
                 <span class="kw">let </span>transitions = Transition {
-                    id: <span class="macro">format!</span>(<span class="string">&quot;t{}&quot;</span>, i.clone()),
+                    id: <span class="macro">format!</span>(<span class="string">"t{}"</span>, i.clone()),
                     input: <span class="prelude-val">Some</span>(t.<span class="number">1</span>.exp_states.clone()),
                     output: <span class="prelude-val">Some</span>(output.clone()),
                     ..Default::default()
                 };
                 transitions_vec.insert(transitions.clone());
 
-                <span class="kw">let </span><span class="kw-2">mut </span>expression_string = <span class="string">&quot;&quot;</span>.to_string();
+                <span class="kw">let </span><span class="kw-2">mut </span>expression_string = <span class="string">""</span>.to_string();
 
                 <span class="kw">for </span>param <span class="kw">in </span>t.<span class="number">0</span>.parameters.clone().iter() {
-                    expression_string = <span class="macro">format!</span>(<span class="string">&quot;{}{}*&quot;</span>, expression_string.clone(), param.clone());
+                    expression_string = <span class="macro">format!</span>(<span class="string">"{}{}*"</span>, expression_string.clone(), param.clone());
                 }
 
                 <span class="kw">let </span>exp_len = t.<span class="number">0</span>.exp_states.len() - <span class="number">1</span>;
                 <span class="kw">for </span>(i, exp) <span class="kw">in </span>t.<span class="number">0</span>.exp_states.clone().iter().enumerate() {
                     <span class="kw">if </span>i != exp_len {
                         expression_string =
-                            <span class="macro">format!</span>(<span class="string">&quot;{}{}*&quot;</span>, expression_string.clone(), exp.clone());
+                            <span class="macro">format!</span>(<span class="string">"{}{}*"</span>, expression_string.clone(), exp.clone());
                     } <span class="kw">else </span>{
-                        expression_string = <span class="macro">format!</span>(<span class="string">&quot;{}{}&quot;</span>, expression_string.clone(), exp.clone());
+                        expression_string = <span class="macro">format!</span>(<span class="string">"{}{}"</span>, expression_string.clone(), exp.clone());
                     }
                 }
 
@@ -1418,31 +1419,31 @@
                     }
 
                     <span class="kw">let </span>transitions = Transition {
-                        id: <span class="macro">format!</span>(<span class="string">&quot;s{}&quot;</span>, i),
+                        id: <span class="macro">format!</span>(<span class="string">"s{}"</span>, i),
                         input: <span class="prelude-val">Some</span>(input.clone()),
                         output: <span class="prelude-val">Some</span>(output.clone()),
                         ..Default::default()
                     };
                     transitions_vec.insert(transitions.clone());
 
-                    <span class="kw">let </span><span class="kw-2">mut </span>expression_string = <span class="string">&quot;&quot;</span>.to_string();
+                    <span class="kw">let </span><span class="kw-2">mut </span>expression_string = <span class="string">""</span>.to_string();
 
                     <span class="kw">if </span>!term.exp_states.is_empty() {
                         <span class="kw">let </span>exp_len = term.exp_states.len() - <span class="number">1</span>;
                         <span class="kw">for </span>(i, exp) <span class="kw">in </span>term.exp_states.clone().iter().enumerate() {
                             <span class="kw">if </span>i != exp_len {
                                 expression_string =
-                                    <span class="macro">format!</span>(<span class="string">&quot;{}{}*&quot;</span>, expression_string.clone(), exp.clone());
+                                    <span class="macro">format!</span>(<span class="string">"{}{}*"</span>, expression_string.clone(), exp.clone());
                             } <span class="kw">else </span>{
                                 expression_string =
-                                    <span class="macro">format!</span>(<span class="string">&quot;{}{}&quot;</span>, expression_string.clone(), exp.clone());
+                                    <span class="macro">format!</span>(<span class="string">"{}{}"</span>, expression_string.clone(), exp.clone());
                             }
                         }
                     }
 
                     <span class="kw">for </span>param <span class="kw">in </span>term.parameters.clone().iter() {
                         expression_string =
-                            <span class="macro">format!</span>(<span class="string">&quot;{}{}&quot;</span>, expression_string.clone(), param.clone());
+                            <span class="macro">format!</span>(<span class="string">"{}{}"</span>, expression_string.clone(), param.clone());
                     }
 
                     <span class="kw">let </span>rate = Rate {
@@ -1459,31 +1460,31 @@
                     }
 
                     <span class="kw">let </span>transitions = Transition {
-                        id: <span class="macro">format!</span>(<span class="string">&quot;s{}&quot;</span>, i),
+                        id: <span class="macro">format!</span>(<span class="string">"s{}"</span>, i),
                         input: <span class="prelude-val">Some</span>(input.clone()),
                         output: <span class="prelude-val">None</span>,
                         ..Default::default()
                     };
                     transitions_vec.insert(transitions.clone());
 
-                    <span class="kw">let </span><span class="kw-2">mut </span>expression_string = <span class="string">&quot;&quot;</span>.to_string();
+                    <span class="kw">let </span><span class="kw-2">mut </span>expression_string = <span class="string">""</span>.to_string();
 
                     <span class="kw">if </span>!term.exp_states.is_empty() {
                         <span class="kw">let </span>exp_len = term.exp_states.len() - <span class="number">1</span>;
                         <span class="kw">for </span>(i, exp) <span class="kw">in </span>term.exp_states.clone().iter().enumerate() {
                             <span class="kw">if </span>i != exp_len {
                                 expression_string =
-                                    <span class="macro">format!</span>(<span class="string">&quot;{}{}*&quot;</span>, expression_string.clone(), exp.clone());
+                                    <span class="macro">format!</span>(<span class="string">"{}{}*"</span>, expression_string.clone(), exp.clone());
                             } <span class="kw">else </span>{
                                 expression_string =
-                                    <span class="macro">format!</span>(<span class="string">&quot;{}{}&quot;</span>, expression_string.clone(), exp.clone());
+                                    <span class="macro">format!</span>(<span class="string">"{}{}"</span>, expression_string.clone(), exp.clone());
                             }
                         }
                     }
 
                     <span class="kw">for </span>param <span class="kw">in </span>term.parameters.clone().iter() {
                         expression_string =
-                            <span class="macro">format!</span>(<span class="string">&quot;{}{}&quot;</span>, expression_string.clone(), param.clone());
+                            <span class="macro">format!</span>(<span class="string">"{}{}"</span>, expression_string.clone(), param.clone());
                     }
 
                     <span class="kw">let </span>rate = Rate {
@@ -1518,11 +1519,11 @@
         };
 
         <span class="kw">let </span>header = Header {
-            name: <span class="string">&quot;mathml model&quot;</span>.to_string(),
-            schema: <span class="string">&quot;https://github.com/DARPA-ASKEM/Model-Representations/blob/main/petrinet/petrinet_schema.json&quot;</span>.to_string(),
-            schema_name: <span class="string">&quot;PetriNet&quot;</span>.to_string(),
-            description: <span class="string">&quot;This is a model from equations&quot;</span>.to_string(),
-            model_version: <span class="string">&quot;0.1&quot;</span>.to_string(),
+            name: <span class="string">"mathml model"</span>.to_string(),
+            schema: <span class="string">"https://github.com/DARPA-ASKEM/Model-Representations/blob/main/petrinet/petrinet_schema.json"</span>.to_string(),
+            schema_name: <span class="string">"PetriNet"</span>.to_string(),
+            description: <span class="string">"This is a model from equations"</span>.to_string(),
+            model_version: <span class="string">"0.1"</span>.to_string(),
         };
 
         PetriNet {
@@ -1563,7 +1564,7 @@
                 id: state.clone(),
                 name: state.clone(),
                 grounding: <span class="prelude-val">None</span>,
-                initial: <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;{}0&quot;</span>, state)),
+                initial: <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">"{}0"</span>, state)),
                 rate_constant: <span class="prelude-val">None</span>,
                 sign: <span class="prelude-val">None</span>,
             };
@@ -1581,7 +1582,7 @@
                         rate_constant: <span class="prelude-val">None</span>,
                     };
                     <span class="kw">let </span>self_trans = RegTransition {
-                        id: <span class="macro">format!</span>(<span class="string">&quot;s{}&quot;</span>, counter.clone()),
+                        id: <span class="macro">format!</span>(<span class="string">"s{}"</span>, counter.clone()),
                         source: <span class="prelude-val">Some</span>([term.dyn_state.clone()].to_vec()),
                         target: <span class="prelude-val">Some</span>([term.dyn_state.clone()].to_vec()),
                         sign: <span class="prelude-val">Some</span>(term.polarity),
@@ -1597,7 +1598,7 @@
                 id: state.clone(),
                 name: <span class="prelude-val">Some</span>(state.clone()),
                 description: <span class="prelude-val">Some</span>(<span class="macro">format!</span>(
-                    <span class="string">&quot;The total {} population at timestep 0&quot;</span>,
+                    <span class="string">"The total {} population at timestep 0"</span>,
                     state.clone()
                 )),
                 ..Default::default()
@@ -1631,7 +1632,7 @@
                     rate_constant: <span class="prelude-val">None</span>,
                 };
                 <span class="kw">let </span>trans = RegTransition {
-                    id: <span class="macro">format!</span>(<span class="string">&quot;t{}&quot;</span>, i.clone()),
+                    id: <span class="macro">format!</span>(<span class="string">"t{}"</span>, i.clone()),
                     source: <span class="prelude-val">Some</span>([t.<span class="number">1</span>.dyn_state.clone()].to_vec()),
                     target: <span class="prelude-val">Some</span>([t.<span class="number">0</span>.dyn_state.clone()].to_vec()),
                     sign: <span class="prelude-val">Some</span>(<span class="bool-val">true</span>),
@@ -1652,7 +1653,7 @@
                 }
 
                 <span class="kw">let </span>_transitions = Transition {
-                    id: <span class="macro">format!</span>(<span class="string">&quot;t{}&quot;</span>, i.clone()),
+                    id: <span class="macro">format!</span>(<span class="string">"t{}"</span>, i.clone()),
                     input: <span class="prelude-val">Some</span>(t.<span class="number">1</span>.exp_states.clone()),
                     output: <span class="prelude-val">Some</span>(output.clone()),
                     ..Default::default()
@@ -1663,7 +1664,7 @@
                     rate_constant: <span class="prelude-val">None</span>,
                 };
                 <span class="kw">let </span>trans = RegTransition {
-                    id: <span class="macro">format!</span>(<span class="string">&quot;t{}&quot;</span>, i.clone()),
+                    id: <span class="macro">format!</span>(<span class="string">"t{}"</span>, i.clone()),
                     source: <span class="prelude-val">Some</span>(t.<span class="number">1</span>.exp_states.clone()),
                     target: <span class="prelude-val">Some</span>(output.clone()),
                     sign: <span class="prelude-val">Some</span>(<span class="bool-val">true</span>),
@@ -1681,7 +1682,7 @@
                 <span class="kw">let </span>parameters = Parameter {
                     id: param.clone(),
                     name: <span class="prelude-val">Some</span>(param.clone()),
-                    description: <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;{} rate&quot;</span>, param.clone())),
+                    description: <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">"{} rate"</span>, param.clone())),
                     ..Default::default()
                 };
                 parameter_vec.push(parameters.clone());
@@ -1700,11 +1701,11 @@
         };
 
         <span class="kw">let </span>header = Header {
-            name: <span class="string">&quot;Regnet mathml model&quot;</span>.to_string(),
-            schema: <span class="string">&quot;https://raw.githubusercontent.com/DARPA-ASKEM/Model-Representations/regnet_v0.1/regnet/regnet_schema.json&quot;</span>.to_string(),
-            schema_name: <span class="string">&quot;regnet&quot;</span>.to_string(),
-            description: <span class="string">&quot;This is a Regnet model from mathml equations&quot;</span>.to_string(),
-            model_version: <span class="string">&quot;0.1&quot;</span>.to_string(),
+            name: <span class="string">"Regnet mathml model"</span>.to_string(),
+            schema: <span class="string">"https://raw.githubusercontent.com/DARPA-ASKEM/Model-Representations/regnet_v0.1/regnet/regnet_schema.json"</span>.to_string(),
+            schema_name: <span class="string">"regnet"</span>.to_string(),
+            description: <span class="string">"This is a Regnet model from mathml equations"</span>.to_string(),
+            model_version: <span class="string">"0.1"</span>.to_string(),
         };
 
         RegNet {

@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/utoipa-3.5.0/src/openapi/path.rs`."><title>path.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="utoipa" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/utoipa-3.5.0/src/openapi/path.rs`."><title>path.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="utoipa" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -771,9 +772,9 @@
     set_value, Deprecated, ExternalDocs, RefOr, Required, Schema, SecurityRequirement, Server,
 };
 
-<span class="attr">#[cfg(not(feature = <span class="string">&quot;preserve_path_order&quot;</span>))]
+<span class="attr">#[cfg(not(feature = <span class="string">"preserve_path_order"</span>))]
 </span><span class="kw">type </span>PathsMap&lt;K, V&gt; = std::collections::BTreeMap&lt;K, V&gt;;
-<span class="attr">#[cfg(feature = <span class="string">&quot;preserve_path_order&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"preserve_path_order"</span>)]
 </span><span class="kw">type </span>PathsMap&lt;K, V&gt; = indexmap::IndexMap&lt;K, V&gt;;
 
 <span class="macro">builder! </span>{
@@ -787,7 +788,7 @@
     /// [paths]: https://spec.openapis.org/oas/latest.html#paths-object
     </span><span class="attr">#[non_exhaustive]
     #[derive(Serialize, Deserialize, Default, Clone, PartialEq)]
-    #[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
+    #[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
     </span><span class="kw">pub struct </span>Paths {
         <span class="doccomment">/// Map of relative paths with [`PathItem`]s holding [`Operation`]s matching
         /// api endpoints.
@@ -810,7 +811,7 @@
     /// ```rust
     /// # use utoipa::openapi::path::{Paths, PathItemType};
     /// # let paths = Paths::new();
-    /// let path_item = paths.get_path_item(&quot;/api/v1/user&quot;);
+    /// let path_item = paths.get_path_item("/api/v1/user");
     /// ```
     </span><span class="kw">pub fn </span>get_path_item&lt;P: AsRef&lt;str&gt;&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, path: P) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>PathItem&gt; {
         <span class="self">self</span>.paths.get(path.as_ref())
@@ -818,8 +819,8 @@
 
     <span class="doccomment">/// Return _`Option`_ of reference to [`Operation`] from map of paths or `None` if not found.
     ///
-    /// * First will try to find [`PathItem`] by given relative path _`P`_ e.g. `&quot;/api/v1/user&quot;`.
-    /// * Then tries to find [`Operation`] from [`PathItem`]&#39;s operations by given [`PathItemType`].
+    /// * First will try to find [`PathItem`] by given relative path _`P`_ e.g. `"/api/v1/user"`.
+    /// * Then tries to find [`Operation`] from [`PathItem`]'s operations by given [`PathItemType`].
     ///
     /// # Examples
     ///
@@ -827,7 +828,7 @@
     /// ```rust
     /// # use utoipa::openapi::path::{Paths, PathItemType};
     /// # let paths = Paths::new();
-    /// let operation = paths.get_path_operation(&quot;/api/v1/user&quot;, PathItemType::Get);
+    /// let operation = paths.get_path_operation("/api/v1/user", PathItemType::Get);
     /// ```
     </span><span class="kw">pub fn </span>get_path_operation&lt;P: AsRef&lt;str&gt;&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -866,27 +867,27 @@
     /// [path_item]: https://spec.openapis.org/oas/latest.html#path-item-object
     </span><span class="attr">#[non_exhaustive]
     #[derive(Serialize, Deserialize, Default, Clone, PartialEq)]
-    #[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
-    #[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+    #[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
+    #[serde(rename_all = <span class="string">"camelCase"</span>)]
     </span><span class="kw">pub struct </span>PathItem {
         <span class="doccomment">/// Optional summary intended to apply all operations in this [`PathItem`].
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
         </span><span class="kw">pub </span>summary: <span class="prelude-ty">Option</span>&lt;String&gt;,
 
         <span class="doccomment">/// Optional description intended to apply all operations in this [`PathItem`].
         /// Description supports markdown syntax.
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
         </span><span class="kw">pub </span>description: <span class="prelude-ty">Option</span>&lt;String&gt;,
 
         <span class="doccomment">/// Alternative [`Server`] array to serve all [`Operation`]s in this [`PathItem`] overriding
         /// the global server array.
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
         </span><span class="kw">pub </span>servers: <span class="prelude-ty">Option</span>&lt;Vec&lt;Server&gt;&gt;,
 
         <span class="doccomment">/// List of [`Parameter`]s common to all [`Operation`]s in this [`PathItem`]. Parameters cannot
         /// contain duplicate parameters. They can be overridden in [`Operation`] level but cannot be
         /// removed there.
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
         </span><span class="kw">pub </span>parameters: <span class="prelude-ty">Option</span>&lt;Vec&lt;Parameter&gt;&gt;,
 
         <span class="doccomment">/// Map of operations in this [`PathItem`]. Operations can hold only one operation
@@ -946,8 +947,8 @@
 
 <span class="doccomment">/// Path item operation type.
 </span><span class="attr">#[derive(Serialize, Deserialize, PartialEq, Eq, Hash, PartialOrd, Ord, Clone)]
-#[serde(rename_all = <span class="string">&quot;lowercase&quot;</span>)]
-#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
+#[serde(rename_all = <span class="string">"lowercase"</span>)]
+#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
 </span><span class="kw">pub enum </span>PathItemType {
     <span class="doccomment">/// Type mapping for HTTP _GET_ request.
     </span>Get,
@@ -977,8 +978,8 @@
     /// [operation]: https://spec.openapis.org/oas/latest.html#operation-object
     </span><span class="attr">#[non_exhaustive]
     #[derive(Serialize, Deserialize, Default, Clone, PartialEq)]
-    #[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
-    #[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+    #[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
+    #[serde(rename_all = <span class="string">"camelCase"</span>)]
     </span><span class="kw">pub struct </span>Operation {
         <span class="doccomment">/// List of tags used for grouping operations.
         ///
@@ -989,7 +990,7 @@
         ///
         /// [derive_path]: ../../attr.path.html
         /// [derive_openapi]: ../../derive.OpenApi.html
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
         </span><span class="kw">pub </span>tags: <span class="prelude-ty">Option</span>&lt;Vec&lt;String&gt;&gt;,
 
         <span class="doccomment">/// Short summary what [`Operation`] does.
@@ -998,7 +999,7 @@
         /// is taken from **first line** of doc comment.
         ///
         /// [derive_path]: ../../attr.path.html
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
         </span><span class="kw">pub </span>summary: <span class="prelude-ty">Option</span>&lt;String&gt;,
 
         <span class="doccomment">/// Long explanation of [`Operation`] behaviour. Markdown syntax is supported.
@@ -1007,7 +1008,7 @@
         /// doc comment is used as value for description.
         ///
         /// [derive_path]: ../../attr.path.html
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
         </span><span class="kw">pub </span>description: <span class="prelude-ty">Option</span>&lt;String&gt;,
 
         <span class="doccomment">/// Unique identifier for the API [`Operation`]. Most typically this is mapped to handler function name.
@@ -1016,30 +1017,30 @@
         /// name will be used by default.
         ///
         /// [derive_path]: ../../attr.path.html
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
         </span><span class="kw">pub </span>operation_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
 
         <span class="doccomment">/// Additional external documentation for this operation.
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
         </span><span class="kw">pub </span>external_docs: <span class="prelude-ty">Option</span>&lt;ExternalDocs&gt;,
 
         <span class="doccomment">/// List of applicable parameters for this [`Operation`].
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
         </span><span class="kw">pub </span>parameters: <span class="prelude-ty">Option</span>&lt;Vec&lt;Parameter&gt;&gt;,
 
         <span class="doccomment">/// Optional request body for this [`Operation`].
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
         </span><span class="kw">pub </span>request_body: <span class="prelude-ty">Option</span>&lt;RequestBody&gt;,
 
         <span class="doccomment">/// List of possible responses returned by the [`Operation`].
         </span><span class="kw">pub </span>responses: Responses,
 
         <span class="comment">// TODO
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
         </span><span class="kw">pub </span>callbacks: <span class="prelude-ty">Option</span>&lt;String&gt;,
 
         <span class="doccomment">/// Define whether the operation is deprecated or not and thus should be avoided consuming.
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
         </span><span class="kw">pub </span>deprecated: <span class="prelude-ty">Option</span>&lt;Deprecated&gt;,
 
         <span class="doccomment">/// Declaration which security mechanisms can be used for for the operation. Only one
@@ -1047,11 +1048,11 @@
         ///
         /// Security for the [`Operation`] can be set to optional by adding empty security with
         /// [`SecurityRequirement::default`].
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
         </span><span class="kw">pub </span>security: <span class="prelude-ty">Option</span>&lt;Vec&lt;SecurityRequirement&gt;&gt;,
 
         <span class="doccomment">/// Alternative [`Server`]s for this [`Operation`].
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
         </span><span class="kw">pub </span>servers: <span class="prelude-ty">Option</span>&lt;Vec&lt;Server&gt;&gt;,
     }
 }
@@ -1204,8 +1205,8 @@
     /// [parameter]: https://spec.openapis.org/oas/latest.html#parameter-object
     </span><span class="attr">#[non_exhaustive]
     #[derive(Serialize, Deserialize, Default, Clone, PartialEq)]
-    #[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
-    #[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+    #[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
+    #[serde(rename_all = <span class="string">"camelCase"</span>)]
     </span><span class="kw">pub struct </span>Parameter {
         <span class="doccomment">/// Name of the parameter.
         ///
@@ -1214,11 +1215,11 @@
         </span><span class="kw">pub </span>name: String,
 
         <span class="doccomment">/// Parameter location.
-        </span><span class="attr">#[serde(rename = <span class="string">&quot;in&quot;</span>)]
+        </span><span class="attr">#[serde(rename = <span class="string">"in"</span>)]
         </span><span class="kw">pub </span>parameter_in: ParameterIn,
 
         <span class="doccomment">/// Markdown supported description of the parameter.
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
         </span><span class="kw">pub </span>description: <span class="prelude-ty">Option</span>&lt;String&gt;,
 
         <span class="doccomment">/// Declares whether the parameter is required or not for api.
@@ -1227,16 +1228,16 @@
         </span><span class="kw">pub </span>required: Required,
 
         <span class="doccomment">/// Declares the parameter deprecated status.
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
         </span><span class="kw">pub </span>deprecated: <span class="prelude-ty">Option</span>&lt;Deprecated&gt;,
         <span class="comment">// pub allow_empty_value: bool, this is going to be removed from further open api spec releases
         </span><span class="doccomment">/// Schema of the parameter. Typically [`Schema::Object`] is used.
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
         </span><span class="kw">pub </span>schema: <span class="prelude-ty">Option</span>&lt;RefOr&lt;Schema&gt;&gt;,
 
         <span class="doccomment">/// Describes how [`Parameter`] is being serialized depending on [`Parameter::schema`] (type of a content).
         /// Default value is based on [`ParameterIn`].
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
         </span><span class="kw">pub </span>style: <span class="prelude-ty">Option</span>&lt;ParameterStyle&gt;,
 
         <span class="doccomment">/// When _`true`_ it will generate separate parameter value for each parameter with _`array`_ and _`object`_ type.
@@ -1251,18 +1252,18 @@
         /// ```text
         ///color=blue&amp;color=black&amp;color=brown
         /// ```
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
         </span><span class="kw">pub </span>explode: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 
         <span class="doccomment">/// Defines whether parameter should allow reserved characters defined by
-        /// [RFC3986](https://tools.ietf.org/html/rfc3986#section-2.2) _`:/?#[]@!$&amp;&#39;()*+,;=`_.
+        /// [RFC3986](https://tools.ietf.org/html/rfc3986#section-2.2) _`:/?#[]@!$&amp;'()*+,;=`_.
         /// This is only applicable with [`ParameterIn::Query`]. Default value is _`false`_.
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
         </span><span class="kw">pub </span>allow_reserved: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 
-        <span class="doccomment">/// Example of [`Parameter`]&#39;s potential value. This examples will override example
+        <span class="doccomment">/// Example of [`Parameter`]'s potential value. This examples will override example
         /// within [`Parameter::schema`] if defined.
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
         </span>example: <span class="prelude-ty">Option</span>&lt;Value&gt;,
     }
 }
@@ -1331,7 +1332,7 @@
         <span class="macro">set_value!</span>(<span class="self">self </span>allow_reserved allow_reserved)
     }
 
-    <span class="doccomment">/// Add or change example of [`Parameter`]&#39;s potential value.
+    <span class="doccomment">/// Add or change example of [`Parameter`]'s potential value.
     </span><span class="kw">pub fn </span>example(<span class="kw-2">mut </span><span class="self">self</span>, example: <span class="prelude-ty">Option</span>&lt;Value&gt;) -&gt; <span class="self">Self </span>{
         <span class="macro">set_value!</span>(<span class="self">self </span>example example)
     }
@@ -1339,8 +1340,8 @@
 
 <span class="doccomment">/// In definition of [`Parameter`].
 </span><span class="attr">#[derive(Serialize, Deserialize, PartialEq, Eq, Clone)]
-#[serde(rename_all = <span class="string">&quot;lowercase&quot;</span>)]
-#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
+#[serde(rename_all = <span class="string">"lowercase"</span>)]
+#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
 </span><span class="kw">pub enum </span>ParameterIn {
     <span class="doccomment">/// Declares that parameter is used as query parameter.
     </span>Query,
@@ -1360,8 +1361,8 @@
 
 <span class="doccomment">/// Defines how [`Parameter`] should be serialized.
 </span><span class="attr">#[derive(Serialize, Deserialize, Clone, PartialEq, Eq)]
-#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
-#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
+#[serde(rename_all = <span class="string">"camelCase"</span>)]
 </span><span class="kw">pub enum </span>ParameterStyle {
     <span class="doccomment">/// Path style parameters defined by [RFC6570](https://tools.ietf.org/html/rfc6570#section-3.2.7)
     /// e.g _`;color=blue`_.
@@ -1400,27 +1401,27 @@
     </span><span class="kw">fn </span>test_path_order() {
         <span class="kw">let </span>paths_list = PathsBuilder::new()
             .path(
-                <span class="string">&quot;/todo&quot;</span>,
+                <span class="string">"/todo"</span>,
                 PathItem::new(PathItemType::Get, OperationBuilder::new()),
             )
             .path(
-                <span class="string">&quot;/todo&quot;</span>,
+                <span class="string">"/todo"</span>,
                 PathItem::new(PathItemType::Post, OperationBuilder::new()),
             )
             .path(
-                <span class="string">&quot;/todo/{id}&quot;</span>,
+                <span class="string">"/todo/{id}"</span>,
                 PathItem::new(PathItemType::Delete, OperationBuilder::new()),
             )
             .path(
-                <span class="string">&quot;/todo/{id}&quot;</span>,
+                <span class="string">"/todo/{id}"</span>,
                 PathItem::new(PathItemType::Get, OperationBuilder::new()),
             )
             .path(
-                <span class="string">&quot;/todo/{id}&quot;</span>,
+                <span class="string">"/todo/{id}"</span>,
                 PathItem::new(PathItemType::Put, OperationBuilder::new()),
             )
             .path(
-                <span class="string">&quot;/todo/search&quot;</span>,
+                <span class="string">"/todo/search"</span>,
                 PathItem::new(PathItemType::Get, OperationBuilder::new()),
             )
             .build();
@@ -1444,28 +1445,28 @@
         <span class="kw">let </span>put = PathItemType::Put;
         <span class="kw">let </span>delete = PathItemType::Delete;
 
-        <span class="attr">#[cfg(not(feature = <span class="string">&quot;preserve_path_order&quot;</span>))]
+        <span class="attr">#[cfg(not(feature = <span class="string">"preserve_path_order"</span>))]
         </span>{
             <span class="kw">let </span>expected_value = <span class="macro">vec!</span>[
-                (<span class="string">&quot;/todo&quot;</span>, <span class="kw-2">&amp;</span>get),
-                (<span class="string">&quot;/todo&quot;</span>, <span class="kw-2">&amp;</span>post),
-                (<span class="string">&quot;/todo/search&quot;</span>, <span class="kw-2">&amp;</span>get),
-                (<span class="string">&quot;/todo/{id}&quot;</span>, <span class="kw-2">&amp;</span>get),
-                (<span class="string">&quot;/todo/{id}&quot;</span>, <span class="kw-2">&amp;</span>put),
-                (<span class="string">&quot;/todo/{id}&quot;</span>, <span class="kw-2">&amp;</span>delete),
+                (<span class="string">"/todo"</span>, <span class="kw-2">&amp;</span>get),
+                (<span class="string">"/todo"</span>, <span class="kw-2">&amp;</span>post),
+                (<span class="string">"/todo/search"</span>, <span class="kw-2">&amp;</span>get),
+                (<span class="string">"/todo/{id}"</span>, <span class="kw-2">&amp;</span>get),
+                (<span class="string">"/todo/{id}"</span>, <span class="kw-2">&amp;</span>put),
+                (<span class="string">"/todo/{id}"</span>, <span class="kw-2">&amp;</span>delete),
             ];
             <span class="macro">assert_eq!</span>(actual_value, expected_value);
         }
 
-        <span class="attr">#[cfg(feature = <span class="string">&quot;preserve_path_order&quot;</span>)]
+        <span class="attr">#[cfg(feature = <span class="string">"preserve_path_order"</span>)]
         </span>{
             <span class="kw">let </span>expected_value = <span class="macro">vec!</span>[
-                (<span class="string">&quot;/todo&quot;</span>, <span class="kw-2">&amp;</span>get),
-                (<span class="string">&quot;/todo&quot;</span>, <span class="kw-2">&amp;</span>post),
-                (<span class="string">&quot;/todo/{id}&quot;</span>, <span class="kw-2">&amp;</span>delete),
-                (<span class="string">&quot;/todo/{id}&quot;</span>, <span class="kw-2">&amp;</span>get),
-                (<span class="string">&quot;/todo/{id}&quot;</span>, <span class="kw-2">&amp;</span>put),
-                (<span class="string">&quot;/todo/search&quot;</span>, <span class="kw-2">&amp;</span>get),
+                (<span class="string">"/todo"</span>, <span class="kw-2">&amp;</span>get),
+                (<span class="string">"/todo"</span>, <span class="kw-2">&amp;</span>post),
+                (<span class="string">"/todo/{id}"</span>, <span class="kw-2">&amp;</span>delete),
+                (<span class="string">"/todo/{id}"</span>, <span class="kw-2">&amp;</span>get),
+                (<span class="string">"/todo/{id}"</span>, <span class="kw-2">&amp;</span>put),
+                (<span class="string">"/todo/search"</span>, <span class="kw-2">&amp;</span>get),
             ];
             <span class="macro">assert_eq!</span>(actual_value, expected_value);
         }
@@ -1492,8 +1493,8 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>operation_builder_security() {
         <span class="kw">let </span>security_requirement1 =
-            SecurityRequirement::new(<span class="string">&quot;api_oauth2_flow&quot;</span>, [<span class="string">&quot;edit:items&quot;</span>, <span class="string">&quot;read:items&quot;</span>]);
-        <span class="kw">let </span>security_requirement2 = SecurityRequirement::new(<span class="string">&quot;api_oauth2_flow&quot;</span>, [<span class="string">&quot;remove:items&quot;</span>]);
+            SecurityRequirement::new(<span class="string">"api_oauth2_flow"</span>, [<span class="string">"edit:items"</span>, <span class="string">"read:items"</span>]);
+        <span class="kw">let </span>security_requirement2 = SecurityRequirement::new(<span class="string">"api_oauth2_flow"</span>, [<span class="string">"remove:items"</span>]);
         <span class="kw">let </span>operation = OperationBuilder::new()
             .security(security_requirement1)
             .security(security_requirement2)
@@ -1504,8 +1505,8 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>operation_builder_server() {
-        <span class="kw">let </span>server1 = Server::new(<span class="string">&quot;/api&quot;</span>);
-        <span class="kw">let </span>server2 = Server::new(<span class="string">&quot;/admin&quot;</span>);
+        <span class="kw">let </span>server1 = Server::new(<span class="string">"/api"</span>);
+        <span class="kw">let </span>server2 = Server::new(<span class="string">"/admin"</span>);
         <span class="kw">let </span>operation = OperationBuilder::new()
             .server(server1)
             .server(server2)

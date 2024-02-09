@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `mathml/src/parsers/math_expression_tree.rs`."><title>math_expression_tree.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="mathml" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `mathml/src/parsers/math_expression_tree.rs`."><title>math_expression_tree.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="mathml" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -2722,26 +2723,26 @@
 /// representation to work with --- this is useful both for human inspection and writing unit
 /// tests.
 </span><span class="kw">impl </span>fmt::Display <span class="kw">for </span>MathExpressionTree {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; fmt::Result {
         <span class="kw">match </span><span class="self">self </span>{
             MathExpressionTree::Atom(MathExpression::Ci(x)) =&gt; {
-                <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, x.content)
+                <span class="macro">write!</span>(f, <span class="string">"{}"</span>, x.content)
             }
             MathExpressionTree::Atom(MathExpression::Mo(Operator::Derivative(x))) =&gt; {
-                <span class="macro">write!</span>(f, <span class="string">&quot;{:?}&quot;</span>, x)
+                <span class="macro">write!</span>(f, <span class="string">"{:?}"</span>, x)
             }
             MathExpressionTree::Atom(MathExpression::Msqrt(x)) =&gt; {
-                <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, x)
+                <span class="macro">write!</span>(f, <span class="string">"{}"</span>, x)
             }
             MathExpressionTree::Atom(i) =&gt; {
-                <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, i)
+                <span class="macro">write!</span>(f, <span class="string">"{}"</span>, i)
             }
             MathExpressionTree::Cons(head, rest) =&gt; {
-                <span class="macro">write!</span>(f, <span class="string">&quot;({}&quot;</span>, head)<span class="question-mark">?</span>;
+                <span class="macro">write!</span>(f, <span class="string">"({}"</span>, head)<span class="question-mark">?</span>;
                 <span class="kw">for </span>s <span class="kw">in </span>rest {
-                    <span class="macro">write!</span>(f, <span class="string">&quot; {}&quot;</span>, s)<span class="question-mark">?
+                    <span class="macro">write!</span>(f, <span class="string">" {}"</span>, s)<span class="question-mark">?
                 </span>}
-                <span class="macro">write!</span>(f, <span class="string">&quot;)&quot;</span>)
+                <span class="macro">write!</span>(f, <span class="string">")"</span>)
             }
         }
     }
@@ -2751,186 +2752,186 @@
 </span><span class="attr">#[allow(unreachable_patterns)] </span><span class="comment">// Lambda in this twice?
 </span><span class="kw">fn </span>unicode_to_latex(input: <span class="kw-2">&amp;</span>str) -&gt; String {
     <span class="comment">// Step 1: Handle English representations of Greek letters
-    </span><span class="kw">let </span>re_english_greek = Regex::new(<span class="string">r&quot;Lambda|lambda|Alpha|alpha|Beta|beta|Gamma|gamma|Delta|delta|Epsilon|epsilon|Zeta|zeta|Eta|eta|Theta|theta|Iota|iota|Kappa|kappa|Lambda|lambda|Mu|mu|Nu|nu|Xi|xi|Omicron|omicron|Pi|pi|Rho|rho|Sigma|sigma|Tau|tau|Upsilon|upsilon|Phi|phi|Chi|chi|Psi|psi|Omega|omega&quot;</span>).unwrap();
+    </span><span class="kw">let </span>re_english_greek = Regex::new(<span class="string">r"Lambda|lambda|Alpha|alpha|Beta|beta|Gamma|gamma|Delta|delta|Epsilon|epsilon|Zeta|zeta|Eta|eta|Theta|theta|Iota|iota|Kappa|kappa|Lambda|lambda|Mu|mu|Nu|nu|Xi|xi|Omicron|omicron|Pi|pi|Rho|rho|Sigma|sigma|Tau|tau|Upsilon|upsilon|Phi|phi|Chi|chi|Psi|psi|Omega|omega"</span>).unwrap();
     <span class="kw">let </span>replaced_english_greek =
         re_english_greek.replace_all(input, |caps: <span class="kw-2">&amp;</span>regex::Captures| <span class="kw">match </span><span class="kw-2">&amp;</span>caps[<span class="number">0</span>] {
-            <span class="string">&quot;Lambda&quot; </span>=&gt; <span class="string">&quot;\\Lambda&quot;</span>.to_string(),
-            <span class="string">&quot;lambda&quot; </span>=&gt; <span class="string">&quot;\\lambda&quot;</span>.to_string(),
-            <span class="string">&quot;Alpha&quot; </span>=&gt; <span class="string">&quot;\\Alpha&quot;</span>.to_string(),
-            <span class="string">&quot;alpha&quot; </span>=&gt; <span class="string">&quot;\\alpha&quot;</span>.to_string(),
-            <span class="string">&quot;Beta&quot; </span>=&gt; <span class="string">&quot;\\Beta&quot;</span>.to_string(),
-            <span class="string">&quot;beta&quot; </span>=&gt; <span class="string">&quot;\\beta&quot;</span>.to_string(),
-            <span class="string">&quot;Gamma&quot; </span>=&gt; <span class="string">&quot;\\Gamma&quot;</span>.to_string(),
-            <span class="string">&quot;gamma&quot; </span>=&gt; <span class="string">&quot;\\gamma&quot;</span>.to_string(),
-            <span class="string">&quot;Delta&quot; </span>=&gt; <span class="string">&quot;\\Delta&quot;</span>.to_string(),
-            <span class="string">&quot;delta&quot; </span>=&gt; <span class="string">&quot;\\delta&quot;</span>.to_string(),
-            <span class="string">&quot;Epsilon&quot; </span>=&gt; <span class="string">&quot;\\Epsilon&quot;</span>.to_string(),
-            <span class="string">&quot;epsilon&quot; </span>=&gt; <span class="string">&quot;\\epsilon&quot;</span>.to_string(),
-            <span class="string">&quot;Zeta&quot; </span>=&gt; <span class="string">&quot;\\Zeta&quot;</span>.to_string(),
-            <span class="string">&quot;zeta&quot; </span>=&gt; <span class="string">&quot;\\zeta&quot;</span>.to_string(),
-            <span class="string">&quot;Eta&quot; </span>=&gt; <span class="string">&quot;\\Eta&quot;</span>.to_string(),
-            <span class="string">&quot;eta&quot; </span>=&gt; <span class="string">&quot;\\eta&quot;</span>.to_string(),
-            <span class="string">&quot;Theta&quot; </span>=&gt; <span class="string">&quot;\\Theta&quot;</span>.to_string(),
-            <span class="string">&quot;theta&quot; </span>=&gt; <span class="string">&quot;\\theta&quot;</span>.to_string(),
-            <span class="string">&quot;Iota&quot; </span>=&gt; <span class="string">&quot;\\Iota&quot;</span>.to_string(),
-            <span class="string">&quot;iota&quot; </span>=&gt; <span class="string">&quot;\\iota&quot;</span>.to_string(),
-            <span class="string">&quot;Kappa&quot; </span>=&gt; <span class="string">&quot;\\Kappa&quot;</span>.to_string(),
-            <span class="string">&quot;kappa&quot; </span>=&gt; <span class="string">&quot;\\kappa&quot;</span>.to_string(),
-            <span class="string">&quot;Lambda&quot; </span>=&gt; <span class="string">&quot;\\Lambda&quot;</span>.to_string(),
-            <span class="string">&quot;lambda&quot; </span>=&gt; <span class="string">&quot;\\lambda&quot;</span>.to_string(),
-            <span class="string">&quot;Mu&quot; </span>=&gt; <span class="string">&quot;\\Mu&quot;</span>.to_string(),
-            <span class="string">&quot;mu&quot; </span>=&gt; <span class="string">&quot;\\mu&quot;</span>.to_string(),
-            <span class="string">&quot;Nu&quot; </span>=&gt; <span class="string">&quot;\\Nu&quot;</span>.to_string(),
-            <span class="string">&quot;nu&quot; </span>=&gt; <span class="string">&quot;\\nu&quot;</span>.to_string(),
-            <span class="string">&quot;Xi&quot; </span>=&gt; <span class="string">&quot;\\Xi&quot;</span>.to_string(),
-            <span class="string">&quot;xi&quot; </span>=&gt; <span class="string">&quot;\\xi&quot;</span>.to_string(),
-            <span class="string">&quot;Omicron&quot; </span>=&gt; <span class="string">&quot;\\Omicron&quot;</span>.to_string(),
-            <span class="string">&quot;omicron&quot; </span>=&gt; <span class="string">&quot;\\omicron&quot;</span>.to_string(),
-            <span class="string">&quot;Pi&quot; </span>=&gt; <span class="string">&quot;\\Pi&quot;</span>.to_string(),
-            <span class="string">&quot;pi&quot; </span>=&gt; <span class="string">&quot;\\pi&quot;</span>.to_string(),
-            <span class="string">&quot;Rho&quot; </span>=&gt; <span class="string">&quot;\\Rho&quot;</span>.to_string(),
-            <span class="string">&quot;rho&quot; </span>=&gt; <span class="string">&quot;\\rho&quot;</span>.to_string(),
-            <span class="string">&quot;Sigma&quot; </span>=&gt; <span class="string">&quot;\\Sigma&quot;</span>.to_string(),
-            <span class="string">&quot;sigma&quot; </span>=&gt; <span class="string">&quot;\\sigma&quot;</span>.to_string(),
-            <span class="string">&quot;Tau&quot; </span>=&gt; <span class="string">&quot;\\Tau&quot;</span>.to_string(),
-            <span class="string">&quot;tau&quot; </span>=&gt; <span class="string">&quot;\\tau&quot;</span>.to_string(),
-            <span class="string">&quot;Upsilon&quot; </span>=&gt; <span class="string">&quot;\\Upsilon&quot;</span>.to_string(),
-            <span class="string">&quot;upsilon&quot; </span>=&gt; <span class="string">&quot;\\upsilon&quot;</span>.to_string(),
-            <span class="string">&quot;Phi&quot; </span>=&gt; <span class="string">&quot;\\Phi&quot;</span>.to_string(),
-            <span class="string">&quot;phi&quot; </span>=&gt; <span class="string">&quot;\\phi&quot;</span>.to_string(),
-            <span class="string">&quot;Chi&quot; </span>=&gt; <span class="string">&quot;\\Chi&quot;</span>.to_string(),
-            <span class="string">&quot;chi&quot; </span>=&gt; <span class="string">&quot;\\chi&quot;</span>.to_string(),
-            <span class="string">&quot;Psi&quot; </span>=&gt; <span class="string">&quot;\\Psi&quot;</span>.to_string(),
-            <span class="string">&quot;psi&quot; </span>=&gt; <span class="string">&quot;\\psi&quot;</span>.to_string(),
-            <span class="string">&quot;Omega&quot; </span>=&gt; <span class="string">&quot;\\Omega&quot;</span>.to_string(),
-            <span class="string">&quot;omega&quot; </span>=&gt; <span class="string">&quot;\\omega&quot;</span>.to_string(),
+            <span class="string">"Lambda" </span>=&gt; <span class="string">"\\Lambda"</span>.to_string(),
+            <span class="string">"lambda" </span>=&gt; <span class="string">"\\lambda"</span>.to_string(),
+            <span class="string">"Alpha" </span>=&gt; <span class="string">"\\Alpha"</span>.to_string(),
+            <span class="string">"alpha" </span>=&gt; <span class="string">"\\alpha"</span>.to_string(),
+            <span class="string">"Beta" </span>=&gt; <span class="string">"\\Beta"</span>.to_string(),
+            <span class="string">"beta" </span>=&gt; <span class="string">"\\beta"</span>.to_string(),
+            <span class="string">"Gamma" </span>=&gt; <span class="string">"\\Gamma"</span>.to_string(),
+            <span class="string">"gamma" </span>=&gt; <span class="string">"\\gamma"</span>.to_string(),
+            <span class="string">"Delta" </span>=&gt; <span class="string">"\\Delta"</span>.to_string(),
+            <span class="string">"delta" </span>=&gt; <span class="string">"\\delta"</span>.to_string(),
+            <span class="string">"Epsilon" </span>=&gt; <span class="string">"\\Epsilon"</span>.to_string(),
+            <span class="string">"epsilon" </span>=&gt; <span class="string">"\\epsilon"</span>.to_string(),
+            <span class="string">"Zeta" </span>=&gt; <span class="string">"\\Zeta"</span>.to_string(),
+            <span class="string">"zeta" </span>=&gt; <span class="string">"\\zeta"</span>.to_string(),
+            <span class="string">"Eta" </span>=&gt; <span class="string">"\\Eta"</span>.to_string(),
+            <span class="string">"eta" </span>=&gt; <span class="string">"\\eta"</span>.to_string(),
+            <span class="string">"Theta" </span>=&gt; <span class="string">"\\Theta"</span>.to_string(),
+            <span class="string">"theta" </span>=&gt; <span class="string">"\\theta"</span>.to_string(),
+            <span class="string">"Iota" </span>=&gt; <span class="string">"\\Iota"</span>.to_string(),
+            <span class="string">"iota" </span>=&gt; <span class="string">"\\iota"</span>.to_string(),
+            <span class="string">"Kappa" </span>=&gt; <span class="string">"\\Kappa"</span>.to_string(),
+            <span class="string">"kappa" </span>=&gt; <span class="string">"\\kappa"</span>.to_string(),
+            <span class="string">"Lambda" </span>=&gt; <span class="string">"\\Lambda"</span>.to_string(),
+            <span class="string">"lambda" </span>=&gt; <span class="string">"\\lambda"</span>.to_string(),
+            <span class="string">"Mu" </span>=&gt; <span class="string">"\\Mu"</span>.to_string(),
+            <span class="string">"mu" </span>=&gt; <span class="string">"\\mu"</span>.to_string(),
+            <span class="string">"Nu" </span>=&gt; <span class="string">"\\Nu"</span>.to_string(),
+            <span class="string">"nu" </span>=&gt; <span class="string">"\\nu"</span>.to_string(),
+            <span class="string">"Xi" </span>=&gt; <span class="string">"\\Xi"</span>.to_string(),
+            <span class="string">"xi" </span>=&gt; <span class="string">"\\xi"</span>.to_string(),
+            <span class="string">"Omicron" </span>=&gt; <span class="string">"\\Omicron"</span>.to_string(),
+            <span class="string">"omicron" </span>=&gt; <span class="string">"\\omicron"</span>.to_string(),
+            <span class="string">"Pi" </span>=&gt; <span class="string">"\\Pi"</span>.to_string(),
+            <span class="string">"pi" </span>=&gt; <span class="string">"\\pi"</span>.to_string(),
+            <span class="string">"Rho" </span>=&gt; <span class="string">"\\Rho"</span>.to_string(),
+            <span class="string">"rho" </span>=&gt; <span class="string">"\\rho"</span>.to_string(),
+            <span class="string">"Sigma" </span>=&gt; <span class="string">"\\Sigma"</span>.to_string(),
+            <span class="string">"sigma" </span>=&gt; <span class="string">"\\sigma"</span>.to_string(),
+            <span class="string">"Tau" </span>=&gt; <span class="string">"\\Tau"</span>.to_string(),
+            <span class="string">"tau" </span>=&gt; <span class="string">"\\tau"</span>.to_string(),
+            <span class="string">"Upsilon" </span>=&gt; <span class="string">"\\Upsilon"</span>.to_string(),
+            <span class="string">"upsilon" </span>=&gt; <span class="string">"\\upsilon"</span>.to_string(),
+            <span class="string">"Phi" </span>=&gt; <span class="string">"\\Phi"</span>.to_string(),
+            <span class="string">"phi" </span>=&gt; <span class="string">"\\phi"</span>.to_string(),
+            <span class="string">"Chi" </span>=&gt; <span class="string">"\\Chi"</span>.to_string(),
+            <span class="string">"chi" </span>=&gt; <span class="string">"\\chi"</span>.to_string(),
+            <span class="string">"Psi" </span>=&gt; <span class="string">"\\Psi"</span>.to_string(),
+            <span class="string">"psi" </span>=&gt; <span class="string">"\\psi"</span>.to_string(),
+            <span class="string">"Omega" </span>=&gt; <span class="string">"\\Omega"</span>.to_string(),
+            <span class="string">"omega" </span>=&gt; <span class="string">"\\omega"</span>.to_string(),
             <span class="kw">_ </span>=&gt; caps[<span class="number">0</span>].to_string(),
         });
 
     <span class="comment">// Step 2: Handle Greek letters represented in Unicode
-    </span><span class="kw">let </span>re_unicode = Regex::new(<span class="string">r&quot;&amp;#x([0-9A-Fa-f]+);&quot;</span>).unwrap();
+    </span><span class="kw">let </span>re_unicode = Regex::new(<span class="string">r"&amp;#x([0-9A-Fa-f]+);"</span>).unwrap();
     <span class="kw">let </span>replaced_unicode =
         re_unicode.replace_all(<span class="kw-2">&amp;</span>replaced_english_greek, |caps: <span class="kw-2">&amp;</span>regex::Captures| {
             <span class="kw">let </span>unicode = u32::from_str_radix(<span class="kw-2">&amp;</span>caps[<span class="number">1</span>], <span class="number">16</span>).unwrap();
             <span class="kw">match </span>unicode {
-                <span class="number">0x0391 </span>=&gt; <span class="string">&quot;\\Alpha&quot;</span>.to_string(),
-                <span class="number">0x03B1 </span>=&gt; <span class="string">&quot;\\alpha&quot;</span>.to_string(),
-                <span class="number">0x0392 </span>=&gt; <span class="string">&quot;\\Beta&quot;</span>.to_string(),
-                <span class="number">0x03B2 </span>=&gt; <span class="string">&quot;\\beta&quot;</span>.to_string(),
-                <span class="number">0x0393 </span>=&gt; <span class="string">&quot;\\Gamma&quot;</span>.to_string(),
-                <span class="number">0x03B3 </span>=&gt; <span class="string">&quot;\\gamma&quot;</span>.to_string(),
-                <span class="number">0x0394 </span>=&gt; <span class="string">&quot;\\Delta&quot;</span>.to_string(),
-                <span class="number">0x03B4 </span>=&gt; <span class="string">&quot;\\delta&quot;</span>.to_string(),
-                <span class="number">0x0395 </span>=&gt; <span class="string">&quot;\\Epsilon&quot;</span>.to_string(),
-                <span class="number">0x03B5 </span>=&gt; <span class="string">&quot;\\epsilon&quot;</span>.to_string(),
-                <span class="number">0x0396 </span>=&gt; <span class="string">&quot;\\Zeta&quot;</span>.to_string(),
-                <span class="number">0x03B6 </span>=&gt; <span class="string">&quot;\\zeta&quot;</span>.to_string(),
-                <span class="number">0x0397 </span>=&gt; <span class="string">&quot;\\Eta&quot;</span>.to_string(),
-                <span class="number">0x03B7 </span>=&gt; <span class="string">&quot;\\eta&quot;</span>.to_string(),
-                <span class="number">0x0398 </span>=&gt; <span class="string">&quot;\\Theta&quot;</span>.to_string(),
-                <span class="number">0x03B8 </span>=&gt; <span class="string">&quot;\\theta&quot;</span>.to_string(),
-                <span class="number">0x0399 </span>=&gt; <span class="string">&quot;\\Iota&quot;</span>.to_string(),
-                <span class="number">0x03B9 </span>=&gt; <span class="string">&quot;\\iota&quot;</span>.to_string(),
-                <span class="number">0x039A </span>=&gt; <span class="string">&quot;\\Kappa&quot;</span>.to_string(),
-                <span class="number">0x03BA </span>=&gt; <span class="string">&quot;\\kappa&quot;</span>.to_string(),
-                <span class="number">0x039B </span>=&gt; <span class="string">&quot;\\Lambda&quot;</span>.to_string(),
-                <span class="number">0x03BB </span>=&gt; <span class="string">&quot;\\lambda&quot;</span>.to_string(),
-                <span class="number">0x039C </span>=&gt; <span class="string">&quot;\\Mu&quot;</span>.to_string(),
-                <span class="number">0x03BC </span>=&gt; <span class="string">&quot;\\mu&quot;</span>.to_string(),
-                <span class="number">0x039D </span>=&gt; <span class="string">&quot;\\Nu&quot;</span>.to_string(),
-                <span class="number">0x03BD </span>=&gt; <span class="string">&quot;\\nu&quot;</span>.to_string(),
-                <span class="number">0x039E </span>=&gt; <span class="string">&quot;\\Xi&quot;</span>.to_string(),
-                <span class="number">0x03BE </span>=&gt; <span class="string">&quot;\\xi&quot;</span>.to_string(),
-                <span class="number">0x039F </span>=&gt; <span class="string">&quot;\\Omicron&quot;</span>.to_string(),
-                <span class="number">0x03BF </span>=&gt; <span class="string">&quot;\\omicron&quot;</span>.to_string(),
-                <span class="number">0x03A0 </span>=&gt; <span class="string">&quot;\\Pi&quot;</span>.to_string(),
-                <span class="number">0x03C0 </span>=&gt; <span class="string">&quot;\\pi&quot;</span>.to_string(),
-                <span class="number">0x03A1 </span>=&gt; <span class="string">&quot;\\Rho&quot;</span>.to_string(),
-                <span class="number">0x03C1 </span>=&gt; <span class="string">&quot;\\rho&quot;</span>.to_string(),
-                <span class="number">0x03A3 </span>=&gt; <span class="string">&quot;\\Sigma&quot;</span>.to_string(),
-                <span class="number">0x03C3 </span>=&gt; <span class="string">&quot;\\sigma&quot;</span>.to_string(),
-                <span class="number">0x03A4 </span>=&gt; <span class="string">&quot;\\Tau&quot;</span>.to_string(),
-                <span class="number">0x03C4 </span>=&gt; <span class="string">&quot;\\tau&quot;</span>.to_string(),
-                <span class="number">0x03A5 </span>=&gt; <span class="string">&quot;\\Upsilon&quot;</span>.to_string(),
-                <span class="number">0x03C5 </span>=&gt; <span class="string">&quot;\\upsilon&quot;</span>.to_string(),
-                <span class="number">0x03A6 </span>=&gt; <span class="string">&quot;\\Phi&quot;</span>.to_string(),
-                <span class="number">0x03C6 </span>=&gt; <span class="string">&quot;\\phi&quot;</span>.to_string(),
-                <span class="number">0x03A7 </span>=&gt; <span class="string">&quot;\\Chi&quot;</span>.to_string(),
-                <span class="number">0x03C7 </span>=&gt; <span class="string">&quot;\\chi&quot;</span>.to_string(),
-                <span class="number">0x03A8 </span>=&gt; <span class="string">&quot;\\Psi&quot;</span>.to_string(),
-                <span class="number">0x03C8 </span>=&gt; <span class="string">&quot;\\psi&quot;</span>.to_string(),
-                <span class="number">0x03A9 </span>=&gt; <span class="string">&quot;\\Omega&quot;</span>.to_string(),
-                <span class="number">0x03C9 </span>=&gt; <span class="string">&quot;\\omega&quot;</span>.to_string(),
+                <span class="number">0x0391 </span>=&gt; <span class="string">"\\Alpha"</span>.to_string(),
+                <span class="number">0x03B1 </span>=&gt; <span class="string">"\\alpha"</span>.to_string(),
+                <span class="number">0x0392 </span>=&gt; <span class="string">"\\Beta"</span>.to_string(),
+                <span class="number">0x03B2 </span>=&gt; <span class="string">"\\beta"</span>.to_string(),
+                <span class="number">0x0393 </span>=&gt; <span class="string">"\\Gamma"</span>.to_string(),
+                <span class="number">0x03B3 </span>=&gt; <span class="string">"\\gamma"</span>.to_string(),
+                <span class="number">0x0394 </span>=&gt; <span class="string">"\\Delta"</span>.to_string(),
+                <span class="number">0x03B4 </span>=&gt; <span class="string">"\\delta"</span>.to_string(),
+                <span class="number">0x0395 </span>=&gt; <span class="string">"\\Epsilon"</span>.to_string(),
+                <span class="number">0x03B5 </span>=&gt; <span class="string">"\\epsilon"</span>.to_string(),
+                <span class="number">0x0396 </span>=&gt; <span class="string">"\\Zeta"</span>.to_string(),
+                <span class="number">0x03B6 </span>=&gt; <span class="string">"\\zeta"</span>.to_string(),
+                <span class="number">0x0397 </span>=&gt; <span class="string">"\\Eta"</span>.to_string(),
+                <span class="number">0x03B7 </span>=&gt; <span class="string">"\\eta"</span>.to_string(),
+                <span class="number">0x0398 </span>=&gt; <span class="string">"\\Theta"</span>.to_string(),
+                <span class="number">0x03B8 </span>=&gt; <span class="string">"\\theta"</span>.to_string(),
+                <span class="number">0x0399 </span>=&gt; <span class="string">"\\Iota"</span>.to_string(),
+                <span class="number">0x03B9 </span>=&gt; <span class="string">"\\iota"</span>.to_string(),
+                <span class="number">0x039A </span>=&gt; <span class="string">"\\Kappa"</span>.to_string(),
+                <span class="number">0x03BA </span>=&gt; <span class="string">"\\kappa"</span>.to_string(),
+                <span class="number">0x039B </span>=&gt; <span class="string">"\\Lambda"</span>.to_string(),
+                <span class="number">0x03BB </span>=&gt; <span class="string">"\\lambda"</span>.to_string(),
+                <span class="number">0x039C </span>=&gt; <span class="string">"\\Mu"</span>.to_string(),
+                <span class="number">0x03BC </span>=&gt; <span class="string">"\\mu"</span>.to_string(),
+                <span class="number">0x039D </span>=&gt; <span class="string">"\\Nu"</span>.to_string(),
+                <span class="number">0x03BD </span>=&gt; <span class="string">"\\nu"</span>.to_string(),
+                <span class="number">0x039E </span>=&gt; <span class="string">"\\Xi"</span>.to_string(),
+                <span class="number">0x03BE </span>=&gt; <span class="string">"\\xi"</span>.to_string(),
+                <span class="number">0x039F </span>=&gt; <span class="string">"\\Omicron"</span>.to_string(),
+                <span class="number">0x03BF </span>=&gt; <span class="string">"\\omicron"</span>.to_string(),
+                <span class="number">0x03A0 </span>=&gt; <span class="string">"\\Pi"</span>.to_string(),
+                <span class="number">0x03C0 </span>=&gt; <span class="string">"\\pi"</span>.to_string(),
+                <span class="number">0x03A1 </span>=&gt; <span class="string">"\\Rho"</span>.to_string(),
+                <span class="number">0x03C1 </span>=&gt; <span class="string">"\\rho"</span>.to_string(),
+                <span class="number">0x03A3 </span>=&gt; <span class="string">"\\Sigma"</span>.to_string(),
+                <span class="number">0x03C3 </span>=&gt; <span class="string">"\\sigma"</span>.to_string(),
+                <span class="number">0x03A4 </span>=&gt; <span class="string">"\\Tau"</span>.to_string(),
+                <span class="number">0x03C4 </span>=&gt; <span class="string">"\\tau"</span>.to_string(),
+                <span class="number">0x03A5 </span>=&gt; <span class="string">"\\Upsilon"</span>.to_string(),
+                <span class="number">0x03C5 </span>=&gt; <span class="string">"\\upsilon"</span>.to_string(),
+                <span class="number">0x03A6 </span>=&gt; <span class="string">"\\Phi"</span>.to_string(),
+                <span class="number">0x03C6 </span>=&gt; <span class="string">"\\phi"</span>.to_string(),
+                <span class="number">0x03A7 </span>=&gt; <span class="string">"\\Chi"</span>.to_string(),
+                <span class="number">0x03C7 </span>=&gt; <span class="string">"\\chi"</span>.to_string(),
+                <span class="number">0x03A8 </span>=&gt; <span class="string">"\\Psi"</span>.to_string(),
+                <span class="number">0x03C8 </span>=&gt; <span class="string">"\\psi"</span>.to_string(),
+                <span class="number">0x03A9 </span>=&gt; <span class="string">"\\Omega"</span>.to_string(),
+                <span class="number">0x03C9 </span>=&gt; <span class="string">"\\omega"</span>.to_string(),
                 <span class="kw">_ </span>=&gt; caps[<span class="number">0</span>].to_string(),
             }
         });
 
     <span class="comment">// Step 3: Handle other Unicode representations
-    </span><span class="kw">let </span>re_other_unicode = Regex::new(<span class="string">r&quot;&amp;#x([0-9A-Fa-f]+);&quot;</span>).unwrap();
+    </span><span class="kw">let </span>re_other_unicode = Regex::new(<span class="string">r"&amp;#x([0-9A-Fa-f]+);"</span>).unwrap();
     <span class="kw">let </span>replaced_other_unicode =
         re_other_unicode.replace_all(<span class="kw-2">&amp;</span>replaced_unicode, |caps: <span class="kw-2">&amp;</span>regex::Captures| {
             <span class="macro">format!</span>(
-                <span class="string">&quot;\\unicode{{U+{:X}}}&quot;</span>,
+                <span class="string">"\\unicode{{U+{:X}}}"</span>,
                 u32::from_str_radix(<span class="kw-2">&amp;</span>caps[<span class="number">1</span>], <span class="number">16</span>).unwrap()
             )
         });
 
     <span class="comment">// Step 4: Handle Greek letter symbols
-    </span><span class="kw">let </span>re_greek_symbols = Regex::new(<span class="string">r&quot;Λ|λ|Α|α|Β|β|Γ|γ|Δ|δ|Ε|ε|Ζ|ζ|Η|η|Θ|θ|Ι|ι|Κ|κ|Λ|λ|Μ|μ|Ν|ν|Ξ|ξ|Ο|ο|Π|π|Ρ|ρ|Σ|σ|ς|Τ|τ|Υ|υ|Φ|φ|Χ|χ|Ψ|ψ|Ω|ω&quot;</span>).unwrap();
+    </span><span class="kw">let </span>re_greek_symbols = Regex::new(<span class="string">r"Λ|λ|Α|α|Β|β|Γ|γ|Δ|δ|Ε|ε|Ζ|ζ|Η|η|Θ|θ|Ι|ι|Κ|κ|Λ|λ|Μ|μ|Ν|ν|Ξ|ξ|Ο|ο|Π|π|Ρ|ρ|Σ|σ|ς|Τ|τ|Υ|υ|Φ|φ|Χ|χ|Ψ|ψ|Ω|ω"</span>).unwrap();
     <span class="kw">let </span>replaced_greek_symbols =
         re_greek_symbols.replace_all(<span class="kw-2">&amp;</span>replaced_other_unicode, |caps: <span class="kw-2">&amp;</span>regex::Captures| {
             <span class="kw">match </span><span class="kw-2">&amp;</span>caps[<span class="number">0</span>] {
-                <span class="string">&quot;Λ&quot; </span>=&gt; <span class="string">&quot;\\Lambda&quot;</span>.to_string(),
-                <span class="string">&quot;λ&quot; </span>=&gt; <span class="string">&quot;\\lambda&quot;</span>.to_string(),
-                <span class="string">&quot;Α&quot; </span>=&gt; <span class="string">&quot;\\Alpha&quot;</span>.to_string(),
-                <span class="string">&quot;α&quot; </span>=&gt; <span class="string">&quot;\\alpha&quot;</span>.to_string(),
-                <span class="string">&quot;Β&quot; </span>=&gt; <span class="string">&quot;\\Beta&quot;</span>.to_string(),
-                <span class="string">&quot;β&quot; </span>=&gt; <span class="string">&quot;\\beta&quot;</span>.to_string(),
-                <span class="string">&quot;Γ&quot; </span>=&gt; <span class="string">&quot;\\Gamma&quot;</span>.to_string(),
-                <span class="string">&quot;γ&quot; </span>=&gt; <span class="string">&quot;\\gamma&quot;</span>.to_string(),
-                <span class="string">&quot;Δ&quot; </span>=&gt; <span class="string">&quot;\\Delta&quot;</span>.to_string(),
-                <span class="string">&quot;δ&quot; </span>=&gt; <span class="string">&quot;\\delta&quot;</span>.to_string(),
-                <span class="string">&quot;Ε&quot; </span>=&gt; <span class="string">&quot;\\Epsilon&quot;</span>.to_string(),
-                <span class="string">&quot;ε&quot; </span>=&gt; <span class="string">&quot;\\epsilon&quot;</span>.to_string(),
-                <span class="string">&quot;Ζ&quot; </span>=&gt; <span class="string">&quot;\\Zeta&quot;</span>.to_string(),
-                <span class="string">&quot;ζ&quot; </span>=&gt; <span class="string">&quot;\\zeta&quot;</span>.to_string(),
-                <span class="string">&quot;Η&quot; </span>=&gt; <span class="string">&quot;\\Eta&quot;</span>.to_string(),
-                <span class="string">&quot;η&quot; </span>=&gt; <span class="string">&quot;\\eta&quot;</span>.to_string(),
-                <span class="string">&quot;Θ&quot; </span>=&gt; <span class="string">&quot;\\Theta&quot;</span>.to_string(),
-                <span class="string">&quot;θ&quot; </span>=&gt; <span class="string">&quot;\\theta&quot;</span>.to_string(),
-                <span class="string">&quot;Ι&quot; </span>=&gt; <span class="string">&quot;\\Iota&quot;</span>.to_string(),
-                <span class="string">&quot;ι&quot; </span>=&gt; <span class="string">&quot;\\iota&quot;</span>.to_string(),
-                <span class="string">&quot;Κ&quot; </span>=&gt; <span class="string">&quot;\\Kappa&quot;</span>.to_string(),
-                <span class="string">&quot;κ&quot; </span>=&gt; <span class="string">&quot;\\kappa&quot;</span>.to_string(),
-                <span class="string">&quot;Λ&quot; </span>=&gt; <span class="string">&quot;\\Lambda&quot;</span>.to_string(),
-                <span class="string">&quot;λ&quot; </span>=&gt; <span class="string">&quot;\\lambda&quot;</span>.to_string(),
-                <span class="string">&quot;Μ&quot; </span>=&gt; <span class="string">&quot;\\Mu&quot;</span>.to_string(),
-                <span class="string">&quot;μ&quot; </span>=&gt; <span class="string">&quot;\\mu&quot;</span>.to_string(),
-                <span class="string">&quot;Ν&quot; </span>=&gt; <span class="string">&quot;\\Nu&quot;</span>.to_string(),
-                <span class="string">&quot;ν&quot; </span>=&gt; <span class="string">&quot;\\nu&quot;</span>.to_string(),
-                <span class="string">&quot;Ξ&quot; </span>=&gt; <span class="string">&quot;\\Xi&quot;</span>.to_string(),
-                <span class="string">&quot;ξ&quot; </span>=&gt; <span class="string">&quot;\\xi&quot;</span>.to_string(),
-                <span class="string">&quot;Ο&quot; </span>=&gt; <span class="string">&quot;\\Omicron&quot;</span>.to_string(),
-                <span class="string">&quot;ο&quot; </span>=&gt; <span class="string">&quot;\\omicron&quot;</span>.to_string(),
-                <span class="string">&quot;Π&quot; </span>=&gt; <span class="string">&quot;\\Pi&quot;</span>.to_string(),
-                <span class="string">&quot;π&quot; </span>=&gt; <span class="string">&quot;\\pi&quot;</span>.to_string(),
-                <span class="string">&quot;Ρ&quot; </span>=&gt; <span class="string">&quot;\\Rho&quot;</span>.to_string(),
-                <span class="string">&quot;ρ&quot; </span>=&gt; <span class="string">&quot;\\rho&quot;</span>.to_string(),
-                <span class="string">&quot;Σ&quot; </span>=&gt; <span class="string">&quot;\\Sigma&quot;</span>.to_string(),
-                <span class="string">&quot;σ&quot; </span>=&gt; <span class="string">&quot;\\sigma&quot;</span>.to_string(),
-                <span class="string">&quot;ς&quot; </span>=&gt; <span class="string">&quot;\\varsigma&quot;</span>.to_string(), <span class="comment">// 处理 sigma 的 final form
-                </span><span class="string">&quot;Τ&quot; </span>=&gt; <span class="string">&quot;\\Tau&quot;</span>.to_string(),
-                <span class="string">&quot;τ&quot; </span>=&gt; <span class="string">&quot;\\tau&quot;</span>.to_string(),
-                <span class="string">&quot;Υ&quot; </span>=&gt; <span class="string">&quot;\\Upsilon&quot;</span>.to_string(),
-                <span class="string">&quot;υ&quot; </span>=&gt; <span class="string">&quot;\\upsilon&quot;</span>.to_string(),
-                <span class="string">&quot;Φ&quot; </span>=&gt; <span class="string">&quot;\\Phi&quot;</span>.to_string(),
-                <span class="string">&quot;φ&quot; </span>=&gt; <span class="string">&quot;\\phi&quot;</span>.to_string(),
-                <span class="string">&quot;Χ&quot; </span>=&gt; <span class="string">&quot;\\Chi&quot;</span>.to_string(),
-                <span class="string">&quot;χ&quot; </span>=&gt; <span class="string">&quot;\\chi&quot;</span>.to_string(),
-                <span class="string">&quot;Ψ&quot; </span>=&gt; <span class="string">&quot;\\Psi&quot;</span>.to_string(),
-                <span class="string">&quot;ψ&quot; </span>=&gt; <span class="string">&quot;\\psi&quot;</span>.to_string(),
-                <span class="string">&quot;Ω&quot; </span>=&gt; <span class="string">&quot;\\Omega&quot;</span>.to_string(),
-                <span class="string">&quot;ω&quot; </span>=&gt; <span class="string">&quot;\\omega&quot;</span>.to_string(),
+                <span class="string">"Λ" </span>=&gt; <span class="string">"\\Lambda"</span>.to_string(),
+                <span class="string">"λ" </span>=&gt; <span class="string">"\\lambda"</span>.to_string(),
+                <span class="string">"Α" </span>=&gt; <span class="string">"\\Alpha"</span>.to_string(),
+                <span class="string">"α" </span>=&gt; <span class="string">"\\alpha"</span>.to_string(),
+                <span class="string">"Β" </span>=&gt; <span class="string">"\\Beta"</span>.to_string(),
+                <span class="string">"β" </span>=&gt; <span class="string">"\\beta"</span>.to_string(),
+                <span class="string">"Γ" </span>=&gt; <span class="string">"\\Gamma"</span>.to_string(),
+                <span class="string">"γ" </span>=&gt; <span class="string">"\\gamma"</span>.to_string(),
+                <span class="string">"Δ" </span>=&gt; <span class="string">"\\Delta"</span>.to_string(),
+                <span class="string">"δ" </span>=&gt; <span class="string">"\\delta"</span>.to_string(),
+                <span class="string">"Ε" </span>=&gt; <span class="string">"\\Epsilon"</span>.to_string(),
+                <span class="string">"ε" </span>=&gt; <span class="string">"\\epsilon"</span>.to_string(),
+                <span class="string">"Ζ" </span>=&gt; <span class="string">"\\Zeta"</span>.to_string(),
+                <span class="string">"ζ" </span>=&gt; <span class="string">"\\zeta"</span>.to_string(),
+                <span class="string">"Η" </span>=&gt; <span class="string">"\\Eta"</span>.to_string(),
+                <span class="string">"η" </span>=&gt; <span class="string">"\\eta"</span>.to_string(),
+                <span class="string">"Θ" </span>=&gt; <span class="string">"\\Theta"</span>.to_string(),
+                <span class="string">"θ" </span>=&gt; <span class="string">"\\theta"</span>.to_string(),
+                <span class="string">"Ι" </span>=&gt; <span class="string">"\\Iota"</span>.to_string(),
+                <span class="string">"ι" </span>=&gt; <span class="string">"\\iota"</span>.to_string(),
+                <span class="string">"Κ" </span>=&gt; <span class="string">"\\Kappa"</span>.to_string(),
+                <span class="string">"κ" </span>=&gt; <span class="string">"\\kappa"</span>.to_string(),
+                <span class="string">"Λ" </span>=&gt; <span class="string">"\\Lambda"</span>.to_string(),
+                <span class="string">"λ" </span>=&gt; <span class="string">"\\lambda"</span>.to_string(),
+                <span class="string">"Μ" </span>=&gt; <span class="string">"\\Mu"</span>.to_string(),
+                <span class="string">"μ" </span>=&gt; <span class="string">"\\mu"</span>.to_string(),
+                <span class="string">"Ν" </span>=&gt; <span class="string">"\\Nu"</span>.to_string(),
+                <span class="string">"ν" </span>=&gt; <span class="string">"\\nu"</span>.to_string(),
+                <span class="string">"Ξ" </span>=&gt; <span class="string">"\\Xi"</span>.to_string(),
+                <span class="string">"ξ" </span>=&gt; <span class="string">"\\xi"</span>.to_string(),
+                <span class="string">"Ο" </span>=&gt; <span class="string">"\\Omicron"</span>.to_string(),
+                <span class="string">"ο" </span>=&gt; <span class="string">"\\omicron"</span>.to_string(),
+                <span class="string">"Π" </span>=&gt; <span class="string">"\\Pi"</span>.to_string(),
+                <span class="string">"π" </span>=&gt; <span class="string">"\\pi"</span>.to_string(),
+                <span class="string">"Ρ" </span>=&gt; <span class="string">"\\Rho"</span>.to_string(),
+                <span class="string">"ρ" </span>=&gt; <span class="string">"\\rho"</span>.to_string(),
+                <span class="string">"Σ" </span>=&gt; <span class="string">"\\Sigma"</span>.to_string(),
+                <span class="string">"σ" </span>=&gt; <span class="string">"\\sigma"</span>.to_string(),
+                <span class="string">"ς" </span>=&gt; <span class="string">"\\varsigma"</span>.to_string(), <span class="comment">// 处理 sigma 的 final form
+                </span><span class="string">"Τ" </span>=&gt; <span class="string">"\\Tau"</span>.to_string(),
+                <span class="string">"τ" </span>=&gt; <span class="string">"\\tau"</span>.to_string(),
+                <span class="string">"Υ" </span>=&gt; <span class="string">"\\Upsilon"</span>.to_string(),
+                <span class="string">"υ" </span>=&gt; <span class="string">"\\upsilon"</span>.to_string(),
+                <span class="string">"Φ" </span>=&gt; <span class="string">"\\Phi"</span>.to_string(),
+                <span class="string">"φ" </span>=&gt; <span class="string">"\\phi"</span>.to_string(),
+                <span class="string">"Χ" </span>=&gt; <span class="string">"\\Chi"</span>.to_string(),
+                <span class="string">"χ" </span>=&gt; <span class="string">"\\chi"</span>.to_string(),
+                <span class="string">"Ψ" </span>=&gt; <span class="string">"\\Psi"</span>.to_string(),
+                <span class="string">"ψ" </span>=&gt; <span class="string">"\\psi"</span>.to_string(),
+                <span class="string">"Ω" </span>=&gt; <span class="string">"\\Omega"</span>.to_string(),
+                <span class="string">"ω" </span>=&gt; <span class="string">"\\omega"</span>.to_string(),
                 <span class="kw">_ </span>=&gt; caps[<span class="number">0</span>].to_string(),
             }
         });
@@ -2978,7 +2979,7 @@
             </span>expression.push_str(<span class="kw-2">&amp;</span>met.to_latex().to_string());
         } <span class="kw">else </span>{
             <span class="comment">// If it is not a unary operator, wrap it in parentheses before adding it to the LaTeX string.
-            </span>expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;({})&quot;</span>, met.to_latex()));
+            </span>expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"({})"</span>, met.to_latex()));
         }
     } <span class="kw">else </span>{
         <span class="comment">// If the expression is an atom, add it to the LaTeX string directly.
@@ -2990,19 +2991,19 @@
 /// the corresponding LaTeX representation to the provided String.
 </span><span class="kw">fn </span>process_math_expression(expr: <span class="kw-2">&amp;</span>MathExpression, expression: <span class="kw-2">&amp;mut </span>String) {
     <span class="kw">match </span>expr {
-        <span class="comment">// If it&#39;s a Ci variant, recursively process its content
+        <span class="comment">// If it's a Ci variant, recursively process its content
         </span>MathExpression::Ci(x) =&gt; {
             process_math_expression(<span class="kw-2">&amp;</span>x.content, expression);
             <span class="kw">if let </span><span class="prelude-val">Some</span>(func_of_vec) = <span class="kw-2">&amp;</span>x.func_of {
                 <span class="kw">if </span>!func_of_vec.is_empty() &amp;&amp; !func_of_vec[<span class="number">0</span>].content.to_string().is_empty() {
-                    expression.push(<span class="string">&#39;(&#39;</span>);
+                    expression.push(<span class="string">'('</span>);
                     <span class="kw">for </span>(index, func_ci) <span class="kw">in </span>func_of_vec.iter().enumerate() {
                         process_math_expression(<span class="kw-2">&amp;</span>func_ci.content, expression);
                         <span class="kw">if </span>index &lt; func_of_vec.len() - <span class="number">1 </span>{
-                            expression.push(<span class="string">&#39;,&#39;</span>);
+                            expression.push(<span class="string">','</span>);
                         }
                     }
-                    expression.push(<span class="string">&#39;)&#39;</span>);
+                    expression.push(<span class="string">')'</span>);
                 }
             }
         }
@@ -3013,50 +3014,50 @@
             expression.push_str(<span class="kw-2">&amp;</span>number.to_string());
         }
         MathExpression::Msqrt(x) =&gt; {
-            expression.push_str(<span class="string">&quot;\\sqrt{&quot;</span>);
+            expression.push_str(<span class="string">"\\sqrt{"</span>);
             process_math_expression(x, expression);
-            expression.push(<span class="string">&#39;}&#39;</span>);
+            expression.push(<span class="string">'}'</span>);
         }
         MathExpression::Mfrac(x1, x2) =&gt; {
-            expression.push_str(<span class="string">&quot;\\frac{&quot;</span>);
+            expression.push_str(<span class="string">"\\frac{"</span>);
             process_math_expression(x1, expression);
-            expression.push_str(<span class="string">&quot;}{&quot;</span>);
+            expression.push_str(<span class="string">"}{"</span>);
             process_math_expression(x2, expression);
-            expression.push(<span class="string">&#39;}&#39;</span>);
+            expression.push(<span class="string">'}'</span>);
         }
         MathExpression::Msup(x1, x2) =&gt; {
             process_math_expression(x1, expression);
-            expression.push_str(<span class="string">&quot;^{&quot;</span>);
+            expression.push_str(<span class="string">"^{"</span>);
             process_math_expression(x2, expression);
-            expression.push(<span class="string">&#39;}&#39;</span>);
+            expression.push(<span class="string">'}'</span>);
         }
         MathExpression::Msub(x1, x2) =&gt; {
             process_math_expression(x1, expression);
-            expression.push_str(<span class="string">&quot;_{&quot;</span>);
+            expression.push_str(<span class="string">"_{"</span>);
             process_math_expression(x2, expression);
-            expression.push(<span class="string">&#39;}&#39;</span>);
+            expression.push(<span class="string">'}'</span>);
         }
         MathExpression::Msubsup(x1, x2, x3) =&gt; {
             process_math_expression(x1, expression);
-            expression.push_str(<span class="string">&quot;_{&quot;</span>);
+            expression.push_str(<span class="string">"_{"</span>);
             process_math_expression(x2, expression);
-            expression.push_str(<span class="string">&quot;}^{&quot;</span>);
+            expression.push_str(<span class="string">"}^{"</span>);
             process_math_expression(x3, expression);
-            expression.push(<span class="string">&#39;}&#39;</span>);
+            expression.push(<span class="string">'}'</span>);
         }
         MathExpression::Munder(x1, x2) =&gt; {
-            expression.push_str(<span class="string">&quot;\\underset{&quot;</span>);
+            expression.push_str(<span class="string">"\\underset{"</span>);
             process_math_expression(x2, expression);
-            expression.push_str(<span class="string">&quot;}{&quot;</span>);
+            expression.push_str(<span class="string">"}{"</span>);
             process_math_expression(x1, expression);
-            expression.push(<span class="string">&#39;}&#39;</span>);
+            expression.push(<span class="string">'}'</span>);
         }
         MathExpression::Mover(x1, x2) =&gt; {
-            expression.push_str(<span class="string">&quot;\\overset{&quot;</span>);
+            expression.push_str(<span class="string">"\\overset{"</span>);
             process_math_expression(x2, expression);
-            expression.push_str(<span class="string">&quot;}{&quot;</span>);
+            expression.push_str(<span class="string">"}{"</span>);
             process_math_expression(x1, expression);
-            expression.push(<span class="string">&#39;}&#39;</span>);
+            expression.push(<span class="string">'}'</span>);
         }
         MathExpression::Mtext(x) =&gt; {
             expression.push_str(x);
@@ -3065,18 +3066,18 @@
             expression.push_str(x);
         }
         MathExpression::AbsoluteSup(x1, x2) =&gt; {
-            expression.push_str(<span class="string">&quot;\\left| &quot;</span>);
+            expression.push_str(<span class="string">"\\left| "</span>);
             process_math_expression(x1, expression);
-            expression.push_str(<span class="string">&quot; \\right|_{&quot;</span>);
+            expression.push_str(<span class="string">" \\right|_{"</span>);
             process_math_expression(x2, expression);
-            expression.push(<span class="string">&#39;}&#39;</span>);
+            expression.push(<span class="string">'}'</span>);
         }
         MathExpression::Mrow(vec_me) =&gt; {
             <span class="kw">for </span>me <span class="kw">in </span>vec_me.<span class="number">0</span>.iter() {
                 process_math_expression(me, expression);
             }
         }
-        t =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unhandled MathExpression: {:?}&quot;</span>, t),
+        t =&gt; <span class="macro">panic!</span>(<span class="string">"Unhandled MathExpression: {:?}"</span>, t),
     }
 }
 
@@ -3087,69 +3088,69 @@
         <span class="kw">match </span><span class="self">self </span>{
             MathExpressionTree::Atom(i) =&gt; <span class="kw">match </span>i {
                 MathExpression::Ci(x) =&gt; {
-                    content_mathml.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;&lt;ci&gt;{}&lt;/ci&gt;&quot;</span>, x.content));
+                    content_mathml.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"&lt;ci&gt;{}&lt;/ci&gt;"</span>, x.content));
                 }
                 MathExpression::Mi(Mi(id)) =&gt; {
-                    content_mathml.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;&lt;ci&gt;{}&lt;/ci&gt;&quot;</span>, id));
+                    content_mathml.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"&lt;ci&gt;{}&lt;/ci&gt;"</span>, id));
                 }
                 MathExpression::Mn(number) =&gt; {
-                    content_mathml.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;&lt;cn&gt;{}&lt;/cn&gt;&quot;</span>, number));
+                    content_mathml.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"&lt;cn&gt;{}&lt;/cn&gt;"</span>, number));
                 }
                 MathExpression::Mrow(<span class="kw">_</span>) =&gt; {
-                    <span class="macro">panic!</span>(<span class="string">&quot;All Mrows should have been removed by now!&quot;</span>);
+                    <span class="macro">panic!</span>(<span class="string">"All Mrows should have been removed by now!"</span>);
                 }
-                t =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unhandled MathExpression: {:?}&quot;</span>, t),
+                t =&gt; <span class="macro">panic!</span>(<span class="string">"Unhandled MathExpression: {:?}"</span>, t),
             },
             MathExpressionTree::Cons(head, rest) =&gt; {
-                content_mathml.push_str(<span class="string">&quot;&lt;apply&gt;&quot;</span>);
+                content_mathml.push_str(<span class="string">"&lt;apply&gt;"</span>);
                 <span class="kw">match </span>head {
-                    Operator::Add =&gt; content_mathml.push_str(<span class="string">&quot;&lt;plus/&gt;&quot;</span>),
-                    Operator::Subtract =&gt; content_mathml.push_str(<span class="string">&quot;&lt;minus/&gt;&quot;</span>),
-                    Operator::Multiply =&gt; content_mathml.push_str(<span class="string">&quot;&lt;times/&gt;&quot;</span>),
-                    Operator::Equals =&gt; content_mathml.push_str(<span class="string">&quot;&lt;eq/&gt;&quot;</span>),
-                    Operator::Divide =&gt; content_mathml.push_str(<span class="string">&quot;&lt;divide/&gt;&quot;</span>),
-                    Operator::Power =&gt; content_mathml.push_str(<span class="string">&quot;&lt;power/&gt;&quot;</span>),
-                    Operator::Exp =&gt; content_mathml.push_str(<span class="string">&quot;&lt;exp/&gt;&quot;</span>),
-                    Operator::Abs =&gt; content_mathml.push_str(<span class="string">&quot;&lt;abs/&gt;&quot;</span>),
-                    Operator::Grad =&gt; content_mathml.push_str(<span class="string">&quot;&lt;grad/&gt;&quot;</span>),
-                    Operator::Div =&gt; content_mathml.push_str(<span class="string">&quot;&lt;divergence/&gt;&quot;</span>),
-                    Operator::Cos =&gt; content_mathml.push_str(<span class="string">&quot;&lt;cos/&gt;&quot;</span>),
-                    Operator::Sin =&gt; content_mathml.push_str(<span class="string">&quot;&lt;sin/&gt;&quot;</span>),
+                    Operator::Add =&gt; content_mathml.push_str(<span class="string">"&lt;plus/&gt;"</span>),
+                    Operator::Subtract =&gt; content_mathml.push_str(<span class="string">"&lt;minus/&gt;"</span>),
+                    Operator::Multiply =&gt; content_mathml.push_str(<span class="string">"&lt;times/&gt;"</span>),
+                    Operator::Equals =&gt; content_mathml.push_str(<span class="string">"&lt;eq/&gt;"</span>),
+                    Operator::Divide =&gt; content_mathml.push_str(<span class="string">"&lt;divide/&gt;"</span>),
+                    Operator::Power =&gt; content_mathml.push_str(<span class="string">"&lt;power/&gt;"</span>),
+                    Operator::Exp =&gt; content_mathml.push_str(<span class="string">"&lt;exp/&gt;"</span>),
+                    Operator::Abs =&gt; content_mathml.push_str(<span class="string">"&lt;abs/&gt;"</span>),
+                    Operator::Grad =&gt; content_mathml.push_str(<span class="string">"&lt;grad/&gt;"</span>),
+                    Operator::Div =&gt; content_mathml.push_str(<span class="string">"&lt;divergence/&gt;"</span>),
+                    Operator::Cos =&gt; content_mathml.push_str(<span class="string">"&lt;cos/&gt;"</span>),
+                    Operator::Sin =&gt; content_mathml.push_str(<span class="string">"&lt;sin/&gt;"</span>),
                     Operator::Derivative(Derivative {
                         order,
                         var_index,
                         bound_var,
                     }) <span class="kw">if </span>(<span class="kw-2">*</span>order, <span class="kw-2">*</span>var_index) == (<span class="number">1_u8</span>, <span class="number">1_u8</span>) =&gt; {
-                        content_mathml.push_str(<span class="string">&quot;&lt;diff/&gt;&quot;</span>);
-                        content_mathml.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;&lt;bvar&gt;{}&lt;/bar&gt;&quot;</span>, bound_var));
+                        content_mathml.push_str(<span class="string">"&lt;diff/&gt;"</span>);
+                        content_mathml.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"&lt;bvar&gt;{}&lt;/bar&gt;"</span>, bound_var));
                     }
                     Operator::PartialDerivative(PartialDerivative {
                         order,
                         var_index,
                         bound_var,
                     }) <span class="kw">if </span>(<span class="kw-2">*</span>order, <span class="kw-2">*</span>var_index) == (<span class="number">1_u8</span>, <span class="number">1_u8</span>) =&gt; {
-                        content_mathml.push_str(<span class="string">&quot;&lt;partialdiff/&gt;&quot;</span>);
-                        content_mathml.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;&lt;bvar&gt;{}&lt;/bar&gt;&quot;</span>, bound_var));
+                        content_mathml.push_str(<span class="string">"&lt;partialdiff/&gt;"</span>);
+                        content_mathml.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"&lt;bvar&gt;{}&lt;/bar&gt;"</span>, bound_var));
                     }
                     <span class="kw">_ </span>=&gt; {}
                 }
                 <span class="kw">for </span>s <span class="kw">in </span>rest {
                     content_mathml.push_str(<span class="kw-2">&amp;</span>s.to_cmml());
                 }
-                content_mathml.push_str(<span class="string">&quot;&lt;/apply&gt;&quot;</span>);
+                content_mathml.push_str(<span class="string">"&lt;/apply&gt;"</span>);
             }
         }
         content_mathml
     }
 
-    <span class="doccomment">/// Translates to infix math expression to provide &quot;string expressions&quot; (e.g. ((α*ρ)*I)  )
-    /// TA-4 uses &quot;string expressions&quot; to display over the transitions in their visual front end.
+    <span class="doccomment">/// Translates to infix math expression to provide "string expressions" (e.g. ((α*ρ)*I)  )
+    /// TA-4 uses "string expressions" to display over the transitions in their visual front end.
     </span><span class="kw">pub fn </span>to_infix_expression(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
         <span class="kw">let </span><span class="kw-2">mut </span>expression = String::new();
         <span class="kw">match </span><span class="self">self </span>{
             MathExpressionTree::Atom(i) =&gt; <span class="kw">match </span>i {
                 MathExpression::Ci(x) =&gt; {
-                    expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, x.content));
+                    expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"{}"</span>, x.content));
                 }
                 MathExpression::Mi(Mi(id)) =&gt; {
                     expression.push_str(<span class="kw-2">&amp;</span>id.to_string());
@@ -3161,27 +3162,27 @@
                     expression.push_str(<span class="kw-2">&amp;</span>text.to_string());
                 }
                 MathExpression::Mrow(<span class="kw">_</span>) =&gt; {
-                    <span class="macro">panic!</span>(<span class="string">&quot;All Mrows should have been removed by now!&quot;</span>);
+                    <span class="macro">panic!</span>(<span class="string">"All Mrows should have been removed by now!"</span>);
                 }
-                t =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unhandled MathExpression: {:?}&quot;</span>, t),
+                t =&gt; <span class="macro">panic!</span>(<span class="string">"Unhandled MathExpression: {:?}"</span>, t),
             },
 
             MathExpressionTree::Cons(head, rest) =&gt; {
                 <span class="kw">let </span><span class="kw-2">mut </span>operation = String::new();
                 <span class="kw">match </span>head {
-                    Operator::Add =&gt; operation.push(<span class="string">&#39;+&#39;</span>),
-                    Operator::Subtract =&gt; operation.push(<span class="string">&#39;-&#39;</span>),
-                    Operator::Multiply =&gt; operation.push(<span class="string">&#39;*&#39;</span>),
-                    Operator::Equals =&gt; operation.push(<span class="string">&#39;=&#39;</span>),
-                    Operator::Divide =&gt; operation.push(<span class="string">&#39;/&#39;</span>),
-                    Operator::Exp =&gt; operation.push_str(<span class="string">&quot;exp&quot;</span>),
+                    Operator::Add =&gt; operation.push(<span class="string">'+'</span>),
+                    Operator::Subtract =&gt; operation.push(<span class="string">'-'</span>),
+                    Operator::Multiply =&gt; operation.push(<span class="string">'*'</span>),
+                    Operator::Equals =&gt; operation.push(<span class="string">'='</span>),
+                    Operator::Divide =&gt; operation.push(<span class="string">'/'</span>),
+                    Operator::Exp =&gt; operation.push_str(<span class="string">"exp"</span>),
                     <span class="kw">_ </span>=&gt; {}
                 }
                 <span class="kw">let </span><span class="kw-2">mut </span>component = Vec::new();
                 <span class="kw">for </span>s <span class="kw">in </span>rest {
                     component.push(s.to_infix_expression());
                 }
-                <span class="kw">let </span>math_exp = <span class="macro">format!</span>(<span class="string">&quot;({})&quot;</span>, component.join(<span class="kw-2">&amp;</span>operation.to_string()));
+                <span class="kw">let </span>math_exp = <span class="macro">format!</span>(<span class="string">"({})"</span>, component.join(<span class="kw-2">&amp;</span>operation.to_string()));
                 expression.push_str(<span class="kw-2">&amp;</span>math_exp);
             }
         }
@@ -3205,29 +3206,29 @@
                                 } <span class="kw">else if let </span>Operator::Add = op {
                                     expression.push_str(<span class="kw-2">&amp;</span>r.to_latex().to_string());
                                 } <span class="kw">else </span>{
-                                    expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;({})&quot;</span>, r.to_latex()));
+                                    expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"({})"</span>, r.to_latex()));
                                 }
                             } <span class="kw">else </span>{
                                 expression.push_str(<span class="kw-2">&amp;</span>r.to_latex().to_string());
                             }
 
-                            <span class="comment">// Add &quot;+&quot; if it&#39;s not the last element
+                            <span class="comment">// Add "+" if it's not the last element
                             </span><span class="kw">if </span>index &lt; rest.len() - <span class="number">1 </span>{
-                                expression.push(<span class="string">&#39;+&#39;</span>);
+                                expression.push(<span class="string">'+'</span>);
                             }
                         }
                     }
                     Operator::Subtract =&gt; {
                         <span class="comment">// Handle unary minus
                         </span><span class="kw">if </span>rest.len() == <span class="number">1 </span>{
-                            expression.push(<span class="string">&#39;-&#39;</span>);
+                            expression.push(<span class="string">'-'</span>);
                             process_expression_parentheses(<span class="kw-2">&amp;mut </span>expression, <span class="kw-2">&amp;</span>rest[<span class="number">0</span>]);
                         } <span class="kw">else </span>{
                             <span class="kw">for </span>(index, r) <span class="kw">in </span>rest.iter().enumerate() {
                                 process_expression_parentheses(<span class="kw-2">&amp;mut </span>expression, r);
-                                <span class="comment">// Add &quot;-&quot; if it&#39;s not the last element
+                                <span class="comment">// Add "-" if it's not the last element
                                 </span><span class="kw">if </span>index &lt; rest.len() - <span class="number">1 </span>{
-                                    expression.push(<span class="string">&#39;-&#39;</span>);
+                                    expression.push(<span class="string">'-'</span>);
                                 }
                             }
                         }
@@ -3244,128 +3245,128 @@
                                 } <span class="kw">else if let </span>Operator::Dot = op {
                                     expression.push_str(<span class="kw-2">&amp;</span>r.to_latex().to_string());
                                 } <span class="kw">else </span>{
-                                    expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;({})&quot;</span>, r.to_latex()));
+                                    expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"({})"</span>, r.to_latex()));
                                 }
                             } <span class="kw">else </span>{
                                 expression.push_str(<span class="kw-2">&amp;</span>r.to_latex().to_string());
                             }
-                            <span class="comment">// Add &quot;*&quot; if it&#39;s not the last element
+                            <span class="comment">// Add "*" if it's not the last element
                             </span><span class="kw">if </span>index &lt; rest.len() - <span class="number">1 </span>{
-                                expression.push(<span class="string">&#39;*&#39;</span>);
+                                expression.push(<span class="string">'*'</span>);
                             }
                         }
                     }
                     Operator::Equals =&gt; {
                         expression.push_str(<span class="kw-2">&amp;</span>rest[<span class="number">0</span>].to_latex().to_string());
-                        expression.push(<span class="string">&#39;=&#39;</span>);
+                        expression.push(<span class="string">'='</span>);
                         expression.push_str(<span class="kw-2">&amp;</span>rest[<span class="number">1</span>].to_latex().to_string());
                     }
                     Operator::Divide =&gt; {
-                        expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;\\frac{{{}}}&quot;</span>, <span class="kw-2">&amp;</span>rest[<span class="number">0</span>].to_latex()));
-                        expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{{{}}}&quot;</span>, <span class="kw-2">&amp;</span>rest[<span class="number">1</span>].to_latex()));
+                        expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"\\frac{{{}}}"</span>, <span class="kw-2">&amp;</span>rest[<span class="number">0</span>].to_latex()));
+                        expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"{{{}}}"</span>, <span class="kw-2">&amp;</span>rest[<span class="number">1</span>].to_latex()));
                     }
                     Operator::Exp =&gt; {
-                        expression.push_str(<span class="string">&quot;\\mathrm{exp}&quot;</span>);
-                        expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{{{}}}&quot;</span>, rest[<span class="number">0</span>].to_latex()));
+                        expression.push_str(<span class="string">"\\mathrm{exp}"</span>);
+                        expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"{{{}}}"</span>, rest[<span class="number">0</span>].to_latex()));
                     }
                     Operator::Sqrt =&gt; {
-                        expression.push_str(<span class="string">&quot;\\sqrt&quot;</span>);
-                        expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{{{}}}&quot;</span>, rest[<span class="number">0</span>].to_latex()));
+                        expression.push_str(<span class="string">"\\sqrt"</span>);
+                        expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"{{{}}}"</span>, rest[<span class="number">0</span>].to_latex()));
                     }
                     Operator::Lparen =&gt; {
-                        expression.push(<span class="string">&#39;(&#39;</span>);
+                        expression.push(<span class="string">'('</span>);
                         expression.push_str(<span class="kw-2">&amp;</span>rest[<span class="number">0</span>].to_latex().to_string());
                     }
                     Operator::Rparen =&gt; {
-                        expression.push(<span class="string">&#39;)&#39;</span>);
+                        expression.push(<span class="string">')'</span>);
                         expression.push_str(<span class="kw-2">&amp;</span>rest[<span class="number">0</span>].to_latex().to_string());
                     }
                     Operator::Compose =&gt; {
                         process_expression_parentheses(<span class="kw-2">&amp;mut </span>expression, <span class="kw-2">&amp;</span>rest[<span class="number">0</span>]);
-                        expression.push(<span class="string">&#39;_&#39;</span>);
+                        expression.push(<span class="string">'_'</span>);
                         process_expression_parentheses(<span class="kw-2">&amp;mut </span>expression, <span class="kw-2">&amp;</span>rest[<span class="number">1</span>]);
                     }
                     Operator::Factorial =&gt; {
                         process_expression_parentheses(<span class="kw-2">&amp;mut </span>expression, <span class="kw-2">&amp;</span>rest[<span class="number">0</span>]);
-                        expression.push(<span class="string">&#39;!&#39;</span>);
+                        expression.push(<span class="string">'!'</span>);
                     }
                     Operator::Power =&gt; {
                         process_expression_parentheses(<span class="kw-2">&amp;mut </span>expression, <span class="kw-2">&amp;</span>rest[<span class="number">0</span>]);
-                        expression.push(<span class="string">&#39;^&#39;</span>);
-                        expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{{{}}}&quot;</span>, rest[<span class="number">1</span>].to_latex()));
+                        expression.push(<span class="string">'^'</span>);
+                        expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"{{{}}}"</span>, rest[<span class="number">1</span>].to_latex()));
                     }
                     Operator::Comma =&gt; {
                         process_expression_parentheses(<span class="kw-2">&amp;mut </span>expression, <span class="kw-2">&amp;</span>rest[<span class="number">0</span>]);
-                        expression.push(<span class="string">&#39;,&#39;</span>);
+                        expression.push(<span class="string">','</span>);
                         process_expression_parentheses(<span class="kw-2">&amp;mut </span>expression, <span class="kw-2">&amp;</span>rest[<span class="number">1</span>]);
                     }
                     Operator::Grad =&gt; {
-                        expression.push_str(<span class="string">&quot;\\nabla{&quot;</span>);
+                        expression.push_str(<span class="string">"\\nabla{"</span>);
                         process_expression_parentheses(<span class="kw-2">&amp;mut </span>expression, <span class="kw-2">&amp;</span>rest[<span class="number">0</span>]);
-                        expression.push(<span class="string">&#39;}&#39;</span>);
+                        expression.push(<span class="string">'}'</span>);
                     }
                     Operator::Dot =&gt; {
                         process_expression_parentheses(<span class="kw-2">&amp;mut </span>expression, <span class="kw-2">&amp;</span>rest[<span class="number">0</span>]);
-                        expression.push_str(<span class="string">&quot; \\cdot &quot;</span>);
+                        expression.push_str(<span class="string">" \\cdot "</span>);
                         process_expression_parentheses(<span class="kw-2">&amp;mut </span>expression, <span class="kw-2">&amp;</span>rest[<span class="number">1</span>]);
                     }
                     Operator::Div =&gt; {
-                        expression.push_str(<span class="string">&quot;\\nabla \\cdot {&quot;</span>);
+                        expression.push_str(<span class="string">"\\nabla \\cdot {"</span>);
                         process_expression_parentheses(<span class="kw-2">&amp;mut </span>expression, <span class="kw-2">&amp;</span>rest[<span class="number">0</span>]);
-                        expression.push(<span class="string">&#39;}&#39;</span>);
+                        expression.push(<span class="string">'}'</span>);
                     }
                     Operator::Abs =&gt; {
-                        expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;\\left|{}\\right|&quot;</span>, rest[<span class="number">0</span>].to_latex()));
+                        expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"\\left|{}\\right|"</span>, rest[<span class="number">0</span>].to_latex()));
                     }
                     Operator::Derivative(d) =&gt; {
-                        expression.push_str(<span class="string">&quot;\\frac{d &quot;</span>);
+                        expression.push_str(<span class="string">"\\frac{d "</span>);
                         process_expression_parentheses(<span class="kw-2">&amp;mut </span>expression, <span class="kw-2">&amp;</span>rest[<span class="number">0</span>]);
-                        expression.push_str(<span class="string">&quot;}{d&quot;</span>);
+                        expression.push_str(<span class="string">"}{d"</span>);
                         process_math_expression(<span class="kw-2">&amp;</span>d.bound_var.content, <span class="kw-2">&amp;mut </span>expression);
-                        expression.push(<span class="string">&#39;}&#39;</span>);
+                        expression.push(<span class="string">'}'</span>);
                     }
                     Operator::Sin =&gt; {
-                        expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;\\sin({})&quot;</span>, rest[<span class="number">0</span>].to_latex()));
+                        expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"\\sin({})"</span>, rest[<span class="number">0</span>].to_latex()));
                     }
                     Operator::Cos =&gt; {
-                        expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;\\cos({})&quot;</span>, rest[<span class="number">0</span>].to_latex()));
+                        expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"\\cos({})"</span>, rest[<span class="number">0</span>].to_latex()));
                     }
                     Operator::Tan =&gt; {
-                        expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;\\tan({})&quot;</span>, rest[<span class="number">0</span>].to_latex()));
+                        expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"\\tan({})"</span>, rest[<span class="number">0</span>].to_latex()));
                     }
                     Operator::Sec =&gt; {
-                        expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;\\sec({})&quot;</span>, rest[<span class="number">0</span>].to_latex()));
+                        expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"\\sec({})"</span>, rest[<span class="number">0</span>].to_latex()));
                     }
                     Operator::Csc =&gt; {
-                        expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;\\csc({})&quot;</span>, rest[<span class="number">0</span>].to_latex()));
+                        expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"\\csc({})"</span>, rest[<span class="number">0</span>].to_latex()));
                     }
                     Operator::Cot =&gt; {
-                        expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;\\cot({})&quot;</span>, rest[<span class="number">0</span>].to_latex()));
+                        expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"\\cot({})"</span>, rest[<span class="number">0</span>].to_latex()));
                     }
                     Operator::Arcsin =&gt; {
-                        expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;\\arcsin({})&quot;</span>, rest[<span class="number">0</span>].to_latex()));
+                        expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"\\arcsin({})"</span>, rest[<span class="number">0</span>].to_latex()));
                     }
                     Operator::Arccos =&gt; {
-                        expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;\\arccos({})&quot;</span>, rest[<span class="number">0</span>].to_latex()));
+                        expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"\\arccos({})"</span>, rest[<span class="number">0</span>].to_latex()));
                     }
                     Operator::Arctan =&gt; {
-                        expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;\\arctan({})&quot;</span>, rest[<span class="number">0</span>].to_latex()));
+                        expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"\\arctan({})"</span>, rest[<span class="number">0</span>].to_latex()));
                     }
                     Operator::Arcsec =&gt; {
-                        expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;\\arcsec({})&quot;</span>, rest[<span class="number">0</span>].to_latex()));
+                        expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"\\arcsec({})"</span>, rest[<span class="number">0</span>].to_latex()));
                     }
                     Operator::Arccsc =&gt; {
-                        expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;\\arccsc({})&quot;</span>, rest[<span class="number">0</span>].to_latex()));
+                        expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"\\arccsc({})"</span>, rest[<span class="number">0</span>].to_latex()));
                     }
                     Operator::Arccot =&gt; {
-                        expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;\\arccot({})&quot;</span>, rest[<span class="number">0</span>].to_latex()));
+                        expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"\\arccot({})"</span>, rest[<span class="number">0</span>].to_latex()));
                     }
                     Operator::Mean =&gt; {
-                        expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;\\langle {} \\rangle&quot;</span>, rest[<span class="number">0</span>].to_latex()));
+                        expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"\\langle {} \\rangle"</span>, rest[<span class="number">0</span>].to_latex()));
                     }
                     <span class="kw">_ </span>=&gt; {
-                        expression = <span class="string">&quot;&quot;</span>.to_string();
-                        <span class="kw">return </span><span class="string">&quot;Contain unsupported operators.&quot;</span>.to_string();
+                        expression = <span class="string">""</span>.to_string();
+                        <span class="kw">return </span><span class="string">"Contain unsupported operators."</span>.to_string();
                     }
                 }
             }
@@ -3399,21 +3400,21 @@
                 <span class="kw">for </span>element <span class="kw">in </span>elements {
                     <span class="kw">if let </span>MathExpression::Ci(x) = element {
                         <span class="comment">// Handles cos, sin, tan as operators
-                        </span><span class="kw">if </span>x.content == Box::new(MathExpression::Mi(Mi(<span class="string">&quot;cos&quot;</span>.to_string()))) {
+                        </span><span class="kw">if </span>x.content == Box::new(MathExpression::Mi(Mi(<span class="string">"cos"</span>.to_string()))) {
                             tokens.push(MathExpression::Mo(Operator::Cos));
                             <span class="kw">if let </span><span class="prelude-val">Some</span>(vec) = x.func_of.clone() {
                                 <span class="kw">for </span>v <span class="kw">in </span>vec {
                                     tokens.push(MathExpression::Ci(v));
                                 }
                             }
-                        } <span class="kw">else if </span>x.content == Box::new(MathExpression::Mi(Mi(<span class="string">&quot;sin&quot;</span>.to_string()))) {
+                        } <span class="kw">else if </span>x.content == Box::new(MathExpression::Mi(Mi(<span class="string">"sin"</span>.to_string()))) {
                             tokens.push(MathExpression::Mo(Operator::Sin));
                             <span class="kw">if let </span><span class="prelude-val">Some</span>(vec) = x.func_of.clone() {
                                 <span class="kw">for </span>v <span class="kw">in </span>vec {
                                     tokens.push(MathExpression::Ci(v));
                                 }
                             }
-                        } <span class="kw">else if </span>x.content == Box::new(MathExpression::Mi(Mi(<span class="string">&quot;tan&quot;</span>.to_string()))) {
+                        } <span class="kw">else if </span>x.content == Box::new(MathExpression::Mi(Mi(<span class="string">"tan"</span>.to_string()))) {
                             tokens.push(MathExpression::Mo(Operator::Tan));
                             <span class="kw">if let </span><span class="prelude-val">Some</span>(vec) = x.func_of.clone() {
                                 <span class="kw">for </span>v <span class="kw">in </span>vec {
@@ -3453,7 +3454,7 @@
             <span class="doccomment">/// Insert implicit `exponential` and `power` operators
             </span>MathExpression::Msup(base, superscript) =&gt; {
                 <span class="kw">if let </span>MathExpression::Ci(x) = <span class="kw-2">&amp;**</span>base {
-                    <span class="kw">if </span>x.content == Box::new(MathExpression::Mi(Mi(<span class="string">&quot;e&quot;</span>.to_string()))) {
+                    <span class="kw">if </span>x.content == Box::new(MathExpression::Mi(Mi(<span class="string">"e"</span>.to_string()))) {
                         tokens.push(MathExpression::Mo(Operator::Exp));
                         tokens.push(MathExpression::Mo(Operator::Lparen));
                         superscript.flatten(tokens);
@@ -3543,7 +3544,7 @@
                 acc.push(x);
             } <span class="kw">else </span>{
                 <span class="kw">match </span>x {
-                    <span class="comment">// Handle left parenthesis operator &#39;(&#39;
+                    <span class="comment">// Handle left parenthesis operator '('
                     </span>MathExpression::Mo(Operator::Lparen) =&gt; {
                         <span class="comment">// Check last element of the accumulator.
                         </span><span class="kw">if let </span><span class="prelude-val">Some</span>(MathExpression::Mo(<span class="kw">_</span>)) = acc.last() {
@@ -3562,7 +3563,7 @@
                         <span class="kw">let </span>last_token = acc.last().unwrap();
                         <span class="kw">match </span>last_token {
                             MathExpression::Mo(Operator::Rparen) =&gt; {
-                                <span class="comment">// If the last item in the accumulator is a right parenthesis &#39;)&#39;,
+                                <span class="comment">// If the last item in the accumulator is a right parenthesis ')',
                                 // insert a multiplication operator
                                 </span>acc.push(<span class="kw-2">&amp;</span>MathExpression::Mo(Operator::Multiply));
                             }
@@ -3683,13 +3684,13 @@
             <span class="kw">let </span>rhs = expr_bp(lexer, r_bp);
             MathExpressionTree::Cons(op, <span class="macro">vec!</span>[rhs])
         }
-        t =&gt; <span class="macro">panic!</span>(<span class="string">&quot;bad token: {:?}&quot;</span>, t),
+        t =&gt; <span class="macro">panic!</span>(<span class="string">"bad token: {:?}"</span>, t),
     };
     <span class="kw">loop </span>{
         <span class="kw">let </span>op = <span class="kw">match </span>lexer.peek() {
             Token::Eof =&gt; <span class="kw">break</span>,
             Token::Op(op) =&gt; op,
-            t =&gt; <span class="macro">panic!</span>(<span class="string">&quot;bad token: {:?}&quot;</span>, t),
+            t =&gt; <span class="macro">panic!</span>(<span class="string">"bad token: {:?}"</span>, t),
         };
         <span class="kw">if let </span><span class="prelude-val">Some</span>((l_bp, ())) = postfix_binding_power(<span class="kw-2">&amp;</span>op) {
             <span class="kw">if </span>l_bp &lt; min_bp {
@@ -3735,7 +3736,7 @@
         Operator::Sqrt =&gt; ((), <span class="number">25</span>),
         Operator::SumUnderOver(SumUnderOver { .. }) =&gt; ((), <span class="number">25</span>),
         Operator::HatOp(HatOp { .. }) =&gt; ((), <span class="number">25</span>),
-        <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;Bad operator: {:?}&quot;</span>, op),
+        <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">"Bad operator: {:?}"</span>, op),
     }
 }
 
@@ -3762,7 +3763,7 @@
         Operator::Dot =&gt; (<span class="number">18</span>, <span class="number">17</span>),
         Operator::Cross =&gt; (<span class="number">18</span>, <span class="number">17</span>),
         <span class="comment">//Operator::Comma =&gt; (18, 17),
-        </span>Operator::Other(op) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unhandled operator: {}!&quot;</span>, op),
+        </span>Operator::Other(op) =&gt; <span class="macro">panic!</span>(<span class="string">"Unhandled operator: {}!"</span>, op),
         <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
     };
     <span class="prelude-val">Some</span>(res)
@@ -3771,7 +3772,7 @@
 <span class="doccomment">/// Replaces Unicode representations in the input string with their corresponding symbols.
 </span><span class="kw">pub fn </span>replace_unicode_with_symbols(input: <span class="kw-2">&amp;</span>str) -&gt; String {
     <span class="comment">// Define a regex pattern to match Unicode representations
-    </span><span class="kw">let </span>re = Regex::new(<span class="string">r#&quot;&amp;#x([0-9A-Fa-f]+);&quot;#</span>).unwrap();
+    </span><span class="kw">let </span>re = Regex::new(<span class="string">r#"&amp;#x([0-9A-Fa-f]+);"#</span>).unwrap();
 
     <span class="comment">// Use replace_all to replace Unicode representations with corresponding symbols
     </span><span class="kw">let </span>replaced_str = re.replace_all(input, |captures: <span class="kw-2">&amp;</span>regex::Captures| {
@@ -3793,16 +3794,16 @@
 ///
 /// This function takes a MathML string as input and performs preprocessing steps to ensure a
 /// cleaner conversion to LaTeX. It removes newline characters, eliminates spaces between MathML
-/// elements, and replaces occurrences of &quot;&lt;mi&gt;∇&lt;/mi&gt;&quot; with &quot;&lt;mo&gt;∇&lt;/mo&gt;&quot; to enhance compatibility
+/// elements, and replaces occurrences of "&lt;mi&gt;∇&lt;/mi&gt;" with "&lt;mo&gt;∇&lt;/mo&gt;" to enhance compatibility
 /// with LaTeX rendering. The resulting processed MathML string is then ready for conversion to LaTeX.
 </span><span class="kw">pub fn </span>preprocess_mathml_for_to_latex(input: <span class="kw-2">&amp;</span>str) -&gt; String {
     <span class="comment">// Remove all newline characters
-    </span><span class="kw">let </span>no_newlines = input.replace(<span class="string">&#39;\n&#39;</span>, <span class="string">&quot;&quot;</span>);
+    </span><span class="kw">let </span>no_newlines = input.replace(<span class="string">'\n'</span>, <span class="string">""</span>);
 
     <span class="comment">// Remove spaces between MathML elements
-    </span><span class="kw">let </span>no_spaces = Regex::new(<span class="string">r&quot;&gt;\s*&lt;&quot;</span>)
+    </span><span class="kw">let </span>no_spaces = Regex::new(<span class="string">r"&gt;\s*&lt;"</span>)
         .unwrap()
-        .replace_all(<span class="kw-2">&amp;</span>no_newlines, <span class="string">&quot;&gt;&lt;&quot;</span>)
+        .replace_all(<span class="kw-2">&amp;</span>no_newlines, <span class="string">"&gt;&lt;"</span>)
         .to_string();
 
     no_spaces.to_string()
@@ -3810,93 +3811,93 @@
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_conversion() {
-    <span class="kw">let </span>input = <span class="string">&quot;&lt;math&gt;&lt;mi&gt;x&lt;/mi&gt;&lt;mo&gt;+&lt;/mo&gt;&lt;mi&gt;y&lt;/mi&gt;&lt;/math&gt;&quot;</span>;
-    <span class="macro">println!</span>(<span class="string">&quot;Input: {input}&quot;</span>);
+    <span class="kw">let </span>input = <span class="string">"&lt;math&gt;&lt;mi&gt;x&lt;/mi&gt;&lt;mo&gt;+&lt;/mo&gt;&lt;mi&gt;y&lt;/mi&gt;&lt;/math&gt;"</span>;
+    <span class="macro">println!</span>(<span class="string">"Input: {input}"</span>);
     <span class="kw">let </span>s = input.parse::&lt;MathExpressionTree&gt;().unwrap();
-    <span class="macro">assert_eq!</span>(s.to_string(), <span class="string">&quot;(+ x y)&quot;</span>);
-    <span class="macro">println!</span>(<span class="string">&quot;Output: {s}\n&quot;</span>);
+    <span class="macro">assert_eq!</span>(s.to_string(), <span class="string">"(+ x y)"</span>);
+    <span class="macro">println!</span>(<span class="string">"Output: {s}\n"</span>);
 
-    <span class="kw">let </span>input = <span class="string">&quot;&lt;math&gt;&lt;mi&gt;a&lt;/mi&gt;&lt;mo&gt;=&lt;/mo&gt;&lt;mi&gt;x&lt;/mi&gt;&lt;mo&gt;+&lt;/mo&gt;&lt;mi&gt;y&lt;/mi&gt;&lt;mi&gt;z&lt;/mi&gt;&lt;/math&gt;&quot;</span>;
-    <span class="macro">println!</span>(<span class="string">&quot;Input: {input}&quot;</span>);
+    <span class="kw">let </span>input = <span class="string">"&lt;math&gt;&lt;mi&gt;a&lt;/mi&gt;&lt;mo&gt;=&lt;/mo&gt;&lt;mi&gt;x&lt;/mi&gt;&lt;mo&gt;+&lt;/mo&gt;&lt;mi&gt;y&lt;/mi&gt;&lt;mi&gt;z&lt;/mi&gt;&lt;/math&gt;"</span>;
+    <span class="macro">println!</span>(<span class="string">"Input: {input}"</span>);
     <span class="kw">let </span>s = input.parse::&lt;MathExpressionTree&gt;().unwrap();
-    <span class="macro">assert_eq!</span>(s.to_string(), <span class="string">&quot;(= a (+ x (* y z)))&quot;</span>);
-    <span class="macro">println!</span>(<span class="string">&quot;Output: {s}\n&quot;</span>);
+    <span class="macro">assert_eq!</span>(s.to_string(), <span class="string">"(= a (+ x (* y z)))"</span>);
+    <span class="macro">println!</span>(<span class="string">"Output: {s}\n"</span>);
 
-    <span class="kw">let </span>input = <span class="string">&quot;&lt;math&gt;&lt;mi&gt;a&lt;/mi&gt;&lt;mo&gt;+&lt;/mo&gt;&lt;mo&gt;(&lt;/mo&gt;&lt;mo&gt;-&lt;/mo&gt;&lt;mi&gt;b&lt;/mi&gt;&lt;mo&gt;)&lt;/mo&gt;&lt;/math&gt;&quot;</span>;
-    <span class="macro">println!</span>(<span class="string">&quot;Input: {input}&quot;</span>);
+    <span class="kw">let </span>input = <span class="string">"&lt;math&gt;&lt;mi&gt;a&lt;/mi&gt;&lt;mo&gt;+&lt;/mo&gt;&lt;mo&gt;(&lt;/mo&gt;&lt;mo&gt;-&lt;/mo&gt;&lt;mi&gt;b&lt;/mi&gt;&lt;mo&gt;)&lt;/mo&gt;&lt;/math&gt;"</span>;
+    <span class="macro">println!</span>(<span class="string">"Input: {input}"</span>);
     <span class="kw">let </span>s = input.parse::&lt;MathExpressionTree&gt;().unwrap();
-    <span class="macro">assert_eq!</span>(s.to_string(), <span class="string">&quot;(+ a (- b))&quot;</span>);
-    <span class="macro">println!</span>(<span class="string">&quot;Output: {s}\n&quot;</span>);
+    <span class="macro">assert_eq!</span>(s.to_string(), <span class="string">"(+ a (- b))"</span>);
+    <span class="macro">println!</span>(<span class="string">"Output: {s}\n"</span>);
 
     <span class="kw">let </span>input =
-        <span class="string">&quot;&lt;math&gt;&lt;mn&gt;2&lt;/mn&gt;&lt;mi&gt;a&lt;/mi&gt;&lt;mo&gt;(&lt;/mo&gt;&lt;mi&gt;c&lt;/mi&gt;&lt;mo&gt;+&lt;/mo&gt;&lt;mi&gt;d&lt;/mi&gt;&lt;mo&gt;)&lt;/mo&gt;&lt;/math&gt;&quot;</span>;
-    <span class="macro">println!</span>(<span class="string">&quot;Input: {input}&quot;</span>);
+        <span class="string">"&lt;math&gt;&lt;mn&gt;2&lt;/mn&gt;&lt;mi&gt;a&lt;/mi&gt;&lt;mo&gt;(&lt;/mo&gt;&lt;mi&gt;c&lt;/mi&gt;&lt;mo&gt;+&lt;/mo&gt;&lt;mi&gt;d&lt;/mi&gt;&lt;mo&gt;)&lt;/mo&gt;&lt;/math&gt;"</span>;
+    <span class="macro">println!</span>(<span class="string">"Input: {input}"</span>);
     <span class="kw">let </span>s = input.parse::&lt;MathExpressionTree&gt;().unwrap();
-    <span class="macro">assert_eq!</span>(s.to_string(), <span class="string">&quot;(* (* 2 a) (+ c d))&quot;</span>);
-    <span class="macro">println!</span>(<span class="string">&quot;Output: {s}\n&quot;</span>);
+    <span class="macro">assert_eq!</span>(s.to_string(), <span class="string">"(* (* 2 a) (+ c d))"</span>);
+    <span class="macro">println!</span>(<span class="string">"Output: {s}\n"</span>);
 
-    <span class="kw">let </span>input = <span class="string">&quot;
+    <span class="kw">let </span>input = <span class="string">"
     &lt;math&gt;
         &lt;mfrac&gt;&lt;mrow&gt;&lt;mi&gt;d&lt;/mi&gt;&lt;mi&gt;S&lt;/mi&gt;&lt;/mrow&gt;&lt;mrow&gt;&lt;mi&gt;d&lt;/mi&gt;&lt;mi&gt;t&lt;/mi&gt;&lt;/mrow&gt;&lt;/mfrac&gt;
         &lt;mo&gt;=&lt;/mo&gt;&lt;mo&gt;−&lt;/mo&gt;&lt;mi&gt;β&lt;/mi&gt;&lt;mi&gt;S&lt;/mi&gt;&lt;mi&gt;I&lt;/mi&gt;
         &lt;/math&gt;
-        &quot;</span>;
-    <span class="macro">println!</span>(<span class="string">&quot;Input: {input}&quot;</span>);
+        "</span>;
+    <span class="macro">println!</span>(<span class="string">"Input: {input}"</span>);
     <span class="kw">let </span>FirstOrderODE {
         lhs_var,
         func_of,
         with_respect_to,
         rhs,
     } = first_order_ode(input.into()).unwrap().<span class="number">1</span>;
-    <span class="macro">assert_eq!</span>(lhs_var.to_string(), <span class="string">&quot;S&quot;</span>);
-    <span class="macro">assert_eq!</span>(func_of[<span class="number">0</span>].to_string(), <span class="string">&quot;&quot;</span>);
-    <span class="macro">assert_eq!</span>(with_respect_to.to_string(), <span class="string">&quot;t&quot;</span>);
-    <span class="macro">assert_eq!</span>(rhs.to_string(), <span class="string">&quot;(* (* (- β) S) I)&quot;</span>);
-    <span class="macro">println!</span>(<span class="string">&quot;Output: {s}\n&quot;</span>);
+    <span class="macro">assert_eq!</span>(lhs_var.to_string(), <span class="string">"S"</span>);
+    <span class="macro">assert_eq!</span>(func_of[<span class="number">0</span>].to_string(), <span class="string">""</span>);
+    <span class="macro">assert_eq!</span>(with_respect_to.to_string(), <span class="string">"t"</span>);
+    <span class="macro">assert_eq!</span>(rhs.to_string(), <span class="string">"(* (* (- β) S) I)"</span>);
+    <span class="macro">println!</span>(<span class="string">"Output: {s}\n"</span>);
 
-    <span class="kw">let </span>input = <span class="string">&quot;
+    <span class="kw">let </span>input = <span class="string">"
     &lt;math&gt;
         &lt;mfrac&gt;&lt;mrow&gt;&lt;mi&gt;d&lt;/mi&gt;&lt;mi&gt;S&lt;/mi&gt;&lt;mo&gt;(&lt;/mo&gt;&lt;mi&gt;t&lt;/mi&gt;&lt;mo&gt;)&lt;/mo&gt;&lt;/mrow&gt;&lt;mrow&gt;&lt;mi&gt;d&lt;/mi&gt;&lt;mi&gt;t&lt;/mi&gt;&lt;/mrow&gt;&lt;/mfrac&gt;
         &lt;mo&gt;=&lt;/mo&gt;&lt;mo&gt;−&lt;/mo&gt;&lt;mi&gt;β&lt;/mi&gt;&lt;mi&gt;S&lt;/mi&gt;&lt;mi&gt;I&lt;/mi&gt;
         &lt;/math&gt;
-        &quot;</span>;
-    <span class="macro">println!</span>(<span class="string">&quot;Input: {input}&quot;</span>);
+        "</span>;
+    <span class="macro">println!</span>(<span class="string">"Input: {input}"</span>);
     <span class="kw">let </span>FirstOrderODE {
         lhs_var,
         func_of,
         with_respect_to,
         rhs,
     } = first_order_ode(input.into()).unwrap().<span class="number">1</span>;
-    <span class="macro">assert_eq!</span>(lhs_var.to_string(), <span class="string">&quot;S&quot;</span>);
-    <span class="macro">assert_eq!</span>(func_of[<span class="number">0</span>].to_string(), <span class="string">&quot;t&quot;</span>);
-    <span class="macro">assert_eq!</span>(with_respect_to.to_string(), <span class="string">&quot;t&quot;</span>);
-    <span class="macro">assert_eq!</span>(rhs.to_string(), <span class="string">&quot;(* (* (- β) S) I)&quot;</span>);
-    <span class="macro">println!</span>(<span class="string">&quot;Output: {s}\n&quot;</span>);
+    <span class="macro">assert_eq!</span>(lhs_var.to_string(), <span class="string">"S"</span>);
+    <span class="macro">assert_eq!</span>(func_of[<span class="number">0</span>].to_string(), <span class="string">"t"</span>);
+    <span class="macro">assert_eq!</span>(with_respect_to.to_string(), <span class="string">"t"</span>);
+    <span class="macro">assert_eq!</span>(rhs.to_string(), <span class="string">"(* (* (- β) S) I)"</span>);
+    <span class="macro">println!</span>(<span class="string">"Output: {s}\n"</span>);
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_to_content_mathml_example1() {
-    <span class="kw">let </span>input = <span class="string">&quot;&lt;math&gt;&lt;mi&gt;x&lt;/mi&gt;&lt;mo&gt;+&lt;/mo&gt;&lt;mi&gt;y&lt;/mi&gt;&lt;/math&gt;&quot;</span>;
+    <span class="kw">let </span>input = <span class="string">"&lt;math&gt;&lt;mi&gt;x&lt;/mi&gt;&lt;mo&gt;+&lt;/mo&gt;&lt;mi&gt;y&lt;/mi&gt;&lt;/math&gt;"</span>;
     <span class="kw">let </span>s = input.parse::&lt;MathExpressionTree&gt;().unwrap();
     <span class="kw">let </span>content = s.to_cmml();
-    <span class="macro">assert_eq!</span>(content, <span class="string">&quot;&lt;apply&gt;&lt;plus/&gt;&lt;ci&gt;x&lt;/ci&gt;&lt;ci&gt;y&lt;/ci&gt;&lt;/apply&gt;&quot;</span>);
+    <span class="macro">assert_eq!</span>(content, <span class="string">"&lt;apply&gt;&lt;plus/&gt;&lt;ci&gt;x&lt;/ci&gt;&lt;ci&gt;y&lt;/ci&gt;&lt;/apply&gt;"</span>);
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_to_content_mathml_example2() {
-    <span class="kw">let </span>input = <span class="string">&quot;&lt;math&gt;
+    <span class="kw">let </span>input = <span class="string">"&lt;math&gt;
         &lt;mfrac&gt;&lt;mrow&gt;&lt;mi&gt;d&lt;/mi&gt;&lt;mi&gt;S&lt;/mi&gt;&lt;/mrow&gt;&lt;mrow&gt;&lt;mi&gt;d&lt;/mi&gt;&lt;mi&gt;t&lt;/mi&gt;&lt;/mrow&gt;&lt;/mfrac&gt;
         &lt;mo&gt;=&lt;/mo&gt;&lt;mo&gt;−&lt;/mo&gt;&lt;mi&gt;β&lt;/mi&gt;&lt;mi&gt;S&lt;/mi&gt;&lt;mi&gt;I&lt;/mi&gt;
         &lt;/math&gt;
-        &quot;</span>;
+        "</span>;
     <span class="kw">let </span>ode = input.parse::&lt;FirstOrderODE&gt;().unwrap();
     <span class="kw">let </span>cmml = ode.to_cmml();
-    <span class="macro">assert_eq!</span>(cmml, <span class="string">&quot;&lt;apply&gt;&lt;eq/&gt;&lt;apply&gt;&lt;diff/&gt;&lt;bvar&gt;t&lt;/bar&gt;&lt;ci&gt;S&lt;/ci&gt;&lt;/apply&gt;&lt;apply&gt;&lt;times/&gt;&lt;apply&gt;&lt;times/&gt;&lt;apply&gt;&lt;minus/&gt;&lt;ci&gt;β&lt;/ci&gt;&lt;/apply&gt;&lt;ci&gt;S&lt;/ci&gt;&lt;/apply&gt;&lt;ci&gt;I&lt;/ci&gt;&lt;/apply&gt;&lt;/apply&gt;&quot;</span>);
+    <span class="macro">assert_eq!</span>(cmml, <span class="string">"&lt;apply&gt;&lt;eq/&gt;&lt;apply&gt;&lt;diff/&gt;&lt;bvar&gt;t&lt;/bar&gt;&lt;ci&gt;S&lt;/ci&gt;&lt;/apply&gt;&lt;apply&gt;&lt;times/&gt;&lt;apply&gt;&lt;times/&gt;&lt;apply&gt;&lt;minus/&gt;&lt;ci&gt;β&lt;/ci&gt;&lt;/apply&gt;&lt;ci&gt;S&lt;/ci&gt;&lt;/apply&gt;&lt;ci&gt;I&lt;/ci&gt;&lt;/apply&gt;&lt;/apply&gt;"</span>);
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_content_hackathon2_scenario1_eq1() {
-    <span class="kw">let </span>input = <span class="string">&quot;
+    <span class="kw">let </span>input = <span class="string">"
     &lt;math&gt;
         &lt;mfrac&gt;
         &lt;mrow&gt;&lt;mi&gt;d&lt;/mi&gt;&lt;mi&gt;S&lt;/mi&gt;&lt;mo&gt;(&lt;/mo&gt;&lt;mi&gt;t&lt;/mi&gt;&lt;mo&gt;)&lt;/mo&gt;&lt;/mrow&gt;
@@ -3908,7 +3909,7 @@
         &lt;mi&gt;I&lt;/mi&gt;&lt;mo&gt;(&lt;/mo&gt;&lt;mi&gt;t&lt;/mi&gt;&lt;mo&gt;)&lt;/mo&gt;
         &lt;mfrac&gt;&lt;mrow&gt;&lt;mi&gt;S&lt;/mi&gt;&lt;mo&gt;(&lt;/mo&gt;&lt;mi&gt;t&lt;/mi&gt;&lt;mo&gt;)&lt;/mo&gt;&lt;/mrow&gt;&lt;mi&gt;N&lt;/mi&gt;&lt;/mfrac&gt;
     &lt;/math&gt;
-    &quot;</span>;
+    "</span>;
     <span class="kw">let </span>ode = input.parse::&lt;FirstOrderODE&gt;().unwrap();
     <span class="kw">let </span>cmml = ode.to_cmml();
     <span class="kw">let </span>FirstOrderODE {
@@ -3917,12 +3918,12 @@
         with_respect_to: <span class="kw">_</span>,
         rhs: <span class="kw">_</span>,
     } = first_order_ode(input.into()).unwrap().<span class="number">1</span>;
-    <span class="macro">assert_eq!</span>(cmml, <span class="string">&quot;&lt;apply&gt;&lt;eq/&gt;&lt;apply&gt;&lt;diff/&gt;&lt;bvar&gt;t&lt;/bar&gt;&lt;ci&gt;S&lt;/ci&gt;&lt;/apply&gt;&lt;apply&gt;&lt;times/&gt;&lt;apply&gt;&lt;times/&gt;&lt;apply&gt;&lt;minus/&gt;&lt;ci&gt;β&lt;/ci&gt;&lt;/apply&gt;&lt;ci&gt;I&lt;/ci&gt;&lt;/apply&gt;&lt;apply&gt;&lt;divide/&gt;&lt;ci&gt;S&lt;/ci&gt;&lt;ci&gt;N&lt;/ci&gt;&lt;/apply&gt;&lt;/apply&gt;&lt;/apply&gt;&quot;</span>);
+    <span class="macro">assert_eq!</span>(cmml, <span class="string">"&lt;apply&gt;&lt;eq/&gt;&lt;apply&gt;&lt;diff/&gt;&lt;bvar&gt;t&lt;/bar&gt;&lt;ci&gt;S&lt;/ci&gt;&lt;/apply&gt;&lt;apply&gt;&lt;times/&gt;&lt;apply&gt;&lt;times/&gt;&lt;apply&gt;&lt;minus/&gt;&lt;ci&gt;β&lt;/ci&gt;&lt;/apply&gt;&lt;ci&gt;I&lt;/ci&gt;&lt;/apply&gt;&lt;apply&gt;&lt;divide/&gt;&lt;ci&gt;S&lt;/ci&gt;&lt;ci&gt;N&lt;/ci&gt;&lt;/apply&gt;&lt;/apply&gt;&lt;/apply&gt;"</span>);
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_content_hackathon2_scenario1_eq2() {
-    <span class="kw">let </span>input = <span class="string">&quot;
+    <span class="kw">let </span>input = <span class="string">"
     &lt;math&gt;
         &lt;mfrac&gt;
         &lt;mrow&gt;&lt;mi&gt;d&lt;/mi&gt;&lt;mi&gt;E&lt;/mi&gt;&lt;mo&gt;(&lt;/mo&gt;&lt;mi&gt;t&lt;/mi&gt;&lt;mo&gt;)&lt;/mo&gt;&lt;/mrow&gt;
@@ -3935,18 +3936,18 @@
         &lt;mo&gt;−&lt;/mo&gt;
         &lt;mi&gt;δ&lt;/mi&gt;&lt;mi&gt;E&lt;/mi&gt;&lt;mo&gt;(&lt;/mo&gt;&lt;mi&gt;t&lt;/mi&gt;&lt;mo&gt;)&lt;/mo&gt;
     &lt;/math&gt;
-    &quot;</span>;
+    "</span>;
     <span class="kw">let </span>ode = input.parse::&lt;FirstOrderODE&gt;().unwrap();
     <span class="kw">let </span>exp = input.parse::&lt;MathExpressionTree&gt;().unwrap();
     <span class="kw">let </span>s_exp = exp.to_string();
-    <span class="macro">assert_eq!</span>(s_exp, <span class="string">&quot;(= (D(1, t) E) (- (* (* β I) (/ S N)) (* δ E)))&quot;</span>);
+    <span class="macro">assert_eq!</span>(s_exp, <span class="string">"(= (D(1, t) E) (- (* (* β I) (/ S N)) (* δ E)))"</span>);
     <span class="kw">let </span>cmml = ode.to_cmml();
-    <span class="macro">assert_eq!</span>(cmml, <span class="string">&quot;&lt;apply&gt;&lt;eq/&gt;&lt;apply&gt;&lt;diff/&gt;&lt;bvar&gt;t&lt;/bar&gt;&lt;ci&gt;E&lt;/ci&gt;&lt;/apply&gt;&lt;apply&gt;&lt;minus/&gt;&lt;apply&gt;&lt;times/&gt;&lt;apply&gt;&lt;times/&gt;&lt;ci&gt;β&lt;/ci&gt;&lt;ci&gt;I&lt;/ci&gt;&lt;/apply&gt;&lt;apply&gt;&lt;divide/&gt;&lt;ci&gt;S&lt;/ci&gt;&lt;ci&gt;N&lt;/ci&gt;&lt;/apply&gt;&lt;/apply&gt;&lt;apply&gt;&lt;times/&gt;&lt;ci&gt;δ&lt;/ci&gt;&lt;ci&gt;E&lt;/ci&gt;&lt;/apply&gt;&lt;/apply&gt;&lt;/apply&gt;&quot;</span>);
+    <span class="macro">assert_eq!</span>(cmml, <span class="string">"&lt;apply&gt;&lt;eq/&gt;&lt;apply&gt;&lt;diff/&gt;&lt;bvar&gt;t&lt;/bar&gt;&lt;ci&gt;E&lt;/ci&gt;&lt;/apply&gt;&lt;apply&gt;&lt;minus/&gt;&lt;apply&gt;&lt;times/&gt;&lt;apply&gt;&lt;times/&gt;&lt;ci&gt;β&lt;/ci&gt;&lt;ci&gt;I&lt;/ci&gt;&lt;/apply&gt;&lt;apply&gt;&lt;divide/&gt;&lt;ci&gt;S&lt;/ci&gt;&lt;ci&gt;N&lt;/ci&gt;&lt;/apply&gt;&lt;/apply&gt;&lt;apply&gt;&lt;times/&gt;&lt;ci&gt;δ&lt;/ci&gt;&lt;ci&gt;E&lt;/ci&gt;&lt;/apply&gt;&lt;/apply&gt;&lt;/apply&gt;"</span>);
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_content_hackathon2_scenario1_eq3() {
-    <span class="kw">let </span>input = <span class="string">&quot;
+    <span class="kw">let </span>input = <span class="string">"
     &lt;math&gt;
         &lt;mfrac&gt;
         &lt;mrow&gt;&lt;mi&gt;d&lt;/mi&gt;&lt;mi&gt;I&lt;/mi&gt;&lt;mo&gt;(&lt;/mo&gt;&lt;mi&gt;t&lt;/mi&gt;&lt;mo&gt;)&lt;/mo&gt;&lt;/mrow&gt;
@@ -3959,16 +3960,16 @@
         &lt;mo&gt;−&lt;/mo&gt;
         &lt;mi&gt;α&lt;/mi&gt;&lt;mi&gt;ρ&lt;/mi&gt;&lt;mi&gt;I&lt;/mi&gt;&lt;mo&gt;(&lt;/mo&gt;&lt;mi&gt;t&lt;/mi&gt;&lt;mo&gt;)&lt;/mo&gt;
     &lt;/math&gt;
-    &quot;</span>;
+    "</span>;
     <span class="kw">let </span>ode = input.parse::&lt;FirstOrderODE&gt;().unwrap();
     <span class="kw">let </span>cmml = ode.to_cmml();
-    <span class="macro">println!</span>(<span class="string">&quot;cmml={:?}&quot;</span>, cmml);
-    <span class="macro">assert_eq!</span>(cmml, <span class="string">&quot;&lt;apply&gt;&lt;eq/&gt;&lt;apply&gt;&lt;diff/&gt;&lt;bvar&gt;t&lt;/bar&gt;&lt;ci&gt;I&lt;/ci&gt;&lt;/apply&gt;&lt;apply&gt;&lt;minus/&gt;&lt;apply&gt;&lt;minus/&gt;&lt;apply&gt;&lt;times/&gt;&lt;ci&gt;δ&lt;/ci&gt;&lt;ci&gt;E&lt;/ci&gt;&lt;/apply&gt;&lt;apply&gt;&lt;times/&gt;&lt;apply&gt;&lt;times/&gt;&lt;apply&gt;&lt;minus/&gt;&lt;cn&gt;1&lt;/cn&gt;&lt;ci&gt;α&lt;/ci&gt;&lt;/apply&gt;&lt;ci&gt;γ&lt;/ci&gt;&lt;/apply&gt;&lt;ci&gt;I&lt;/ci&gt;&lt;/apply&gt;&lt;/apply&gt;&lt;apply&gt;&lt;times/&gt;&lt;apply&gt;&lt;times/&gt;&lt;ci&gt;α&lt;/ci&gt;&lt;ci&gt;ρ&lt;/ci&gt;&lt;/apply&gt;&lt;ci&gt;I&lt;/ci&gt;&lt;/apply&gt;&lt;/apply&gt;&lt;/apply&gt;&quot;</span>);
+    <span class="macro">println!</span>(<span class="string">"cmml={:?}"</span>, cmml);
+    <span class="macro">assert_eq!</span>(cmml, <span class="string">"&lt;apply&gt;&lt;eq/&gt;&lt;apply&gt;&lt;diff/&gt;&lt;bvar&gt;t&lt;/bar&gt;&lt;ci&gt;I&lt;/ci&gt;&lt;/apply&gt;&lt;apply&gt;&lt;minus/&gt;&lt;apply&gt;&lt;minus/&gt;&lt;apply&gt;&lt;times/&gt;&lt;ci&gt;δ&lt;/ci&gt;&lt;ci&gt;E&lt;/ci&gt;&lt;/apply&gt;&lt;apply&gt;&lt;times/&gt;&lt;apply&gt;&lt;times/&gt;&lt;apply&gt;&lt;minus/&gt;&lt;cn&gt;1&lt;/cn&gt;&lt;ci&gt;α&lt;/ci&gt;&lt;/apply&gt;&lt;ci&gt;γ&lt;/ci&gt;&lt;/apply&gt;&lt;ci&gt;I&lt;/ci&gt;&lt;/apply&gt;&lt;/apply&gt;&lt;apply&gt;&lt;times/&gt;&lt;apply&gt;&lt;times/&gt;&lt;ci&gt;α&lt;/ci&gt;&lt;ci&gt;ρ&lt;/ci&gt;&lt;/apply&gt;&lt;ci&gt;I&lt;/ci&gt;&lt;/apply&gt;&lt;/apply&gt;&lt;/apply&gt;"</span>);
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_content_hackathon2_scenario1_eq4() {
-    <span class="kw">let </span>input = <span class="string">&quot;
+    <span class="kw">let </span>input = <span class="string">"
     &lt;math&gt;
         &lt;mfrac&gt;
         &lt;mrow&gt;&lt;mi&gt;d&lt;/mi&gt;&lt;mi&gt;R&lt;/mi&gt;&lt;mo&gt;(&lt;/mo&gt;&lt;mi&gt;t&lt;/mi&gt;&lt;mo&gt;)&lt;/mo&gt;&lt;/mrow&gt;
@@ -3977,15 +3978,15 @@
         &lt;mo&gt;=&lt;/mo&gt;
         &lt;mo&gt;(&lt;/mo&gt;&lt;mn&gt;1&lt;/mn&gt;&lt;mo&gt;−&lt;/mo&gt;&lt;mi&gt;α&lt;/mi&gt;&lt;mo&gt;)&lt;/mo&gt;&lt;mi&gt;γ&lt;/mi&gt;&lt;mi&gt;I&lt;/mi&gt;&lt;mo&gt;(&lt;/mo&gt;&lt;mi&gt;t&lt;/mi&gt;&lt;mo&gt;)&lt;/mo&gt;
     &lt;/math&gt;
-    &quot;</span>;
+    "</span>;
     <span class="kw">let </span>ode = input.parse::&lt;FirstOrderODE&gt;().unwrap();
     <span class="kw">let </span>cmml = ode.to_cmml();
-    <span class="macro">assert_eq!</span>(cmml, <span class="string">&quot;&lt;apply&gt;&lt;eq/&gt;&lt;apply&gt;&lt;diff/&gt;&lt;bvar&gt;t&lt;/bar&gt;&lt;ci&gt;R&lt;/ci&gt;&lt;/apply&gt;&lt;apply&gt;&lt;times/&gt;&lt;apply&gt;&lt;times/&gt;&lt;apply&gt;&lt;minus/&gt;&lt;cn&gt;1&lt;/cn&gt;&lt;ci&gt;α&lt;/ci&gt;&lt;/apply&gt;&lt;ci&gt;γ&lt;/ci&gt;&lt;/apply&gt;&lt;ci&gt;I&lt;/ci&gt;&lt;/apply&gt;&lt;/apply&gt;&quot;</span>);
+    <span class="macro">assert_eq!</span>(cmml, <span class="string">"&lt;apply&gt;&lt;eq/&gt;&lt;apply&gt;&lt;diff/&gt;&lt;bvar&gt;t&lt;/bar&gt;&lt;ci&gt;R&lt;/ci&gt;&lt;/apply&gt;&lt;apply&gt;&lt;times/&gt;&lt;apply&gt;&lt;times/&gt;&lt;apply&gt;&lt;minus/&gt;&lt;cn&gt;1&lt;/cn&gt;&lt;ci&gt;α&lt;/ci&gt;&lt;/apply&gt;&lt;ci&gt;γ&lt;/ci&gt;&lt;/apply&gt;&lt;ci&gt;I&lt;/ci&gt;&lt;/apply&gt;&lt;/apply&gt;"</span>);
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_content_hackathon2_scenario1_eq5() {
-    <span class="kw">let </span>input = <span class="string">&quot;
+    <span class="kw">let </span>input = <span class="string">"
     &lt;math&gt;
         &lt;mfrac&gt;
         &lt;mrow&gt;&lt;mi&gt;d&lt;/mi&gt;&lt;mi&gt;D&lt;/mi&gt;&lt;mo&gt;(&lt;/mo&gt;&lt;mi&gt;t&lt;/mi&gt;&lt;mo&gt;)&lt;/mo&gt;&lt;/mrow&gt;
@@ -3996,15 +3997,15 @@
         &lt;mi&gt;ρ&lt;/mi&gt;
         &lt;mi&gt;I&lt;/mi&gt;&lt;mo&gt;(&lt;/mo&gt;&lt;mi&gt;t&lt;/mi&gt;&lt;mo&gt;)&lt;/mo&gt;
     &lt;/math&gt;
-    &quot;</span>;
+    "</span>;
     <span class="kw">let </span>ode = input.parse::&lt;FirstOrderODE&gt;().unwrap();
     <span class="kw">let </span>cmml = ode.to_cmml();
-    <span class="macro">assert_eq!</span>(cmml, <span class="string">&quot;&lt;apply&gt;&lt;eq/&gt;&lt;apply&gt;&lt;diff/&gt;&lt;bvar&gt;t&lt;/bar&gt;&lt;ci&gt;D&lt;/ci&gt;&lt;/apply&gt;&lt;apply&gt;&lt;times/&gt;&lt;apply&gt;&lt;times/&gt;&lt;ci&gt;α&lt;/ci&gt;&lt;ci&gt;ρ&lt;/ci&gt;&lt;/apply&gt;&lt;ci&gt;I&lt;/ci&gt;&lt;/apply&gt;&lt;/apply&gt;&quot;</span>);
+    <span class="macro">assert_eq!</span>(cmml, <span class="string">"&lt;apply&gt;&lt;eq/&gt;&lt;apply&gt;&lt;diff/&gt;&lt;bvar&gt;t&lt;/bar&gt;&lt;ci&gt;D&lt;/ci&gt;&lt;/apply&gt;&lt;apply&gt;&lt;times/&gt;&lt;apply&gt;&lt;times/&gt;&lt;ci&gt;α&lt;/ci&gt;&lt;ci&gt;ρ&lt;/ci&gt;&lt;/apply&gt;&lt;ci&gt;I&lt;/ci&gt;&lt;/apply&gt;&lt;/apply&gt;"</span>);
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_content_hackathon2_scenario1_eq6() {
-    <span class="kw">let </span>input = <span class="string">&quot;
+    <span class="kw">let </span>input = <span class="string">"
     &lt;math&gt;
         &lt;mfrac&gt;
         &lt;mrow&gt;&lt;mi&gt;d&lt;/mi&gt;&lt;mi&gt;S&lt;/mi&gt;&lt;mo&gt;(&lt;/mo&gt;&lt;mi&gt;t&lt;/mi&gt;&lt;mo&gt;)&lt;/mo&gt;&lt;/mrow&gt;
@@ -4019,15 +4020,15 @@
         &lt;mi&gt;ϵ&lt;/mi&gt;
         &lt;mi&gt;R&lt;/mi&gt;&lt;mo&gt;(&lt;/mo&gt;&lt;mi&gt;t&lt;/mi&gt;&lt;mo&gt;)&lt;/mo&gt;
     &lt;/math&gt;
-    &quot;</span>;
+    "</span>;
     <span class="kw">let </span>ode = input.parse::&lt;FirstOrderODE&gt;().unwrap();
     <span class="kw">let </span>cmml = ode.to_cmml();
-    <span class="macro">assert_eq!</span>(cmml,<span class="string">&quot;&lt;apply&gt;&lt;eq/&gt;&lt;apply&gt;&lt;diff/&gt;&lt;bvar&gt;t&lt;/bar&gt;&lt;ci&gt;S&lt;/ci&gt;&lt;/apply&gt;&lt;apply&gt;&lt;plus/&gt;&lt;apply&gt;&lt;times/&gt;&lt;apply&gt;&lt;times/&gt;&lt;apply&gt;&lt;minus/&gt;&lt;ci&gt;β&lt;/ci&gt;&lt;/apply&gt;&lt;ci&gt;I&lt;/ci&gt;&lt;/apply&gt;&lt;apply&gt;&lt;divide/&gt;&lt;ci&gt;S&lt;/ci&gt;&lt;ci&gt;N&lt;/ci&gt;&lt;/apply&gt;&lt;/apply&gt;&lt;apply&gt;&lt;times/&gt;&lt;ci&gt;ϵ&lt;/ci&gt;&lt;ci&gt;R&lt;/ci&gt;&lt;/apply&gt;&lt;/apply&gt;&lt;/apply&gt;&quot;</span>);
+    <span class="macro">assert_eq!</span>(cmml,<span class="string">"&lt;apply&gt;&lt;eq/&gt;&lt;apply&gt;&lt;diff/&gt;&lt;bvar&gt;t&lt;/bar&gt;&lt;ci&gt;S&lt;/ci&gt;&lt;/apply&gt;&lt;apply&gt;&lt;plus/&gt;&lt;apply&gt;&lt;times/&gt;&lt;apply&gt;&lt;times/&gt;&lt;apply&gt;&lt;minus/&gt;&lt;ci&gt;β&lt;/ci&gt;&lt;/apply&gt;&lt;ci&gt;I&lt;/ci&gt;&lt;/apply&gt;&lt;apply&gt;&lt;divide/&gt;&lt;ci&gt;S&lt;/ci&gt;&lt;ci&gt;N&lt;/ci&gt;&lt;/apply&gt;&lt;/apply&gt;&lt;apply&gt;&lt;times/&gt;&lt;ci&gt;ϵ&lt;/ci&gt;&lt;ci&gt;R&lt;/ci&gt;&lt;/apply&gt;&lt;/apply&gt;&lt;/apply&gt;"</span>);
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_content_hackathon2_scenario1_eq7() {
-    <span class="kw">let </span>input = <span class="string">&quot;
+    <span class="kw">let </span>input = <span class="string">"
     &lt;math&gt;
         &lt;mfrac&gt;
         &lt;mrow&gt;&lt;mi&gt;d&lt;/mi&gt;&lt;mi&gt;R&lt;/mi&gt;&lt;mo&gt;(&lt;/mo&gt;&lt;mi&gt;t&lt;/mi&gt;&lt;mo&gt;)&lt;/mo&gt;&lt;/mrow&gt;
@@ -4039,58 +4040,58 @@
         &lt;mi&gt;ϵ&lt;/mi&gt;
         &lt;mi&gt;R&lt;/mi&gt;&lt;mo&gt;(&lt;/mo&gt;&lt;mi&gt;t&lt;/mi&gt;&lt;mo&gt;)&lt;/mo&gt;
     &lt;/math&gt;
-    &quot;</span>;
+    "</span>;
     <span class="kw">let </span>ode = input.parse::&lt;FirstOrderODE&gt;().unwrap();
     <span class="kw">let </span>cmml = ode.to_cmml();
-    <span class="macro">assert_eq!</span>(cmml, <span class="string">&quot;&lt;apply&gt;&lt;eq/&gt;&lt;apply&gt;&lt;diff/&gt;&lt;bvar&gt;t&lt;/bar&gt;&lt;ci&gt;R&lt;/ci&gt;&lt;/apply&gt;&lt;apply&gt;&lt;minus/&gt;&lt;apply&gt;&lt;times/&gt;&lt;apply&gt;&lt;times/&gt;&lt;apply&gt;&lt;minus/&gt;&lt;cn&gt;1&lt;/cn&gt;&lt;ci&gt;α&lt;/ci&gt;&lt;/apply&gt;&lt;ci&gt;γ&lt;/ci&gt;&lt;/apply&gt;&lt;ci&gt;I&lt;/ci&gt;&lt;/apply&gt;&lt;apply&gt;&lt;times/&gt;&lt;ci&gt;ϵ&lt;/ci&gt;&lt;ci&gt;R&lt;/ci&gt;&lt;/apply&gt;&lt;/apply&gt;&lt;/apply&gt;&quot;</span>);
+    <span class="macro">assert_eq!</span>(cmml, <span class="string">"&lt;apply&gt;&lt;eq/&gt;&lt;apply&gt;&lt;diff/&gt;&lt;bvar&gt;t&lt;/bar&gt;&lt;ci&gt;R&lt;/ci&gt;&lt;/apply&gt;&lt;apply&gt;&lt;minus/&gt;&lt;apply&gt;&lt;times/&gt;&lt;apply&gt;&lt;times/&gt;&lt;apply&gt;&lt;minus/&gt;&lt;cn&gt;1&lt;/cn&gt;&lt;ci&gt;α&lt;/ci&gt;&lt;/apply&gt;&lt;ci&gt;γ&lt;/ci&gt;&lt;/apply&gt;&lt;ci&gt;I&lt;/ci&gt;&lt;/apply&gt;&lt;apply&gt;&lt;times/&gt;&lt;ci&gt;ϵ&lt;/ci&gt;&lt;ci&gt;R&lt;/ci&gt;&lt;/apply&gt;&lt;/apply&gt;&lt;/apply&gt;"</span>);
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_content_hackathon2_scenario1_eq8() {
-    <span class="kw">let </span>input = <span class="string">&quot;
+    <span class="kw">let </span>input = <span class="string">"
     &lt;math&gt;
         &lt;mi&gt;β&lt;/mi&gt;&lt;mo&gt;(&lt;/mo&gt;&lt;mi&gt;t&lt;/mi&gt;&lt;mo&gt;)&lt;/mo&gt;
         &lt;mo&gt;=&lt;/mo&gt;
         &lt;mi&gt;κ&lt;/mi&gt;
         &lt;mi&gt;m&lt;/mi&gt;&lt;mo&gt;(&lt;/mo&gt;&lt;mi&gt;t&lt;/mi&gt;&lt;mo&gt;)&lt;/mo&gt;
     &lt;/math&gt;
-    &quot;</span>;
+    "</span>;
     <span class="kw">let </span>exp = input.parse::&lt;MathExpressionTree&gt;().unwrap();
     <span class="kw">let </span>cmml = exp.to_cmml();
     <span class="macro">assert_eq!</span>(
         cmml,
-        <span class="string">&quot;&lt;apply&gt;&lt;eq/&gt;&lt;ci&gt;β&lt;/ci&gt;&lt;apply&gt;&lt;times/&gt;&lt;ci&gt;κ&lt;/ci&gt;&lt;ci&gt;m&lt;/ci&gt;&lt;/apply&gt;&lt;/apply&gt;&quot;
+        <span class="string">"&lt;apply&gt;&lt;eq/&gt;&lt;ci&gt;β&lt;/ci&gt;&lt;apply&gt;&lt;times/&gt;&lt;ci&gt;κ&lt;/ci&gt;&lt;ci&gt;m&lt;/ci&gt;&lt;/apply&gt;&lt;/apply&gt;"
     </span>);
     <span class="kw">let </span>s_exp = exp.to_string();
-    <span class="macro">assert_eq!</span>(s_exp, <span class="string">&quot;(= β (* κ m))&quot;</span>);
+    <span class="macro">assert_eq!</span>(s_exp, <span class="string">"(= β (* κ m))"</span>);
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_expression1() {
-    <span class="kw">let </span>input = <span class="string">&quot;&lt;math&gt;&lt;mi&gt;γ&lt;/mi&gt;&lt;mi&gt;I&lt;/mi&gt;&lt;/math&gt;&quot;</span>;
+    <span class="kw">let </span>input = <span class="string">"&lt;math&gt;&lt;mi&gt;γ&lt;/mi&gt;&lt;mi&gt;I&lt;/mi&gt;&lt;/math&gt;"</span>;
     <span class="kw">let </span>exp = input.parse::&lt;MathExpressionTree&gt;().unwrap();
     <span class="kw">let </span>math = exp.to_infix_expression();
-    <span class="macro">assert_eq!</span>(math, <span class="string">&quot;(γ*I)&quot;</span>);
+    <span class="macro">assert_eq!</span>(math, <span class="string">"(γ*I)"</span>);
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_expression2() {
-    <span class="kw">let </span>input = <span class="string">&quot;
+    <span class="kw">let </span>input = <span class="string">"
     &lt;math&gt;
         &lt;mi&gt;α&lt;/mi&gt;
         &lt;mi&gt;ρ&lt;/mi&gt;
         &lt;mi&gt;I&lt;/mi&gt;&lt;mo&gt;(&lt;/mo&gt;&lt;mi&gt;t&lt;/mi&gt;&lt;mo&gt;)&lt;/mo&gt;
     &lt;/math&gt;
-    &quot;</span>;
+    "</span>;
     <span class="kw">let </span>exp = input.parse::&lt;MathExpressionTree&gt;().unwrap();
     <span class="kw">let </span>math = exp.to_infix_expression();
-    <span class="macro">println!</span>(<span class="string">&quot;math = {:?}&quot;</span>, math);
-    <span class="macro">assert_eq!</span>(math, <span class="string">&quot;((α*ρ)*I)&quot;</span>);
+    <span class="macro">println!</span>(<span class="string">"math = {:?}"</span>, math);
+    <span class="macro">assert_eq!</span>(math, <span class="string">"((α*ρ)*I)"</span>);
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_expression3() {
-    <span class="kw">let </span>input = <span class="string">&quot;
+    <span class="kw">let </span>input = <span class="string">"
     &lt;math&gt;
         &lt;mi&gt;β&lt;/mi&gt;
         &lt;mi&gt;I&lt;/mi&gt;&lt;mo&gt;(&lt;/mo&gt;&lt;mi&gt;t&lt;/mi&gt;&lt;mo&gt;)&lt;/mo&gt;
@@ -4098,94 +4099,94 @@
         &lt;mo&gt;−&lt;/mo&gt;
         &lt;mi&gt;δ&lt;/mi&gt;&lt;mi&gt;E&lt;/mi&gt;&lt;mo&gt;(&lt;/mo&gt;&lt;mi&gt;t&lt;/mi&gt;&lt;mo&gt;)&lt;/mo&gt;
     &lt;/math&gt;
-    &quot;</span>;
+    "</span>;
     <span class="kw">let </span>exp = input.parse::&lt;MathExpressionTree&gt;().unwrap();
-    <span class="macro">println!</span>(<span class="string">&quot;exp={:?}&quot;</span>, exp);
+    <span class="macro">println!</span>(<span class="string">"exp={:?}"</span>, exp);
     <span class="kw">let </span>s_exp = exp.to_string();
-    <span class="macro">assert_eq!</span>(s_exp, <span class="string">&quot;(- (* (* β I) (/ S N)) (* δ E))&quot;</span>);
+    <span class="macro">assert_eq!</span>(s_exp, <span class="string">"(- (* (* β I) (/ S N)) (* δ E))"</span>);
     <span class="kw">let </span>math = exp.to_infix_expression();
-    <span class="macro">assert_eq!</span>(math, <span class="string">&quot;(((β*I)*(S/N))-(δ*E))&quot;</span>)
+    <span class="macro">assert_eq!</span>(math, <span class="string">"(((β*I)*(S/N))-(δ*E))"</span>)
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_expression4() {
-    <span class="kw">let </span>input = <span class="string">&quot;
+    <span class="kw">let </span>input = <span class="string">"
     &lt;math&gt;
         &lt;mo&gt;(&lt;/mo&gt;&lt;mn&gt;1&lt;/mn&gt;&lt;mo&gt;−&lt;/mo&gt;&lt;mi&gt;α&lt;/mi&gt;&lt;mo&gt;)&lt;/mo&gt;&lt;mi&gt;γ&lt;/mi&gt;&lt;mi&gt;I&lt;/mi&gt;&lt;mo&gt;(&lt;/mo&gt;&lt;mi&gt;t&lt;/mi&gt;&lt;mo&gt;)&lt;/mo&gt;
         &lt;mo&gt;-&lt;/mo&gt;
         &lt;mi&gt;ϵ&lt;/mi&gt;
         &lt;mi&gt;R&lt;/mi&gt;&lt;mo&gt;(&lt;/mo&gt;&lt;mi&gt;t&lt;/mi&gt;&lt;mo&gt;)&lt;/mo&gt;
     &lt;/math&gt;
-    &quot;</span>;
+    "</span>;
     <span class="kw">let </span>exp = input.parse::&lt;MathExpressionTree&gt;().unwrap();
     <span class="kw">let </span>math = exp.to_infix_expression();
-    <span class="macro">assert_eq!</span>(math, <span class="string">&quot;((((1-α)*γ)*I)-(ϵ*R))&quot;</span>)
+    <span class="macro">assert_eq!</span>(math, <span class="string">"((((1-α)*γ)*I)-(ϵ*R))"</span>)
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_mfrac() {
-    <span class="kw">let </span>input = <span class="string">&quot;
+    <span class="kw">let </span>input = <span class="string">"
     &lt;math&gt;
         &lt;mfrac&gt;&lt;mi&gt;S&lt;/mi&gt;&lt;mi&gt;N&lt;/mi&gt;&lt;/mfrac&gt;
     &lt;/math&gt;
-    &quot;</span>;
+    "</span>;
     <span class="kw">let </span>exp = input.parse::&lt;MathExpressionTree&gt;().unwrap();
     <span class="kw">let </span>math = exp.to_infix_expression();
     <span class="kw">let </span>s_exp = exp.to_string();
-    <span class="macro">assert_eq!</span>(math, <span class="string">&quot;(S/N)&quot;</span>);
-    <span class="macro">assert_eq!</span>(s_exp, <span class="string">&quot;(/ S N)&quot;</span>);
+    <span class="macro">assert_eq!</span>(math, <span class="string">"(S/N)"</span>);
+    <span class="macro">assert_eq!</span>(s_exp, <span class="string">"(/ S N)"</span>);
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_superscript() {
-    <span class="kw">let </span>input = <span class="string">&quot;
+    <span class="kw">let </span>input = <span class="string">"
     &lt;math&gt;
         &lt;msup&gt;
         &lt;mi&gt;x&lt;/mi&gt;
         &lt;mn&gt;3&lt;/mn&gt;
         &lt;/msup&gt;
     &lt;/math&gt;
-    &quot;</span>;
+    "</span>;
     <span class="kw">let </span>exp = input.parse::&lt;MathExpressionTree&gt;().unwrap();
     <span class="kw">let </span>s_exp = exp.to_string();
-    <span class="macro">assert_eq!</span>(s_exp, <span class="string">&quot;(^ x 3)&quot;</span>);
+    <span class="macro">assert_eq!</span>(s_exp, <span class="string">"(^ x 3)"</span>);
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_msup_exp() {
-    <span class="kw">let </span>input = <span class="string">&quot;
+    <span class="kw">let </span>input = <span class="string">"
     &lt;math&gt;
         &lt;msup&gt;
         &lt;mi&gt;e&lt;/mi&gt;
         &lt;mrow&gt;&lt;mo&gt;-&lt;/mo&gt;&lt;mo&gt;(&lt;/mo&gt;&lt;mn&gt;1&lt;/mn&gt;&lt;mo&gt;−&lt;/mo&gt;&lt;mi&gt;α&lt;/mi&gt;&lt;mo&gt;)&lt;/mo&gt;&lt;mi&gt;γ&lt;/mi&gt;&lt;mi&gt;I&lt;/mi&gt;&lt;/mrow&gt;
         &lt;/msup&gt;
     &lt;/math&gt;
-    &quot;</span>;
+    "</span>;
     <span class="kw">let </span>exp = input.parse::&lt;MathExpressionTree&gt;().unwrap();
     <span class="kw">let </span>s_exp = exp.to_string();
-    <span class="macro">assert_eq!</span>(s_exp, <span class="string">&quot;(exp (* (* (- (- 1 α)) γ) I))&quot;</span>);
+    <span class="macro">assert_eq!</span>(s_exp, <span class="string">"(exp (* (* (- (- 1 α)) γ) I))"</span>);
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_trig_cos() {
-    <span class="kw">let </span>input = <span class="string">&quot;
+    <span class="kw">let </span>input = <span class="string">"
     &lt;math&gt;
         &lt;mrow&gt;
         &lt;mi&gt;cos&lt;/mi&gt;
         &lt;mi&gt;x&lt;/mi&gt;
         &lt;/mrow&gt;
     &lt;/math&gt;
-    &quot;</span>;
+    "</span>;
     <span class="kw">let </span>exp = input.parse::&lt;MathExpressionTree&gt;().unwrap();
     <span class="kw">let </span>cmml = exp.to_cmml();
-    <span class="macro">assert_eq!</span>(cmml, <span class="string">&quot;&lt;apply&gt;&lt;cos/&gt;&lt;ci&gt;x&lt;/ci&gt;&lt;/apply&gt;&quot;</span>);
+    <span class="macro">assert_eq!</span>(cmml, <span class="string">"&lt;apply&gt;&lt;cos/&gt;&lt;ci&gt;x&lt;/ci&gt;&lt;/apply&gt;"</span>);
     <span class="kw">let </span>s_exp = exp.to_string();
-    <span class="macro">assert_eq!</span>(s_exp, <span class="string">&quot;(Cos x)&quot;</span>);
+    <span class="macro">assert_eq!</span>(s_exp, <span class="string">"(Cos x)"</span>);
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_trig_another_cos() {
-    <span class="kw">let </span>input = <span class="string">&quot;
+    <span class="kw">let </span>input = <span class="string">"
     &lt;math&gt;
         &lt;mrow&gt;
         &lt;mi&gt;cos&lt;/mi&gt;
@@ -4194,30 +4195,30 @@
         &lt;mo&gt;)&lt;/mo&gt;
         &lt;/mrow&gt;
     &lt;/math&gt;
-    &quot;</span>;
+    "</span>;
     <span class="kw">let </span>exp = input.parse::&lt;MathExpressionTree&gt;().unwrap();
     <span class="kw">let </span>s_exp = exp.to_string();
-    <span class="macro">assert_eq!</span>(s_exp, <span class="string">&quot;(Cos x)&quot;</span>);
+    <span class="macro">assert_eq!</span>(s_exp, <span class="string">"(Cos x)"</span>);
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_mover_mean() {
-    <span class="kw">let </span>input = <span class="string">&quot;
+    <span class="kw">let </span>input = <span class="string">"
     &lt;math&gt;
         &lt;mover&gt;
         &lt;mi&gt;T&lt;/mi&gt;
         &lt;mo&gt;¯&lt;/mo&gt;
         &lt;/mover&gt;
     &lt;/math&gt;
-    &quot;</span>;
+    "</span>;
     <span class="kw">let </span>exp = input.parse::&lt;MathExpressionTree&gt;().unwrap();
     <span class="kw">let </span>s_exp = exp.to_string();
-    <span class="macro">assert_eq!</span>(s_exp, <span class="string">&quot;(Mean T)&quot;</span>);
+    <span class="macro">assert_eq!</span>(s_exp, <span class="string">"(Mean T)"</span>);
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_one_dimensional_ebm() {
-    <span class="kw">let </span>input = <span class="string">&quot;
+    <span class="kw">let </span>input = <span class="string">"
     &lt;math&gt;
         &lt;mi&gt;C&lt;/mi&gt;
         &lt;mfrac&gt;
@@ -4245,15 +4246,15 @@
         &lt;/mfrac&gt;
         &lt;mo&gt;)&lt;/mo&gt;
     &lt;/math&gt;
-    &quot;</span>;
+    "</span>;
     <span class="kw">let </span>exp = input.parse::&lt;MathExpressionTree&gt;().unwrap();
     <span class="kw">let </span>s_exp = exp.to_string();
-    <span class="macro">assert_eq!</span>(s_exp, <span class="string">&quot;(= (* C (D(1, t) T)) (+ (- (* (- 1 α) S) (+ A (* B T))) (* (/ D (Cos ϕ)) (PD(1, ϕ) (* (Cos ϕ) (D(1, ϕ) T))))))&quot;</span>);
+    <span class="macro">assert_eq!</span>(s_exp, <span class="string">"(= (* C (D(1, t) T)) (+ (- (* (- 1 α) S) (+ A (* B T))) (* (/ D (Cos ϕ)) (PD(1, ϕ) (* (Cos ϕ) (D(1, ϕ) T))))))"</span>);
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_derivative_with_func_comp_in_parenthesis() {
-    <span class="kw">let </span>input = <span class="string">&quot;
+    <span class="kw">let </span>input = <span class="string">"
     &lt;math&gt;
         &lt;mfrac&gt;
         &lt;mi&gt;∂&lt;/mi&gt;
@@ -4267,15 +4268,15 @@
         &lt;/mfrac&gt;
         &lt;mo&gt;)&lt;/mo&gt;
     &lt;/math&gt;
-    &quot;</span>;
+    "</span>;
     <span class="kw">let </span>exp = input.parse::&lt;MathExpressionTree&gt;().unwrap();
     <span class="kw">let </span>s_exp = exp.to_string();
-    <span class="macro">assert_eq!</span>(s_exp, <span class="string">&quot;(PD(1, ϕ) (* (Cos ϕ) (D(1, ϕ) T)))&quot;</span>);
+    <span class="macro">assert_eq!</span>(s_exp, <span class="string">"(PD(1, ϕ) (* (Cos ϕ) (D(1, ϕ) T)))"</span>);
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_derivative_with_func_inside_parenthesis() {
-    <span class="kw">let </span>input = <span class="string">&quot;
+    <span class="kw">let </span>input = <span class="string">"
     &lt;math&gt;
         &lt;mfrac&gt;
         &lt;mi&gt;∂&lt;/mi&gt;
@@ -4285,66 +4286,66 @@
         &lt;mi&gt;T&lt;/mi&gt;
         &lt;mo&gt;)&lt;/mo&gt;
     &lt;/math&gt;
-    &quot;</span>;
+    "</span>;
     <span class="kw">let </span>exp = input.parse::&lt;MathExpressionTree&gt;().unwrap();
     <span class="kw">let </span>s_exp = exp.to_string();
-    <span class="macro">assert_eq!</span>(s_exp, <span class="string">&quot;(PD(1, ϕ) T)&quot;</span>);
+    <span class="macro">assert_eq!</span>(s_exp, <span class="string">"(PD(1, ϕ) T)"</span>);
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_absolute_value() {
-    <span class="kw">let </span>input = <span class="string">&quot;
+    <span class="kw">let </span>input = <span class="string">"
     &lt;math&gt;
         &lt;mo&gt;|&lt;/mo&gt;&lt;mo&gt;&amp;#x2207;&lt;/mo&gt;&lt;mi&gt;H&lt;/mi&gt;&lt;mo&gt;|&lt;/mo&gt;
     &lt;/math&gt;
-    &quot;</span>;
+    "</span>;
     <span class="kw">let </span>exp = input.parse::&lt;MathExpressionTree&gt;().unwrap();
     <span class="kw">let </span>s_exp = exp.to_string();
-    <span class="macro">assert_eq!</span>(s_exp, <span class="string">&quot;(Abs (Grad H))&quot;</span>);
+    <span class="macro">assert_eq!</span>(s_exp, <span class="string">"(Abs (Grad H))"</span>);
 }
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_another_absolute() {
-    <span class="kw">let </span>input = <span class="string">&quot;
+    <span class="kw">let </span>input = <span class="string">"
     &lt;math&gt;
         &lt;mo&gt;|&lt;/mo&gt;&lt;mi&gt;H&lt;/mi&gt;&lt;mo&gt;|&lt;/mo&gt;
     &lt;/math&gt;
-    &quot;</span>;
+    "</span>;
     <span class="kw">let </span>exp = input.parse::&lt;MathExpressionTree&gt;().unwrap();
     <span class="kw">let </span>s_exp = exp.to_string();
-    <span class="macro">assert_eq!</span>(s_exp, <span class="string">&quot;(Abs H)&quot;</span>);
+    <span class="macro">assert_eq!</span>(s_exp, <span class="string">"(Abs H)"</span>);
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_grad() {
-    <span class="kw">let </span>input = <span class="string">&quot;
+    <span class="kw">let </span>input = <span class="string">"
     &lt;math&gt;
         &lt;mi&gt;&amp;#x2207;&lt;/mi&gt;&lt;mi&gt;H&lt;/mi&gt;
         &lt;/math&gt;
-    &quot;</span>;
+    "</span>;
     <span class="kw">let </span>exp = input.parse::&lt;MathExpressionTree&gt;().unwrap();
     <span class="kw">let </span>cmml = exp.to_cmml();
-    <span class="macro">assert_eq!</span>(cmml, <span class="string">&quot;&lt;apply&gt;&lt;grad/&gt;&lt;ci&gt;H&lt;/ci&gt;&lt;/apply&gt;&quot;</span>);
+    <span class="macro">assert_eq!</span>(cmml, <span class="string">"&lt;apply&gt;&lt;grad/&gt;&lt;ci&gt;H&lt;/ci&gt;&lt;/apply&gt;"</span>);
     <span class="kw">let </span>s_exp = exp.to_string();
-    <span class="macro">assert_eq!</span>(s_exp, <span class="string">&quot;(Grad H)&quot;</span>);
+    <span class="macro">assert_eq!</span>(s_exp, <span class="string">"(Grad H)"</span>);
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_absolute_as_msup() {
-    <span class="kw">let </span>input = <span class="string">&quot;
+    <span class="kw">let </span>input = <span class="string">"
     &lt;math&gt;
         &lt;mo&gt;|&lt;/mo&gt;&lt;mrow&gt;&lt;mo&gt;&amp;#x2207;&lt;/mo&gt;&lt;mi&gt;H&lt;/mi&gt;&lt;/mrow&gt;
         &lt;msup&gt;&lt;mo&gt;|&lt;/mo&gt;
         &lt;mrow&gt;&lt;mi&gt;n&lt;/mi&gt;&lt;mo&gt;−&lt;/mo&gt;&lt;mn&gt;1&lt;/mn&gt;&lt;/mrow&gt;&lt;/msup&gt;
     &lt;/math&gt;
-    &quot;</span>;
+    "</span>;
     <span class="kw">let </span>exp = input.parse::&lt;MathExpressionTree&gt;().unwrap();
     <span class="kw">let </span>s_exp = exp.to_string();
-    <span class="macro">assert_eq!</span>(s_exp, <span class="string">&quot;(^ (Abs (Grad H)) (- n 1))&quot;</span>);
+    <span class="macro">assert_eq!</span>(s_exp, <span class="string">"(^ (Abs (Grad H)) (- n 1))"</span>);
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_equation_halfar_dome() {
-    <span class="kw">let </span>input = <span class="string">&quot;
+    <span class="kw">let </span>input = <span class="string">"
     &lt;math&gt;
         &lt;mfrac&gt;&lt;mrow&gt;&lt;mi&gt;∂&lt;/mi&gt;&lt;mi&gt;H&lt;/mi&gt;&lt;/mrow&gt;&lt;mrow&gt;&lt;mi&gt;∂&lt;/mi&gt;&lt;mi&gt;t&lt;/mi&gt;&lt;/mrow&gt;&lt;/mfrac&gt;
         &lt;mo&gt;=&lt;/mo&gt;
@@ -4359,18 +4360,18 @@
         &lt;mo&gt;&amp;#x2207;&lt;/mo&gt;&lt;mi&gt;H&lt;/mi&gt;
         &lt;mo&gt;)&lt;/mo&gt;
     &lt;/math&gt;
-    &quot;</span>;
+    "</span>;
     <span class="kw">let </span>exp = input.parse::&lt;MathExpressionTree&gt;().unwrap();
     <span class="kw">let </span>s_exp = exp.to_string();
     <span class="macro">assert_eq!</span>(
         s_exp,
-        <span class="string">&quot;(= (D(1, t) H) (Div (* (* (* Γ (^ H (+ n 2))) (^ (Abs (Grad H)) (- n 1))) (Grad H))))&quot;
+        <span class="string">"(= (D(1, t) H) (Div (* (* (* Γ (^ H (+ n 2))) (^ (Abs (Grad H)) (- n 1))) (Grad H))))"
     </span>);
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_halfar_dome_rhs() {
-    <span class="kw">let </span>input = <span class="string">&quot;
+    <span class="kw">let </span>input = <span class="string">"
     &lt;math&gt;
         &lt;mo&gt;&amp;#x2207;&lt;/mo&gt;
         &lt;mo&gt;&amp;#x22c5;&lt;/mo&gt;
@@ -4383,163 +4384,163 @@
         &lt;mo&gt;&amp;#x2207;&lt;/mo&gt;&lt;mi&gt;H&lt;/mi&gt;
         &lt;mo&gt;)&lt;/mo&gt;
     &lt;/math&gt;
-    &quot;</span>;
+    "</span>;
     <span class="kw">let </span>exp = input.parse::&lt;MathExpressionTree&gt;().unwrap();
     <span class="kw">let </span>s_exp = exp.to_string();
     <span class="macro">assert_eq!</span>(
         s_exp,
-        <span class="string">&quot;(Div (* (* (* Γ (^ H (+ n 2))) (^ (Abs (Grad H)) (- n 1))) (Grad H)))&quot;
+        <span class="string">"(Div (* (* (* Γ (^ H (+ n 2))) (^ (Abs (Grad H)) (- n 1))) (Grad H)))"
     </span>);
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_func_paren() {
-    <span class="kw">let </span>input = <span class="string">&quot;
+    <span class="kw">let </span>input = <span class="string">"
     &lt;math&gt;
         &lt;mo&gt;(&lt;/mo&gt;&lt;mi&gt;a&lt;/mi&gt;&lt;mo&gt;+&lt;/mo&gt;&lt;mo&gt;(&lt;/mo&gt;&lt;mi&gt;b&lt;/mi&gt;&lt;mo&gt;+&lt;/mo&gt;&lt;mi&gt;c&lt;/mi&gt;&lt;mo&gt;)&lt;/mo&gt;
         &lt;mo&gt;)&lt;/mo&gt;
     &lt;/math&gt;
-    &quot;</span>;
+    "</span>;
     <span class="kw">let </span>exp = input.parse::&lt;MathExpressionTree&gt;().unwrap();
     <span class="kw">let </span>s_exp = exp.to_string();
-    <span class="macro">assert_eq!</span>(s_exp, <span class="string">&quot;(+ a (+ b c))&quot;</span>);
+    <span class="macro">assert_eq!</span>(s_exp, <span class="string">"(+ a (+ b c))"</span>);
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_func_paren_and_times() {
-    <span class="kw">let </span>input = <span class="string">&quot;
+    <span class="kw">let </span>input = <span class="string">"
     &lt;math&gt;
         &lt;mi&gt;S&lt;/mi&gt;&lt;mo&gt;(&lt;/mo&gt;&lt;mi&gt;t&lt;/mi&gt;&lt;mo&gt;)&lt;/mo&gt;
         &lt;mo&gt;(&lt;/mo&gt;&lt;mi&gt;a&lt;/mi&gt;&lt;mo&gt;+&lt;/mo&gt;&lt;mi&gt;b&lt;/mi&gt;&lt;mo&gt;)&lt;/mo&gt;
     &lt;/math&gt;
-    &quot;</span>;
+    "</span>;
     <span class="kw">let </span>exp = input.parse::&lt;MathExpressionTree&gt;().unwrap();
     <span class="kw">let </span>s_exp = exp.to_string();
-    <span class="macro">assert_eq!</span>(s_exp, <span class="string">&quot;(* S (+ a b))&quot;</span>);
+    <span class="macro">assert_eq!</span>(s_exp, <span class="string">"(* S (+ a b))"</span>);
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_func_a_plus_b() {
-    <span class="kw">let </span>input = <span class="string">&quot;
+    <span class="kw">let </span>input = <span class="string">"
     &lt;math&gt;
         &lt;mo&gt;(&lt;/mo&gt;&lt;mi&gt;a&lt;/mi&gt;&lt;mo&gt;+&lt;/mo&gt;&lt;mi&gt;b&lt;/mi&gt;&lt;mo&gt;)&lt;/mo&gt;
     &lt;/math&gt;
-    &quot;</span>;
+    "</span>;
     <span class="kw">let </span>exp = input.parse::&lt;MathExpressionTree&gt;().unwrap();
     <span class="kw">let </span>s_exp = exp.to_string();
-    <span class="macro">assert_eq!</span>(s_exp, <span class="string">&quot;(+ a b)&quot;</span>);
+    <span class="macro">assert_eq!</span>(s_exp, <span class="string">"(+ a b)"</span>);
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_func_paren_and_times_another() {
-    <span class="kw">let </span>input = <span class="string">&quot;
+    <span class="kw">let </span>input = <span class="string">"
     &lt;math&gt;
         &lt;mi&gt;S&lt;/mi&gt;&lt;mo&gt;(&lt;/mo&gt;&lt;mi&gt;t&lt;/mi&gt;&lt;mo&gt;)&lt;/mo&gt;
         &lt;mo&gt;(&lt;/mo&gt;&lt;mi&gt;a&lt;/mi&gt;&lt;mi&gt;I&lt;/mi&gt;&lt;mo&gt;(&lt;/mo&gt;&lt;mi&gt;t&lt;/mi&gt;&lt;mo&gt;)&lt;/mo&gt;&lt;mo&gt;+&lt;/mo&gt;&lt;mi&gt;b&lt;/mi&gt;&lt;mi&gt;R&lt;/mi&gt;&lt;mo&gt;(&lt;/mo&gt;&lt;mi&gt;t&lt;/mi&gt;&lt;mo&gt;)&lt;/mo&gt;&lt;mo&gt;)&lt;/mo&gt;
     &lt;/math&gt;
-    &quot;</span>;
+    "</span>;
     <span class="kw">let </span>exp = input.parse::&lt;MathExpressionTree&gt;().unwrap();
     <span class="kw">let </span>s_exp = exp.to_string();
-    <span class="macro">assert_eq!</span>(s_exp, <span class="string">&quot;(* S (+ (* a I) (* b R)))&quot;</span>);
+    <span class="macro">assert_eq!</span>(s_exp, <span class="string">"(* S (+ (* a I) (* b R)))"</span>);
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_divergence() {
-    <span class="kw">let </span>input = <span class="string">&quot;
+    <span class="kw">let </span>input = <span class="string">"
     &lt;math&gt;
         &lt;mo&gt;&amp;#x2207;&lt;/mo&gt;&lt;mo&gt;&amp;#x22c5;&lt;/mo&gt;
         &lt;mi&gt;H&lt;/mi&gt;
     &lt;/math&gt;
-    &quot;</span>;
+    "</span>;
     <span class="kw">let </span>exp = input.parse::&lt;MathExpressionTree&gt;().unwrap();
     <span class="kw">let </span>cmml = exp.to_cmml();
-    <span class="macro">assert_eq!</span>(cmml, <span class="string">&quot;&lt;apply&gt;&lt;divergence/&gt;&lt;ci&gt;H&lt;/ci&gt;&lt;/apply&gt;&quot;</span>);
+    <span class="macro">assert_eq!</span>(cmml, <span class="string">"&lt;apply&gt;&lt;divergence/&gt;&lt;ci&gt;H&lt;/ci&gt;&lt;/apply&gt;"</span>);
     <span class="kw">let </span>s_exp = exp.to_string();
-    <span class="macro">assert_eq!</span>(s_exp, <span class="string">&quot;(Div H)&quot;</span>);
+    <span class="macro">assert_eq!</span>(s_exp, <span class="string">"(Div H)"</span>);
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_combination() {
-    <span class="kw">let </span>input = <span class="string">&quot;
+    <span class="kw">let </span>input = <span class="string">"
     &lt;math&gt;
         &lt;mi&gt;S&lt;/mi&gt;
         &lt;mrow&gt;&lt;mi&gt;n&lt;/mi&gt;&lt;mo&gt;+&lt;/mo&gt;&lt;mn&gt;4&lt;/mn&gt;&lt;/mrow&gt;
         &lt;mrow&gt;&lt;mi&gt;i&lt;/mi&gt;&lt;mo&gt;-&lt;/mo&gt;&lt;mn&gt;3&lt;/mn&gt;&lt;/mrow&gt;
         &lt;msup&gt;&lt;mi&gt;H&lt;/mi&gt;&lt;mrow&gt;&lt;mi&gt;m&lt;/mi&gt;&lt;mo&gt;-&lt;/mo&gt;&lt;mn&gt;2&lt;/mn&gt;&lt;/mrow&gt;&lt;/msup&gt;
     &lt;/math&gt;
-    &quot;</span>;
+    "</span>;
     <span class="kw">let </span>exp = input.parse::&lt;MathExpressionTree&gt;().unwrap();
     <span class="kw">let </span>s_exp = exp.to_string();
-    <span class="macro">assert_eq!</span>(s_exp, <span class="string">&quot;(* (* (* S (+ n 4)) (- i 3)) (^ H (- m 2)))&quot;</span>);
+    <span class="macro">assert_eq!</span>(s_exp, <span class="string">"(* (* (* S (+ n 4)) (- i 3)) (^ H (- m 2)))"</span>);
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_mi_multiply() {
-    <span class="kw">let </span>input = <span class="string">&quot;
+    <span class="kw">let </span>input = <span class="string">"
     &lt;math&gt;
         &lt;mi&gt;A&lt;/mi&gt;
         &lt;msup&gt;&lt;mi&gt;ρ&lt;/mi&gt;&lt;mi&gt;n&lt;/mi&gt;&lt;/msup&gt;
         &lt;msup&gt;&lt;mi&gt;g&lt;/mi&gt;&lt;mi&gt;n&lt;/mi&gt;&lt;/msup&gt;
     &lt;/math&gt;
-    &quot;</span>;
+    "</span>;
     <span class="kw">let </span>exp = input.parse::&lt;MathExpressionTree&gt;().unwrap();
     <span class="kw">let </span>s_exp = exp.to_string();
-    <span class="macro">println!</span>(<span class="string">&quot;s_exp={:?}&quot;</span>, s_exp);
+    <span class="macro">println!</span>(<span class="string">"s_exp={:?}"</span>, s_exp);
 }
 <span class="attr">#[allow(dead_code)] </span><span class="comment">// used in tests I believe
 </span><span class="kw">fn </span>test_unicode_conversion() {
-    <span class="kw">let </span>input1 = <span class="string">&quot;&amp;#x039B; is a Greek letter.&quot;</span>;
-    <span class="kw">let </span>input2 = <span class="string">&quot;&amp;#x03bb; is another Greek letter.&quot;</span>;
-    <span class="kw">let </span>input3 = <span class="string">&quot;Λ and λ are Greek letters.&quot;</span>;
-    <span class="kw">let </span>input4 = <span class="string">&quot;Lambda and lambda are English representations of Greek letters.&quot;</span>;
+    <span class="kw">let </span>input1 = <span class="string">"&amp;#x039B; is a Greek letter."</span>;
+    <span class="kw">let </span>input2 = <span class="string">"&amp;#x03bb; is another Greek letter."</span>;
+    <span class="kw">let </span>input3 = <span class="string">"Λ and λ are Greek letters."</span>;
+    <span class="kw">let </span>input4 = <span class="string">"Lambda and lambda are English representations of Greek letters."</span>;
 
-    <span class="macro">assert_eq!</span>(unicode_to_latex(input1), <span class="string">&quot;\\Lambda is a Greek letter.&quot;</span>);
+    <span class="macro">assert_eq!</span>(unicode_to_latex(input1), <span class="string">"\\Lambda is a Greek letter."</span>);
     <span class="macro">assert_eq!</span>(
         unicode_to_latex(input2),
-        <span class="string">&quot;\\lambda is another Greek letter.&quot;
+        <span class="string">"\\lambda is another Greek letter."
     </span>);
     <span class="macro">assert_eq!</span>(
         unicode_to_latex(input3),
-        <span class="string">&quot;\\Lambda and \\lambda are Greek letters.&quot;
+        <span class="string">"\\Lambda and \\lambda are Greek letters."
     </span>);
     <span class="macro">assert_eq!</span>(
         unicode_to_latex(input4),
-        <span class="string">&quot;\\Lambda and \\lambda are English representations of Greek letters.&quot;
+        <span class="string">"\\Lambda and \\lambda are English representations of Greek letters."
     </span>);
 }
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_sexp2latex() {
-    <span class="kw">let </span>input = <span class="string">&quot;
+    <span class="kw">let </span>input = <span class="string">"
     &lt;math&gt;
         &lt;mi&gt;&amp;#x03bb;&lt;/mi&gt;
         &lt;mrow&gt;&lt;mi&gt;n&lt;/mi&gt;&lt;mo&gt;+&lt;/mo&gt;&lt;mn&gt;4&lt;/mn&gt;&lt;/mrow&gt;
         &lt;mrow&gt;&lt;mi&gt;i&lt;/mi&gt;&lt;mo&gt;-&lt;/mo&gt;&lt;mn&gt;3&lt;/mn&gt;&lt;/mrow&gt;
         &lt;msup&gt;&lt;mi&gt;H&lt;/mi&gt;&lt;mrow&gt;&lt;mi&gt;m&lt;/mi&gt;&lt;mo&gt;-&lt;/mo&gt;&lt;mn&gt;2&lt;/mn&gt;&lt;/mrow&gt;&lt;/msup&gt;
     &lt;/math&gt;
-    &quot;</span>;
+    "</span>;
     <span class="kw">let </span>exp = input.parse::&lt;MathExpressionTree&gt;().unwrap();
     <span class="kw">let </span>latex_exp = exp.to_latex();
-    <span class="macro">assert_eq!</span>(latex_exp, <span class="string">&quot;\\lambda*(n+4)*(i-3)*H^{m-2}&quot;</span>);
+    <span class="macro">assert_eq!</span>(latex_exp, <span class="string">"\\lambda*(n+4)*(i-3)*H^{m-2}"</span>);
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_sexp2latex_derivative() {
-    <span class="kw">let </span>input = <span class="string">&quot;
+    <span class="kw">let </span>input = <span class="string">"
     &lt;math&gt;
     &lt;mfrac&gt;
         &lt;mrow&gt;&lt;mi&gt;d&lt;/mi&gt;&lt;mi&gt;S&lt;/mi&gt;&lt;/mrow&gt;
         &lt;mrow&gt;&lt;mi&gt;d&lt;/mi&gt;&lt;mi&gt;t&lt;/mi&gt;&lt;/mrow&gt;
         &lt;/mfrac&gt;
     &lt;/math&gt;
-    &quot;</span>;
+    "</span>;
     <span class="kw">let </span>exp = input.parse::&lt;MathExpressionTree&gt;().unwrap();
     <span class="kw">let </span>latex_exp = exp.to_latex();
-    <span class="macro">assert_eq!</span>(latex_exp, <span class="string">&quot;\\frac{d S}{dt}&quot;</span>);
+    <span class="macro">assert_eq!</span>(latex_exp, <span class="string">"\\frac{d S}{dt}"</span>);
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_equation_halfar_dome_to_latex() {
-    <span class="kw">let </span>input = <span class="string">&quot;
+    <span class="kw">let </span>input = <span class="string">"
     &lt;math&gt;
         &lt;mfrac&gt;&lt;mrow&gt;&lt;mi&gt;∂&lt;/mi&gt;&lt;mi&gt;H&lt;/mi&gt;&lt;/mrow&gt;&lt;mrow&gt;&lt;mi&gt;∂&lt;/mi&gt;&lt;mi&gt;t&lt;/mi&gt;&lt;/mrow&gt;&lt;/mfrac&gt;
         &lt;mo&gt;=&lt;/mo&gt;
@@ -4554,18 +4555,18 @@
         &lt;mo&gt;&amp;#x2207;&lt;/mo&gt;&lt;mi&gt;H&lt;/mi&gt;
         &lt;mo&gt;)&lt;/mo&gt;
     &lt;/math&gt;
-    &quot;</span>;
+    "</span>;
     <span class="kw">let </span>exp = input.parse::&lt;MathExpressionTree&gt;().unwrap();
     <span class="kw">let </span>latex_exp = exp.to_latex();
     <span class="macro">assert_eq!</span>(
         latex_exp,
-        <span class="string">&quot;\\frac{d H}{dt}=\\nabla \\cdot {(\\Gamma*H^{n+2}*\\left|\\nabla{H}\\right|^{n-1}*\\nabla{H})}&quot;
+        <span class="string">"\\frac{d H}{dt}=\\nabla \\cdot {(\\Gamma*H^{n+2}*\\left|\\nabla{H}\\right|^{n-1}*\\nabla{H})}"
     </span>);
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_equation_halfar_dome_8_1_to_latex() {
-    <span class="kw">let </span>input = <span class="string">&quot;
+    <span class="kw">let </span>input = <span class="string">"
     &lt;math&gt;
       &lt;mfrac&gt;
         &lt;mrow&gt;
@@ -4605,20 +4606,20 @@
       &lt;mi&gt;H&lt;/mi&gt;
       &lt;mo&gt;)&lt;/mo&gt;
     &lt;/math&gt;
-    &quot;</span>;
+    "</span>;
     <span class="kw">let </span>modified_input1 = <span class="kw-2">&amp;</span>replace_unicode_with_symbols(input).to_string();
     <span class="kw">let </span>modified_input2 = <span class="kw-2">&amp;</span>preprocess_mathml_for_to_latex(modified_input1).to_string();
     <span class="kw">let </span>exp = modified_input2.parse::&lt;MathExpressionTree&gt;().unwrap();
     <span class="kw">let </span>latex_exp = exp.to_latex();
     <span class="macro">assert_eq!</span>(
         latex_exp,
-        <span class="string">&quot;\\frac{d H}{dt}=\\nabla \\cdot {(\\Gamma*H^{n+2}*\\left|\\nabla{H}\\right|^{n-1}*\\nabla{H})}&quot;
+        <span class="string">"\\frac{d H}{dt}=\\nabla \\cdot {(\\Gamma*H^{n+2}*\\left|\\nabla{H}\\right|^{n-1}*\\nabla{H})}"
     </span>);
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_equation_halfar_dome_8_2_to_latex() {
-    <span class="kw">let </span>input = <span class="string">&quot;
+    <span class="kw">let </span>input = <span class="string">"
     &lt;math&gt;
       &lt;mi&gt;&amp;#x0393;&lt;/mi&gt;
       &lt;mo&gt;=&lt;/mo&gt;
@@ -4639,17 +4640,17 @@
         &lt;mi&gt;n&lt;/mi&gt;
       &lt;/msup&gt;
     &lt;/math&gt;
-    &quot;</span>;
+    "</span>;
     <span class="kw">let </span>modified_input1 = <span class="kw-2">&amp;</span>replace_unicode_with_symbols(input).to_string();
     <span class="kw">let </span>modified_input2 = <span class="kw-2">&amp;</span>preprocess_mathml_for_to_latex(modified_input1).to_string();
     <span class="kw">let </span>exp = modified_input2.parse::&lt;MathExpressionTree&gt;().unwrap();
     <span class="kw">let </span>latex_exp = exp.to_latex();
-    <span class="macro">assert_eq!</span>(latex_exp, <span class="string">&quot;\\Gamma=\\frac{2}{n+2}*A*(\\rho*g)^{n}&quot;</span>);
+    <span class="macro">assert_eq!</span>(latex_exp, <span class="string">"\\Gamma=\\frac{2}{n+2}*A*(\\rho*g)^{n}"</span>);
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_equation_halfar_dome_8_3_to_latex() {
-    <span class="kw">let </span>input = <span class="string">&quot;
+    <span class="kw">let </span>input = <span class="string">"
     &lt;math&gt;
       &lt;mi&gt;H&lt;/mi&gt;
       &lt;mo&gt;(&lt;/mo&gt;
@@ -4736,20 +4737,20 @@
         &lt;/mrow&gt;
       &lt;/msup&gt;
     &lt;/math&gt;
-    &quot;</span>;
+    "</span>;
     <span class="kw">let </span>modified_input1 = <span class="kw-2">&amp;</span>replace_unicode_with_symbols(input).to_string();
     <span class="kw">let </span>modified_input2 = <span class="kw-2">&amp;</span>preprocess_mathml_for_to_latex(modified_input1).to_string();
     <span class="kw">let </span>exp = modified_input2.parse::&lt;MathExpressionTree&gt;().unwrap();
     <span class="kw">let </span>latex_exp = exp.to_latex();
     <span class="macro">assert_eq!</span>(
         latex_exp,
-        <span class="string">&quot;H(t,r)=H_{0}*(\\frac{t_{0}}{t})^{\\frac{1}{9}}*(1-((\\frac{t_{0}}{t})^{\\frac{1}{18}}*\\frac{r}{R_{0}})^{\\frac{4}{3}})^{\\frac{3}{7}}&quot;
+        <span class="string">"H(t,r)=H_{0}*(\\frac{t_{0}}{t})^{\\frac{1}{9}}*(1-((\\frac{t_{0}}{t})^{\\frac{1}{18}}*\\frac{r}{R_{0}})^{\\frac{4}{3}})^{\\frac{3}{7}}"
     </span>);
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_equation_halfar_dome_8_4_to_latex() {
-    <span class="kw">let </span>input = <span class="string">&quot;
+    <span class="kw">let </span>input = <span class="string">"
     &lt;math&gt;
       &lt;msub&gt;
         &lt;mi&gt;t&lt;/mi&gt;
@@ -4787,24 +4788,24 @@
         &lt;/msubsup&gt;
       &lt;/mfrac&gt;
     &lt;/math&gt;
-    &quot;</span>;
+    "</span>;
     <span class="kw">let </span>exp = input.parse::&lt;MathExpressionTree&gt;().unwrap();
-    <span class="macro">println!</span>(<span class="string">&quot;exp={:?}&quot;</span>, exp);
+    <span class="macro">println!</span>(<span class="string">"exp={:?}"</span>, exp);
     <span class="kw">let </span>s_exp = exp.to_string();
-    <span class="macro">println!</span>(<span class="string">&quot;s_exp={:?}&quot;</span>, s_exp);
+    <span class="macro">println!</span>(<span class="string">"s_exp={:?}"</span>, s_exp);
     <span class="kw">let </span>modified_input1 = <span class="kw-2">&amp;</span>replace_unicode_with_symbols(input).to_string();
     <span class="kw">let </span>modified_input2 = <span class="kw-2">&amp;</span>preprocess_mathml_for_to_latex(modified_input1).to_string();
     <span class="kw">let </span>exp = modified_input2.parse::&lt;MathExpressionTree&gt;().unwrap();
     <span class="kw">let </span>latex_exp = exp.to_latex();
     <span class="macro">assert_eq!</span>(
         latex_exp,
-        <span class="string">&quot;t_{0}=\\frac{1}{18*\\Gamma}*(\\frac{7}{4})^{3}*\\frac{R_{0}^{4}}{H_{0}^{7}}&quot;
+        <span class="string">"t_{0}=\\frac{1}{18*\\Gamma}*(\\frac{7}{4})^{3}*\\frac{R_{0}^{4}}{H_{0}^{7}}"
     </span>);
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>new_test_halfar_whitespace() {
-    <span class="kw">let </span>input = <span class="string">&quot;
+    <span class="kw">let </span>input = <span class="string">"
     &lt;math&gt;
       &lt;msub&gt;
         &lt;mi&gt;t&lt;/mi&gt;
@@ -4842,40 +4843,40 @@
         &lt;/msubsup&gt;
       &lt;/mfrac&gt;
     &lt;/math&gt;
-    &quot;</span>;
+    "</span>;
     <span class="kw">let </span>exp = input.parse::&lt;MathExpressionTree&gt;().unwrap();
     <span class="kw">let </span>s_exp = exp.to_string();
     <span class="macro">assert_eq!</span>(
         s_exp,
-        <span class="string">&quot;(= t_{0} (* (* (/ 1 (* 18 Γ)) (^ (/ 7 4) 3)) (/ R_{0}^{4} H_{0}^{7})))&quot;
+        <span class="string">"(= t_{0} (* (* (/ 1 (* 18 Γ)) (^ (/ 7 4) 3)) (/ R_{0}^{4} H_{0}^{7})))"
     </span>);
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_equation_with_mtext() {
-    <span class="kw">let </span>input = <span class="string">&quot;&lt;math&gt;&lt;msub&gt;&lt;mrow&gt;&lt;mi mathvariant=\&quot;script\&quot;&gt;L&lt;/mi&gt;&lt;/mrow&gt;&lt;mrow&gt;&lt;mtext&gt;reg&lt;/mtext&gt;&lt;/mrow&gt;&lt;/msub&gt;&lt;mo&gt;=&lt;/mo&gt;&lt;msub&gt;&lt;mrow&gt;&lt;mi mathvariant=\&quot;script\&quot;&gt;L&lt;/mi&gt;&lt;/mrow&gt;&lt;mrow&gt;&lt;mi&gt;d&lt;/mi&gt;&lt;mn&gt;1&lt;/mn&gt;&lt;/mrow&gt;&lt;/msub&gt;&lt;mo&gt;+&lt;/mo&gt;&lt;msub&gt;&lt;mrow&gt;&lt;mi mathvariant=\&quot;script\&quot;&gt;L&lt;/mi&gt;&lt;/mrow&gt;&lt;mrow&gt;&lt;mi&gt;d&lt;/mi&gt;&lt;mn&gt;2&lt;/mn&gt;&lt;/mrow&gt;&lt;/msub&gt;&lt;/math&gt;&quot;</span>;
+    <span class="kw">let </span>input = <span class="string">"&lt;math&gt;&lt;msub&gt;&lt;mrow&gt;&lt;mi mathvariant=\"script\"&gt;L&lt;/mi&gt;&lt;/mrow&gt;&lt;mrow&gt;&lt;mtext&gt;reg&lt;/mtext&gt;&lt;/mrow&gt;&lt;/msub&gt;&lt;mo&gt;=&lt;/mo&gt;&lt;msub&gt;&lt;mrow&gt;&lt;mi mathvariant=\"script\"&gt;L&lt;/mi&gt;&lt;/mrow&gt;&lt;mrow&gt;&lt;mi&gt;d&lt;/mi&gt;&lt;mn&gt;1&lt;/mn&gt;&lt;/mrow&gt;&lt;/msub&gt;&lt;mo&gt;+&lt;/mo&gt;&lt;msub&gt;&lt;mrow&gt;&lt;mi mathvariant=\"script\"&gt;L&lt;/mi&gt;&lt;/mrow&gt;&lt;mrow&gt;&lt;mi&gt;d&lt;/mi&gt;&lt;mn&gt;2&lt;/mn&gt;&lt;/mrow&gt;&lt;/msub&gt;&lt;/math&gt;"</span>;
     <span class="kw">let </span>exp = input.parse::&lt;MathExpressionTree&gt;().unwrap();
     <span class="kw">let </span>s_exp = exp.to_string();
-    <span class="macro">assert_eq!</span>(s_exp, <span class="string">&quot;(= L_{reg} (+ L_{d1} L_{d2}))&quot;</span>);
+    <span class="macro">assert_eq!</span>(s_exp, <span class="string">"(= L_{reg} (+ L_{d1} L_{d2}))"</span>);
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>new_msqrt_test_function() {
-    <span class="kw">let </span>input = <span class="string">&quot;&lt;math&gt;
+    <span class="kw">let </span>input = <span class="string">"&lt;math&gt;
     &lt;msqrt&gt;
     &lt;mn&gt;4&lt;/mn&gt;
     &lt;mi&gt;a&lt;/mi&gt;
     &lt;mi&gt;c&lt;/mi&gt;
     &lt;/msqrt&gt;
-    &lt;/math&gt;&quot;</span>;
+    &lt;/math&gt;"</span>;
     <span class="kw">let </span>exp = input.parse::&lt;MathExpressionTree&gt;().unwrap();
     <span class="kw">let </span>s_exp = exp.to_string();
-    <span class="macro">assert_eq!</span>(s_exp, <span class="string">&quot;(√ (* (* 4 a) c))&quot;</span>);
-    <span class="macro">assert_eq!</span>(exp.to_latex(), <span class="string">&quot;\\sqrt{4*a*c}&quot;</span>);
+    <span class="macro">assert_eq!</span>(s_exp, <span class="string">"(√ (* (* 4 a) c))"</span>);
+    <span class="macro">assert_eq!</span>(exp.to_latex(), <span class="string">"\\sqrt{4*a*c}"</span>);
 }
 <span class="attr">#[test]
 </span><span class="kw">fn </span>new_quadratic_equation() {
-    <span class="kw">let </span>input = <span class="string">&quot;&lt;math&gt;
+    <span class="kw">let </span>input = <span class="string">"&lt;math&gt;
   &lt;mi&gt;x&lt;/mi&gt;
   &lt;mo&gt;=&lt;/mo&gt;
   &lt;mfrac&gt;
@@ -4899,20 +4900,20 @@
       &lt;mi&gt;a&lt;/mi&gt;
     &lt;/mrow&gt;
   &lt;/mfrac&gt;
-&lt;/math&gt;&quot;</span>;
+&lt;/math&gt;"</span>;
     <span class="kw">let </span>exp = input.parse::&lt;MathExpressionTree&gt;().unwrap();
     <span class="kw">let </span>s_exp = exp.to_string();
-    <span class="macro">println!</span>(<span class="string">&quot;s_exp={:?}&quot;</span>, s_exp);
+    <span class="macro">println!</span>(<span class="string">"s_exp={:?}"</span>, s_exp);
     <span class="macro">assert_eq!</span>(
         s_exp,
-        <span class="string">&quot;(= x (/ (- (- b) (√ (- (^ b 2) (* (* 4 a) c)))) (* 2 a)))&quot;
+        <span class="string">"(= x (/ (- (- b) (√ (- (^ b 2) (* (* 4 a) c)))) (* 2 a)))"
     </span>);
-    <span class="macro">assert_eq!</span>(exp.to_latex(), <span class="string">&quot;x=\\frac{(-b)-\\sqrt{b^{2}-(4*a*c)}}{2*a}&quot;</span>);
+    <span class="macro">assert_eq!</span>(exp.to_latex(), <span class="string">"x=\\frac{(-b)-\\sqrt{b^{2}-(4*a*c)}}{2*a}"</span>);
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_dot_in_derivative() {
-    <span class="kw">let </span>input = <span class="string">&quot;&lt;math&gt;
+    <span class="kw">let </span>input = <span class="string">"&lt;math&gt;
     &lt;mrow&gt;
     &lt;mover&gt;
     &lt;mi&gt;S&lt;/mi&gt;
@@ -4922,15 +4923,15 @@
     &lt;mo&gt;(&lt;/mo&gt;
     &lt;mi&gt;t&lt;/mi&gt;
     &lt;mo&gt;)&lt;/mo&gt;
-    &lt;/math&gt;&quot;</span>;
+    &lt;/math&gt;"</span>;
     <span class="kw">let </span>exp = input.parse::&lt;MathExpressionTree&gt;().unwrap();
     <span class="kw">let </span>s_exp = exp.to_string();
-    <span class="macro">assert_eq!</span>(s_exp, <span class="string">&quot;(D(1, t) S)&quot;</span>);
+    <span class="macro">assert_eq!</span>(s_exp, <span class="string">"(D(1, t) S)"</span>);
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_sidarthe_equation() {
-    <span class="kw">let </span>input = <span class="string">&quot;&lt;math&gt;
+    <span class="kw">let </span>input = <span class="string">"&lt;math&gt;
   &lt;mrow&gt;
     &lt;mover&gt;
       &lt;mi&gt;S&lt;/mi&gt;
@@ -4971,18 +4972,18 @@
   &lt;mi&gt;t&lt;/mi&gt;
   &lt;mo&gt;)&lt;/mo&gt;
   &lt;mo&gt;)&lt;/mo&gt;
-&lt;/math&gt;&quot;</span>;
+&lt;/math&gt;"</span>;
     <span class="kw">let </span>exp = input.parse::&lt;MathExpressionTree&gt;().unwrap();
     <span class="kw">let </span>s_exp = exp.to_string();
     <span class="macro">assert_eq!</span>(
         s_exp,
-        <span class="string">&quot;(= (D(1, t) S) (* (- S) (+ (+ (+ (* α I) (* β D)) (* γ A)) (* δ R))))&quot;
+        <span class="string">"(= (D(1, t) S) (* (- S) (+ (+ (+ (* α I) (* β D)) (* γ A)) (* δ R))))"
     </span>);
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_heating_rate() {
-    <span class="kw">let </span>input = <span class="string">&quot;&lt;math&gt;
+    <span class="kw">let </span>input = <span class="string">"&lt;math&gt;
     &lt;msub&gt;
     &lt;mi&gt;Q&lt;/mi&gt;
     &lt;mi&gt;i&lt;/mi&gt;
@@ -5017,15 +5018,15 @@
     &lt;mo&gt;)&lt;/mo&gt;
   &lt;/mrow&gt;
 &lt;/math&gt;
-    &quot;</span>;
+    "</span>;
     <span class="kw">let </span>exp = input.parse::&lt;MathExpressionTree&gt;().unwrap();
     <span class="kw">let </span>s_exp = exp.to_string();
-    <span class="macro">assert_eq!</span>(s_exp, <span class="string">&quot;(= Q_{i} (/ (- T_{i} T_{i-1}) (* C_{p} Δt)))&quot;</span>);
+    <span class="macro">assert_eq!</span>(s_exp, <span class="string">"(= Q_{i} (/ (- T_{i} T_{i-1}) (* C_{p} Δt)))"</span>);
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_sum_munderover() {
-    <span class="kw">let </span>input = <span class="string">&quot;&lt;math&gt;
+    <span class="kw">let </span>input = <span class="string">"&lt;math&gt;
     &lt;munderover&gt;
     &lt;mo&gt;&amp;#x2211;&lt;/mo&gt;
     &lt;mrow&gt;
@@ -5036,15 +5037,15 @@
     &lt;mi&gt;K&lt;/mi&gt;
     &lt;/munderover&gt;
     &lt;mi&gt;S&lt;/mi&gt;
-    &lt;/math&gt;&quot;</span>;
+    &lt;/math&gt;"</span>;
     <span class="kw">let </span>exp = input.parse::&lt;MathExpressionTree&gt;().unwrap();
     <span class="kw">let </span>s_exp = exp.to_string();
-    <span class="macro">assert_eq!</span>(s_exp, <span class="string">&quot;(∑_{l=k}^{K} S)&quot;</span>);
+    <span class="macro">assert_eq!</span>(s_exp, <span class="string">"(∑_{l=k}^{K} S)"</span>);
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_hydrostatic() {
-    <span class="kw">let </span>input = <span class="string">&quot;&lt;math&gt;
+    <span class="kw">let </span>input = <span class="string">"&lt;math&gt;
     &lt;msub&gt;
     &lt;mi&gt;Φ&lt;/mi&gt;
     &lt;mi&gt;k&lt;/mi&gt;
@@ -5079,19 +5080,19 @@
     &lt;mi&gt;l&lt;/mi&gt;
     &lt;/mrow&gt;
     &lt;/msub&gt;
-    &lt;/math&gt;&quot;</span>;
+    &lt;/math&gt;"</span>;
     <span class="kw">let </span>exp = input.parse::&lt;MathExpressionTree&gt;().unwrap();
     <span class="kw">let </span>s_exp = exp.to_string();
-    <span class="comment">//println!(&quot;s_exp={:?}&quot;, s_exp);
+    <span class="comment">//println!("s_exp={:?}", s_exp);
     </span><span class="macro">assert_eq!</span>(
         s_exp,
-        <span class="string">&quot;(= Φ_{k} (+ Φ_{s} (* R (∑_{l=k}^{K} (* H_{kl} T_{vl})))))&quot;
+        <span class="string">"(= Φ_{k} (+ Φ_{s} (* R (∑_{l=k}^{K} (* H_{kl} T_{vl})))))"
     </span>);
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_temperature_evolution() {
-    <span class="kw">let </span>input = <span class="string">&quot;&lt;math&gt;
+    <span class="kw">let </span>input = <span class="string">"&lt;math&gt;
     &lt;mfrac&gt;
     &lt;mrow&gt;
     &lt;mi&gt;Δ&lt;/mi&gt;
@@ -5139,55 +5140,55 @@
     &lt;mi&gt;C&lt;/mi&gt;
     &lt;mi&gt;p&lt;/mi&gt;
     &lt;/msub&gt;
-    &lt;/math&gt;&quot;</span>;
+    &lt;/math&gt;"</span>;
     <span class="kw">let </span>exp = input.parse::&lt;MathExpressionTree&gt;().unwrap();
     <span class="kw">let </span>s_exp = exp.to_string();
     <span class="macro">assert_eq!</span>(
         s_exp,
-        <span class="string">&quot;(= (/ (/ Δs_{i} Δt) C_{p}) (/ (/ (- s_{i} s_{i-1}) Δt) C_{p}))&quot;
+        <span class="string">"(= (/ (/ Δs_{i} Δt) C_{p}) (/ (/ (- s_{i} s_{i-1}) Δt) C_{p}))"
     </span>);
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_cross_product() {
-    <span class="kw">let </span>input = <span class="string">&quot;&lt;math&gt;
+    <span class="kw">let </span>input = <span class="string">"&lt;math&gt;
     &lt;mi&gt;f&lt;/mi&gt;
     &lt;mo&gt;&amp;#x00D7;&lt;/mo&gt;
     &lt;mi&gt;u&lt;/mi&gt;
-    &lt;/math&gt;&quot;</span>;
+    &lt;/math&gt;"</span>;
     <span class="kw">let </span>exp = input.parse::&lt;MathExpressionTree&gt;().unwrap();
     <span class="kw">let </span>s_exp = exp.to_string();
-    <span class="macro">assert_eq!</span>(s_exp, <span class="string">&quot;(× f u)&quot;</span>);
+    <span class="macro">assert_eq!</span>(s_exp, <span class="string">"(× f u)"</span>);
 }
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_dot_product() {
-    <span class="kw">let </span>input = <span class="string">&quot;&lt;math&gt;
+    <span class="kw">let </span>input = <span class="string">"&lt;math&gt;
     &lt;mi&gt;f&lt;/mi&gt;
     &lt;mo&gt;&amp;#x22c5;&lt;/mo&gt;
     &lt;mi&gt;u&lt;/mi&gt;
-    &lt;/math&gt;&quot;</span>;
+    &lt;/math&gt;"</span>;
     <span class="kw">let </span>exp = input.parse::&lt;MathExpressionTree&gt;().unwrap();
     <span class="kw">let </span>s_exp = exp.to_string();
-    <span class="macro">assert_eq!</span>(s_exp, <span class="string">&quot;(⋅ f u)&quot;</span>);
+    <span class="macro">assert_eq!</span>(s_exp, <span class="string">"(⋅ f u)"</span>);
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_partial_with_msub_t() {
-    <span class="kw">let </span>input = <span class="string">&quot;&lt;math&gt;
+    <span class="kw">let </span>input = <span class="string">"&lt;math&gt;
     &lt;msub&gt;
     &lt;mi&gt;∂&lt;/mi&gt;
     &lt;mi&gt;t&lt;/mi&gt;
     &lt;/msub&gt;
     &lt;mi&gt;S&lt;/mi&gt;
-    &lt;/math&gt;&quot;</span>;
+    &lt;/math&gt;"</span>;
     <span class="kw">let </span>exp = input.parse::&lt;MathExpressionTree&gt;().unwrap();
     <span class="kw">let </span>s_exp = exp.to_string();
-    <span class="macro">assert_eq!</span>(s_exp, <span class="string">&quot;(PD(1, t) S)&quot;</span>);
+    <span class="macro">assert_eq!</span>(s_exp, <span class="string">"(PD(1, t) S)"</span>);
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_dry_static_energy() {
-    <span class="kw">let </span>input = <span class="string">&quot;&lt;math&gt;
+    <span class="kw">let </span>input = <span class="string">"&lt;math&gt;
     &lt;msub&gt;
     &lt;mi&gt;s&lt;/mi&gt;
     &lt;mi&gt;i&lt;/mi&gt;
@@ -5251,15 +5252,15 @@
     &lt;mo&gt;…&lt;/mo&gt;
     &lt;mo&gt;)&lt;/mo&gt;
   &lt;/mrow&gt;
-    &lt;/math&gt;&quot;</span>;
+    &lt;/math&gt;"</span>;
     <span class="kw">let </span>exp = input.parse::&lt;MathExpressionTree&gt;().unwrap();
     <span class="kw">let </span>s_exp = exp.to_string();
-    <span class="macro">assert_eq!</span>(s_exp, <span class="string">&quot;(= s_{i} (+ s_{i-1} (* Δt Q_{i})))&quot;</span>);
+    <span class="macro">assert_eq!</span>(s_exp, <span class="string">"(= s_{i} (+ s_{i-1} (* Δt Q_{i})))"</span>);
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_hat_operator() {
-    <span class="kw">let </span>input = <span class="string">&quot;&lt;math&gt;
+    <span class="kw">let </span>input = <span class="string">"&lt;math&gt;
     &lt;mi&gt;ζ&lt;/mi&gt;
     &lt;mrow&gt;
     &lt;mover&gt;
@@ -5267,15 +5268,15 @@
     &lt;mo&gt;&amp;#x5E;&lt;/mo&gt;
     &lt;/mover&gt;
     &lt;/mrow&gt;
-    &lt;/math&gt;&quot;</span>;
+    &lt;/math&gt;"</span>;
     <span class="kw">let </span>exp = input.parse::&lt;MathExpressionTree&gt;().unwrap();
     <span class="kw">let </span>s_exp = exp.to_string();
-    <span class="macro">assert_eq!</span>(s_exp, <span class="string">&quot;(Hat(z) ζ)&quot;</span>);
+    <span class="macro">assert_eq!</span>(s_exp, <span class="string">"(Hat(z) ζ)"</span>);
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_vector_invariant_form() {
-    <span class="kw">let </span>input = <span class="string">&quot;&lt;math&gt;
+    <span class="kw">let </span>input = <span class="string">"&lt;math&gt;
     &lt;msub&gt;
     &lt;mi&gt;∂&lt;/mi&gt;
     &lt;mi&gt;t&lt;/mi&gt;
@@ -5316,30 +5317,30 @@
     &lt;mi&gt;u&lt;/mi&gt;
     &lt;mo&gt;]&lt;/mo&gt;
     &lt;/mrow&gt;
-    &lt;/math&gt;&quot;</span>;
+    &lt;/math&gt;"</span>;
     <span class="kw">let </span>exp = input.parse::&lt;MathExpressionTree&gt;().unwrap();
     <span class="kw">let </span>s_exp = exp.to_string();
-    <span class="macro">assert_eq!</span>(s_exp, <span class="string">&quot;(= (+ (PD(1, t) u) (× (+ (Hat(z) ζ) f) u)) (- (Grad (+ (* g (+ h b)) (* (/ 1 2) (⋅ u u))))))&quot;</span>);
+    <span class="macro">assert_eq!</span>(s_exp, <span class="string">"(= (+ (PD(1, t) u) (× (+ (Hat(z) ζ) f) u)) (- (Grad (+ (* g (+ h b)) (* (/ 1 2) (⋅ u u))))))"</span>);
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_mi_dot_gradient() {
-    <span class="kw">let </span>input = <span class="string">&quot;&lt;math&gt;
+    <span class="kw">let </span>input = <span class="string">"&lt;math&gt;
     &lt;mo&gt;(&lt;/mo&gt;
     &lt;mi&gt;v&lt;/mi&gt;
     &lt;mo&gt;&amp;#x22c5;&lt;/mo&gt;
     &lt;mi&gt;&amp;#x2207;&lt;/mi&gt;
     &lt;mo&gt;)&lt;/mo&gt;
     &lt;mi&gt;u&lt;/mi&gt;
-    &lt;/math&gt;&quot;</span>;
+    &lt;/math&gt;"</span>;
     <span class="kw">let </span>exp = input.parse::&lt;MathExpressionTree&gt;().unwrap();
     <span class="kw">let </span>s_exp = exp.to_string();
-    <span class="macro">assert_eq!</span>(s_exp, <span class="string">&quot;(* (⋅ v Grad) u)&quot;</span>);
+    <span class="macro">assert_eq!</span>(s_exp, <span class="string">"(* (⋅ v Grad) u)"</span>);
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_momentum_conservation() {
-    <span class="kw">let </span>input = <span class="string">&quot;&lt;math&gt;
+    <span class="kw">let </span>input = <span class="string">"&lt;math&gt;
     &lt;msub&gt;
     &lt;mi&gt;∂&lt;/mi&gt;
     &lt;mi&gt;t&lt;/mi&gt;
@@ -5379,9 +5380,9 @@
     &lt;mi&gt;u&lt;/mi&gt;
     &lt;/mrow&gt;
     &lt;/msub&gt;
-    &lt;/math&gt;&quot;</span>;
+    &lt;/math&gt;"</span>;
     <span class="kw">let </span>exp = input.parse::&lt;MathExpressionTree&gt;().unwrap();
     <span class="kw">let </span>s_exp = exp.to_string();
-    <span class="macro">assert_eq!</span>(s_exp, <span class="string">&quot;(= (PD(1, t) u) (+ (- (- (- (* (- (⋅ v Grad)) u) (× f u)) (Grad_h) (+ p (* g η)))) (Div τ)) F_{u}))&quot;</span>);
+    <span class="macro">assert_eq!</span>(s_exp, <span class="string">"(= (PD(1, t) u) (+ (- (- (- (* (- (⋅ v Grad)) u) (× f u)) (Grad_h) (+ p (* g η)))) (Div τ)) F_{u}))"</span>);
 }
 </code></pre></div></section></main></body></html>

@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/utoipa-3.5.0/src/openapi/server.rs`."><title>server.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="utoipa" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/utoipa-3.5.0/src/openapi/server.rs`."><title>server.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="utoipa" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -243,7 +244,7 @@
 <a href="#243" id="243">243</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Implements [OpenAPI Server Object][server] types to configure target servers.
 //!
-//! OpenAPI will implicitly add [`Server`] with `url = &quot;/&quot;` to [`OpenApi`][openapi] when no servers
+//! OpenAPI will implicitly add [`Server`] with `url = "/"` to [`OpenApi`][openapi] when no servers
 //! are defined.
 //!
 //! [`Server`] can be used to alter connection url for _**path operations**_. It can be a
@@ -261,24 +262,24 @@
 //! Create new server with relative path.
 //! ```rust
 //! # use utoipa::openapi::server::Server;
-//! Server::new(&quot;/api/v1&quot;);
+//! Server::new("/api/v1");
 //! ```
 //!
 //! Create server with custom url using a builder.
 //! ```rust
 //! # use utoipa::openapi::server::ServerBuilder;
-//! ServerBuilder::new().url(&quot;https://alternative.api.url.test/api&quot;).build();
+//! ServerBuilder::new().url("https://alternative.api.url.test/api").build();
 //! ```
 //!
 //! Create server with builder and variable substitution.
 //! ```rust
 //! # use utoipa::openapi::server::{ServerBuilder, ServerVariableBuilder};
-//! ServerBuilder::new().url(&quot;/api/{version}/{username}&quot;)
-//!     .parameter(&quot;version&quot;, ServerVariableBuilder::new()
-//!         .enum_values(Some([&quot;v1&quot;, &quot;v2&quot;]))
-//!         .default_value(&quot;v1&quot;))
-//!     .parameter(&quot;username&quot;, ServerVariableBuilder::new()
-//!         .default_value(&quot;the_user&quot;)).build();
+//! ServerBuilder::new().url("/api/{version}/{username}")
+//!     .parameter("version", ServerVariableBuilder::new()
+//!         .enum_values(Some(["v1", "v2"]))
+//!         .default_value("v1"))
+//!     .parameter("username", ServerVariableBuilder::new()
+//!         .default_value("the_user")).build();
 //! ```
 //!
 //! [server]: https://spec.openapis.org/oas/latest.html#server-object
@@ -296,14 +297,14 @@
     <span class="doccomment">/// Represents target server object. It can be used to alter server connection for
     /// _**path operations**_.
     ///
-    /// By default OpenAPI will implicitly implement [`Server`] with `url = &quot;/&quot;` if no servers is provided to
+    /// By default OpenAPI will implicitly implement [`Server`] with `url = "/"` if no servers is provided to
     /// the [`OpenApi`][openapi].
     ///
     /// [openapi]: ../struct.OpenApi.html
     </span><span class="attr">#[non_exhaustive]
     #[derive(Serialize, Deserialize, Default, Clone, PartialEq, Eq)]
-    #[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
-    #[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+    #[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
+    #[serde(rename_all = <span class="string">"camelCase"</span>)]
     </span><span class="kw">pub struct </span>Server {
         <span class="doccomment">/// Target url of the [`Server`]. It can be valid http url or relative path.
         ///
@@ -312,11 +313,11 @@
         </span><span class="kw">pub </span>url: String,
 
         <span class="doccomment">/// Optional description describing the target server url. Description supports markdown syntax.
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
         </span><span class="kw">pub </span>description: <span class="prelude-ty">Option</span>&lt;String&gt;,
 
         <span class="doccomment">/// Optional map of variable name and its substitution value used in [`Server::url`].
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
         </span><span class="kw">pub </span>variables: <span class="prelude-ty">Option</span>&lt;BTreeMap&lt;String, ServerVariable&gt;&gt;,
     }
 }
@@ -324,7 +325,7 @@
 <span class="kw">impl </span>Server {
     <span class="doccomment">/// Construct a new [`Server`] with given url. Url can be valid http url or context path of the url.
     ///
-    /// If url is valid http url then all path operation request&#39;s will be forwarded to the selected [`Server`].
+    /// If url is valid http url then all path operation request's will be forwarded to the selected [`Server`].
     ///
     /// If url is path of url e.g. `/api/v1` then the url will be appended to the servers address and the
     /// operations will be forwarded to location `server address + url`.
@@ -335,13 +336,13 @@
     /// Create new server with url path.
     /// ```rust
     /// # use utoipa::openapi::server::Server;
-    ///  Server::new(&quot;/api/v1&quot;);
+    ///  Server::new("/api/v1");
     /// ```
     ///
     /// Create new server with alternative server.
     /// ```rust
     /// # use utoipa::openapi::server::Server;
-    ///  Server::new(&quot;https://alternative.pet-api.test/api/v1&quot;);
+    ///  Server::new("https://alternative.pet-api.test/api/v1");
     /// ```
     </span><span class="kw">pub fn </span>new&lt;S: Into&lt;String&gt;&gt;(url: S) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
@@ -397,19 +398,19 @@
     /// [server_variable]: https://spec.openapis.org/oas/latest.html#server-variable-object
     </span><span class="attr">#[non_exhaustive]
     #[derive(Serialize, Deserialize, Default, Clone, PartialEq, Eq)]
-    #[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
+    #[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
     </span><span class="kw">pub struct </span>ServerVariable {
         <span class="doccomment">/// Default value used to substitute parameter if no other value is being provided.
-        </span><span class="attr">#[serde(rename = <span class="string">&quot;default&quot;</span>)]
+        </span><span class="attr">#[serde(rename = <span class="string">"default"</span>)]
         </span>default_value: String,
 
         <span class="doccomment">/// Optional description describing the variable of substitution. Markdown syntax is supported.
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
         </span>description: <span class="prelude-ty">Option</span>&lt;String&gt;,
 
         <span class="doccomment">/// Enum values can be used to limit possible options for substitution. If enum values is used
         /// the [`ServerVariable::default_value`] must contain one of the enum values.
-        </span><span class="attr">#[serde(rename = <span class="string">&quot;enum&quot;</span>, skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="attr">#[serde(rename = <span class="string">"enum"</span>, skip_serializing_if = <span class="string">"Option::is_none"</span>)]
         </span>enum_values: <span class="prelude-ty">Option</span>&lt;Vec&lt;String&gt;&gt;,
     }
 }
@@ -449,39 +450,39 @@
                 <span class="macro">assert_eq!</span>(
                     value,
                     expected_value,
-                    <span class="string">&quot;testing serializing \&quot;{}\&quot;: \nactual:\n{}\nexpected:\n{}&quot;</span>,
+                    <span class="string">"testing serializing \"{}\": \nactual:\n{}\nexpected:\n{}"</span>,
                     <span class="macro">stringify!</span>(<span class="macro-nonterminal">$name</span>),
                     value,
                     expected_value
                 );
 
-                <span class="macro">println!</span>(<span class="string">&quot;{}&quot;</span>, <span class="kw-2">&amp;</span>serde_json::to_string_pretty(<span class="kw-2">&amp;</span><span class="macro-nonterminal">$schema</span>).unwrap());
+                <span class="macro">println!</span>(<span class="string">"{}"</span>, <span class="kw-2">&amp;</span>serde_json::to_string_pretty(<span class="kw-2">&amp;</span><span class="macro-nonterminal">$schema</span>).unwrap());
             }
         };
     }
 
     <span class="macro">test_fn! </span>{
     create_server_with_builder_and_variable_substitution:
-    ServerBuilder::new().url(<span class="string">&quot;/api/{version}/{username}&quot;</span>)
-        .parameter(<span class="string">&quot;version&quot;</span>, ServerVariableBuilder::new()
-            .enum_values(<span class="prelude-val">Some</span>([<span class="string">&quot;v1&quot;</span>, <span class="string">&quot;v2&quot;</span>]))
-            .description(<span class="prelude-val">Some</span>(<span class="string">&quot;api version&quot;</span>))
-            .default_value(<span class="string">&quot;v1&quot;</span>))
-        .parameter(<span class="string">&quot;username&quot;</span>, ServerVariableBuilder::new()
-            .default_value(<span class="string">&quot;the_user&quot;</span>)).build();
-    <span class="string">r###&quot;{
-  &quot;url&quot;: &quot;/api/{version}/{username}&quot;,
-  &quot;variables&quot;: {
-      &quot;version&quot;: {
-          &quot;enum&quot;: [&quot;v1&quot;, &quot;v2&quot;],
-          &quot;default&quot;: &quot;v1&quot;,
-          &quot;description&quot;: &quot;api version&quot;
+    ServerBuilder::new().url(<span class="string">"/api/{version}/{username}"</span>)
+        .parameter(<span class="string">"version"</span>, ServerVariableBuilder::new()
+            .enum_values(<span class="prelude-val">Some</span>([<span class="string">"v1"</span>, <span class="string">"v2"</span>]))
+            .description(<span class="prelude-val">Some</span>(<span class="string">"api version"</span>))
+            .default_value(<span class="string">"v1"</span>))
+        .parameter(<span class="string">"username"</span>, ServerVariableBuilder::new()
+            .default_value(<span class="string">"the_user"</span>)).build();
+    <span class="string">r###"{
+  "url": "/api/{version}/{username}",
+  "variables": {
+      "version": {
+          "enum": ["v1", "v2"],
+          "default": "v1",
+          "description": "api version"
       },
-      &quot;username&quot;: {
-          &quot;default&quot;: &quot;the_user&quot;
+      "username": {
+          "default": "the_user"
       }
   }
-}&quot;###
+}"###
     </span>}
 }
 </code></pre></div></section></main></body></html>

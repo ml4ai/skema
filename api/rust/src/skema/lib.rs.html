@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `skema/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="skema" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `skema/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="skema" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -579,7 +580,7 @@
 
 <span class="comment">/******** AST for the Gromet Data Structure ********/
 </span><span class="attr">#[derive(Deserialize, Serialize, Clone, Debug, ToSchema)]
-#[serde(rename_all = <span class="string">&quot;UPPERCASE&quot;</span>)] </span><span class="comment">// Allows variants to match to uppercase json values
+#[serde(rename_all = <span class="string">"UPPERCASE"</span>)] </span><span class="comment">// Allows variants to match to uppercase json values
 </span><span class="attr">#[derive(strum_macros::Display)] </span><span class="comment">// Allows variants to be printed as strings if needed
 </span><span class="kw">pub enum </span>FnType {
     Fn,
@@ -587,19 +588,19 @@
 }
 
 <span class="attr">#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, ToSchema)]
-#[serde(rename_all = <span class="string">&quot;UPPERCASE&quot;</span>)]
+#[serde(rename_all = <span class="string">"UPPERCASE"</span>)]
 #[derive(strum_macros::Display)]
 </span><span class="kw">pub enum </span>FunctionType {
     Function,
     Predicate,
-    <span class="attr">#[serde(rename = <span class="string">&quot;LANGUAGE_PRIMITIVE&quot;</span>)]
+    <span class="attr">#[serde(rename = <span class="string">"LANGUAGE_PRIMITIVE"</span>)]
     </span>Primitive,
     Abstract,
     Module,
     Expression,
     Literal,
     Imported,
-    <span class="attr">#[serde(rename = <span class="string">&quot;IMPORTED_METHOD&quot;</span>)]
+    <span class="attr">#[serde(rename = <span class="string">"IMPORTED_METHOD"</span>)]
     </span>ImportedMethod,
 }
 
@@ -608,279 +609,279 @@
     <span class="kw">pub </span>value_type: String, <span class="comment">// could be enum?
 
     // This is the generic problem. floats are exported as ints but rust exports
-    // as floats, making full generic isn&#39;t feasible since we don&#39;t know the
+    // as floats, making full generic isn't feasible since we don't know the
     // number of instances before hand. So we import as a string to capture the
     // data regardless of type.
-    </span><span class="attr">#[serde(deserialize_with = <span class="string">&quot;de_value&quot;</span>)]
-    #[serde(serialize_with = <span class="string">&quot;se_value&quot;</span>)]
+    </span><span class="attr">#[serde(deserialize_with = <span class="string">"de_value"</span>)]
+    #[serde(serialize_with = <span class="string">"se_value"</span>)]
     </span><span class="kw">pub </span>value: String,
 
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>gromet_type: <span class="prelude-ty">Option</span>&lt;String&gt;,
 }
 
 <span class="attr">#[derive(Deserialize, Serialize, Clone, Debug, ToSchema)]
 </span><span class="kw">pub struct </span>GrometBox {
     <span class="kw">pub </span>function_type: FunctionType,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>, rename = <span class="string">&quot;body&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>, rename = <span class="string">"body"</span>)]
     </span><span class="kw">pub </span>contents: <span class="prelude-ty">Option</span>&lt;u32&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>value: <span class="prelude-ty">Option</span>&lt;ValueL&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>name: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>gromet_type: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>metadata: <span class="prelude-ty">Option</span>&lt;u32&gt;,
 }
 
 <span class="attr">#[derive(Deserialize, Serialize, Clone, Debug, ToSchema)]
 </span><span class="kw">pub struct </span>GrometPort {
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>id: <span class="prelude-ty">Option</span>&lt;u8&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>name: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="attr">#[serde(rename = <span class="string">&quot;box&quot;</span>)]
+    <span class="attr">#[serde(rename = <span class="string">"box"</span>)]
     </span><span class="kw">pub </span>r#box: u8,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>gromet_type: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
-    </span><span class="kw">pub </span>metadata: <span class="prelude-ty">Option</span>&lt;u32&gt;, <span class="comment">// pof: 473, 582, b: 685, 702, 719, 736, most b&#39;s
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
+    </span><span class="kw">pub </span>metadata: <span class="prelude-ty">Option</span>&lt;u32&gt;, <span class="comment">// pof: 473, 582, b: 685, 702, 719, 736, most b's
 </span>}
 
 <span class="attr">#[derive(Deserialize, Serialize, Clone, Debug, ToSchema)]
 </span><span class="kw">pub struct </span>GrometWire {
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>name: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="kw">pub </span>src: u8,
     <span class="kw">pub </span>tgt: u8,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>gromet_type: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>metadata: <span class="prelude-ty">Option</span>&lt;u32&gt;,
 }
 
 <span class="attr">#[derive(Deserialize, Serialize, Clone, Debug, ToSchema)]
 </span><span class="kw">pub struct </span>GrometBoxLoop {
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>name: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>pre: <span class="prelude-ty">Option</span>&lt;u32&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>condition: <span class="prelude-ty">Option</span>&lt;u32&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>init: <span class="prelude-ty">Option</span>&lt;u32&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>body: <span class="prelude-ty">Option</span>&lt;u32&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>gromet_type: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>metadata: <span class="prelude-ty">Option</span>&lt;u32&gt;,
 }
-<span class="comment">// condition, body_if, and body_else don&#39;t match online documentation
+<span class="comment">// condition, body_if, and body_else don't match online documentation
 // They are vecs of gromet boxes not integers...
 </span><span class="attr">#[derive(Deserialize, Serialize, Clone, Debug, ToSchema)]
 </span><span class="kw">pub struct </span>GrometBoxConditional {
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>name: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>condition: <span class="prelude-ty">Option</span>&lt;u32&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>body: <span class="prelude-ty">Option</span>&lt;u32&gt;, <span class="comment">// This exist is CHIME v2, but not in documentation...
-    </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>body_if: <span class="prelude-ty">Option</span>&lt;u32&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>body_else: <span class="prelude-ty">Option</span>&lt;u32&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>gromet_type: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>metadata: <span class="prelude-ty">Option</span>&lt;u32&gt;,
 }
 
 <span class="attr">#[derive(Deserialize, Serialize, Clone, Debug, ToSchema)]
 </span><span class="kw">pub struct </span>FunctionNet {
     <span class="comment">// this I guess is optional as of import support now...
-    </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>b: <span class="prelude-ty">Option</span>&lt;[GrometBox; <span class="number">1</span>]&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>opi: <span class="prelude-ty">Option</span>&lt;Vec&lt;GrometPort&gt;&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>opo: <span class="prelude-ty">Option</span>&lt;Vec&lt;GrometPort&gt;&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>wopio: <span class="prelude-ty">Option</span>&lt;Vec&lt;GrometWire&gt;&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>bf: <span class="prelude-ty">Option</span>&lt;Vec&lt;GrometBox&gt;&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>pif: <span class="prelude-ty">Option</span>&lt;Vec&lt;GrometPort&gt;&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>pof: <span class="prelude-ty">Option</span>&lt;Vec&lt;GrometPort&gt;&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>wfopi: <span class="prelude-ty">Option</span>&lt;Vec&lt;GrometWire&gt;&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>wfl: <span class="prelude-ty">Option</span>&lt;Vec&lt;GrometWire&gt;&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>wff: <span class="prelude-ty">Option</span>&lt;Vec&lt;GrometWire&gt;&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>wfc: <span class="prelude-ty">Option</span>&lt;Vec&lt;GrometWire&gt;&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>wfopo: <span class="prelude-ty">Option</span>&lt;Vec&lt;GrometWire&gt;&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>bl: <span class="prelude-ty">Option</span>&lt;Vec&lt;GrometBoxLoop&gt;&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>pil: <span class="prelude-ty">Option</span>&lt;Vec&lt;GrometPort&gt;&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>pol: <span class="prelude-ty">Option</span>&lt;Vec&lt;GrometPort&gt;&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>wlopi: <span class="prelude-ty">Option</span>&lt;Vec&lt;GrometWire&gt;&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>wll: <span class="prelude-ty">Option</span>&lt;Vec&lt;GrometWire&gt;&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>wlf: <span class="prelude-ty">Option</span>&lt;Vec&lt;GrometWire&gt;&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>wlc: <span class="prelude-ty">Option</span>&lt;Vec&lt;GrometWire&gt;&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>wlopo: <span class="prelude-ty">Option</span>&lt;Vec&lt;GrometWire&gt;&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>wl_iiargs: <span class="prelude-ty">Option</span>&lt;Vec&lt;GrometWire&gt;&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>wl_ioargs: <span class="prelude-ty">Option</span>&lt;Vec&lt;GrometWire&gt;&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>wl_cargs: <span class="prelude-ty">Option</span>&lt;Vec&lt;GrometWire&gt;&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>bc: <span class="prelude-ty">Option</span>&lt;Vec&lt;GrometBoxConditional&gt;&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>pic: <span class="prelude-ty">Option</span>&lt;Vec&lt;GrometPort&gt;&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>poc: <span class="prelude-ty">Option</span>&lt;Vec&lt;GrometPort&gt;&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>wcopi: <span class="prelude-ty">Option</span>&lt;Vec&lt;GrometWire&gt;&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>wcl: <span class="prelude-ty">Option</span>&lt;Vec&lt;GrometWire&gt;&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>wcf: <span class="prelude-ty">Option</span>&lt;Vec&lt;GrometWire&gt;&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>wcc: <span class="prelude-ty">Option</span>&lt;Vec&lt;GrometWire&gt;&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>wcopo: <span class="prelude-ty">Option</span>&lt;Vec&lt;GrometWire&gt;&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>wc_cargs: <span class="prelude-ty">Option</span>&lt;Vec&lt;GrometWire&gt;&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>gromet_type: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>metadata: <span class="prelude-ty">Option</span>&lt;u32&gt;,
     <span class="comment">// these additions are I guess how imports are being handled...
-    </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>name: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>src_language: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>, rename = <span class="string">&quot;type&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>, rename = <span class="string">"type"</span>)]
     </span><span class="kw">pub </span>r#type: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>version: <span class="prelude-ty">Option</span>&lt;String&gt;,
 }
 
 <span class="attr">#[derive(Deserialize, Serialize, Clone, Debug, ToSchema)]
 </span><span class="kw">pub struct </span>Attribute {
-    <span class="attr">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
+    <span class="attr">#[serde(rename = <span class="string">"type"</span>)]
     </span><span class="kw">pub </span>r#type: FnType,
     <span class="kw">pub </span>value: FunctionNet,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>index: <span class="prelude-ty">Option</span>&lt;u8&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>gromet_type: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>metadata: <span class="prelude-ty">Option</span>&lt;u32&gt;,
 }
 
 <span class="attr">#[derive(Deserialize, Serialize, Clone, Debug, ToSchema, JsonSchema)]
 </span><span class="kw">pub struct </span>Provenance {
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>method: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>timestamp: <span class="prelude-ty">Option</span>&lt;String&gt;,
 }
 
 <span class="attr">#[derive(Deserialize, Serialize, Clone, Debug, ToSchema, JsonSchema)]
 </span><span class="kw">pub struct </span>Files {
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>uid: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>name: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>path: <span class="prelude-ty">Option</span>&lt;String&gt;,
 }
 
 <span class="attr">#[derive(Deserialize, Serialize, Clone, Debug, ToSchema, JsonSchema)]
 </span><span class="kw">pub struct </span>TextExtraction {
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>document_reference_uid: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>page: <span class="prelude-ty">Option</span>&lt;u32&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>block: <span class="prelude-ty">Option</span>&lt;u32&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>char_begin: <span class="prelude-ty">Option</span>&lt;u32&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>char_end: <span class="prelude-ty">Option</span>&lt;u32&gt;,
 }
 
 <span class="attr">#[derive(Deserialize, Serialize, Clone, Debug, ToSchema, JsonSchema)]
 </span><span class="kw">pub struct </span>Grounding {
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>argument_name: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>id: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>description: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>score: <span class="prelude-ty">Option</span>&lt;f32&gt;,
 }
 
 <span class="attr">#[derive(Deserialize, Serialize, Clone, Debug, ToSchema, JsonSchema)]
 </span><span class="kw">pub struct </span>ValueMeta {
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>value: <span class="prelude-ty">Option</span>&lt;String&gt;,
 }
 
 <span class="attr">#[derive(Deserialize, Serialize, Clone, Debug, ToSchema, JsonSchema)]
 </span><span class="kw">pub struct </span>Metadata {
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>metadata_type: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>gromet_version: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>text_extraction: <span class="prelude-ty">Option</span>&lt;TextExtraction&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>variable_identifier: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>variable_definition: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>value: <span class="prelude-ty">Option</span>&lt;ValueMeta&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>grounding: <span class="prelude-ty">Option</span>&lt;Vec&lt;Grounding&gt;&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>name: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>global_reference_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>files: <span class="prelude-ty">Option</span>&lt;Vec&lt;Files&gt;&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>source_language: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>source_language_version: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>data_type: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>code_file_reference_uid: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>line_begin: <span class="prelude-ty">Option</span>&lt;u32&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>line_end: <span class="prelude-ty">Option</span>&lt;u32&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>col_begin: <span class="prelude-ty">Option</span>&lt;u32&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>col_end: <span class="prelude-ty">Option</span>&lt;u32&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>provenance: <span class="prelude-ty">Option</span>&lt;Provenance&gt;,
 }
 
@@ -889,15 +890,15 @@
     <span class="kw">pub </span>schema: String,
     <span class="kw">pub </span>schema_version: String,
     <span class="kw">pub </span>name: String,
-    <span class="attr">#[serde(rename = <span class="string">&quot;fn&quot;</span>)]
+    <span class="attr">#[serde(rename = <span class="string">"fn"</span>)]
     </span><span class="kw">pub </span>r#fn: FunctionNet,
-    <span class="attr">#[serde(rename = <span class="string">&quot;fn_array&quot;</span>)]
+    <span class="attr">#[serde(rename = <span class="string">"fn_array"</span>)]
     </span><span class="kw">pub </span>attributes: Vec&lt;FunctionNet&gt;, <span class="comment">// from 0.1.5 this went from Vec&lt;Attribute&gt; -&gt; Vec&lt;FunctionNet&gt;
-    </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>metadata_collection: <span class="prelude-ty">Option</span>&lt;Vec&lt;Vec&lt;Metadata&gt;&gt;&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>gromet_type: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>metadata: <span class="prelude-ty">Option</span>&lt;u32&gt;,
 }
 
@@ -913,7 +914,7 @@
 
 <span class="comment">// Methods
 // This is a custom deserialization of the value field in the Value struct.
-</span><span class="kw">fn </span>de_value&lt;<span class="lifetime">&#39;de</span>, D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;String, D::Error&gt; {
+</span><span class="kw">fn </span>de_value&lt;<span class="lifetime">'de</span>, D: Deserializer&lt;<span class="lifetime">'de</span>&gt;&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;String, D::Error&gt; {
     <span class="prelude-val">Ok</span>(<span class="kw">match </span>Value::deserialize(deserializer)<span class="question-mark">? </span>{
         Value::Number(num) =&gt; num.to_string(),
         Value::Bool(boo) =&gt; boo.to_string(),
@@ -923,24 +924,24 @@
             </span>serde_json::to_string(<span class="kw-2">&amp;</span>vl).unwrap()
         } <span class="comment">// this will encode the vector as a string, re-serializing will be more difficult though
         </span>Value::Object(map) =&gt; {
-            <span class="kw">let </span>f = <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, map);
+            <span class="kw">let </span>f = <span class="macro">format!</span>(<span class="string">"{:?}"</span>, map);
             f
         } <span class="comment">// this handles if the map is encoded as a map, make sure this still works with character matching..
         </span>Value::String(strng) =&gt; {
             <span class="kw">let </span><span class="kw-2">mut </span>it = strng.chars().peekable();
-            <span class="kw">let </span>c = <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>c) = it.peek() { c } <span class="kw">else </span>{ <span class="string">&#39;_&#39; </span>};
+            <span class="kw">let </span>c = <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>c) = it.peek() { c } <span class="kw">else </span>{ <span class="string">'_' </span>};
             <span class="kw">match </span>c {
-                <span class="string">&#39;{&#39; </span>=&gt; {
+                <span class="string">'{' </span>=&gt; {
                     strng.to_string() <span class="comment">// This handles if the map is encoded as a string
                 </span>}
                 <span class="kw">_ </span>=&gt; {
-                    <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, strng)
+                    <span class="macro">format!</span>(<span class="string">"{:?}"</span>, strng)
                 }
             }
-            <span class="comment">// Add conditional that will takes maps starting with &#39;{&#39; and format {} but for other strings format as {:?} to parse later as &#39;&quot;&#39;
+            <span class="comment">// Add conditional that will takes maps starting with '{' and format {} but for other strings format as {:?} to parse later as '"'
         </span>}
         <span class="comment">// Need to add support for List types (SVIIvR) --- This one is nontrivial...
-        </span><span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(de::Error::custom(<span class="string">&quot;Not Recognized Type&quot;</span>)),
+        </span><span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(de::Error::custom(<span class="string">"Not Recognized Type"</span>)),
     })
 }
 
@@ -952,16 +953,16 @@
     <span class="comment">// Having to implement a custom parser based on the first character of the strings.
     // t | f for bools, else for numbers, should be able to extend to { for maps and [ for lists
     </span><span class="kw">let </span><span class="kw-2">mut </span>it = x.chars().peekable(); <span class="comment">// characterization allows for handling most edge cases, (strings named after primatives)
-    </span><span class="kw">let </span>c = <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>c) = it.peek() { c } <span class="kw">else </span>{ <span class="string">&#39;x&#39; </span>};
+    </span><span class="kw">let </span>c = <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>c) = it.peek() { c } <span class="kw">else </span>{ <span class="string">'x' </span>};
     <span class="comment">// we run a match on the first character because otherwise we would need to know every possible string if we run it on the full words.
-    // &#39;t&#39; and &#39;f&#39; are unique as characters are encoded as &quot;t&quot; so if there is a character &quot;t&quot; it will be parsed correctly
+    // 't' and 'f' are unique as characters are encoded as "t" so if there is a character "t" it will be parsed correctly
     </span><span class="kw">match </span>c {
-        <span class="string">&#39;[&#39; </span>=&gt; {
+        <span class="string">'[' </span>=&gt; {
             <span class="kw">let </span>vals: Vec&lt;ValueL&gt; = serde_json::from_str(x).unwrap();
             s.collect_seq(vals.iter()) <span class="comment">// This is to serialize a vector, WARNING: serde is only implemented for vecs up to length 32 by default.
         </span>}
-        <span class="string">&#39;{&#39; </span>=&gt; s.serialize_str(x), <span class="comment">// This is just if maps are serialized as strings, change if that changes
-        </span><span class="string">&#39;&quot;&#39; </span>=&gt; {
+        <span class="string">'{' </span>=&gt; s.serialize_str(x), <span class="comment">// This is just if maps are serialized as strings, change if that changes
+        </span><span class="string">'"' </span>=&gt; {
             <span class="kw">let </span>char_vec: Vec&lt;char&gt; = x.chars().collect();
             <span class="kw">if </span>char_vec.len() == <span class="number">3 </span>{
                 s.serialize_char(char_vec[<span class="number">1</span>])
@@ -971,7 +972,7 @@
                 s.serialize_str(<span class="kw-2">&amp;</span>list_str)
             }
         }
-        <span class="string">&#39;t&#39; </span>| <span class="string">&#39;f&#39; </span>=&gt; {
+        <span class="string">'t' </span>| <span class="string">'f' </span>=&gt; {
             <span class="kw">let </span>parse_bool: bool = x.parse().unwrap();
             s.serialize_bool(parse_bool)
         }
@@ -998,16 +999,16 @@
     //use std::fs;
 
     /*fn test_roundtrip_serialization(path_example: &amp;str) {
-        let mut file_contents = fs::read_to_string(path_example).expect(&quot;Unable to read file&quot;);
+        let mut file_contents = fs::read_to_string(path_example).expect("Unable to read file");
 
-        let res: ModuleCollection = serde_json::from_str(&amp;file_contents).expect(&quot;Unable to parse&quot;);
+        let res: ModuleCollection = serde_json::from_str(&amp;file_contents).expect("Unable to parse");
         let mut res_serialized = serde_json::to_string(&amp;res).unwrap();
 
         // processing the imported data
-        file_contents = file_contents.replace([&#39;\n&#39;, &#39; &#39;], &quot;&quot;);
+        file_contents = file_contents.replace(['\n', ' '], "");
         res_serialized = res_serialized
-            .replace(&quot;\\\\&quot;, &quot;\\&quot;) // temp fix for the extra \\&#39;s
-            .replace([&#39;\n&#39;, &#39; &#39;], &quot;&quot;);
+            .replace("\\\\", "\\") // temp fix for the extra \\'s
+            .replace(['\n', ' '], "");
 
         assert_eq!(res_serialized, file_contents);
     }*/
@@ -1015,7 +1016,7 @@
         #[test]
         fn de_ser_cond1() {
             test_roundtrip_serialization(
-                &quot;../../../data/gromet/examples/cond1/FN_0.1.6/cond1--Gromet-FN-auto.json&quot;,
+                "../../../data/gromet/examples/cond1/FN_0.1.6/cond1--Gromet-FN-auto.json",
             );
         }
 
@@ -1023,35 +1024,35 @@
         //#[test]
         fn de_ser_dict1() {
             test_roundtrip_serialization(
-                &quot;../../../data/gromet/examples/dict1/FN_0.1.6/dict1--Gromet-FN-auto.json&quot;,
+                "../../../data/gromet/examples/dict1/FN_0.1.6/dict1--Gromet-FN-auto.json",
             );
         }
 
         #[test]
         fn de_ser_exp0() {
             test_roundtrip_serialization(
-                &quot;../../../data/gromet/examples/exp0/FN_0.1.6/exp0--Gromet-FN-auto.json&quot;,
+                "../../../data/gromet/examples/exp0/FN_0.1.6/exp0--Gromet-FN-auto.json",
             );
         }
 
         #[test]
         fn de_ser_exp1() {
             test_roundtrip_serialization(
-                &quot;../../../data/gromet/examples/exp1/FN_0.1.6/exp1--Gromet-FN-auto.json&quot;,
+                "../../../data/gromet/examples/exp1/FN_0.1.6/exp1--Gromet-FN-auto.json",
             );
         }
 
         #[test]
         fn de_ser_exp2() {
             test_roundtrip_serialization(
-                &quot;../../../data/gromet/examples/exp2/FN_0.1.6/exp2--Gromet-FN-auto.json&quot;,
+                "../../../data/gromet/examples/exp2/FN_0.1.6/exp2--Gromet-FN-auto.json",
             );
         }
 
         #[test]
         fn de_ser_for1() {
             test_roundtrip_serialization(
-                &quot;../../../data/gromet/examples/for1/FN_0.1.6/for1--Gromet-FN-auto.json&quot;,
+                "../../../data/gromet/examples/for1/FN_0.1.6/for1--Gromet-FN-auto.json",
             );
         }
 
@@ -1059,74 +1060,74 @@
         //#[test]
         fn de_ser_fun1() {
             test_roundtrip_serialization(
-                &quot;../../../data/gromet/examples/fun1/FN_0.1.6/fun1--Gromet-FN-auto.json&quot;,
+                "../../../data/gromet/examples/fun1/FN_0.1.6/fun1--Gromet-FN-auto.json",
             );
         }
 
         #[test]
         fn de_ser_fun2() {
             test_roundtrip_serialization(
-                &quot;../../../data/gromet/examples/fun2/FN_0.1.6/fun2--Gromet-FN-auto.json&quot;,
+                "../../../data/gromet/examples/fun2/FN_0.1.6/fun2--Gromet-FN-auto.json",
             );
         }
 
         #[test]
         fn de_ser_fun3() {
             test_roundtrip_serialization(
-                &quot;../../../data/gromet/examples/fun3/FN_0.1.6/fun3--Gromet-FN-auto.json&quot;,
+                "../../../data/gromet/examples/fun3/FN_0.1.6/fun3--Gromet-FN-auto.json",
             );
         }
 
         #[test]
         fn de_ser_fun4() {
             test_roundtrip_serialization(
-                &quot;../../../data/gromet/examples/fun4/FN_0.1.6/fun4--Gromet-FN-auto.json&quot;,
+                "../../../data/gromet/examples/fun4/FN_0.1.6/fun4--Gromet-FN-auto.json",
             );
         }
 
         #[test]
         fn de_ser_while1() {
             test_roundtrip_serialization(
-                &quot;../../../data/gromet/examples/while1/FN_0.1.6/while1--Gromet-FN-auto.json&quot;,
+                "../../../data/gromet/examples/while1/FN_0.1.6/while1--Gromet-FN-auto.json",
             );
         }
 
         #[test]
         fn de_ser_while2() {
             test_roundtrip_serialization(
-                &quot;../../../data/gromet/examples/while2/FN_0.1.6/while2--Gromet-FN-auto.json&quot;,
+                "../../../data/gromet/examples/while2/FN_0.1.6/while2--Gromet-FN-auto.json",
             );
         }
 
         #[test]
         fn de_ser_while3() {
             test_roundtrip_serialization(
-                &quot;../../../data/gromet/examples/while3/FN_0.1.6/while3--Gromet-FN-auto.json&quot;,
+                "../../../data/gromet/examples/while3/FN_0.1.6/while3--Gromet-FN-auto.json",
             );
         }
     */
-    // my manual modifications of this json broke this test. I named my modifications &quot;bugged&quot; to track them and I don&#39;t think the
+    // my manual modifications of this json broke this test. I named my modifications "bugged" to track them and I don't think the
     // serializer likes that.
     /*    #[test]
     fn de_ser_chime() {
         test_roundtrip_serialization(
-            &quot;../../../data/epidemiology/CHIME/CHIME_SIR_model/gromet/FN_0.1.5/CHIME_SIR_while_loop--Gromet-FN-auto.json&quot;,
+            "../../../data/epidemiology/CHIME/CHIME_SIR_model/gromet/FN_0.1.5/CHIME_SIR_while_loop--Gromet-FN-auto.json",
         );
     }
 
-    // doesn&#39;t exist
+    // doesn't exist
     //#[test]
     fn de_ser_chime_sviivr() {
         test_roundtrip_serialization(
-            &quot;../../../data/epidemiology/CHIME/CHIME_SVIIvR_model/gromet/FN_0.1.5/CHIME_SVIIvR--Gromet-FN-auto-no_lists.json&quot;,
+            "../../../data/epidemiology/CHIME/CHIME_SVIIvR_model/gromet/FN_0.1.5/CHIME_SVIIvR--Gromet-FN-auto-no_lists.json",
         );
     }
 
-    // doesn&#39;t exist
+    // doesn't exist
     //#[test]
     fn de_ser_chime_sviivr_lists() {
         test_roundtrip_serialization(
-            &quot;../../../data/epidemiology/CHIME/CHIME_SVIIvR_model/gromet/FN_0.1.5/CHIME_SVIIvR--Gromet-FN-auto.json&quot;,
+            "../../../data/epidemiology/CHIME/CHIME_SVIIvR_model/gromet/FN_0.1.5/CHIME_SVIIvR--Gromet-FN-auto.json",
         );
     }*/
 </span>}

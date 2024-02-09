@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/utoipa-3.5.0/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="utoipa" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/utoipa-3.5.0/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="utoipa" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1082,9 +1083,9 @@
 <a href="#1082" id="1082">1082</a>
 <a href="#1083" id="1083">1083</a>
 </pre></div><pre class="rust"><code><span class="attr">#![cfg_attr(doc_cfg, feature(doc_cfg))]
-</span><span class="doccomment">//! Want to have your API documented with OpenAPI? But you don&#39;t want to see the
+</span><span class="doccomment">//! Want to have your API documented with OpenAPI? But you don't want to see the
 //! trouble with manual yaml or json tweaking? Would like it to be so easy that it would almost
-//! be like utopic? Don&#39;t worry utoipa is just there to fill this gap. It aims to do if not all then
+//! be like utopic? Don't worry utoipa is just there to fill this gap. It aims to do if not all then
 //! the most of heavy lifting for you enabling you to focus writing the actual API logic instead of
 //! documentation. It aims to be *minimal*, *simple* and *fast*. It uses simple proc macros which
 //! you can use to annotate your code to have items documented.
@@ -1100,7 +1101,7 @@
 //! codebase.
 //!
 //! Utoipa is framework agnostic and could be used together with any web framework or even without one. While
-//! being portable and standalone one of it&#39;s key aspects is simple integration with web frameworks.
+//! being portable and standalone one of it's key aspects is simple integration with web frameworks.
 //!
 //! Currently utoipa provides simple integration with actix-web framework but is not limited to the actix-web
 //! framework. All functionalities are not restricted to any specific framework.
@@ -1118,7 +1119,7 @@
 //! Even if there is no example for your favorite framework `utoipa` can be used with any
 //! web framework which supports decorating functions with macros similarly to **warp** and **tide** examples.
 //!
-//! # What&#39;s up with the word play?
+//! # What's up with the word play?
 //!
 //! The name comes from words `utopic` and `api` where `uto` is the first three letters of _utopic_
 //! and the `ipa` is _api_ reversed. Aaand... `ipa` is also awesome type of beer.
@@ -1157,7 +1158,7 @@
 //! * **openapi_extensions** Adds convenience functions for documenting common scenarios, such as JSON request bodies and responses.
 //!   See the [`request_body`](https://docs.rs/utoipa/latest/utoipa/openapi/request_body/index.html) and
 //!   [`response`](https://docs.rs/utoipa/latest/utoipa/openapi/response/index.html) docs for examples.
-//! * **repr** Add support for [repr_serde](https://github.com/dtolnay/serde-repr)&#39;s `repr(u*)` and `repr(i*)` attributes to unit type enums for
+//! * **repr** Add support for [repr_serde](https://github.com/dtolnay/serde-repr)'s `repr(u*)` and `repr(i*)` attributes to unit type enums for
 //!   C-like enum representation. See [docs](https://docs.rs/utoipa/latest/utoipa/derive.ToSchema.html) for more details.
 //! * **preserve_order** Preserve order of properties when serializing the schema for a component.
 //!   When enabled, the properties are listed in order of fields in the corresponding struct definition.
@@ -1178,14 +1179,14 @@
 //! Add minimal dependency declaration to Cargo.toml.
 //! ```toml
 //! [dependencies]
-//! utoipa = &quot;3&quot;
+//! utoipa = "3"
 //! ```
 //!
 //! To enable more features such as use actix framework extras you could define the
 //! dependency as follows.
 //! ```toml
 //! [dependencies]
-//! utoipa = { version = &quot;3&quot;, features = [&quot;actix_extras&quot;] }
+//! utoipa = { version = "3", features = ["actix_extras"] }
 //! ```
 //!
 //! **Note!** To use `utoipa` together with Swagger UI you can use the [`utoipa-swagger-ui`][utoipa_swagger] crate.
@@ -1222,20 +1223,20 @@
 //!     /// Get pet from database by pet id
 //!     #[utoipa::path(
 //!         get,
-//!         path = &quot;/pets/{id}&quot;,
+//!         path = "/pets/{id}",
 //!         responses(
-//!             (status = 200, description = &quot;Pet found successfully&quot;, body = Pet),
-//!             (status = NOT_FOUND, description = &quot;Pet was not found&quot;)
+//!             (status = 200, description = "Pet found successfully", body = Pet),
+//!             (status = NOT_FOUND, description = "Pet was not found")
 //!         ),
 //!         params(
-//!             (&quot;id&quot; = u64, Path, description = &quot;Pet database id to get Pet for&quot;),
+//!             ("id" = u64, Path, description = "Pet database id to get Pet for"),
 //!         )
 //!     )]
 //!     async fn get_pet_by_id(pet_id: u64) -&gt; Pet {
 //!         Pet {
 //!             id: pet_id,
 //!             age: None,
-//!             name: &quot;lightning&quot;.to_string(),
+//!             name: "lightning".to_string(),
 //!         }
 //!     }
 //! }
@@ -1260,20 +1261,20 @@
 //! #     /// Get pet from database by pet id
 //! #     #[utoipa::path(
 //! #         get,
-//! #         path = &quot;/pets/{id}&quot;,
+//! #         path = "/pets/{id}",
 //! #         responses(
-//! #             (status = 200, description = &quot;Pet found successfully&quot;, body = Pet),
-//! #             (status = 404, description = &quot;Pet was not found&quot;)
+//! #             (status = 200, description = "Pet found successfully", body = Pet),
+//! #             (status = 404, description = "Pet was not found")
 //! #         ),
 //! #         params(
-//! #             (&quot;id&quot; = u64, Path, description = &quot;Pet database id to get Pet for&quot;),
+//! #             ("id" = u64, Path, description = "Pet database id to get Pet for"),
 //! #         )
 //! #     )]
 //! #     async fn get_pet_by_id(pet_id: u64) -&gt; Pet {
 //! #         Pet {
 //! #             id: pet_id,
 //! #             age: None,
-//! #             name: &quot;lightning&quot;.to_string(),
+//! #             name: "lightning".to_string(),
 //! #         }
 //! #     }
 //! # }
@@ -1290,7 +1291,7 @@
 //! #[openapi(paths(pet_api::get_pet_by_id), components(schemas(Pet)))]
 //! struct ApiDoc;
 //!
-//! println!(&quot;{}&quot;, ApiDoc::openapi().to_pretty_json().unwrap());
+//! println!("{}", ApiDoc::openapi().to_pretty_json().unwrap());
 //! ```
 //!
 //! # Modify OpenAPI at runtime
@@ -1303,12 +1304,12 @@
 //! # use utoipa::OpenApi;
 //! #[derive(OpenApi)]
 //! #[openapi(
-//!     info(description = &quot;My Api description&quot;),
+//!     info(description = "My Api description"),
 //! )]
 //! struct ApiDoc;
 //!
 //! let mut doc = ApiDoc::openapi();
-//! doc.info.title = String::from(&quot;My Api&quot;);
+//! doc.info.title = String::from("My Api");
 //! ```
 //!
 //! _**You can even convert the generated [`OpenApi`] to [`openapi::OpenApiBuilder`].**_
@@ -1317,7 +1318,7 @@
 //! # use utoipa::OpenApi;
 //! #[derive(OpenApi)]
 //! #[openapi(
-//!     info(description = &quot;My Api description&quot;),
+//!     info(description = "My Api description"),
 //! )]
 //! struct ApiDoc;
 //!
@@ -1377,14 +1378,14 @@
 ///         use utoipa::{ToSchema, Path};
 ///         utoipa::openapi::OpenApiBuilder::new()
 ///             .info(utoipa::openapi::InfoBuilder::new()
-///                 .title(&quot;application name&quot;)
-///                 .version(&quot;version&quot;)
-///                 .description(Some(&quot;application description&quot;))
-///                 .license(Some(utoipa::openapi::License::new(&quot;MIT&quot;)))
+///                 .title("application name")
+///                 .version("version")
+///                 .description(Some("application description"))
+///                 .license(Some(utoipa::openapi::License::new("MIT")))
 ///                 .contact(
 ///                     Some(utoipa::openapi::ContactBuilder::new()
-///                         .name(Some(&quot;author name&quot;))
-///                         .email(Some(&quot;author email&quot;)).build()),
+///                         .name(Some("author name"))
+///                         .email(Some("author email")).build()),
 ///             ).build())
 ///             .paths(utoipa::openapi::path::Paths::new())
 ///             .components(Some(utoipa::openapi::Components::new()))
@@ -1412,7 +1413,7 @@
 /// ```rust
 /// # use utoipa::ToSchema;
 /// #[derive(ToSchema)]
-/// #[schema(example = json!({&quot;name&quot;: &quot;bob the cat&quot;, &quot;id&quot;: 1}))]
+/// #[schema(example = json!({"name": "bob the cat", "id": 1}))]
 /// struct Pet {
 ///     id: u64,
 ///     name: String,
@@ -1428,28 +1429,28 @@
 /// #     age: Option&lt;i32&gt;,
 /// # }
 /// #
-/// impl&lt;&#39;__s&gt; utoipa::ToSchema&lt;&#39;__s&gt; for Pet {
-///     fn schema() -&gt; (&amp;&#39;__s str, utoipa::openapi::RefOr&lt;utoipa::openapi::schema::Schema&gt;) {
+/// impl&lt;'__s&gt; utoipa::ToSchema&lt;'__s&gt; for Pet {
+///     fn schema() -&gt; (&amp;'__s str, utoipa::openapi::RefOr&lt;utoipa::openapi::schema::Schema&gt;) {
 ///          (
-///             &quot;Pet&quot;,
+///             "Pet",
 ///             utoipa::openapi::ObjectBuilder::new()
 ///                 .property(
-///                     &quot;id&quot;,
+///                     "id",
 ///                     utoipa::openapi::ObjectBuilder::new()
 ///                         .schema_type(utoipa::openapi::SchemaType::Integer)
 ///                         .format(Some(utoipa::openapi::SchemaFormat::KnownFormat(
 ///                             utoipa::openapi::KnownFormat::Int64,
 ///                         ))),
 ///                 )
-///                 .required(&quot;id&quot;)
+///                 .required("id")
 ///                 .property(
-///                     &quot;name&quot;,
+///                     "name",
 ///                     utoipa::openapi::ObjectBuilder::new()
 ///                         .schema_type(utoipa::openapi::SchemaType::String),
 ///                 )
-///                 .required(&quot;name&quot;)
+///                 .required("name")
 ///                 .property(
-///                     &quot;age&quot;,
+///                     "age",
 ///                     utoipa::openapi::ObjectBuilder::new()
 ///                         .schema_type(utoipa::openapi::SchemaType::Integer)
 ///                         .format(Some(utoipa::openapi::SchemaFormat::KnownFormat(
@@ -1457,40 +1458,40 @@
 ///                         ))),
 ///                 )
 ///                 .example(Some(serde_json::json!({
-///                   &quot;name&quot;:&quot;bob the cat&quot;,&quot;id&quot;:1
+///                   "name":"bob the cat","id":1
 ///                 })))
 ///                 .into(),
 ///         ) }
 /// }
 /// ```
-</span><span class="kw">pub trait </span>ToSchema&lt;<span class="lifetime">&#39;__s</span>&gt; {
+</span><span class="kw">pub trait </span>ToSchema&lt;<span class="lifetime">'__s</span>&gt; {
     <span class="doccomment">/// Return a tuple of name and schema or reference to a schema that can be referenced by the
     /// name or inlined directly to responses, request bodies or parameters.
-    </span><span class="kw">fn </span>schema() -&gt; (<span class="kw-2">&amp;</span><span class="lifetime">&#39;__s </span>str, openapi::RefOr&lt;openapi::schema::Schema&gt;);
+    </span><span class="kw">fn </span>schema() -&gt; (<span class="kw-2">&amp;</span><span class="lifetime">'__s </span>str, openapi::RefOr&lt;openapi::schema::Schema&gt;);
 
     <span class="doccomment">/// Optional set of alias schemas for the [`ToSchema::schema`].
     ///
     /// Typically there is no need to manually implement this method but it is instead implemented
     /// by derive [`macro@ToSchema`] when `#[aliases(...)]` attribute is defined.
-    </span><span class="kw">fn </span>aliases() -&gt; Vec&lt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;__s </span>str, openapi::schema::Schema)&gt; {
+    </span><span class="kw">fn </span>aliases() -&gt; Vec&lt;(<span class="kw-2">&amp;</span><span class="lifetime">'__s </span>str, openapi::schema::Schema)&gt; {
         Vec::new()
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;__s</span>, T: ToSchema&lt;<span class="lifetime">&#39;__s</span>&gt;&gt; From&lt;T&gt; <span class="kw">for </span>openapi::RefOr&lt;openapi::schema::Schema&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'__s</span>, T: ToSchema&lt;<span class="lifetime">'__s</span>&gt;&gt; From&lt;T&gt; <span class="kw">for </span>openapi::RefOr&lt;openapi::schema::Schema&gt; {
     <span class="kw">fn </span>from(<span class="kw">_</span>: T) -&gt; <span class="self">Self </span>{
         T::schema().<span class="number">1
     </span>}
 }
 
-<span class="doccomment">/// Represents _`nullable`_ type. This can be used anywhere where &quot;nothing&quot; needs to be evaluated.
+<span class="doccomment">/// Represents _`nullable`_ type. This can be used anywhere where "nothing" needs to be evaluated.
 /// This will serialize to _`null`_ in JSON and [`openapi::schema::empty`] is used to create the
 /// [`openapi::schema::Schema`] for the type.
 </span><span class="kw">pub type </span>TupleUnit = ();
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;__s</span>&gt; ToSchema&lt;<span class="lifetime">&#39;__s</span>&gt; <span class="kw">for </span>TupleUnit {
-    <span class="kw">fn </span>schema() -&gt; (<span class="kw-2">&amp;</span><span class="lifetime">&#39;__s </span>str, openapi::RefOr&lt;openapi::schema::Schema&gt;) {
-        (<span class="string">&quot;TupleUnit&quot;</span>, openapi::schema::empty().into())
+<span class="kw">impl</span>&lt;<span class="lifetime">'__s</span>&gt; ToSchema&lt;<span class="lifetime">'__s</span>&gt; <span class="kw">for </span>TupleUnit {
+    <span class="kw">fn </span>schema() -&gt; (<span class="kw-2">&amp;</span><span class="lifetime">'__s </span>str, openapi::RefOr&lt;openapi::schema::Schema&gt;) {
+        (<span class="string">"TupleUnit"</span>, openapi::schema::empty().into())
     }
 }
 
@@ -1580,9 +1581,9 @@
 /// }
 ///
 /// let pet_schema = ObjectBuilder::new()
-///     .property(&quot;id&quot;, i32::schema())
-///     .property(&quot;name&quot;, String::schema())
-///     .required(&quot;id&quot;).required(&quot;name&quot;)
+///     .property("id", i32::schema())
+///     .property("name", String::schema())
+///     .required("id").required("name")
 ///     .build();
 /// ```
 ///
@@ -1603,19 +1604,19 @@
 
 <span class="macro">impl_partial_schema!</span>(<span class="kw-2">&amp;</span>str);
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;__s</span>, T: ToSchema&lt;<span class="lifetime">&#39;__s</span>&gt;&gt; PartialSchema <span class="kw">for </span>Vec&lt;T&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'__s</span>, T: ToSchema&lt;<span class="lifetime">'__s</span>&gt;&gt; PartialSchema <span class="kw">for </span>Vec&lt;T&gt; {
     <span class="kw">fn </span>schema() -&gt; openapi::RefOr&lt;openapi::schema::Schema&gt; {
         <span class="macro">schema!</span>(<span class="attr">#[inline] </span>Vec&lt;T&gt;).into()
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;__s</span>, T: ToSchema&lt;<span class="lifetime">&#39;__s</span>&gt;&gt; PartialSchema <span class="kw">for </span><span class="prelude-ty">Option</span>&lt;Vec&lt;T&gt;&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'__s</span>, T: ToSchema&lt;<span class="lifetime">'__s</span>&gt;&gt; PartialSchema <span class="kw">for </span><span class="prelude-ty">Option</span>&lt;Vec&lt;T&gt;&gt; {
     <span class="kw">fn </span>schema() -&gt; openapi::RefOr&lt;openapi::schema::Schema&gt; {
         <span class="macro">schema!</span>(<span class="attr">#[inline] </span><span class="prelude-ty">Option</span>&lt;Vec&lt;T&gt;&gt;).into()
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;__s</span>, T: ToSchema&lt;<span class="lifetime">&#39;__s</span>&gt;&gt; PartialSchema <span class="kw">for </span>[T] {
+<span class="kw">impl</span>&lt;<span class="lifetime">'__s</span>, T: ToSchema&lt;<span class="lifetime">'__s</span>&gt;&gt; PartialSchema <span class="kw">for </span>[T] {
     <span class="kw">fn </span>schema() -&gt; openapi::RefOr&lt;openapi::schema::Schema&gt; {
         <span class="macro">schema!</span>(
             <span class="attr">#[inline]
@@ -1625,7 +1626,7 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;__s</span>, T: ToSchema&lt;<span class="lifetime">&#39;__s</span>&gt;&gt; PartialSchema <span class="kw">for </span><span class="kw-2">&amp;</span>[T] {
+<span class="kw">impl</span>&lt;<span class="lifetime">'__s</span>, T: ToSchema&lt;<span class="lifetime">'__s</span>&gt;&gt; PartialSchema <span class="kw">for </span><span class="kw-2">&amp;</span>[T] {
     <span class="kw">fn </span>schema() -&gt; openapi::RefOr&lt;openapi::schema::Schema&gt; {
         <span class="macro">schema!</span>(
             <span class="attr">#[inline]
@@ -1635,7 +1636,7 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;__s</span>, T: ToSchema&lt;<span class="lifetime">&#39;__s</span>&gt;&gt; PartialSchema <span class="kw">for </span><span class="kw-2">&amp;mut </span>[T] {
+<span class="kw">impl</span>&lt;<span class="lifetime">'__s</span>, T: ToSchema&lt;<span class="lifetime">'__s</span>&gt;&gt; PartialSchema <span class="kw">for </span><span class="kw-2">&amp;mut </span>[T] {
     <span class="kw">fn </span>schema() -&gt; openapi::RefOr&lt;openapi::schema::Schema&gt; {
         <span class="macro">schema!</span>(
             <span class="attr">#[inline]
@@ -1645,7 +1646,7 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;__s</span>, T: ToSchema&lt;<span class="lifetime">&#39;__s</span>&gt;&gt; PartialSchema <span class="kw">for </span><span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>[T]&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'__s</span>, T: ToSchema&lt;<span class="lifetime">'__s</span>&gt;&gt; PartialSchema <span class="kw">for </span><span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>[T]&gt; {
     <span class="kw">fn </span>schema() -&gt; openapi::RefOr&lt;openapi::schema::Schema&gt; {
         <span class="macro">schema!</span>(
             <span class="attr">#[inline]
@@ -1655,7 +1656,7 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;__s</span>, T: ToSchema&lt;<span class="lifetime">&#39;__s</span>&gt;&gt; PartialSchema <span class="kw">for </span><span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>[T]&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'__s</span>, T: ToSchema&lt;<span class="lifetime">'__s</span>&gt;&gt; PartialSchema <span class="kw">for </span><span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>[T]&gt; {
     <span class="kw">fn </span>schema() -&gt; openapi::RefOr&lt;openapi::schema::Schema&gt; {
         <span class="macro">schema!</span>(
             <span class="attr">#[inline]
@@ -1665,13 +1666,13 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;__s</span>, T: ToSchema&lt;<span class="lifetime">&#39;__s</span>&gt;&gt; PartialSchema <span class="kw">for </span><span class="prelude-ty">Option</span>&lt;T&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'__s</span>, T: ToSchema&lt;<span class="lifetime">'__s</span>&gt;&gt; PartialSchema <span class="kw">for </span><span class="prelude-ty">Option</span>&lt;T&gt; {
     <span class="kw">fn </span>schema() -&gt; openapi::RefOr&lt;openapi::schema::Schema&gt; {
         <span class="macro">schema!</span>(<span class="attr">#[inline] </span><span class="prelude-ty">Option</span>&lt;T&gt;).into()
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;__s</span>, K: PartialSchema, V: ToSchema&lt;<span class="lifetime">&#39;__s</span>&gt;&gt; PartialSchema <span class="kw">for </span>BTreeMap&lt;K, V&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'__s</span>, K: PartialSchema, V: ToSchema&lt;<span class="lifetime">'__s</span>&gt;&gt; PartialSchema <span class="kw">for </span>BTreeMap&lt;K, V&gt; {
     <span class="kw">fn </span>schema() -&gt; openapi::RefOr&lt;openapi::schema::Schema&gt; {
         <span class="macro">schema!</span>(
             <span class="attr">#[inline]
@@ -1681,7 +1682,7 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;__s</span>, K: PartialSchema, V: ToSchema&lt;<span class="lifetime">&#39;__s</span>&gt;&gt; PartialSchema <span class="kw">for </span><span class="prelude-ty">Option</span>&lt;BTreeMap&lt;K, V&gt;&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'__s</span>, K: PartialSchema, V: ToSchema&lt;<span class="lifetime">'__s</span>&gt;&gt; PartialSchema <span class="kw">for </span><span class="prelude-ty">Option</span>&lt;BTreeMap&lt;K, V&gt;&gt; {
     <span class="kw">fn </span>schema() -&gt; openapi::RefOr&lt;openapi::schema::Schema&gt; {
         <span class="macro">schema!</span>(
             <span class="attr">#[inline]
@@ -1691,7 +1692,7 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;__s</span>, K: PartialSchema, V: ToSchema&lt;<span class="lifetime">&#39;__s</span>&gt;&gt; PartialSchema <span class="kw">for </span>HashMap&lt;K, V&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'__s</span>, K: PartialSchema, V: ToSchema&lt;<span class="lifetime">'__s</span>&gt;&gt; PartialSchema <span class="kw">for </span>HashMap&lt;K, V&gt; {
     <span class="kw">fn </span>schema() -&gt; openapi::RefOr&lt;openapi::schema::Schema&gt; {
         <span class="macro">schema!</span>(
             <span class="attr">#[inline]
@@ -1701,7 +1702,7 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;__s</span>, K: PartialSchema, V: ToSchema&lt;<span class="lifetime">&#39;__s</span>&gt;&gt; PartialSchema <span class="kw">for </span><span class="prelude-ty">Option</span>&lt;HashMap&lt;K, V&gt;&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'__s</span>, K: PartialSchema, V: ToSchema&lt;<span class="lifetime">'__s</span>&gt;&gt; PartialSchema <span class="kw">for </span><span class="prelude-ty">Option</span>&lt;HashMap&lt;K, V&gt;&gt; {
     <span class="kw">fn </span>schema() -&gt; openapi::RefOr&lt;openapi::schema::Schema&gt; {
         <span class="macro">schema!</span>(
             <span class="attr">#[inline]
@@ -1731,19 +1732,19 @@
 /// /// Get pet from database by pet database id
 /// #[utoipa::path(
 ///     get,
-///     path = &quot;/pets/{id}&quot;,
+///     path = "/pets/{id}",
 ///     responses(
-///         (status = 200, description = &quot;Pet found successfully&quot;, body = Pet),
-///         (status = 404, description = &quot;Pet was not found&quot;)
+///         (status = 200, description = "Pet found successfully", body = Pet),
+///         (status = 404, description = "Pet was not found")
 ///     ),
 ///     params(
-///         (&quot;id&quot; = u64, Path, description = &quot;Pet database id to get Pet for&quot;),
+///         ("id" = u64, Path, description = "Pet database id to get Pet for"),
 ///     )
 /// )]
 /// async fn get_pet_by_id(pet_id: u64) -&gt; Pet {
 ///     Pet {
 ///         id: pet_id,
-///         name: &quot;lightning&quot;.to_string(),
+///         name: "lightning".to_string(),
 ///     }
 /// }
 /// ```
@@ -1751,49 +1752,49 @@
 /// Example of what would manual implementation roughly look like of above `#[utoipa::path(...)]` macro.
 /// ```rust
 /// utoipa::openapi::PathsBuilder::new().path(
-///         &quot;/pets/{id}&quot;,
+///         "/pets/{id}",
 ///         utoipa::openapi::PathItem::new(
 ///             utoipa::openapi::PathItemType::Get,
 ///             utoipa::openapi::path::OperationBuilder::new()
 ///                 .responses(
 ///                     utoipa::openapi::ResponsesBuilder::new()
 ///                         .response(
-///                             &quot;200&quot;,
+///                             "200",
 ///                             utoipa::openapi::ResponseBuilder::new()
-///                                 .description(&quot;Pet found successfully&quot;)
-///                                 .content(&quot;application/json&quot;,
+///                                 .description("Pet found successfully")
+///                                 .content("application/json",
 ///                                     utoipa::openapi::Content::new(
-///                                         utoipa::openapi::Ref::from_schema_name(&quot;Pet&quot;),
+///                                         utoipa::openapi::Ref::from_schema_name("Pet"),
 ///                                     ),
 ///                             ),
 ///                         )
-///                         .response(&quot;404&quot;, utoipa::openapi::Response::new(&quot;Pet was not found&quot;)),
+///                         .response("404", utoipa::openapi::Response::new("Pet was not found")),
 ///                 )
-///                 .operation_id(Some(&quot;get_pet_by_id&quot;))
+///                 .operation_id(Some("get_pet_by_id"))
 ///                 .deprecated(Some(utoipa::openapi::Deprecated::False))
-///                 .summary(Some(&quot;Get pet by id&quot;))
-///                 .description(Some(&quot;Get pet by id\n\nGet pet from database by pet database id\n&quot;))
+///                 .summary(Some("Get pet by id"))
+///                 .description(Some("Get pet by id\n\nGet pet from database by pet database id\n"))
 ///                 .parameter(
 ///                     utoipa::openapi::path::ParameterBuilder::new()
-///                         .name(&quot;id&quot;)
+///                         .name("id")
 ///                         .parameter_in(utoipa::openapi::path::ParameterIn::Path)
 ///                         .required(utoipa::openapi::Required::True)
 ///                         .deprecated(Some(utoipa::openapi::Deprecated::False))
-///                         .description(Some(&quot;Pet database id to get Pet for&quot;))
+///                         .description(Some("Pet database id to get Pet for"))
 ///                         .schema(
 ///                             Some(utoipa::openapi::ObjectBuilder::new()
 ///                                 .schema_type(utoipa::openapi::SchemaType::Integer)
 ///                                 .format(Some(utoipa::openapi::SchemaFormat::KnownFormat(utoipa::openapi::KnownFormat::Int64)))),
 ///                         ),
 ///                 )
-///                 .tag(&quot;pet_api&quot;),
+///                 .tag("pet_api"),
 ///         ),
 ///     );
 /// ```
 ///
 /// [derive]: attr.path.html
 </span><span class="kw">pub trait </span>Path {
-    <span class="kw">fn </span>path() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str;
+    <span class="kw">fn </span>path() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str;
 
     <span class="kw">fn </span>path_item(default_tag: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; openapi::path::PathItem;
 }
@@ -1828,11 +1829,11 @@
 ///          openapi.components = Some(
 ///              utoipa::openapi::ComponentsBuilder::new()
 ///                  .security_scheme(
-///                      &quot;api_jwt_token&quot;,
+///                      "api_jwt_token",
 ///                      SecurityScheme::Http(
 ///                          HttpBuilder::new()
 ///                              .scheme(HttpAuthScheme::Bearer)
-///                              .bearer_format(&quot;JWT&quot;)
+///                              .bearer_format("JWT")
 ///                              .build(),
 ///                      ),
 ///                  )
@@ -1855,7 +1856,7 @@
 ///
 /// impl Modify for ServerAddon {
 ///     fn modify(&amp;self, openapi: &amp;mut utoipa::openapi::OpenApi) {
-///         openapi.servers = Some(vec![Server::new(&quot;/api&quot;)])
+///         openapi.servers = Some(vec![Server::new("/api")])
 ///     }
 /// }
 /// ```
@@ -1901,10 +1902,10 @@
 ///     ) -&gt; Vec&lt;utoipa::openapi::path::Parameter&gt; {
 ///         vec![
 ///             utoipa::openapi::path::ParameterBuilder::new()
-///                 .name(&quot;id&quot;)
+///                 .name("id")
 ///                 .required(utoipa::openapi::Required::True)
 ///                 .parameter_in(parameter_in_provider().unwrap_or_default())
-///                 .description(Some(&quot;Id of pet&quot;))
+///                 .description(Some("Id of pet"))
 ///                 .schema(Some(
 ///                     utoipa::openapi::ObjectBuilder::new()
 ///                         .schema_type(utoipa::openapi::SchemaType::Integer)
@@ -1912,10 +1913,10 @@
 ///                 ))
 ///                 .build(),
 ///             utoipa::openapi::path::ParameterBuilder::new()
-///                 .name(&quot;name&quot;)
+///                 .name("name")
 ///                 .required(utoipa::openapi::Required::True)
 ///                 .parameter_in(parameter_in_provider().unwrap_or_default())
-///                 .description(Some(&quot;Name of pet&quot;))
+///                 .description(Some("Name of pet"))
 ///                 .schema(Some(
 ///                     utoipa::openapi::ObjectBuilder::new()
 ///                         .schema_type(utoipa::openapi::SchemaType::String),
@@ -1954,8 +1955,8 @@
 /// impl IntoResponses for MyResponse {
 ///     fn responses() -&gt; BTreeMap&lt;String, RefOr&lt;Response&gt;&gt; {
 ///         ResponsesBuilder::new()
-///             .response(&quot;200&quot;, ResponseBuilder::new().description(&quot;Ok&quot;))
-///             .response(&quot;404&quot;, ResponseBuilder::new().description(&quot;Not Found&quot;))
+///             .response("200", ResponseBuilder::new().description("Ok"))
+///             .response("404", ResponseBuilder::new().description("Not Found"))
 ///             .build()
 ///             .into()
 ///     }
@@ -1966,7 +1967,7 @@
     </span><span class="kw">fn </span>responses() -&gt; BTreeMap&lt;String, openapi::RefOr&lt;openapi::response::Response&gt;&gt;;
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;auto_into_responses&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"auto_into_responses"</span>)]
 </span><span class="kw">impl</span>&lt;T: IntoResponses, E: IntoResponses&gt; IntoResponses <span class="kw">for </span><span class="prelude-ty">Result</span>&lt;T, E&gt; {
     <span class="kw">fn </span>responses() -&gt; BTreeMap&lt;String, openapi::RefOr&lt;openapi::response::Response&gt;&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>responses = T::responses();
@@ -1976,7 +1977,7 @@
     }
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;auto_into_responses&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"auto_into_responses"</span>)]
 </span><span class="kw">impl </span>IntoResponses <span class="kw">for </span>() {
     <span class="kw">fn </span>responses() -&gt; BTreeMap&lt;String, openapi::RefOr&lt;openapi::response::Response&gt;&gt; {
         BTreeMap::new()
@@ -1998,20 +1999,20 @@
 ///
 /// struct MyResponse;
 ///
-/// impl&lt;&#39;__r&gt; ToResponse&lt;&#39;__r&gt; for MyResponse {
-///     fn response() -&gt; (&amp;&#39;__r str, RefOr&lt;Response&gt;) {
+/// impl&lt;'__r&gt; ToResponse&lt;'__r&gt; for MyResponse {
+///     fn response() -&gt; (&amp;'__r str, RefOr&lt;Response&gt;) {
 ///         (
-///             &quot;MyResponse&quot;,
-///             ResponseBuilder::new().description(&quot;My Response&quot;).build().into(),
+///             "MyResponse",
+///             ResponseBuilder::new().description("My Response").build().into(),
 ///         )
 ///     }
 /// }
 /// ```
 ///
 /// [derive]: derive.ToResponse.html
-</span><span class="kw">pub trait </span>ToResponse&lt;<span class="lifetime">&#39;__r</span>&gt; {
+</span><span class="kw">pub trait </span>ToResponse&lt;<span class="lifetime">'__r</span>&gt; {
     <span class="doccomment">/// Returns a tuple of response component name (to be referenced) to a response.
-    </span><span class="kw">fn </span>response() -&gt; (<span class="kw-2">&amp;</span><span class="lifetime">&#39;__r </span>str, openapi::RefOr&lt;openapi::response::Response&gt;);
+    </span><span class="kw">fn </span>response() -&gt; (<span class="kw-2">&amp;</span><span class="lifetime">'__r </span>str, openapi::RefOr&lt;openapi::response::Response&gt;);
 }
 
 <span class="attr">#[cfg(test)]
@@ -2021,57 +2022,57 @@
 
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-    <span class="attr">#[cfg(not(feature = <span class="string">&quot;non_strict_integers&quot;</span>))]
+    <span class="attr">#[cfg(not(feature = <span class="string">"non_strict_integers"</span>))]
     #[test]
     </span><span class="kw">fn </span>test_partial_schema_strict_integers() {
         <span class="kw">use </span>assert_json_diff::{assert_json_matches, CompareMode, Config, NumericMode};
 
         <span class="kw">for </span>(name, schema, value) <span class="kw">in </span>[
             (
-                <span class="string">&quot;i8&quot;</span>,
+                <span class="string">"i8"</span>,
                 i8::schema(),
-                <span class="macro">json!</span>({<span class="string">&quot;type&quot;</span>: <span class="string">&quot;integer&quot;</span>, <span class="string">&quot;format&quot;</span>: <span class="string">&quot;int32&quot;</span>}),
+                <span class="macro">json!</span>({<span class="string">"type"</span>: <span class="string">"integer"</span>, <span class="string">"format"</span>: <span class="string">"int32"</span>}),
             ),
             (
-                <span class="string">&quot;i16&quot;</span>,
+                <span class="string">"i16"</span>,
                 i16::schema(),
-                <span class="macro">json!</span>({<span class="string">&quot;type&quot;</span>: <span class="string">&quot;integer&quot;</span>, <span class="string">&quot;format&quot;</span>: <span class="string">&quot;int32&quot;</span>}),
+                <span class="macro">json!</span>({<span class="string">"type"</span>: <span class="string">"integer"</span>, <span class="string">"format"</span>: <span class="string">"int32"</span>}),
             ),
             (
-                <span class="string">&quot;i32&quot;</span>,
+                <span class="string">"i32"</span>,
                 i32::schema(),
-                <span class="macro">json!</span>({<span class="string">&quot;type&quot;</span>: <span class="string">&quot;integer&quot;</span>, <span class="string">&quot;format&quot;</span>: <span class="string">&quot;int32&quot;</span>}),
+                <span class="macro">json!</span>({<span class="string">"type"</span>: <span class="string">"integer"</span>, <span class="string">"format"</span>: <span class="string">"int32"</span>}),
             ),
             (
-                <span class="string">&quot;i64&quot;</span>,
+                <span class="string">"i64"</span>,
                 i64::schema(),
-                <span class="macro">json!</span>({<span class="string">&quot;type&quot;</span>: <span class="string">&quot;integer&quot;</span>, <span class="string">&quot;format&quot;</span>: <span class="string">&quot;int64&quot;</span>}),
+                <span class="macro">json!</span>({<span class="string">"type"</span>: <span class="string">"integer"</span>, <span class="string">"format"</span>: <span class="string">"int64"</span>}),
             ),
-            (<span class="string">&quot;i128&quot;</span>, i128::schema(), <span class="macro">json!</span>({<span class="string">&quot;type&quot;</span>: <span class="string">&quot;integer&quot;</span>})),
-            (<span class="string">&quot;isize&quot;</span>, isize::schema(), <span class="macro">json!</span>({<span class="string">&quot;type&quot;</span>: <span class="string">&quot;integer&quot;</span>})),
+            (<span class="string">"i128"</span>, i128::schema(), <span class="macro">json!</span>({<span class="string">"type"</span>: <span class="string">"integer"</span>})),
+            (<span class="string">"isize"</span>, isize::schema(), <span class="macro">json!</span>({<span class="string">"type"</span>: <span class="string">"integer"</span>})),
             (
-                <span class="string">&quot;u8&quot;</span>,
+                <span class="string">"u8"</span>,
                 u8::schema(),
-                <span class="macro">json!</span>({<span class="string">&quot;type&quot;</span>: <span class="string">&quot;integer&quot;</span>, <span class="string">&quot;format&quot;</span>: <span class="string">&quot;int32&quot;</span>, <span class="string">&quot;minimum&quot;</span>: <span class="number">0.0</span>}),
+                <span class="macro">json!</span>({<span class="string">"type"</span>: <span class="string">"integer"</span>, <span class="string">"format"</span>: <span class="string">"int32"</span>, <span class="string">"minimum"</span>: <span class="number">0.0</span>}),
             ),
             (
-                <span class="string">&quot;u16&quot;</span>,
+                <span class="string">"u16"</span>,
                 u16::schema(),
-                <span class="macro">json!</span>({<span class="string">&quot;type&quot;</span>: <span class="string">&quot;integer&quot;</span>, <span class="string">&quot;format&quot;</span>: <span class="string">&quot;int32&quot;</span>, <span class="string">&quot;minimum&quot;</span>: <span class="number">0.0</span>}),
+                <span class="macro">json!</span>({<span class="string">"type"</span>: <span class="string">"integer"</span>, <span class="string">"format"</span>: <span class="string">"int32"</span>, <span class="string">"minimum"</span>: <span class="number">0.0</span>}),
             ),
             (
-                <span class="string">&quot;u32&quot;</span>,
+                <span class="string">"u32"</span>,
                 u32::schema(),
-                <span class="macro">json!</span>({<span class="string">&quot;type&quot;</span>: <span class="string">&quot;integer&quot;</span>, <span class="string">&quot;format&quot;</span>: <span class="string">&quot;int32&quot;</span>, <span class="string">&quot;minimum&quot;</span>: <span class="number">0.0</span>}),
+                <span class="macro">json!</span>({<span class="string">"type"</span>: <span class="string">"integer"</span>, <span class="string">"format"</span>: <span class="string">"int32"</span>, <span class="string">"minimum"</span>: <span class="number">0.0</span>}),
             ),
             (
-                <span class="string">&quot;u64&quot;</span>,
+                <span class="string">"u64"</span>,
                 u64::schema(),
-                <span class="macro">json!</span>({<span class="string">&quot;type&quot;</span>: <span class="string">&quot;integer&quot;</span>, <span class="string">&quot;format&quot;</span>: <span class="string">&quot;int64&quot;</span>, <span class="string">&quot;minimum&quot;</span>: <span class="number">0.0</span>}),
+                <span class="macro">json!</span>({<span class="string">"type"</span>: <span class="string">"integer"</span>, <span class="string">"format"</span>: <span class="string">"int64"</span>, <span class="string">"minimum"</span>: <span class="number">0.0</span>}),
             ),
         ] {
             <span class="macro">println!</span>(
-                <span class="string">&quot;{name}: {json}&quot;</span>,
+                <span class="string">"{name}: {json}"</span>,
                 json = serde_json::to_string(<span class="kw-2">&amp;</span>schema).unwrap()
             );
             <span class="kw">let </span>schema = serde_json::to_value(schema).unwrap();
@@ -2081,55 +2082,55 @@
         }
     }
 
-    <span class="attr">#[cfg(feature = <span class="string">&quot;non_strict_integers&quot;</span>)]
+    <span class="attr">#[cfg(feature = <span class="string">"non_strict_integers"</span>)]
     #[test]
     </span><span class="kw">fn </span>test_partial_schema_non_strict_integers() {
         <span class="kw">for </span>(name, schema, value) <span class="kw">in </span>[
             (
-                <span class="string">&quot;i8&quot;</span>,
+                <span class="string">"i8"</span>,
                 i8::schema(),
-                <span class="macro">json!</span>({<span class="string">&quot;type&quot;</span>: <span class="string">&quot;integer&quot;</span>, <span class="string">&quot;format&quot;</span>: <span class="string">&quot;int8&quot;</span>}),
+                <span class="macro">json!</span>({<span class="string">"type"</span>: <span class="string">"integer"</span>, <span class="string">"format"</span>: <span class="string">"int8"</span>}),
             ),
             (
-                <span class="string">&quot;i16&quot;</span>,
+                <span class="string">"i16"</span>,
                 i16::schema(),
-                <span class="macro">json!</span>({<span class="string">&quot;type&quot;</span>: <span class="string">&quot;integer&quot;</span>, <span class="string">&quot;format&quot;</span>: <span class="string">&quot;int16&quot;</span>}),
+                <span class="macro">json!</span>({<span class="string">"type"</span>: <span class="string">"integer"</span>, <span class="string">"format"</span>: <span class="string">"int16"</span>}),
             ),
             (
-                <span class="string">&quot;i32&quot;</span>,
+                <span class="string">"i32"</span>,
                 i32::schema(),
-                <span class="macro">json!</span>({<span class="string">&quot;type&quot;</span>: <span class="string">&quot;integer&quot;</span>, <span class="string">&quot;format&quot;</span>: <span class="string">&quot;int32&quot;</span>}),
+                <span class="macro">json!</span>({<span class="string">"type"</span>: <span class="string">"integer"</span>, <span class="string">"format"</span>: <span class="string">"int32"</span>}),
             ),
             (
-                <span class="string">&quot;i64&quot;</span>,
+                <span class="string">"i64"</span>,
                 i64::schema(),
-                <span class="macro">json!</span>({<span class="string">&quot;type&quot;</span>: <span class="string">&quot;integer&quot;</span>, <span class="string">&quot;format&quot;</span>: <span class="string">&quot;int64&quot;</span>}),
+                <span class="macro">json!</span>({<span class="string">"type"</span>: <span class="string">"integer"</span>, <span class="string">"format"</span>: <span class="string">"int64"</span>}),
             ),
-            (<span class="string">&quot;i128&quot;</span>, i128::schema(), <span class="macro">json!</span>({<span class="string">&quot;type&quot;</span>: <span class="string">&quot;integer&quot;</span>})),
-            (<span class="string">&quot;isize&quot;</span>, isize::schema(), <span class="macro">json!</span>({<span class="string">&quot;type&quot;</span>: <span class="string">&quot;integer&quot;</span>})),
+            (<span class="string">"i128"</span>, i128::schema(), <span class="macro">json!</span>({<span class="string">"type"</span>: <span class="string">"integer"</span>})),
+            (<span class="string">"isize"</span>, isize::schema(), <span class="macro">json!</span>({<span class="string">"type"</span>: <span class="string">"integer"</span>})),
             (
-                <span class="string">&quot;u8&quot;</span>,
+                <span class="string">"u8"</span>,
                 u8::schema(),
-                <span class="macro">json!</span>({<span class="string">&quot;type&quot;</span>: <span class="string">&quot;integer&quot;</span>, <span class="string">&quot;format&quot;</span>: <span class="string">&quot;uint8&quot;</span>, <span class="string">&quot;minimum&quot;</span>: <span class="number">0</span>}),
+                <span class="macro">json!</span>({<span class="string">"type"</span>: <span class="string">"integer"</span>, <span class="string">"format"</span>: <span class="string">"uint8"</span>, <span class="string">"minimum"</span>: <span class="number">0</span>}),
             ),
             (
-                <span class="string">&quot;u16&quot;</span>,
+                <span class="string">"u16"</span>,
                 u16::schema(),
-                <span class="macro">json!</span>({<span class="string">&quot;type&quot;</span>: <span class="string">&quot;integer&quot;</span>, <span class="string">&quot;format&quot;</span>: <span class="string">&quot;uint16&quot;</span>, <span class="string">&quot;minimum&quot;</span>: <span class="number">0</span>}),
+                <span class="macro">json!</span>({<span class="string">"type"</span>: <span class="string">"integer"</span>, <span class="string">"format"</span>: <span class="string">"uint16"</span>, <span class="string">"minimum"</span>: <span class="number">0</span>}),
             ),
             (
-                <span class="string">&quot;u32&quot;</span>,
+                <span class="string">"u32"</span>,
                 u32::schema(),
-                <span class="macro">json!</span>({<span class="string">&quot;type&quot;</span>: <span class="string">&quot;integer&quot;</span>, <span class="string">&quot;format&quot;</span>: <span class="string">&quot;uint32&quot;</span>, <span class="string">&quot;minimum&quot;</span>: <span class="number">0</span>}),
+                <span class="macro">json!</span>({<span class="string">"type"</span>: <span class="string">"integer"</span>, <span class="string">"format"</span>: <span class="string">"uint32"</span>, <span class="string">"minimum"</span>: <span class="number">0</span>}),
             ),
             (
-                <span class="string">&quot;u64&quot;</span>,
+                <span class="string">"u64"</span>,
                 u64::schema(),
-                <span class="macro">json!</span>({<span class="string">&quot;type&quot;</span>: <span class="string">&quot;integer&quot;</span>, <span class="string">&quot;format&quot;</span>: <span class="string">&quot;uint64&quot;</span>, <span class="string">&quot;minimum&quot;</span>: <span class="number">0</span>}),
+                <span class="macro">json!</span>({<span class="string">"type"</span>: <span class="string">"integer"</span>, <span class="string">"format"</span>: <span class="string">"uint64"</span>, <span class="string">"minimum"</span>: <span class="number">0</span>}),
             ),
         ] {
             <span class="macro">println!</span>(
-                <span class="string">&quot;{name}: {json}&quot;</span>,
+                <span class="string">"{name}: {json}"</span>,
                 json = serde_json::to_string(<span class="kw-2">&amp;</span>schema).unwrap()
             );
             <span class="kw">let </span>schema = serde_json::to_value(schema).unwrap();
@@ -2140,23 +2141,23 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_partial_schema() {
         <span class="kw">for </span>(name, schema, value) <span class="kw">in </span>[
-            (<span class="string">&quot;bool&quot;</span>, bool::schema(), <span class="macro">json!</span>({<span class="string">&quot;type&quot;</span>: <span class="string">&quot;boolean&quot;</span>})),
-            (<span class="string">&quot;str&quot;</span>, str::schema(), <span class="macro">json!</span>({<span class="string">&quot;type&quot;</span>: <span class="string">&quot;string&quot;</span>})),
-            (<span class="string">&quot;String&quot;</span>, String::schema(), <span class="macro">json!</span>({<span class="string">&quot;type&quot;</span>: <span class="string">&quot;string&quot;</span>})),
-            (<span class="string">&quot;char&quot;</span>, char::schema(), <span class="macro">json!</span>({<span class="string">&quot;type&quot;</span>: <span class="string">&quot;string&quot;</span>})),
+            (<span class="string">"bool"</span>, bool::schema(), <span class="macro">json!</span>({<span class="string">"type"</span>: <span class="string">"boolean"</span>})),
+            (<span class="string">"str"</span>, str::schema(), <span class="macro">json!</span>({<span class="string">"type"</span>: <span class="string">"string"</span>})),
+            (<span class="string">"String"</span>, String::schema(), <span class="macro">json!</span>({<span class="string">"type"</span>: <span class="string">"string"</span>})),
+            (<span class="string">"char"</span>, char::schema(), <span class="macro">json!</span>({<span class="string">"type"</span>: <span class="string">"string"</span>})),
             (
-                <span class="string">&quot;f32&quot;</span>,
+                <span class="string">"f32"</span>,
                 f32::schema(),
-                <span class="macro">json!</span>({<span class="string">&quot;type&quot;</span>: <span class="string">&quot;number&quot;</span>, <span class="string">&quot;format&quot;</span>: <span class="string">&quot;float&quot;</span>}),
+                <span class="macro">json!</span>({<span class="string">"type"</span>: <span class="string">"number"</span>, <span class="string">"format"</span>: <span class="string">"float"</span>}),
             ),
             (
-                <span class="string">&quot;f64&quot;</span>,
+                <span class="string">"f64"</span>,
                 f64::schema(),
-                <span class="macro">json!</span>({<span class="string">&quot;type&quot;</span>: <span class="string">&quot;number&quot;</span>, <span class="string">&quot;format&quot;</span>: <span class="string">&quot;double&quot;</span>}),
+                <span class="macro">json!</span>({<span class="string">"type"</span>: <span class="string">"number"</span>, <span class="string">"format"</span>: <span class="string">"double"</span>}),
             ),
         ] {
             <span class="macro">println!</span>(
-                <span class="string">&quot;{name}: {json}&quot;</span>,
+                <span class="string">"{name}: {json}"</span>,
                 json = serde_json::to_string(<span class="kw-2">&amp;</span>schema).unwrap()
             );
             <span class="kw">let </span>schema = serde_json::to_value(schema).unwrap();

@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/utoipa-3.5.0/src/openapi.rs`."><title>openapi.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="utoipa" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/utoipa-3.5.0/src/openapi.rs`."><title>openapi.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="utoipa" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -790,7 +791,7 @@
     /// ```rust
     /// # use utoipa::openapi::{Info, Paths, Components, OpenApiBuilder};
     /// let openapi = OpenApiBuilder::new()
-    ///      .info(Info::new(&quot;My api&quot;, &quot;1.0.0&quot;))
+    ///      .info(Info::new("My api", "1.0.0"))
     ///      .paths(Paths::new())
     ///      .components(Some(
     ///          Components::new()
@@ -809,8 +810,8 @@
     /// See more details at &lt;https://spec.openapis.org/oas/latest.html#openapi-object&gt;.
     </span><span class="attr">#[non_exhaustive]
     #[derive(Serialize, Deserialize, Default, Clone, PartialEq)]
-    #[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
-    #[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+    #[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
+    #[serde(rename_all = <span class="string">"camelCase"</span>)]
     </span><span class="kw">pub struct </span>OpenApi {
         <span class="doccomment">/// OpenAPI document version.
         </span><span class="kw">pub </span>openapi: OpenApiVersion,
@@ -825,7 +826,7 @@
         /// This is implicitly one server with `url` set to `/`.
         ///
         /// See more details at &lt;https://spec.openapis.org/oas/latest.html#server-object&gt;.
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
         </span><span class="kw">pub </span>servers: <span class="prelude-ty">Option</span>&lt;Vec&lt;Server&gt;&gt;,
 
         <span class="doccomment">/// Available paths and operations for the API.
@@ -839,7 +840,7 @@
         /// Few of these elements are security schemas and object schemas.
         ///
         /// See more details at &lt;https://spec.openapis.org/oas/latest.html#components-object&gt;.
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
         </span><span class="kw">pub </span>components: <span class="prelude-ty">Option</span>&lt;Components&gt;,
 
         <span class="doccomment">/// Declaration of global security mechanisms that can be used across the API. The individual operations
@@ -847,19 +848,19 @@
         /// optional by adding it to the list of securities.
         ///
         /// See more details at &lt;https://spec.openapis.org/oas/latest.html#security-requirement-object&gt;.
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
         </span><span class="kw">pub </span>security: <span class="prelude-ty">Option</span>&lt;Vec&lt;SecurityRequirement&gt;&gt;,
 
         <span class="doccomment">/// Optional list of tags can be used to add additional documentation to matching tags of operations.
         ///
         /// See more details at &lt;https://spec.openapis.org/oas/latest.html#tag-object&gt;.
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
         </span><span class="kw">pub </span>tags: <span class="prelude-ty">Option</span>&lt;Vec&lt;Tag&gt;&gt;,
 
         <span class="doccomment">/// Optional global additional documentation reference.
         ///
         /// See more details at &lt;https://spec.openapis.org/oas/latest.html#external-documentation-object&gt;.
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
         </span><span class="kw">pub </span>external_docs: <span class="prelude-ty">Option</span>&lt;ExternalDocs&gt;,
     }
 }
@@ -875,7 +876,7 @@
     /// ```rust
     /// # use utoipa::openapi::{Info, Paths, OpenApi};
     /// #
-    /// let openapi = OpenApi::new(Info::new(&quot;pet api&quot;, &quot;0.1.0&quot;), Paths::new());
+    /// let openapi = OpenApi::new(Info::new("pet api", "0.1.0"), Paths::new());
     /// ```
     </span><span class="kw">pub fn </span>new&lt;P: Into&lt;Paths&gt;&gt;(info: Info, paths: P) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
@@ -896,13 +897,13 @@
     }
 
     <span class="doccomment">/// Converts this [`OpenApi`] to YAML String. This method essentially calls [`serde_yaml::to_string`] method.
-    </span><span class="attr">#[cfg(feature = <span class="string">&quot;yaml&quot;</span>)]
-    #[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">&quot;yaml&quot;</span>)))]
+    </span><span class="attr">#[cfg(feature = <span class="string">"yaml"</span>)]
+    #[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">"yaml"</span>)))]
     </span><span class="kw">pub fn </span>to_yaml(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;String, serde_yaml::Error&gt; {
         serde_yaml::to_string(<span class="self">self</span>)
     }
 
-    <span class="doccomment">/// Merge `other` [`OpenApi`] consuming it and resuming it&#39;s content.
+    <span class="doccomment">/// Merge `other` [`OpenApi`] consuming it and resuming it's content.
     ///
     /// Merge function will take all `self` nonexistent _`servers`, `paths`, `schemas`, `responses`,
     /// `security_schemes`, `security_requirements` and `tags`_ from _`other`_ [`OpenApi`].
@@ -1010,10 +1011,10 @@
 ///
 /// [version]: &lt;https://spec.openapis.org/oas/latest.html#versions&gt;
 </span><span class="attr">#[derive(Serialize, Clone, PartialEq, Eq)]
-#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
+#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
 </span><span class="kw">pub enum </span>OpenApiVersion {
     <span class="doccomment">/// Will serialize to `3.0.3` the latest from 3.0 serde.
-    </span><span class="attr">#[serde(rename = <span class="string">&quot;3.0.3&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">"3.0.3"</span>)]
     </span>Version3,
 }
 
@@ -1023,18 +1024,18 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; Deserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>OpenApiVersion {
+<span class="kw">impl</span>&lt;<span class="lifetime">'de</span>&gt; Deserialize&lt;<span class="lifetime">'de</span>&gt; <span class="kw">for </span>OpenApiVersion {
     <span class="kw">fn </span>deserialize&lt;D&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, D::Error&gt;
     <span class="kw">where
-        </span>D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;,
+        </span>D: Deserializer&lt;<span class="lifetime">'de</span>&gt;,
     {
         <span class="kw">struct </span>VersionVisitor;
 
-        <span class="kw">impl</span>&lt;<span class="lifetime">&#39;v</span>&gt; Visitor&lt;<span class="lifetime">&#39;v</span>&gt; <span class="kw">for </span>VersionVisitor {
+        <span class="kw">impl</span>&lt;<span class="lifetime">'v</span>&gt; Visitor&lt;<span class="lifetime">'v</span>&gt; <span class="kw">for </span>VersionVisitor {
             <span class="kw">type </span>Value = OpenApiVersion;
 
             <span class="kw">fn </span>expecting(<span class="kw-2">&amp;</span><span class="self">self</span>, formatter: <span class="kw-2">&amp;mut </span>Formatter) -&gt; std::fmt::Result {
-                formatter.write_str(<span class="string">&quot;a version string in 3, 3.0, or 3.0.x format&quot;</span>)
+                formatter.write_str(<span class="string">"a version string in 3, 3.0, or 3.0.x format"</span>)
             }
 
             <span class="kw">fn </span>visit_str&lt;E&gt;(<span class="self">self</span>, v: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Value, E&gt;
@@ -1048,17 +1049,17 @@
             <span class="kw">where
                 </span>E: Error,
             {
-                <span class="kw">let </span>parts = v.split(<span class="string">&#39;.&#39;</span>).collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
+                <span class="kw">let </span>parts = v.split(<span class="string">'.'</span>).collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
                 <span class="kw">if </span>parts.len() &gt; <span class="number">3 </span>|| parts.is_empty() {
                     <span class="kw">return </span><span class="prelude-val">Err</span>(E::custom(<span class="macro">format!</span>(
-                        <span class="string">&quot;Invalid format of OpenAPI version: {}&quot;</span>,
+                        <span class="string">"Invalid format of OpenAPI version: {}"</span>,
                         v,
                     )));
                 }
 
-                <span class="prelude-val">Ok</span>(<span class="kw">match </span>(parts[<span class="number">0</span>], parts.get(<span class="number">1</span>).copied().unwrap_or(<span class="string">&quot;0&quot;</span>)) {
-                    (<span class="string">&quot;3&quot;</span>, <span class="string">&quot;0&quot;</span>) =&gt; OpenApiVersion::Version3,
-                    <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(E::custom(<span class="macro">format!</span>(<span class="string">&quot;Unsupported version: {}&quot;</span>, <span class="kw-2">&amp;</span>v))),
+                <span class="prelude-val">Ok</span>(<span class="kw">match </span>(parts[<span class="number">0</span>], parts.get(<span class="number">1</span>).copied().unwrap_or(<span class="string">"0"</span>)) {
+                    (<span class="string">"3"</span>, <span class="string">"0"</span>) =&gt; OpenApiVersion::Version3,
+                    <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(E::custom(<span class="macro">format!</span>(<span class="string">"Unsupported version: {}"</span>, <span class="kw-2">&amp;</span>v))),
                 })
             }
         }
@@ -1071,7 +1072,7 @@
 ///
 /// The value will serialize to boolean.
 </span><span class="attr">#[derive(PartialEq, Eq, Clone)]
-#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
+#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
 </span><span class="kw">pub enum </span>Deprecated {
     True,
     False,
@@ -1086,17 +1087,17 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; Deserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>Deprecated {
+<span class="kw">impl</span>&lt;<span class="lifetime">'de</span>&gt; Deserialize&lt;<span class="lifetime">'de</span>&gt; <span class="kw">for </span>Deprecated {
     <span class="kw">fn </span>deserialize&lt;D&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, D::Error&gt;
     <span class="kw">where
-        </span>D: serde::Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;,
+        </span>D: serde::Deserializer&lt;<span class="lifetime">'de</span>&gt;,
     {
         <span class="kw">struct </span>BoolVisitor;
-        <span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; Visitor&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>BoolVisitor {
+        <span class="kw">impl</span>&lt;<span class="lifetime">'de</span>&gt; Visitor&lt;<span class="lifetime">'de</span>&gt; <span class="kw">for </span>BoolVisitor {
             <span class="kw">type </span>Value = Deprecated;
 
             <span class="kw">fn </span>expecting(<span class="kw-2">&amp;</span><span class="self">self</span>, formatter: <span class="kw-2">&amp;mut </span>std::fmt::Formatter) -&gt; std::fmt::Result {
-                formatter.write_str(<span class="string">&quot;a bool true or false&quot;</span>)
+                formatter.write_str(<span class="string">"a bool true or false"</span>)
             }
 
             <span class="kw">fn </span>visit_bool&lt;E&gt;(<span class="self">self</span>, v: bool) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Value, E&gt;
@@ -1123,7 +1124,7 @@
 ///
 /// The value will serialize to boolean.
 </span><span class="attr">#[derive(PartialEq, Eq, Clone)]
-#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
+#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
 </span><span class="kw">pub enum </span>Required {
     True,
     False,
@@ -1138,17 +1139,17 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; Deserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>Required {
+<span class="kw">impl</span>&lt;<span class="lifetime">'de</span>&gt; Deserialize&lt;<span class="lifetime">'de</span>&gt; <span class="kw">for </span>Required {
     <span class="kw">fn </span>deserialize&lt;D&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, D::Error&gt;
     <span class="kw">where
-        </span>D: serde::Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;,
+        </span>D: serde::Deserializer&lt;<span class="lifetime">'de</span>&gt;,
     {
         <span class="kw">struct </span>BoolVisitor;
-        <span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; Visitor&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>BoolVisitor {
+        <span class="kw">impl</span>&lt;<span class="lifetime">'de</span>&gt; Visitor&lt;<span class="lifetime">'de</span>&gt; <span class="kw">for </span>BoolVisitor {
             <span class="kw">type </span>Value = Required;
 
             <span class="kw">fn </span>expecting(<span class="kw-2">&amp;</span><span class="self">self</span>, formatter: <span class="kw-2">&amp;mut </span>std::fmt::Formatter) -&gt; std::fmt::Result {
-                formatter.write_str(<span class="string">&quot;a bool true or false&quot;</span>)
+                formatter.write_str(<span class="string">"a bool true or false"</span>)
             }
 
             <span class="kw">fn </span>visit_bool&lt;E&gt;(<span class="self">self</span>, v: bool) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Value, E&gt;
@@ -1176,7 +1177,7 @@
 /// Typically used in combination with [`Components`] and is an union type between [`Ref`] and any
 /// other given type such as [`Schema`] or [`Response`].
 </span><span class="attr">#[derive(Serialize, Deserialize, Clone, PartialEq, Eq)]
-#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
+#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
 #[serde(untagged)]
 </span><span class="kw">pub enum </span>RefOr&lt;T&gt; {
     Ref(Ref),
@@ -1185,7 +1186,7 @@
 
 <span class="macro">macro_rules! </span>build_fn {
     ( <span class="macro-nonterminal">$vis</span>:vis <span class="macro-nonterminal">$name</span>:ident $( <span class="macro-nonterminal">$field</span>:ident ),+ ) =&gt; {
-        <span class="attr">#[doc = <span class="macro">concat!</span>(<span class="string">&quot;Constructs a new [`&quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$name</span>),<span class="string">&quot;`] taking all fields values from this object.&quot;</span>)]
+        <span class="attr">#[doc = <span class="macro">concat!</span>(<span class="string">"Constructs a new [`"</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$name</span>),<span class="string">"`] taking all fields values from this object."</span>)]
         </span><span class="macro-nonterminal">$vis </span><span class="kw">fn </span>build(<span class="self">self</span>) -&gt; <span class="macro-nonterminal">$name </span>{
             <span class="macro-nonterminal">$name </span>{
                 $(
@@ -1208,7 +1209,7 @@
 
 <span class="macro">macro_rules! </span>new {
     ( <span class="macro-nonterminal">$vis</span>:vis <span class="macro-nonterminal">$name</span>:ident ) =&gt; {
-        <span class="attr">#[doc = <span class="macro">concat!</span>(<span class="string">&quot;Constructs a new [`&quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$name</span>),<span class="string">&quot;`].&quot;</span>)]
+        <span class="attr">#[doc = <span class="macro">concat!</span>(<span class="string">"Constructs a new [`"</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$name</span>),<span class="string">"`]."</span>)]
         </span><span class="macro-nonterminal">$vis </span><span class="kw">fn </span>new() -&gt; <span class="macro-nonterminal">$name </span>{
             <span class="macro-nonterminal">$name </span>{
                 ..Default::default()
@@ -1256,10 +1257,10 @@
     ( @builder_impl $( <span class="attr">#[<span class="macro-nonterminal">$builder_meta</span>:meta] </span>)* <span class="macro-nonterminal">$builder_name</span>:ident $( <span class="attr">#[<span class="macro-nonterminal">$meta</span>:meta] </span>)* <span class="macro-nonterminal">$vis</span>:vis <span class="macro-nonterminal">$key</span>:ident <span class="macro-nonterminal">$name</span>:ident
         { $( $( <span class="attr">#[<span class="macro-nonterminal">$field_meta</span>:meta] </span>)* <span class="macro-nonterminal">$field_vis</span>:vis <span class="macro-nonterminal">$field</span>:ident: <span class="macro-nonterminal">$field_ty</span>:ty, )* }
     ) =&gt; {
-        <span class="attr">#[doc = <span class="macro">concat!</span>(<span class="string">&quot;Builder for [`&quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$name</span>),
-            <span class="string">&quot;`] with chainable configuration methods to create a new [`&quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$name</span>) , <span class="string">&quot;`].&quot;</span>)]
+        <span class="attr">#[doc = <span class="macro">concat!</span>(<span class="string">"Builder for [`"</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$name</span>),
+            <span class="string">"`] with chainable configuration methods to create a new [`"</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$name</span>) , <span class="string">"`]."</span>)]
         </span>$( <span class="attr">#[<span class="macro-nonterminal">$builder_meta</span>] </span>)*
-        <span class="attr">#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
+        <span class="attr">#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
         </span><span class="macro-nonterminal">$vis $key $builder_name </span>{
             $( <span class="macro-nonterminal">$field</span>: <span class="macro-nonterminal">$field_ty</span>, )*
         }
@@ -1296,22 +1297,22 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>serialize_deserialize_openapi_version_success() -&gt; <span class="prelude-ty">Result</span>&lt;(), serde_json::Error&gt; {
-        <span class="macro">assert_eq!</span>(serde_json::to_value(<span class="kw-2">&amp;</span>OpenApiVersion::Version3)<span class="question-mark">?</span>, <span class="string">&quot;3.0.3&quot;</span>);
+        <span class="macro">assert_eq!</span>(serde_json::to_value(<span class="kw-2">&amp;</span>OpenApiVersion::Version3)<span class="question-mark">?</span>, <span class="string">"3.0.3"</span>);
         <span class="prelude-val">Ok</span>(())
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>serialize_openapi_json_minimal_success() -&gt; <span class="prelude-ty">Result</span>&lt;(), serde_json::Error&gt; {
-        <span class="kw">let </span>raw_json = <span class="macro">include_str!</span>(<span class="string">&quot;openapi/testdata/expected_openapi_minimal.json&quot;</span>);
+        <span class="kw">let </span>raw_json = <span class="macro">include_str!</span>(<span class="string">"openapi/testdata/expected_openapi_minimal.json"</span>);
         <span class="kw">let </span>openapi = OpenApi::new(
             InfoBuilder::new()
-                .title(<span class="string">&quot;My api&quot;</span>)
-                .version(<span class="string">&quot;1.0.0&quot;</span>)
-                .description(<span class="prelude-val">Some</span>(<span class="string">&quot;My api description&quot;</span>))
+                .title(<span class="string">"My api"</span>)
+                .version(<span class="string">"1.0.0"</span>)
+                .description(<span class="prelude-val">Some</span>(<span class="string">"My api description"</span>))
                 .license(<span class="prelude-val">Some</span>(
                     LicenseBuilder::new()
-                        .name(<span class="string">&quot;MIT&quot;</span>)
-                        .url(<span class="prelude-val">Some</span>(<span class="string">&quot;http://mit.licence&quot;</span>))
+                        .name(<span class="string">"MIT"</span>)
+                        .url(<span class="prelude-val">Some</span>(<span class="string">"http://mit.licence"</span>))
                         .build(),
                 ))
                 .build(),
@@ -1321,7 +1322,7 @@
 
         <span class="macro">assert_eq!</span>(
             serialized, raw_json,
-            <span class="string">&quot;expected serialized json to match raw: \nserialized: \n{serialized} \nraw: \n{raw_json}&quot;
+            <span class="string">"expected serialized json to match raw: \nserialized: \n{serialized} \nraw: \n{raw_json}"
         </span>);
         <span class="prelude-val">Ok</span>(())
     }
@@ -1329,37 +1330,37 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>serialize_openapi_json_with_paths_success() -&gt; <span class="prelude-ty">Result</span>&lt;(), serde_json::Error&gt; {
         <span class="kw">let </span>openapi = OpenApi::new(
-            Info::new(<span class="string">&quot;My big api&quot;</span>, <span class="string">&quot;1.1.0&quot;</span>),
+            Info::new(<span class="string">"My big api"</span>, <span class="string">"1.1.0"</span>),
             PathsBuilder::new()
                 .path(
-                    <span class="string">&quot;/api/v1/users&quot;</span>,
+                    <span class="string">"/api/v1/users"</span>,
                     PathItem::new(
                         PathItemType::Get,
-                        OperationBuilder::new().response(<span class="string">&quot;200&quot;</span>, Response::new(<span class="string">&quot;Get users list&quot;</span>)),
+                        OperationBuilder::new().response(<span class="string">"200"</span>, Response::new(<span class="string">"Get users list"</span>)),
                     ),
                 )
                 .path(
-                    <span class="string">&quot;/api/v1/users&quot;</span>,
+                    <span class="string">"/api/v1/users"</span>,
                     PathItem::new(
                         PathItemType::Post,
-                        OperationBuilder::new().response(<span class="string">&quot;200&quot;</span>, Response::new(<span class="string">&quot;Post new user&quot;</span>)),
+                        OperationBuilder::new().response(<span class="string">"200"</span>, Response::new(<span class="string">"Post new user"</span>)),
                     ),
                 )
                 .path(
-                    <span class="string">&quot;/api/v1/users/{id}&quot;</span>,
+                    <span class="string">"/api/v1/users/{id}"</span>,
                     PathItem::new(
                         PathItemType::Get,
-                        OperationBuilder::new().response(<span class="string">&quot;200&quot;</span>, Response::new(<span class="string">&quot;Get user by id&quot;</span>)),
+                        OperationBuilder::new().response(<span class="string">"200"</span>, Response::new(<span class="string">"Get user by id"</span>)),
                     ),
                 ),
         );
 
         <span class="kw">let </span>serialized = serde_json::to_string_pretty(<span class="kw-2">&amp;</span>openapi)<span class="question-mark">?</span>;
-        <span class="kw">let </span>expected = <span class="macro">include_str!</span>(<span class="string">&quot;./openapi/testdata/expected_openapi_with_paths.json&quot;</span>);
+        <span class="kw">let </span>expected = <span class="macro">include_str!</span>(<span class="string">"./openapi/testdata/expected_openapi_with_paths.json"</span>);
 
         <span class="macro">assert_eq!</span>(
             serialized, expected,
-            <span class="string">&quot;expected serialized json to match raw: \nserialized: \n{serialized} \nraw: \n{expected}&quot;
+            <span class="string">"expected serialized json to match raw: \nserialized: \n{serialized} \nraw: \n{expected}"
         </span>);
         <span class="prelude-val">Ok</span>(())
     }
@@ -1367,44 +1368,44 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>merge_2_openapi_documents() {
         <span class="kw">let </span><span class="kw-2">mut </span>api_1 = OpenApi::new(
-            Info::new(<span class="string">&quot;Api&quot;</span>, <span class="string">&quot;v1&quot;</span>),
+            Info::new(<span class="string">"Api"</span>, <span class="string">"v1"</span>),
             PathsBuilder::new()
                 .path(
-                    <span class="string">&quot;/api/v1/user&quot;</span>,
+                    <span class="string">"/api/v1/user"</span>,
                     PathItem::new(
                         PathItemType::Get,
-                        OperationBuilder::new().response(<span class="string">&quot;200&quot;</span>, Response::new(<span class="string">&quot;Get user success&quot;</span>)),
+                        OperationBuilder::new().response(<span class="string">"200"</span>, Response::new(<span class="string">"Get user success"</span>)),
                     ),
                 )
                 .build(),
         );
 
         <span class="kw">let </span>api_2 = OpenApiBuilder::new()
-            .info(Info::new(<span class="string">&quot;Api&quot;</span>, <span class="string">&quot;v2&quot;</span>))
+            .info(Info::new(<span class="string">"Api"</span>, <span class="string">"v2"</span>))
             .paths(
                 PathsBuilder::new()
                     .path(
-                        <span class="string">&quot;/api/v1/user&quot;</span>,
+                        <span class="string">"/api/v1/user"</span>,
                         PathItem::new(
                             PathItemType::Get,
                             OperationBuilder::new()
-                                .response(<span class="string">&quot;200&quot;</span>, Response::new(<span class="string">&quot;This will not get added&quot;</span>)),
+                                .response(<span class="string">"200"</span>, Response::new(<span class="string">"This will not get added"</span>)),
                         ),
                     )
                     .path(
-                        <span class="string">&quot;/ap/v2/user&quot;</span>,
+                        <span class="string">"/ap/v2/user"</span>,
                         PathItem::new(
                             PathItemType::Get,
                             OperationBuilder::new()
-                                .response(<span class="string">&quot;200&quot;</span>, Response::new(<span class="string">&quot;Get user success 2&quot;</span>)),
+                                .response(<span class="string">"200"</span>, Response::new(<span class="string">"Get user success 2"</span>)),
                         ),
                     )
                     .path(
-                        <span class="string">&quot;/api/v2/user&quot;</span>,
+                        <span class="string">"/api/v2/user"</span>,
                         PathItem::new(
                             PathItemType::Post,
                             OperationBuilder::new()
-                                .response(<span class="string">&quot;200&quot;</span>, Response::new(<span class="string">&quot;Get user success&quot;</span>)),
+                                .response(<span class="string">"200"</span>, Response::new(<span class="string">"Get user success"</span>)),
                         ),
                     )
                     .build(),
@@ -1412,11 +1413,11 @@
             .components(<span class="prelude-val">Some</span>(
                 ComponentsBuilder::new()
                     .schema(
-                        <span class="string">&quot;User2&quot;</span>,
+                        <span class="string">"User2"</span>,
                         ObjectBuilder::new()
                             .schema_type(SchemaType::Object)
                             .property(
-                                <span class="string">&quot;name&quot;</span>,
+                                <span class="string">"name"</span>,
                                 ObjectBuilder::new().schema_type(SchemaType::String).build(),
                             ),
                     )
@@ -1431,47 +1432,47 @@
             value,
             <span class="macro">json!</span>(
                 {
-                  <span class="string">&quot;openapi&quot;</span>: <span class="string">&quot;3.0.3&quot;</span>,
-                  <span class="string">&quot;info&quot;</span>: {
-                    <span class="string">&quot;title&quot;</span>: <span class="string">&quot;Api&quot;</span>,
-                    <span class="string">&quot;version&quot;</span>: <span class="string">&quot;v1&quot;
+                  <span class="string">"openapi"</span>: <span class="string">"3.0.3"</span>,
+                  <span class="string">"info"</span>: {
+                    <span class="string">"title"</span>: <span class="string">"Api"</span>,
+                    <span class="string">"version"</span>: <span class="string">"v1"
                   </span>},
-                  <span class="string">&quot;paths&quot;</span>: {
-                    <span class="string">&quot;/ap/v2/user&quot;</span>: {
-                      <span class="string">&quot;get&quot;</span>: {
-                        <span class="string">&quot;responses&quot;</span>: {
-                          <span class="string">&quot;200&quot;</span>: {
-                            <span class="string">&quot;description&quot;</span>: <span class="string">&quot;Get user success 2&quot;
+                  <span class="string">"paths"</span>: {
+                    <span class="string">"/ap/v2/user"</span>: {
+                      <span class="string">"get"</span>: {
+                        <span class="string">"responses"</span>: {
+                          <span class="string">"200"</span>: {
+                            <span class="string">"description"</span>: <span class="string">"Get user success 2"
                           </span>}
                         }
                       }
                     },
-                    <span class="string">&quot;/api/v1/user&quot;</span>: {
-                      <span class="string">&quot;get&quot;</span>: {
-                        <span class="string">&quot;responses&quot;</span>: {
-                          <span class="string">&quot;200&quot;</span>: {
-                            <span class="string">&quot;description&quot;</span>: <span class="string">&quot;Get user success&quot;
+                    <span class="string">"/api/v1/user"</span>: {
+                      <span class="string">"get"</span>: {
+                        <span class="string">"responses"</span>: {
+                          <span class="string">"200"</span>: {
+                            <span class="string">"description"</span>: <span class="string">"Get user success"
                           </span>}
                         }
                       }
                     },
-                    <span class="string">&quot;/api/v2/user&quot;</span>: {
-                      <span class="string">&quot;post&quot;</span>: {
-                        <span class="string">&quot;responses&quot;</span>: {
-                          <span class="string">&quot;200&quot;</span>: {
-                            <span class="string">&quot;description&quot;</span>: <span class="string">&quot;Get user success&quot;
+                    <span class="string">"/api/v2/user"</span>: {
+                      <span class="string">"post"</span>: {
+                        <span class="string">"responses"</span>: {
+                          <span class="string">"200"</span>: {
+                            <span class="string">"description"</span>: <span class="string">"Get user success"
                           </span>}
                         }
                       }
                     }
                   },
-                  <span class="string">&quot;components&quot;</span>: {
-                    <span class="string">&quot;schemas&quot;</span>: {
-                      <span class="string">&quot;User2&quot;</span>: {
-                        <span class="string">&quot;type&quot;</span>: <span class="string">&quot;object&quot;</span>,
-                        <span class="string">&quot;properties&quot;</span>: {
-                          <span class="string">&quot;name&quot;</span>: {
-                            <span class="string">&quot;type&quot;</span>: <span class="string">&quot;string&quot;
+                  <span class="string">"components"</span>: {
+                    <span class="string">"schemas"</span>: {
+                      <span class="string">"User2"</span>: {
+                        <span class="string">"type"</span>: <span class="string">"object"</span>,
+                        <span class="string">"properties"</span>: {
+                          <span class="string">"name"</span>: {
+                            <span class="string">"type"</span>: <span class="string">"string"
                           </span>}
                         }
                       }
@@ -1484,7 +1485,7 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>deserialize_other_versions() {
-        [<span class="string">r#&quot;&quot;3.0.3&quot;&quot;#</span>, <span class="string">r#&quot;&quot;3.0.0&quot;&quot;#</span>, <span class="string">r#&quot;&quot;3.0&quot;&quot;#</span>, <span class="string">r#&quot;&quot;3&quot;&quot;#</span>]
+        [<span class="string">r#""3.0.3""#</span>, <span class="string">r#""3.0.0""#</span>, <span class="string">r#""3.0""#</span>, <span class="string">r#""3""#</span>]
             .iter()
             .for_each(|v| {
                 <span class="macro">assert!</span>(<span class="macro">matches!</span>(

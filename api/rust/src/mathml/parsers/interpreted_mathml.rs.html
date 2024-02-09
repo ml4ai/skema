@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `mathml/src/parsers/interpreted_mathml.rs`."><title>interpreted_mathml.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="mathml" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `mathml/src/parsers/interpreted_mathml.rs`."><title>interpreted_mathml.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="mathml" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1128,7 +1129,7 @@
 <a href="#1128" id="1128">1128</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! This module contains parsers that perform some amount of preliminary domain-specific
 //! interpretation of presentation MathML (e.g., globbing S(t) to an identifier S of type
-//! &#39;function&#39;). This is in contrast to the `generic_mathml.rs` module that contains parsers that
+//! 'function'). This is in contrast to the `generic_mathml.rs` module that contains parsers that
 //! do not attempt to perform any interpretation but instead simply preserve the original MathML
 //! document structure.
 
@@ -1157,11 +1158,11 @@
 /// disallowing operators besides +, -, =, (, ) and ,.
 </span><span class="kw">pub fn </span>operator(input: Span) -&gt; IResult&lt;Operator&gt; {
     <span class="kw">let </span>(s, op) = ws(delimited(
-        <span class="macro">stag!</span>(<span class="string">&quot;mo&quot;</span>),
+        <span class="macro">stag!</span>(<span class="string">"mo"</span>),
         alt((
             add, subtract, multiply, divide, equals, lparen, rparen, mean, dot, cross, hat,
         )),
-        <span class="macro">etag!</span>(<span class="string">&quot;mo&quot;</span>),
+        <span class="macro">etag!</span>(<span class="string">"mo"</span>),
     ))(input)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((s, op))
 }
@@ -1169,9 +1170,9 @@
 <span class="doccomment">/// Parses function of identifiers
 /// Example: S(t,x) identifies (t,x) as identifiers.
 </span><span class="kw">fn </span>parenthesized_identifier(input: Span) -&gt; IResult&lt;Vec&lt;Mi&gt;&gt; {
-    <span class="kw">let </span>mo_lparen = delimited(<span class="macro">stag!</span>(<span class="string">&quot;mo&quot;</span>), lparen, <span class="macro">etag!</span>(<span class="string">&quot;mo&quot;</span>));
-    <span class="kw">let </span>mo_rparen = delimited(<span class="macro">stag!</span>(<span class="string">&quot;mo&quot;</span>), rparen, <span class="macro">etag!</span>(<span class="string">&quot;mo&quot;</span>));
-    <span class="kw">let </span>mo_comma = delimited(<span class="macro">stag!</span>(<span class="string">&quot;mo&quot;</span>), ws(tag(<span class="string">&quot;,&quot;</span>)), <span class="macro">etag!</span>(<span class="string">&quot;mo&quot;</span>));
+    <span class="kw">let </span>mo_lparen = delimited(<span class="macro">stag!</span>(<span class="string">"mo"</span>), lparen, <span class="macro">etag!</span>(<span class="string">"mo"</span>));
+    <span class="kw">let </span>mo_rparen = delimited(<span class="macro">stag!</span>(<span class="string">"mo"</span>), rparen, <span class="macro">etag!</span>(<span class="string">"mo"</span>));
+    <span class="kw">let </span>mo_comma = delimited(<span class="macro">stag!</span>(<span class="string">"mo"</span>), ws(tag(<span class="string">","</span>)), <span class="macro">etag!</span>(<span class="string">"mo"</span>));
     <span class="kw">let </span>(s, bound_vars) = delimited(mo_lparen, separated_list1(mo_comma, mi), mo_rparen)(input)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((s, bound_vars))
 }
@@ -1179,11 +1180,11 @@
 <span class="doccomment">/// Parses function of identifiers
 /// Example: Q_i ( t_{i-1}, s_{i-1} ) identifies ( t_{i-1}, s_{i-1} ) as identifiers.
 </span><span class="kw">fn </span>parenthesized_msub_identifier(input: Span) -&gt; IResult&lt;Vec&lt;Mi&gt;&gt; {
-    <span class="kw">let </span>mo_lparen = delimited(<span class="macro">stag!</span>(<span class="string">&quot;mo&quot;</span>), lparen, <span class="macro">etag!</span>(<span class="string">&quot;mo&quot;</span>));
-    <span class="kw">let </span>mo_rparen = delimited(<span class="macro">stag!</span>(<span class="string">&quot;mo&quot;</span>), rparen, <span class="macro">etag!</span>(<span class="string">&quot;mo&quot;</span>));
-    <span class="kw">let </span>mo_mrow_lparen = delimited(tag(<span class="string">&quot;&lt;mrow&gt;&lt;mo&gt;&quot;</span>), lparen, tag(<span class="string">&quot;&lt;/mo&gt;&quot;</span>));
-    <span class="kw">let </span>mo_mrow_rparen = delimited(tag(<span class="string">&quot;&lt;mo&gt;&quot;</span>), rparen, tag(<span class="string">&quot;&lt;/mo&gt;&lt;/mrow&gt;&quot;</span>));
-    <span class="kw">let </span>mo_comma = delimited(<span class="macro">stag!</span>(<span class="string">&quot;mo&quot;</span>), ws(tag(<span class="string">&quot;,&quot;</span>)), <span class="macro">etag!</span>(<span class="string">&quot;mo&quot;</span>));
+    <span class="kw">let </span>mo_lparen = delimited(<span class="macro">stag!</span>(<span class="string">"mo"</span>), lparen, <span class="macro">etag!</span>(<span class="string">"mo"</span>));
+    <span class="kw">let </span>mo_rparen = delimited(<span class="macro">stag!</span>(<span class="string">"mo"</span>), rparen, <span class="macro">etag!</span>(<span class="string">"mo"</span>));
+    <span class="kw">let </span>mo_mrow_lparen = delimited(tag(<span class="string">"&lt;mrow&gt;&lt;mo&gt;"</span>), lparen, tag(<span class="string">"&lt;/mo&gt;"</span>));
+    <span class="kw">let </span>mo_mrow_rparen = delimited(tag(<span class="string">"&lt;mo&gt;"</span>), rparen, tag(<span class="string">"&lt;/mo&gt;&lt;/mrow&gt;"</span>));
+    <span class="kw">let </span>mo_comma = delimited(<span class="macro">stag!</span>(<span class="string">"mo"</span>), ws(tag(<span class="string">","</span>)), <span class="macro">etag!</span>(<span class="string">"mo"</span>));
     <span class="kw">let </span>(s, bound_vars) = delimited(
         alt((mo_lparen, mo_mrow_lparen)),
         separated_list1(mo_comma, alt((msub, multiple_dots))),
@@ -1200,7 +1201,7 @@
 <span class="doccomment">/// Parse empty univariate function.
 /// Example: S
 </span><span class="kw">fn </span>empty_parenthesis(input: Span) -&gt; IResult&lt;Vec&lt;Mi&gt;&gt; {
-    <span class="kw">let </span>empty = <span class="macro">vec!</span>[Mi(<span class="string">&quot;&quot;</span>.to_string())];
+    <span class="kw">let </span>empty = <span class="macro">vec!</span>[Mi(<span class="string">""</span>.to_string())];
     <span class="prelude-val">Ok</span>((input, empty))
 }
 
@@ -1297,7 +1298,7 @@
 <span class="doccomment">/// Parse content identifier for Msup
 </span><span class="kw">pub fn </span>superscript(input: Span) -&gt; IResult&lt;MathExpression&gt; {
     <span class="kw">let </span>(s, sup) = ws(map(
-        <span class="macro">tag_parser!</span>(<span class="string">&quot;msup&quot;</span>, pair(math_expression, math_expression)),
+        <span class="macro">tag_parser!</span>(<span class="string">"msup"</span>, pair(math_expression, math_expression)),
         |(x, y)| MathExpression::Msup(Box::new(x), Box::new(y)),
     ))(input)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((s, sup))
@@ -1307,11 +1308,11 @@
 </span><span class="kw">pub fn </span>over_term(input: Span) -&gt; IResult&lt;MathExpression&gt; {
     <span class="kw">let </span>(s, over) = ws(map(
         alt((
-            <span class="macro">tag_parser!</span>(<span class="string">&quot;mover&quot;</span>, pair(math_expression, math_expression)),
+            <span class="macro">tag_parser!</span>(<span class="string">"mover"</span>, pair(math_expression, math_expression)),
             delimited(
-                tag(<span class="string">&quot;&lt;mrow&gt;&lt;mover&gt;&quot;</span>),
+                tag(<span class="string">"&lt;mrow&gt;&lt;mover&gt;"</span>),
                 pair(math_expression, math_expression),
-                tag(<span class="string">&quot;&lt;/mover&gt;&lt;/mrow&gt;&quot;</span>),
+                tag(<span class="string">"&lt;/mover&gt;&lt;/mrow&gt;"</span>),
             ),
         )),
         |(x, y)| MathExpression::Mover(Box::new(x), Box::new(y)),
@@ -1325,7 +1326,7 @@
         }
     }
     <span class="prelude-val">Err</span>(nom::Err::Error(ParseError::new(
-        <span class="string">&quot;Unable to obtain Mover term&quot;</span>.to_string(),
+        <span class="string">"Unable to obtain Mover term"</span>.to_string(),
         input,
     )))
 }
@@ -1336,29 +1337,29 @@
     <span class="prelude-val">Ok</span>((s, (op, MathExpression::Mi(comp))))
 }
 
-<span class="doccomment">/// Parse the identifier &#39;d&#39;
+<span class="doccomment">/// Parse the identifier 'd'
 </span><span class="kw">fn </span>d(input: Span) -&gt; IResult&lt;()&gt; {
     <span class="kw">let </span>(s, Mi(x)) = mi(input)<span class="question-mark">?</span>;
-    <span class="kw">if let </span><span class="string">&quot;d&quot; </span>= x.as_ref() {
+    <span class="kw">if let </span><span class="string">"d" </span>= x.as_ref() {
         <span class="prelude-val">Ok</span>((s, ()))
     } <span class="kw">else </span>{
         <span class="prelude-val">Err</span>(nom::Err::Error(ParseError::new(
-            <span class="string">&quot;Unable to identify Mi(&#39;d&#39;)&quot;</span>.to_string(),
+            <span class="string">"Unable to identify Mi('d')"</span>.to_string(),
             input,
         )))
     }
 }
 
-<span class="doccomment">/// Parse the identifier &#39;∂&#39;
+<span class="doccomment">/// Parse the identifier '∂'
 </span><span class="kw">fn </span>partial(input: Span) -&gt; IResult&lt;()&gt; {
     <span class="kw">let </span>(s, Mi(x)) = mi(input)<span class="question-mark">?</span>;
-    <span class="kw">if let </span><span class="string">&quot;∂&quot; </span>= x.as_ref() {
+    <span class="kw">if let </span><span class="string">"∂" </span>= x.as_ref() {
         <span class="prelude-val">Ok</span>((s, ()))
-    } <span class="kw">else if let </span><span class="string">&quot;&amp;#x2202;&quot; </span>= x.as_ref() {
+    } <span class="kw">else if let </span><span class="string">"&amp;#x2202;" </span>= x.as_ref() {
         <span class="prelude-val">Ok</span>((s, ()))
     } <span class="kw">else </span>{
         <span class="prelude-val">Err</span>(nom::Err::Error(ParseError::new(
-            <span class="string">&quot;Unable to identify Mi(&#39;∂&#39;)&quot;</span>.to_string(),
+            <span class="string">"Unable to identify Mi('∂')"</span>.to_string(),
             input,
         )))
     }
@@ -1404,14 +1405,14 @@
 <span class="doccomment">/// Parse first order derivative where the function of derivative is within a parenthesis
 /// e.g. d/dt ( S(t)* I(t) )
 </span><span class="kw">pub fn </span>first_order_with_func_in_parenthesis(input: Span) -&gt; IResult&lt;(Derivative, Mrow)&gt; {
-    <span class="kw">let </span>(s, <span class="kw">_</span>) = pair(<span class="macro">stag!</span>(<span class="string">&quot;mfrac&quot;</span>), d)(input)<span class="question-mark">?</span>;
+    <span class="kw">let </span>(s, <span class="kw">_</span>) = pair(<span class="macro">stag!</span>(<span class="string">"mfrac"</span>), d)(input)<span class="question-mark">?</span>;
     <span class="kw">let </span>(s, with_respect_to) = delimited(
-        tuple((<span class="macro">stag!</span>(<span class="string">&quot;mrow&quot;</span>), d)),
+        tuple((<span class="macro">stag!</span>(<span class="string">"mrow"</span>), d)),
         mi,
-        pair(<span class="macro">etag!</span>(<span class="string">&quot;mrow&quot;</span>), <span class="macro">etag!</span>(<span class="string">&quot;mfrac&quot;</span>)),
+        pair(<span class="macro">etag!</span>(<span class="string">"mrow"</span>), <span class="macro">etag!</span>(<span class="string">"mfrac"</span>)),
     )(s)<span class="question-mark">?</span>;
     <span class="kw">let </span>(s, <span class="kw-2">mut </span>func) = ws(preceded(
-        tuple((<span class="macro">stag!</span>(<span class="string">&quot;mo&quot;</span>), lparen, <span class="macro">etag!</span>(<span class="string">&quot;mo&quot;</span>))),
+        tuple((<span class="macro">stag!</span>(<span class="string">"mo"</span>), lparen, <span class="macro">etag!</span>(<span class="string">"mo"</span>))),
         many0(math_expression),
     ))(s)<span class="question-mark">?</span>;
     <span class="kw">let </span><span class="prelude-val">Some</span>(<span class="kw">_</span>) = func.pop() <span class="kw">else </span>{ <span class="macro">todo!</span>() };
@@ -1437,14 +1438,14 @@
 </span><span class="kw">pub fn </span>first_order_partial_with_func_in_parenthesis(
     input: Span,
 ) -&gt; IResult&lt;(PartialDerivative, Mrow)&gt; {
-    <span class="kw">let </span>(s, <span class="kw">_</span>) = pair(<span class="macro">stag!</span>(<span class="string">&quot;mfrac&quot;</span>), partial)(input)<span class="question-mark">?</span>;
+    <span class="kw">let </span>(s, <span class="kw">_</span>) = pair(<span class="macro">stag!</span>(<span class="string">"mfrac"</span>), partial)(input)<span class="question-mark">?</span>;
     <span class="kw">let </span>(s, with_respect_to) = delimited(
-        tuple((<span class="macro">stag!</span>(<span class="string">&quot;mrow&quot;</span>), partial)),
+        tuple((<span class="macro">stag!</span>(<span class="string">"mrow"</span>), partial)),
         mi,
-        pair(<span class="macro">etag!</span>(<span class="string">&quot;mrow&quot;</span>), <span class="macro">etag!</span>(<span class="string">&quot;mfrac&quot;</span>)),
+        pair(<span class="macro">etag!</span>(<span class="string">"mrow"</span>), <span class="macro">etag!</span>(<span class="string">"mfrac"</span>)),
     )(s)<span class="question-mark">?</span>;
     <span class="kw">let </span>(s, <span class="kw-2">mut </span>func) = ws(preceded(
-        tuple((<span class="macro">stag!</span>(<span class="string">&quot;mo&quot;</span>), lparen, <span class="macro">etag!</span>(<span class="string">&quot;mo&quot;</span>))),
+        tuple((<span class="macro">stag!</span>(<span class="string">"mo"</span>), lparen, <span class="macro">etag!</span>(<span class="string">"mo"</span>))),
         many0(math_expression),
     ))(s)<span class="question-mark">?</span>;
     <span class="kw">let </span><span class="prelude-val">Some</span>(<span class="kw">_</span>) = func.pop() <span class="kw">else </span>{ <span class="macro">todo!</span>() };
@@ -1467,7 +1468,7 @@
 
 <span class="doccomment">/// Parse a first-order ordinary derivative written in Leibniz notation.
 </span><span class="kw">pub fn </span>first_order_derivative_leibniz_notation(input: Span) -&gt; IResult&lt;(Derivative, Ci)&gt; {
-    <span class="kw">let </span>(s, <span class="kw">_</span>) = tuple((<span class="macro">stag!</span>(<span class="string">&quot;mfrac&quot;</span>), <span class="macro">stag!</span>(<span class="string">&quot;mrow&quot;</span>), alt((d, partial))))(input)<span class="question-mark">?</span>;
+    <span class="kw">let </span>(s, <span class="kw">_</span>) = tuple((<span class="macro">stag!</span>(<span class="string">"mfrac"</span>), <span class="macro">stag!</span>(<span class="string">"mrow"</span>), alt((d, partial))))(input)<span class="question-mark">?</span>;
     <span class="kw">let </span>(s, func) = ws(alt((
         ci_univariate_func,
         map(
@@ -1485,9 +1486,9 @@
         ci_subscript_func,
     )))(s)<span class="question-mark">?</span>;
     <span class="kw">let </span>(s, with_respect_to) = delimited(
-        tuple((<span class="macro">etag!</span>(<span class="string">&quot;mrow&quot;</span>), <span class="macro">stag!</span>(<span class="string">&quot;mrow&quot;</span>), alt((d, partial)))),
+        tuple((<span class="macro">etag!</span>(<span class="string">"mrow"</span>), <span class="macro">stag!</span>(<span class="string">"mrow"</span>), alt((d, partial)))),
         mi,
-        pair(<span class="macro">etag!</span>(<span class="string">&quot;mrow&quot;</span>), <span class="macro">etag!</span>(<span class="string">&quot;mfrac&quot;</span>)),
+        pair(<span class="macro">etag!</span>(<span class="string">"mrow"</span>), <span class="macro">etag!</span>(<span class="string">"mfrac"</span>)),
     )(s)<span class="question-mark">?</span>;
 
     <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>ci_vec) = func.func_of {
@@ -1511,7 +1512,7 @@
                     ),
                 ));
             } <span class="kw">else if </span><span class="prelude-val">Some</span>(bvar.content.clone())
-                == <span class="prelude-val">Some</span>(Box::new(MathExpression::Mi(Mi(<span class="string">&quot;&quot;</span>.to_string()))))
+                == <span class="prelude-val">Some</span>(Box::new(MathExpression::Mi(Mi(<span class="string">""</span>.to_string()))))
             {
                 <span class="kw">return </span><span class="prelude-val">Ok</span>((
                     s,
@@ -1533,7 +1534,7 @@
     }
 
     <span class="prelude-val">Err</span>(nom::Err::Error(ParseError::new(
-        <span class="string">&quot;Unable to match  function_of  with with_respect_to&quot;</span>.to_string(),
+        <span class="string">"Unable to match  function_of  with with_respect_to"</span>.to_string(),
         input,
     )))
 }
@@ -1542,8 +1543,8 @@
 </span><span class="kw">pub fn </span>first_order_partial_derivative_partial_func(
     input: Span,
 ) -&gt; IResult&lt;(PartialDerivative, Ci)&gt; {
-    <span class="kw">let </span>(s, <span class="kw">_</span>) = tuple((<span class="macro">stag!</span>(<span class="string">&quot;msub&quot;</span>), partial))(input)<span class="question-mark">?</span>;
-    <span class="kw">let </span>(s, with_respect_to) = ws(terminated(mi, <span class="macro">etag!</span>(<span class="string">&quot;msub&quot;</span>)))(s)<span class="question-mark">?</span>;
+    <span class="kw">let </span>(s, <span class="kw">_</span>) = tuple((<span class="macro">stag!</span>(<span class="string">"msub"</span>), partial))(input)<span class="question-mark">?</span>;
+    <span class="kw">let </span>(s, with_respect_to) = ws(terminated(mi, <span class="macro">etag!</span>(<span class="string">"msub"</span>)))(s)<span class="question-mark">?</span>;
     <span class="kw">let </span>(s, func) = ws(alt((
         ci_univariate_func,
         map(
@@ -1581,7 +1582,7 @@
                     ),
                 ));
             } <span class="kw">else if </span><span class="prelude-val">Some</span>(bvar.content.clone())
-                == <span class="prelude-val">Some</span>(Box::new(MathExpression::Mi(Mi(<span class="string">&quot;&quot;</span>.to_string()))))
+                == <span class="prelude-val">Some</span>(Box::new(MathExpression::Mi(Mi(<span class="string">""</span>.to_string()))))
             {
                 <span class="kw">return </span><span class="prelude-val">Ok</span>((
                     s,
@@ -1603,7 +1604,7 @@
     }
 
     <span class="prelude-val">Err</span>(nom::Err::Error(ParseError::new(
-        <span class="string">&quot;Unable to match  function_of  with with_respect_to in ∂_{t} S&quot;</span>.to_string(),
+        <span class="string">"Unable to match  function_of  with with_respect_to in ∂_{t} S"</span>.to_string(),
         input,
     )))
 }
@@ -1612,7 +1613,7 @@
 </span><span class="kw">pub fn </span>first_order_partial_derivative_leibniz_notation(
     input: Span,
 ) -&gt; IResult&lt;(PartialDerivative, Ci)&gt; {
-    <span class="kw">let </span>(s, <span class="kw">_</span>) = tuple((<span class="macro">stag!</span>(<span class="string">&quot;mfrac&quot;</span>), <span class="macro">stag!</span>(<span class="string">&quot;mrow&quot;</span>), partial))(input)<span class="question-mark">?</span>;
+    <span class="kw">let </span>(s, <span class="kw">_</span>) = tuple((<span class="macro">stag!</span>(<span class="string">"mfrac"</span>), <span class="macro">stag!</span>(<span class="string">"mrow"</span>), partial))(input)<span class="question-mark">?</span>;
     <span class="kw">let </span>(s, func) = ws(alt((
         ci_univariate_func,
         map(
@@ -1630,9 +1631,9 @@
         ci_subscript_func,
     )))(s)<span class="question-mark">?</span>;
     <span class="kw">let </span>(s, with_respect_to) = delimited(
-        tuple((<span class="macro">etag!</span>(<span class="string">&quot;mrow&quot;</span>), <span class="macro">stag!</span>(<span class="string">&quot;mrow&quot;</span>), partial)),
+        tuple((<span class="macro">etag!</span>(<span class="string">"mrow"</span>), <span class="macro">stag!</span>(<span class="string">"mrow"</span>), partial)),
         mi,
-        pair(<span class="macro">etag!</span>(<span class="string">&quot;mrow&quot;</span>), <span class="macro">etag!</span>(<span class="string">&quot;mfrac&quot;</span>)),
+        pair(<span class="macro">etag!</span>(<span class="string">"mrow"</span>), <span class="macro">etag!</span>(<span class="string">"mfrac"</span>)),
     )(s)<span class="question-mark">?</span>;
 
     <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>ci_vec) = func.func_of {
@@ -1656,7 +1657,7 @@
                     ),
                 ));
             } <span class="kw">else if </span><span class="prelude-val">Some</span>(bvar.content.clone())
-                == <span class="prelude-val">Some</span>(Box::new(MathExpression::Mi(Mi(<span class="string">&quot;&quot;</span>.to_string()))))
+                == <span class="prelude-val">Some</span>(Box::new(MathExpression::Mi(Mi(<span class="string">""</span>.to_string()))))
             {
                 <span class="kw">return </span><span class="prelude-val">Ok</span>((
                     s,
@@ -1678,7 +1679,7 @@
     }
 
     <span class="prelude-val">Err</span>(nom::Err::Error(ParseError::new(
-        <span class="string">&quot;Unable to match  function_of  with with_respect_to&quot;</span>.to_string(),
+        <span class="string">"Unable to match  function_of  with with_respect_to"</span>.to_string(),
         input,
     )))
 }
@@ -1686,18 +1687,18 @@
 <span class="kw">pub fn </span>newtonian_derivative(input: Span) -&gt; IResult&lt;(Derivative, Ci)&gt; {
     <span class="comment">// Get number of dots to recognize the order of the derivative
     </span><span class="kw">let </span>n_dots = delimited(
-        <span class="macro">stag!</span>(<span class="string">&quot;mo&quot;</span>),
+        <span class="macro">stag!</span>(<span class="string">"mo"</span>),
         alt((
-            map(many1(nom::character::complete::char(<span class="string">&#39;˙&#39;</span>)), |x| {
+            map(many1(nom::character::complete::char(<span class="string">'˙'</span>)), |x| {
                 x.len() <span class="kw">as </span>u8
             }),
-            value(<span class="number">1_u8</span>, tag(<span class="string">&quot;&amp;#x02D9;&quot;</span>)),
+            value(<span class="number">1_u8</span>, tag(<span class="string">"&amp;#x02D9;"</span>)),
         )),
-        <span class="macro">etag!</span>(<span class="string">&quot;mo&quot;</span>),
+        <span class="macro">etag!</span>(<span class="string">"mo"</span>),
     );
 
     <span class="kw">let </span>(s, (func, order)) = delimited(
-        alt((tag(<span class="string">&quot;&lt;mrow&gt;&lt;mover&gt;&quot;</span>), tag(<span class="string">&quot;&lt;mover&gt;&quot;</span>))),
+        alt((tag(<span class="string">"&lt;mrow&gt;&lt;mover&gt;"</span>), tag(<span class="string">"&lt;mover&gt;"</span>))),
         pair(
             map(
                 ci_unknown,
@@ -1713,7 +1714,7 @@
             ),
             n_dots,
         ),
-        alt((tag(<span class="string">&quot;&lt;/mover&gt;&lt;/mrow&gt;&quot;</span>), <span class="macro">etag!</span>(<span class="string">&quot;mover&quot;</span>))),
+        alt((tag(<span class="string">"&lt;/mover&gt;&lt;/mrow&gt;"</span>), <span class="macro">etag!</span>(<span class="string">"mover"</span>))),
     )(input)<span class="question-mark">?</span>;
     <span class="kw">let </span>(s, mi_func_of) = alt((parenthesized_identifier, empty_parenthesis))(s)<span class="question-mark">?</span>;
     <span class="kw">let </span><span class="kw-2">mut </span>ci_func_of: Vec&lt;Ci&gt; = Vec::new();
@@ -1754,7 +1755,7 @@
 // (also in this file).
 </span><span class="kw">pub fn </span>mfrac(input: Span) -&gt; IResult&lt;MathExpression&gt; {
     <span class="kw">let </span>(s, frac) = ws(map(
-        <span class="macro">tag_parser!</span>(<span class="string">&quot;mfrac&quot;</span>, pair(math_expression, math_expression)),
+        <span class="macro">tag_parser!</span>(<span class="string">"mfrac"</span>, pair(math_expression, math_expression)),
         |(x, y)| MathExpression::Mfrac(Box::new(x), Box::new(y)),
     ))(input)<span class="question-mark">?</span>;
 
@@ -1763,9 +1764,9 @@
 
 <span class="kw">pub fn </span>mrow(input: Span) -&gt; IResult&lt;Mrow&gt; {
     <span class="kw">let </span>(s, elements) = ws(delimited(
-        <span class="macro">stag!</span>(<span class="string">&quot;mrow&quot;</span>),
+        <span class="macro">stag!</span>(<span class="string">"mrow"</span>),
         many0(math_expression),
-        <span class="macro">etag!</span>(<span class="string">&quot;mrow&quot;</span>),
+        <span class="macro">etag!</span>(<span class="string">"mrow"</span>),
     ))(input)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((s, Mrow(elements)))
 }
@@ -1773,9 +1774,9 @@
 <span class="doccomment">///Absolute value
 </span><span class="kw">pub fn </span>absolute(input: Span) -&gt; IResult&lt;MathExpression&gt; {
     <span class="kw">let </span>(s, elements) = ws(delimited(
-        tag(<span class="string">&quot;&lt;mo&gt;|&lt;/mo&gt;&quot;</span>),
+        tag(<span class="string">"&lt;mo&gt;|&lt;/mo&gt;"</span>),
         many0(math_expression),
-        tag(<span class="string">&quot;&lt;mo&gt;|&lt;/mo&gt;&quot;</span>),
+        tag(<span class="string">"&lt;mo&gt;|&lt;/mo&gt;"</span>),
     ))(input)<span class="question-mark">?</span>;
     <span class="kw">let </span>components = MathExpression::Absolute(
         Box::new(MathExpression::Mo(Operator::Abs)),
@@ -1787,23 +1788,23 @@
 
 <span class="doccomment">/// Example: Divergence
 </span><span class="kw">pub fn </span>div(input: Span) -&gt; IResult&lt;Operator&gt; {
-    <span class="kw">let </span>(s, _op) = ws(pair(gradient, ws(delimited(<span class="macro">stag!</span>(<span class="string">&quot;mo&quot;</span>), dot, <span class="macro">etag!</span>(<span class="string">&quot;mo&quot;</span>)))))(input)<span class="question-mark">?</span>;
+    <span class="kw">let </span>(s, _op) = ws(pair(gradient, ws(delimited(<span class="macro">stag!</span>(<span class="string">"mo"</span>), dot, <span class="macro">etag!</span>(<span class="string">"mo"</span>)))))(input)<span class="question-mark">?</span>;
     <span class="kw">let </span>div = Operator::Div;
     <span class="prelude-val">Ok</span>((s, div))
 }
 
 <span class="kw">pub fn </span>gradient(input: Span) -&gt; IResult&lt;Operator&gt; {
     <span class="kw">let </span>(s, op) = ws(alt((
-        delimited(<span class="macro">stag!</span>(<span class="string">&quot;mo&quot;</span>), grad, <span class="macro">etag!</span>(<span class="string">&quot;mo&quot;</span>)),
-        delimited(<span class="macro">stag!</span>(<span class="string">&quot;mi&quot;</span>), grad, <span class="macro">etag!</span>(<span class="string">&quot;mi&quot;</span>)),
+        delimited(<span class="macro">stag!</span>(<span class="string">"mo"</span>), grad, <span class="macro">etag!</span>(<span class="string">"mo"</span>)),
+        delimited(<span class="macro">stag!</span>(<span class="string">"mi"</span>), grad, <span class="macro">etag!</span>(<span class="string">"mi"</span>)),
     )))(input)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((s, op))
 }
 
 <span class="doccomment">/// Gradient sub  E.g. ∇_{x}
 </span><span class="kw">pub fn </span>gradient_subscript(input: Span) -&gt; IResult&lt;Operator&gt; {
-    <span class="kw">let </span>(s, <span class="kw">_</span>) = tuple((<span class="macro">stag!</span>(<span class="string">&quot;msub&quot;</span>), gradient))(input)<span class="question-mark">?</span>;
-    <span class="kw">let </span>(s, mi) = ws(terminated(mi, <span class="macro">etag!</span>(<span class="string">&quot;msub&quot;</span>)))(s)<span class="question-mark">?</span>;
+    <span class="kw">let </span>(s, <span class="kw">_</span>) = tuple((<span class="macro">stag!</span>(<span class="string">"msub"</span>), gradient))(input)<span class="question-mark">?</span>;
+    <span class="kw">let </span>(s, mi) = ws(terminated(mi, <span class="macro">etag!</span>(<span class="string">"msub"</span>)))(s)<span class="question-mark">?</span>;
     <span class="kw">let </span>grad_sub = Operator::GradSub(GradSub::new(Box::new(MathExpression::Mi(mi.clone()))));
     <span class="prelude-val">Ok</span>((s, grad_sub))
 }
@@ -1823,14 +1824,14 @@
 </span><span class="kw">pub fn </span>absolute_with_msup(input: Span) -&gt; IResult&lt;MathExpression&gt; {
     <span class="kw">let </span>(s, sup) = ws(map(
         ws(delimited(
-            ws(tuple((<span class="macro">stag!</span>(<span class="string">&quot;mo&quot;</span>), tag(<span class="string">&quot;|&quot;</span>), <span class="macro">etag!</span>(<span class="string">&quot;mo&quot;</span>)))),
-            <span class="comment">//ws(tag(&quot;&lt;mo&gt;|&lt;/mo&gt;&quot;)),
+            ws(tuple((<span class="macro">stag!</span>(<span class="string">"mo"</span>), tag(<span class="string">"|"</span>), <span class="macro">etag!</span>(<span class="string">"mo"</span>)))),
+            <span class="comment">//ws(tag("&lt;mo&gt;|&lt;/mo&gt;")),
             </span>ws(tuple((
                 <span class="comment">//math_expression,
                 </span>map(ws(many0(math_expression)), Mrow),
-                preceded(ws(tag(<span class="string">&quot;&lt;msup&gt;&lt;mo&gt;|&lt;/mo&gt;&quot;</span>)), ws(math_expression)),
+                preceded(ws(tag(<span class="string">"&lt;msup&gt;&lt;mo&gt;|&lt;/mo&gt;"</span>)), ws(math_expression)),
             ))),
-            ws(tag(<span class="string">&quot;&lt;/msup&gt;&quot;</span>)),
+            ws(tag(<span class="string">"&lt;/msup&gt;"</span>)),
         )),
         |(x, y)| MathExpression::AbsoluteSup(Box::new(MathExpression::Mrow(x)), Box::new(y)),
     ))(input)<span class="question-mark">?</span>;
@@ -1841,12 +1842,12 @@
 </span><span class="kw">pub fn </span>paren_as_msup(input: Span) -&gt; IResult&lt;MathExpression&gt; {
     <span class="kw">let </span>(s, sup) = ws(map(
         ws(delimited(
-            tag(<span class="string">&quot;&lt;mo&gt;(&lt;/mo&gt;&quot;</span>),
+            tag(<span class="string">"&lt;mo&gt;(&lt;/mo&gt;"</span>),
             tuple((
                 map(many0(math_expression), Mrow),
-                preceded(tag(<span class="string">&quot;&lt;msup&gt;&lt;mo&gt;)&lt;/mo&gt;&quot;</span>), math_expression),
+                preceded(tag(<span class="string">"&lt;msup&gt;&lt;mo&gt;)&lt;/mo&gt;"</span>), math_expression),
             )),
-            tag(<span class="string">&quot;&lt;/msup&gt;&quot;</span>),
+            tag(<span class="string">"&lt;/msup&gt;"</span>),
         )),
         |(x, y)| MathExpression::Msup(Box::new(MathExpression::Mrow(x)), Box::new(y)),
     ))(input)<span class="question-mark">?</span>;
@@ -1856,9 +1857,9 @@
 <span class="doccomment">/// Parser for multiple elements in square root
 </span><span class="kw">pub fn </span>sqrt(input: Span) -&gt; IResult&lt;MathExpression&gt; {
     <span class="kw">let </span>(s, elements) = ws(delimited(
-        <span class="macro">stag!</span>(<span class="string">&quot;msqrt&quot;</span>),
+        <span class="macro">stag!</span>(<span class="string">"msqrt"</span>),
         many0(math_expression),
-        <span class="macro">etag!</span>(<span class="string">&quot;msqrt&quot;</span>),
+        <span class="macro">etag!</span>(<span class="string">"msqrt"</span>),
     ))(input)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((
         s,
@@ -1870,10 +1871,10 @@
 /// Example: Δx
 </span><span class="kw">pub fn </span>change_in_variable(input: Span) -&gt; IResult&lt;Ci&gt; {
     <span class="kw">let </span>(s, elements) = ws(preceded(
-        alt((tag(<span class="string">&quot;&lt;mi&gt;Δ&lt;/mi&gt;&quot;</span>), tag(<span class="string">&quot;&lt;mi&gt;&amp;#x0394;&lt;/mi&gt;&quot;</span>))),
+        alt((tag(<span class="string">"&lt;mi&gt;Δ&lt;/mi&gt;"</span>), tag(<span class="string">"&lt;mi&gt;&amp;#x0394;&lt;/mi&gt;"</span>))),
         math_expression,
     ))(input)<span class="question-mark">?</span>;
-    <span class="kw">let </span>temp_sum = <span class="macro">format!</span>(<span class="string">&quot;Δ{}&quot;</span>, elements);
+    <span class="kw">let </span>temp_sum = <span class="macro">format!</span>(<span class="string">"Δ{}"</span>, elements);
     <span class="kw">let </span>change_in_var = Ci::new(
         <span class="prelude-val">Some</span>(Type::Real),
         Box::new(MathExpression::Mi(Mi(temp_sum.to_string()))),
@@ -1886,12 +1887,12 @@
 /// E.g. (v ⋅ ∇) u
 </span><span class="kw">pub fn </span>gradient_with_closed_paren(input: Span) -&gt; IResult&lt;Vec&lt;MathExpression&gt;&gt; {
     <span class="kw">let </span>(s, (_lp, (mi, (op, _gg)))) = ws(pair(
-        tag(<span class="string">&quot;&lt;mo&gt;(&lt;/mo&gt;&quot;</span>),
+        tag(<span class="string">"&lt;mo&gt;(&lt;/mo&gt;"</span>),
         pair(
             mi,
             pair(
-                ws(delimited(<span class="macro">stag!</span>(<span class="string">&quot;mo&quot;</span>), dot, <span class="macro">etag!</span>(<span class="string">&quot;mo&quot;</span>))),
-                terminated(gradient, tag(<span class="string">&quot;&lt;mo&gt;)&lt;/mo&gt;&quot;</span>)),
+                ws(delimited(<span class="macro">stag!</span>(<span class="string">"mo"</span>), dot, <span class="macro">etag!</span>(<span class="string">"mo"</span>))),
+                terminated(gradient, tag(<span class="string">"&lt;mo&gt;)&lt;/mo&gt;"</span>)),
             ),
         ),
     ))(input)<span class="question-mark">?</span>;
@@ -1900,7 +1901,7 @@
     expression.push(MathExpression::Mo(op));
     <span class="kw">let </span>ci = Ci::new(
         <span class="prelude-val">Some</span>(Type::Real),
-        Box::new(MathExpression::Mi(Mi(<span class="string">&quot;Grad&quot;</span>.to_string()))),
+        Box::new(MathExpression::Mi(Mi(<span class="string">"Grad"</span>.to_string()))),
         <span class="prelude-val">None</span>,
     );
     expression.push(MathExpression::Ci(ci.clone()));
@@ -1910,7 +1911,7 @@
 <span class="doccomment">/// Parser handles e.g. `...` in the equation
 /// E.g. Q_i(s_{i-1}, T_{i-1}, ... )
 </span><span class="kw">pub fn </span>multiple_dots(input: Span) -&gt; IResult&lt;MathExpression&gt; {
-    <span class="kw">let </span>(s, x) = ws(delimited(tag(<span class="string">&quot;&lt;mo&gt;&quot;</span>), tag(<span class="string">&quot;…&quot;</span>), tag(<span class="string">&quot;&lt;/mo&gt;&quot;</span>)))(input)<span class="question-mark">?</span>;
+    <span class="kw">let </span>(s, x) = ws(delimited(tag(<span class="string">"&lt;mo&gt;"</span>), tag(<span class="string">"…"</span>), tag(<span class="string">"&lt;/mo&gt;"</span>)))(input)<span class="question-mark">?</span>;
     <span class="kw">let </span>ci = Ci::new(
         <span class="prelude-val">Some</span>(Type::List),
         Box::new(MathExpression::Mi(Mi(x.to_string()))),
@@ -1923,18 +1924,18 @@
 </span><span class="kw">pub fn </span>munderover_summation(input: Span) -&gt; IResult&lt;(SumUnderOver, Mrow)&gt; {
     <span class="kw">let </span>(s, (under, over)) = ws(delimited(
         alt((
-            tag(<span class="string">&quot;&lt;munderover&gt;&lt;mo&gt;∑&lt;/mo&gt;&quot;</span>),
-            tag(<span class="string">&quot;&lt;munderover&gt;&lt;mo&gt;&amp;#x2211;&lt;/mo&gt;&quot;</span>),
+            tag(<span class="string">"&lt;munderover&gt;&lt;mo&gt;∑&lt;/mo&gt;"</span>),
+            tag(<span class="string">"&lt;munderover&gt;&lt;mo&gt;&amp;#x2211;&lt;/mo&gt;"</span>),
         )),
         pair(
             ws(delimited(
-                tag(<span class="string">&quot;&lt;mrow&gt;&quot;</span>),
+                tag(<span class="string">"&lt;mrow&gt;"</span>),
                 many0(math_expression),
-                tag(<span class="string">&quot;&lt;/mrow&gt;&quot;</span>),
+                tag(<span class="string">"&lt;/mrow&gt;"</span>),
             )),
             many0(math_expression),
         ),
-        tag(<span class="string">&quot;&lt;/munderover&gt;&quot;</span>),
+        tag(<span class="string">"&lt;/munderover&gt;"</span>),
     ))(input)<span class="question-mark">?</span>;
     <span class="kw">let </span>(s, comps) = many0(math_expression)(s)<span class="question-mark">?</span>;
     <span class="kw">let </span>sum_operator = Operator::Sum;
@@ -2240,16 +2241,16 @@
         opt(xml_declaration),
         alt((
             ws(delimited(
-                ws(tag(<span class="string">&quot;&lt;math&gt;&quot;</span>)),
+                ws(tag(<span class="string">"&lt;math&gt;"</span>)),
                 ws(many0(math_expression)),
-                ws(tag(<span class="string">&quot;&lt;mo&gt;,&lt;/mo&gt;&lt;/math&gt;&quot;</span>)),
+                ws(tag(<span class="string">"&lt;mo&gt;,&lt;/mo&gt;&lt;/math&gt;"</span>)),
             )),
             ws(delimited(
-                ws(tag(<span class="string">&quot;&lt;math&gt;&quot;</span>)),
+                ws(tag(<span class="string">"&lt;math&gt;"</span>)),
                 ws(many0(math_expression)),
-                ws(tag(<span class="string">&quot;&lt;mo&gt;.&lt;/mo&gt;&lt;/math&gt;&quot;</span>)),
+                ws(tag(<span class="string">"&lt;mo&gt;.&lt;/mo&gt;&lt;/math&gt;"</span>)),
             )),
-            <span class="macro">elem_many0!</span>(<span class="string">&quot;math&quot;</span>),
+            <span class="macro">elem_many0!</span>(<span class="string">"math"</span>),
         )),
     )(input)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((s, Math { content: elements }))

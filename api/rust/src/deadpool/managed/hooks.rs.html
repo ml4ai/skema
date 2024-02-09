@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/deadpool-0.9.5/src/managed/hooks.rs`."><title>hooks.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="deadpool" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/deadpool-0.9.5/src/managed/hooks.rs`."><title>hooks.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="deadpool" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -213,14 +214,14 @@
 </span><span class="kw">pub type </span>HookResult&lt;E&gt; = <span class="prelude-ty">Result</span>&lt;(), HookError&lt;E&gt;&gt;;
 
 <span class="doccomment">/// The boxed future that should be returned by async hooks
-</span><span class="kw">pub type </span>HookFuture&lt;<span class="lifetime">&#39;a</span>, E&gt; = Pin&lt;Box&lt;<span class="kw">dyn </span>Future&lt;Output = HookResult&lt;E&gt;&gt; + Send + <span class="lifetime">&#39;a</span>&gt;&gt;;
+</span><span class="kw">pub type </span>HookFuture&lt;<span class="lifetime">'a</span>, E&gt; = Pin&lt;Box&lt;<span class="kw">dyn </span>Future&lt;Output = HookResult&lt;E&gt;&gt; + Send + <span class="lifetime">'a</span>&gt;&gt;;
 
 <span class="doccomment">/// Function signature for sync callbacks
 </span><span class="kw">type </span>SyncFn&lt;M&gt; =
     <span class="kw">dyn </span>Fn(<span class="kw-2">&amp;mut </span>&lt;M <span class="kw">as </span>Manager&gt;::Type, <span class="kw-2">&amp;</span>Metrics) -&gt; HookResult&lt;&lt;M <span class="kw">as </span>Manager&gt;::Error&gt; + Sync + Send;
 
 <span class="doccomment">/// Function siganture for async callbacks
-</span><span class="kw">type </span>AsyncFn&lt;M&gt; = <span class="kw">dyn for</span>&lt;<span class="lifetime">&#39;a</span>&gt; Fn(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>&lt;M <span class="kw">as </span>Manager&gt;::Type, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Metrics) -&gt; HookFuture&lt;<span class="lifetime">&#39;a</span>, &lt;M <span class="kw">as </span>Manager&gt;::Error&gt;
+</span><span class="kw">type </span>AsyncFn&lt;M&gt; = <span class="kw">dyn for</span>&lt;<span class="lifetime">'a</span>&gt; Fn(<span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span>&lt;M <span class="kw">as </span>Manager&gt;::Type, <span class="kw-2">&amp;</span><span class="lifetime">'a </span>Metrics) -&gt; HookFuture&lt;<span class="lifetime">'a</span>, &lt;M <span class="kw">as </span>Manager&gt;::Error&gt;
     + Sync
     + Send;
 
@@ -235,30 +236,30 @@
 <span class="kw">impl</span>&lt;M: Manager&gt; Hook&lt;M&gt; {
     <span class="doccomment">/// Create Hook from sync function
     </span><span class="kw">pub fn </span>sync_fn(
-        f: <span class="kw">impl </span>Fn(<span class="kw-2">&amp;mut </span>M::Type, <span class="kw-2">&amp;</span>Metrics) -&gt; HookResult&lt;M::Error&gt; + Sync + Send + <span class="lifetime">&#39;static</span>,
+        f: <span class="kw">impl </span>Fn(<span class="kw-2">&amp;mut </span>M::Type, <span class="kw-2">&amp;</span>Metrics) -&gt; HookResult&lt;M::Error&gt; + Sync + Send + <span class="lifetime">'static</span>,
     ) -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>::Fn(Box::new(f))
     }
     <span class="doccomment">/// Create Hook from async function
     </span><span class="kw">pub fn </span>async_fn(
-        f: <span class="kw">impl for</span>&lt;<span class="lifetime">&#39;a</span>&gt; Fn(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>M::Type, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Metrics) -&gt; HookFuture&lt;<span class="lifetime">&#39;a</span>, M::Error&gt;
+        f: <span class="kw">impl for</span>&lt;<span class="lifetime">'a</span>&gt; Fn(<span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span>M::Type, <span class="kw-2">&amp;</span><span class="lifetime">'a </span>Metrics) -&gt; HookFuture&lt;<span class="lifetime">'a</span>, M::Error&gt;
             + Sync
             + Send
-            + <span class="lifetime">&#39;static</span>,
+            + <span class="lifetime">'static</span>,
     ) -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>::AsyncFn(Box::new(f))
     }
 }
 
 <span class="kw">impl</span>&lt;M: Manager&gt; fmt::Debug <span class="kw">for </span>Hook&lt;M&gt; {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; fmt::Result {
         <span class="kw">match </span><span class="self">self </span>{
             <span class="self">Self</span>::Fn(<span class="kw">_</span>) =&gt; f
-                .debug_tuple(<span class="string">&quot;Fn&quot;</span>)
+                .debug_tuple(<span class="string">"Fn"</span>)
                 <span class="comment">//.field(arg0)
                 </span>.finish(),
             <span class="self">Self</span>::AsyncFn(<span class="kw">_</span>) =&gt; f
-                .debug_tuple(<span class="string">&quot;AsyncFn&quot;</span>)
+                .debug_tuple(<span class="string">"AsyncFn"</span>)
                 <span class="comment">//.field(arg0)
                 </span>.finish(),
         }
@@ -294,7 +295,7 @@
     </span>Message(String),
 
     <span class="doccomment">/// Hook failed for some other reason.
-    </span>StaticMessage(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str),
+    </span>StaticMessage(<span class="kw-2">&amp;</span><span class="lifetime">'static </span>str),
 
     <span class="doccomment">/// Error caused by the backend.
     </span>Backend(E),
@@ -311,18 +312,18 @@
 }
 
 <span class="kw">impl</span>&lt;E: fmt::Display&gt; fmt::Display <span class="kw">for </span>HookError&lt;E&gt; {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; fmt::Result {
         <span class="kw">match </span><span class="self">self</span>.cause() {
-            <span class="prelude-val">Some</span>(HookErrorCause::Message(msg)) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, msg),
-            <span class="prelude-val">Some</span>(HookErrorCause::StaticMessage(msg)) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, msg),
-            <span class="prelude-val">Some</span>(HookErrorCause::Backend(e)) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, e),
-            <span class="prelude-val">None </span>=&gt; <span class="macro">write!</span>(f, <span class="string">&quot;No cause given&quot;</span>),
+            <span class="prelude-val">Some</span>(HookErrorCause::Message(msg)) =&gt; <span class="macro">write!</span>(f, <span class="string">"{}"</span>, msg),
+            <span class="prelude-val">Some</span>(HookErrorCause::StaticMessage(msg)) =&gt; <span class="macro">write!</span>(f, <span class="string">"{}"</span>, msg),
+            <span class="prelude-val">Some</span>(HookErrorCause::Backend(e)) =&gt; <span class="macro">write!</span>(f, <span class="string">"{}"</span>, e),
+            <span class="prelude-val">None </span>=&gt; <span class="macro">write!</span>(f, <span class="string">"No cause given"</span>),
         }
     }
 }
 
-<span class="kw">impl</span>&lt;E: std::error::Error + <span class="lifetime">&#39;static</span>&gt; std::error::Error <span class="kw">for </span>HookError&lt;E&gt; {
-    <span class="kw">fn </span>source(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>(<span class="kw">dyn </span>std::error::Error + <span class="lifetime">&#39;static</span>)&gt; {
+<span class="kw">impl</span>&lt;E: std::error::Error + <span class="lifetime">'static</span>&gt; std::error::Error <span class="kw">for </span>HookError&lt;E&gt; {
+    <span class="kw">fn </span>source(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>(<span class="kw">dyn </span>std::error::Error + <span class="lifetime">'static</span>)&gt; {
         <span class="kw">match </span><span class="self">self</span>.cause() {
             <span class="prelude-val">Some</span>(HookErrorCause::Message(<span class="kw">_</span>)) =&gt; <span class="prelude-val">None</span>,
             <span class="prelude-val">Some</span>(HookErrorCause::StaticMessage(<span class="kw">_</span>)) =&gt; <span class="prelude-val">None</span>,
@@ -338,9 +339,9 @@
 
 <span class="comment">// Implemented manually to avoid unnecessary trait bound on `M` type parameter.
 </span><span class="kw">impl</span>&lt;M: Manager&gt; fmt::Debug <span class="kw">for </span>HookVec&lt;M&gt; {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
-        f.debug_struct(<span class="string">&quot;HookVec&quot;</span>)
-            <span class="comment">//.field(&quot;fns&quot;, &amp;self.fns)
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; fmt::Result {
+        f.debug_struct(<span class="string">"HookVec"</span>)
+            <span class="comment">//.field("fns", &amp;self.fns)
             </span>.finish_non_exhaustive()
     }
 }
@@ -389,11 +390,11 @@
 
 <span class="comment">// Implemented manually to avoid unnecessary trait bound on `M` type parameter.
 </span><span class="kw">impl</span>&lt;M: Manager&gt; fmt::Debug <span class="kw">for </span>Hooks&lt;M&gt; {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
-        f.debug_struct(<span class="string">&quot;Hooks&quot;</span>)
-            .field(<span class="string">&quot;post_create&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.post_create)
-            .field(<span class="string">&quot;pre_recycle&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.post_recycle)
-            .field(<span class="string">&quot;post_recycle&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.post_recycle)
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; fmt::Result {
+        f.debug_struct(<span class="string">"Hooks"</span>)
+            .field(<span class="string">"post_create"</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.post_create)
+            .field(<span class="string">"pre_recycle"</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.post_recycle)
+            .field(<span class="string">"post_recycle"</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.post_recycle)
             .finish()
     }
 }

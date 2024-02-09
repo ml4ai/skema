@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/utoipa-gen-3.5.0/src/openapi.rs`."><title>openapi.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="utoipa_gen" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/utoipa-gen-3.5.0/src/openapi.rs`."><title>openapi.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="utoipa_gen" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -590,20 +591,20 @@
 <span class="kw">mod </span>info;
 
 <span class="attr">#[derive(Default)]
-#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
-</span><span class="kw">pub struct </span>OpenApiAttr&lt;<span class="lifetime">&#39;o</span>&gt; {
-    info: <span class="prelude-ty">Option</span>&lt;Info&lt;<span class="lifetime">&#39;o</span>&gt;&gt;,
+#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
+</span><span class="kw">pub struct </span>OpenApiAttr&lt;<span class="lifetime">'o</span>&gt; {
+    info: <span class="prelude-ty">Option</span>&lt;Info&lt;<span class="lifetime">'o</span>&gt;&gt;,
     paths: Punctuated&lt;ExprPath, Comma&gt;,
     components: Components,
     modifiers: Punctuated&lt;Modifier, Comma&gt;,
-    security: <span class="prelude-ty">Option</span>&lt;Array&lt;<span class="lifetime">&#39;static</span>, SecurityRequirementAttr&gt;&gt;,
-    tags: <span class="prelude-ty">Option</span>&lt;Array&lt;<span class="lifetime">&#39;static</span>, Tag&gt;&gt;,
+    security: <span class="prelude-ty">Option</span>&lt;Array&lt;<span class="lifetime">'static</span>, SecurityRequirementAttr&gt;&gt;,
+    tags: <span class="prelude-ty">Option</span>&lt;Array&lt;<span class="lifetime">'static</span>, Tag&gt;&gt;,
     external_docs: <span class="prelude-ty">Option</span>&lt;ExternalDocs&gt;,
     servers: Punctuated&lt;Server, Comma&gt;,
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;o</span>&gt; OpenApiAttr&lt;<span class="lifetime">&#39;o</span>&gt; {
-    <span class="kw">fn </span>merge(<span class="kw-2">mut </span><span class="self">self</span>, other: OpenApiAttr&lt;<span class="lifetime">&#39;o</span>&gt;) -&gt; <span class="self">Self </span>{
+<span class="kw">impl</span>&lt;<span class="lifetime">'o</span>&gt; OpenApiAttr&lt;<span class="lifetime">'o</span>&gt; {
+    <span class="kw">fn </span>merge(<span class="kw-2">mut </span><span class="self">self</span>, other: OpenApiAttr&lt;<span class="lifetime">'o</span>&gt;) -&gt; <span class="self">Self </span>{
         <span class="kw">if </span>other.info.is_some() {
             <span class="self">self</span>.info = other.info;
         }
@@ -636,54 +637,54 @@
 <span class="kw">pub fn </span>parse_openapi_attrs(attrs: <span class="kw-2">&amp;</span>[Attribute]) -&gt; <span class="prelude-ty">Option</span>&lt;OpenApiAttr&gt; {
     attrs
         .iter()
-        .filter(|attribute| attribute.path().is_ident(<span class="string">&quot;openapi&quot;</span>))
+        .filter(|attribute| attribute.path().is_ident(<span class="string">"openapi"</span>))
         .map(|attribute| attribute.parse_args::&lt;OpenApiAttr&gt;().unwrap_or_abort())
         .reduce(|acc, item| acc.merge(item))
 }
 
-<span class="kw">impl </span>Parse <span class="kw">for </span>OpenApiAttr&lt;<span class="lifetime">&#39;_</span>&gt; {
+<span class="kw">impl </span>Parse <span class="kw">for </span>OpenApiAttr&lt;<span class="lifetime">'_</span>&gt; {
     <span class="kw">fn </span>parse(input: syn::parse::ParseStream) -&gt; syn::Result&lt;<span class="self">Self</span>&gt; {
         <span class="kw">const </span>EXPECTED_ATTRIBUTE: <span class="kw-2">&amp;</span>str =
-            <span class="string">&quot;unexpected attribute, expected any of: handlers, components, modifiers, security, tags, external_docs, servers&quot;</span>;
+            <span class="string">"unexpected attribute, expected any of: handlers, components, modifiers, security, tags, external_docs, servers"</span>;
         <span class="kw">let </span><span class="kw-2">mut </span>openapi = OpenApiAttr::default();
 
         <span class="kw">while </span>!input.is_empty() {
             <span class="kw">let </span>ident = input.parse::&lt;Ident&gt;().map_err(|error| {
-                Error::new(error.span(), <span class="macro">format!</span>(<span class="string">&quot;{EXPECTED_ATTRIBUTE}, {error}&quot;</span>))
+                Error::new(error.span(), <span class="macro">format!</span>(<span class="string">"{EXPECTED_ATTRIBUTE}, {error}"</span>))
             })<span class="question-mark">?</span>;
             <span class="kw">let </span>attribute = <span class="kw-2">&amp;*</span>ident.to_string();
 
             <span class="kw">match </span>attribute {
-                <span class="string">&quot;info&quot; </span>=&gt; {
+                <span class="string">"info" </span>=&gt; {
                     <span class="kw">let </span>info_stream;
                     <span class="macro">parenthesized!</span>(info_stream <span class="kw">in </span>input);
                     openapi.info = <span class="prelude-val">Some</span>(info_stream.parse()<span class="question-mark">?</span>)
                 }
-                <span class="string">&quot;paths&quot; </span>=&gt; {
+                <span class="string">"paths" </span>=&gt; {
                     openapi.paths = parse_utils::parse_punctuated_within_parenthesis(input)<span class="question-mark">?</span>;
                 }
-                <span class="string">&quot;components&quot; </span>=&gt; {
+                <span class="string">"components" </span>=&gt; {
                     openapi.components = input.parse()<span class="question-mark">?</span>;
                 }
-                <span class="string">&quot;modifiers&quot; </span>=&gt; {
+                <span class="string">"modifiers" </span>=&gt; {
                     openapi.modifiers = parse_utils::parse_punctuated_within_parenthesis(input)<span class="question-mark">?</span>;
                 }
-                <span class="string">&quot;security&quot; </span>=&gt; {
+                <span class="string">"security" </span>=&gt; {
                     <span class="kw">let </span>security;
                     <span class="macro">parenthesized!</span>(security <span class="kw">in </span>input);
                     openapi.security = <span class="prelude-val">Some</span>(parse_utils::parse_groups(<span class="kw-2">&amp;</span>security)<span class="question-mark">?</span>)
                 }
-                <span class="string">&quot;tags&quot; </span>=&gt; {
+                <span class="string">"tags" </span>=&gt; {
                     <span class="kw">let </span>tags;
                     <span class="macro">parenthesized!</span>(tags <span class="kw">in </span>input);
                     openapi.tags = <span class="prelude-val">Some</span>(parse_utils::parse_groups(<span class="kw-2">&amp;</span>tags)<span class="question-mark">?</span>);
                 }
-                <span class="string">&quot;external_docs&quot; </span>=&gt; {
+                <span class="string">"external_docs" </span>=&gt; {
                     <span class="kw">let </span>external_docs;
                     <span class="macro">parenthesized!</span>(external_docs <span class="kw">in </span>input);
                     openapi.external_docs = <span class="prelude-val">Some</span>(external_docs.parse()<span class="question-mark">?</span>);
                 }
-                <span class="string">&quot;servers&quot; </span>=&gt; {
+                <span class="string">"servers" </span>=&gt; {
                     openapi.servers = parse_utils::parse_punctuated_within_parenthesis(input)<span class="question-mark">?</span>;
                 }
                 <span class="kw">_ </span>=&gt; {
@@ -700,7 +701,7 @@
     }
 }
 
-<span class="attr">#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
+<span class="attr">#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
 </span><span class="kw">struct </span>Schema(TypePath);
 
 <span class="kw">impl </span>Parse <span class="kw">for </span>Schema {
@@ -709,7 +710,7 @@
     }
 }
 
-<span class="attr">#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
+<span class="attr">#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
 </span><span class="kw">struct </span>Response(TypePath);
 
 <span class="kw">impl </span>Parse <span class="kw">for </span>Response {
@@ -718,7 +719,7 @@
     }
 }
 
-<span class="attr">#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
+<span class="attr">#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
 </span><span class="kw">struct </span>Modifier {
     and: And,
     ident: Ident,
@@ -744,7 +745,7 @@
 }
 
 <span class="attr">#[derive(Default)]
-#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
+#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
 </span><span class="kw">struct </span>Tag {
     name: String,
     description: <span class="prelude-ty">Option</span>&lt;String&gt;,
@@ -754,22 +755,22 @@
 <span class="kw">impl </span>Parse <span class="kw">for </span>Tag {
     <span class="kw">fn </span>parse(input: ParseStream) -&gt; syn::Result&lt;<span class="self">Self</span>&gt; {
         <span class="kw">const </span>EXPECTED_ATTRIBUTE: <span class="kw-2">&amp;</span>str =
-            <span class="string">&quot;unexpected token, expected any of: name, description, external_docs&quot;</span>;
+            <span class="string">"unexpected token, expected any of: name, description, external_docs"</span>;
 
         <span class="kw">let </span><span class="kw-2">mut </span>tag = Tag::default();
 
         <span class="kw">while </span>!input.is_empty() {
             <span class="kw">let </span>ident = input.parse::&lt;Ident&gt;().map_err(|error| {
-                syn::Error::new(error.span(), <span class="macro">format!</span>(<span class="string">&quot;{EXPECTED_ATTRIBUTE}, {error}&quot;</span>))
+                syn::Error::new(error.span(), <span class="macro">format!</span>(<span class="string">"{EXPECTED_ATTRIBUTE}, {error}"</span>))
             })<span class="question-mark">?</span>;
             <span class="kw">let </span>attribute_name = <span class="kw-2">&amp;*</span>ident.to_string();
 
             <span class="kw">match </span>attribute_name {
-                <span class="string">&quot;name&quot; </span>=&gt; tag.name = parse_utils::parse_next_literal_str(input)<span class="question-mark">?</span>,
-                <span class="string">&quot;description&quot; </span>=&gt; {
+                <span class="string">"name" </span>=&gt; tag.name = parse_utils::parse_next_literal_str(input)<span class="question-mark">?</span>,
+                <span class="string">"description" </span>=&gt; {
                     tag.description = <span class="prelude-val">Some</span>(parse_utils::parse_next_literal_str(input)<span class="question-mark">?</span>)
                 }
-                <span class="string">&quot;external_docs&quot; </span>=&gt; {
+                <span class="string">"external_docs" </span>=&gt; {
                     <span class="kw">let </span>content;
                     <span class="macro">parenthesized!</span>(content <span class="kw">in </span>input);
                     tag.external_docs = <span class="prelude-val">Some</span>(content.parse::&lt;ExternalDocs&gt;()<span class="question-mark">?</span>);
@@ -809,9 +810,9 @@
     }
 }
 
-<span class="comment">// (url = &quot;http:://url&quot;, description = &quot;description&quot;, variables(...))
+<span class="comment">// (url = "http:://url", description = "description", variables(...))
 </span><span class="attr">#[derive(Default)]
-#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
+#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
 </span><span class="kw">struct </span>Server {
     url: String,
     description: <span class="prelude-ty">Option</span>&lt;String&gt;,
@@ -828,18 +829,18 @@
             <span class="kw">let </span>attribute_name = <span class="kw-2">&amp;*</span>ident.to_string();
 
             <span class="kw">match </span>attribute_name {
-                <span class="string">&quot;url&quot; </span>=&gt; {
+                <span class="string">"url" </span>=&gt; {
                     server.url = parse_utils::parse_next(<span class="kw-2">&amp;</span>server_stream, || server_stream.parse::&lt;LitStr&gt;())<span class="question-mark">?</span>.value()
                 }
-                <span class="string">&quot;description&quot; </span>=&gt; {
+                <span class="string">"description" </span>=&gt; {
                     server.description =
                         <span class="prelude-val">Some</span>(parse_utils::parse_next(<span class="kw-2">&amp;</span>server_stream, || server_stream.parse::&lt;LitStr&gt;())<span class="question-mark">?</span>.value())
                 }
-                <span class="string">&quot;variables&quot; </span>=&gt; {
+                <span class="string">"variables" </span>=&gt; {
                     server.variables = parse_utils::parse_punctuated_within_parenthesis(<span class="kw-2">&amp;</span>server_stream)<span class="question-mark">?
                 </span>}
                 <span class="kw">_ </span>=&gt; {
-                    <span class="kw">return </span><span class="prelude-val">Err</span>(Error::new(ident.span(), <span class="macro">format!</span>(<span class="string">&quot;unexpected attribute: {attribute_name}, expected one of: url, description, variables&quot;</span>)))
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(Error::new(ident.span(), <span class="macro">format!</span>(<span class="string">"unexpected attribute: {attribute_name}, expected one of: url, description, variables"</span>)))
                 }
             }
 
@@ -896,10 +897,10 @@
     }
 }
 
-<span class="comment">// (&quot;username&quot; = (default = &quot;demo&quot;, description = &quot;This is default username for the API&quot;)),
-// (&quot;port&quot; = (enum_values = (8080, 5000, 4545)))
+<span class="comment">// ("username" = (default = "demo", description = "This is default username for the API")),
+// ("port" = (enum_values = (8080, 5000, 4545)))
 </span><span class="attr">#[derive(Default)]
-#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
+#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
 </span><span class="kw">struct </span>ServerVariable {
     name: String,
     default: String,
@@ -925,20 +926,20 @@
             <span class="kw">let </span>attribute_name = <span class="kw-2">&amp;*</span>ident.to_string();
 
             <span class="kw">match </span>attribute_name {
-                <span class="string">&quot;default&quot; </span>=&gt; {
+                <span class="string">"default" </span>=&gt; {
                     server_variable.default =
                         parse_utils::parse_next(<span class="kw-2">&amp;</span>content, || content.parse::&lt;LitStr&gt;())<span class="question-mark">?</span>.value()
                 }
-                <span class="string">&quot;description&quot; </span>=&gt; {
+                <span class="string">"description" </span>=&gt; {
                     server_variable.description =
                         <span class="prelude-val">Some</span>(parse_utils::parse_next(<span class="kw-2">&amp;</span>content, || content.parse::&lt;LitStr&gt;())<span class="question-mark">?</span>.value())
                 }
-                <span class="string">&quot;enum_values&quot; </span>=&gt; {
+                <span class="string">"enum_values" </span>=&gt; {
                     server_variable.enum_values =
                         <span class="prelude-val">Some</span>(parse_utils::parse_punctuated_within_parenthesis(<span class="kw-2">&amp;</span>content)<span class="question-mark">?</span>)
                 }
                 <span class="kw">_ </span>=&gt; {
-                    <span class="kw">return </span><span class="prelude-val">Err</span>(Error::new(ident.span(), <span class="macro">format!</span>( <span class="string">&quot;unexpected attribute: {attribute_name}, expected one of: default, description, enum_values&quot;</span>)))
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(Error::new(ident.span(), <span class="macro">format!</span>( <span class="string">"unexpected attribute: {attribute_name}, expected one of: default, description, enum_values"</span>)))
                 }
             }
 
@@ -951,9 +952,9 @@
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>OpenApi&lt;<span class="lifetime">&#39;o</span>&gt;(<span class="kw">pub </span>OpenApiAttr&lt;<span class="lifetime">&#39;o</span>&gt;, <span class="kw">pub </span>Ident);
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>OpenApi&lt;<span class="lifetime">'o</span>&gt;(<span class="kw">pub </span>OpenApiAttr&lt;<span class="lifetime">'o</span>&gt;, <span class="kw">pub </span>Ident);
 
-<span class="kw">impl </span>ToTokens <span class="kw">for </span>OpenApi&lt;<span class="lifetime">&#39;_</span>&gt; {
+<span class="kw">impl </span>ToTokens <span class="kw">for </span>OpenApi&lt;<span class="lifetime">'_</span>&gt; {
     <span class="kw">fn </span>to_tokens(<span class="kw-2">&amp;</span><span class="self">self</span>, tokens: <span class="kw-2">&amp;mut </span>proc_macro2::TokenStream) {
         <span class="kw">let </span>OpenApi(attributes, ident) = <span class="self">self</span>;
 
@@ -1019,7 +1020,7 @@
 }
 
 <span class="attr">#[derive(Default)]
-#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
+#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
 </span><span class="kw">struct </span>Components {
     schemas: Vec&lt;Schema&gt;,
     responses: Vec&lt;Response&gt;,
@@ -1030,24 +1031,24 @@
         <span class="kw">let </span>content;
         <span class="macro">parenthesized!</span>(content <span class="kw">in </span>input);
         <span class="kw">const </span>EXPECTED_ATTRIBUTE: <span class="kw-2">&amp;</span>str =
-            <span class="string">&quot;unexpected attribute. expected one of: schemas, responses&quot;</span>;
+            <span class="string">"unexpected attribute. expected one of: schemas, responses"</span>;
 
         <span class="kw">let </span><span class="kw-2">mut </span>schemas: Vec&lt;Schema&gt; = Vec::new();
         <span class="kw">let </span><span class="kw-2">mut </span>responses: Vec&lt;Response&gt; = Vec::new();
 
         <span class="kw">while </span>!content.is_empty() {
             <span class="kw">let </span>ident = content.parse::&lt;Ident&gt;().map_err(|error| {
-                Error::new(error.span(), <span class="macro">format!</span>(<span class="string">&quot;{EXPECTED_ATTRIBUTE}, {error}&quot;</span>))
+                Error::new(error.span(), <span class="macro">format!</span>(<span class="string">"{EXPECTED_ATTRIBUTE}, {error}"</span>))
             })<span class="question-mark">?</span>;
             <span class="kw">let </span>attribute = <span class="kw-2">&amp;*</span>ident.to_string();
 
             <span class="kw">match </span>attribute {
-                <span class="string">&quot;schemas&quot; </span>=&gt; schemas.append(
+                <span class="string">"schemas" </span>=&gt; schemas.append(
                     <span class="kw-2">&amp;mut </span>parse_utils::parse_punctuated_within_parenthesis(<span class="kw-2">&amp;</span>content)<span class="question-mark">?
                         </span>.into_iter()
                         .collect(),
                 ),
-                <span class="string">&quot;responses&quot; </span>=&gt; responses.append(
+                <span class="string">"responses" </span>=&gt; responses.append(
                     <span class="kw-2">&amp;mut </span>parse_utils::parse_punctuated_within_parenthesis(<span class="kw-2">&amp;</span>content)<span class="question-mark">?
                         </span>.into_iter()
                         .collect(),
@@ -1111,9 +1112,9 @@
                 .take(segments.len() - <span class="number">1</span>)
                 .map(|part| part.ident.to_string())
                 .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;()
-                .join(<span class="string">&quot;::&quot;</span>);
+                .join(<span class="string">"::"</span>);
 
-            <span class="kw">let </span>handler_ident = <span class="macro">format_ident!</span>(<span class="string">&quot;{}{}&quot;</span>, PATH_STRUCT_PREFIX, handler_fn_name);
+            <span class="kw">let </span>handler_ident = <span class="macro">format_ident!</span>(<span class="string">"{}{}"</span>, PATH_STRUCT_PREFIX, handler_fn_name);
             <span class="kw">let </span>handler_ident_name = <span class="kw-2">&amp;*</span>handler_ident.to_string();
 
             <span class="kw">let </span>usage = syn::parse_str::&lt;ExprPath&gt;(
@@ -1124,7 +1125,7 @@
                 .into_iter()
                 .flatten()
                 .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;()
-                .join(<span class="string">&quot;::&quot;</span>),
+                .join(<span class="string">"::"</span>),
             )
             .unwrap();
 

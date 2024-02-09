@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/neo4rs-0.7.1/src/types/serde/path.rs`."><title>path.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="neo4rs" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/neo4rs-0.7.1/src/types/serde/path.rs`."><title>path.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="neo4rs" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -409,19 +410,19 @@
     forward_to_deserialize_any, Deserialize,
 };
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; Deserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>Path {
+<span class="kw">impl</span>&lt;<span class="lifetime">'de</span>&gt; Deserialize&lt;<span class="lifetime">'de</span>&gt; <span class="kw">for </span>Path {
     <span class="kw">fn </span>deserialize&lt;D&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, D::Error&gt;
     <span class="kw">where
-        </span>D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;,
+        </span>D: Deserializer&lt;<span class="lifetime">'de</span>&gt;,
     {
         BoltPath::deserialize(deserializer).map(Path::new)
     }
 }
 
 <span class="kw">impl </span>BoltPath {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>to&lt;<span class="lifetime">&#39;this</span>, T&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;this </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;T, DeError&gt;
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>to&lt;<span class="lifetime">'this</span>, T&gt;(<span class="kw-2">&amp;</span><span class="lifetime">'this </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;T, DeError&gt;
     <span class="kw">where
-        </span>T: Deserialize&lt;<span class="lifetime">&#39;this</span>&gt;,
+        </span>T: Deserialize&lt;<span class="lifetime">'this</span>&gt;,
     {
         T::deserialize(<span class="self">self</span>.into_deserializer())
     }
@@ -433,41 +434,41 @@
     Indices,
 });
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; Deserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>BoltPath {
+<span class="kw">impl</span>&lt;<span class="lifetime">'de</span>&gt; Deserialize&lt;<span class="lifetime">'de</span>&gt; <span class="kw">for </span>BoltPath {
     <span class="kw">fn </span>deserialize&lt;D&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, D::Error&gt;
     <span class="kw">where
-        </span>D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;,
+        </span>D: Deserializer&lt;<span class="lifetime">'de</span>&gt;,
     {
-        <span class="kw">const </span>FIELDS: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str] = <span class="kw-2">&amp;</span>[<span class="string">&quot;nodes&quot;</span>, <span class="string">&quot;relationships&quot;</span>, <span class="string">&quot;indices&quot;</span>];
+        <span class="kw">const </span>FIELDS: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str] = <span class="kw-2">&amp;</span>[<span class="string">"nodes"</span>, <span class="string">"relationships"</span>, <span class="string">"indices"</span>];
 
         <span class="kw">struct </span>BoltPathVisitor;
 
-        <span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; Visitor&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>BoltPathVisitor {
+        <span class="kw">impl</span>&lt;<span class="lifetime">'de</span>&gt; Visitor&lt;<span class="lifetime">'de</span>&gt; <span class="kw">for </span>BoltPathVisitor {
             <span class="kw">type </span>Value = BoltPath;
 
             <span class="kw">fn </span>expecting(<span class="kw-2">&amp;</span><span class="self">self</span>, formatter: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
-                formatter.write_str(<span class="string">&quot;struct BoltPath&quot;</span>)
+                formatter.write_str(<span class="string">"struct BoltPath"</span>)
             }
 
             <span class="kw">fn </span>visit_map&lt;A&gt;(<span class="self">self</span>, <span class="kw-2">mut </span>map: A) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Value, A::Error&gt;
             <span class="kw">where
-                </span>A: ::serde::de::MapAccess&lt;<span class="lifetime">&#39;de</span>&gt;,
+                </span>A: ::serde::de::MapAccess&lt;<span class="lifetime">'de</span>&gt;,
             {
                 <span class="kw">let </span><span class="kw-2">mut </span>path = BoltPathBuilder::default();
 
                 <span class="kw">while let </span><span class="prelude-val">Some</span>(key) = map.next_key::&lt;<span class="kw-2">&amp;</span>str&gt;()<span class="question-mark">? </span>{
                     <span class="kw">match </span>key {
-                        <span class="string">&quot;nodes&quot; </span>=&gt; path.nodes(|| {
+                        <span class="string">"nodes" </span>=&gt; path.nodes(|| {
                             <span class="prelude-val">Ok</span>(BoltList {
                                 value: map.next_value::&lt;Nodes&lt;BoltType&gt;&gt;()<span class="question-mark">?</span>.<span class="number">0</span>,
                             })
                         })<span class="question-mark">?</span>,
-                        <span class="string">&quot;relationships&quot; </span>=&gt; path.relations(|| {
+                        <span class="string">"relationships" </span>=&gt; path.relations(|| {
                             <span class="prelude-val">Ok</span>(BoltList {
                                 value: map.next_value::&lt;Relationships&lt;BoltType&gt;&gt;()<span class="question-mark">?</span>.<span class="number">0</span>,
                             })
                         })<span class="question-mark">?</span>,
-                        <span class="string">&quot;indices&quot; </span>=&gt; path.indices(|| {
+                        <span class="string">"indices" </span>=&gt; path.indices(|| {
                             <span class="prelude-val">Ok</span>(BoltList {
                                 value: map.next_value::&lt;Indices&lt;BoltType&gt;&gt;()<span class="question-mark">?</span>.<span class="number">0</span>,
                             })
@@ -480,22 +481,22 @@
             }
         }
 
-        deserializer.deserialize_struct(<span class="string">&quot;BoltPath&quot;</span>, FIELDS, BoltPathVisitor)
+        deserializer.deserialize_struct(<span class="string">"BoltPath"</span>, FIELDS, BoltPathVisitor)
     }
 }
 
 <span class="kw">pub struct </span>BoltPathVisitor;
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; Visitor&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>BoltPathVisitor {
+<span class="kw">impl</span>&lt;<span class="lifetime">'de</span>&gt; Visitor&lt;<span class="lifetime">'de</span>&gt; <span class="kw">for </span>BoltPathVisitor {
     <span class="kw">type </span>Value = BoltPath;
 
     <span class="kw">fn </span>expecting(<span class="kw-2">&amp;</span><span class="self">self</span>, formatter: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
-        formatter.write_str(<span class="string">&quot;struct BoltPath&quot;</span>)
+        formatter.write_str(<span class="string">"struct BoltPath"</span>)
     }
 
     <span class="kw">fn </span>visit_map&lt;A&gt;(<span class="self">self</span>, <span class="kw-2">mut </span>map: A) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Value, A::Error&gt;
     <span class="kw">where
-        </span>A: ::serde::de::MapAccess&lt;<span class="lifetime">&#39;de</span>&gt;,
+        </span>A: ::serde::de::MapAccess&lt;<span class="lifetime">'de</span>&gt;,
     {
         <span class="kw">let </span><span class="kw-2">mut </span>path = BoltPathBuilder::default();
 
@@ -507,7 +508,7 @@
                 otherwise =&gt; {
                     <span class="kw">return </span><span class="prelude-val">Err</span>(Error::unknown_field(
                         otherwise.name(),
-                        <span class="kw-2">&amp;</span>[<span class="string">&quot;nodes&quot;</span>, <span class="string">&quot;relationships&quot;</span>, <span class="string">&quot;indices&quot;</span>],
+                        <span class="kw-2">&amp;</span>[<span class="string">"nodes"</span>, <span class="string">"relationships"</span>, <span class="string">"indices"</span>],
                     ))
                 }
             }
@@ -517,34 +518,34 @@
     }
 }
 
-<span class="kw">pub struct </span>BoltPathDeserializer&lt;<span class="lifetime">&#39;de</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;de </span>BoltPath);
+<span class="kw">pub struct </span>BoltPathDeserializer&lt;<span class="lifetime">'de</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">'de </span>BoltPath);
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; BoltPathDeserializer&lt;<span class="lifetime">&#39;de</span>&gt; {
-    <span class="kw">fn </span>new(node: <span class="kw-2">&amp;</span><span class="lifetime">&#39;de </span>BoltPath) -&gt; <span class="self">Self </span>{
+<span class="kw">impl</span>&lt;<span class="lifetime">'de</span>&gt; BoltPathDeserializer&lt;<span class="lifetime">'de</span>&gt; {
+    <span class="kw">fn </span>new(node: <span class="kw-2">&amp;</span><span class="lifetime">'de </span>BoltPath) -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>(node)
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; IntoDeserializer&lt;<span class="lifetime">&#39;de</span>, DeError&gt; <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;de </span>BoltList {
-    <span class="kw">type </span>Deserializer = SeqDeserializer&lt;std::slice::Iter&lt;<span class="lifetime">&#39;de</span>, BoltType&gt;, DeError&gt;;
+<span class="kw">impl</span>&lt;<span class="lifetime">'de</span>&gt; IntoDeserializer&lt;<span class="lifetime">'de</span>, DeError&gt; <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">'de </span>BoltList {
+    <span class="kw">type </span>Deserializer = SeqDeserializer&lt;std::slice::Iter&lt;<span class="lifetime">'de</span>, BoltType&gt;, DeError&gt;;
 
     <span class="kw">fn </span>into_deserializer(<span class="self">self</span>) -&gt; <span class="self">Self</span>::Deserializer {
         SeqDeserializer::new(<span class="self">self</span>.value.iter())
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; Deserializer&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>BoltPathDeserializer&lt;<span class="lifetime">&#39;de</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'de</span>&gt; Deserializer&lt;<span class="lifetime">'de</span>&gt; <span class="kw">for </span>BoltPathDeserializer&lt;<span class="lifetime">'de</span>&gt; {
     <span class="kw">type </span>Error = DeError;
 
     <span class="kw">fn </span>deserialize_map&lt;V&gt;(<span class="self">self</span>, visitor: V) -&gt; <span class="prelude-ty">Result</span>&lt;V::Value, <span class="self">Self</span>::Error&gt;
     <span class="kw">where
-        </span>V: Visitor&lt;<span class="lifetime">&#39;de</span>&gt;,
+        </span>V: Visitor&lt;<span class="lifetime">'de</span>&gt;,
     {
         visitor.visit_map(MapDeserializer::new(
             [
-                (<span class="string">&quot;nodes&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.nodes),
-                (<span class="string">&quot;relationships&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.rels),
-                (<span class="string">&quot;indices&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.indices),
+                (<span class="string">"nodes"</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.nodes),
+                (<span class="string">"relationships"</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.rels),
+                (<span class="string">"indices"</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.indices),
             ]
             .into_iter(),
         ))
@@ -552,49 +553,49 @@
 
     <span class="kw">fn </span>deserialize_struct&lt;V&gt;(
         <span class="self">self</span>,
-        _name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
-        fields: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str],
+        _name: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str,
+        fields: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>[<span class="kw-2">&amp;</span><span class="lifetime">'static </span>str],
         visitor: V,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;V::Value, <span class="self">Self</span>::Error&gt;
     <span class="kw">where
-        </span>V: Visitor&lt;<span class="lifetime">&#39;de</span>&gt;,
+        </span>V: Visitor&lt;<span class="lifetime">'de</span>&gt;,
     {
         ElementDataDeserializer::new(<span class="self">self</span>.<span class="number">0</span>).deserialize_outer_struct(fields, visitor)
     }
 
     <span class="kw">fn </span>deserialize_newtype_struct&lt;V&gt;(
         <span class="self">self</span>,
-        name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+        name: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str,
         visitor: V,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;V::Value, <span class="self">Self</span>::Error&gt;
     <span class="kw">where
-        </span>V: Visitor&lt;<span class="lifetime">&#39;de</span>&gt;,
+        </span>V: Visitor&lt;<span class="lifetime">'de</span>&gt;,
     {
         ElementDataDeserializer::new(<span class="self">self</span>.<span class="number">0</span>).deserialize_newtype_struct(name, visitor)
     }
 
     <span class="kw">fn </span>deserialize_enum&lt;V&gt;(
         <span class="self">self</span>,
-        _name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
-        _variants: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str],
+        _name: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str,
+        _variants: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>[<span class="kw-2">&amp;</span><span class="lifetime">'static </span>str],
         visitor: V,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;V::Value, <span class="self">Self</span>::Error&gt;
     <span class="kw">where
-        </span>V: Visitor&lt;<span class="lifetime">&#39;de</span>&gt;,
+        </span>V: Visitor&lt;<span class="lifetime">'de</span>&gt;,
     {
         visitor.visit_enum(<span class="self">self</span>)
     }
 
     <span class="kw">fn </span>deserialize_ignored_any&lt;V&gt;(<span class="self">self</span>, visitor: V) -&gt; <span class="prelude-ty">Result</span>&lt;V::Value, <span class="self">Self</span>::Error&gt;
     <span class="kw">where
-        </span>V: Visitor&lt;<span class="lifetime">&#39;de</span>&gt;,
+        </span>V: Visitor&lt;<span class="lifetime">'de</span>&gt;,
     {
         visitor.visit_unit()
     }
 
     <span class="kw">fn </span>deserialize_any&lt;V&gt;(<span class="self">self</span>, visitor: V) -&gt; <span class="prelude-ty">Result</span>&lt;V::Value, <span class="self">Self</span>::Error&gt;
     <span class="kw">where
-        </span>V: Visitor&lt;<span class="lifetime">&#39;de</span>&gt;,
+        </span>V: Visitor&lt;<span class="lifetime">'de</span>&gt;,
     {
         <span class="self">self</span>.deserialize_map(visitor)
     }
@@ -605,14 +606,14 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; EnumAccess&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>BoltPathDeserializer&lt;<span class="lifetime">&#39;de</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'de</span>&gt; EnumAccess&lt;<span class="lifetime">'de</span>&gt; <span class="kw">for </span>BoltPathDeserializer&lt;<span class="lifetime">'de</span>&gt; {
     <span class="kw">type </span>Error = DeError;
 
-    <span class="kw">type </span>Variant = ElementDataDeserializer&lt;<span class="lifetime">&#39;de</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;de </span>BoltPath&gt;;
+    <span class="kw">type </span>Variant = ElementDataDeserializer&lt;<span class="lifetime">'de</span>, <span class="kw-2">&amp;</span><span class="lifetime">'de </span>BoltPath&gt;;
 
     <span class="kw">fn </span>variant_seed&lt;V&gt;(<span class="self">self</span>, seed: V) -&gt; <span class="prelude-ty">Result</span>&lt;(V::Value, <span class="self">Self</span>::Variant), <span class="self">Self</span>::Error&gt;
     <span class="kw">where
-        </span>V: DeserializeSeed&lt;<span class="lifetime">&#39;de</span>&gt;,
+        </span>V: DeserializeSeed&lt;<span class="lifetime">'de</span>&gt;,
     {
         <span class="kw">let </span>kind = BoltKind::Path;
         <span class="kw">let </span>val = seed.deserialize(kind.into_deserializer())<span class="question-mark">?</span>;
@@ -620,8 +621,8 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; IntoDeserializer&lt;<span class="lifetime">&#39;de</span>, DeError&gt; <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;de </span>BoltPath {
-    <span class="kw">type </span>Deserializer = BoltPathDeserializer&lt;<span class="lifetime">&#39;de</span>&gt;;
+<span class="kw">impl</span>&lt;<span class="lifetime">'de</span>&gt; IntoDeserializer&lt;<span class="lifetime">'de</span>, DeError&gt; <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">'de </span>BoltPath {
+    <span class="kw">type </span>Deserializer = BoltPathDeserializer&lt;<span class="lifetime">'de</span>&gt;;
 
     <span class="kw">fn </span>into_deserializer(<span class="self">self</span>) -&gt; <span class="self">Self</span>::Deserializer {
         BoltPathDeserializer::new(<span class="self">self</span>)
@@ -642,22 +643,22 @@
     <span class="kw">fn </span>test_path() -&gt; BoltPath {
         <span class="kw">let </span>alice = BoltNode::new(
             BoltInteger::new(<span class="number">42</span>),
-            BoltList::from(<span class="macro">vec!</span>[BoltType::from(<span class="string">&quot;Person&quot;</span>)]),
-            [(<span class="string">&quot;name&quot;</span>.into(), <span class="string">&quot;Alice&quot;</span>.into()), (<span class="string">&quot;age&quot;</span>.into(), <span class="number">42</span>.into())]
+            BoltList::from(<span class="macro">vec!</span>[BoltType::from(<span class="string">"Person"</span>)]),
+            [(<span class="string">"name"</span>.into(), <span class="string">"Alice"</span>.into()), (<span class="string">"age"</span>.into(), <span class="number">42</span>.into())]
                 .into_iter()
                 .collect(),
         );
         <span class="kw">let </span>bob = BoltNode::new(
             BoltInteger::new(<span class="number">1337</span>),
-            BoltList::from(<span class="macro">vec!</span>[BoltType::from(<span class="string">&quot;Person&quot;</span>)]),
-            [(<span class="string">&quot;name&quot;</span>.into(), <span class="string">&quot;Bob&quot;</span>.into()), (<span class="string">&quot;age&quot;</span>.into(), <span class="number">84</span>.into())]
+            BoltList::from(<span class="macro">vec!</span>[BoltType::from(<span class="string">"Person"</span>)]),
+            [(<span class="string">"name"</span>.into(), <span class="string">"Bob"</span>.into()), (<span class="string">"age"</span>.into(), <span class="number">84</span>.into())]
                 .into_iter()
                 .collect(),
         );
         <span class="kw">let </span>rel = BoltUnboundedRelation::new(
             BoltInteger::new(<span class="number">84</span>),
-            BoltString::from(<span class="string">&quot;KNOWS&quot;</span>),
-            [(<span class="string">&quot;since&quot;</span>.into(), <span class="number">2017</span>.into())].into_iter().collect(),
+            BoltString::from(<span class="string">"KNOWS"</span>),
+            [(<span class="string">"since"</span>.into(), <span class="number">2017</span>.into())].into_iter().collect(),
         );
         BoltPath {
             nodes: BoltList::from(<span class="macro">vec!</span>[BoltType::Node(alice), BoltType::Node(bob)]),
@@ -676,11 +677,11 @@
 
         test_extract_path(Nodes(<span class="macro">vec!</span>[
             Person {
-                name: <span class="string">&quot;Alice&quot;</span>.into(),
+                name: <span class="string">"Alice"</span>.into(),
                 age: <span class="number">42</span>,
             },
             Person {
-                name: <span class="string">&quot;Bob&quot;</span>.into(),
+                name: <span class="string">"Bob"</span>.into(),
                 age: <span class="number">84</span>,
             },
         ]));
@@ -724,11 +725,11 @@
         test_extract_path(Path {
             nodes: Nodes(<span class="macro">vec!</span>[
                 Person {
-                    name: <span class="string">&quot;Alice&quot;</span>.into(),
+                    name: <span class="string">"Alice"</span>.into(),
                     age: <span class="number">42</span>,
                 },
                 Person {
-                    name: <span class="string">&quot;Bob&quot;</span>.into(),
+                    name: <span class="string">"Bob"</span>.into(),
                     age: <span class="number">84</span>,
                 },
             ]),
@@ -737,7 +738,7 @@
         });
     }
 
-    <span class="kw">fn </span>test_extract_path&lt;T: Debug + PartialEq + <span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; Deserialize&lt;<span class="lifetime">&#39;a</span>&gt;&gt;(expected: T) {
+    <span class="kw">fn </span>test_extract_path&lt;T: Debug + PartialEq + <span class="kw">for</span>&lt;<span class="lifetime">'a</span>&gt; Deserialize&lt;<span class="lifetime">'a</span>&gt;&gt;(expected: T) {
         <span class="kw">let </span>path = test_path();
         <span class="kw">let </span>actual = path.to::&lt;T&gt;().unwrap();
         <span class="macro">assert_eq!</span>(actual, expected);

@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `mathml/src/parsers/decapodes_serialization.rs`."><title>decapodes_serialization.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="mathml" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `mathml/src/parsers/decapodes_serialization.rs`."><title>decapodes_serialization.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="mathml" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -656,7 +657,7 @@
             </span>}
             Operator::Div =&gt; {
                 table_counts.operation_count += <span class="number">1</span>;
-                <span class="kw">let </span>temp_str = <span class="macro">format!</span>(<span class="string">&quot;•{}&quot;</span>, (table_counts.operation_count));
+                <span class="kw">let </span>temp_str = <span class="macro">format!</span>(<span class="string">"•{}"</span>, (table_counts.operation_count));
                 <span class="kw">let </span>temp_variable = Variable {
                     r#type: Type::infer,
                     name: temp_str,
@@ -668,14 +669,14 @@
                 <span class="kw">let </span>unary = UnaryOperator {
                     src: to_decapodes_serialization(<span class="kw-2">&amp;</span>rest[<span class="number">0</span>], tables, table_counts),
                     tgt: tgt_idx,
-                    op1: <span class="string">&quot;Div&quot;</span>.to_string(),
+                    op1: <span class="string">"Div"</span>.to_string(),
                 };
                 tables.unary_operators.push(unary.clone());
                 tgt_idx
             }
             Operator::Abs =&gt; {
                 table_counts.operation_count += <span class="number">1</span>;
-                <span class="kw">let </span>temp_str = <span class="macro">format!</span>(<span class="string">&quot;•{}&quot;</span>, (table_counts.operation_count));
+                <span class="kw">let </span>temp_str = <span class="macro">format!</span>(<span class="string">"•{}"</span>, (table_counts.operation_count));
                 <span class="kw">let </span>temp_variable = Variable {
                     r#type: Type::infer,
                     name: temp_str,
@@ -687,14 +688,14 @@
                 <span class="kw">let </span>unary = UnaryOperator {
                     src: to_decapodes_serialization(<span class="kw-2">&amp;</span>rest[<span class="number">0</span>], tables, table_counts),
                     tgt: tgt_idx,
-                    op1: <span class="string">&quot;Abs&quot;</span>.to_string(),
+                    op1: <span class="string">"Abs"</span>.to_string(),
                 };
                 tables.unary_operators.push(unary.clone());
                 tgt_idx
             }
             Operator::Add =&gt; {
                 table_counts.sum_count += <span class="number">1</span>;
-                <span class="kw">let </span>temp_sum = <span class="macro">format!</span>(<span class="string">&quot;sum_{}&quot;</span>, table_counts.sum_count);
+                <span class="kw">let </span>temp_sum = <span class="macro">format!</span>(<span class="string">"sum_{}"</span>, table_counts.sum_count);
                 <span class="kw">let </span>temp_variable = Variable {
                     r#type: Type::infer,
                     name: temp_sum,
@@ -719,7 +720,7 @@
             }
             Operator::Power =&gt; {
                 table_counts.operation_count += <span class="number">1</span>;
-                <span class="kw">let </span>temp_str = <span class="macro">format!</span>(<span class="string">&quot;•{}&quot;</span>, table_counts.operation_count);
+                <span class="kw">let </span>temp_str = <span class="macro">format!</span>(<span class="string">"•{}"</span>, table_counts.operation_count);
                 <span class="kw">let </span>temp_variable = Variable {
                     r#type: Type::infer,
                     name: temp_str,
@@ -732,14 +733,14 @@
                     proj1: to_decapodes_serialization(<span class="kw-2">&amp;</span>rest[<span class="number">0</span>], tables, table_counts),
                     proj2: to_decapodes_serialization(<span class="kw-2">&amp;</span>rest[<span class="number">1</span>], tables, table_counts),
                     res: tgt_idx,
-                    op2: <span class="string">&quot;^&quot;</span>.to_string(),
+                    op2: <span class="string">"^"</span>.to_string(),
                 };
                 tables.projection_operators.push(projection.clone());
                 tgt_idx
             }
             Operator::Subtract =&gt; {
                 table_counts.operation_count += <span class="number">1</span>;
-                <span class="kw">let </span>temp_str = <span class="macro">format!</span>(<span class="string">&quot;•{}&quot;</span>, table_counts.operation_count);
+                <span class="kw">let </span>temp_str = <span class="macro">format!</span>(<span class="string">"•{}"</span>, table_counts.operation_count);
                 <span class="kw">let </span>temp_variable = Variable {
                     r#type: Type::infer,
                     name: temp_str,
@@ -751,7 +752,7 @@
                     <span class="kw">let </span>unary = UnaryOperator {
                         src: to_decapodes_serialization(<span class="kw-2">&amp;</span>rest[<span class="number">0</span>], tables, table_counts),
                         tgt: tgt_idx,
-                        op1: <span class="string">&quot;-&quot;</span>.to_string(),
+                        op1: <span class="string">"-"</span>.to_string(),
                     };
                     tables.unary_operators.push(unary.clone());
                 } <span class="kw">else </span>{
@@ -759,7 +760,7 @@
                         proj1: to_decapodes_serialization(<span class="kw-2">&amp;</span>rest[<span class="number">0</span>], tables, table_counts),
                         proj2: to_decapodes_serialization(<span class="kw-2">&amp;</span>rest[<span class="number">1</span>], tables, table_counts),
                         res: tgt_idx,
-                        op2: <span class="string">&quot;-&quot;</span>.to_string(),
+                        op2: <span class="string">"-"</span>.to_string(),
                     };
                     tables.projection_operators.push(projection.clone());
                 }
@@ -767,7 +768,7 @@
             }
             Operator::Multiply =&gt; {
                 table_counts.multi_count += <span class="number">1</span>;
-                <span class="kw">let </span>temp_multi = <span class="macro">format!</span>(<span class="string">&quot;mult_{}&quot;</span>, table_counts.multi_count);
+                <span class="kw">let </span>temp_multi = <span class="macro">format!</span>(<span class="string">"mult_{}"</span>, table_counts.multi_count);
                 <span class="kw">let </span>temp_variable = Variable {
                     r#type: Type::infer,
                     name: temp_multi,
@@ -779,14 +780,14 @@
                     proj1: to_decapodes_serialization(<span class="kw-2">&amp;</span>rest[<span class="number">0</span>], tables, table_counts),
                     proj2: to_decapodes_serialization(<span class="kw-2">&amp;</span>rest[<span class="number">1</span>], tables, table_counts),
                     res: tgt_idx,
-                    op2: <span class="string">&quot;*&quot;</span>.to_string(),
+                    op2: <span class="string">"*"</span>.to_string(),
                 };
                 tables.projection_operators.push(projection.clone());
                 tgt_idx
             }
             Operator::Divide =&gt; {
                 table_counts.operation_count += <span class="number">1</span>;
-                <span class="kw">let </span>temp_str = <span class="macro">format!</span>(<span class="string">&quot;•{}&quot;</span>, table_counts.operation_count);
+                <span class="kw">let </span>temp_str = <span class="macro">format!</span>(<span class="string">"•{}"</span>, table_counts.operation_count);
                 <span class="kw">let </span>temp_variable = Variable {
                     r#type: Type::infer,
                     name: temp_str,
@@ -798,7 +799,7 @@
                     proj1: to_decapodes_serialization(<span class="kw-2">&amp;</span>rest[<span class="number">0</span>], tables, table_counts),
                     proj2: to_decapodes_serialization(<span class="kw-2">&amp;</span>rest[<span class="number">1</span>], tables, table_counts),
                     res: tgt_idx,
-                    op2: <span class="string">&quot;/&quot;</span>.to_string(),
+                    op2: <span class="string">"/"</span>.to_string(),
                 };
                 tables.projection_operators.push(projection.clone());
                 tgt_idx
@@ -809,7 +810,7 @@
                 bound_var,
             }) =&gt; {
                 table_counts.operation_count += <span class="number">1</span>;
-                <span class="kw">let </span>temp_str = <span class="macro">format!</span>(<span class="string">&quot;•{}&quot;</span>, (table_counts.operation_count));
+                <span class="kw">let </span>temp_str = <span class="macro">format!</span>(<span class="string">"•{}"</span>, (table_counts.operation_count));
                 <span class="kw">let </span>temp_variable = Variable {
                     r#type: Type::infer,
                     name: temp_str,
@@ -817,7 +818,7 @@
                 tables.variables.push(temp_variable.clone());
                 table_counts.variable_count += <span class="number">1</span>;
                 <span class="kw">let </span>tgt_idx = table_counts.variable_count;
-                <span class="kw">let </span>derivative_str = <span class="macro">format!</span>(<span class="string">&quot;D({},{})&quot;</span>, order, bound_var);
+                <span class="kw">let </span>derivative_str = <span class="macro">format!</span>(<span class="string">"D({},{})"</span>, order, bound_var);
                 <span class="kw">let </span>unary = UnaryOperator {
                     src: to_decapodes_serialization(<span class="kw-2">&amp;</span>rest[<span class="number">0</span>], tables, table_counts),
                     tgt: tgt_idx,
@@ -828,7 +829,7 @@
             }
             Operator::Grad =&gt; {
                 table_counts.operation_count += <span class="number">1</span>;
-                <span class="kw">let </span>temp_str = <span class="macro">format!</span>(<span class="string">&quot;•{}&quot;</span>, (table_counts.operation_count));
+                <span class="kw">let </span>temp_str = <span class="macro">format!</span>(<span class="string">"•{}"</span>, (table_counts.operation_count));
                 <span class="kw">let </span>temp_variable = Variable {
                     r#type: Type::infer,
                     name: temp_str,
@@ -839,7 +840,7 @@
                 <span class="kw">let </span>unary = UnaryOperator {
                     src: to_decapodes_serialization(<span class="kw-2">&amp;</span>rest[<span class="number">0</span>], tables, table_counts),
                     tgt: tgt_idx,
-                    op1: <span class="string">&quot;Grad&quot;</span>.to_string(),
+                    op1: <span class="string">"Grad"</span>.to_string(),
                 };
                 tables.unary_operators.push(unary.clone());
                 tgt_idx
@@ -887,7 +888,7 @@
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_serialize1() {
-    <span class="kw">let </span>input = <span class="string">&quot;
+    <span class="kw">let </span>input = <span class="string">"
     &lt;math&gt;
         &lt;msub&gt;&lt;mi&gt;C&lt;/mi&gt;&lt;mi&gt;o&lt;/mi&gt;&lt;/msub&gt;
         &lt;mo&gt;=&lt;/mo&gt;
@@ -895,16 +896,16 @@
         &lt;msub&gt;&lt;mi&gt;c&lt;/mi&gt;&lt;mi&gt;w&lt;/mi&gt;&lt;/msub&gt;
         &lt;mi&gt;dz&lt;/mi&gt;
     &lt;/math&gt;
-    &quot;</span>;
+    "</span>;
     <span class="kw">let </span>expression = input.parse::&lt;MathExpressionTree&gt;().unwrap();
     <span class="kw">let </span>wiring_diagram = to_wiring_diagram(<span class="kw-2">&amp;</span>expression);
     <span class="kw">let </span>json = to_decapodes_json(wiring_diagram);
-    <span class="macro">assert_eq!</span>(json, <span class="string">&quot;{\&quot;Var\&quot;:[{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;mult_1\&quot;},{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;mult_2\&quot;},{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;ρ_{w}\&quot;},{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;c_{w}\&quot;},{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;dz\&quot;},{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;C_{o}\&quot;}],\&quot;Op1\&quot;:[],\&quot;Op2\&quot;:[{\&quot;proj1\&quot;:3,\&quot;proj2\&quot;:4,\&quot;res\&quot;:2,\&quot;op2\&quot;:\&quot;*\&quot;},{\&quot;proj1\&quot;:2,\&quot;proj2\&quot;:5,\&quot;res\&quot;:1,\&quot;op2\&quot;:\&quot;*\&quot;}],\&quot;Σ\&quot;:[],\&quot;Summand\&quot;:[]}&quot;</span>);
+    <span class="macro">assert_eq!</span>(json, <span class="string">"{\"Var\":[{\"type\":\"infer\",\"name\":\"mult_1\"},{\"type\":\"infer\",\"name\":\"mult_2\"},{\"type\":\"infer\",\"name\":\"ρ_{w}\"},{\"type\":\"infer\",\"name\":\"c_{w}\"},{\"type\":\"infer\",\"name\":\"dz\"},{\"type\":\"infer\",\"name\":\"C_{o}\"}],\"Op1\":[],\"Op2\":[{\"proj1\":3,\"proj2\":4,\"res\":2,\"op2\":\"*\"},{\"proj1\":2,\"proj2\":5,\"res\":1,\"op2\":\"*\"}],\"Σ\":[],\"Summand\":[]}"</span>);
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_serialize_aplus_bt() {
-    <span class="kw">let </span>input = <span class="string">&quot;
+    <span class="kw">let </span>input = <span class="string">"
     &lt;math&gt;
         &lt;mrow&gt;&lt;mi&gt;OLR&lt;/mi&gt;&lt;/mrow&gt;
         &lt;mo&gt;=&lt;/mo&gt;
@@ -913,30 +914,30 @@
         &lt;mi&gt;B&lt;/mi&gt;
         &lt;mi&gt;T&lt;/mi&gt;
     &lt;/math&gt;
-    &quot;</span>;
+    "</span>;
     <span class="kw">let </span>expression = input.parse::&lt;MathExpressionTree&gt;().unwrap();
     <span class="kw">let </span>wiring_diagram = to_wiring_diagram(<span class="kw-2">&amp;</span>expression);
     <span class="kw">let </span>json = to_decapodes_json(wiring_diagram);
-    <span class="macro">assert_eq!</span>(json, <span class="string">&quot;{\&quot;Var\&quot;:[{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;sum_1\&quot;},{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;A\&quot;},{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;mult_1\&quot;},{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;B\&quot;},{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;T\&quot;},{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;OLR\&quot;}],\&quot;Op1\&quot;:[],\&quot;Op2\&quot;:[{\&quot;proj1\&quot;:4,\&quot;proj2\&quot;:5,\&quot;res\&quot;:3,\&quot;op2\&quot;:\&quot;*\&quot;}],\&quot;Σ\&quot;:[{\&quot;sum\&quot;:1}],\&quot;Summand\&quot;:[{\&quot;summand\&quot;:2,\&quot;summation\&quot;:1},{\&quot;summand\&quot;:3,\&quot;summation\&quot;:1}]}&quot;</span>);
+    <span class="macro">assert_eq!</span>(json, <span class="string">"{\"Var\":[{\"type\":\"infer\",\"name\":\"sum_1\"},{\"type\":\"infer\",\"name\":\"A\"},{\"type\":\"infer\",\"name\":\"mult_1\"},{\"type\":\"infer\",\"name\":\"B\"},{\"type\":\"infer\",\"name\":\"T\"},{\"type\":\"infer\",\"name\":\"OLR\"}],\"Op1\":[],\"Op2\":[{\"proj1\":4,\"proj2\":5,\"res\":3,\"op2\":\"*\"}],\"Σ\":[{\"sum\":1}],\"Summand\":[{\"summand\":2,\"summation\":1},{\"summand\":3,\"summation\":1}]}"</span>);
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_serialize_multiply_sup() {
-    <span class="kw">let </span>input = <span class="string">&quot;
+    <span class="kw">let </span>input = <span class="string">"
     &lt;math&gt;
         &lt;mi&gt;Γ&lt;/mi&gt;
         &lt;msup&gt;&lt;mi&gt;H&lt;/mi&gt;&lt;mrow&gt;&lt;mi&gt;n&lt;/mi&gt;&lt;mo&gt;+&lt;/mo&gt;&lt;mn&gt;2&lt;/mn&gt;&lt;/mrow&gt;&lt;/msup&gt;
     &lt;/math&gt;
-    &quot;</span>;
+    "</span>;
     <span class="kw">let </span>expression = input.parse::&lt;MathExpressionTree&gt;().unwrap();
     <span class="kw">let </span>wiring_diagram = to_wiring_diagram(<span class="kw-2">&amp;</span>expression);
     <span class="kw">let </span>json = to_decapodes_json(wiring_diagram);
-    <span class="macro">assert_eq!</span>(json, <span class="string">&quot;{\&quot;Var\&quot;:[{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;mult_1\&quot;},{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;Γ\&quot;},{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;•1\&quot;},{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;H\&quot;},{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;sum_1\&quot;},{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;n\&quot;},{\&quot;type\&quot;:\&quot;Literal\&quot;,\&quot;name\&quot;:\&quot;2\&quot;}],\&quot;Op1\&quot;:[],\&quot;Op2\&quot;:[{\&quot;proj1\&quot;:4,\&quot;proj2\&quot;:5,\&quot;res\&quot;:3,\&quot;op2\&quot;:\&quot;^\&quot;},{\&quot;proj1\&quot;:2,\&quot;proj2\&quot;:3,\&quot;res\&quot;:1,\&quot;op2\&quot;:\&quot;*\&quot;}],\&quot;Σ\&quot;:[{\&quot;sum\&quot;:5}],\&quot;Summand\&quot;:[{\&quot;summand\&quot;:6,\&quot;summation\&quot;:1},{\&quot;summand\&quot;:7,\&quot;summation\&quot;:1}]}&quot;</span>);
+    <span class="macro">assert_eq!</span>(json, <span class="string">"{\"Var\":[{\"type\":\"infer\",\"name\":\"mult_1\"},{\"type\":\"infer\",\"name\":\"Γ\"},{\"type\":\"infer\",\"name\":\"•1\"},{\"type\":\"infer\",\"name\":\"H\"},{\"type\":\"infer\",\"name\":\"sum_1\"},{\"type\":\"infer\",\"name\":\"n\"},{\"type\":\"Literal\",\"name\":\"2\"}],\"Op1\":[],\"Op2\":[{\"proj1\":4,\"proj2\":5,\"res\":3,\"op2\":\"^\"},{\"proj1\":2,\"proj2\":3,\"res\":1,\"op2\":\"*\"}],\"Σ\":[{\"sum\":5}],\"Summand\":[{\"summand\":6,\"summation\":1},{\"summand\":7,\"summation\":1}]}"</span>);
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_serialize_hackathon2_scenario1_eq5() {
-    <span class="kw">let </span>input = <span class="string">&quot;
+    <span class="kw">let </span>input = <span class="string">"
     &lt;math&gt;
         &lt;mfrac&gt;
         &lt;mrow&gt;&lt;mi&gt;d&lt;/mi&gt;&lt;mi&gt;D&lt;/mi&gt;&lt;mo&gt;(&lt;/mo&gt;&lt;mi&gt;t&lt;/mi&gt;&lt;mo&gt;)&lt;/mo&gt;&lt;/mrow&gt;
@@ -947,16 +948,16 @@
         &lt;mi&gt;ρ&lt;/mi&gt;
         &lt;mi&gt;I&lt;/mi&gt;&lt;mo&gt;(&lt;/mo&gt;&lt;mi&gt;t&lt;/mi&gt;&lt;mo&gt;)&lt;/mo&gt;
     &lt;/math&gt;
-    &quot;</span>;
+    "</span>;
     <span class="kw">let </span>expression = input.parse::&lt;MathExpressionTree&gt;().unwrap();
     <span class="kw">let </span>wiring_diagram = to_wiring_diagram(<span class="kw-2">&amp;</span>expression);
     <span class="kw">let </span>json = to_decapodes_json(wiring_diagram);
-    <span class="macro">assert_eq!</span>(json, <span class="string">&quot;{\&quot;Var\&quot;:[{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;mult_1\&quot;},{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;mult_2\&quot;},{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;α\&quot;},{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;ρ\&quot;},{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;I\&quot;},{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;•1\&quot;},{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;D\&quot;}],\&quot;Op1\&quot;:[{\&quot;src\&quot;:7,\&quot;tgt\&quot;:6,\&quot;op1\&quot;:\&quot;D(1,t)\&quot;}],\&quot;Op2\&quot;:[{\&quot;proj1\&quot;:3,\&quot;proj2\&quot;:4,\&quot;res\&quot;:2,\&quot;op2\&quot;:\&quot;*\&quot;},{\&quot;proj1\&quot;:2,\&quot;proj2\&quot;:5,\&quot;res\&quot;:1,\&quot;op2\&quot;:\&quot;*\&quot;}],\&quot;Σ\&quot;:[],\&quot;Summand\&quot;:[]}&quot;</span>);
+    <span class="macro">assert_eq!</span>(json, <span class="string">"{\"Var\":[{\"type\":\"infer\",\"name\":\"mult_1\"},{\"type\":\"infer\",\"name\":\"mult_2\"},{\"type\":\"infer\",\"name\":\"α\"},{\"type\":\"infer\",\"name\":\"ρ\"},{\"type\":\"infer\",\"name\":\"I\"},{\"type\":\"infer\",\"name\":\"•1\"},{\"type\":\"infer\",\"name\":\"D\"}],\"Op1\":[{\"src\":7,\"tgt\":6,\"op1\":\"D(1,t)\"}],\"Op2\":[{\"proj1\":3,\"proj2\":4,\"res\":2,\"op2\":\"*\"},{\"proj1\":2,\"proj2\":5,\"res\":1,\"op2\":\"*\"}],\"Σ\":[],\"Summand\":[]}"</span>);
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_serialize_halfar_dome() {
-    <span class="kw">let </span>input = <span class="string">&quot;
+    <span class="kw">let </span>input = <span class="string">"
     &lt;math&gt;
         &lt;mfrac&gt;&lt;mrow&gt;&lt;mi&gt;∂&lt;/mi&gt;&lt;mi&gt;H&lt;/mi&gt;&lt;/mrow&gt;&lt;mrow&gt;&lt;mi&gt;∂&lt;/mi&gt;&lt;mi&gt;t&lt;/mi&gt;&lt;/mrow&gt;&lt;/mfrac&gt;
         &lt;mo&gt;=&lt;/mo&gt;
@@ -971,16 +972,16 @@
         &lt;mo&gt;&amp;#x2207;&lt;/mo&gt;&lt;mi&gt;H&lt;/mi&gt;
         &lt;mo&gt;)&lt;/mo&gt;
     &lt;/math&gt;
-    &quot;</span>;
+    "</span>;
     <span class="kw">let </span>expression = input.parse::&lt;MathExpressionTree&gt;().unwrap();
     <span class="kw">let </span>wiring_diagram = to_wiring_diagram(<span class="kw-2">&amp;</span>expression);
     <span class="kw">let </span>json = to_decapodes_json(wiring_diagram);
-    <span class="macro">assert_eq!</span>(json,<span class="string">&quot;{\&quot;Var\&quot;:[{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;•1\&quot;},{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;mult_1\&quot;},{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;mult_2\&quot;},{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;mult_3\&quot;},{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;Γ\&quot;},{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;•2\&quot;},{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;H\&quot;},{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;sum_1\&quot;},{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;n\&quot;},{\&quot;type\&quot;:\&quot;Literal\&quot;,\&quot;name\&quot;:\&quot;2\&quot;},{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;•3\&quot;},{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;•4\&quot;},{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;•5\&quot;},{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;•6\&quot;},{\&quot;type\&quot;:\&quot;Literal\&quot;,\&quot;name\&quot;:\&quot;1\&quot;},{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;•7\&quot;},{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;•8\&quot;}],\&quot;Op1\&quot;:[{\&quot;src\&quot;:7,\&quot;tgt\&quot;:13,\&quot;op1\&quot;:\&quot;Grad\&quot;},{\&quot;src\&quot;:13,\&quot;tgt\&quot;:12,\&quot;op1\&quot;:\&quot;Abs\&quot;},{\&quot;src\&quot;:7,\&quot;tgt\&quot;:16,\&quot;op1\&quot;:\&quot;Grad\&quot;},{\&quot;src\&quot;:2,\&quot;tgt\&quot;:1,\&quot;op1\&quot;:\&quot;Div\&quot;},{\&quot;src\&quot;:7,\&quot;tgt\&quot;:17,\&quot;op1\&quot;:\&quot;D(1,t)\&quot;}],\&quot;Op2\&quot;:[{\&quot;proj1\&quot;:7,\&quot;proj2\&quot;:8,\&quot;res\&quot;:6,\&quot;op2\&quot;:\&quot;^\&quot;},{\&quot;proj1\&quot;:5,\&quot;proj2\&quot;:6,\&quot;res\&quot;:4,\&quot;op2\&quot;:\&quot;*\&quot;},{\&quot;proj1\&quot;:9,\&quot;proj2\&quot;:15,\&quot;res\&quot;:14,\&quot;op2\&quot;:\&quot;-\&quot;},{\&quot;proj1\&quot;:12,\&quot;proj2\&quot;:14,\&quot;res\&quot;:11,\&quot;op2\&quot;:\&quot;^\&quot;},{\&quot;proj1\&quot;:4,\&quot;proj2\&quot;:11,\&quot;res\&quot;:3,\&quot;op2\&quot;:\&quot;*\&quot;},{\&quot;proj1\&quot;:3,\&quot;proj2\&quot;:16,\&quot;res\&quot;:2,\&quot;op2\&quot;:\&quot;*\&quot;}],\&quot;Σ\&quot;:[{\&quot;sum\&quot;:8}],\&quot;Summand\&quot;:[{\&quot;summand\&quot;:9,\&quot;summation\&quot;:1},{\&quot;summand\&quot;:10,\&quot;summation\&quot;:1}]}&quot;</span>);
+    <span class="macro">assert_eq!</span>(json,<span class="string">"{\"Var\":[{\"type\":\"infer\",\"name\":\"•1\"},{\"type\":\"infer\",\"name\":\"mult_1\"},{\"type\":\"infer\",\"name\":\"mult_2\"},{\"type\":\"infer\",\"name\":\"mult_3\"},{\"type\":\"infer\",\"name\":\"Γ\"},{\"type\":\"infer\",\"name\":\"•2\"},{\"type\":\"infer\",\"name\":\"H\"},{\"type\":\"infer\",\"name\":\"sum_1\"},{\"type\":\"infer\",\"name\":\"n\"},{\"type\":\"Literal\",\"name\":\"2\"},{\"type\":\"infer\",\"name\":\"•3\"},{\"type\":\"infer\",\"name\":\"•4\"},{\"type\":\"infer\",\"name\":\"•5\"},{\"type\":\"infer\",\"name\":\"•6\"},{\"type\":\"Literal\",\"name\":\"1\"},{\"type\":\"infer\",\"name\":\"•7\"},{\"type\":\"infer\",\"name\":\"•8\"}],\"Op1\":[{\"src\":7,\"tgt\":13,\"op1\":\"Grad\"},{\"src\":13,\"tgt\":12,\"op1\":\"Abs\"},{\"src\":7,\"tgt\":16,\"op1\":\"Grad\"},{\"src\":2,\"tgt\":1,\"op1\":\"Div\"},{\"src\":7,\"tgt\":17,\"op1\":\"D(1,t)\"}],\"Op2\":[{\"proj1\":7,\"proj2\":8,\"res\":6,\"op2\":\"^\"},{\"proj1\":5,\"proj2\":6,\"res\":4,\"op2\":\"*\"},{\"proj1\":9,\"proj2\":15,\"res\":14,\"op2\":\"-\"},{\"proj1\":12,\"proj2\":14,\"res\":11,\"op2\":\"^\"},{\"proj1\":4,\"proj2\":11,\"res\":3,\"op2\":\"*\"},{\"proj1\":3,\"proj2\":16,\"res\":2,\"op2\":\"*\"}],\"Σ\":[{\"sum\":8}],\"Summand\":[{\"summand\":9,\"summation\":1},{\"summand\":10,\"summation\":1}]}"</span>);
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_serialize_halfar_dome_3_2() {
-    <span class="kw">let </span>input = <span class="string">&quot;
+    <span class="kw">let </span>input = <span class="string">"
     &lt;math&gt;
         &lt;mi&gt;Γ&lt;/mi&gt;
         &lt;mo&gt;=&lt;/mo&gt;
@@ -992,18 +993,18 @@
         &lt;msup&gt;&lt;mo&gt;)&lt;/mo&gt;
         &lt;mi&gt;n&lt;/mi&gt;&lt;/msup&gt;
     &lt;/math&gt;
-    &quot;</span>;
+    "</span>;
     <span class="kw">let </span>expression = input.parse::&lt;MathExpressionTree&gt;().unwrap();
     <span class="kw">let </span>s_exp = expression.to_string();
-    <span class="macro">println!</span>(<span class="string">&quot;s_exp={:?}&quot;</span>, s_exp);
+    <span class="macro">println!</span>(<span class="string">"s_exp={:?}"</span>, s_exp);
     <span class="kw">let </span>wiring_diagram = to_wiring_diagram(<span class="kw-2">&amp;</span>expression);
     <span class="kw">let </span>json = to_decapodes_json(wiring_diagram);
-    <span class="macro">assert_eq!</span>(json, <span class="string">&quot;{\&quot;Var\&quot;:[{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;mult_1\&quot;},{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;mult_2\&quot;},{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;•1\&quot;},{\&quot;type\&quot;:\&quot;Literal\&quot;,\&quot;name\&quot;:\&quot;2\&quot;},{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;sum_1\&quot;},{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;n\&quot;},{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;A\&quot;},{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;•2\&quot;},{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;mult_3\&quot;},{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;ρ\&quot;},{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;g\&quot;},{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;Γ\&quot;}],\&quot;Op1\&quot;:[],\&quot;Op2\&quot;:[{\&quot;proj1\&quot;:4,\&quot;proj2\&quot;:5,\&quot;res\&quot;:3,\&quot;op2\&quot;:\&quot;/\&quot;},{\&quot;proj1\&quot;:3,\&quot;proj2\&quot;:7,\&quot;res\&quot;:2,\&quot;op2\&quot;:\&quot;*\&quot;},{\&quot;proj1\&quot;:10,\&quot;proj2\&quot;:11,\&quot;res\&quot;:9,\&quot;op2\&quot;:\&quot;*\&quot;},{\&quot;proj1\&quot;:9,\&quot;proj2\&quot;:6,\&quot;res\&quot;:8,\&quot;op2\&quot;:\&quot;^\&quot;},{\&quot;proj1\&quot;:2,\&quot;proj2\&quot;:8,\&quot;res\&quot;:1,\&quot;op2\&quot;:\&quot;*\&quot;}],\&quot;Σ\&quot;:[{\&quot;sum\&quot;:5}],\&quot;Summand\&quot;:[{\&quot;summand\&quot;:6,\&quot;summation\&quot;:1},{\&quot;summand\&quot;:4,\&quot;summation\&quot;:1}]}&quot;</span>);
+    <span class="macro">assert_eq!</span>(json, <span class="string">"{\"Var\":[{\"type\":\"infer\",\"name\":\"mult_1\"},{\"type\":\"infer\",\"name\":\"mult_2\"},{\"type\":\"infer\",\"name\":\"•1\"},{\"type\":\"Literal\",\"name\":\"2\"},{\"type\":\"infer\",\"name\":\"sum_1\"},{\"type\":\"infer\",\"name\":\"n\"},{\"type\":\"infer\",\"name\":\"A\"},{\"type\":\"infer\",\"name\":\"•2\"},{\"type\":\"infer\",\"name\":\"mult_3\"},{\"type\":\"infer\",\"name\":\"ρ\"},{\"type\":\"infer\",\"name\":\"g\"},{\"type\":\"infer\",\"name\":\"Γ\"}],\"Op1\":[],\"Op2\":[{\"proj1\":4,\"proj2\":5,\"res\":3,\"op2\":\"/\"},{\"proj1\":3,\"proj2\":7,\"res\":2,\"op2\":\"*\"},{\"proj1\":10,\"proj2\":11,\"res\":9,\"op2\":\"*\"},{\"proj1\":9,\"proj2\":6,\"res\":8,\"op2\":\"^\"},{\"proj1\":2,\"proj2\":8,\"res\":1,\"op2\":\"*\"}],\"Σ\":[{\"sum\":5}],\"Summand\":[{\"summand\":6,\"summation\":1},{\"summand\":4,\"summation\":1}]}"</span>);
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_serialize_from_image_3_1() {
-    <span class="kw">let </span>input = <span class="string">&quot;
+    <span class="kw">let </span>input = <span class="string">"
     &lt;math&gt;
         &lt;mfrac&gt;&lt;mrow&gt;&lt;mi&gt;∂&lt;/mi&gt;&lt;mi&gt;H&lt;/mi&gt;&lt;/mrow&gt;&lt;mrow&gt;&lt;mi&gt;∂&lt;/mi&gt;&lt;mi&gt;t&lt;/mi&gt;&lt;/mrow&gt;&lt;/mfrac&gt;
         &lt;mo&gt;=&lt;/mo&gt;
@@ -1018,16 +1019,16 @@
         &lt;mo&gt;∇&lt;/mo&gt;&lt;mi&gt;H&lt;/mi&gt;
         &lt;mo&gt;)&lt;/mo&gt;
     &lt;/math&gt;
-    &quot;</span>;
+    "</span>;
     <span class="kw">let </span>expression = input.parse::&lt;MathExpressionTree&gt;().unwrap();
     <span class="kw">let </span>wiring_diagram = to_wiring_diagram(<span class="kw-2">&amp;</span>expression);
     <span class="kw">let </span>json = to_decapodes_json(wiring_diagram);
-    <span class="macro">assert_eq!</span>(json,<span class="string">&quot;{\&quot;Var\&quot;:[{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;•1\&quot;},{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;mult_1\&quot;},{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;mult_2\&quot;},{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;mult_3\&quot;},{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;Γ\&quot;},{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;•2\&quot;},{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;H\&quot;},{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;sum_1\&quot;},{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;n\&quot;},{\&quot;type\&quot;:\&quot;Literal\&quot;,\&quot;name\&quot;:\&quot;2\&quot;},{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;•3\&quot;},{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;•4\&quot;},{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;•5\&quot;},{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;•6\&quot;},{\&quot;type\&quot;:\&quot;Literal\&quot;,\&quot;name\&quot;:\&quot;1\&quot;},{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;•7\&quot;},{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;•8\&quot;}],\&quot;Op1\&quot;:[{\&quot;src\&quot;:7,\&quot;tgt\&quot;:13,\&quot;op1\&quot;:\&quot;Grad\&quot;},{\&quot;src\&quot;:13,\&quot;tgt\&quot;:12,\&quot;op1\&quot;:\&quot;Abs\&quot;},{\&quot;src\&quot;:7,\&quot;tgt\&quot;:16,\&quot;op1\&quot;:\&quot;Grad\&quot;},{\&quot;src\&quot;:2,\&quot;tgt\&quot;:1,\&quot;op1\&quot;:\&quot;Div\&quot;},{\&quot;src\&quot;:7,\&quot;tgt\&quot;:17,\&quot;op1\&quot;:\&quot;D(1,t)\&quot;}],\&quot;Op2\&quot;:[{\&quot;proj1\&quot;:7,\&quot;proj2\&quot;:8,\&quot;res\&quot;:6,\&quot;op2\&quot;:\&quot;^\&quot;},{\&quot;proj1\&quot;:5,\&quot;proj2\&quot;:6,\&quot;res\&quot;:4,\&quot;op2\&quot;:\&quot;*\&quot;},{\&quot;proj1\&quot;:9,\&quot;proj2\&quot;:15,\&quot;res\&quot;:14,\&quot;op2\&quot;:\&quot;-\&quot;},{\&quot;proj1\&quot;:12,\&quot;proj2\&quot;:14,\&quot;res\&quot;:11,\&quot;op2\&quot;:\&quot;^\&quot;},{\&quot;proj1\&quot;:4,\&quot;proj2\&quot;:11,\&quot;res\&quot;:3,\&quot;op2\&quot;:\&quot;*\&quot;},{\&quot;proj1\&quot;:3,\&quot;proj2\&quot;:16,\&quot;res\&quot;:2,\&quot;op2\&quot;:\&quot;*\&quot;}],\&quot;Σ\&quot;:[{\&quot;sum\&quot;:8}],\&quot;Summand\&quot;:[{\&quot;summand\&quot;:9,\&quot;summation\&quot;:1},{\&quot;summand\&quot;:10,\&quot;summation\&quot;:1}]}&quot;</span>);
+    <span class="macro">assert_eq!</span>(json,<span class="string">"{\"Var\":[{\"type\":\"infer\",\"name\":\"•1\"},{\"type\":\"infer\",\"name\":\"mult_1\"},{\"type\":\"infer\",\"name\":\"mult_2\"},{\"type\":\"infer\",\"name\":\"mult_3\"},{\"type\":\"infer\",\"name\":\"Γ\"},{\"type\":\"infer\",\"name\":\"•2\"},{\"type\":\"infer\",\"name\":\"H\"},{\"type\":\"infer\",\"name\":\"sum_1\"},{\"type\":\"infer\",\"name\":\"n\"},{\"type\":\"Literal\",\"name\":\"2\"},{\"type\":\"infer\",\"name\":\"•3\"},{\"type\":\"infer\",\"name\":\"•4\"},{\"type\":\"infer\",\"name\":\"•5\"},{\"type\":\"infer\",\"name\":\"•6\"},{\"type\":\"Literal\",\"name\":\"1\"},{\"type\":\"infer\",\"name\":\"•7\"},{\"type\":\"infer\",\"name\":\"•8\"}],\"Op1\":[{\"src\":7,\"tgt\":13,\"op1\":\"Grad\"},{\"src\":13,\"tgt\":12,\"op1\":\"Abs\"},{\"src\":7,\"tgt\":16,\"op1\":\"Grad\"},{\"src\":2,\"tgt\":1,\"op1\":\"Div\"},{\"src\":7,\"tgt\":17,\"op1\":\"D(1,t)\"}],\"Op2\":[{\"proj1\":7,\"proj2\":8,\"res\":6,\"op2\":\"^\"},{\"proj1\":5,\"proj2\":6,\"res\":4,\"op2\":\"*\"},{\"proj1\":9,\"proj2\":15,\"res\":14,\"op2\":\"-\"},{\"proj1\":12,\"proj2\":14,\"res\":11,\"op2\":\"^\"},{\"proj1\":4,\"proj2\":11,\"res\":3,\"op2\":\"*\"},{\"proj1\":3,\"proj2\":16,\"res\":2,\"op2\":\"*\"}],\"Σ\":[{\"sum\":8}],\"Summand\":[{\"summand\":9,\"summation\":1},{\"summand\":10,\"summation\":1}]}"</span>);
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_serialize_from_image_3_2() {
-    <span class="kw">let </span>input = <span class="string">&quot;
+    <span class="kw">let </span>input = <span class="string">"
     &lt;math&gt;
         &lt;mi&gt;Γ&lt;/mi&gt;
         &lt;mo&gt;=&lt;/mo&gt;
@@ -1039,11 +1040,11 @@
         &lt;msup&gt;&lt;mo&gt;)&lt;/mo&gt;
         &lt;mi&gt;n&lt;/mi&gt;&lt;/msup&gt;
     &lt;/math&gt;
-    &quot;</span>;
+    "</span>;
     <span class="kw">let </span>expression = input.parse::&lt;MathExpressionTree&gt;().unwrap();
     <span class="kw">let </span>_s_exp = expression.to_string();
     <span class="kw">let </span>wiring_diagram = to_wiring_diagram(<span class="kw-2">&amp;</span>expression);
     <span class="kw">let </span>json = to_decapodes_json(wiring_diagram);
-    <span class="macro">assert_eq!</span>(json, <span class="string">&quot;{\&quot;Var\&quot;:[{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;mult_1\&quot;},{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;mult_2\&quot;},{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;•1\&quot;},{\&quot;type\&quot;:\&quot;Literal\&quot;,\&quot;name\&quot;:\&quot;2\&quot;},{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;sum_1\&quot;},{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;n\&quot;},{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;A\&quot;},{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;•2\&quot;},{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;mult_3\&quot;},{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;ρ\&quot;},{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;g\&quot;},{\&quot;type\&quot;:\&quot;infer\&quot;,\&quot;name\&quot;:\&quot;Γ\&quot;}],\&quot;Op1\&quot;:[],\&quot;Op2\&quot;:[{\&quot;proj1\&quot;:4,\&quot;proj2\&quot;:5,\&quot;res\&quot;:3,\&quot;op2\&quot;:\&quot;/\&quot;},{\&quot;proj1\&quot;:3,\&quot;proj2\&quot;:7,\&quot;res\&quot;:2,\&quot;op2\&quot;:\&quot;*\&quot;},{\&quot;proj1\&quot;:10,\&quot;proj2\&quot;:11,\&quot;res\&quot;:9,\&quot;op2\&quot;:\&quot;*\&quot;},{\&quot;proj1\&quot;:9,\&quot;proj2\&quot;:6,\&quot;res\&quot;:8,\&quot;op2\&quot;:\&quot;^\&quot;},{\&quot;proj1\&quot;:2,\&quot;proj2\&quot;:8,\&quot;res\&quot;:1,\&quot;op2\&quot;:\&quot;*\&quot;}],\&quot;Σ\&quot;:[{\&quot;sum\&quot;:5}],\&quot;Summand\&quot;:[{\&quot;summand\&quot;:6,\&quot;summation\&quot;:1},{\&quot;summand\&quot;:4,\&quot;summation\&quot;:1}]}&quot;</span>);
+    <span class="macro">assert_eq!</span>(json, <span class="string">"{\"Var\":[{\"type\":\"infer\",\"name\":\"mult_1\"},{\"type\":\"infer\",\"name\":\"mult_2\"},{\"type\":\"infer\",\"name\":\"•1\"},{\"type\":\"Literal\",\"name\":\"2\"},{\"type\":\"infer\",\"name\":\"sum_1\"},{\"type\":\"infer\",\"name\":\"n\"},{\"type\":\"infer\",\"name\":\"A\"},{\"type\":\"infer\",\"name\":\"•2\"},{\"type\":\"infer\",\"name\":\"mult_3\"},{\"type\":\"infer\",\"name\":\"ρ\"},{\"type\":\"infer\",\"name\":\"g\"},{\"type\":\"infer\",\"name\":\"Γ\"}],\"Op1\":[],\"Op2\":[{\"proj1\":4,\"proj2\":5,\"res\":3,\"op2\":\"/\"},{\"proj1\":3,\"proj2\":7,\"res\":2,\"op2\":\"*\"},{\"proj1\":10,\"proj2\":11,\"res\":9,\"op2\":\"*\"},{\"proj1\":9,\"proj2\":6,\"res\":8,\"op2\":\"^\"},{\"proj1\":2,\"proj2\":8,\"res\":1,\"op2\":\"*\"}],\"Σ\":[{\"sum\":5}],\"Summand\":[{\"summand\":6,\"summation\":1},{\"summand\":4,\"summation\":1}]}"</span>);
 }
 </code></pre></div></section></main></body></html>

@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/serde_yaml-0.9.31/src/libyaml/parser.rs`."><title>parser.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serde_yaml" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/serde_yaml-0.9.31/src/libyaml/parser.rs`."><title>parser.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serde_yaml" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -210,35 +211,35 @@
 <span class="kw">use </span>std::slice;
 <span class="kw">use </span>unsafe_libyaml <span class="kw">as </span>sys;
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Parser&lt;<span class="lifetime">&#39;input</span>&gt; {
-    pin: Owned&lt;ParserPinned&lt;<span class="lifetime">&#39;input</span>&gt;&gt;,
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Parser&lt;<span class="lifetime">'input</span>&gt; {
+    pin: Owned&lt;ParserPinned&lt;<span class="lifetime">'input</span>&gt;&gt;,
 }
 
-<span class="kw">struct </span>ParserPinned&lt;<span class="lifetime">&#39;input</span>&gt; {
+<span class="kw">struct </span>ParserPinned&lt;<span class="lifetime">'input</span>&gt; {
     sys: sys::yaml_parser_t,
-    input: Cow&lt;<span class="lifetime">&#39;input</span>, [u8]&gt;,
+    input: Cow&lt;<span class="lifetime">'input</span>, [u8]&gt;,
 }
 
 <span class="attr">#[derive(Debug)]
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>Event&lt;<span class="lifetime">&#39;input</span>&gt; {
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>Event&lt;<span class="lifetime">'input</span>&gt; {
     StreamStart,
     StreamEnd,
     DocumentStart,
     DocumentEnd,
     Alias(Anchor),
-    Scalar(Scalar&lt;<span class="lifetime">&#39;input</span>&gt;),
+    Scalar(Scalar&lt;<span class="lifetime">'input</span>&gt;),
     SequenceStart(SequenceStart),
     SequenceEnd,
     MappingStart(MappingStart),
     MappingEnd,
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Scalar&lt;<span class="lifetime">&#39;input</span>&gt; {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Scalar&lt;<span class="lifetime">'input</span>&gt; {
     <span class="kw">pub </span>anchor: <span class="prelude-ty">Option</span>&lt;Anchor&gt;,
     <span class="kw">pub </span>tag: <span class="prelude-ty">Option</span>&lt;Tag&gt;,
     <span class="kw">pub </span>value: Box&lt;[u8]&gt;,
     <span class="kw">pub </span>style: ScalarStyle,
-    <span class="kw">pub </span>repr: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;input </span>[u8]&gt;,
+    <span class="kw">pub </span>repr: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'input </span>[u8]&gt;,
 }
 
 <span class="attr">#[derive(Debug)]
@@ -265,13 +266,13 @@
     Folded,
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;input</span>&gt; Parser&lt;<span class="lifetime">&#39;input</span>&gt; {
-    <span class="kw">pub fn </span>new(input: Cow&lt;<span class="lifetime">&#39;input</span>, [u8]&gt;) -&gt; Parser&lt;<span class="lifetime">&#39;input</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'input</span>&gt; Parser&lt;<span class="lifetime">'input</span>&gt; {
+    <span class="kw">pub fn </span>new(input: Cow&lt;<span class="lifetime">'input</span>, [u8]&gt;) -&gt; Parser&lt;<span class="lifetime">'input</span>&gt; {
         <span class="kw">let </span>owned = Owned::&lt;ParserPinned&gt;::new_uninit();
         <span class="kw">let </span>pin = <span class="kw">unsafe </span>{
             <span class="kw">let </span>parser = <span class="macro">addr_of_mut!</span>((<span class="kw-2">*</span>owned.ptr).sys);
             <span class="kw">if </span>sys::yaml_parser_initialize(parser).fail {
-                <span class="macro">panic!</span>(<span class="string">&quot;malloc error: {}&quot;</span>, Error::parse_error(parser));
+                <span class="macro">panic!</span>(<span class="string">"malloc error: {}"</span>, Error::parse_error(parser));
             }
             sys::yaml_parser_set_encoding(parser, sys::YAML_UTF8_ENCODING);
             sys::yaml_parser_set_input_string(parser, input.as_ptr(), input.len() <span class="kw">as </span>u64);
@@ -281,7 +282,7 @@
         Parser { pin }
     }
 
-    <span class="kw">pub fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;(Event&lt;<span class="lifetime">&#39;input</span>&gt;, Mark)&gt; {
+    <span class="kw">pub fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;(Event&lt;<span class="lifetime">'input</span>&gt;, Mark)&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>event = MaybeUninit::&lt;sys::yaml_event_t&gt;::uninit();
         <span class="kw">unsafe </span>{
             <span class="kw">let </span>parser = <span class="macro">addr_of_mut!</span>((<span class="kw-2">*</span><span class="self">self</span>.pin.ptr).sys);
@@ -302,10 +303,10 @@
     }
 }
 
-<span class="kw">unsafe fn </span>convert_event&lt;<span class="lifetime">&#39;input</span>&gt;(
+<span class="kw">unsafe fn </span>convert_event&lt;<span class="lifetime">'input</span>&gt;(
     sys: <span class="kw-2">&amp;</span>sys::yaml_event_t,
-    input: <span class="kw-2">&amp;</span>Cow&lt;<span class="lifetime">&#39;input</span>, [u8]&gt;,
-) -&gt; Event&lt;<span class="lifetime">&#39;input</span>&gt; {
+    input: <span class="kw-2">&amp;</span>Cow&lt;<span class="lifetime">'input</span>, [u8]&gt;,
+) -&gt; Event&lt;<span class="lifetime">'input</span>&gt; {
     <span class="kw">match </span>sys.type_ {
         sys::YAML_STREAM_START_EVENT =&gt; Event::StreamStart,
         sys::YAML_STREAM_END_EVENT =&gt; Event::StreamEnd,
@@ -361,7 +362,7 @@
     <span class="prelude-val">Some</span>(Tag(Box::from(cstr.to_bytes())))
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;input</span>&gt; Debug <span class="kw">for </span>Scalar&lt;<span class="lifetime">&#39;input</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'input</span>&gt; Debug <span class="kw">for </span>Scalar&lt;<span class="lifetime">'input</span>&gt; {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, formatter: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
         <span class="kw">let </span>Scalar {
             anchor,
@@ -371,20 +372,20 @@
             repr: <span class="kw">_</span>,
         } = <span class="self">self</span>;
 
-        <span class="kw">struct </span>LossySlice&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]);
+        <span class="kw">struct </span>LossySlice&lt;<span class="lifetime">'a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">'a </span>[u8]);
 
-        <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Debug <span class="kw">for </span>LossySlice&lt;<span class="lifetime">&#39;a</span>&gt; {
+        <span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Debug <span class="kw">for </span>LossySlice&lt;<span class="lifetime">'a</span>&gt; {
             <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, formatter: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
                 cstr::debug_lossy(<span class="self">self</span>.<span class="number">0</span>, formatter)
             }
         }
 
         formatter
-            .debug_struct(<span class="string">&quot;Scalar&quot;</span>)
-            .field(<span class="string">&quot;anchor&quot;</span>, anchor)
-            .field(<span class="string">&quot;tag&quot;</span>, tag)
-            .field(<span class="string">&quot;value&quot;</span>, <span class="kw-2">&amp;</span>LossySlice(value))
-            .field(<span class="string">&quot;style&quot;</span>, style)
+            .debug_struct(<span class="string">"Scalar"</span>)
+            .field(<span class="string">"anchor"</span>, anchor)
+            .field(<span class="string">"tag"</span>, tag)
+            .field(<span class="string">"value"</span>, <span class="kw-2">&amp;</span>LossySlice(value))
+            .field(<span class="string">"style"</span>, style)
             .finish()
     }
 }
@@ -395,7 +396,7 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;input</span>&gt; Drop <span class="kw">for </span>ParserPinned&lt;<span class="lifetime">&#39;input</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'input</span>&gt; Drop <span class="kw">for </span>ParserPinned&lt;<span class="lifetime">'input</span>&gt; {
     <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
         <span class="kw">unsafe </span>{ sys::yaml_parser_delete(<span class="kw-2">&amp;mut </span><span class="self">self</span>.sys) }
     }

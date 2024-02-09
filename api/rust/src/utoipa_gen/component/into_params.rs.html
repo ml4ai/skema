@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/utoipa-gen-3.5.0/src/component/into_params.rs`."><title>into_params.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="utoipa_gen" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/utoipa-gen-3.5.0/src/component/into_params.rs`."><title>into_params.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="utoipa_gen" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -487,7 +488,7 @@
 
 <span class="macro">impl_into_inner!</span>(IntoParamsFeatures);
 
-<span class="attr">#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
+<span class="attr">#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
 </span><span class="kw">pub struct </span>IntoParams {
     <span class="doccomment">/// Attributes tagged on the whole struct or enum.
     </span><span class="kw">pub </span>attrs: Vec&lt;Attribute&gt;,
@@ -507,7 +508,7 @@
         <span class="kw">let </span><span class="kw-2">mut </span>into_params_features = <span class="self">self
             </span>.attrs
             .iter()
-            .filter(|attr| attr.path().is_ident(<span class="string">&quot;into_params&quot;</span>))
+            .filter(|attr| attr.path().is_ident(<span class="string">"into_params"</span>))
             .map(|attribute| {
                 attribute
                     .parse_args::&lt;IntoParamsFeatures&gt;()
@@ -518,11 +519,11 @@
         <span class="kw">let </span>serde_container = serde::parse_container(<span class="kw-2">&amp;</span><span class="self">self</span>.attrs);
 
         <span class="comment">// #[param] is only supported over fields
-        </span><span class="kw">if </span><span class="self">self</span>.attrs.iter().any(|attr| attr.path().is_ident(<span class="string">&quot;param&quot;</span>)) {
+        </span><span class="kw">if </span><span class="self">self</span>.attrs.iter().any(|attr| attr.path().is_ident(<span class="string">"param"</span>)) {
             <span class="macro">abort! </span>{
                 ident,
-                <span class="string">&quot;found `param` attribute in unsupported context&quot;</span>;
-                help = <span class="string">&quot;Did you mean `into_params`?&quot;</span>,
+                <span class="string">"found `param` attribute in unsupported context"</span>;
+                help = <span class="string">"Did you mean `into_params`?"</span>,
             }
         }
 
@@ -566,7 +567,7 @@
                         name: names.as_ref()
                             .map(|names| names.get(index).unwrap_or_else(|| <span class="macro">abort!</span>(
                                 ident,
-                                <span class="string">&quot;There is no name specified in the names(...) container attribute for tuple struct field {}&quot;</span>,
+                                <span class="string">"There is no name specified in the names(...) container attribute for tuple struct field {}"</span>,
                                 index
                             ))),
                     },
@@ -594,7 +595,7 @@
         <span class="kw">let </span>abort = |note: <span class="kw-2">&amp;</span>str| {
             <span class="macro">abort! </span>{
                 ident,
-                <span class="string">&quot;unsupported data type, expected struct with named fields `struct {} {{...}}` or unnamed fields `struct {}(...)`&quot;</span>,
+                <span class="string">"unsupported data type, expected struct with named fields `struct {} {{...}}` or unnamed fields `struct {}(...)`"</span>,
                 ident.to_string(),
                 ident.to_string();
                 note = note
@@ -605,7 +606,7 @@
             Data::Struct(data_struct) =&gt; <span class="kw">match </span><span class="kw-2">&amp;</span>data_struct.fields {
                 syn::Fields::Named(named_fields) =&gt; {
                     <span class="kw">if </span>field_names.is_some() {
-                        <span class="macro">abort! </span>{ident, <span class="string">&quot;`#[into_params(names(...))]` is not supported attribute on a struct with named fields&quot;</span>}
+                        <span class="macro">abort! </span>{ident, <span class="string">"`#[into_params(names(...))]` is not supported attribute on a struct with named fields"</span>}
                     }
                     named_fields.named.iter()
                 }
@@ -613,9 +614,9 @@
                     <span class="self">self</span>.validate_unnamed_field_names(<span class="kw-2">&amp;</span>unnamed_fields.unnamed, field_names);
                     unnamed_fields.unnamed.iter()
                 }
-                <span class="kw">_ </span>=&gt; abort(<span class="string">&quot;Unit type struct is not supported&quot;</span>),
+                <span class="kw">_ </span>=&gt; abort(<span class="string">"Unit type struct is not supported"</span>),
             },
-            <span class="kw">_ </span>=&gt; abort(<span class="string">&quot;Only struct type is supported&quot;</span>),
+            <span class="kw">_ </span>=&gt; abort(<span class="string">"Only struct type is supported"</span>),
         }
     }
 
@@ -630,34 +631,34 @@
                 <span class="kw">if </span>names.len() != unnamed_fields.len() {
                     <span class="macro">abort! </span>{
                         ident,
-                        <span class="string">&quot;declared names amount &#39;{}&#39; does not match to the unnamed fields amount &#39;{}&#39; in type: {}&quot;</span>,
+                        <span class="string">"declared names amount '{}' does not match to the unnamed fields amount '{}' in type: {}"</span>,
                             names.len(), unnamed_fields.len(), ident;
-                        help = <span class="string">r#&quot;Did you forget to add a field name to `#[into_params(names(... , &quot;field_name&quot;))]`&quot;#</span>;
-                        help = <span class="string">&quot;Or have you added extra name but haven&#39;t defined a type?&quot;
+                        help = <span class="string">r#"Did you forget to add a field name to `#[into_params(names(... , "field_name"))]`"#</span>;
+                        help = <span class="string">"Or have you added extra name but haven't defined a type?"
                     </span>}
                 }
             }
             <span class="prelude-val">None </span>=&gt; {
                 <span class="macro">abort! </span>{
                     ident,
-                    <span class="string">&quot;struct with unnamed fields must have explicit name declarations.&quot;</span>;
-                    help = <span class="string">&quot;Try defining `#[into_params(names(...))]` over your type: {}&quot;</span>, ident,
+                    <span class="string">"struct with unnamed fields must have explicit name declarations."</span>;
+                    help = <span class="string">"Try defining `#[into_params(names(...))]` over your type: {}"</span>, ident,
                 }
             }
         }
     }
 }
 
-<span class="attr">#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
-</span><span class="kw">pub struct </span>FieldParamContainerAttributes&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="attr">#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
+</span><span class="kw">pub struct </span>FieldParamContainerAttributes&lt;<span class="lifetime">'a</span>&gt; {
     <span class="doccomment">/// See [`IntoParamsAttr::style`].
-    </span>style: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="prelude-ty">Option</span>&lt;Feature&gt;,
+    </span>style: <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="prelude-ty">Option</span>&lt;Feature&gt;,
     <span class="doccomment">/// See [`IntoParamsAttr::names`]. The name that applies to this field.
-    </span>name: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>String&gt;,
+    </span>name: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>String&gt;,
     <span class="doccomment">/// See [`IntoParamsAttr::parameter_in`].
-    </span>parameter_in: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="prelude-ty">Option</span>&lt;Feature&gt;,
+    </span>parameter_in: <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="prelude-ty">Option</span>&lt;Feature&gt;,
     <span class="doccomment">/// Custom rename all if serde attribute is not present.
-    </span>rename_all: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>RenameAll&gt;,
+    </span>rename_all: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>RenameAll&gt;,
 }
 
 <span class="kw">struct </span>FieldFeatures(Vec&lt;Feature&gt;);
@@ -699,19 +700,19 @@
     }
 }
 
-<span class="attr">#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
-</span><span class="kw">struct </span>Param&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="attr">#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
+</span><span class="kw">struct </span>Param&lt;<span class="lifetime">'a</span>&gt; {
     <span class="doccomment">/// Field in the container used to create a single parameter.
-    </span>field: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Field,
+    </span>field: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>Field,
     <span class="comment">//// Field serde params parsed from field attributes.
     </span>field_serde_params: <span class="prelude-ty">Option</span>&lt;SerdeValue&gt;,
     <span class="doccomment">/// Attributes on the container which are relevant for this macro.
-    </span>container_attributes: FieldParamContainerAttributes&lt;<span class="lifetime">&#39;a</span>&gt;,
+    </span>container_attributes: FieldParamContainerAttributes&lt;<span class="lifetime">'a</span>&gt;,
     <span class="doccomment">/// Either serde rename all rule or into_params rename all rule if provided.
-    </span>serde_container: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>SerdeContainer&gt;,
+    </span>serde_container: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>SerdeContainer&gt;,
 }
 
-<span class="kw">impl </span>Param&lt;<span class="lifetime">&#39;_</span>&gt; {
+<span class="kw">impl </span>Param&lt;<span class="lifetime">'_</span>&gt; {
     <span class="doccomment">/// Resolve [`Param`] features and split features into two [`Vec`]s. Features are split by
     /// whether they should be rendered in [`Param`] itself or in [`Param`]s schema.
     ///
@@ -721,7 +722,7 @@
             </span>.field
             .attrs
             .iter()
-            .filter(|attribute| attribute.path().is_ident(<span class="string">&quot;param&quot;</span>))
+            .filter(|attribute| attribute.path().is_ident(<span class="string">"param"</span>))
             .map(|attribute| {
                 attribute
                     .parse_args::&lt;FieldFeatures&gt;()
@@ -775,7 +776,7 @@
     }
 }
 
-<span class="kw">impl </span>ToTokens <span class="kw">for </span>Param&lt;<span class="lifetime">&#39;_</span>&gt; {
+<span class="kw">impl </span>ToTokens <span class="kw">for </span>Param&lt;<span class="lifetime">'_</span>&gt; {
     <span class="kw">fn </span>to_tokens(<span class="kw-2">&amp;</span><span class="self">self</span>, tokens: <span class="kw-2">&amp;mut </span>TokenStream) {
         <span class="kw">let </span>field = <span class="self">self</span>.field;
         <span class="kw">let </span>field_serde_params = <span class="kw-2">&amp;</span><span class="self">self</span>.field_serde_params;
@@ -785,11 +786,11 @@
             .map(|ident| ident.to_string())
             .or_else(|| <span class="self">self</span>.container_attributes.name.cloned())
             .unwrap_or_else(|| <span class="macro">abort!</span>(
-                field, <span class="string">&quot;No name specified for unnamed field.&quot;</span>;
-                help = <span class="string">&quot;Try adding #[into_params(names(...))] container attribute to specify the name for this field&quot;
+                field, <span class="string">"No name specified for unnamed field."</span>;
+                help = <span class="string">"Try adding #[into_params(names(...))] container attribute to specify the name for this field"
             </span>));
 
-        <span class="kw">if </span>name.starts_with(<span class="string">&quot;r#&quot;</span>) {
+        <span class="kw">if </span>name.starts_with(<span class="string">"r#"</span>) {
             name = <span class="kw-2">&amp;</span>name[<span class="number">2</span>..];
         }
 
@@ -867,7 +868,7 @@
                 features: <span class="prelude-val">Some</span>(schema_features),
                 description: <span class="prelude-val">None</span>,
                 deprecated: <span class="prelude-val">None</span>,
-                object_name: <span class="string">&quot;&quot;</span>,
+                object_name: <span class="string">""</span>,
             });
 
             tokens.extend(<span class="macro">quote! </span>{ .schema(<span class="prelude-val">Some</span>(#schema)).build() });

@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/utoipa-gen-3.5.0/src/component/serde.rs`."><title>serde.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="utoipa_gen" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/utoipa-gen-3.5.0/src/component/serde.rs`."><title>serde.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="utoipa_gen" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -481,9 +482,9 @@
 </span><span class="kw">fn </span>parse_next_lit_str(next: Cursor) -&gt; <span class="prelude-ty">Option</span>&lt;(String, Span)&gt; {
     <span class="kw">match </span>next.token_tree() {
         <span class="prelude-val">Some</span>((tt, next)) =&gt; <span class="kw">match </span>tt {
-            TokenTree::Punct(punct) <span class="kw">if </span>punct.as_char() == <span class="string">&#39;=&#39; </span>=&gt; parse_next_lit_str(next),
+            TokenTree::Punct(punct) <span class="kw">if </span>punct.as_char() == <span class="string">'=' </span>=&gt; parse_next_lit_str(next),
             TokenTree::Literal(literal) =&gt; {
-                <span class="prelude-val">Some</span>((literal.to_string().replace(<span class="string">&#39;\&quot;&#39;</span>, <span class="string">&quot;&quot;</span>), literal.span()))
+                <span class="prelude-val">Some</span>((literal.to_string().replace(<span class="string">'\"'</span>, <span class="string">""</span>), literal.span()))
             }
             <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         },
@@ -492,7 +493,7 @@
 }
 
 <span class="attr">#[derive(Default)]
-#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
+#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
 </span><span class="kw">pub struct </span>SerdeValue {
     <span class="kw">pub </span>skip: bool,
     <span class="kw">pub </span>rename: <span class="prelude-ty">Option</span>&lt;String&gt;,
@@ -503,7 +504,7 @@
 }
 
 <span class="kw">impl </span>SerdeValue {
-    <span class="kw">const </span>SERDE_WITH_DOUBLE_OPTION: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;::serde_with::rust::double_option&quot;</span>;
+    <span class="kw">const </span>SERDE_WITH_DOUBLE_OPTION: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str = <span class="string">"::serde_with::rust::double_option"</span>;
 }
 
 <span class="kw">impl </span>SerdeValue {
@@ -515,16 +516,16 @@
             <span class="kw">while let </span><span class="prelude-val">Some</span>((tt, next)) = rest.token_tree() {
                 <span class="kw">match </span>tt {
                     TokenTree::Ident(ident)
-                        <span class="kw">if </span>ident == <span class="string">&quot;skip&quot;
-                            </span>|| ident == <span class="string">&quot;skip_serializing&quot;
-                            </span>|| ident == <span class="string">&quot;skip_deserializing&quot; </span>=&gt;
+                        <span class="kw">if </span>ident == <span class="string">"skip"
+                            </span>|| ident == <span class="string">"skip_serializing"
+                            </span>|| ident == <span class="string">"skip_deserializing" </span>=&gt;
                     {
                         value.skip = <span class="bool-val">true
                     </span>}
-                    TokenTree::Ident(ident) <span class="kw">if </span>ident == <span class="string">&quot;skip_serializing_if&quot; </span>=&gt; {
+                    TokenTree::Ident(ident) <span class="kw">if </span>ident == <span class="string">"skip_serializing_if" </span>=&gt; {
                         value.skip_serializing_if = <span class="bool-val">true
                     </span>}
-                    TokenTree::Ident(ident) <span class="kw">if </span>ident == <span class="string">&quot;with&quot; </span>=&gt; {
+                    TokenTree::Ident(ident) <span class="kw">if </span>ident == <span class="string">"with" </span>=&gt; {
                         value.double_option = parse_next_lit_str(next)
                             .and_then(|(literal, <span class="kw">_</span>)| {
                                 <span class="kw">if </span>literal == SerdeValue::SERDE_WITH_DOUBLE_OPTION {
@@ -535,13 +536,13 @@
                             })
                             .unwrap_or(<span class="bool-val">false</span>);
                     }
-                    TokenTree::Ident(ident) <span class="kw">if </span>ident == <span class="string">&quot;flatten&quot; </span>=&gt; value.flatten = <span class="bool-val">true</span>,
-                    TokenTree::Ident(ident) <span class="kw">if </span>ident == <span class="string">&quot;rename&quot; </span>=&gt; {
+                    TokenTree::Ident(ident) <span class="kw">if </span>ident == <span class="string">"flatten" </span>=&gt; value.flatten = <span class="bool-val">true</span>,
+                    TokenTree::Ident(ident) <span class="kw">if </span>ident == <span class="string">"rename" </span>=&gt; {
                         <span class="kw">if let </span><span class="prelude-val">Some</span>((literal, <span class="kw">_</span>)) = parse_next_lit_str(next) {
                             value.rename = <span class="prelude-val">Some</span>(literal)
                         };
                     }
-                    TokenTree::Ident(ident) <span class="kw">if </span>ident == <span class="string">&quot;default&quot; </span>=&gt; value.default = <span class="bool-val">true</span>,
+                    TokenTree::Ident(ident) <span class="kw">if </span>ident == <span class="string">"default" </span>=&gt; value.default = <span class="bool-val">true</span>,
                     <span class="kw">_ </span>=&gt; (),
                 }
 
@@ -583,7 +584,7 @@
 
 <span class="doccomment">/// Attributes defined within a `#[serde(...)]` container attribute.
 </span><span class="attr">#[derive(Default)]
-#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
+#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
 </span><span class="kw">pub struct </span>SerdeContainer {
     <span class="kw">pub </span>rename_all: <span class="prelude-ty">Option</span>&lt;RenameRule&gt;,
     <span class="kw">pub </span>enum_repr: SerdeEnumRepr,
@@ -599,7 +600,7 @@
     ///     * `default = ...`
     </span><span class="kw">fn </span>parse_attribute(<span class="kw-2">&amp;mut </span><span class="self">self</span>, ident: Ident, next: Cursor) -&gt; syn::Result&lt;()&gt; {
         <span class="kw">match </span>ident.to_string().as_str() {
-            <span class="string">&quot;rename_all&quot; </span>=&gt; {
+            <span class="string">"rename_all" </span>=&gt; {
                 <span class="kw">if let </span><span class="prelude-val">Some</span>((literal, span)) = parse_next_lit_str(next) {
                     <span class="self">self</span>.rename_all = <span class="prelude-val">Some</span>(
                         literal
@@ -608,7 +609,7 @@
                     );
                 }
             }
-            <span class="string">&quot;tag&quot; </span>=&gt; {
+            <span class="string">"tag" </span>=&gt; {
                 <span class="kw">if let </span><span class="prelude-val">Some</span>((literal, span)) = parse_next_lit_str(next) {
                     <span class="self">self</span>.enum_repr = <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.enum_repr {
                         SerdeEnumRepr::ExternallyTagged =&gt; {
@@ -622,13 +623,13 @@
                         }
                         SerdeEnumRepr::InternallyTagged { .. }
                         | SerdeEnumRepr::AdjacentlyTagged { .. } =&gt; {
-                            <span class="macro">abort!</span>(span, <span class="string">&quot;Duplicate serde tag argument&quot;</span>)
+                            <span class="macro">abort!</span>(span, <span class="string">"Duplicate serde tag argument"</span>)
                         }
-                        SerdeEnumRepr::Untagged =&gt; <span class="macro">abort!</span>(span, <span class="string">&quot;Untagged enum cannot have tag&quot;</span>),
+                        SerdeEnumRepr::Untagged =&gt; <span class="macro">abort!</span>(span, <span class="string">"Untagged enum cannot have tag"</span>),
                     };
                 }
             }
-            <span class="string">&quot;content&quot; </span>=&gt; {
+            <span class="string">"content" </span>=&gt; {
                 <span class="kw">if let </span><span class="prelude-val">Some</span>((literal, span)) = parse_next_lit_str(next) {
                     <span class="self">self</span>.enum_repr = <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.enum_repr {
                         SerdeEnumRepr::InternallyTagged { tag } =&gt; {
@@ -642,18 +643,18 @@
                         }
                         SerdeEnumRepr::AdjacentlyTagged { .. }
                         | SerdeEnumRepr::UnfinishedAdjacentlyTagged { .. } =&gt; {
-                            <span class="macro">abort!</span>(span, <span class="string">&quot;Duplicate serde content argument&quot;</span>)
+                            <span class="macro">abort!</span>(span, <span class="string">"Duplicate serde content argument"</span>)
                         }
                         SerdeEnumRepr::Untagged =&gt; {
-                            <span class="macro">abort!</span>(span, <span class="string">&quot;Untagged enum cannot have content&quot;</span>)
+                            <span class="macro">abort!</span>(span, <span class="string">"Untagged enum cannot have content"</span>)
                         }
                     };
                 }
             }
-            <span class="string">&quot;untagged&quot; </span>=&gt; {
+            <span class="string">"untagged" </span>=&gt; {
                 <span class="self">self</span>.enum_repr = SerdeEnumRepr::Untagged;
             }
-            <span class="string">&quot;default&quot; </span>=&gt; {
+            <span class="string">"default" </span>=&gt; {
                 <span class="self">self</span>.default = <span class="bool-val">true</span>;
             }
             <span class="kw">_ </span>=&gt; {}
@@ -684,7 +685,7 @@
 <span class="kw">pub fn </span>parse_value(attributes: <span class="kw-2">&amp;</span>[Attribute]) -&gt; <span class="prelude-ty">Option</span>&lt;SerdeValue&gt; {
     attributes
         .iter()
-        .filter(|attribute| attribute.path().is_ident(<span class="string">&quot;serde&quot;</span>))
+        .filter(|attribute| attribute.path().is_ident(<span class="string">"serde"</span>))
         .map(|serde_attribute| {
             serde_attribute
                 .parse_args_with(SerdeValue::parse)
@@ -719,7 +720,7 @@
 <span class="kw">pub fn </span>parse_container(attributes: <span class="kw-2">&amp;</span>[Attribute]) -&gt; <span class="prelude-ty">Option</span>&lt;SerdeContainer&gt; {
     attributes
         .iter()
-        .filter(|attribute| attribute.path().is_ident(<span class="string">&quot;serde&quot;</span>))
+        .filter(|attribute| attribute.path().is_ident(<span class="string">"serde"</span>))
         .map(|serde_attribute| {
             serde_attribute
                 .parse_args_with(SerdeContainer::parse)
@@ -749,7 +750,7 @@
 }
 
 <span class="attr">#[derive(Clone)]
-#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
+#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
 </span><span class="kw">pub enum </span>RenameRule {
     Lower,
     Upper,
@@ -771,7 +772,7 @@
 
                 <span class="kw">let </span><span class="kw-2">mut </span>upper = <span class="bool-val">false</span>;
                 <span class="kw">for </span>letter <span class="kw">in </span>value.chars() {
-                    <span class="kw">if </span>letter == <span class="string">&#39;_&#39; </span>{
+                    <span class="kw">if </span>letter == <span class="string">'_' </span>{
                         upper = <span class="bool-val">true</span>;
                         <span class="kw">continue</span>;
                     }
@@ -794,7 +795,7 @@
 
                 pascal_case
             }
-            RenameRule::Kebab =&gt; <span class="self">Self</span>::Snake.rename(value).replace(<span class="string">&#39;_&#39;</span>, <span class="string">&quot;-&quot;</span>),
+            RenameRule::Kebab =&gt; <span class="self">Self</span>::Snake.rename(value).replace(<span class="string">'_'</span>, <span class="string">"-"</span>),
             RenameRule::ScreamingKebab =&gt; <span class="self">Self</span>::Kebab.rename(value).to_ascii_uppercase(),
         }
     }
@@ -814,7 +815,7 @@
 
                 <span class="kw">for </span>(index, letter) <span class="kw">in </span>variant.char_indices() {
                     <span class="kw">if </span>index &gt; <span class="number">0 </span>&amp;&amp; letter.is_uppercase() {
-                        snake_case.push(<span class="string">&#39;_&#39;</span>);
+                        snake_case.push(<span class="string">'_'</span>);
                     }
                     snake_case.push(letter);
                 }
@@ -823,21 +824,21 @@
             }
             RenameRule::ScreamingSnake =&gt; <span class="self">Self</span>::Snake.rename_variant(variant).to_ascii_uppercase(),
             RenameRule::Pascal =&gt; variant.to_string(),
-            RenameRule::Kebab =&gt; <span class="self">Self</span>::Snake.rename_variant(variant).replace(<span class="string">&#39;_&#39;</span>, <span class="string">&quot;-&quot;</span>),
+            RenameRule::Kebab =&gt; <span class="self">Self</span>::Snake.rename_variant(variant).replace(<span class="string">'_'</span>, <span class="string">"-"</span>),
             RenameRule::ScreamingKebab =&gt; <span class="self">Self</span>::Kebab.rename_variant(variant).to_ascii_uppercase(),
         }
     }
 }
 
 <span class="kw">const </span>RENAME_RULE_NAME_MAPPING: [(<span class="kw-2">&amp;</span>str, RenameRule); <span class="number">8</span>] = [
-    (<span class="string">&quot;lowercase&quot;</span>, RenameRule::Lower),
-    (<span class="string">&quot;UPPERCASE&quot;</span>, RenameRule::Upper),
-    (<span class="string">&quot;PascalCase&quot;</span>, RenameRule::Pascal),
-    (<span class="string">&quot;camelCase&quot;</span>, RenameRule::Camel),
-    (<span class="string">&quot;snake_case&quot;</span>, RenameRule::Snake),
-    (<span class="string">&quot;SCREAMING_SNAKE_CASE&quot;</span>, RenameRule::ScreamingSnake),
-    (<span class="string">&quot;kebab-case&quot;</span>, RenameRule::Kebab),
-    (<span class="string">&quot;SCREAMING-KEBAB-CASE&quot;</span>, RenameRule::ScreamingKebab),
+    (<span class="string">"lowercase"</span>, RenameRule::Lower),
+    (<span class="string">"UPPERCASE"</span>, RenameRule::Upper),
+    (<span class="string">"PascalCase"</span>, RenameRule::Pascal),
+    (<span class="string">"camelCase"</span>, RenameRule::Camel),
+    (<span class="string">"snake_case"</span>, RenameRule::Snake),
+    (<span class="string">"SCREAMING_SNAKE_CASE"</span>, RenameRule::ScreamingSnake),
+    (<span class="string">"kebab-case"</span>, RenameRule::Kebab),
+    (<span class="string">"SCREAMING-KEBAB-CASE"</span>, RenameRule::ScreamingKebab),
 ];
 
 <span class="kw">impl </span>FromStr <span class="kw">for </span>RenameRule {
@@ -846,16 +847,16 @@
     <span class="kw">fn </span>from_str(s: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Err&gt; {
         <span class="kw">let </span>expected_one_of = RENAME_RULE_NAME_MAPPING
             .into_iter()
-            .map(|(name, <span class="kw">_</span>)| <span class="macro">format!</span>(<span class="string">r#&quot;&quot;{name}&quot;&quot;#</span>))
+            .map(|(name, <span class="kw">_</span>)| <span class="macro">format!</span>(<span class="string">r#""{name}""#</span>))
             .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;()
-            .join(<span class="string">&quot;, &quot;</span>);
+            .join(<span class="string">", "</span>);
         RENAME_RULE_NAME_MAPPING
             .into_iter()
             .find_map(|(case, rule)| <span class="kw">if </span>case == s { <span class="prelude-val">Some</span>(rule) } <span class="kw">else </span>{ <span class="prelude-val">None </span>})
             .ok_or_else(|| {
                 Error::new(
                     Span::call_site(),
-                    <span class="macro">format!</span>(<span class="string">r#&quot;unexpected rename rule, expected one of: {expected_one_of}&quot;#</span>),
+                    <span class="macro">format!</span>(<span class="string">r#"unexpected rename rule, expected one of: {expected_one_of}"#</span>),
                 )
             })
     }
@@ -871,7 +872,7 @@
             </span><span class="kw">fn </span>rename_all_rename_rules() {
                 $(
                     <span class="kw">let </span>value = <span class="macro-nonterminal">$case</span>.rename(<span class="macro-nonterminal">$value</span>);
-                    <span class="macro">assert_eq!</span>(value, <span class="macro-nonterminal">$expected</span>, <span class="string">&quot;expected case: {} =&gt; {} != {}&quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$case</span>), <span class="macro-nonterminal">$value</span>, <span class="macro-nonterminal">$expected</span>);
+                    <span class="macro">assert_eq!</span>(value, <span class="macro-nonterminal">$expected</span>, <span class="string">"expected case: {} =&gt; {} != {}"</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$case</span>), <span class="macro-nonterminal">$value</span>, <span class="macro-nonterminal">$expected</span>);
                 )*
             }
         };
@@ -883,50 +884,50 @@
             </span><span class="kw">fn </span>rename_all_rename_variant_rules() {
                 $(
                     <span class="kw">let </span>value = <span class="macro-nonterminal">$case</span>.rename_variant(<span class="macro-nonterminal">$value</span>);
-                    <span class="macro">assert_eq!</span>(value, <span class="macro-nonterminal">$expected</span>, <span class="string">&quot;expected case: {} =&gt; {} != {}&quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$case</span>), <span class="macro-nonterminal">$value</span>, <span class="macro-nonterminal">$expected</span>);
+                    <span class="macro">assert_eq!</span>(value, <span class="macro-nonterminal">$expected</span>, <span class="string">"expected case: {} =&gt; {} != {}"</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$case</span>), <span class="macro-nonterminal">$value</span>, <span class="macro-nonterminal">$expected</span>);
                 )*
             }
         };
     }
 
     <span class="macro">test_rename_rule! </span>{
-        RenameRule::Lower=&gt; <span class="string">&quot;single&quot; </span>= <span class="string">&quot;single&quot;
-        </span>RenameRule::Upper=&gt; <span class="string">&quot;single&quot; </span>= <span class="string">&quot;SINGLE&quot;
-        </span>RenameRule::Pascal=&gt; <span class="string">&quot;single&quot; </span>= <span class="string">&quot;Single&quot;
-        </span>RenameRule::Camel=&gt; <span class="string">&quot;single&quot; </span>= <span class="string">&quot;single&quot;
-        </span>RenameRule::Snake=&gt; <span class="string">&quot;single&quot; </span>= <span class="string">&quot;single&quot;
-        </span>RenameRule::ScreamingSnake=&gt; <span class="string">&quot;single&quot; </span>= <span class="string">&quot;SINGLE&quot;
-        </span>RenameRule::Kebab=&gt; <span class="string">&quot;single&quot; </span>= <span class="string">&quot;single&quot;
-        </span>RenameRule::ScreamingKebab=&gt; <span class="string">&quot;single&quot; </span>= <span class="string">&quot;SINGLE&quot;
+        RenameRule::Lower=&gt; <span class="string">"single" </span>= <span class="string">"single"
+        </span>RenameRule::Upper=&gt; <span class="string">"single" </span>= <span class="string">"SINGLE"
+        </span>RenameRule::Pascal=&gt; <span class="string">"single" </span>= <span class="string">"Single"
+        </span>RenameRule::Camel=&gt; <span class="string">"single" </span>= <span class="string">"single"
+        </span>RenameRule::Snake=&gt; <span class="string">"single" </span>= <span class="string">"single"
+        </span>RenameRule::ScreamingSnake=&gt; <span class="string">"single" </span>= <span class="string">"SINGLE"
+        </span>RenameRule::Kebab=&gt; <span class="string">"single" </span>= <span class="string">"single"
+        </span>RenameRule::ScreamingKebab=&gt; <span class="string">"single" </span>= <span class="string">"SINGLE"
 
-        </span>RenameRule::Lower=&gt; <span class="string">&quot;multi_value&quot; </span>= <span class="string">&quot;multi_value&quot;
-        </span>RenameRule::Upper=&gt; <span class="string">&quot;multi_value&quot; </span>= <span class="string">&quot;MULTI_VALUE&quot;
-        </span>RenameRule::Pascal=&gt; <span class="string">&quot;multi_value&quot; </span>= <span class="string">&quot;MultiValue&quot;
-        </span>RenameRule::Camel=&gt; <span class="string">&quot;multi_value&quot; </span>= <span class="string">&quot;multiValue&quot;
-        </span>RenameRule::Snake=&gt; <span class="string">&quot;multi_value&quot; </span>= <span class="string">&quot;multi_value&quot;
-        </span>RenameRule::ScreamingSnake=&gt; <span class="string">&quot;multi_value&quot; </span>= <span class="string">&quot;MULTI_VALUE&quot;
-        </span>RenameRule::Kebab=&gt; <span class="string">&quot;multi_value&quot; </span>= <span class="string">&quot;multi-value&quot;
-        </span>RenameRule::ScreamingKebab=&gt; <span class="string">&quot;multi_value&quot; </span>= <span class="string">&quot;MULTI-VALUE&quot;
+        </span>RenameRule::Lower=&gt; <span class="string">"multi_value" </span>= <span class="string">"multi_value"
+        </span>RenameRule::Upper=&gt; <span class="string">"multi_value" </span>= <span class="string">"MULTI_VALUE"
+        </span>RenameRule::Pascal=&gt; <span class="string">"multi_value" </span>= <span class="string">"MultiValue"
+        </span>RenameRule::Camel=&gt; <span class="string">"multi_value" </span>= <span class="string">"multiValue"
+        </span>RenameRule::Snake=&gt; <span class="string">"multi_value" </span>= <span class="string">"multi_value"
+        </span>RenameRule::ScreamingSnake=&gt; <span class="string">"multi_value" </span>= <span class="string">"MULTI_VALUE"
+        </span>RenameRule::Kebab=&gt; <span class="string">"multi_value" </span>= <span class="string">"multi-value"
+        </span>RenameRule::ScreamingKebab=&gt; <span class="string">"multi_value" </span>= <span class="string">"MULTI-VALUE"
     </span>}
 
     <span class="macro">test_rename_variant_rule! </span>{
-        RenameRule::Lower=&gt; <span class="string">&quot;Single&quot; </span>= <span class="string">&quot;single&quot;
-        </span>RenameRule::Upper=&gt; <span class="string">&quot;Single&quot; </span>= <span class="string">&quot;SINGLE&quot;
-        </span>RenameRule::Pascal=&gt; <span class="string">&quot;Single&quot; </span>= <span class="string">&quot;Single&quot;
-        </span>RenameRule::Camel=&gt; <span class="string">&quot;Single&quot; </span>= <span class="string">&quot;single&quot;
-        </span>RenameRule::Snake=&gt; <span class="string">&quot;Single&quot; </span>= <span class="string">&quot;single&quot;
-        </span>RenameRule::ScreamingSnake=&gt; <span class="string">&quot;Single&quot; </span>= <span class="string">&quot;SINGLE&quot;
-        </span>RenameRule::Kebab=&gt; <span class="string">&quot;Single&quot; </span>= <span class="string">&quot;single&quot;
-        </span>RenameRule::ScreamingKebab=&gt; <span class="string">&quot;Single&quot; </span>= <span class="string">&quot;SINGLE&quot;
+        RenameRule::Lower=&gt; <span class="string">"Single" </span>= <span class="string">"single"
+        </span>RenameRule::Upper=&gt; <span class="string">"Single" </span>= <span class="string">"SINGLE"
+        </span>RenameRule::Pascal=&gt; <span class="string">"Single" </span>= <span class="string">"Single"
+        </span>RenameRule::Camel=&gt; <span class="string">"Single" </span>= <span class="string">"single"
+        </span>RenameRule::Snake=&gt; <span class="string">"Single" </span>= <span class="string">"single"
+        </span>RenameRule::ScreamingSnake=&gt; <span class="string">"Single" </span>= <span class="string">"SINGLE"
+        </span>RenameRule::Kebab=&gt; <span class="string">"Single" </span>= <span class="string">"single"
+        </span>RenameRule::ScreamingKebab=&gt; <span class="string">"Single" </span>= <span class="string">"SINGLE"
 
-        </span>RenameRule::Lower=&gt; <span class="string">&quot;MultiValue&quot; </span>= <span class="string">&quot;multivalue&quot;
-        </span>RenameRule::Upper=&gt; <span class="string">&quot;MultiValue&quot; </span>= <span class="string">&quot;MULTIVALUE&quot;
-        </span>RenameRule::Pascal=&gt; <span class="string">&quot;MultiValue&quot; </span>= <span class="string">&quot;MultiValue&quot;
-        </span>RenameRule::Camel=&gt; <span class="string">&quot;MultiValue&quot; </span>= <span class="string">&quot;multiValue&quot;
-        </span>RenameRule::Snake=&gt; <span class="string">&quot;MultiValue&quot; </span>= <span class="string">&quot;multi_value&quot;
-        </span>RenameRule::ScreamingSnake=&gt; <span class="string">&quot;MultiValue&quot; </span>= <span class="string">&quot;MULTI_VALUE&quot;
-        </span>RenameRule::Kebab=&gt; <span class="string">&quot;MultiValue&quot; </span>= <span class="string">&quot;multi-value&quot;
-        </span>RenameRule::ScreamingKebab=&gt; <span class="string">&quot;MultiValue&quot; </span>= <span class="string">&quot;MULTI-VALUE&quot;
+        </span>RenameRule::Lower=&gt; <span class="string">"MultiValue" </span>= <span class="string">"multivalue"
+        </span>RenameRule::Upper=&gt; <span class="string">"MultiValue" </span>= <span class="string">"MULTIVALUE"
+        </span>RenameRule::Pascal=&gt; <span class="string">"MultiValue" </span>= <span class="string">"MultiValue"
+        </span>RenameRule::Camel=&gt; <span class="string">"MultiValue" </span>= <span class="string">"multiValue"
+        </span>RenameRule::Snake=&gt; <span class="string">"MultiValue" </span>= <span class="string">"multi_value"
+        </span>RenameRule::ScreamingSnake=&gt; <span class="string">"MultiValue" </span>= <span class="string">"MULTI_VALUE"
+        </span>RenameRule::Kebab=&gt; <span class="string">"MultiValue" </span>= <span class="string">"multi-value"
+        </span>RenameRule::ScreamingKebab=&gt; <span class="string">"MultiValue" </span>= <span class="string">"MULTI-VALUE"
     </span>}
 
     <span class="attr">#[test]

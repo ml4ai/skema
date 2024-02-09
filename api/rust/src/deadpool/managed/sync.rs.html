@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/deadpool-0.9.5/src/managed/sync.rs`."><title>sync.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="deadpool" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/deadpool-0.9.5/src/managed/sync.rs`."><title>sync.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="deadpool" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -218,7 +219,7 @@
 <a href="#218" id="218">218</a>
 <a href="#219" id="219">219</a>
 <a href="#220" id="220">220</a>
-</pre></div><pre class="rust"><code><span class="doccomment">//! Helpers for writing pools for objects that don&#39;t support async and need to
+</pre></div><pre class="rust"><code><span class="doccomment">//! Helpers for writing pools for objects that don't support async and need to
 //! be run inside a thread.
 
 </span><span class="kw">pub mod </span>reexports {
@@ -233,7 +234,7 @@
     //! ```rust,ignore
     //! pub use deadpool::managed::sync::reexports::*;
     //! deadpool::managed_reexports!(
-    //!     &quot;name_of_crate&quot;,
+    //!     "name_of_crate",
     //!     Manager,
     //!     Object&lt;Manager&gt;,
     //!     Error,
@@ -259,7 +260,7 @@
 </span><span class="attr">#[derive(Debug)]
 </span><span class="kw">pub enum </span>InteractError&lt;E&gt; {
     <span class="doccomment">/// Provided callback has panicked.
-    </span>Panic(Box&lt;<span class="kw">dyn </span>Any + Send + <span class="lifetime">&#39;static</span>&gt;),
+    </span>Panic(Box&lt;<span class="kw">dyn </span>Any + Send + <span class="lifetime">'static</span>&gt;),
 
     <span class="doccomment">/// Callback was aborted.
     </span>Aborted,
@@ -269,17 +270,17 @@
 }
 
 <span class="kw">impl</span>&lt;E: fmt::Display&gt; fmt::Display <span class="kw">for </span>InteractError&lt;E&gt; {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; fmt::Result {
         <span class="kw">match </span><span class="self">self </span>{
-            <span class="self">Self</span>::Panic(<span class="kw">_</span>) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Panic&quot;</span>),
-            <span class="self">Self</span>::Aborted =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Aborted&quot;</span>),
-            <span class="self">Self</span>::Backend(e) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Backend error: {}&quot;</span>, e),
+            <span class="self">Self</span>::Panic(<span class="kw">_</span>) =&gt; <span class="macro">write!</span>(f, <span class="string">"Panic"</span>),
+            <span class="self">Self</span>::Aborted =&gt; <span class="macro">write!</span>(f, <span class="string">"Aborted"</span>),
+            <span class="self">Self</span>::Backend(e) =&gt; <span class="macro">write!</span>(f, <span class="string">"Backend error: {}"</span>, e),
         }
     }
 }
 
-<span class="kw">impl</span>&lt;E: std::error::Error + <span class="lifetime">&#39;static</span>&gt; std::error::Error <span class="kw">for </span>InteractError&lt;E&gt; {
-    <span class="kw">fn </span>source(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>(<span class="kw">dyn </span>std::error::Error + <span class="lifetime">&#39;static</span>)&gt; {
+<span class="kw">impl</span>&lt;E: std::error::Error + <span class="lifetime">'static</span>&gt; std::error::Error <span class="kw">for </span>InteractError&lt;E&gt; {
+    <span class="kw">fn </span>source(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>(<span class="kw">dyn </span>std::error::Error + <span class="lifetime">'static</span>)&gt; {
         <span class="kw">match </span><span class="self">self </span>{
             <span class="self">Self</span>::Panic(<span class="kw">_</span>) | <span class="self">Self</span>::Aborted =&gt; <span class="prelude-val">None</span>,
             <span class="self">Self</span>::Backend(e) =&gt; <span class="prelude-val">Some</span>(e),
@@ -295,8 +296,8 @@
 </span><span class="attr">#[must_use]
 </span><span class="kw">pub struct </span>SyncWrapper&lt;T, E&gt;
 <span class="kw">where
-    </span>T: Send + <span class="lifetime">&#39;static</span>,
-    E: Send + <span class="lifetime">&#39;static</span>,
+    </span>T: Send + <span class="lifetime">'static</span>,
+    E: Send + <span class="lifetime">'static</span>,
 {
     obj: Arc&lt;Mutex&lt;<span class="prelude-ty">Option</span>&lt;T&gt;&gt;&gt;,
     runtime: Runtime,
@@ -306,34 +307,34 @@
 <span class="comment">// Implemented manually to avoid unnecessary trait bound on `E` type parameter.
 </span><span class="kw">impl</span>&lt;T, E&gt; fmt::Debug <span class="kw">for </span>SyncWrapper&lt;T, E&gt;
 <span class="kw">where
-    </span>T: fmt::Debug + Send + <span class="lifetime">&#39;static</span>,
-    E: Send + <span class="lifetime">&#39;static</span>,
+    </span>T: fmt::Debug + Send + <span class="lifetime">'static</span>,
+    E: Send + <span class="lifetime">'static</span>,
 {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
-        f.debug_struct(<span class="string">&quot;SyncWrapper&quot;</span>)
-            .field(<span class="string">&quot;obj&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.obj)
-            .field(<span class="string">&quot;runtime&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.runtime)
-            .field(<span class="string">&quot;_error&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>._error)
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; fmt::Result {
+        f.debug_struct(<span class="string">"SyncWrapper"</span>)
+            .field(<span class="string">"obj"</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.obj)
+            .field(<span class="string">"runtime"</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.runtime)
+            .field(<span class="string">"_error"</span>, <span class="kw-2">&amp;</span><span class="self">self</span>._error)
             .finish()
     }
 }
 
 <span class="kw">impl</span>&lt;T, E&gt; SyncWrapper&lt;T, E&gt;
 <span class="kw">where
-    </span>T: Send + <span class="lifetime">&#39;static</span>,
-    E: Send + <span class="lifetime">&#39;static</span>,
+    </span>T: Send + <span class="lifetime">'static</span>,
+    E: Send + <span class="lifetime">'static</span>,
 {
     <span class="doccomment">/// Creates a new wrapped object.
     </span><span class="kw">pub async fn </span>new&lt;F&gt;(runtime: Runtime, f: F) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, E&gt;
     <span class="kw">where
-        </span>F: FnOnce() -&gt; <span class="prelude-ty">Result</span>&lt;T, E&gt; + Send + <span class="lifetime">&#39;static</span>,
+        </span>F: FnOnce() -&gt; <span class="prelude-ty">Result</span>&lt;T, E&gt; + Send + <span class="lifetime">'static</span>,
     {
         <span class="kw">let </span>result = <span class="kw">match </span>runtime.spawn_blocking(f).<span class="kw">await </span>{
             <span class="comment">// FIXME: Panicking when the creation panics is not nice.
             // In order to handle this properly the Manager::create
             // methods needs to support a custom error enum which
             // supports a Panic variant.
-            </span><span class="prelude-val">Err</span>(SpawnBlockingError::Panic(e)) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;{:?}&quot;</span>, e),
+            </span><span class="prelude-val">Err</span>(SpawnBlockingError::Panic(e)) =&gt; <span class="macro">panic!</span>(<span class="string">"{:?}"</span>, e),
             <span class="prelude-val">Ok</span>(obj) =&gt; obj,
         };
         result.map(|obj| <span class="self">Self </span>{
@@ -350,8 +351,8 @@
     /// is not blocked.
     </span><span class="kw">pub async fn </span>interact&lt;F, R&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, f: F) -&gt; <span class="prelude-ty">Result</span>&lt;R, InteractError&lt;E&gt;&gt;
     <span class="kw">where
-        </span>F: FnOnce(<span class="kw-2">&amp;mut </span>T) -&gt; <span class="prelude-ty">Result</span>&lt;R, E&gt; + Send + <span class="lifetime">&#39;static</span>,
-        R: Send + <span class="lifetime">&#39;static</span>,
+        </span>F: FnOnce(<span class="kw-2">&amp;mut </span>T) -&gt; <span class="prelude-ty">Result</span>&lt;R, E&gt; + Send + <span class="lifetime">'static</span>,
+        R: Send + <span class="lifetime">'static</span>,
     {
         <span class="kw">let </span>arc = <span class="self">self</span>.obj.clone();
         <span class="self">self</span>.runtime
@@ -376,21 +377,21 @@
 
     <span class="doccomment">/// Lock the underlying mutex and return a guard for the inner
     /// object.
-    </span><span class="kw">pub fn </span>lock(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;SyncGuard&lt;<span class="lifetime">&#39;_</span>, T&gt;, PoisonError&lt;MutexGuard&lt;<span class="lifetime">&#39;_</span>, <span class="prelude-ty">Option</span>&lt;T&gt;&gt;&gt;&gt; {
+    </span><span class="kw">pub fn </span>lock(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;SyncGuard&lt;<span class="lifetime">'_</span>, T&gt;, PoisonError&lt;MutexGuard&lt;<span class="lifetime">'_</span>, <span class="prelude-ty">Option</span>&lt;T&gt;&gt;&gt;&gt; {
         <span class="self">self</span>.obj.lock().map(SyncGuard)
     }
 
     <span class="doccomment">/// Try to lock the underlying mutex and return a guard for the
     /// inner object.
-    </span><span class="kw">pub fn </span>try_lock(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;SyncGuard&lt;<span class="lifetime">&#39;_</span>, T&gt;, TryLockError&lt;MutexGuard&lt;<span class="lifetime">&#39;_</span>, <span class="prelude-ty">Option</span>&lt;T&gt;&gt;&gt;&gt; {
+    </span><span class="kw">pub fn </span>try_lock(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;SyncGuard&lt;<span class="lifetime">'_</span>, T&gt;, TryLockError&lt;MutexGuard&lt;<span class="lifetime">'_</span>, <span class="prelude-ty">Option</span>&lt;T&gt;&gt;&gt;&gt; {
         <span class="self">self</span>.obj.try_lock().map(SyncGuard)
     }
 }
 
 <span class="kw">impl</span>&lt;T, E&gt; Drop <span class="kw">for </span>SyncWrapper&lt;T, E&gt;
 <span class="kw">where
-    </span>T: Send + <span class="lifetime">&#39;static</span>,
-    E: Send + <span class="lifetime">&#39;static</span>,
+    </span>T: Send + <span class="lifetime">'static</span>,
+    E: Send + <span class="lifetime">'static</span>,
 {
     <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
         <span class="kw">let </span>arc = <span class="self">self</span>.obj.clone();
@@ -412,28 +413,28 @@
 /// **Important:** Any blocking operation using this object
 /// should be executed on a separate thread (e.g. via `spawn_blocking`).
 </span><span class="attr">#[derive(Debug)]
-</span><span class="kw">pub struct </span>SyncGuard&lt;<span class="lifetime">&#39;a</span>, T: Send&gt;(MutexGuard&lt;<span class="lifetime">&#39;a</span>, <span class="prelude-ty">Option</span>&lt;T&gt;&gt;);
+</span><span class="kw">pub struct </span>SyncGuard&lt;<span class="lifetime">'a</span>, T: Send&gt;(MutexGuard&lt;<span class="lifetime">'a</span>, <span class="prelude-ty">Option</span>&lt;T&gt;&gt;);
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T: Send&gt; Deref <span class="kw">for </span>SyncGuard&lt;<span class="lifetime">&#39;a</span>, T&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>, T: Send&gt; Deref <span class="kw">for </span>SyncGuard&lt;<span class="lifetime">'a</span>, T&gt; {
     <span class="kw">type </span>Target = T;
     <span class="kw">fn </span>deref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>::Target {
         <span class="self">self</span>.<span class="number">0</span>.as_ref().unwrap()
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T: Send&gt; DerefMut <span class="kw">for </span>SyncGuard&lt;<span class="lifetime">&#39;a</span>, T&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>, T: Send&gt; DerefMut <span class="kw">for </span>SyncGuard&lt;<span class="lifetime">'a</span>, T&gt; {
     <span class="kw">fn </span>deref_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self</span>::Target {
         <span class="self">self</span>.<span class="number">0</span>.as_mut().unwrap()
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T: Send&gt; AsRef&lt;T&gt; <span class="kw">for </span>SyncGuard&lt;<span class="lifetime">&#39;a</span>, T&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>, T: Send&gt; AsRef&lt;T&gt; <span class="kw">for </span>SyncGuard&lt;<span class="lifetime">'a</span>, T&gt; {
     <span class="kw">fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>T {
         <span class="self">self</span>.<span class="number">0</span>.as_ref().unwrap()
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T: Send&gt; AsMut&lt;T&gt; <span class="kw">for </span>SyncGuard&lt;<span class="lifetime">&#39;a</span>, T&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>, T: Send&gt; AsMut&lt;T&gt; <span class="kw">for </span>SyncGuard&lt;<span class="lifetime">'a</span>, T&gt; {
     <span class="kw">fn </span>as_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>T {
         <span class="self">self</span>.<span class="number">0</span>.as_mut().unwrap()
     }

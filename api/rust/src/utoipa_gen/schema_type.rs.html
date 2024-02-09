@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/utoipa-gen-3.5.0/src/schema_type.rs`."><title>schema_type.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="utoipa_gen" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/utoipa-gen-3.5.0/src/schema_type.rs`."><title>schema_type.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="utoipa_gen" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -519,20 +520,20 @@
 <span class="kw">use </span>syn::{parse::Parse, Error, Ident, LitStr, Path};
 
 <span class="doccomment">/// Tokenizes OpenAPI data type correctly according to the Rust type
-</span><span class="kw">pub struct </span>SchemaType&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw">pub </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>syn::Path);
+</span><span class="kw">pub struct </span>SchemaType&lt;<span class="lifetime">'a</span>&gt;(<span class="kw">pub </span><span class="kw-2">&amp;</span><span class="lifetime">'a </span>syn::Path);
 
-<span class="kw">impl </span>SchemaType&lt;<span class="lifetime">&#39;_</span>&gt; {
+<span class="kw">impl </span>SchemaType&lt;<span class="lifetime">'_</span>&gt; {
     <span class="kw">fn </span>last_segment_to_string(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
         <span class="self">self</span>.<span class="number">0
             </span>.segments
             .last()
-            .expect(<span class="string">&quot;Expected at least one segment is_integer&quot;</span>)
+            .expect(<span class="string">"Expected at least one segment is_integer"</span>)
             .ident
             .to_string()
     }
 
     <span class="kw">pub fn </span>is_value(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-        <span class="macro">matches!</span>(<span class="kw-2">&amp;*</span><span class="self">self</span>.last_segment_to_string(), <span class="string">&quot;Value&quot;</span>)
+        <span class="macro">matches!</span>(<span class="kw-2">&amp;*</span><span class="self">self</span>.last_segment_to_string(), <span class="string">"Value"</span>)
     }
 
     <span class="doccomment">/// Check whether type is known to be primitive in which case returns true.
@@ -545,58 +546,58 @@
         <span class="kw">let </span>name = <span class="kw-2">&amp;*</span>last_segment.ident.to_string();
 
         <span class="attr">#[cfg(not(any(
-            feature = <span class="string">&quot;chrono&quot;</span>,
-            feature = <span class="string">&quot;decimal&quot;</span>,
-            feature = <span class="string">&quot;rocket_extras&quot;</span>,
-            feature = <span class="string">&quot;uuid&quot;</span>,
-            feature = <span class="string">&quot;ulid&quot;</span>,
-            feature = <span class="string">&quot;time&quot;</span>,
+            feature = <span class="string">"chrono"</span>,
+            feature = <span class="string">"decimal"</span>,
+            feature = <span class="string">"rocket_extras"</span>,
+            feature = <span class="string">"uuid"</span>,
+            feature = <span class="string">"ulid"</span>,
+            feature = <span class="string">"time"</span>,
         )))]
         </span>{
             is_primitive(name)
         }
 
         <span class="attr">#[cfg(any(
-            feature = <span class="string">&quot;chrono&quot;</span>,
-            feature = <span class="string">&quot;decimal&quot;</span>,
-            feature = <span class="string">&quot;rocket_extras&quot;</span>,
-            feature = <span class="string">&quot;uuid&quot;</span>,
-            feature = <span class="string">&quot;ulid&quot;</span>,
-            feature = <span class="string">&quot;time&quot;</span>,
+            feature = <span class="string">"chrono"</span>,
+            feature = <span class="string">"decimal"</span>,
+            feature = <span class="string">"rocket_extras"</span>,
+            feature = <span class="string">"uuid"</span>,
+            feature = <span class="string">"ulid"</span>,
+            feature = <span class="string">"time"</span>,
         ))]
         </span>{
             <span class="kw">let </span><span class="kw-2">mut </span>primitive = is_primitive(name);
 
-            <span class="attr">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
+            <span class="attr">#[cfg(feature = <span class="string">"chrono"</span>)]
             </span><span class="kw">if </span>!primitive {
                 primitive = is_primitive_chrono(name);
             }
 
-            <span class="attr">#[cfg(feature = <span class="string">&quot;decimal&quot;</span>)]
+            <span class="attr">#[cfg(feature = <span class="string">"decimal"</span>)]
             </span><span class="kw">if </span>!primitive {
                 primitive = is_primitive_rust_decimal(name);
             }
 
-            <span class="attr">#[cfg(feature = <span class="string">&quot;rocket_extras&quot;</span>)]
+            <span class="attr">#[cfg(feature = <span class="string">"rocket_extras"</span>)]
             </span><span class="kw">if </span>!primitive {
-                primitive = <span class="macro">matches!</span>(name, <span class="string">&quot;PathBuf&quot;</span>);
+                primitive = <span class="macro">matches!</span>(name, <span class="string">"PathBuf"</span>);
             }
 
-            <span class="attr">#[cfg(feature = <span class="string">&quot;uuid&quot;</span>)]
+            <span class="attr">#[cfg(feature = <span class="string">"uuid"</span>)]
             </span><span class="kw">if </span>!primitive {
-                primitive = <span class="macro">matches!</span>(name, <span class="string">&quot;Uuid&quot;</span>);
+                primitive = <span class="macro">matches!</span>(name, <span class="string">"Uuid"</span>);
             }
 
-            <span class="attr">#[cfg(feature = <span class="string">&quot;ulid&quot;</span>)]
+            <span class="attr">#[cfg(feature = <span class="string">"ulid"</span>)]
             </span><span class="kw">if </span>!primitive {
-                primitive = <span class="macro">matches!</span>(name, <span class="string">&quot;Ulid&quot;</span>);
+                primitive = <span class="macro">matches!</span>(name, <span class="string">"Ulid"</span>);
             }
 
-            <span class="attr">#[cfg(feature = <span class="string">&quot;time&quot;</span>)]
+            <span class="attr">#[cfg(feature = <span class="string">"time"</span>)]
             </span><span class="kw">if </span>!primitive {
                 primitive = <span class="macro">matches!</span>(
                     name,
-                    <span class="string">&quot;Date&quot; </span>| <span class="string">&quot;PrimitiveDateTime&quot; </span>| <span class="string">&quot;OffsetDateTime&quot; </span>| <span class="string">&quot;Duration&quot;
+                    <span class="string">"Date" </span>| <span class="string">"PrimitiveDateTime" </span>| <span class="string">"OffsetDateTime" </span>| <span class="string">"Duration"
                 </span>);
             }
 
@@ -607,41 +608,41 @@
     <span class="kw">pub fn </span>is_integer(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="macro">matches!</span>(
             <span class="kw-2">&amp;*</span><span class="self">self</span>.last_segment_to_string(),
-            <span class="string">&quot;i8&quot; </span>| <span class="string">&quot;i16&quot;
-                </span>| <span class="string">&quot;i32&quot;
-                </span>| <span class="string">&quot;i64&quot;
-                </span>| <span class="string">&quot;i128&quot;
-                </span>| <span class="string">&quot;isize&quot;
-                </span>| <span class="string">&quot;u8&quot;
-                </span>| <span class="string">&quot;u16&quot;
-                </span>| <span class="string">&quot;u32&quot;
-                </span>| <span class="string">&quot;u64&quot;
-                </span>| <span class="string">&quot;u128&quot;
-                </span>| <span class="string">&quot;usize&quot;
+            <span class="string">"i8" </span>| <span class="string">"i16"
+                </span>| <span class="string">"i32"
+                </span>| <span class="string">"i64"
+                </span>| <span class="string">"i128"
+                </span>| <span class="string">"isize"
+                </span>| <span class="string">"u8"
+                </span>| <span class="string">"u16"
+                </span>| <span class="string">"u32"
+                </span>| <span class="string">"u64"
+                </span>| <span class="string">"u128"
+                </span>| <span class="string">"usize"
         </span>)
     }
 
     <span class="kw">pub fn </span>is_unsigned_integer(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="macro">matches!</span>(
             <span class="kw-2">&amp;*</span><span class="self">self</span>.last_segment_to_string(),
-            <span class="string">&quot;u8&quot; </span>| <span class="string">&quot;u16&quot; </span>| <span class="string">&quot;u32&quot; </span>| <span class="string">&quot;u64&quot; </span>| <span class="string">&quot;u128&quot; </span>| <span class="string">&quot;usize&quot;
+            <span class="string">"u8" </span>| <span class="string">"u16" </span>| <span class="string">"u32" </span>| <span class="string">"u64" </span>| <span class="string">"u128" </span>| <span class="string">"usize"
         </span>)
     }
 
     <span class="kw">pub fn </span>is_number(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="kw">match </span><span class="kw-2">&amp;*</span><span class="self">self</span>.last_segment_to_string() {
-            <span class="string">&quot;f32&quot; </span>| <span class="string">&quot;f64&quot; </span>=&gt; <span class="bool-val">true</span>,
+            <span class="string">"f32" </span>| <span class="string">"f64" </span>=&gt; <span class="bool-val">true</span>,
             <span class="kw">_ if </span><span class="self">self</span>.is_integer() =&gt; <span class="bool-val">true</span>,
             <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
         }
     }
 
     <span class="kw">pub fn </span>is_string(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-        <span class="macro">matches!</span>(<span class="kw-2">&amp;*</span><span class="self">self</span>.last_segment_to_string(), <span class="string">&quot;str&quot; </span>| <span class="string">&quot;String&quot;</span>)
+        <span class="macro">matches!</span>(<span class="kw-2">&amp;*</span><span class="self">self</span>.last_segment_to_string(), <span class="string">"str" </span>| <span class="string">"String"</span>)
     }
 
     <span class="kw">pub fn </span>is_byte(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-        <span class="macro">matches!</span>(<span class="kw-2">&amp;*</span><span class="self">self</span>.last_segment_to_string(), <span class="string">&quot;u8&quot;</span>)
+        <span class="macro">matches!</span>(<span class="kw-2">&amp;*</span><span class="self">self</span>.last_segment_to_string(), <span class="string">"u8"</span>)
     }
 }
 
@@ -649,82 +650,82 @@
 </span><span class="kw">fn </span>is_primitive(name: <span class="kw-2">&amp;</span>str) -&gt; bool {
     <span class="macro">matches!</span>(
         name,
-        <span class="string">&quot;String&quot;
-            </span>| <span class="string">&quot;str&quot;
-            </span>| <span class="string">&quot;char&quot;
-            </span>| <span class="string">&quot;bool&quot;
-            </span>| <span class="string">&quot;usize&quot;
-            </span>| <span class="string">&quot;u8&quot;
-            </span>| <span class="string">&quot;u16&quot;
-            </span>| <span class="string">&quot;u32&quot;
-            </span>| <span class="string">&quot;u64&quot;
-            </span>| <span class="string">&quot;u128&quot;
-            </span>| <span class="string">&quot;isize&quot;
-            </span>| <span class="string">&quot;i8&quot;
-            </span>| <span class="string">&quot;i16&quot;
-            </span>| <span class="string">&quot;i32&quot;
-            </span>| <span class="string">&quot;i64&quot;
-            </span>| <span class="string">&quot;i128&quot;
-            </span>| <span class="string">&quot;f32&quot;
-            </span>| <span class="string">&quot;f64&quot;
+        <span class="string">"String"
+            </span>| <span class="string">"str"
+            </span>| <span class="string">"char"
+            </span>| <span class="string">"bool"
+            </span>| <span class="string">"usize"
+            </span>| <span class="string">"u8"
+            </span>| <span class="string">"u16"
+            </span>| <span class="string">"u32"
+            </span>| <span class="string">"u64"
+            </span>| <span class="string">"u128"
+            </span>| <span class="string">"isize"
+            </span>| <span class="string">"i8"
+            </span>| <span class="string">"i16"
+            </span>| <span class="string">"i32"
+            </span>| <span class="string">"i64"
+            </span>| <span class="string">"i128"
+            </span>| <span class="string">"f32"
+            </span>| <span class="string">"f64"
     </span>)
 }
 
 <span class="attr">#[inline]
-#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
+#[cfg(feature = <span class="string">"chrono"</span>)]
 </span><span class="kw">fn </span>is_primitive_chrono(name: <span class="kw-2">&amp;</span>str) -&gt; bool {
     <span class="macro">matches!</span>(
         name,
-        <span class="string">&quot;DateTime&quot; </span>| <span class="string">&quot;Date&quot; </span>| <span class="string">&quot;NaiveDate&quot; </span>| <span class="string">&quot;NaiveTime&quot; </span>| <span class="string">&quot;Duration&quot; </span>| <span class="string">&quot;NaiveDateTime&quot;
+        <span class="string">"DateTime" </span>| <span class="string">"Date" </span>| <span class="string">"NaiveDate" </span>| <span class="string">"NaiveTime" </span>| <span class="string">"Duration" </span>| <span class="string">"NaiveDateTime"
     </span>)
 }
 
 <span class="attr">#[inline]
-#[cfg(feature = <span class="string">&quot;decimal&quot;</span>)]
+#[cfg(feature = <span class="string">"decimal"</span>)]
 </span><span class="kw">fn </span>is_primitive_rust_decimal(name: <span class="kw-2">&amp;</span>str) -&gt; bool {
-    <span class="macro">matches!</span>(name, <span class="string">&quot;Decimal&quot;</span>)
+    <span class="macro">matches!</span>(name, <span class="string">"Decimal"</span>)
 }
 
-<span class="kw">impl </span>ToTokens <span class="kw">for </span>SchemaType&lt;<span class="lifetime">&#39;_</span>&gt; {
+<span class="kw">impl </span>ToTokens <span class="kw">for </span>SchemaType&lt;<span class="lifetime">'_</span>&gt; {
     <span class="kw">fn </span>to_tokens(<span class="kw-2">&amp;</span><span class="self">self</span>, tokens: <span class="kw-2">&amp;mut </span>proc_macro2::TokenStream) {
         <span class="kw">let </span>last_segment = <span class="self">self</span>.<span class="number">0</span>.segments.last().unwrap_or_else(|| {
-            <span class="macro">abort_call_site!</span>(<span class="string">&quot;expected there to be at least one segment in the path&quot;</span>)
+            <span class="macro">abort_call_site!</span>(<span class="string">"expected there to be at least one segment in the path"</span>)
         });
         <span class="kw">let </span>name = <span class="kw-2">&amp;*</span>last_segment.ident.to_string();
 
         <span class="kw">match </span>name {
-            <span class="string">&quot;String&quot; </span>| <span class="string">&quot;str&quot; </span>| <span class="string">&quot;char&quot; </span>=&gt; {
+            <span class="string">"String" </span>| <span class="string">"str" </span>| <span class="string">"char" </span>=&gt; {
                 tokens.extend(<span class="macro">quote! </span>{utoipa::openapi::SchemaType::String})
             }
 
-            <span class="string">&quot;bool&quot; </span>=&gt; tokens.extend(<span class="macro">quote! </span>{ utoipa::openapi::SchemaType::Boolean }),
+            <span class="string">"bool" </span>=&gt; tokens.extend(<span class="macro">quote! </span>{ utoipa::openapi::SchemaType::Boolean }),
 
-            <span class="string">&quot;i8&quot; </span>| <span class="string">&quot;i16&quot; </span>| <span class="string">&quot;i32&quot; </span>| <span class="string">&quot;i64&quot; </span>| <span class="string">&quot;i128&quot; </span>| <span class="string">&quot;isize&quot; </span>| <span class="string">&quot;u8&quot; </span>| <span class="string">&quot;u16&quot; </span>| <span class="string">&quot;u32&quot; </span>| <span class="string">&quot;u64&quot;
-            </span>| <span class="string">&quot;u128&quot; </span>| <span class="string">&quot;usize&quot; </span>=&gt; tokens.extend(<span class="macro">quote! </span>{ utoipa::openapi::SchemaType::Integer }),
-            <span class="string">&quot;f32&quot; </span>| <span class="string">&quot;f64&quot; </span>=&gt; tokens.extend(<span class="macro">quote! </span>{ utoipa::openapi::SchemaType::Number }),
+            <span class="string">"i8" </span>| <span class="string">"i16" </span>| <span class="string">"i32" </span>| <span class="string">"i64" </span>| <span class="string">"i128" </span>| <span class="string">"isize" </span>| <span class="string">"u8" </span>| <span class="string">"u16" </span>| <span class="string">"u32" </span>| <span class="string">"u64"
+            </span>| <span class="string">"u128" </span>| <span class="string">"usize" </span>=&gt; tokens.extend(<span class="macro">quote! </span>{ utoipa::openapi::SchemaType::Integer }),
+            <span class="string">"f32" </span>| <span class="string">"f64" </span>=&gt; tokens.extend(<span class="macro">quote! </span>{ utoipa::openapi::SchemaType::Number }),
 
-            <span class="attr">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
-            </span><span class="string">&quot;DateTime&quot; </span>| <span class="string">&quot;NaiveDateTime&quot; </span>| <span class="string">&quot;NaiveDate&quot; </span>| <span class="string">&quot;NaiveTime&quot; </span>=&gt; {
+            <span class="attr">#[cfg(feature = <span class="string">"chrono"</span>)]
+            </span><span class="string">"DateTime" </span>| <span class="string">"NaiveDateTime" </span>| <span class="string">"NaiveDate" </span>| <span class="string">"NaiveTime" </span>=&gt; {
                 tokens.extend(<span class="macro">quote! </span>{ utoipa::openapi::SchemaType::String })
             }
 
-            <span class="attr">#[cfg(any(feature = <span class="string">&quot;chrono&quot;</span>, feature = <span class="string">&quot;time&quot;</span>))]
-            </span><span class="string">&quot;Date&quot; </span>| <span class="string">&quot;Duration&quot; </span>=&gt; tokens.extend(<span class="macro">quote! </span>{ utoipa::openapi::SchemaType::String }),
+            <span class="attr">#[cfg(any(feature = <span class="string">"chrono"</span>, feature = <span class="string">"time"</span>))]
+            </span><span class="string">"Date" </span>| <span class="string">"Duration" </span>=&gt; tokens.extend(<span class="macro">quote! </span>{ utoipa::openapi::SchemaType::String }),
 
-            <span class="attr">#[cfg(feature = <span class="string">&quot;decimal&quot;</span>)]
-            </span><span class="string">&quot;Decimal&quot; </span>=&gt; tokens.extend(<span class="macro">quote! </span>{ utoipa::openapi::SchemaType::String }),
+            <span class="attr">#[cfg(feature = <span class="string">"decimal"</span>)]
+            </span><span class="string">"Decimal" </span>=&gt; tokens.extend(<span class="macro">quote! </span>{ utoipa::openapi::SchemaType::String }),
 
-            <span class="attr">#[cfg(feature = <span class="string">&quot;rocket_extras&quot;</span>)]
-            </span><span class="string">&quot;PathBuf&quot; </span>=&gt; tokens.extend(<span class="macro">quote! </span>{ utoipa::openapi::SchemaType::String }),
+            <span class="attr">#[cfg(feature = <span class="string">"rocket_extras"</span>)]
+            </span><span class="string">"PathBuf" </span>=&gt; tokens.extend(<span class="macro">quote! </span>{ utoipa::openapi::SchemaType::String }),
 
-            <span class="attr">#[cfg(feature = <span class="string">&quot;uuid&quot;</span>)]
-            </span><span class="string">&quot;Uuid&quot; </span>=&gt; tokens.extend(<span class="macro">quote! </span>{ utoipa::openapi::SchemaType::String }),
+            <span class="attr">#[cfg(feature = <span class="string">"uuid"</span>)]
+            </span><span class="string">"Uuid" </span>=&gt; tokens.extend(<span class="macro">quote! </span>{ utoipa::openapi::SchemaType::String }),
 
-            <span class="attr">#[cfg(feature = <span class="string">&quot;ulid&quot;</span>)]
-            </span><span class="string">&quot;Ulid&quot; </span>=&gt; tokens.extend(<span class="macro">quote! </span>{ utoipa::openapi::SchemaType::String }),
+            <span class="attr">#[cfg(feature = <span class="string">"ulid"</span>)]
+            </span><span class="string">"Ulid" </span>=&gt; tokens.extend(<span class="macro">quote! </span>{ utoipa::openapi::SchemaType::String }),
 
-            <span class="attr">#[cfg(feature = <span class="string">&quot;time&quot;</span>)]
-            </span><span class="string">&quot;PrimitiveDateTime&quot; </span>| <span class="string">&quot;OffsetDateTime&quot; </span>=&gt; {
+            <span class="attr">#[cfg(feature = <span class="string">"time"</span>)]
+            </span><span class="string">"PrimitiveDateTime" </span>| <span class="string">"OffsetDateTime" </span>=&gt; {
                 tokens.extend(<span class="macro">quote! </span>{ utoipa::openapi::SchemaType::String })
             }
             <span class="kw">_ </span>=&gt; tokens.extend(<span class="macro">quote! </span>{ utoipa::openapi::SchemaType::Object }),
@@ -734,15 +735,15 @@
 
 <span class="doccomment">/// Either Rust type component variant or enum variant schema variant.
 </span><span class="attr">#[derive(Clone)]
-#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
-</span><span class="kw">pub enum </span>SchemaFormat&lt;<span class="lifetime">&#39;c</span>&gt; {
+#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
+</span><span class="kw">pub enum </span>SchemaFormat&lt;<span class="lifetime">'c</span>&gt; {
     <span class="doccomment">/// [`utoipa::openapi::schema::SchemaFormat`] enum variant schema format.
     </span>Variant(Variant),
     <span class="doccomment">/// Rust type schema format.
-    </span>Type(Type&lt;<span class="lifetime">&#39;c</span>&gt;),
+    </span>Type(Type&lt;<span class="lifetime">'c</span>&gt;),
 }
 
-<span class="kw">impl </span>SchemaFormat&lt;<span class="lifetime">&#39;_</span>&gt; {
+<span class="kw">impl </span>SchemaFormat&lt;<span class="lifetime">'_</span>&gt; {
     <span class="kw">pub fn </span>is_known_format(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="kw">match </span><span class="self">self </span>{
             <span class="self">Self</span>::Type(ty) =&gt; ty.is_known_format(),
@@ -751,19 +752,19 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Path&gt; <span class="kw">for </span>SchemaFormat&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">fn </span>from(path: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Path) -&gt; <span class="self">Self </span>{
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>Path&gt; <span class="kw">for </span>SchemaFormat&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="kw">fn </span>from(path: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>Path) -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>::Type(Type(path))
     }
 }
 
-<span class="kw">impl </span>Parse <span class="kw">for </span>SchemaFormat&lt;<span class="lifetime">&#39;_</span>&gt; {
+<span class="kw">impl </span>Parse <span class="kw">for </span>SchemaFormat&lt;<span class="lifetime">'_</span>&gt; {
     <span class="kw">fn </span>parse(input: syn::parse::ParseStream) -&gt; syn::Result&lt;<span class="self">Self</span>&gt; {
         <span class="prelude-val">Ok</span>(<span class="self">Self</span>::Variant(input.parse()<span class="question-mark">?</span>))
     }
 }
 
-<span class="kw">impl </span>ToTokens <span class="kw">for </span>SchemaFormat&lt;<span class="lifetime">&#39;_</span>&gt; {
+<span class="kw">impl </span>ToTokens <span class="kw">for </span>SchemaFormat&lt;<span class="lifetime">'_</span>&gt; {
     <span class="kw">fn </span>to_tokens(<span class="kw-2">&amp;</span><span class="self">self</span>, tokens: <span class="kw-2">&amp;mut </span>TokenStream) {
         <span class="kw">match </span><span class="self">self </span>{
             <span class="self">Self</span>::Type(ty) =&gt; ty.to_tokens(tokens),
@@ -774,10 +775,10 @@
 
 <span class="doccomment">/// Tokenizes OpenAPI data type format correctly by given Rust type.
 </span><span class="attr">#[derive(Clone)]
-#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
-</span><span class="kw">pub struct </span>Type&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>syn::Path);
+#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
+</span><span class="kw">pub struct </span>Type&lt;<span class="lifetime">'a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">'a </span>syn::Path);
 
-<span class="kw">impl </span>Type&lt;<span class="lifetime">&#39;_</span>&gt; {
+<span class="kw">impl </span>Type&lt;<span class="lifetime">'_</span>&gt; {
     <span class="doccomment">/// Check is the format know format. Known formats can be used within `quote! {...}` statements.
     </span><span class="kw">pub fn </span>is_known_format(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="kw">let </span>last_segment = <span class="kw">match </span><span class="self">self</span>.<span class="number">0</span>.segments.last() {
@@ -787,42 +788,42 @@
         <span class="kw">let </span>name = <span class="kw-2">&amp;*</span>last_segment.ident.to_string();
 
         <span class="attr">#[cfg(not(any(
-            feature = <span class="string">&quot;chrono&quot;</span>,
-            feature = <span class="string">&quot;uuid&quot;</span>,
-            feature = <span class="string">&quot;ulid&quot;</span>,
-            feature = <span class="string">&quot;time&quot;
+            feature = <span class="string">"chrono"</span>,
+            feature = <span class="string">"uuid"</span>,
+            feature = <span class="string">"ulid"</span>,
+            feature = <span class="string">"time"
         </span>)))]
         </span>{
             is_known_format(name)
         }
 
         <span class="attr">#[cfg(any(
-            feature = <span class="string">&quot;chrono&quot;</span>,
-            feature = <span class="string">&quot;uuid&quot;</span>,
-            feature = <span class="string">&quot;ulid&quot;</span>,
-            feature = <span class="string">&quot;time&quot;
+            feature = <span class="string">"chrono"</span>,
+            feature = <span class="string">"uuid"</span>,
+            feature = <span class="string">"ulid"</span>,
+            feature = <span class="string">"time"
         </span>))]
         </span>{
             <span class="kw">let </span><span class="kw-2">mut </span>known_format = is_known_format(name);
 
-            <span class="attr">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
+            <span class="attr">#[cfg(feature = <span class="string">"chrono"</span>)]
             </span><span class="kw">if </span>!known_format {
-                known_format = <span class="macro">matches!</span>(name, <span class="string">&quot;DateTime&quot; </span>| <span class="string">&quot;Date&quot; </span>| <span class="string">&quot;NaiveDate&quot; </span>| <span class="string">&quot;NaiveDateTime&quot;</span>);
+                known_format = <span class="macro">matches!</span>(name, <span class="string">"DateTime" </span>| <span class="string">"Date" </span>| <span class="string">"NaiveDate" </span>| <span class="string">"NaiveDateTime"</span>);
             }
 
-            <span class="attr">#[cfg(feature = <span class="string">&quot;uuid&quot;</span>)]
+            <span class="attr">#[cfg(feature = <span class="string">"uuid"</span>)]
             </span><span class="kw">if </span>!known_format {
-                known_format = <span class="macro">matches!</span>(name, <span class="string">&quot;Uuid&quot;</span>);
+                known_format = <span class="macro">matches!</span>(name, <span class="string">"Uuid"</span>);
             }
 
-            <span class="attr">#[cfg(feature = <span class="string">&quot;ulid&quot;</span>)]
+            <span class="attr">#[cfg(feature = <span class="string">"ulid"</span>)]
             </span><span class="kw">if </span>!known_format {
-                known_format = <span class="macro">matches!</span>(name, <span class="string">&quot;Ulid&quot;</span>);
+                known_format = <span class="macro">matches!</span>(name, <span class="string">"Ulid"</span>);
             }
 
-            <span class="attr">#[cfg(feature = <span class="string">&quot;time&quot;</span>)]
+            <span class="attr">#[cfg(feature = <span class="string">"time"</span>)]
             </span><span class="kw">if </span>!known_format {
-                known_format = <span class="macro">matches!</span>(name, <span class="string">&quot;Date&quot; </span>| <span class="string">&quot;PrimitiveDateTime&quot; </span>| <span class="string">&quot;OffsetDateTime&quot;</span>);
+                known_format = <span class="macro">matches!</span>(name, <span class="string">"Date" </span>| <span class="string">"PrimitiveDateTime" </span>| <span class="string">"OffsetDateTime"</span>);
             }
 
             known_format
@@ -834,65 +835,65 @@
 </span><span class="kw">fn </span>is_known_format(name: <span class="kw-2">&amp;</span>str) -&gt; bool {
     <span class="macro">matches!</span>(
         name,
-        <span class="string">&quot;i8&quot; </span>| <span class="string">&quot;i16&quot; </span>| <span class="string">&quot;i32&quot; </span>| <span class="string">&quot;u8&quot; </span>| <span class="string">&quot;u16&quot; </span>| <span class="string">&quot;u32&quot; </span>| <span class="string">&quot;i64&quot; </span>| <span class="string">&quot;u64&quot; </span>| <span class="string">&quot;f32&quot; </span>| <span class="string">&quot;f64&quot;
+        <span class="string">"i8" </span>| <span class="string">"i16" </span>| <span class="string">"i32" </span>| <span class="string">"u8" </span>| <span class="string">"u16" </span>| <span class="string">"u32" </span>| <span class="string">"i64" </span>| <span class="string">"u64" </span>| <span class="string">"f32" </span>| <span class="string">"f64"
     </span>)
 }
 
-<span class="kw">impl </span>ToTokens <span class="kw">for </span>Type&lt;<span class="lifetime">&#39;_</span>&gt; {
+<span class="kw">impl </span>ToTokens <span class="kw">for </span>Type&lt;<span class="lifetime">'_</span>&gt; {
     <span class="kw">fn </span>to_tokens(<span class="kw-2">&amp;</span><span class="self">self</span>, tokens: <span class="kw-2">&amp;mut </span>proc_macro2::TokenStream) {
         <span class="kw">let </span>last_segment = <span class="self">self</span>.<span class="number">0</span>.segments.last().unwrap_or_else(|| {
-            <span class="macro">abort_call_site!</span>(<span class="string">&quot;expected there to be at least one segment in the path&quot;</span>)
+            <span class="macro">abort_call_site!</span>(<span class="string">"expected there to be at least one segment in the path"</span>)
         });
         <span class="kw">let </span>name = <span class="kw-2">&amp;*</span>last_segment.ident.to_string();
 
         <span class="kw">match </span>name {
-            <span class="attr">#[cfg(feature=<span class="string">&quot;non_strict_integers&quot;</span>)]
-            </span><span class="string">&quot;i8&quot; </span>=&gt; tokens.extend(<span class="macro">quote! </span>{ utoipa::openapi::SchemaFormat::KnownFormat(utoipa::openapi::KnownFormat::Int8) }),
-            <span class="attr">#[cfg(feature=<span class="string">&quot;non_strict_integers&quot;</span>)]
-            </span><span class="string">&quot;u8&quot; </span>=&gt; tokens.extend(<span class="macro">quote! </span>{ utoipa::openapi::SchemaFormat::KnownFormat(utoipa::openapi::KnownFormat::UInt8) }),
-            <span class="attr">#[cfg(feature=<span class="string">&quot;non_strict_integers&quot;</span>)]
-            </span><span class="string">&quot;i16&quot; </span>=&gt; tokens.extend(<span class="macro">quote! </span>{ utoipa::openapi::SchemaFormat::KnownFormat(utoipa::openapi::KnownFormat::Int16) }),
-            <span class="attr">#[cfg(feature=<span class="string">&quot;non_strict_integers&quot;</span>)]
-            </span><span class="string">&quot;u16&quot; </span>=&gt; tokens.extend(<span class="macro">quote! </span>{ utoipa::openapi::SchemaFormat::KnownFormat(utoipa::openapi::KnownFormat::UInt16) }),
-            <span class="attr">#[cfg(feature=<span class="string">&quot;non_strict_integers&quot;</span>)]
-            #[cfg(feature=<span class="string">&quot;non_strict_integers&quot;</span>)]
-            </span><span class="string">&quot;u32&quot; </span>=&gt; tokens.extend(<span class="macro">quote! </span>{ utoipa::openapi::SchemaFormat::KnownFormat(utoipa::openapi::KnownFormat::UInt32) }),
-            <span class="attr">#[cfg(feature=<span class="string">&quot;non_strict_integers&quot;</span>)]
-            </span><span class="string">&quot;u64&quot; </span>=&gt; tokens.extend(<span class="macro">quote! </span>{ utoipa::openapi::SchemaFormat::KnownFormat(utoipa::openapi::KnownFormat::UInt64) }),
+            <span class="attr">#[cfg(feature=<span class="string">"non_strict_integers"</span>)]
+            </span><span class="string">"i8" </span>=&gt; tokens.extend(<span class="macro">quote! </span>{ utoipa::openapi::SchemaFormat::KnownFormat(utoipa::openapi::KnownFormat::Int8) }),
+            <span class="attr">#[cfg(feature=<span class="string">"non_strict_integers"</span>)]
+            </span><span class="string">"u8" </span>=&gt; tokens.extend(<span class="macro">quote! </span>{ utoipa::openapi::SchemaFormat::KnownFormat(utoipa::openapi::KnownFormat::UInt8) }),
+            <span class="attr">#[cfg(feature=<span class="string">"non_strict_integers"</span>)]
+            </span><span class="string">"i16" </span>=&gt; tokens.extend(<span class="macro">quote! </span>{ utoipa::openapi::SchemaFormat::KnownFormat(utoipa::openapi::KnownFormat::Int16) }),
+            <span class="attr">#[cfg(feature=<span class="string">"non_strict_integers"</span>)]
+            </span><span class="string">"u16" </span>=&gt; tokens.extend(<span class="macro">quote! </span>{ utoipa::openapi::SchemaFormat::KnownFormat(utoipa::openapi::KnownFormat::UInt16) }),
+            <span class="attr">#[cfg(feature=<span class="string">"non_strict_integers"</span>)]
+            #[cfg(feature=<span class="string">"non_strict_integers"</span>)]
+            </span><span class="string">"u32" </span>=&gt; tokens.extend(<span class="macro">quote! </span>{ utoipa::openapi::SchemaFormat::KnownFormat(utoipa::openapi::KnownFormat::UInt32) }),
+            <span class="attr">#[cfg(feature=<span class="string">"non_strict_integers"</span>)]
+            </span><span class="string">"u64" </span>=&gt; tokens.extend(<span class="macro">quote! </span>{ utoipa::openapi::SchemaFormat::KnownFormat(utoipa::openapi::KnownFormat::UInt64) }),
 
-            <span class="attr">#[cfg(not(feature=<span class="string">&quot;non_strict_integers&quot;</span>))]
-            </span><span class="string">&quot;i8&quot; </span>| <span class="string">&quot;i16&quot; </span>| <span class="string">&quot;u8&quot; </span>| <span class="string">&quot;u16&quot; </span>| <span class="string">&quot;u32&quot; </span>=&gt; {
+            <span class="attr">#[cfg(not(feature=<span class="string">"non_strict_integers"</span>))]
+            </span><span class="string">"i8" </span>| <span class="string">"i16" </span>| <span class="string">"u8" </span>| <span class="string">"u16" </span>| <span class="string">"u32" </span>=&gt; {
                 tokens.extend(<span class="macro">quote! </span>{ utoipa::openapi::SchemaFormat::KnownFormat(utoipa::openapi::KnownFormat::Int32) })
             }
 
-            <span class="attr">#[cfg(not(feature=<span class="string">&quot;non_strict_integers&quot;</span>))]
-            </span><span class="string">&quot;u64&quot; </span>=&gt; tokens.extend(<span class="macro">quote! </span>{ utoipa::openapi::SchemaFormat::KnownFormat(utoipa::openapi::KnownFormat::Int64) }),
+            <span class="attr">#[cfg(not(feature=<span class="string">"non_strict_integers"</span>))]
+            </span><span class="string">"u64" </span>=&gt; tokens.extend(<span class="macro">quote! </span>{ utoipa::openapi::SchemaFormat::KnownFormat(utoipa::openapi::KnownFormat::Int64) }),
 
-            <span class="string">&quot;i32&quot; </span>=&gt; tokens.extend(<span class="macro">quote! </span>{ utoipa::openapi::SchemaFormat::KnownFormat(utoipa::openapi::KnownFormat::Int32) }),
-            <span class="string">&quot;i64&quot; </span>=&gt; tokens.extend(<span class="macro">quote! </span>{ utoipa::openapi::SchemaFormat::KnownFormat(utoipa::openapi::KnownFormat::Int64) }),
-            <span class="string">&quot;f32&quot; </span>=&gt; tokens.extend(<span class="macro">quote! </span>{ utoipa::openapi::SchemaFormat::KnownFormat(utoipa::openapi::KnownFormat::Float) }),
-            <span class="string">&quot;f64&quot; </span>=&gt; tokens.extend(<span class="macro">quote! </span>{ utoipa::openapi::SchemaFormat::KnownFormat(utoipa::openapi::KnownFormat::Double) }),
+            <span class="string">"i32" </span>=&gt; tokens.extend(<span class="macro">quote! </span>{ utoipa::openapi::SchemaFormat::KnownFormat(utoipa::openapi::KnownFormat::Int32) }),
+            <span class="string">"i64" </span>=&gt; tokens.extend(<span class="macro">quote! </span>{ utoipa::openapi::SchemaFormat::KnownFormat(utoipa::openapi::KnownFormat::Int64) }),
+            <span class="string">"f32" </span>=&gt; tokens.extend(<span class="macro">quote! </span>{ utoipa::openapi::SchemaFormat::KnownFormat(utoipa::openapi::KnownFormat::Float) }),
+            <span class="string">"f64" </span>=&gt; tokens.extend(<span class="macro">quote! </span>{ utoipa::openapi::SchemaFormat::KnownFormat(utoipa::openapi::KnownFormat::Double) }),
 
-            <span class="attr">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
-            </span><span class="string">&quot;NaiveDate&quot; </span>=&gt; tokens.extend(<span class="macro">quote! </span>{ utoipa::openapi::SchemaFormat::KnownFormat(utoipa::openapi::KnownFormat::Date) }),
+            <span class="attr">#[cfg(feature = <span class="string">"chrono"</span>)]
+            </span><span class="string">"NaiveDate" </span>=&gt; tokens.extend(<span class="macro">quote! </span>{ utoipa::openapi::SchemaFormat::KnownFormat(utoipa::openapi::KnownFormat::Date) }),
 
-            <span class="attr">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
-            </span><span class="string">&quot;DateTime&quot; </span>=&gt; tokens.extend(<span class="macro">quote! </span>{ utoipa::openapi::SchemaFormat::KnownFormat(utoipa::openapi::KnownFormat::DateTime) }),
+            <span class="attr">#[cfg(feature = <span class="string">"chrono"</span>)]
+            </span><span class="string">"DateTime" </span>=&gt; tokens.extend(<span class="macro">quote! </span>{ utoipa::openapi::SchemaFormat::KnownFormat(utoipa::openapi::KnownFormat::DateTime) }),
 
-            <span class="attr">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
-            </span><span class="string">&quot;NaiveDateTime&quot; </span>=&gt; tokens.extend(<span class="macro">quote! </span>{ utoipa::openapi::SchemaFormat::KnownFormat(utoipa::openapi::KnownFormat::DateTime) }),
+            <span class="attr">#[cfg(feature = <span class="string">"chrono"</span>)]
+            </span><span class="string">"NaiveDateTime" </span>=&gt; tokens.extend(<span class="macro">quote! </span>{ utoipa::openapi::SchemaFormat::KnownFormat(utoipa::openapi::KnownFormat::DateTime) }),
 
-            <span class="attr">#[cfg(any(feature = <span class="string">&quot;chrono&quot;</span>, feature = <span class="string">&quot;time&quot;</span>))]
-            </span><span class="string">&quot;Date&quot; </span>=&gt; tokens.extend(<span class="macro">quote! </span>{ utoipa::openapi::SchemaFormat::KnownFormat(utoipa::openapi::KnownFormat::Date) }),
+            <span class="attr">#[cfg(any(feature = <span class="string">"chrono"</span>, feature = <span class="string">"time"</span>))]
+            </span><span class="string">"Date" </span>=&gt; tokens.extend(<span class="macro">quote! </span>{ utoipa::openapi::SchemaFormat::KnownFormat(utoipa::openapi::KnownFormat::Date) }),
 
-            <span class="attr">#[cfg(feature = <span class="string">&quot;uuid&quot;</span>)]
-            </span><span class="string">&quot;Uuid&quot; </span>=&gt; tokens.extend(<span class="macro">quote! </span>{ utoipa::openapi::SchemaFormat::KnownFormat(utoipa::openapi::KnownFormat::Uuid) }),
+            <span class="attr">#[cfg(feature = <span class="string">"uuid"</span>)]
+            </span><span class="string">"Uuid" </span>=&gt; tokens.extend(<span class="macro">quote! </span>{ utoipa::openapi::SchemaFormat::KnownFormat(utoipa::openapi::KnownFormat::Uuid) }),
 
-            <span class="attr">#[cfg(feature = <span class="string">&quot;ulid&quot;</span>)]
-            </span><span class="string">&quot;Ulid&quot; </span>=&gt; tokens.extend(<span class="macro">quote! </span>{ utoipa::openapi::SchemaFormat::KnownFormat(utoipa::openapi::KnownFormat::Ulid) }),
+            <span class="attr">#[cfg(feature = <span class="string">"ulid"</span>)]
+            </span><span class="string">"Ulid" </span>=&gt; tokens.extend(<span class="macro">quote! </span>{ utoipa::openapi::SchemaFormat::KnownFormat(utoipa::openapi::KnownFormat::Ulid) }),
 
-            <span class="attr">#[cfg(feature = <span class="string">&quot;time&quot;</span>)]
-            </span><span class="string">&quot;PrimitiveDateTime&quot; </span>| <span class="string">&quot;OffsetDateTime&quot; </span>=&gt; {
+            <span class="attr">#[cfg(feature = <span class="string">"time"</span>)]
+            </span><span class="string">"PrimitiveDateTime" </span>| <span class="string">"OffsetDateTime" </span>=&gt; {
                 tokens.extend(<span class="macro">quote! </span>{ utoipa::openapi::SchemaFormat::KnownFormat(utoipa::openapi::KnownFormat::DateTime) })
             }
             <span class="kw">_ </span>=&gt; (),
@@ -902,7 +903,7 @@
 
 <span class="doccomment">/// [`Parse`] and [`ToTokens`] implementation for [`utoipa::openapi::schema::SchemaFormat`].
 </span><span class="attr">#[derive(Clone)]
-#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
+#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
 </span><span class="kw">pub enum </span>Variant {
     Int32,
     Int64,
@@ -913,9 +914,9 @@
     Date,
     DateTime,
     Password,
-    <span class="attr">#[cfg(feature = <span class="string">&quot;uuid&quot;</span>)]
+    <span class="attr">#[cfg(feature = <span class="string">"uuid"</span>)]
     </span>Uuid,
-    <span class="attr">#[cfg(feature = <span class="string">&quot;ulid&quot;</span>)]
+    <span class="attr">#[cfg(feature = <span class="string">"ulid"</span>)]
     </span>Ulid,
     Custom(String),
 }
@@ -923,27 +924,27 @@
 <span class="kw">impl </span>Parse <span class="kw">for </span>Variant {
     <span class="kw">fn </span>parse(input: syn::parse::ParseStream) -&gt; syn::Result&lt;<span class="self">Self</span>&gt; {
         <span class="kw">const </span>FORMATS: [<span class="kw-2">&amp;</span>str; <span class="number">11</span>] = [
-            <span class="string">&quot;Int32&quot;</span>, <span class="string">&quot;Int64&quot;</span>, <span class="string">&quot;Float&quot;</span>, <span class="string">&quot;Double&quot;</span>, <span class="string">&quot;Byte&quot;</span>, <span class="string">&quot;Binary&quot;</span>, <span class="string">&quot;Date&quot;</span>, <span class="string">&quot;DateTime&quot;</span>, <span class="string">&quot;Password&quot;</span>,
-            <span class="string">&quot;Uuid&quot;</span>, <span class="string">&quot;Ulid&quot;</span>,
+            <span class="string">"Int32"</span>, <span class="string">"Int64"</span>, <span class="string">"Float"</span>, <span class="string">"Double"</span>, <span class="string">"Byte"</span>, <span class="string">"Binary"</span>, <span class="string">"Date"</span>, <span class="string">"DateTime"</span>, <span class="string">"Password"</span>,
+            <span class="string">"Uuid"</span>, <span class="string">"Ulid"</span>,
         ];
         <span class="kw">let </span>known_formats = FORMATS
             .into_iter()
             .filter(|_format| {
-                <span class="attr">#[cfg(all(feature = <span class="string">&quot;uuid&quot;</span>, feature = <span class="string">&quot;ulid&quot;</span>))]
+                <span class="attr">#[cfg(all(feature = <span class="string">"uuid"</span>, feature = <span class="string">"ulid"</span>))]
                 </span>{
                     <span class="bool-val">true
                 </span>}
-                <span class="attr">#[cfg(all(not(feature = <span class="string">&quot;uuid&quot;</span>), feature = <span class="string">&quot;ulid&quot;</span>))]
+                <span class="attr">#[cfg(all(not(feature = <span class="string">"uuid"</span>), feature = <span class="string">"ulid"</span>))]
                 </span>{
-                    _format != <span class="kw-2">&amp;</span><span class="string">&quot;Uuid&quot;
+                    _format != <span class="kw-2">&amp;</span><span class="string">"Uuid"
                 </span>}
-                <span class="attr">#[cfg(all(feature = <span class="string">&quot;uuid&quot;</span>, not(feature = <span class="string">&quot;ulid&quot;</span>)))]
+                <span class="attr">#[cfg(all(feature = <span class="string">"uuid"</span>, not(feature = <span class="string">"ulid"</span>)))]
                 </span>{
-                    _format != <span class="kw-2">&amp;</span><span class="string">&quot;Ulid&quot;
+                    _format != <span class="kw-2">&amp;</span><span class="string">"Ulid"
                 </span>}
-                <span class="attr">#[cfg(all(not(feature = <span class="string">&quot;uuid&quot;</span>), not(feature = <span class="string">&quot;ulid&quot;</span>)))]
+                <span class="attr">#[cfg(all(not(feature = <span class="string">"uuid"</span>), not(feature = <span class="string">"ulid"</span>)))]
                 </span>{
-                    _format != <span class="kw-2">&amp;</span><span class="string">&quot;Uuid&quot; </span>&amp;&amp; _format != <span class="kw-2">&amp;</span><span class="string">&quot;Ulid&quot;
+                    _format != <span class="kw-2">&amp;</span><span class="string">"Uuid" </span>&amp;&amp; _format != <span class="kw-2">&amp;</span><span class="string">"Ulid"
                 </span>}
             })
             .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
@@ -954,24 +955,24 @@
             <span class="kw">let </span>name = <span class="kw-2">&amp;*</span>format.to_string();
 
             <span class="kw">match </span>name {
-                <span class="string">&quot;Int32&quot; </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::Int32),
-                <span class="string">&quot;Int64&quot; </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::Int64),
-                <span class="string">&quot;Float&quot; </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::Float),
-                <span class="string">&quot;Double&quot; </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::Double),
-                <span class="string">&quot;Byte&quot; </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::Byte),
-                <span class="string">&quot;Binary&quot; </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::Binary),
-                <span class="string">&quot;Date&quot; </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::Date),
-                <span class="string">&quot;DateTime&quot; </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::DateTime),
-                <span class="string">&quot;Password&quot; </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::Password),
-                <span class="attr">#[cfg(feature = <span class="string">&quot;uuid&quot;</span>)]
-                </span><span class="string">&quot;Uuid&quot; </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::Uuid),
-                <span class="attr">#[cfg(feature = <span class="string">&quot;ulid&quot;</span>)]
-                </span><span class="string">&quot;Ulid&quot; </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::Ulid),
+                <span class="string">"Int32" </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::Int32),
+                <span class="string">"Int64" </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::Int64),
+                <span class="string">"Float" </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::Float),
+                <span class="string">"Double" </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::Double),
+                <span class="string">"Byte" </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::Byte),
+                <span class="string">"Binary" </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::Binary),
+                <span class="string">"Date" </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::Date),
+                <span class="string">"DateTime" </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::DateTime),
+                <span class="string">"Password" </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::Password),
+                <span class="attr">#[cfg(feature = <span class="string">"uuid"</span>)]
+                </span><span class="string">"Uuid" </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::Uuid),
+                <span class="attr">#[cfg(feature = <span class="string">"ulid"</span>)]
+                </span><span class="string">"Ulid" </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::Ulid),
                 <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(Error::new(
                     format.span(),
                     <span class="macro">format!</span>(
-                        <span class="string">&quot;unexpected format: {name}, expected one of: {}&quot;</span>,
-                        known_formats.join(<span class="string">&quot;, &quot;</span>)
+                        <span class="string">"unexpected format: {name}, expected one of: {}"</span>,
+                        known_formats.join(<span class="string">", "</span>)
                     ),
                 )),
             }
@@ -1014,11 +1015,11 @@
             <span class="self">Self</span>::Password =&gt; tokens.extend(<span class="macro">quote!</span>(utoipa::openapi::SchemaFormat::KnownFormat(
                 utoipa::openapi::KnownFormat::Password
             ))),
-            <span class="attr">#[cfg(feature = <span class="string">&quot;uuid&quot;</span>)]
+            <span class="attr">#[cfg(feature = <span class="string">"uuid"</span>)]
             </span><span class="self">Self</span>::Uuid =&gt; tokens.extend(<span class="macro">quote!</span>(utoipa::openapi::SchemaFormat::KnownFormat(
                 utoipa::openapi::KnownFormat::Uuid
             ))),
-            <span class="attr">#[cfg(feature = <span class="string">&quot;ulid&quot;</span>)]
+            <span class="attr">#[cfg(feature = <span class="string">"ulid"</span>)]
             </span><span class="self">Self</span>::Ulid =&gt; tokens.extend(<span class="macro">quote!</span>(utoipa::openapi::SchemaFormat::KnownFormat(
                 utoipa::openapi::KnownFormat::Ulid
             ))),

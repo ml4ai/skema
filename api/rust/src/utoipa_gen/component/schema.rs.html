@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/utoipa-gen-3.5.0/src/component/schema.rs`."><title>schema.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="utoipa_gen" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/utoipa-gen-3.5.0/src/component/schema.rs`."><title>schema.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="utoipa_gen" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1599,23 +1600,23 @@
 <span class="kw">mod </span>features;
 <span class="kw">pub mod </span>xml;
 
-<span class="kw">pub struct </span>Schema&lt;<span class="lifetime">&#39;a</span>&gt; {
-    ident: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Ident,
-    attributes: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[Attribute],
-    generics: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Generics,
+<span class="kw">pub struct </span>Schema&lt;<span class="lifetime">'a</span>&gt; {
+    ident: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>Ident,
+    attributes: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>[Attribute],
+    generics: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>Generics,
     aliases: <span class="prelude-ty">Option</span>&lt;Punctuated&lt;AliasSchema, Comma&gt;&gt;,
-    data: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Data,
-    vis: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Visibility,
+    data: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>Data,
+    vis: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>Visibility,
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Schema&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">const </span>TO_SCHEMA_LIFETIME: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;&#39;__s&quot;</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Schema&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="kw">const </span>TO_SCHEMA_LIFETIME: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str = <span class="string">"'__s"</span>;
     <span class="kw">pub fn </span>new(
-        data: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Data,
-        attributes: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[Attribute],
-        ident: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Ident,
-        generics: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Generics,
-        vis: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Visibility,
+        data: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>Data,
+        attributes: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>[Attribute],
+        ident: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>Ident,
+        generics: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>Generics,
+        vis: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>Visibility,
     ) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>aliases = <span class="kw">if </span>generics.type_params().count() &gt; <span class="number">0 </span>{
             parse_aliases(attributes)
@@ -1634,7 +1635,7 @@
     }
 }
 
-<span class="kw">impl </span>ToTokens <span class="kw">for </span>Schema&lt;<span class="lifetime">&#39;_</span>&gt; {
+<span class="kw">impl </span>ToTokens <span class="kw">for </span>Schema&lt;<span class="lifetime">'_</span>&gt; {
     <span class="kw">fn </span>to_tokens(<span class="kw-2">&amp;</span><span class="self">self</span>, tokens: <span class="kw-2">&amp;mut </span>TokenStream) {
         <span class="kw">let </span>ident = <span class="self">self</span>.ident;
         <span class="kw">let </span>variant = SchemaVariant::new(
@@ -1683,7 +1684,7 @@
             aliases
                 .iter()
                 .map(|alias| {
-                    <span class="kw">let </span>name = <span class="macro">quote::format_ident!</span>(<span class="string">&quot;{}&quot;</span>, alias.name);
+                    <span class="kw">let </span>name = <span class="macro">quote::format_ident!</span>(<span class="string">"{}"</span>, alias.name);
                     <span class="kw">let </span>ty = <span class="kw-2">&amp;</span>alias.ty;
                     <span class="kw">let </span>vis = <span class="self">self</span>.vis;
                     <span class="kw">let </span>name_generics = alias.get_lifetimes().fold(
@@ -1731,22 +1732,22 @@
     }
 }
 
-<span class="attr">#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
-</span><span class="kw">enum </span>SchemaVariant&lt;<span class="lifetime">&#39;a</span>&gt; {
-    Named(NamedStructSchema&lt;<span class="lifetime">&#39;a</span>&gt;),
-    Unnamed(UnnamedStructSchema&lt;<span class="lifetime">&#39;a</span>&gt;),
-    Enum(EnumSchema&lt;<span class="lifetime">&#39;a</span>&gt;),
+<span class="attr">#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
+</span><span class="kw">enum </span>SchemaVariant&lt;<span class="lifetime">'a</span>&gt; {
+    Named(NamedStructSchema&lt;<span class="lifetime">'a</span>&gt;),
+    Unnamed(UnnamedStructSchema&lt;<span class="lifetime">'a</span>&gt;),
+    Enum(EnumSchema&lt;<span class="lifetime">'a</span>&gt;),
     Unit(UnitStructVariant),
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; SchemaVariant&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">pub fn </span>new&lt;I: IntoIterator&lt;Item = (TypeTree&lt;<span class="lifetime">&#39;a</span>&gt;, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>TypeTree&lt;<span class="lifetime">&#39;a</span>&gt;)&gt;&gt;(
-        data: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Data,
-        attributes: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[Attribute],
-        ident: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Ident,
-        generics: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Generics,
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; SchemaVariant&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="kw">pub fn </span>new&lt;I: IntoIterator&lt;Item = (TypeTree&lt;<span class="lifetime">'a</span>&gt;, <span class="kw-2">&amp;</span><span class="lifetime">'a </span>TypeTree&lt;<span class="lifetime">'a</span>&gt;)&gt;&gt;(
+        data: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>Data,
+        attributes: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>[Attribute],
+        ident: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>Ident,
+        generics: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>Generics,
         aliases: <span class="prelude-ty">Option</span>&lt;I&gt;,
-    ) -&gt; SchemaVariant&lt;<span class="lifetime">&#39;a</span>&gt; {
+    ) -&gt; SchemaVariant&lt;<span class="lifetime">'a</span>&gt; {
         <span class="kw">match </span>data {
             Data::Struct(content) =&gt; <span class="kw">match </span><span class="kw-2">&amp;</span>content.fields {
                 Fields::Unnamed(fields) =&gt; {
@@ -1791,7 +1792,7 @@
             )),
             <span class="kw">_ </span>=&gt; <span class="macro">abort!</span>(
                 ident.span(),
-                <span class="string">&quot;unexpected data type, expected syn::Data::Struct or syn::Data::Enum&quot;
+                <span class="string">"unexpected data type, expected syn::Data::Struct or syn::Data::Enum"
             </span>),
         }
     }
@@ -1806,7 +1807,7 @@
     }
 }
 
-<span class="kw">impl </span>ToTokens <span class="kw">for </span>SchemaVariant&lt;<span class="lifetime">&#39;_</span>&gt; {
+<span class="kw">impl </span>ToTokens <span class="kw">for </span>SchemaVariant&lt;<span class="lifetime">'_</span>&gt; {
     <span class="kw">fn </span>to_tokens(<span class="kw-2">&amp;</span><span class="self">self</span>, tokens: <span class="kw-2">&amp;mut </span>TokenStream) {
         <span class="kw">match </span><span class="self">self </span>{
             <span class="self">Self</span>::Enum(schema) =&gt; schema.to_tokens(tokens),
@@ -1817,7 +1818,7 @@
     }
 }
 
-<span class="attr">#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
+<span class="attr">#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
 </span><span class="kw">struct </span>UnitStructVariant;
 
 <span class="kw">impl </span>ToTokens <span class="kw">for </span>UnitStructVariant {
@@ -1828,31 +1829,31 @@
     }
 }
 
-<span class="attr">#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
-</span><span class="kw">pub struct </span>NamedStructSchema&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">pub </span>struct_name: Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;,
-    <span class="kw">pub </span>fields: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Punctuated&lt;Field, Comma&gt;,
-    <span class="kw">pub </span>attributes: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[Attribute],
+<span class="attr">#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
+</span><span class="kw">pub struct </span>NamedStructSchema&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="kw">pub </span>struct_name: Cow&lt;<span class="lifetime">'a</span>, str&gt;,
+    <span class="kw">pub </span>fields: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>Punctuated&lt;Field, Comma&gt;,
+    <span class="kw">pub </span>attributes: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>[Attribute],
     <span class="kw">pub </span>features: <span class="prelude-ty">Option</span>&lt;Vec&lt;Feature&gt;&gt;,
     <span class="kw">pub </span>rename_all: <span class="prelude-ty">Option</span>&lt;RenameAll&gt;,
-    <span class="kw">pub </span>generics: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Generics&gt;,
-    <span class="kw">pub </span>aliases: <span class="prelude-ty">Option</span>&lt;Vec&lt;(TypeTree&lt;<span class="lifetime">&#39;a</span>&gt;, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>TypeTree&lt;<span class="lifetime">&#39;a</span>&gt;)&gt;&gt;,
+    <span class="kw">pub </span>generics: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>Generics&gt;,
+    <span class="kw">pub </span>aliases: <span class="prelude-ty">Option</span>&lt;Vec&lt;(TypeTree&lt;<span class="lifetime">'a</span>&gt;, <span class="kw-2">&amp;</span><span class="lifetime">'a </span>TypeTree&lt;<span class="lifetime">'a</span>&gt;)&gt;&gt;,
     <span class="kw">pub </span>schema_as: <span class="prelude-ty">Option</span>&lt;As&gt;,
 }
 
-<span class="kw">struct </span>NamedStructFieldOptions&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">struct </span>NamedStructFieldOptions&lt;<span class="lifetime">'a</span>&gt; {
     property: Property,
-    rename_field_value: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;,
+    rename_field_value: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;,
     required: <span class="prelude-ty">Option</span>&lt;<span class="kw">super</span>::features::Required&gt;,
     is_option: bool,
 }
 
-<span class="kw">impl </span>NamedStructSchema&lt;<span class="lifetime">&#39;_</span>&gt; {
+<span class="kw">impl </span>NamedStructSchema&lt;<span class="lifetime">'_</span>&gt; {
     <span class="kw">fn </span>field_as_schema_property&lt;R&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         field: <span class="kw-2">&amp;</span>Field,
         container_rules: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;SerdeContainer&gt;,
-        yield_: <span class="kw">impl </span>FnOnce(NamedStructFieldOptions&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; R,
+        yield_: <span class="kw">impl </span>FnOnce(NamedStructFieldOptions&lt;<span class="lifetime">'_</span>&gt;) -&gt; R,
     ) -&gt; R {
         <span class="kw">let </span>type_tree = <span class="kw-2">&amp;mut </span>TypeTree::from_type(<span class="kw-2">&amp;</span>field.ty);
         <span class="kw">if let </span><span class="prelude-val">Some</span>(aliases) = <span class="kw-2">&amp;</span><span class="self">self</span>.aliases {
@@ -1885,14 +1886,14 @@
                 .any(|f| <span class="macro">matches!</span>(f, Feature::Default(<span class="kw">_</span>)))
             {
                 <span class="kw">let </span>field_ident = field.ident.as_ref().unwrap().to_owned();
-                <span class="kw">let </span>struct_ident = <span class="macro">format_ident!</span>(<span class="string">&quot;{}&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.struct_name);
+                <span class="kw">let </span>struct_ident = <span class="macro">format_ident!</span>(<span class="string">"{}"</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.struct_name);
                 features_inner.push(Feature::Default(
                     <span class="kw">crate</span>::features::Default::new_default_trait(struct_ident, field_ident.into()),
                 ));
             }
         }
 
-        <span class="comment">// check for Rust&#39;s `#[deprecated]` attribute first, then check for `deprecated` feature
+        <span class="comment">// check for Rust's `#[deprecated]` attribute first, then check for `deprecated` feature
         </span><span class="kw">let </span>deprecated = <span class="kw">super</span>::get_deprecated(<span class="kw-2">&amp;</span>field.attrs).or_else(|| {
             <span class="macro">pop_feature!</span>(field_features =&gt; Feature::Deprecated(<span class="kw">_</span>)).and_then(|feature| <span class="kw">match </span>feature
             {
@@ -1938,7 +1939,7 @@
     }
 }
 
-<span class="kw">impl </span>ToTokens <span class="kw">for </span>NamedStructSchema&lt;<span class="lifetime">&#39;_</span>&gt; {
+<span class="kw">impl </span>ToTokens <span class="kw">for </span>NamedStructSchema&lt;<span class="lifetime">'_</span>&gt; {
     <span class="kw">fn </span>to_tokens(<span class="kw-2">&amp;</span><span class="self">self</span>, tokens: <span class="kw-2">&amp;mut </span>TokenStream) {
         <span class="kw">let </span>container_rules = serde::parse_container(<span class="self">self</span>.attributes);
 
@@ -1959,7 +1960,7 @@
                 |<span class="kw-2">mut </span>object_tokens, (field, field_rule)| {
                     <span class="kw">let </span><span class="kw-2">mut </span>field_name = <span class="kw-2">&amp;*</span>field.ident.as_ref().unwrap().to_string();
 
-                    <span class="kw">if </span>field_name.starts_with(<span class="string">&quot;r#&quot;</span>) {
+                    <span class="kw">if </span>field_name.starts_with(<span class="string">"r#"</span>) {
                         field_name = <span class="kw-2">&amp;</span>field_name[<span class="number">2</span>..];
                     }
 
@@ -2066,16 +2067,16 @@
     }
 }
 
-<span class="attr">#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
-</span><span class="kw">struct </span>UnnamedStructSchema&lt;<span class="lifetime">&#39;a</span>&gt; {
-    struct_name: Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;,
-    fields: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Punctuated&lt;Field, Comma&gt;,
-    attributes: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[Attribute],
+<span class="attr">#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
+</span><span class="kw">struct </span>UnnamedStructSchema&lt;<span class="lifetime">'a</span>&gt; {
+    struct_name: Cow&lt;<span class="lifetime">'a</span>, str&gt;,
+    fields: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>Punctuated&lt;Field, Comma&gt;,
+    attributes: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>[Attribute],
     features: <span class="prelude-ty">Option</span>&lt;Vec&lt;Feature&gt;&gt;,
     schema_as: <span class="prelude-ty">Option</span>&lt;As&gt;,
 }
 
-<span class="kw">impl </span>ToTokens <span class="kw">for </span>UnnamedStructSchema&lt;<span class="lifetime">&#39;_</span>&gt; {
+<span class="kw">impl </span>ToTokens <span class="kw">for </span>UnnamedStructSchema&lt;<span class="lifetime">'_</span>&gt; {
     <span class="kw">fn </span>to_tokens(<span class="kw-2">&amp;</span><span class="self">self</span>, tokens: <span class="kw-2">&amp;mut </span>TokenStream) {
         <span class="kw">let </span>fields_len = <span class="self">self</span>.fields.len();
         <span class="kw">let </span>first_field = <span class="self">self</span>.fields.first().unwrap();
@@ -2103,7 +2104,7 @@
                     <span class="kw">if </span><span class="macro">pop_feature!</span>(features =&gt; Feature::Default(<span class="kw">crate</span>::features::Default(<span class="prelude-val">None</span>)))
                         .is_some()
                     {
-                        <span class="kw">let </span>struct_ident = <span class="macro">format_ident!</span>(<span class="string">&quot;{}&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.struct_name);
+                        <span class="kw">let </span>struct_ident = <span class="macro">format_ident!</span>(<span class="string">"{}"</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.struct_name);
                         <span class="kw">let </span>index: syn::Index = <span class="number">0</span>.into();
                         features.push(Feature::Default(
                             <span class="kw">crate</span>::features::Default::new_default_trait(struct_ident, index.into()),
@@ -2150,28 +2151,28 @@
     }
 }
 
-<span class="attr">#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
-</span><span class="kw">pub struct </span>EnumSchema&lt;<span class="lifetime">&#39;a</span>&gt; {
-    schema_type: EnumSchemaType&lt;<span class="lifetime">&#39;a</span>&gt;,
+<span class="attr">#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
+</span><span class="kw">pub struct </span>EnumSchema&lt;<span class="lifetime">'a</span>&gt; {
+    schema_type: EnumSchemaType&lt;<span class="lifetime">'a</span>&gt;,
     schema_as: <span class="prelude-ty">Option</span>&lt;As&gt;,
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;e</span>&gt; EnumSchema&lt;<span class="lifetime">&#39;e</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'e</span>&gt; EnumSchema&lt;<span class="lifetime">'e</span>&gt; {
     <span class="kw">pub fn </span>new(
-        enum_name: Cow&lt;<span class="lifetime">&#39;e</span>, str&gt;,
-        variants: <span class="kw-2">&amp;</span><span class="lifetime">&#39;e </span>Punctuated&lt;Variant, Comma&gt;,
-        attributes: <span class="kw-2">&amp;</span><span class="lifetime">&#39;e </span>[Attribute],
+        enum_name: Cow&lt;<span class="lifetime">'e</span>, str&gt;,
+        variants: <span class="kw-2">&amp;</span><span class="lifetime">'e </span>Punctuated&lt;Variant, Comma&gt;,
+        attributes: <span class="kw-2">&amp;</span><span class="lifetime">'e </span>[Attribute],
     ) -&gt; <span class="self">Self </span>{
         <span class="kw">if </span>variants
             .iter()
             .all(|variant| <span class="macro">matches!</span>(variant.fields, Fields::Unit))
         {
-            <span class="attr">#[cfg(feature = <span class="string">&quot;repr&quot;</span>)]
+            <span class="attr">#[cfg(feature = <span class="string">"repr"</span>)]
             </span>{
                 attributes
                     .iter()
                     .find_map(|attribute| {
-                        <span class="kw">if </span>attribute.path().is_ident(<span class="string">&quot;repr&quot;</span>) {
+                        <span class="kw">if </span>attribute.path().is_ident(<span class="string">"repr"</span>) {
                             attribute.parse_args::&lt;syn::TypePath&gt;().ok()
                         } <span class="kw">else </span>{
                             <span class="prelude-val">None
@@ -2222,7 +2223,7 @@
                     })
             }
 
-            <span class="attr">#[cfg(not(feature = <span class="string">&quot;repr&quot;</span>))]
+            <span class="attr">#[cfg(not(feature = <span class="string">"repr"</span>))]
             </span>{
                 <span class="kw">let </span><span class="kw-2">mut </span>simple_enum_features = attributes
                     .parse_features::&lt;EnumFeatures&gt;()
@@ -2263,28 +2264,28 @@
     }
 }
 
-<span class="kw">impl </span>ToTokens <span class="kw">for </span>EnumSchema&lt;<span class="lifetime">&#39;_</span>&gt; {
+<span class="kw">impl </span>ToTokens <span class="kw">for </span>EnumSchema&lt;<span class="lifetime">'_</span>&gt; {
     <span class="kw">fn </span>to_tokens(<span class="kw-2">&amp;</span><span class="self">self</span>, tokens: <span class="kw-2">&amp;mut </span>TokenStream) {
         <span class="self">self</span>.schema_type.to_tokens(tokens);
     }
 }
 
-<span class="attr">#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
-</span><span class="kw">enum </span>EnumSchemaType&lt;<span class="lifetime">&#39;e</span>&gt; {
-    Simple(SimpleEnum&lt;<span class="lifetime">&#39;e</span>&gt;),
-    <span class="attr">#[cfg(feature = <span class="string">&quot;repr&quot;</span>)]
-    </span>Repr(ReprEnum&lt;<span class="lifetime">&#39;e</span>&gt;),
-    Complex(ComplexEnum&lt;<span class="lifetime">&#39;e</span>&gt;),
+<span class="attr">#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
+</span><span class="kw">enum </span>EnumSchemaType&lt;<span class="lifetime">'e</span>&gt; {
+    Simple(SimpleEnum&lt;<span class="lifetime">'e</span>&gt;),
+    <span class="attr">#[cfg(feature = <span class="string">"repr"</span>)]
+    </span>Repr(ReprEnum&lt;<span class="lifetime">'e</span>&gt;),
+    Complex(ComplexEnum&lt;<span class="lifetime">'e</span>&gt;),
 }
 
-<span class="kw">impl </span>ToTokens <span class="kw">for </span>EnumSchemaType&lt;<span class="lifetime">&#39;_</span>&gt; {
+<span class="kw">impl </span>ToTokens <span class="kw">for </span>EnumSchemaType&lt;<span class="lifetime">'_</span>&gt; {
     <span class="kw">fn </span>to_tokens(<span class="kw-2">&amp;</span><span class="self">self</span>, tokens: <span class="kw-2">&amp;mut </span>TokenStream) {
         <span class="kw">let </span>attributes = <span class="kw">match </span><span class="self">self </span>{
             <span class="self">Self</span>::Simple(simple) =&gt; {
                 simple.to_tokens(tokens);
                 simple.attributes
             }
-            <span class="attr">#[cfg(feature = <span class="string">&quot;repr&quot;</span>)]
+            <span class="attr">#[cfg(feature = <span class="string">"repr"</span>)]
             </span><span class="self">Self</span>::Repr(repr) =&gt; {
                 repr.to_tokens(tokens);
                 repr.attributes
@@ -2308,17 +2309,17 @@
     }
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;repr&quot;</span>)]
-#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
-</span><span class="kw">struct </span>ReprEnum&lt;<span class="lifetime">&#39;a</span>&gt; {
-    variants: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Punctuated&lt;Variant, Comma&gt;,
-    attributes: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[Attribute],
+<span class="attr">#[cfg(feature = <span class="string">"repr"</span>)]
+#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
+</span><span class="kw">struct </span>ReprEnum&lt;<span class="lifetime">'a</span>&gt; {
+    variants: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>Punctuated&lt;Variant, Comma&gt;,
+    attributes: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>[Attribute],
     enum_type: syn::TypePath,
     enum_features: Vec&lt;Feature&gt;,
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;repr&quot;</span>)]
-</span><span class="kw">impl </span>ToTokens <span class="kw">for </span>ReprEnum&lt;<span class="lifetime">&#39;_</span>&gt; {
+<span class="attr">#[cfg(feature = <span class="string">"repr"</span>)]
+</span><span class="kw">impl </span>ToTokens <span class="kw">for </span>ReprEnum&lt;<span class="lifetime">'_</span>&gt; {
     <span class="kw">fn </span>to_tokens(<span class="kw-2">&amp;</span><span class="self">self</span>, tokens: <span class="kw-2">&amp;mut </span>TokenStream) {
         <span class="kw">let </span>container_rules = serde::parse_container(<span class="self">self</span>.attributes);
 
@@ -2344,13 +2345,13 @@
     }
 }
 
-<span class="kw">fn </span>rename_enum_variant&lt;<span class="lifetime">&#39;a</span>&gt;(
-    name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
+<span class="kw">fn </span>rename_enum_variant&lt;<span class="lifetime">'a</span>&gt;(
+    name: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>str,
     features: <span class="kw-2">&amp;mut </span>Vec&lt;Feature&gt;,
-    variant_rules: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="prelude-ty">Option</span>&lt;SerdeValue&gt;,
-    container_rules: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="prelude-ty">Option</span>&lt;SerdeContainer&gt;,
-    rename_all: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="prelude-ty">Option</span>&lt;RenameAll&gt;,
-) -&gt; <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt; {
+    variant_rules: <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="prelude-ty">Option</span>&lt;SerdeValue&gt;,
+    container_rules: <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="prelude-ty">Option</span>&lt;SerdeContainer&gt;,
+    rename_all: <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="prelude-ty">Option</span>&lt;RenameAll&gt;,
+) -&gt; <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt; {
     <span class="kw">let </span>rename = features
         .pop_rename_feature()
         .map(|rename| rename.into_value());
@@ -2371,15 +2372,15 @@
     <span class="kw">super</span>::rename::&lt;VariantRename&gt;(name, rename_to, rename_all)
 }
 
-<span class="attr">#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
-</span><span class="kw">struct </span>SimpleEnum&lt;<span class="lifetime">&#39;a</span>&gt; {
-    variants: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Punctuated&lt;Variant, Comma&gt;,
-    attributes: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[Attribute],
+<span class="attr">#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
+</span><span class="kw">struct </span>SimpleEnum&lt;<span class="lifetime">'a</span>&gt; {
+    variants: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>Punctuated&lt;Variant, Comma&gt;,
+    attributes: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>[Attribute],
     enum_features: Vec&lt;Feature&gt;,
     rename_all: <span class="prelude-ty">Option</span>&lt;RenameAll&gt;,
 }
 
-<span class="kw">impl </span>ToTokens <span class="kw">for </span>SimpleEnum&lt;<span class="lifetime">&#39;_</span>&gt; {
+<span class="kw">impl </span>ToTokens <span class="kw">for </span>SimpleEnum&lt;<span class="lifetime">'_</span>&gt; {
     <span class="kw">fn </span>to_tokens(<span class="kw-2">&amp;</span><span class="self">self</span>, tokens: <span class="kw-2">&amp;mut </span>TokenStream) {
         <span class="kw">let </span>container_rules = serde::parse_container(<span class="self">self</span>.attributes);
 
@@ -2454,7 +2455,7 @@
                 .to_token_stream()
             }
             <span class="comment">// This should not be possible as serde should not let that happen
-            </span>SerdeEnumRepr::UnfinishedAdjacentlyTagged { .. } =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Invalid serde enum repr&quot;</span>),
+            </span>SerdeEnumRepr::UnfinishedAdjacentlyTagged { .. } =&gt; <span class="macro">panic!</span>(<span class="string">"Invalid serde enum repr"</span>),
         },
         <span class="kw">_ </span>=&gt; Enum::new(enum_values).to_token_stream(),
     });
@@ -2462,20 +2463,20 @@
     tokens.extend(enum_variant_features.to_token_stream());
 }
 
-<span class="attr">#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
-</span><span class="kw">struct </span>ComplexEnum&lt;<span class="lifetime">&#39;a</span>&gt; {
-    variants: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Punctuated&lt;Variant, Comma&gt;,
-    attributes: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[Attribute],
-    enum_name: Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;,
+<span class="attr">#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
+</span><span class="kw">struct </span>ComplexEnum&lt;<span class="lifetime">'a</span>&gt; {
+    variants: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>Punctuated&lt;Variant, Comma&gt;,
+    attributes: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>[Attribute],
+    enum_name: Cow&lt;<span class="lifetime">'a</span>, str&gt;,
     enum_features: Vec&lt;Feature&gt;,
     rename_all: <span class="prelude-ty">Option</span>&lt;RenameAll&gt;,
 }
 
-<span class="kw">impl </span>ComplexEnum&lt;<span class="lifetime">&#39;_</span>&gt; {
+<span class="kw">impl </span>ComplexEnum&lt;<span class="lifetime">'_</span>&gt; {
     <span class="doccomment">/// Produce tokens that represent a variant of a [`ComplexEnum`].
     </span><span class="kw">fn </span>variant_tokens(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        name: Cow&lt;<span class="lifetime">&#39;_</span>, str&gt;,
+        name: Cow&lt;<span class="lifetime">'_</span>, str&gt;,
         variant: <span class="kw-2">&amp;</span>Variant,
         variant_rules: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;SerdeValue&gt;,
         container_rules: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;SerdeContainer&gt;,
@@ -2644,7 +2645,7 @@
     </span><span class="kw">fn </span>tagged_variant_tokens(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         tag: <span class="kw-2">&amp;</span>str,
-        name: Cow&lt;<span class="lifetime">&#39;_</span>, str&gt;,
+        name: Cow&lt;<span class="lifetime">'_</span>, str&gt;,
         variant: <span class="kw-2">&amp;</span>Variant,
         variant_rules: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;SerdeValue&gt;,
         container_rules: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;SerdeContainer&gt;,
@@ -2750,10 +2751,10 @@
                 } <span class="kw">else </span>{
                     <span class="macro">abort!</span>(
                         variant,
-                        <span class="string">&quot;Unnamed (tuple) enum variants are unsupported for internally tagged enums using the `tag = ` serde attribute&quot;</span>;
+                        <span class="string">"Unnamed (tuple) enum variants are unsupported for internally tagged enums using the `tag = ` serde attribute"</span>;
 
-                        help = <span class="string">&quot;Try using a different serde enum representation&quot;</span>;
-                        note = <span class="string">&quot;See more about enum limitations here: `https://serde.rs/enum-representations.html#internally-tagged`&quot;
+                        help = <span class="string">"Try using a different serde enum representation"</span>;
+                        note = <span class="string">"See more about enum limitations here: `https://serde.rs/enum-representations.html#internally-tagged`"
                     </span>);
                 }
             }
@@ -2796,7 +2797,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         tag: <span class="kw-2">&amp;</span>str,
         content: <span class="kw-2">&amp;</span>str,
-        name: Cow&lt;<span class="lifetime">&#39;_</span>, str&gt;,
+        name: Cow&lt;<span class="lifetime">'_</span>, str&gt;,
         variant: <span class="kw-2">&amp;</span>Variant,
         variant_rules: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;SerdeValue&gt;,
         container_rules: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;SerdeContainer&gt;,
@@ -2888,10 +2889,10 @@
                 } <span class="kw">else </span>{
                     <span class="macro">abort!</span>(
                         variant,
-                        <span class="string">&quot;Unnamed (tuple) enum variants are unsupported for adjacently tagged enums using the `tag = &lt;tag&gt;, content = &lt;content&gt;` serde attribute&quot;</span>;
+                        <span class="string">"Unnamed (tuple) enum variants are unsupported for adjacently tagged enums using the `tag = &lt;tag&gt;, content = &lt;content&gt;` serde attribute"</span>;
 
-                        help = <span class="string">&quot;Try using a different serde enum representation&quot;</span>;
-                        note = <span class="string">&quot;See more about enum limitations here: `https://serde.rs/enum-representations.html#adjacently-tagged`&quot;
+                        help = <span class="string">"Try using a different serde enum representation"</span>;
+                        note = <span class="string">"See more about enum limitations here: `https://serde.rs/enum-representations.html#adjacently-tagged`"
                     </span>);
                 }
             }
@@ -2931,7 +2932,7 @@
     }
 }
 
-<span class="kw">impl </span>ToTokens <span class="kw">for </span>ComplexEnum&lt;<span class="lifetime">&#39;_</span>&gt; {
+<span class="kw">impl </span>ToTokens <span class="kw">for </span>ComplexEnum&lt;<span class="lifetime">'_</span>&gt; {
     <span class="kw">fn </span>to_tokens(<span class="kw-2">&amp;</span><span class="self">self</span>, tokens: <span class="kw-2">&amp;mut </span>TokenStream) {
         <span class="kw">let </span>attributes = <span class="kw-2">&amp;</span><span class="self">self</span>.attributes;
         <span class="kw">let </span>container_rules = serde::parse_container(attributes);
@@ -2989,11 +2990,11 @@
                             <span class="kw-2">&amp;</span><span class="self">self</span>.rename_all,
                         ),
                     SerdeEnumRepr::UnfinishedAdjacentlyTagged { .. } =&gt; {
-                        <span class="macro">unreachable!</span>(<span class="string">&quot;Serde should not have parsed an UnfinishedAdjacentlyTagged&quot;</span>)
+                        <span class="macro">unreachable!</span>(<span class="string">"Serde should not have parsed an UnfinishedAdjacentlyTagged"</span>)
                     }
                 }
             })
-            .collect::&lt;CustomEnum&lt;<span class="lifetime">&#39;_</span>, TokenStream&gt;&gt;()
+            .collect::&lt;CustomEnum&lt;<span class="lifetime">'_</span>, TokenStream&gt;&gt;()
             .with_discriminator(tag.map(|t| Cow::Borrowed(t.as_str())))
             .to_tokens(tokens);
 
@@ -3001,11 +3002,11 @@
     }
 }
 
-<span class="attr">#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
+<span class="attr">#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
 #[derive(PartialEq)]
-</span><span class="kw">struct </span>TypeTuple&lt;<span class="lifetime">&#39;a</span>, T&gt;(T, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Ident);
+</span><span class="kw">struct </span>TypeTuple&lt;<span class="lifetime">'a</span>, T&gt;(T, <span class="kw-2">&amp;</span><span class="lifetime">'a </span>Ident);
 
-<span class="attr">#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
+<span class="attr">#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
 </span><span class="kw">enum </span>Property {
     Schema(ComponentSchema),
     SchemaWith(Feature),
@@ -3042,7 +3043,7 @@
     }
     <span class="comment">// :: are not officially supported in the spec
     // See: https://github.com/juhaku/utoipa/pull/187#issuecomment-1173101405
-    </span>path.to_token_stream().to_string().replace(<span class="string">&quot; :: &quot;</span>, <span class="string">&quot;.&quot;</span>)
+    </span>path.to_token_stream().to_string().replace(<span class="string">" :: "</span>, <span class="string">"."</span>)
 }
 
 <span class="attr">#[inline]
@@ -3055,7 +3056,7 @@
     rule.as_ref().map(|value| value.flatten).unwrap_or(<span class="bool-val">false</span>)
 }
 
-<span class="attr">#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
+<span class="attr">#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
 </span><span class="kw">pub struct </span>AliasSchema {
     <span class="kw">pub </span>name: String,
     <span class="kw">pub </span>ty: Type,
@@ -3082,10 +3083,10 @@
                         }
                         <span class="kw">_ </span>=&gt; <span class="macro">vec!</span>[arg],
                     })
-                    .filter(|generic_arg| <span class="macro">matches!</span>(generic_arg, syn::GenericArgument::Lifetime(lifetime) <span class="kw">if </span>lifetime.ident != <span class="string">&quot;&#39;static&quot;</span>)),
+                    .filter(|generic_arg| <span class="macro">matches!</span>(generic_arg, syn::GenericArgument::Lifetime(lifetime) <span class="kw">if </span>lifetime.ident != <span class="string">"'static"</span>)),
                 <span class="kw">_ </span>=&gt; <span class="macro">abort!</span>(
                     <span class="kw-2">&amp;</span>ty.span(),
-                    <span class="string">&quot;AliasSchema `get_lifetimes` only supports syn::TypePath types&quot;
+                    <span class="string">"AliasSchema `get_lifetimes` only supports syn::TypePath types"
                 </span>),
             }
         }
@@ -3109,7 +3110,7 @@
 <span class="kw">fn </span>parse_aliases(attributes: <span class="kw-2">&amp;</span>[Attribute]) -&gt; <span class="prelude-ty">Option</span>&lt;Punctuated&lt;AliasSchema, Comma&gt;&gt; {
     attributes
         .iter()
-        .find(|attribute| attribute.path().is_ident(<span class="string">&quot;aliases&quot;</span>))
+        .find(|attribute| attribute.path().is_ident(<span class="string">"aliases"</span>))
         .map(|aliases| {
             aliases
                 .parse_args_with(Punctuated::&lt;AliasSchema, Comma&gt;::parse_terminated)

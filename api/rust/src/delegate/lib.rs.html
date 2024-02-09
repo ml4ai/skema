@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/delegate-0.10.0/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="delegate" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/delegate-0.10.0/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="delegate" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -886,13 +887,13 @@
 //!         // ```rust
 //!         // match self {
 //!         //     Enum::A(a) =&gt; a.dbg_inner(),
-//!         //     Enum::B(b) =&gt; { println!(&quot;i am b&quot;); b }.dbg_inner(),
+//!         //     Enum::B(b) =&gt; { println!("i am b"); b }.dbg_inner(),
 //!         //     Enum::C { v: c } =&gt; { c }.dbg_inner(),
 //!         // }
 //!         // ```
 //!         to match self {
 //!             Enum::A(a) =&gt; a,
-//!             Enum::B(b) =&gt; { println!(&quot;i am b&quot;); b },
+//!             Enum::B(b) =&gt; { println!("i am b"); b },
 //!             Enum::C { v: c } =&gt; { c },
 //!         } {
 //!             fn dbg_inner(&amp;self) -&gt; usize;
@@ -1149,15 +1150,15 @@
                 <span class="kw">let </span>ident = ident.as_str();
 
                 <span class="kw">match </span>ident {
-                    <span class="string">&quot;into&quot; </span>=&gt; <span class="kw">return </span><span class="prelude-val">Ok</span>(ArgumentModifier::Into),
-                    <span class="string">&quot;as_ref&quot; </span>=&gt; <span class="kw">return </span><span class="prelude-val">Ok</span>(ArgumentModifier::AsRef),
+                    <span class="string">"into" </span>=&gt; <span class="kw">return </span><span class="prelude-val">Ok</span>(ArgumentModifier::Into),
+                    <span class="string">"as_ref" </span>=&gt; <span class="kw">return </span><span class="prelude-val">Ok</span>(ArgumentModifier::AsRef),
                     <span class="kw">_ </span>=&gt; (),
                 }
             }
         }
     };
 
-    <span class="macro">panic!</span>(<span class="string">&quot;The attribute argument has to be `from` or `as_ref`, like this: `#[from] a: u32`.&quot;</span>)
+    <span class="macro">panic!</span>(<span class="string">"The attribute argument has to be `from` or `as_ref`, like this: `#[from] a: u32`."</span>)
 }
 
 <span class="kw">impl </span>syn::parse::Parse <span class="kw">for </span>DelegatedInput {
@@ -1172,10 +1173,10 @@
             <span class="kw">let </span>(input, modifier) = <span class="kw">if </span>lookahead.peek(syn::token::Pound) {
                 <span class="kw">let </span><span class="kw-2">mut </span>attributes = input.call(syn::Attribute::parse_outer)<span class="question-mark">?</span>;
                 <span class="kw">if </span>attributes.len() &gt; <span class="number">1 </span>{
-                    <span class="macro">panic!</span>(<span class="string">&quot;You can specify at most a single attribute for each parameter in a delegated method&quot;</span>);
+                    <span class="macro">panic!</span>(<span class="string">"You can specify at most a single attribute for each parameter in a delegated method"</span>);
                 }
                 <span class="kw">let </span>modifier = get_argument_modifier(attributes.pop().unwrap())
-                    .expect(<span class="string">&quot;Could not parse argument modifier attribute&quot;</span>);
+                    .expect(<span class="string">"Could not parse argument modifier attribute"</span>);
 
                 <span class="kw">let </span>input: syn::FnArg = input.parse()<span class="question-mark">?</span>;
                 (input, <span class="prelude-val">Some</span>(modifier))
@@ -1212,7 +1213,7 @@
                 <span class="comment">// This should not happen, I think. If it does,
                 // it will be ignored as if it were the
                 // receiver.
-                </span>syn::Pat::Ident(ident) <span class="kw">if </span>ident.ident == <span class="string">&quot;self&quot; </span>=&gt; <span class="prelude-val">None</span>,
+                </span>syn::Pat::Ident(ident) <span class="kw">if </span>ident.ident == <span class="string">"self" </span>=&gt; <span class="prelude-val">None</span>,
                 <span class="comment">// Expression in the form `x: T`. Extract the
                 // identifier, wrap it in Expr for type compatibility with bracketed expressions,
                 // and append it
@@ -1237,13 +1238,13 @@
                 }
                 <span class="comment">// Other more complex argument expressions are not covered.
                 </span><span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(
-                    <span class="string">&quot;You have to use simple identifiers for delegated method parameters ({})&quot;</span>,
+                    <span class="string">"You have to use simple identifiers for delegated method parameters ({})"</span>,
                     function_name <span class="comment">// The signature is not constructed yet. We make due.
                 </span>),
             }
         }
         <span class="comment">// Skip any `self`/`&amp;self`/`&amp;mut self` argument, since
-        // it does not appear in the argument list and it&#39;s
+        // it does not appear in the argument list and it's
         // already added to the parameter list.
         </span>syn::FnArg::Receiver(_receiver) =&gt; <span class="prelude-val">None</span>,
     }
@@ -1343,10 +1344,10 @@
 
                             <span class="kw">match </span>modifier {
                                 ArgumentModifier::Into =&gt; {
-                                    argument = method_call(<span class="string">&quot;into&quot;</span>);
+                                    argument = method_call(<span class="string">"into"</span>);
                                 }
                                 ArgumentModifier::AsRef =&gt; {
-                                    argument = method_call(<span class="string">&quot;as_ref&quot;</span>);
+                                    argument = method_call(<span class="string">"as_ref"</span>);
                                 }
                             }
                         }
@@ -1395,7 +1396,7 @@
             <span class="prelude-val">Some</span>(input.parse()<span class="question-mark">?</span>)
         } <span class="kw">else </span>{
             <span class="macro">panic!</span>(
-                <span class="string">&quot;Do not include implementation of delegated functions ({})&quot;</span>,
+                <span class="string">"Do not include implementation of delegated functions ({})"</span>,
                 signature.ident
             );
         };
@@ -1432,7 +1433,7 @@
         <span class="kw">let </span>segment_attrs = parse_segment_attributes(<span class="kw-2">&amp;</span>attributes);
 
         <span class="kw">if let </span><span class="prelude-val">Ok</span>(keyword) = input.parse::&lt;kw::target&gt;() {
-            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::new(keyword.span(), <span class="string">&quot;You are using the old `target` expression, which is deprecated. Please replace `target` with `to`.&quot;</span>));
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::new(keyword.span(), <span class="string">"You are using the old `target` expression, which is deprecated. Please replace `target` with `to`."</span>));
         } <span class="kw">else </span>{
             input.parse::&lt;kw::to&gt;()<span class="question-mark">?</span>;
         }
@@ -1446,7 +1447,7 @@
                 methods.push(
                     content
                         .parse::&lt;DelegatedMethod&gt;()
-                        .expect(<span class="string">&quot;Cannot parse delegated method&quot;</span>),
+                        .expect(<span class="string">"Cannot parse delegated method"</span>),
                 );
             }
 
@@ -1478,7 +1479,7 @@
 </span><span class="kw">fn </span>has_inline_attribute(attrs: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>syn::Attribute]) -&gt; bool {
     attrs.iter().any(|attr| {
         <span class="kw">if let </span>syn::AttrStyle::Outer = attr.style {
-            attr.path.is_ident(<span class="string">&quot;inline&quot;</span>)
+            attr.path.is_ident(<span class="string">"inline"</span>)
         } <span class="kw">else </span>{
             <span class="bool-val">false
         </span>}
@@ -1514,7 +1515,7 @@
 
             <span class="kw">if </span>input.default.is_some() {
                 <span class="macro">panic!</span>(
-                    <span class="string">&quot;Do not include implementation of delegated functions ({})&quot;</span>,
+                    <span class="string">"Do not include implementation of delegated functions ({})"</span>,
                     signature.ident
                 );
             }

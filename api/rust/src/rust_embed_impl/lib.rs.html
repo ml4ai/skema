@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/rust-embed-impl-6.8.1/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="rust_embed_impl" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/rust-embed-impl-6.8.1/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="rust_embed_impl" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -307,7 +308,7 @@
 <a href="#307" id="307">307</a>
 <a href="#308" id="308">308</a>
 <a href="#309" id="309">309</a>
-</pre></div><pre class="rust"><code><span class="attr">#![recursion_limit = <span class="string">&quot;1024&quot;</span>]
+</pre></div><pre class="rust"><code><span class="attr">#![recursion_limit = <span class="string">"1024"</span>]
 #![forbid(unsafe_code)]
 #[macro_use]
 </span><span class="kw">extern crate </span>quote;
@@ -336,7 +337,7 @@
     match_values.push(embed_file(relative_folder_path.clone(), <span class="kw-2">&amp;</span>rel_path, <span class="kw-2">&amp;</span>full_canonical_path));
 
     list_values.push(<span class="kw">if let </span><span class="prelude-val">Some</span>(prefix) = prefix {
-      <span class="macro">format!</span>(<span class="string">&quot;{}{}&quot;</span>, prefix, rel_path)
+      <span class="macro">format!</span>(<span class="string">"{}{}"</span>, prefix, rel_path)
     } <span class="kw">else </span>{
       rel_path
     });
@@ -346,7 +347,7 @@
 
   <span class="comment">// If debug-embed is on, unconditionally include the code below. Otherwise,
   // make it conditional on cfg(not(debug_assertions)).
-  </span><span class="kw">let </span>not_debug_attr = <span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;debug-embed&quot;</span>) {
+  </span><span class="kw">let </span>not_debug_attr = <span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">"debug-embed"</span>) {
     <span class="macro">quote! </span>{}
   } <span class="kw">else </span>{
     <span class="macro">quote! </span>{ <span class="attr">#[cfg(not(debug_assertions))]</span>}
@@ -366,19 +367,19 @@
           <span class="doccomment">/// Get an embedded file and its metadata.
           </span><span class="kw">pub fn </span>get(file_path: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;rust_embed::EmbeddedFile&gt; {
             #handle_prefix
-            <span class="kw">match </span>file_path.replace(<span class="string">&quot;\\&quot;</span>, <span class="string">&quot;/&quot;</span>).as_str() {
+            <span class="kw">match </span>file_path.replace(<span class="string">"\\"</span>, <span class="string">"/"</span>).as_str() {
                 #(#match_values)*
                 <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
             }
           }
 
-          <span class="kw">fn </span>names() -&gt; std::slice::Iter&lt;<span class="lifetime">&#39;static</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt; {
+          <span class="kw">fn </span>names() -&gt; std::slice::Iter&lt;<span class="lifetime">'static</span>, <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str&gt; {
               <span class="kw">const </span>items: [<span class="kw-2">&amp;</span>str; #array_len] = [#(#list_values),<span class="kw-2">*</span>];
               items.iter()
           }
 
           <span class="doccomment">/// Iterates over the file paths in the folder.
-          </span><span class="kw">pub fn </span>iter() -&gt; <span class="kw">impl </span>Iterator&lt;Item = std::borrow::Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;&gt; {
+          </span><span class="kw">pub fn </span>iter() -&gt; <span class="kw">impl </span>Iterator&lt;Item = std::borrow::Cow&lt;<span class="lifetime">'static</span>, str&gt;&gt; {
               <span class="self">Self</span>::names().map(|x| std::borrow::Cow::from(<span class="kw-2">*</span>x))
           }
       }
@@ -399,7 +400,7 @@
   <span class="kw">let </span>(handle_prefix, map_iter) = <span class="kw">if let </span><span class="prelude-val">Some</span>(prefix) = prefix {
     (
       <span class="macro">quote! </span>{ <span class="kw">let </span>file_path = file_path.strip_prefix(#prefix)<span class="question-mark">?</span>; },
-      <span class="macro">quote! </span>{ std::borrow::Cow::Owned(<span class="macro">format!</span>(<span class="string">&quot;{}{}&quot;</span>, #prefix, e.rel_path)) },
+      <span class="macro">quote! </span>{ std::borrow::Cow::Owned(<span class="macro">format!</span>(<span class="string">"{}{}"</span>, #prefix, e.rel_path)) },
     )
   } <span class="kw">else </span>{
     (TokenStream2::new(), <span class="macro">quote! </span>{ std::borrow::Cow::from(e.rel_path) })
@@ -413,8 +414,8 @@
     <span class="kw">const </span>excludes: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str] = <span class="kw-2">&amp;</span>[#(#excludes),<span class="kw-2">*</span>];
   };
 
-  <span class="kw">let </span>canonical_folder_path = Path::new(<span class="kw-2">&amp;</span>folder_path).canonicalize().expect(<span class="string">&quot;folder path must resolve to an absolute path&quot;</span>);
-  <span class="kw">let </span>canonical_folder_path = canonical_folder_path.to_str().expect(<span class="string">&quot;absolute folder path must be valid unicode&quot;</span>);
+  <span class="kw">let </span>canonical_folder_path = Path::new(<span class="kw-2">&amp;</span>folder_path).canonicalize().expect(<span class="string">"folder path must resolve to an absolute path"</span>);
+  <span class="kw">let </span>canonical_folder_path = canonical_folder_path.to_str().expect(<span class="string">"absolute folder path must be valid unicode"</span>);
 
   <span class="macro">quote! </span>{
       <span class="attr">#[cfg(debug_assertions)]
@@ -426,7 +427,7 @@
               #declare_includes
               #declare_excludes
 
-              <span class="kw">let </span>rel_file_path = file_path.replace(<span class="string">&quot;\\&quot;</span>, <span class="string">&quot;/&quot;</span>);
+              <span class="kw">let </span>rel_file_path = file_path.replace(<span class="string">"\\"</span>, <span class="string">"/"</span>);
               <span class="kw">let </span>file_path = std::path::Path::new(#folder_path).join(<span class="kw-2">&amp;</span>rel_file_path);
 
               <span class="comment">// Make sure the path requested does not escape the folder path
@@ -444,7 +445,7 @@
           }
 
           <span class="doccomment">/// Iterates over the file paths in the folder.
-          </span><span class="kw">pub fn </span>iter() -&gt; <span class="kw">impl </span>Iterator&lt;Item = std::borrow::Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;&gt; {
+          </span><span class="kw">pub fn </span>iter() -&gt; <span class="kw">impl </span>Iterator&lt;Item = std::borrow::Cow&lt;<span class="lifetime">'static</span>, str&gt;&gt; {
               <span class="kw">use </span>std::path::Path;
 
               #declare_includes
@@ -479,7 +480,7 @@
     <span class="kw-2">&amp;</span>includes,
     <span class="kw-2">&amp;</span>excludes,
   );
-  <span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;debug-embed&quot;</span>) {
+  <span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">"debug-embed"</span>) {
     <span class="kw">return </span>embedded_impl;
   }
 
@@ -492,23 +493,23 @@
 }
 
 <span class="kw">fn </span>embed_file(folder_path: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;, rel_path: <span class="kw-2">&amp;</span>str, full_canonical_path: <span class="kw-2">&amp;</span>str) -&gt; TokenStream2 {
-  <span class="kw">let </span>file = rust_embed_utils::read_file_from_fs(Path::new(full_canonical_path)).expect(<span class="string">&quot;File should be readable&quot;</span>);
+  <span class="kw">let </span>file = rust_embed_utils::read_file_from_fs(Path::new(full_canonical_path)).expect(<span class="string">"File should be readable"</span>);
   <span class="kw">let </span>hash = file.metadata.sha256_hash();
   <span class="kw">let </span>last_modified = <span class="kw">match </span>file.metadata.last_modified() {
     <span class="prelude-val">Some</span>(last_modified) =&gt; <span class="macro">quote! </span>{ <span class="prelude-val">Some</span>(#last_modified) },
     <span class="prelude-val">None </span>=&gt; <span class="macro">quote! </span>{ <span class="prelude-val">None </span>},
   };
-  <span class="attr">#[cfg(feature = <span class="string">&quot;mime-guess&quot;</span>)]
+  <span class="attr">#[cfg(feature = <span class="string">"mime-guess"</span>)]
   </span><span class="kw">let </span>mimetype_tokens = {
     <span class="kw">let </span>mt = file.metadata.mimetype();
     <span class="macro">quote! </span>{ , #mt }
   };
-  <span class="attr">#[cfg(not(feature = <span class="string">&quot;mime-guess&quot;</span>))]
+  <span class="attr">#[cfg(not(feature = <span class="string">"mime-guess"</span>))]
   </span><span class="kw">let </span>mimetype_tokens = TokenStream2::new();
 
-  <span class="kw">let </span>embedding_code = <span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;compression&quot;</span>) {
+  <span class="kw">let </span>embedding_code = <span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">"compression"</span>) {
     <span class="comment">// Print some debugging information
-    </span><span class="kw">let </span>full_relative_path = PathBuf::from_iter([folder_path.expect(<span class="string">&quot;folder_path must be provided under `compression` feature&quot;</span>), rel_path]);
+    </span><span class="kw">let </span>full_relative_path = PathBuf::from_iter([folder_path.expect(<span class="string">"folder_path must be provided under `compression` feature"</span>), rel_path]);
     <span class="kw">let </span>full_relative_path = full_relative_path.to_string_lossy();
     <span class="macro">quote! </span>{
       <span class="macro">rust_embed::flate!</span>(<span class="kw">static </span>FILE: [u8] from #full_relative_path);
@@ -532,7 +533,7 @@
   }
 }
 
-<span class="doccomment">/// Find all pairs of the `name = &quot;value&quot;` attribute from the derive input
+<span class="doccomment">/// Find all pairs of the `name = "value"` attribute from the derive input
 </span><span class="kw">fn </span>find_attribute_values(ast: <span class="kw-2">&amp;</span>syn::DeriveInput, attr_name: <span class="kw-2">&amp;</span>str) -&gt; Vec&lt;String&gt; {
   ast
     .attrs
@@ -552,59 +553,59 @@
   <span class="kw">match </span>ast.data {
     Data::Struct(<span class="kw-2">ref </span>data) =&gt; <span class="kw">match </span>data.fields {
       Fields::Unit =&gt; {}
-      <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;RustEmbed can only be derived for unit structs&quot;</span>),
+      <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">"RustEmbed can only be derived for unit structs"</span>),
     },
-    <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;RustEmbed can only be derived for unit structs&quot;</span>),
+    <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">"RustEmbed can only be derived for unit structs"</span>),
   };
 
-  <span class="kw">let </span><span class="kw-2">mut </span>folder_paths = find_attribute_values(ast, <span class="string">&quot;folder&quot;</span>);
+  <span class="kw">let </span><span class="kw-2">mut </span>folder_paths = find_attribute_values(ast, <span class="string">"folder"</span>);
   <span class="kw">if </span>folder_paths.len() != <span class="number">1 </span>{
-    <span class="macro">panic!</span>(<span class="string">&quot;#[derive(RustEmbed)] must contain one attribute like this #[folder = \&quot;examples/public/\&quot;]&quot;</span>);
+    <span class="macro">panic!</span>(<span class="string">"#[derive(RustEmbed)] must contain one attribute like this #[folder = \"examples/public/\"]"</span>);
   }
   <span class="kw">let </span>folder_path = folder_paths.remove(<span class="number">0</span>);
 
-  <span class="kw">let </span>prefix = find_attribute_values(ast, <span class="string">&quot;prefix&quot;</span>).into_iter().next();
-  <span class="kw">let </span>includes = find_attribute_values(ast, <span class="string">&quot;include&quot;</span>);
-  <span class="kw">let </span>excludes = find_attribute_values(ast, <span class="string">&quot;exclude&quot;</span>);
+  <span class="kw">let </span>prefix = find_attribute_values(ast, <span class="string">"prefix"</span>).into_iter().next();
+  <span class="kw">let </span>includes = find_attribute_values(ast, <span class="string">"include"</span>);
+  <span class="kw">let </span>excludes = find_attribute_values(ast, <span class="string">"exclude"</span>);
 
-  <span class="attr">#[cfg(not(feature = <span class="string">&quot;include-exclude&quot;</span>))]
+  <span class="attr">#[cfg(not(feature = <span class="string">"include-exclude"</span>))]
   </span><span class="kw">if </span>!includes.is_empty() || !excludes.is_empty() {
-    <span class="macro">panic!</span>(<span class="string">&quot;Please turn on the `include-exclude` feature to use the `include` and `exclude` attributes&quot;</span>)
+    <span class="macro">panic!</span>(<span class="string">"Please turn on the `include-exclude` feature to use the `include` and `exclude` attributes"</span>)
   }
 
-  <span class="attr">#[cfg(feature = <span class="string">&quot;interpolate-folder-path&quot;</span>)]
+  <span class="attr">#[cfg(feature = <span class="string">"interpolate-folder-path"</span>)]
   </span><span class="kw">let </span>folder_path = shellexpand::full(<span class="kw-2">&amp;</span>folder_path).unwrap().to_string();
 
   <span class="comment">// Base relative paths on the Cargo.toml location
   </span><span class="kw">let </span>(relative_path, absolute_folder_path) = <span class="kw">if </span>Path::new(<span class="kw-2">&amp;</span>folder_path).is_relative() {
-    <span class="kw">let </span>absolute_path = Path::new(<span class="kw-2">&amp;</span>env::var(<span class="string">&quot;CARGO_MANIFEST_DIR&quot;</span>).unwrap())
+    <span class="kw">let </span>absolute_path = Path::new(<span class="kw-2">&amp;</span>env::var(<span class="string">"CARGO_MANIFEST_DIR"</span>).unwrap())
       .join(<span class="kw-2">&amp;</span>folder_path)
       .to_str()
       .unwrap()
       .to_owned();
     (<span class="prelude-val">Some</span>(folder_path.clone()), absolute_path)
   } <span class="kw">else </span>{
-    <span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;compression&quot;</span>) {
-      <span class="macro">panic!</span>(<span class="string">&quot;`folder` must be a relative path under `compression` feature.&quot;</span>)
+    <span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">"compression"</span>) {
+      <span class="macro">panic!</span>(<span class="string">"`folder` must be a relative path under `compression` feature."</span>)
     }
     (<span class="prelude-val">None</span>, folder_path)
   };
 
   <span class="kw">if </span>!Path::new(<span class="kw-2">&amp;</span>absolute_folder_path).exists() {
     <span class="kw">let </span><span class="kw-2">mut </span>message = <span class="macro">format!</span>(
-      <span class="string">&quot;#[derive(RustEmbed)] folder &#39;{}&#39; does not exist. cwd: &#39;{}&#39;&quot;</span>,
+      <span class="string">"#[derive(RustEmbed)] folder '{}' does not exist. cwd: '{}'"</span>,
       absolute_folder_path,
       std::env::current_dir().unwrap().to_str().unwrap()
     );
 
     <span class="comment">// Add a message about the interpolate-folder-path feature if the path may
     // include a variable
-    </span><span class="kw">if </span>absolute_folder_path.contains(<span class="string">&#39;$&#39;</span>) &amp;&amp; <span class="macro">cfg!</span>(not(feature = <span class="string">&quot;interpolate-folder-path&quot;</span>)) {
-      message += <span class="string">&quot;\nA variable has been detected. RustEmbed can expand variables \
-                  when the `interpolate-folder-path` feature is enabled.&quot;</span>;
+    </span><span class="kw">if </span>absolute_folder_path.contains(<span class="string">'$'</span>) &amp;&amp; <span class="macro">cfg!</span>(not(feature = <span class="string">"interpolate-folder-path"</span>)) {
+      message += <span class="string">"\nA variable has been detected. RustEmbed can expand variables \
+                  when the `interpolate-folder-path` feature is enabled."</span>;
     }
 
-    <span class="macro">panic!</span>(<span class="string">&quot;{}&quot;</span>, message);
+    <span class="macro">panic!</span>(<span class="string">"{}"</span>, message);
   };
 
   generate_assets(<span class="kw-2">&amp;</span>ast.ident, relative_path.as_deref(), absolute_folder_path, prefix, includes, excludes)

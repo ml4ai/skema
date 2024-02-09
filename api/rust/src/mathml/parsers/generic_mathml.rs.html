@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `mathml/src/parsers/generic_mathml.rs`."><title>generic_mathml.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="mathml" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `mathml/src/parsers/generic_mathml.rs`."><title>generic_mathml.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="mathml" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -679,17 +680,17 @@
 <span class="kw">use </span>nom_locate::LocatedSpan;
 <span class="kw">use </span>std::str::FromStr;
 
-<span class="kw">pub type </span>Span&lt;<span class="lifetime">&#39;a</span>&gt; = LocatedSpan&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;;
+<span class="kw">pub type </span>Span&lt;<span class="lifetime">'a</span>&gt; = LocatedSpan&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>str&gt;;
 
 <span class="attr">#[derive(Debug, PartialEq, Eq)]
-</span><span class="kw">pub struct </span>ParseError&lt;<span class="lifetime">&#39;a</span>&gt; {
-    span: Span&lt;<span class="lifetime">&#39;a</span>&gt;,
+</span><span class="kw">pub struct </span>ParseError&lt;<span class="lifetime">'a</span>&gt; {
+    span: Span&lt;<span class="lifetime">'a</span>&gt;,
     message: String,
 }
 
 <span class="doccomment">/// We implement the ParseError trait here to support the Span type.
-</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; ParseError&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">pub fn </span>new(message: String, span: Span&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; <span class="self">Self </span>{
+</span><span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; ParseError&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="kw">pub fn </span>new(message: String, span: Span&lt;<span class="lifetime">'a</span>&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{ message, span }
     }
 
@@ -706,66 +707,66 @@
     }
 
     <span class="kw">pub fn </span>append_message(<span class="kw-2">&amp;mut </span><span class="self">self</span>, msg: <span class="kw-2">&amp;</span>str) {
-        <span class="self">self</span>.message.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;\nERROR: {}&quot;</span>, msg));
+        <span class="self">self</span>.message.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"\nERROR: {}"</span>, msg));
     }
 }
 
 <span class="doccomment">/// Further trait implementation for Span
-</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; nom::error::ParseError&lt;Span&lt;<span class="lifetime">&#39;a</span>&gt;&gt; <span class="kw">for </span>ParseError&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">fn </span>from_error_kind(input: Span&lt;<span class="lifetime">&#39;a</span>&gt;, kind: nom::error::ErrorKind) -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>::new(<span class="macro">format!</span>(<span class="string">&quot;Parse error {kind:?}&quot;</span>), input)
+</span><span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; nom::error::ParseError&lt;Span&lt;<span class="lifetime">'a</span>&gt;&gt; <span class="kw">for </span>ParseError&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="kw">fn </span>from_error_kind(input: Span&lt;<span class="lifetime">'a</span>&gt;, kind: nom::error::ErrorKind) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::new(<span class="macro">format!</span>(<span class="string">"Parse error {kind:?}"</span>), input)
     }
 
-    <span class="kw">fn </span>append(_input: Span&lt;<span class="lifetime">&#39;a</span>&gt;, _kind: nom::error::ErrorKind, other: <span class="self">Self</span>) -&gt; <span class="self">Self </span>{
+    <span class="kw">fn </span>append(_input: Span&lt;<span class="lifetime">'a</span>&gt;, _kind: nom::error::ErrorKind, other: <span class="self">Self</span>) -&gt; <span class="self">Self </span>{
         other
     }
 
-    <span class="kw">fn </span>from_char(input: Span&lt;<span class="lifetime">&#39;a</span>&gt;, c: char) -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>::new(<span class="macro">format!</span>(<span class="string">&quot;Unexpected character &#39;{c}&#39;&quot;</span>), input)
+    <span class="kw">fn </span>from_char(input: Span&lt;<span class="lifetime">'a</span>&gt;, c: char) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::new(<span class="macro">format!</span>(<span class="string">"Unexpected character '{c}'"</span>), input)
     }
 }
 
 <span class="doccomment">/// Implementing ContextError to support Span
-</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; nom::error::ContextError&lt;Span&lt;<span class="lifetime">&#39;a</span>&gt;&gt; <span class="kw">for </span>ParseError&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">fn </span>add_context(input: Span&lt;<span class="lifetime">&#39;a</span>&gt;, ctx: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, other: <span class="self">Self</span>) -&gt; <span class="self">Self </span>{
-        <span class="kw">let </span>message = <span class="macro">format!</span>(<span class="string">&quot;{}: {}&quot;</span>, ctx, other.message);
+</span><span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; nom::error::ContextError&lt;Span&lt;<span class="lifetime">'a</span>&gt;&gt; <span class="kw">for </span>ParseError&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="kw">fn </span>add_context(input: Span&lt;<span class="lifetime">'a</span>&gt;, ctx: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, other: <span class="self">Self</span>) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>message = <span class="macro">format!</span>(<span class="string">"{}: {}"</span>, ctx, other.message);
         ParseError::new(message, input)
     }
 }
 
 <span class="doccomment">/// Redefine IResult, filling in the first generic type parameter with Span, for increased brevity.
-</span><span class="kw">pub type </span>IResult&lt;<span class="lifetime">&#39;a</span>, O&gt; = nom::IResult&lt;Span&lt;<span class="lifetime">&#39;a</span>&gt;, O, ParseError&lt;<span class="lifetime">&#39;a</span>&gt;&gt;;
+</span><span class="kw">pub type </span>IResult&lt;<span class="lifetime">'a</span>, O&gt; = nom::IResult&lt;Span&lt;<span class="lifetime">'a</span>&gt;, O, ParseError&lt;<span class="lifetime">'a</span>&gt;&gt;;
 
 <span class="doccomment">/// A combinator that takes a parser `inner` and produces a parser that also consumes both leading
 /// and trailing whitespace, returning the output of `inner`.
-</span><span class="kw">pub fn </span>ws&lt;<span class="lifetime">&#39;a</span>, F: <span class="lifetime">&#39;a</span>, O&gt;(inner: F) -&gt; <span class="kw">impl </span>FnMut(Span&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; IResult&lt;O&gt;
+</span><span class="kw">pub fn </span>ws&lt;<span class="lifetime">'a</span>, F: <span class="lifetime">'a</span>, O&gt;(inner: F) -&gt; <span class="kw">impl </span>FnMut(Span&lt;<span class="lifetime">'a</span>&gt;) -&gt; IResult&lt;O&gt;
 <span class="kw">where
-    </span>F: FnMut(Span&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; IResult&lt;O&gt;,
+    </span>F: FnMut(Span&lt;<span class="lifetime">'a</span>&gt;) -&gt; IResult&lt;O&gt;,
 {
     delimited(multispace0, inner, multispace0)
 }
 
 <span class="doccomment">///Quoted string
 </span><span class="kw">pub fn </span>quoted_string(input: Span) -&gt; IResult&lt;Span&gt; {
-    delimited(tag(<span class="string">&quot;\&quot;&quot;</span>), take_until(<span class="string">&quot;\&quot;&quot;</span>), tag(<span class="string">&quot;\&quot;&quot;</span>))(input)
+    delimited(tag(<span class="string">"\""</span>), take_until(<span class="string">"\""</span>), tag(<span class="string">"\""</span>))(input)
 }
 
 <span class="kw">pub fn </span>attribute(input: Span) -&gt; IResult&lt;(<span class="kw-2">&amp;</span>str, <span class="kw-2">&amp;</span>str)&gt; {
-    <span class="kw">let </span>(s, (key, value)) = ws(separated_pair(alphanumeric1, ws(tag(<span class="string">&quot;=&quot;</span>)), quoted_string))(input)<span class="question-mark">?</span>;
+    <span class="kw">let </span>(s, (key, value)) = ws(separated_pair(alphanumeric1, ws(tag(<span class="string">"="</span>)), quoted_string))(input)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((s, (<span class="kw-2">&amp;</span>key, <span class="kw-2">&amp;</span>value)))
 }
 
 <span class="attr">#[macro_export]
 </span><span class="macro">macro_rules! </span>stag {
     (<span class="macro-nonterminal">$tag</span>:expr) =&gt; {{
-        ws(tuple((tag(<span class="string">&quot;&lt;&quot;</span>), tag(<span class="macro-nonterminal">$tag</span>), many0(attribute), tag(<span class="string">&quot;&gt;&quot;</span>))))
+        ws(tuple((tag(<span class="string">"&lt;"</span>), tag(<span class="macro-nonterminal">$tag</span>), many0(attribute), tag(<span class="string">"&gt;"</span>))))
     }};
 }
 
 <span class="attr">#[macro_export]
 </span><span class="macro">macro_rules! </span>etag {
     (<span class="macro-nonterminal">$tag</span>:expr) =&gt; {{
-        ws(delimited(tag(<span class="string">&quot;&lt;/&quot;</span>), tag(<span class="macro-nonterminal">$tag</span>), tag(<span class="string">&quot;&gt;&quot;</span>)))
+        ws(delimited(tag(<span class="string">"&lt;/"</span>), tag(<span class="macro-nonterminal">$tag</span>), tag(<span class="string">"&gt;"</span>)))
     }};
 }
 
@@ -781,7 +782,7 @@
 </span><span class="attr">#[macro_export]
 </span><span class="macro">macro_rules! </span>elem0 {
     (<span class="macro-nonterminal">$tag</span>:expr) =&gt; {{
-        <span class="kw">let </span>tag_end = <span class="macro">concat!</span>(<span class="string">&quot;&lt;/&quot;</span>, <span class="macro-nonterminal">$tag</span>, <span class="string">&quot;&gt;&quot;</span>);
+        <span class="kw">let </span>tag_end = <span class="macro">concat!</span>(<span class="string">"&lt;/"</span>, <span class="macro-nonterminal">$tag</span>, <span class="string">"&gt;"</span>);
         <span class="macro">tag_parser!</span>(<span class="macro-nonterminal">$tag</span>, ws(take_until(tag_end)))
     }};
 }
@@ -829,85 +830,85 @@
 
 <span class="doccomment">/// Identifiers
 </span><span class="kw">pub fn </span>mi(input: Span) -&gt; IResult&lt;Mi&gt; {
-    <span class="kw">let </span>(s, element) = <span class="macro">elem0!</span>(<span class="string">&quot;mi&quot;</span>)(input)<span class="question-mark">?</span>;
+    <span class="kw">let </span>(s, element) = <span class="macro">elem0!</span>(<span class="string">"mi"</span>)(input)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((s, Mi(element.trim().to_string())))
 }
 
 <span class="doccomment">/// Numbers
 </span><span class="kw">pub fn </span>mn(input: Span) -&gt; IResult&lt;MathExpression&gt; {
-    <span class="kw">let </span>(s, element) = <span class="macro">elem0!</span>(<span class="string">&quot;mn&quot;</span>)(input)<span class="question-mark">?</span>;
+    <span class="kw">let </span>(s, element) = <span class="macro">elem0!</span>(<span class="string">"mn"</span>)(input)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((s, Mn(element.trim().to_string())))
 }
 
 <span class="kw">pub fn </span>add(input: Span) -&gt; IResult&lt;Operator&gt; {
-    <span class="kw">let </span>(s, op) = value(Operator::Add, ws(tag(<span class="string">&quot;+&quot;</span>)))(input)<span class="question-mark">?</span>;
+    <span class="kw">let </span>(s, op) = value(Operator::Add, ws(tag(<span class="string">"+"</span>)))(input)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((s, op))
 }
 
 <span class="kw">pub fn </span>subtract(input: Span) -&gt; IResult&lt;Operator&gt; {
     <span class="kw">let </span>(s, op) = value(
         Operator::Subtract,
-        alt((tag(<span class="string">&quot;-&quot;</span>), tag(<span class="string">&quot;−&quot;</span>), tag(<span class="string">&quot;&amp;#x2212;&quot;</span>))),
+        alt((tag(<span class="string">"-"</span>), tag(<span class="string">"−"</span>), tag(<span class="string">"&amp;#x2212;"</span>))),
     )(input)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((s, op))
 }
 
 <span class="kw">pub fn </span>multiply(input: Span) -&gt; IResult&lt;Operator&gt; {
-    <span class="kw">let </span>(s, op) = value(Operator::Multiply, alt((ws(tag(<span class="string">&quot;*&quot;</span>)), ws(tag(<span class="string">&quot;&amp;#x2217;&quot;</span>)))))(input)<span class="question-mark">?</span>;
+    <span class="kw">let </span>(s, op) = value(Operator::Multiply, alt((ws(tag(<span class="string">"*"</span>)), ws(tag(<span class="string">"&amp;#x2217;"</span>)))))(input)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((s, op))
 }
 
 <span class="kw">pub fn </span>divide(input: Span) -&gt; IResult&lt;Operator&gt; {
-    <span class="kw">let </span>(s, op) = value(Operator::Divide, alt((ws(tag(<span class="string">&quot;∕&quot;</span>)), ws(tag(<span class="string">&quot;&amp;#x2215;&quot;</span>)))))(input)<span class="question-mark">?</span>;
+    <span class="kw">let </span>(s, op) = value(Operator::Divide, alt((ws(tag(<span class="string">"∕"</span>)), ws(tag(<span class="string">"&amp;#x2215;"</span>)))))(input)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((s, op))
 }
 
 <span class="kw">pub fn </span>equals(input: Span) -&gt; IResult&lt;Operator&gt; {
-    <span class="kw">let </span>(s, op) = value(Operator::Equals, ws(tag(<span class="string">&quot;=&quot;</span>)))(input)<span class="question-mark">?</span>;
+    <span class="kw">let </span>(s, op) = value(Operator::Equals, ws(tag(<span class="string">"="</span>)))(input)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((s, op))
 }
 
 <span class="kw">pub fn </span>lparen(input: Span) -&gt; IResult&lt;Operator&gt; {
-    <span class="kw">let </span>(s, op) = value(Operator::Lparen, alt((ws(tag(<span class="string">&quot;(&quot;</span>)), ws(tag(<span class="string">&quot;[&quot;</span>)))))(input)<span class="question-mark">?</span>;
+    <span class="kw">let </span>(s, op) = value(Operator::Lparen, alt((ws(tag(<span class="string">"("</span>)), ws(tag(<span class="string">"["</span>)))))(input)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((s, op))
 }
 
 <span class="kw">pub fn </span>rparen(input: Span) -&gt; IResult&lt;Operator&gt; {
-    <span class="kw">let </span>(s, op) = value(Operator::Rparen, alt((ws(tag(<span class="string">&quot;)&quot;</span>)), ws(tag(<span class="string">&quot;]&quot;</span>)))))(input)<span class="question-mark">?</span>;
+    <span class="kw">let </span>(s, op) = value(Operator::Rparen, alt((ws(tag(<span class="string">")"</span>)), ws(tag(<span class="string">"]"</span>)))))(input)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((s, op))
 }
 
 <span class="kw">pub fn </span>comma(input: Span) -&gt; IResult&lt;Operator&gt; {
-    <span class="kw">let </span>(s, op) = value(Operator::Comma, ws(tag(<span class="string">&quot;,&quot;</span>)))(input)<span class="question-mark">?</span>;
+    <span class="kw">let </span>(s, op) = value(Operator::Comma, ws(tag(<span class="string">","</span>)))(input)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((s, op))
 }
 
 <span class="kw">pub fn </span>period(input: Span) -&gt; IResult&lt;Operator&gt; {
-    <span class="kw">let </span>(s, op) = value(Operator::Period, ws(tag(<span class="string">&quot;.&quot;</span>)))(input)<span class="question-mark">?</span>;
+    <span class="kw">let </span>(s, op) = value(Operator::Period, ws(tag(<span class="string">"."</span>)))(input)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((s, op))
 }
 
 <span class="kw">pub fn </span>mean(input: Span) -&gt; IResult&lt;Operator&gt; {
-    <span class="kw">let </span>(s, op) = value(Operator::Mean, ws(tag(<span class="string">&quot;¯&quot;</span>)))(input)<span class="question-mark">?</span>;
+    <span class="kw">let </span>(s, op) = value(Operator::Mean, ws(tag(<span class="string">"¯"</span>)))(input)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((s, op))
 }
 
 <span class="kw">pub fn </span>hat(input: Span) -&gt; IResult&lt;Operator&gt; {
-    <span class="kw">let </span>(s, op) = value(Operator::Hat, alt((ws(tag(<span class="string">&quot;^&quot;</span>)), ws(tag(<span class="string">&quot;&amp;#x5E;&quot;</span>)))))(input)<span class="question-mark">?</span>;
+    <span class="kw">let </span>(s, op) = value(Operator::Hat, alt((ws(tag(<span class="string">"^"</span>)), ws(tag(<span class="string">"&amp;#x5E;"</span>)))))(input)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((s, op))
 }
 
 <span class="kw">pub fn </span>grad(input: Span) -&gt; IResult&lt;Operator&gt; {
-    <span class="kw">let </span>(s, op) = value(Operator::Grad, alt((ws(tag(<span class="string">&quot;∇&quot;</span>)), ws(tag(<span class="string">&quot;&amp;#x2207;&quot;</span>)))))(input)<span class="question-mark">?</span>;
+    <span class="kw">let </span>(s, op) = value(Operator::Grad, alt((ws(tag(<span class="string">"∇"</span>)), ws(tag(<span class="string">"&amp;#x2207;"</span>)))))(input)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((s, op))
 }
 <span class="kw">pub fn </span>dot(input: Span) -&gt; IResult&lt;Operator&gt; {
-    <span class="kw">let </span>(s, op) = value(Operator::Dot, alt((ws(tag(<span class="string">&quot;⋅&quot;</span>)), ws(tag(<span class="string">&quot;&amp;#x22c5;&quot;</span>)))))(input)<span class="question-mark">?</span>;
+    <span class="kw">let </span>(s, op) = value(Operator::Dot, alt((ws(tag(<span class="string">"⋅"</span>)), ws(tag(<span class="string">"&amp;#x22c5;"</span>)))))(input)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((s, op))
 }
 
 <span class="kw">pub fn </span>cross(input: Span) -&gt; IResult&lt;Operator&gt; {
-    <span class="kw">let </span>(s, op) = value(Operator::Cross, alt((ws(tag(<span class="string">&quot;×&quot;</span>)), ws(tag(<span class="string">&quot;&amp;#x00D7;&quot;</span>)))))(input)<span class="question-mark">?</span>;
+    <span class="kw">let </span>(s, op) = value(Operator::Cross, alt((ws(tag(<span class="string">"×"</span>)), ws(tag(<span class="string">"&amp;#x00D7;"</span>)))))(input)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((s, op))
 }
 
@@ -939,16 +940,16 @@
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_operator() {
-    <span class="kw">let </span>(<span class="kw">_</span>, op) = operator(Span::new(<span class="string">&quot;-&quot;</span>)).unwrap();
+    <span class="kw">let </span>(<span class="kw">_</span>, op) = operator(Span::new(<span class="string">"-"</span>)).unwrap();
     <span class="macro">assert_eq!</span>(op, Operator::Subtract);
 }
 
 <span class="doccomment">/// Operators
 </span><span class="kw">pub fn </span>mo(input: Span) -&gt; IResult&lt;MathExpression&gt; {
     <span class="kw">let </span>(s, op) = ws(delimited(
-        <span class="macro">stag!</span>(<span class="string">&quot;mo&quot;</span>),
-        map_parser(recognize(take_until(<span class="string">&quot;&lt;/mo&gt;&quot;</span>)), operator),
-        <span class="macro">etag!</span>(<span class="string">&quot;mo&quot;</span>),
+        <span class="macro">stag!</span>(<span class="string">"mo"</span>),
+        map_parser(recognize(take_until(<span class="string">"&lt;/mo&gt;"</span>)), operator),
+        <span class="macro">etag!</span>(<span class="string">"mo"</span>),
     ))(input)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((s, Mo(op)))
 }
@@ -956,82 +957,82 @@
 <span class="doccomment">/// Rows
 </span><span class="kw">pub fn </span>mrow(input: Span) -&gt; IResult&lt;Mrow&gt; {
     <span class="kw">let </span>(s, elements) = ws(delimited(
-        <span class="macro">stag!</span>(<span class="string">&quot;mrow&quot;</span>),
+        <span class="macro">stag!</span>(<span class="string">"mrow"</span>),
         many0(math_expression),
-        <span class="macro">etag!</span>(<span class="string">&quot;mrow&quot;</span>),
+        <span class="macro">etag!</span>(<span class="string">"mrow"</span>),
     ))(input)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((s, Mrow(elements)))
 }
 
 <span class="doccomment">/// Fractions
 </span><span class="kw">pub fn </span>mfrac(input: Span) -&gt; IResult&lt;MathExpression&gt; {
-    <span class="kw">let </span>(s, frac) = <span class="macro">elem2!</span>(<span class="string">&quot;mfrac&quot;</span>, Mfrac)(input)<span class="question-mark">?</span>;
+    <span class="kw">let </span>(s, frac) = <span class="macro">elem2!</span>(<span class="string">"mfrac"</span>, Mfrac)(input)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((s, frac))
 }
 
 <span class="doccomment">/// Superscripts
 </span><span class="kw">pub fn </span>msup(input: Span) -&gt; IResult&lt;MathExpression&gt; {
-    <span class="kw">let </span>(s, expression) = <span class="macro">elem2!</span>(<span class="string">&quot;msup&quot;</span>, Msup)(input)<span class="question-mark">?</span>;
+    <span class="kw">let </span>(s, expression) = <span class="macro">elem2!</span>(<span class="string">"msup"</span>, Msup)(input)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((s, expression))
 }
 
 <span class="doccomment">/// Subscripts
 </span><span class="kw">pub fn </span>msub(input: Span) -&gt; IResult&lt;MathExpression&gt; {
-    <span class="kw">let </span>(s, expression) = <span class="macro">elem2!</span>(<span class="string">&quot;msub&quot;</span>, Msub)(input)<span class="question-mark">?</span>;
+    <span class="kw">let </span>(s, expression) = <span class="macro">elem2!</span>(<span class="string">"msub"</span>, Msub)(input)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((s, expression))
 }
 
 <span class="doccomment">/// Square roots
 </span><span class="kw">pub fn </span>msqrt(input: Span) -&gt; IResult&lt;MathExpression&gt; {
-    <span class="kw">let </span>(s, expression) = <span class="macro">elem1!</span>(<span class="string">&quot;msqrt&quot;</span>, Msqrt)(input)<span class="question-mark">?</span>;
+    <span class="kw">let </span>(s, expression) = <span class="macro">elem1!</span>(<span class="string">"msqrt"</span>, Msqrt)(input)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((s, expression))
 }
 
 <span class="comment">// Underscripts
 </span><span class="kw">fn </span>munder(input: Span) -&gt; IResult&lt;MathExpression&gt; {
-    <span class="kw">let </span>(s, underscript) = <span class="macro">elem2!</span>(<span class="string">&quot;munder&quot;</span>, Munder)(input)<span class="question-mark">?</span>;
+    <span class="kw">let </span>(s, underscript) = <span class="macro">elem2!</span>(<span class="string">"munder"</span>, Munder)(input)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((s, underscript))
 }
 
 <span class="comment">// Overscripts
 </span><span class="kw">pub fn </span>mover(input: Span) -&gt; IResult&lt;MathExpression&gt; {
-    <span class="kw">let </span>(s, overscript) = <span class="macro">elem2!</span>(<span class="string">&quot;mover&quot;</span>, Mover)(input)<span class="question-mark">?</span>;
+    <span class="kw">let </span>(s, overscript) = <span class="macro">elem2!</span>(<span class="string">"mover"</span>, Mover)(input)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((s, overscript))
 }
 
 <span class="comment">// Subscript-superscript Pair
 </span><span class="kw">pub fn </span>msubsup(input: Span) -&gt; IResult&lt;MathExpression&gt; {
-    <span class="kw">let </span>(s, subsup) = <span class="macro">elem3!</span>(<span class="string">&quot;msubsup&quot;</span>, Msubsup)(input)<span class="question-mark">?</span>;
+    <span class="kw">let </span>(s, subsup) = <span class="macro">elem3!</span>(<span class="string">"msubsup"</span>, Msubsup)(input)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((s, subsup))
 }
 
 <span class="comment">//Text
 </span><span class="kw">pub fn </span>mtext(input: Span) -&gt; IResult&lt;MathExpression&gt; {
-    <span class="kw">let </span>(s, element) = <span class="macro">elem0!</span>(<span class="string">&quot;mtext&quot;</span>)(input)<span class="question-mark">?</span>;
+    <span class="kw">let </span>(s, element) = <span class="macro">elem0!</span>(<span class="string">"mtext"</span>)(input)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((s, Mtext(element.trim().to_string())))
 }
 
 <span class="comment">//mstyle
 </span><span class="kw">fn </span>mstyle(input: Span) -&gt; IResult&lt;MathExpression&gt; {
-    <span class="kw">let </span>(s, elements) = <span class="macro">elem_many0!</span>(<span class="string">&quot;mstyle&quot;</span>)(input)<span class="question-mark">?</span>;
+    <span class="kw">let </span>(s, elements) = <span class="macro">elem_many0!</span>(<span class="string">"mstyle"</span>)(input)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((s, Mstyle(elements)))
 }
 
 <span class="comment">// function for xml
 </span><span class="kw">pub fn </span>xml_declaration(input: Span) -&gt; IResult&lt;()&gt; {
-    <span class="kw">let </span>(s, _contents) = ws(delimited(tag(<span class="string">&quot;&lt;?&quot;</span>), take_until(<span class="string">&quot;?&gt;&quot;</span>), tag(<span class="string">&quot;?&gt;&quot;</span>)))(input)<span class="question-mark">?</span>;
+    <span class="kw">let </span>(s, _contents) = ws(delimited(tag(<span class="string">"&lt;?"</span>), take_until(<span class="string">"?&gt;"</span>), tag(<span class="string">"?&gt;"</span>)))(input)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((s, ()))
 }
 
 <span class="comment">//mspace
 </span><span class="kw">fn </span>mspace(input: Span) -&gt; IResult&lt;MathExpression&gt; {
-    <span class="kw">let </span>(s, element) = ws(delimited(tag(<span class="string">&quot;&lt;mspace&quot;</span>), take_until(<span class="string">&quot;/&gt;&quot;</span>), tag(<span class="string">&quot;/&gt;&quot;</span>)))(input)<span class="question-mark">?</span>;
+    <span class="kw">let </span>(s, element) = ws(delimited(tag(<span class="string">"&lt;mspace"</span>), take_until(<span class="string">"/&gt;"</span>), tag(<span class="string">"/&gt;"</span>)))(input)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((s, Mspace(element.to_string())))
 }
 
 <span class="comment">// Some xml have &lt;mo .../&gt;
 </span><span class="kw">fn </span>mo_line(input: Span) -&gt; IResult&lt;MathExpression&gt; {
-    <span class="kw">let </span>(s, element) = ws(delimited(tag(<span class="string">&quot;&lt;mo&quot;</span>), take_until(<span class="string">&quot;/&gt;&quot;</span>), tag(<span class="string">&quot;/&gt;&quot;</span>)))(input)<span class="question-mark">?</span>;
+    <span class="kw">let </span>(s, element) = ws(delimited(tag(<span class="string">"&lt;mo"</span>), take_until(<span class="string">"/&gt;"</span>), tag(<span class="string">"/&gt;"</span>)))(input)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((s, MoLine(element.to_string())))
 }
 
@@ -1041,9 +1042,9 @@
     </span><span class="kw">let </span>tag_name = peek(delimited(
         multispace0,
         delimited(
-            nom_char(<span class="string">&#39;&lt;&#39;</span>),
-            take_until(<span class="string">&quot;&gt;&quot;</span>),
-            alt((tag(<span class="string">&quot;&gt;&quot;</span>), tag(<span class="string">&quot;/&gt;&quot;</span>))), <span class="comment">// Matches both self-closing and regular tags
+            nom_char(<span class="string">'&lt;'</span>),
+            take_until(<span class="string">"&gt;"</span>),
+            alt((tag(<span class="string">"&gt;"</span>), tag(<span class="string">"/&gt;"</span>))), <span class="comment">// Matches both self-closing and regular tags
         </span>),
         multispace0,
     ))(input)
@@ -1053,32 +1054,32 @@
         </span>split_tag_name.next().unwrap().to_string()
     })<span class="question-mark">?</span>;
 
-    <span class="kw">if </span>tag_name.contains(<span class="string">&#39;/&#39;</span>) {
+    <span class="kw">if </span>tag_name.contains(<span class="string">'/'</span>) {
         <span class="comment">// Found a closing tag! This means no more math expressions, but is not wrong.
         // We want the parent combinator to still continue to try and parse the remaining input
         </span>mn(input)
     } <span class="kw">else </span>{
         <span class="kw">match </span>tag_name.as_str() {
-            <span class="string">&quot;mi&quot; </span>=&gt; context(<span class="string">&quot;FAILED TO PARSE &lt;mi&gt;&quot;</span>, cut(ws(map(mi, MathExpression::Mi))))(input),
-            <span class="string">&quot;mn&quot; </span>=&gt; context(<span class="string">&quot;FAILED TO PARSE &lt;mn&gt;&quot;</span>, cut(ws(mn)))(input),
-            <span class="string">&quot;msup&quot; </span>=&gt; context(<span class="string">&quot;FAILED TO PARSE &lt;msup&gt;&quot;</span>, cut(ws(msup)))(input),
-            <span class="string">&quot;msub&quot; </span>=&gt; context(<span class="string">&quot;FAILED TO PARSE &lt;msub&gt;&quot;</span>, cut(ws(msub)))(input),
-            <span class="string">&quot;msqrt&quot; </span>=&gt; context(<span class="string">&quot;FAILED TO PARSE &lt;msqrt&gt;&quot;</span>, cut(ws(msqrt)))(input),
-            <span class="string">&quot;mfrac&quot; </span>=&gt; context(<span class="string">&quot;FAILED TO PARSE &lt;mfrac&gt;&quot;</span>, cut(ws(mfrac)))(input),
-            <span class="string">&quot;mrow&quot; </span>=&gt; context(
-                <span class="string">&quot;FAILED TO PARSE &lt;mrow&gt;&quot;</span>,
+            <span class="string">"mi" </span>=&gt; context(<span class="string">"FAILED TO PARSE &lt;mi&gt;"</span>, cut(ws(map(mi, MathExpression::Mi))))(input),
+            <span class="string">"mn" </span>=&gt; context(<span class="string">"FAILED TO PARSE &lt;mn&gt;"</span>, cut(ws(mn)))(input),
+            <span class="string">"msup" </span>=&gt; context(<span class="string">"FAILED TO PARSE &lt;msup&gt;"</span>, cut(ws(msup)))(input),
+            <span class="string">"msub" </span>=&gt; context(<span class="string">"FAILED TO PARSE &lt;msub&gt;"</span>, cut(ws(msub)))(input),
+            <span class="string">"msqrt" </span>=&gt; context(<span class="string">"FAILED TO PARSE &lt;msqrt&gt;"</span>, cut(ws(msqrt)))(input),
+            <span class="string">"mfrac" </span>=&gt; context(<span class="string">"FAILED TO PARSE &lt;mfrac&gt;"</span>, cut(ws(mfrac)))(input),
+            <span class="string">"mrow" </span>=&gt; context(
+                <span class="string">"FAILED TO PARSE &lt;mrow&gt;"</span>,
                 cut(map(mrow, MathExpression::Mrow)),
             )(input),
-            <span class="string">&quot;munder&quot; </span>=&gt; context(<span class="string">&quot;FAILED TO PARSE &lt;munder&gt;&quot;</span>, cut(ws(munder)))(input),
-            <span class="string">&quot;mover&quot; </span>=&gt; context(<span class="string">&quot;FAILED TO PARSE &lt;mover&gt;&quot;</span>, cut(ws(mover)))(input),
-            <span class="string">&quot;msubsup&quot; </span>=&gt; context(<span class="string">&quot;FAILED TO PARSE &lt;msubsup&gt;&quot;</span>, cut(ws(msubsup)))(input),
-            <span class="string">&quot;mtext&quot; </span>=&gt; context(<span class="string">&quot;FAILED TO PARSE &lt;mtext&gt;&quot;</span>, cut(ws(mtext)))(input),
-            <span class="string">&quot;mstyle&quot; </span>=&gt; context(<span class="string">&quot;FAILED TO PARSE &lt;mstyle&gt;&quot;</span>, cut(ws(mstyle)))(input),
-            <span class="string">&quot;mspace&quot; </span>=&gt; context(<span class="string">&quot;FAILED TO PARSE &lt;mspace&gt;&quot;</span>, cut(ws(mspace)))(input),
-            <span class="string">&quot;mo&quot; </span>=&gt; context(<span class="string">&quot;FAILED TO PARSE &lt;mo&gt;&quot;</span>, cut(ws(alt((mo, mo_line)))))(input),
+            <span class="string">"munder" </span>=&gt; context(<span class="string">"FAILED TO PARSE &lt;munder&gt;"</span>, cut(ws(munder)))(input),
+            <span class="string">"mover" </span>=&gt; context(<span class="string">"FAILED TO PARSE &lt;mover&gt;"</span>, cut(ws(mover)))(input),
+            <span class="string">"msubsup" </span>=&gt; context(<span class="string">"FAILED TO PARSE &lt;msubsup&gt;"</span>, cut(ws(msubsup)))(input),
+            <span class="string">"mtext" </span>=&gt; context(<span class="string">"FAILED TO PARSE &lt;mtext&gt;"</span>, cut(ws(mtext)))(input),
+            <span class="string">"mstyle" </span>=&gt; context(<span class="string">"FAILED TO PARSE &lt;mstyle&gt;"</span>, cut(ws(mstyle)))(input),
+            <span class="string">"mspace" </span>=&gt; context(<span class="string">"FAILED TO PARSE &lt;mspace&gt;"</span>, cut(ws(mspace)))(input),
+            <span class="string">"mo" </span>=&gt; context(<span class="string">"FAILED TO PARSE &lt;mo&gt;"</span>, cut(ws(alt((mo, mo_line)))))(input),
             <span class="kw">_ </span>=&gt; {
-                <span class="macro">println!</span>(<span class="string">&quot;Something went wrong. We grabbed a {} tag&quot;</span>, tag_name);
-                context(<span class="string">&quot;SOMETHING WENT WRONG. WE SHOULDN&#39;T BE HERE.&quot;</span>, cut(mn))(input)
+                <span class="macro">println!</span>(<span class="string">"Something went wrong. We grabbed a {} tag"</span>, tag_name);
+                context(<span class="string">"SOMETHING WENT WRONG. WE SHOULDN'T BE HERE."</span>, cut(mn))(input)
             }
         }
     }
@@ -1086,7 +1087,7 @@
 
 <span class="doccomment">/// testing MathML documents
 </span><span class="kw">pub fn </span>math(input: Span) -&gt; IResult&lt;Math&gt; {
-    <span class="kw">let </span>(s, elements) = preceded(opt(xml_declaration), <span class="macro">elem_many0!</span>(<span class="string">&quot;math&quot;</span>))(input)<span class="question-mark">?</span>;
+    <span class="kw">let </span>(s, elements) = preceded(opt(xml_declaration), <span class="macro">elem_many0!</span>(<span class="string">"math"</span>))(input)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((s, Math { content: elements }))
 }
 
@@ -1110,78 +1111,78 @@
 <span class="kw">pub trait </span>FromFile&lt;T: FromStr&gt; {
     <span class="kw">fn </span>from_file(filepath: <span class="kw-2">&amp;</span>str) -&gt; T {
         <span class="kw">let </span>file_contents = std::fs::read_to_string(filepath)
-            .unwrap_or_else(|<span class="kw">_</span>| <span class="macro">panic!</span>(<span class="string">&quot;{}&quot;</span>, <span class="string">&quot;Unable to read file {filepath}!&quot;</span>));
+            .unwrap_or_else(|<span class="kw">_</span>| <span class="macro">panic!</span>(<span class="string">"{}"</span>, <span class="string">"Unable to read file {filepath}!"</span>));
         file_contents
             .parse::&lt;T&gt;()
-            .unwrap_or_else(|<span class="kw">_</span>| <span class="macro">panic!</span>(<span class="string">&quot;{}&quot;</span>, <span class="string">&quot;Unable to parse file {filepath}!&quot;</span>))
+            .unwrap_or_else(|<span class="kw">_</span>| <span class="macro">panic!</span>(<span class="string">"{}"</span>, <span class="string">"Unable to parse file {filepath}!"</span>))
     }
 }
 
 <span class="doccomment">/// A generic helper function for testing individual parsers.
 </span><span class="attr">#[cfg(test)]
-</span><span class="kw">pub fn </span>test_parser&lt;<span class="lifetime">&#39;a</span>, P, O&gt;(input: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, <span class="kw-2">mut </span>parser: P, output: O)
+</span><span class="kw">pub fn </span>test_parser&lt;<span class="lifetime">'a</span>, P, O&gt;(input: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>str, <span class="kw-2">mut </span>parser: P, output: O)
 <span class="kw">where
-    </span>P: FnMut(Span&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; IResult&lt;<span class="lifetime">&#39;a</span>, O&gt;,
+    </span>P: FnMut(Span&lt;<span class="lifetime">'a</span>&gt;) -&gt; IResult&lt;<span class="lifetime">'a</span>, O&gt;,
     O: std::cmp::PartialEq + std::fmt::Debug,
 {
     <span class="kw">let </span>(s, o) = parser(Span::new(input)).unwrap();
-    <span class="macro">assert_eq!</span>(s.fragment(), <span class="kw-2">&amp;</span><span class="string">&quot;&quot;</span>);
+    <span class="macro">assert_eq!</span>(s.fragment(), <span class="kw-2">&amp;</span><span class="string">""</span>);
     <span class="macro">assert_eq!</span>(o, output);
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_mi() {
-    test_parser(<span class="string">&quot;&lt;mi k=\&quot;v\&quot; m1=\&quot;n\&quot;&gt;x&lt;/mi&gt;&quot;</span>, mi, Mi(<span class="string">&quot;x&quot;</span>.to_string()))
+    test_parser(<span class="string">"&lt;mi k=\"v\" m1=\"n\"&gt;x&lt;/mi&gt;"</span>, mi, Mi(<span class="string">"x"</span>.to_string()))
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_mo() {
-    test_parser(<span class="string">&quot;&lt;mo&gt;=&lt;/mo&gt;&quot;</span>, mo, Mo(Operator::Equals));
-    test_parser(<span class="string">&quot;&lt;mo&gt;+&lt;/mo&gt;&quot;</span>, mo, Mo(Operator::Add));
-    test_parser(<span class="string">&quot;&lt;mo&gt;-&lt;/mo&gt;&quot;</span>, mo, Mo(Operator::Subtract));
+    test_parser(<span class="string">"&lt;mo&gt;=&lt;/mo&gt;"</span>, mo, Mo(Operator::Equals));
+    test_parser(<span class="string">"&lt;mo&gt;+&lt;/mo&gt;"</span>, mo, Mo(Operator::Add));
+    test_parser(<span class="string">"&lt;mo&gt;-&lt;/mo&gt;"</span>, mo, Mo(Operator::Subtract));
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_mn() {
-    test_parser(<span class="string">&quot;&lt;mn&gt;1&lt;/mn&gt;&quot;</span>, mn, Mn(<span class="string">&quot;1&quot;</span>.to_string()));
+    test_parser(<span class="string">"&lt;mn&gt;1&lt;/mn&gt;"</span>, mn, Mn(<span class="string">"1"</span>.to_string()));
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_mrow() {
     test_parser(
-        <span class="string">&quot;&lt;mrow&gt;&lt;mo&gt;-&lt;/mo&gt;&lt;mi&gt;b&lt;/mi&gt;&lt;/mrow&gt;&quot;</span>,
+        <span class="string">"&lt;mrow&gt;&lt;mo&gt;-&lt;/mo&gt;&lt;mi&gt;b&lt;/mi&gt;&lt;/mrow&gt;"</span>,
         mrow,
         Mrow(<span class="macro">vec!</span>[
             Mo(Operator::Subtract),
-            MathExpression::Mi(Mi(<span class="string">&quot;b&quot;</span>.to_string())),
+            MathExpression::Mi(Mi(<span class="string">"b"</span>.to_string())),
         ]),
     );
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_attribute() {
-    test_parser(<span class="string">&quot;key=\&quot;value\&quot;&quot;</span>, attribute, (<span class="string">&quot;key&quot;</span>, <span class="string">&quot;value&quot;</span>))
+    test_parser(<span class="string">"key=\"value\""</span>, attribute, (<span class="string">"key"</span>, <span class="string">"value"</span>))
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_mfrac() {
-    <span class="kw">let </span>frac = mfrac(Span::new(<span class="string">&quot;&lt;mfrac&gt;&lt;mn&gt;1&lt;/mn&gt;&lt;mn&gt;2&lt;/mn&gt;&lt;/mfrac&gt;&quot;</span>))
+    <span class="kw">let </span>frac = mfrac(Span::new(<span class="string">"&lt;mfrac&gt;&lt;mn&gt;1&lt;/mn&gt;&lt;mn&gt;2&lt;/mn&gt;&lt;/mfrac&gt;"</span>))
         .unwrap()
         .<span class="number">1</span>;
     <span class="macro">assert_eq!</span>(
         frac,
-        Mfrac(Box::new(Mn(<span class="string">&quot;1&quot;</span>.to_string())), Box::new(Mn(<span class="string">&quot;2&quot;</span>.to_string()))),
+        Mfrac(Box::new(Mn(<span class="string">"1"</span>.to_string())), Box::new(Mn(<span class="string">"2"</span>.to_string()))),
     )
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_math_expression() {
     test_parser(
-        <span class="string">&quot;&lt;mrow&gt;&lt;mo&gt;-&lt;/mo&gt;&lt;mi&gt;b&lt;/mi&gt;&lt;/mrow&gt;&quot;</span>,
+        <span class="string">"&lt;mrow&gt;&lt;mo&gt;-&lt;/mo&gt;&lt;mi&gt;b&lt;/mi&gt;&lt;/mrow&gt;"</span>,
         math_expression,
         MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
             Mo(Operator::Subtract),
-            MathExpression::Mi(Mi(<span class="string">&quot;b&quot;</span>.to_string())),
+            MathExpression::Mi(Mi(<span class="string">"b"</span>.to_string())),
         ])),
     )
 }
@@ -1189,29 +1190,29 @@
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_mover() {
     test_parser(
-        <span class="string">&quot;&lt;mover&gt;&lt;mi&gt;x&lt;/mi&gt;&lt;mo&gt;¯&lt;/mo&gt;&lt;/mover&gt;&quot;</span>,
+        <span class="string">"&lt;mover&gt;&lt;mi&gt;x&lt;/mi&gt;&lt;mo&gt;¯&lt;/mo&gt;&lt;/mover&gt;"</span>,
         mover,
         Mover(
-            Box::new(MathExpression::Mi(Mi(<span class="string">&quot;x&quot;</span>.to_string()))),
+            Box::new(MathExpression::Mi(Mi(<span class="string">"x"</span>.to_string()))),
             Box::new(Mo(Operator::Mean)),
-            <span class="comment">//Box::new(Mo(Operator::Other(&quot;¯&quot;.to_string()))),
+            <span class="comment">//Box::new(Mo(Operator::Other("¯".to_string()))),
         </span>),
     )
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_mtext() {
-    test_parser(<span class="string">&quot;&lt;mtext&gt;if&lt;/mtext&gt;&quot;</span>, mtext, Mtext(<span class="string">&quot;if&quot;</span>.to_string()));
+    test_parser(<span class="string">"&lt;mtext&gt;if&lt;/mtext&gt;"</span>, mtext, Mtext(<span class="string">"if"</span>.to_string()));
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_mstyle() {
     test_parser(
-        <span class="string">&quot;&lt;mstyle&gt;&lt;mo&gt;∑&lt;/mo&gt;&lt;mi&gt;I&lt;/mi&gt;&lt;/mstyle&gt;&quot;</span>,
+        <span class="string">"&lt;mstyle&gt;&lt;mo&gt;∑&lt;/mo&gt;&lt;mi&gt;I&lt;/mi&gt;&lt;/mstyle&gt;"</span>,
         mstyle,
         Mstyle(<span class="macro">vec!</span>[
-            Mo(Operator::Other(<span class="string">&quot;∑&quot;</span>.to_string())),
-            MathExpression::Mi(Mi(<span class="string">&quot;I&quot;</span>.to_string())),
+            Mo(Operator::Other(<span class="string">"∑"</span>.to_string())),
+            MathExpression::Mi(Mi(<span class="string">"I"</span>.to_string())),
         ]),
     )
 }
@@ -1219,92 +1220,92 @@
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_mspace() {
     test_parser(
-        <span class="string">&quot;&lt;mspace width=\&quot;1em\&quot;/&gt;&quot;</span>,
+        <span class="string">"&lt;mspace width=\"1em\"/&gt;"</span>,
         mspace,
-        Mspace(<span class="string">&quot; width=\&quot;1em\&quot;&quot;</span>.to_string()),
+        Mspace(<span class="string">" width=\"1em\""</span>.to_string()),
     );
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_moline() {
     test_parser(
-        <span class="string">&quot;&lt;mo fence=\&quot;true\&quot; stretchy=\&quot;true\&quot; symmetric=\&quot;true\&quot;/&gt;&quot;</span>,
+        <span class="string">"&lt;mo fence=\"true\" stretchy=\"true\" symmetric=\"true\"/&gt;"</span>,
         mo_line,
-        MoLine(<span class="string">&quot; fence=\&quot;true\&quot; stretchy=\&quot;true\&quot; symmetric=\&quot;true\&quot;&quot;</span>.to_string()),
+        MoLine(<span class="string">" fence=\"true\" stretchy=\"true\" symmetric=\"true\""</span>.to_string()),
     );
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_math() {
     test_parser(
-        <span class="string">&quot;&lt;math&gt;
+        <span class="string">"&lt;math&gt;
             &lt;mrow&gt;
                 &lt;mo&gt;-&lt;/mo&gt;
                 &lt;mi&gt;b&lt;/mi&gt;
             &lt;/mrow&gt;
-        &lt;/math&gt;&quot;</span>,
+        &lt;/math&gt;"</span>,
         math,
         Math {
             content: <span class="macro">vec!</span>[MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
                 Mo(Operator::Subtract),
-                MathExpression::Mi(Mi(<span class="string">&quot;b&quot;</span>.to_string())),
+                MathExpression::Mi(Mi(<span class="string">"b"</span>.to_string())),
             ]))],
         },
     )
 }
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_mathml_parser() {
-    <span class="kw">let </span>eqn = std::fs::read_to_string(<span class="string">&quot;tests/test01.xml&quot;</span>).unwrap();
+    <span class="kw">let </span>eqn = std::fs::read_to_string(<span class="string">"tests/test01.xml"</span>).unwrap();
     test_parser(
         <span class="kw-2">&amp;</span>eqn,
         math,
         Math {
             content: <span class="macro">vec!</span>[
                 Munder(
-                    Box::new(Mo(Operator::Other(<span class="string">&quot;sup&quot;</span>.to_string()))),
+                    Box::new(Mo(Operator::Other(<span class="string">"sup"</span>.to_string()))),
                     Box::new(MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
-                        Mn(<span class="string">&quot;0&quot;</span>.to_string()),
-                        Mo(Operator::Other(<span class="string">&quot;≤&quot;</span>.to_string())),
-                        MathExpression::Mi(Mi(<span class="string">&quot;t&quot;</span>.to_string())),
-                        Mo(Operator::Other(<span class="string">&quot;≤&quot;</span>.to_string())),
+                        Mn(<span class="string">"0"</span>.to_string()),
+                        Mo(Operator::Other(<span class="string">"≤"</span>.to_string())),
+                        MathExpression::Mi(Mi(<span class="string">"t"</span>.to_string())),
+                        Mo(Operator::Other(<span class="string">"≤"</span>.to_string())),
                         Msub(
-                            Box::new(MathExpression::Mi(Mi(<span class="string">&quot;T&quot;</span>.to_string()))),
-                            Box::new(Mn(<span class="string">&quot;0&quot;</span>.to_string())),
+                            Box::new(MathExpression::Mi(Mi(<span class="string">"T"</span>.to_string()))),
+                            Box::new(Mn(<span class="string">"0"</span>.to_string())),
                         ),
                     ]))),
                 ),
-                Mo(Operator::Other(<span class="string">&quot;‖&quot;</span>.to_string())),
+                Mo(Operator::Other(<span class="string">"‖"</span>.to_string())),
                 Msup(
                     Box::new(MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[Mover(
-                        Box::new(MathExpression::Mi(Mi(<span class="string">&quot;ρ&quot;</span>.to_string()))),
-                        Box::new(Mo(Operator::Other(<span class="string">&quot;~&quot;</span>.to_string()))),
+                        Box::new(MathExpression::Mi(Mi(<span class="string">"ρ"</span>.to_string()))),
+                        Box::new(Mo(Operator::Other(<span class="string">"~"</span>.to_string()))),
                     )]))),
-                    Box::new(MathExpression::Mi(Mi(<span class="string">&quot;R&quot;</span>.to_string()))),
+                    Box::new(MathExpression::Mi(Mi(<span class="string">"R"</span>.to_string()))),
                 ),
                 Msup(
                     Box::new(MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[Mover(
-                        Box::new(MathExpression::Mi(Mi(<span class="string">&quot;x&quot;</span>.to_string()))),
+                        Box::new(MathExpression::Mi(Mi(<span class="string">"x"</span>.to_string()))),
                         Box::new(Mo(Operator::Mean)),
-                        <span class="comment">//Box::new(Mo(Operator::Other(&quot;¯&quot;.to_string()))),
+                        <span class="comment">//Box::new(Mo(Operator::Other("¯".to_string()))),
                     </span>)]))),
-                    Box::new(MathExpression::Mi(Mi(<span class="string">&quot;a&quot;</span>.to_string()))),
+                    Box::new(MathExpression::Mi(Mi(<span class="string">"a"</span>.to_string()))),
                 ),
                 Msub(
-                    Box::new(Mo(Operator::Other(<span class="string">&quot;‖&quot;</span>.to_string()))),
+                    Box::new(Mo(Operator::Other(<span class="string">"‖"</span>.to_string()))),
                     Box::new(MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
                         Msup(
-                            Box::new(MathExpression::Mi(Mi(<span class="string">&quot;L&quot;</span>.to_string()))),
-                            Box::new(Mn(<span class="string">&quot;1&quot;</span>.to_string())),
+                            Box::new(MathExpression::Mi(Mi(<span class="string">"L"</span>.to_string()))),
+                            Box::new(Mn(<span class="string">"1"</span>.to_string())),
                         ),
-                        Mo(Operator::Other(<span class="string">&quot;∩&quot;</span>.to_string())),
+                        Mo(Operator::Other(<span class="string">"∩"</span>.to_string())),
                         Msup(
-                            Box::new(MathExpression::Mi(Mi(<span class="string">&quot;L&quot;</span>.to_string()))),
-                            Box::new(MathExpression::Mi(Mi(<span class="string">&quot;∞&quot;</span>.to_string()))),
+                            Box::new(MathExpression::Mi(Mi(<span class="string">"L"</span>.to_string()))),
+                            Box::new(MathExpression::Mi(Mi(<span class="string">"∞"</span>.to_string()))),
                         ),
                     ]))),
                 ),
-                Mo(Operator::Other(<span class="string">&quot;≤&quot;</span>.to_string())),
-                MathExpression::Mi(Mi(<span class="string">&quot;C&quot;</span>.to_string())),
+                Mo(Operator::Other(<span class="string">"≤"</span>.to_string())),
+                MathExpression::Mi(Mi(<span class="string">"C"</span>.to_string())),
             ],
         },
     )

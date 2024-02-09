@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/utoipa-3.5.0/src/openapi/request_body.rs`."><title>request_body.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="utoipa" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/utoipa-3.5.0/src/openapi/request_body.rs`."><title>request_body.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="utoipa" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -226,18 +227,18 @@
     /// [request_body]: https://spec.openapis.org/oas/latest.html#request-body-object
     </span><span class="attr">#[non_exhaustive]
     #[derive(Serialize, Deserialize, Default, Clone, PartialEq)]
-    #[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
-    #[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+    #[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
+    #[serde(rename_all = <span class="string">"camelCase"</span>)]
     </span><span class="kw">pub struct </span>RequestBody {
         <span class="doccomment">/// Additional description of [`RequestBody`] supporting markdown syntax.
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
         </span><span class="kw">pub </span>description: <span class="prelude-ty">Option</span>&lt;String&gt;,
 
         <span class="doccomment">/// Map of request body contents mapped by content type e.g. `application/json`.
         </span><span class="kw">pub </span>content: BTreeMap&lt;String, Content&gt;,
 
         <span class="doccomment">/// Determines whether request body is required in the request or not.
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
         </span><span class="kw">pub </span>required: <span class="prelude-ty">Option</span>&lt;Required&gt;,
     }
 }
@@ -272,22 +273,22 @@
 ///
 /// With a single method call we can add [`Content`] to our [`RequestBodyBuilder`] and
 /// [`RequestBody`] that references a [schema][schema] using
-/// content-type `&quot;application/json&quot;`.
+/// content-type `"application/json"`.
 ///
 /// _**Add json request body from schema ref.**_
 /// ```rust
 /// use utoipa::openapi::request_body::{RequestBodyBuilder, RequestBodyExt};
 ///
-/// let request = RequestBodyBuilder::new().json_schema_ref(&quot;EmailPayload&quot;).build();
+/// let request = RequestBodyBuilder::new().json_schema_ref("EmailPayload").build();
 /// ```
 ///
 /// If serialized to JSON, the above will result in a requestBody schema like this.
 /// ```json
 /// {
-///   &quot;content&quot;: {
-///     &quot;application/json&quot;: {
-///       &quot;schema&quot;: {
-///         &quot;$ref&quot;: &quot;#/components/schemas/EmailPayload&quot;
+///   "content": {
+///     "application/json": {
+///       "schema": {
+///         "$ref": "#/components/schemas/EmailPayload"
 ///       }
 ///     }
 ///   }
@@ -296,30 +297,30 @@
 ///
 /// [schema]: crate::ToSchema
 ///
-</span><span class="attr">#[cfg(feature = <span class="string">&quot;openapi_extensions&quot;</span>)]
-#[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">&quot;openapi_extensions&quot;</span>)))]
+</span><span class="attr">#[cfg(feature = <span class="string">"openapi_extensions"</span>)]
+#[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">"openapi_extensions"</span>)))]
 </span><span class="kw">pub trait </span>RequestBodyExt {
     <span class="doccomment">/// Add [`Content`] to [`RequestBody`] referring to a _`schema`_
     /// with Content-Type `application/json`.
     </span><span class="kw">fn </span>json_schema_ref(<span class="self">self</span>, ref_name: <span class="kw-2">&amp;</span>str) -&gt; <span class="self">Self</span>;
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;openapi_extensions&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"openapi_extensions"</span>)]
 </span><span class="kw">impl </span>RequestBodyExt <span class="kw">for </span>RequestBody {
     <span class="kw">fn </span>json_schema_ref(<span class="kw-2">mut </span><span class="self">self</span>, ref_name: <span class="kw-2">&amp;</span>str) -&gt; RequestBody {
         <span class="self">self</span>.content.insert(
-            <span class="string">&quot;application/json&quot;</span>.to_string(),
+            <span class="string">"application/json"</span>.to_string(),
             <span class="kw">crate</span>::openapi::Content::new(<span class="kw">crate</span>::openapi::Ref::from_schema_name(ref_name)),
         );
         <span class="self">self
     </span>}
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;openapi_extensions&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"openapi_extensions"</span>)]
 </span><span class="kw">impl </span>RequestBodyExt <span class="kw">for </span>RequestBodyBuilder {
     <span class="kw">fn </span>json_schema_ref(<span class="self">self</span>, ref_name: <span class="kw-2">&amp;</span>str) -&gt; RequestBodyBuilder {
         <span class="self">self</span>.content(
-            <span class="string">&quot;application/json&quot;</span>,
+            <span class="string">"application/json"</span>,
             <span class="kw">crate</span>::openapi::Content::new(<span class="kw">crate</span>::openapi::Ref::from_schema_name(ref_name)),
         )
     }
@@ -344,35 +345,35 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>request_body_builder() -&gt; <span class="prelude-ty">Result</span>&lt;(), serde_json::Error&gt; {
         <span class="kw">let </span>request_body = RequestBodyBuilder::new()
-            .description(<span class="prelude-val">Some</span>(<span class="string">&quot;A sample requestBody&quot;</span>))
+            .description(<span class="prelude-val">Some</span>(<span class="string">"A sample requestBody"</span>))
             .required(<span class="prelude-val">Some</span>(Required::True))
             .content(
-                <span class="string">&quot;application/json&quot;</span>,
-                Content::new(<span class="kw">crate</span>::openapi::Ref::from_schema_name(<span class="string">&quot;EmailPayload&quot;</span>)),
+                <span class="string">"application/json"</span>,
+                Content::new(<span class="kw">crate</span>::openapi::Ref::from_schema_name(<span class="string">"EmailPayload"</span>)),
             )
             .build();
         <span class="kw">let </span>serialized = serde_json::to_string_pretty(<span class="kw-2">&amp;</span>request_body)<span class="question-mark">?</span>;
-        <span class="macro">println!</span>(<span class="string">&quot;serialized json:\n {serialized}&quot;</span>);
+        <span class="macro">println!</span>(<span class="string">"serialized json:\n {serialized}"</span>);
         <span class="macro">assert_json_eq!</span>(
             request_body,
             <span class="macro">json!</span>({
-              <span class="string">&quot;description&quot;</span>: <span class="string">&quot;A sample requestBody&quot;</span>,
-              <span class="string">&quot;content&quot;</span>: {
-                <span class="string">&quot;application/json&quot;</span>: {
-                  <span class="string">&quot;schema&quot;</span>: {
-                    <span class="string">&quot;$ref&quot;</span>: <span class="string">&quot;#/components/schemas/EmailPayload&quot;
+              <span class="string">"description"</span>: <span class="string">"A sample requestBody"</span>,
+              <span class="string">"content"</span>: {
+                <span class="string">"application/json"</span>: {
+                  <span class="string">"schema"</span>: {
+                    <span class="string">"$ref"</span>: <span class="string">"#/components/schemas/EmailPayload"
                   </span>}
                 }
               },
-              <span class="string">&quot;required&quot;</span>: <span class="bool-val">true
+              <span class="string">"required"</span>: <span class="bool-val">true
             </span>})
         );
         <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="attr">#[cfg(all(test, feature = <span class="string">&quot;openapi_extensions&quot;</span>))]
-#[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">&quot;openapi_extensions&quot;</span>)))]
+<span class="attr">#[cfg(all(test, feature = <span class="string">"openapi_extensions"</span>))]
+#[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">"openapi_extensions"</span>)))]
 </span><span class="kw">mod </span>openapi_extensions_tests {
     <span class="kw">use </span>assert_json_diff::assert_json_eq;
     <span class="kw">use </span>serde_json::json;
@@ -386,14 +387,14 @@
         <span class="kw">let </span>request_body = RequestBodyBuilder::new()
             .build()
             <span class="comment">// build a RequestBody first to test the method
-            </span>.json_schema_ref(<span class="string">&quot;EmailPayload&quot;</span>);
+            </span>.json_schema_ref(<span class="string">"EmailPayload"</span>);
         <span class="macro">assert_json_eq!</span>(
             request_body,
             <span class="macro">json!</span>({
-              <span class="string">&quot;content&quot;</span>: {
-                <span class="string">&quot;application/json&quot;</span>: {
-                  <span class="string">&quot;schema&quot;</span>: {
-                    <span class="string">&quot;$ref&quot;</span>: <span class="string">&quot;#/components/schemas/EmailPayload&quot;
+              <span class="string">"content"</span>: {
+                <span class="string">"application/json"</span>: {
+                  <span class="string">"schema"</span>: {
+                    <span class="string">"$ref"</span>: <span class="string">"#/components/schemas/EmailPayload"
                   </span>}
                 }
               }
@@ -404,15 +405,15 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>request_body_builder_ext() {
         <span class="kw">let </span>request_body = RequestBodyBuilder::new()
-            .json_schema_ref(<span class="string">&quot;EmailPayload&quot;</span>)
+            .json_schema_ref(<span class="string">"EmailPayload"</span>)
             .build();
         <span class="macro">assert_json_eq!</span>(
             request_body,
             <span class="macro">json!</span>({
-              <span class="string">&quot;content&quot;</span>: {
-                <span class="string">&quot;application/json&quot;</span>: {
-                  <span class="string">&quot;schema&quot;</span>: {
-                    <span class="string">&quot;$ref&quot;</span>: <span class="string">&quot;#/components/schemas/EmailPayload&quot;
+              <span class="string">"content"</span>: {
+                <span class="string">"application/json"</span>: {
+                  <span class="string">"schema"</span>: {
+                    <span class="string">"$ref"</span>: <span class="string">"#/components/schemas/EmailPayload"
                   </span>}
                 }
               }

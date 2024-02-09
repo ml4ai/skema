@@ -1,6 +1,7 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Generate path parameters from struct’s fields."><title>IntoParams in utoipa - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../" data-static-root-path="../static.files/" data-current-crate="utoipa" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="sidebar-items.js"></script><script defer src="../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc derive"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button></nav><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../utoipa/index.html">utoipa</a><span class="version">3.5.0</span></h2></div><div class="sidebar-elems"></div></nav><main><div class="width-limiter"><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="main-heading"><h1>Derive Macro <a href="index.html">utoipa</a>::<wbr><a class="derive" href="#">IntoParams</a><button id="copy-path" title="Copy item path to clipboard"><img src="../static.files/clipboard-7571035ce49a181d.svg" width="19" height="18" alt="Copy item path"></button></h1><span class="out-of-band"><a class="src" href="../src/utoipa_gen/lib.rs.html#1598">source</a> · <button id="toggle-all-docs" title="collapse all docs">[<span>&#x2212;</span>]</button></span></div><pre class="rust item-decl"><code>#[derive(IntoParams)]
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Generate path parameters from struct’s fields."><title>IntoParams in utoipa - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../" data-static-root-path="../static.files/" data-current-crate="utoipa" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="sidebar-items.js"></script><script defer src="../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc derive"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button></nav><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../utoipa/index.html">utoipa</a><span class="version">3.5.0</span></h2></div><div class="sidebar-elems"></div></nav><div class="sidebar-resizer"></div>
+    <main><div class="width-limiter"><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../utoipa/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="main-heading"><h1>Derive Macro <a href="index.html">utoipa</a>::<wbr><a class="derive" href="#">IntoParams</a><button id="copy-path" title="Copy item path to clipboard"><img src="../static.files/clipboard-7571035ce49a181d.svg" width="19" height="18" alt="Copy item path"></button></h1><span class="out-of-band"><a class="src" href="../src/utoipa_gen/lib.rs.html#1598">source</a> · <button id="toggle-all-docs" title="collapse all docs">[<span>&#x2212;</span>]</button></span></div><pre class="rust item-decl"><code>#[derive(IntoParams)]
 {
-    // Attributes available to this derive:
+    <span class="comment">// Attributes available to this derive:</span>
     #[param]
     #[into_params]
 }
@@ -9,7 +10,7 @@ fields.</p>
 <p>This is <code>#[derive]</code> implementation for <a href="trait.IntoParams.html"><code>IntoParams</code></a> trait.</p>
 <p>Typically path parameters need to be defined within <a href="attr.path.html#params-attributes"><code>#[utoipa::path(...params(...))]</code></a> section
 for the endpoint. But this trait eliminates the need for that when <a href="https://doc.rust-lang.org/std/keyword.struct.html"><code>struct</code></a>s are used to define parameters.
-Still [<code>std::primitive</code>] and <a href="std::string::String"><code>String</code></a> path parameters or <a href="https://doc.rust-lang.org/1.75.0/std/primitive.tuple.html" title="primitive tuple"><code>tuple</code></a> style path parameters need to be defined
+Still [<code>std::primitive</code>] and <a href="std::string::String"><code>String</code></a> path parameters or <a href="https://doc.rust-lang.org/1.76.0/std/primitive.tuple.html" title="primitive tuple"><code>tuple</code></a> style path parameters need to be defined
 within <code>params(...)</code> section if description or other than default configuration need to be given.</p>
 <p>You can use the Rust’s own <code>#[deprecated]</code> attribute on field to mark it as
 deprecated and it will reflect to the generated OpenAPI spec.</p>
@@ -41,12 +42,12 @@ supplied, then the value is determined by the <code>parameter_in_provider</code>
 <p>Use <code>names</code> to define name for single unnamed argument.</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="attr">#[derive(IntoParams)]
-#[into_params(names(<span class="string">&quot;id&quot;</span>))]
+#[into_params(names(<span class="string">"id"</span>))]
 </span><span class="kw">struct </span>Id(u64);</code></pre></div>
 <p>Use <code>names</code> to define names for multiple unnamed arguments.</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="attr">#[derive(IntoParams)]
-#[into_params(names(<span class="string">&quot;id&quot;</span>, <span class="string">&quot;name&quot;</span>))]
+#[into_params(names(<span class="string">"id"</span>, <span class="string">"name"</span>))]
 </span><span class="kw">struct </span>IdAndName(u64, String);</code></pre></div>
 <h2 id="intoparams-field-attributes-for-param"><a href="#intoparams-field-attributes-for-param">IntoParams Field Attributes for <code>#[param(...)]</code></a></h2>
 <p>The following attributes are available for use in the <code>#[param(...)]</code> on struct fields:</p>
@@ -196,12 +197,12 @@ with <em><code>actix-web</code></em></strong></em>.</p>
 <span class="attr">#[utoipa::path(
     params(PetPathArgs, Filter),
     responses(
-        (status = <span class="number">200</span>, description = <span class="string">&quot;success response&quot;</span>)
+        (status = <span class="number">200</span>, description = <span class="string">"success response"</span>)
     )
 )]
-#[get(<span class="string">&quot;/pet/{id}/{name}&quot;</span>)]
+#[get(<span class="string">"/pet/{id}/{name}"</span>)]
 </span><span class="kw">async fn </span>get_pet(pet: Path&lt;PetPathArgs&gt;, query: Query&lt;Filter&gt;) -&gt; <span class="kw">impl </span>Responder {
-    HttpResponse::Ok().json(<span class="macro">json!</span>({ <span class="string">&quot;id&quot;</span>: pet.id }))
+    HttpResponse::Ok().json(<span class="macro">json!</span>({ <span class="string">"id"</span>: pet.id }))
 }</code></pre></div>
 <p><em><strong>Demonstrate <a href="trait.IntoParams.html"><code>IntoParams</code></a> usage with the <code>#[into_params(...)]</code> container attribute to
 be used as a path query, and inlining a schema query field:</strong></em></p>
@@ -210,7 +211,7 @@ be used as a path query, and inlining a schema query field:</strong></em></p>
 <span class="kw">use </span>utoipa::{IntoParams, ToSchema};
 
 <span class="attr">#[derive(Deserialize, ToSchema)]
-#[serde(rename_all = <span class="string">&quot;snake_case&quot;</span>)]
+#[serde(rename_all = <span class="string">"snake_case"</span>)]
 </span><span class="kw">enum </span>PetKind {
     Dog,
     Cat,
@@ -230,10 +231,10 @@ be used as a path query, and inlining a schema query field:</strong></em></p>
 
 <span class="attr">#[utoipa::path(
     get,
-    path = <span class="string">&quot;/get_pet&quot;</span>,
+    path = <span class="string">"/get_pet"</span>,
     params(PetQuery),
     responses(
-        (status = <span class="number">200</span>, description = <span class="string">&quot;success response&quot;</span>)
+        (status = <span class="number">200</span>, description = <span class="string">"success response"</span>)
     )
 )]
 </span><span class="kw">async fn </span>get_pet(query: PetQuery) {
@@ -290,7 +291,7 @@ be used as a path query, and inlining a schema query field:</strong></em></p>
 </span><span class="kw">struct </span>Item {
     <span class="attr">#[param(maximum = <span class="number">10</span>, minimum = <span class="number">5</span>, multiple_of = <span class="number">2.5</span>)]
     </span>id: i32,
-    <span class="attr">#[param(max_length = <span class="number">10</span>, min_length = <span class="number">5</span>, pattern = <span class="string">&quot;[a-z]*&quot;</span>)]
+    <span class="attr">#[param(max_length = <span class="number">10</span>, min_length = <span class="number">5</span>, pattern = <span class="string">"[a-z]*"</span>)]
     </span>value: String,
     <span class="attr">#[param(max_items = <span class="number">5</span>, min_items = <span class="number">1</span>)]
     </span>items: Vec&lt;String&gt;,
@@ -301,9 +302,9 @@ be used as a path query, and inlining a schema query field:</strong></em></p>
     ObjectBuilder::new()
         .schema_type(utoipa::openapi::SchemaType::String)
         .format(<span class="prelude-val">Some</span>(utoipa::openapi::SchemaFormat::Custom(
-            <span class="string">&quot;email&quot;</span>.to_string(),
+            <span class="string">"email"</span>.to_string(),
         )))
-        .description(<span class="prelude-val">Some</span>(<span class="string">&quot;this is the description&quot;</span>))
+        .description(<span class="prelude-val">Some</span>(<span class="string">"this is the description"</span>))
         .build()
 }
 

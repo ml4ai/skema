@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `skema/src/bin/gromet2graphdb.rs`."><title>gromet2graphdb.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="gromet2graphdb" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `skema/src/bin/gromet2graphdb.rs`."><title>gromet2graphdb.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="gromet2graphdb" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -75,7 +76,7 @@
     </span>path: String,
 
     <span class="doccomment">/// Database host
-    </span><span class="attr">#[arg(long, default_value_t = String::from(<span class="string">&quot;localhost&quot;</span>))]
+    </span><span class="attr">#[arg(long, default_value_t = String::from(<span class="string">"localhost"</span>))]
     </span>db_host: String,
 }
 
@@ -86,8 +87,8 @@
     <span class="comment">// take in gromet location and deserialize
 
     </span><span class="kw">let </span>args = Cli::parse();
-    <span class="kw">let </span>data = fs::read_to_string(<span class="kw-2">&amp;</span>args.path).expect(<span class="string">&quot;Unable to read file&quot;</span>);
-    <span class="kw">let </span>gromet: ModuleCollection = serde_json::from_str(<span class="kw-2">&amp;</span>data).expect(<span class="string">&quot;Unable to parse&quot;</span>);
+    <span class="kw">let </span>data = fs::read_to_string(<span class="kw-2">&amp;</span>args.path).expect(<span class="string">"Unable to read file"</span>);
+    <span class="kw">let </span>gromet: ModuleCollection = serde_json::from_str(<span class="kw-2">&amp;</span>data).expect(<span class="string">"Unable to parse"</span>);
 
     <span class="comment">// parse gromet into vec of queries
     </span><span class="kw">let </span>queries = parse_gromet_queries(gromet);
@@ -95,19 +96,19 @@
     <span class="comment">// need to make the whole query list one line, individual executions are treated as different graphs for each execution.
     </span><span class="kw">let </span><span class="kw-2">mut </span>full_query = queries[<span class="number">0</span>].clone();
     <span class="kw">for </span>que <span class="kw">in </span>queries.iter().skip(<span class="number">1</span>) {
-        full_query.push(<span class="string">&#39;\n&#39;</span>);
+        full_query.push(<span class="string">'\n'</span>);
         <span class="kw">let </span>temp_str = que;
         full_query.push_str(temp_str);
     }
 
     <span class="kw">if </span>debug {
-        fs::write(<span class="string">&quot;debug.txt&quot;</span>, full_query.clone()).expect(<span class="string">&quot;Unable to write file&quot;</span>);
+        fs::write(<span class="string">"debug.txt"</span>, full_query.clone()).expect(<span class="string">"Unable to write file"</span>);
     }
 
-    <span class="kw">let </span>db_protocol = env::var(<span class="string">&quot;SKEMA_GRAPH_DB_PROTO&quot;</span>).unwrap_or(<span class="string">&quot;bolt+s://&quot;</span>.to_string());
+    <span class="kw">let </span>db_protocol = env::var(<span class="string">"SKEMA_GRAPH_DB_PROTO"</span>).unwrap_or(<span class="string">"bolt+s://"</span>.to_string());
     <span class="kw">let </span>db_host =
-        env::var(<span class="string">&quot;SKEMA_GRAPH_DB_HOST&quot;</span>).unwrap_or(<span class="string">&quot;graphdb-bolt.askem.lum.ai&quot;</span>.to_string());
-    <span class="kw">let </span>db_port = env::var(<span class="string">&quot;SKEMA_GRAPH_DB_PORT&quot;</span>).unwrap_or(<span class="string">&quot;443&quot;</span>.to_string());
+        env::var(<span class="string">"SKEMA_GRAPH_DB_HOST"</span>).unwrap_or(<span class="string">"graphdb-bolt.askem.lum.ai"</span>.to_string());
+    <span class="kw">let </span>db_port = env::var(<span class="string">"SKEMA_GRAPH_DB_PORT"</span>).unwrap_or(<span class="string">"443"</span>.to_string());
 
     <span class="kw">let </span>config = Config {
         db_protocol: db_protocol.clone(),

@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/utoipa-gen-3.5.0/src/component/features.rs`."><title>features.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="utoipa_gen" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/utoipa-gen-3.5.0/src/component/features.rs`."><title>features.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="utoipa_gen" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1897,7 +1898,7 @@
 }
 
 <span class="kw">pub trait </span>Name {
-    <span class="kw">fn </span>get_name() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str
+    <span class="kw">fn </span>get_name() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str
     <span class="kw">where
         </span><span class="self">Self</span>: Sized;
 }
@@ -1905,15 +1906,15 @@
 <span class="macro">macro_rules! </span>name {
     ( <span class="macro-nonterminal">$ident</span>:ident = <span class="macro-nonterminal">$name</span>:literal ) =&gt; {
         <span class="kw">impl </span>Name <span class="kw">for </span><span class="macro-nonterminal">$ident </span>{
-            <span class="kw">fn </span>get_name() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
+            <span class="kw">fn </span>get_name() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str {
                 <span class="macro-nonterminal">$name
             </span>}
         }
 
         <span class="kw">impl </span>Display <span class="kw">for </span><span class="macro-nonterminal">$ident </span>{
-            <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+            <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; std::fmt::Result {
                 <span class="kw">let </span>name = &lt;<span class="self">Self </span><span class="kw">as </span>Name&gt;::get_name();
-                <span class="macro">write!</span>(f, <span class="string">&quot;{name}&quot;</span>)
+                <span class="macro">write!</span>(f, <span class="string">"{name}"</span>)
             }
         }
     };
@@ -1937,7 +1938,7 @@
         </span><span class="self">Self</span>: std::marker::Sized;
 }
 
-<span class="attr">#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
+<span class="attr">#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
 #[derive(Clone)]
 </span><span class="kw">pub enum </span>Feature {
     Example(Example),
@@ -2006,21 +2007,21 @@
             ),
             _unsupported_variant =&gt; {
                 <span class="kw">const </span>SUPPORTED_VARIANTS: [<span class="kw-2">&amp;</span>str; <span class="number">10</span>] = [
-                    <span class="string">&quot;multiple_of&quot;</span>,
-                    <span class="string">&quot;maximum&quot;</span>,
-                    <span class="string">&quot;minimum&quot;</span>,
-                    <span class="string">&quot;exclusive_maximum&quot;</span>,
-                    <span class="string">&quot;exclusive_minimum&quot;</span>,
-                    <span class="string">&quot;max_length&quot;</span>,
-                    <span class="string">&quot;min_length&quot;</span>,
-                    <span class="string">&quot;pattern&quot;</span>,
-                    <span class="string">&quot;max_items&quot;</span>,
-                    <span class="string">&quot;min_items&quot;</span>,
+                    <span class="string">"multiple_of"</span>,
+                    <span class="string">"maximum"</span>,
+                    <span class="string">"minimum"</span>,
+                    <span class="string">"exclusive_maximum"</span>,
+                    <span class="string">"exclusive_minimum"</span>,
+                    <span class="string">"max_length"</span>,
+                    <span class="string">"min_length"</span>,
+                    <span class="string">"pattern"</span>,
+                    <span class="string">"max_items"</span>,
+                    <span class="string">"min_items"</span>,
                 ];
                 <span class="macro">panic!</span>(
-                    <span class="string">&quot;Unsupported variant: `{variant}` for Validate::validate, expected one of: {variants}&quot;</span>,
+                    <span class="string">"Unsupported variant: `{variant}` for Validate::validate, expected one of: {variants}"</span>,
                     variant = _unsupported_variant,
-                    variants = SUPPORTED_VARIANTS.join(<span class="string">&quot;, &quot;</span>)
+                    variants = SUPPORTED_VARIANTS.join(<span class="string">", "</span>)
                 )
             }
         }
@@ -2074,14 +2075,14 @@
             Feature::RenameAll(<span class="kw">_</span>) =&gt; {
                 <span class="macro">abort! </span>{
                     Span::call_site(),
-                    <span class="string">&quot;RenameAll feature does not support `ToTokens`&quot;
+                    <span class="string">"RenameAll feature does not support `ToTokens`"
                 </span>}
             }
             Feature::ValueType(<span class="kw">_</span>) =&gt; {
                 <span class="macro">abort! </span>{
                     Span::call_site(),
-                    <span class="string">&quot;ValueType feature does not support `ToTokens`&quot;</span>;
-                    help = <span class="string">&quot;ValueType is supposed to be used with `TypeTree` in same manner as a resolved struct/field type.&quot;</span>;
+                    <span class="string">"ValueType feature does not support `ToTokens`"</span>;
+                    help = <span class="string">"ValueType is supposed to be used with `TypeTree` in same manner as a resolved struct/field type."</span>;
                 }
             }
             Feature::Inline(<span class="kw">_</span>) =&gt; {
@@ -2091,12 +2092,12 @@
             Feature::IntoParamsNames(<span class="kw">_</span>) =&gt; {
                 <span class="macro">abort! </span>{
                     Span::call_site(),
-                    <span class="string">&quot;Names feature does not support `ToTokens`&quot;</span>;
-                    help = <span class="string">&quot;Names is only used with IntoParams to artificially give names for unnamed struct type `IntoParams`.&quot;
+                    <span class="string">"Names feature does not support `ToTokens`"</span>;
+                    help = <span class="string">"Names is only used with IntoParams to artificially give names for unnamed struct type `IntoParams`."
                 </span>}
             }
             Feature::As(<span class="kw">_</span>) =&gt; {
-                <span class="macro">abort!</span>(Span::call_site(), <span class="string">&quot;As does not support `ToTokens`&quot;</span>)
+                <span class="macro">abort!</span>(Span::call_site(), <span class="string">"As does not support `ToTokens`"</span>)
             }
             Feature::Required(required) =&gt; {
                 <span class="kw">let </span>name = &lt;Required <span class="kw">as </span>Name&gt;::get_name();
@@ -2109,7 +2110,7 @@
 }
 
 <span class="kw">impl </span>Display <span class="kw">for </span>Feature {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; std::fmt::Result {
         <span class="kw">match </span><span class="self">self </span>{
             Feature::Default(default) =&gt; default.fmt(f),
             Feature::Example(example) =&gt; example.fmt(f),
@@ -2245,7 +2246,7 @@
 </span>}
 
 <span class="attr">#[derive(Clone)]
-#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
+#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
 </span><span class="kw">pub struct </span>Example(AnyValue);
 
 <span class="kw">impl </span>Parse <span class="kw">for </span>Example {
@@ -2266,10 +2267,10 @@
     }
 }
 
-<span class="macro">name!</span>(Example = <span class="string">&quot;example&quot;</span>);
+<span class="macro">name!</span>(Example = <span class="string">"example"</span>);
 
 <span class="attr">#[derive(Clone)]
-#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
+#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
 </span><span class="kw">pub struct </span>Default(<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="prelude-ty">Option</span>&lt;AnyValue&gt;);
 
 <span class="kw">impl </span>Default {
@@ -2303,10 +2304,10 @@
     }
 }
 
-<span class="macro">name!</span>(Default = <span class="string">&quot;default&quot;</span>);
+<span class="macro">name!</span>(Default = <span class="string">"default"</span>);
 
 <span class="attr">#[derive(Clone)]
-#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
+#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
 </span><span class="kw">pub struct </span>Inline(bool);
 
 <span class="kw">impl </span>Parse <span class="kw">for </span>Inline {
@@ -2327,10 +2328,10 @@
     }
 }
 
-<span class="macro">name!</span>(Inline = <span class="string">&quot;inline&quot;</span>);
+<span class="macro">name!</span>(Inline = <span class="string">"inline"</span>);
 
 <span class="attr">#[derive(Default, Clone)]
-#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
+#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
 </span><span class="kw">pub struct </span>XmlAttr(schema::xml::XmlAttr);
 
 <span class="kw">impl </span>XmlAttr {
@@ -2355,8 +2356,8 @@
     <span class="attr">#[inline]
     </span><span class="kw">fn </span>validate_xml(<span class="kw-2">&amp;</span><span class="self">self</span>, xml: <span class="kw-2">&amp;</span>schema::xml::XmlAttr) {
         <span class="kw">if let </span><span class="prelude-val">Some</span>(wrapped_ident) = xml.is_wrapped.as_ref() {
-            <span class="macro">abort! </span>{wrapped_ident, <span class="string">&quot;cannot use `wrapped` attribute in non slice field type&quot;</span>;
-                help = <span class="string">&quot;Try removing `wrapped` attribute or make your field `Vec`&quot;
+            <span class="macro">abort! </span>{wrapped_ident, <span class="string">"cannot use `wrapped` attribute in non slice field type"</span>;
+                help = <span class="string">"Try removing `wrapped` attribute or make your field `Vec`"
             </span>}
         }
     }
@@ -2382,11 +2383,11 @@
     }
 }
 
-<span class="macro">name!</span>(XmlAttr = <span class="string">&quot;xml&quot;</span>);
+<span class="macro">name!</span>(XmlAttr = <span class="string">"xml"</span>);
 
 <span class="attr">#[derive(Clone)]
-#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
-</span><span class="kw">pub struct </span>Format(SchemaFormat&lt;<span class="lifetime">&#39;static</span>&gt;);
+#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
+</span><span class="kw">pub struct </span>Format(SchemaFormat&lt;<span class="lifetime">'static</span>&gt;);
 
 <span class="kw">impl </span>Parse <span class="kw">for </span>Format {
     <span class="kw">fn </span>parse(input: syn::parse::ParseStream, <span class="kw">_</span>: Ident) -&gt; syn::Result&lt;<span class="self">Self</span>&gt; {
@@ -2406,10 +2407,10 @@
     }
 }
 
-<span class="macro">name!</span>(Format = <span class="string">&quot;format&quot;</span>);
+<span class="macro">name!</span>(Format = <span class="string">"format"</span>);
 
 <span class="attr">#[derive(Clone)]
-#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
+#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
 </span><span class="kw">pub struct </span>ValueType(syn::Type);
 
 <span class="kw">impl </span>ValueType {
@@ -2431,10 +2432,10 @@
     }
 }
 
-<span class="macro">name!</span>(ValueType = <span class="string">&quot;value_type&quot;</span>);
+<span class="macro">name!</span>(ValueType = <span class="string">"value_type"</span>);
 
 <span class="attr">#[derive(Clone, Copy)]
-#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
+#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
 </span><span class="kw">pub struct </span>WriteOnly(bool);
 
 <span class="kw">impl </span>Parse <span class="kw">for </span>WriteOnly {
@@ -2455,10 +2456,10 @@
     }
 }
 
-<span class="macro">name!</span>(WriteOnly = <span class="string">&quot;write_only&quot;</span>);
+<span class="macro">name!</span>(WriteOnly = <span class="string">"write_only"</span>);
 
 <span class="attr">#[derive(Clone, Copy)]
-#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
+#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
 </span><span class="kw">pub struct </span>ReadOnly(bool);
 
 <span class="kw">impl </span>Parse <span class="kw">for </span>ReadOnly {
@@ -2479,10 +2480,10 @@
     }
 }
 
-<span class="macro">name!</span>(ReadOnly = <span class="string">&quot;read_only&quot;</span>);
+<span class="macro">name!</span>(ReadOnly = <span class="string">"read_only"</span>);
 
 <span class="attr">#[derive(Clone)]
-#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
+#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
 </span><span class="kw">pub struct </span>Title(String);
 
 <span class="kw">impl </span>Parse <span class="kw">for </span>Title {
@@ -2503,10 +2504,10 @@
     }
 }
 
-<span class="macro">name!</span>(Title = <span class="string">&quot;title&quot;</span>);
+<span class="macro">name!</span>(Title = <span class="string">"title"</span>);
 
 <span class="attr">#[derive(Clone, Copy)]
-#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
+#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
 </span><span class="kw">pub struct </span>Nullable(bool);
 
 <span class="kw">impl </span>Nullable {
@@ -2533,9 +2534,9 @@
     }
 }
 
-<span class="macro">name!</span>(Nullable = <span class="string">&quot;nullable&quot;</span>);
+<span class="macro">name!</span>(Nullable = <span class="string">"nullable"</span>);
 
-<span class="attr">#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
+<span class="attr">#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
 #[derive(Clone)]
 </span><span class="kw">pub struct </span>Rename(String);
 
@@ -2563,9 +2564,9 @@
     }
 }
 
-<span class="macro">name!</span>(Rename = <span class="string">&quot;rename&quot;</span>);
+<span class="macro">name!</span>(Rename = <span class="string">"rename"</span>);
 
-<span class="attr">#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
+<span class="attr">#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
 #[derive(Clone)]
 </span><span class="kw">pub struct </span>RenameAll(RenameRule);
 
@@ -2593,9 +2594,9 @@
     }
 }
 
-<span class="macro">name!</span>(RenameAll = <span class="string">&quot;rename_all&quot;</span>);
+<span class="macro">name!</span>(RenameAll = <span class="string">"rename_all"</span>);
 
-<span class="attr">#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
+<span class="attr">#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
 #[derive(Clone)]
 </span><span class="kw">pub struct </span>Style(ParameterStyle);
 
@@ -2623,9 +2624,9 @@
     }
 }
 
-<span class="macro">name!</span>(Style = <span class="string">&quot;style&quot;</span>);
+<span class="macro">name!</span>(Style = <span class="string">"style"</span>);
 
-<span class="attr">#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
+<span class="attr">#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
 #[derive(Clone)]
 </span><span class="kw">pub struct </span>AllowReserved(bool);
 
@@ -2647,9 +2648,9 @@
     }
 }
 
-<span class="macro">name!</span>(AllowReserved = <span class="string">&quot;allow_reserved&quot;</span>);
+<span class="macro">name!</span>(AllowReserved = <span class="string">"allow_reserved"</span>);
 
-<span class="attr">#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
+<span class="attr">#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
 #[derive(Clone)]
 </span><span class="kw">pub struct </span>Explode(bool);
 
@@ -2671,9 +2672,9 @@
     }
 }
 
-<span class="macro">name!</span>(Explode = <span class="string">&quot;explode&quot;</span>);
+<span class="macro">name!</span>(Explode = <span class="string">"explode"</span>);
 
-<span class="attr">#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
+<span class="attr">#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
 #[derive(Clone)]
 </span><span class="kw">pub struct </span>ParameterIn(parameter::ParameterIn);
 
@@ -2695,10 +2696,10 @@
     }
 }
 
-<span class="macro">name!</span>(ParameterIn = <span class="string">&quot;parameter_in&quot;</span>);
+<span class="macro">name!</span>(ParameterIn = <span class="string">"parameter_in"</span>);
 
 <span class="doccomment">/// Specify names of unnamed fields with `names(...) attribute for `IntoParams` derive.
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
 #[derive(Clone)]
 </span><span class="kw">pub struct </span>Names(Vec&lt;String&gt;);
 
@@ -2725,17 +2726,17 @@
     }
 }
 
-<span class="macro">name!</span>(Names = <span class="string">&quot;names&quot;</span>);
+<span class="macro">name!</span>(Names = <span class="string">"names"</span>);
 
-<span class="attr">#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
+<span class="attr">#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
 #[derive(Clone)]
 </span><span class="kw">pub struct </span>MultipleOf(f64, Ident);
 
 <span class="kw">impl </span>Validate <span class="kw">for </span>MultipleOf {
     <span class="kw">fn </span>validate(<span class="kw-2">&amp;</span><span class="self">self</span>, validator: <span class="kw">impl </span>Validator) {
         <span class="kw">if let </span><span class="prelude-val">Err</span>(error) = validator.is_valid() {
-            <span class="macro">abort! </span>{<span class="self">self</span>.<span class="number">1</span>, <span class="string">&quot;`multiple_of` error: {}&quot;</span>, error;
-                help = <span class="string">&quot;See more details: `http://json-schema.org/draft/2020-12/json-schema-validation.html#name-multipleof`&quot;
+            <span class="macro">abort! </span>{<span class="self">self</span>.<span class="number">1</span>, <span class="string">"`multiple_of` error: {}"</span>, error;
+                help = <span class="string">"See more details: `http://json-schema.org/draft/2020-12/json-schema-validation.html#name-multipleof`"
             </span>}
         };
     }
@@ -2759,17 +2760,17 @@
     }
 }
 
-<span class="macro">name!</span>(MultipleOf = <span class="string">&quot;multiple_of&quot;</span>);
+<span class="macro">name!</span>(MultipleOf = <span class="string">"multiple_of"</span>);
 
-<span class="attr">#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
+<span class="attr">#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
 #[derive(Clone)]
 </span><span class="kw">pub struct </span>Maximum(f64, Ident);
 
 <span class="kw">impl </span>Validate <span class="kw">for </span>Maximum {
     <span class="kw">fn </span>validate(<span class="kw-2">&amp;</span><span class="self">self</span>, validator: <span class="kw">impl </span>Validator) {
         <span class="kw">if let </span><span class="prelude-val">Err</span>(error) = validator.is_valid() {
-            <span class="macro">abort! </span>{<span class="self">self</span>.<span class="number">1</span>, <span class="string">&quot;`maximum` error: {}&quot;</span>, error;
-                help = <span class="string">&quot;See more details: `http://json-schema.org/draft/2020-12/json-schema-validation.html#name-maximum`&quot;
+            <span class="macro">abort! </span>{<span class="self">self</span>.<span class="number">1</span>, <span class="string">"`maximum` error: {}"</span>, error;
+                help = <span class="string">"See more details: `http://json-schema.org/draft/2020-12/json-schema-validation.html#name-maximum`"
             </span>}
         }
     }
@@ -2796,23 +2797,23 @@
     }
 }
 
-<span class="macro">name!</span>(Maximum = <span class="string">&quot;maximum&quot;</span>);
+<span class="macro">name!</span>(Maximum = <span class="string">"maximum"</span>);
 
-<span class="attr">#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
+<span class="attr">#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
 #[derive(Clone)]
 </span><span class="kw">pub struct </span>Minimum(f64, Ident);
 
 <span class="kw">impl </span>Minimum {
     <span class="kw">pub fn </span>new(value: f64, span: Span) -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>(value, Ident::new(<span class="string">&quot;empty&quot;</span>, span))
+        <span class="self">Self</span>(value, Ident::new(<span class="string">"empty"</span>, span))
     }
 }
 
 <span class="kw">impl </span>Validate <span class="kw">for </span>Minimum {
     <span class="kw">fn </span>validate(<span class="kw-2">&amp;</span><span class="self">self</span>, validator: <span class="kw">impl </span>Validator) {
         <span class="kw">if let </span><span class="prelude-val">Err</span>(error) = validator.is_valid() {
-            <span class="macro">abort! </span>{<span class="self">self</span>.<span class="number">1</span>, <span class="string">&quot;`minimum` error: {}&quot;</span>, error;
-                help = <span class="string">&quot;See more details: `http://json-schema.org/draft/2020-12/json-schema-validation.html#name-minimum`&quot;
+            <span class="macro">abort! </span>{<span class="self">self</span>.<span class="number">1</span>, <span class="string">"`minimum` error: {}"</span>, error;
+                help = <span class="string">"See more details: `http://json-schema.org/draft/2020-12/json-schema-validation.html#name-minimum`"
             </span>}
         }
     }
@@ -2839,17 +2840,17 @@
     }
 }
 
-<span class="macro">name!</span>(Minimum = <span class="string">&quot;minimum&quot;</span>);
+<span class="macro">name!</span>(Minimum = <span class="string">"minimum"</span>);
 
-<span class="attr">#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
+<span class="attr">#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
 #[derive(Clone)]
 </span><span class="kw">pub struct </span>ExclusiveMaximum(f64, Ident);
 
 <span class="kw">impl </span>Validate <span class="kw">for </span>ExclusiveMaximum {
     <span class="kw">fn </span>validate(<span class="kw-2">&amp;</span><span class="self">self</span>, validator: <span class="kw">impl </span>Validator) {
         <span class="kw">if let </span><span class="prelude-val">Err</span>(error) = validator.is_valid() {
-            <span class="macro">abort! </span>{<span class="self">self</span>.<span class="number">1</span>, <span class="string">&quot;`exclusive_maximum` error: {}&quot;</span>, error;
-                help = <span class="string">&quot;See more details: `http://json-schema.org/draft/2020-12/json-schema-validation.html#name-exclusivemaximum`&quot;
+            <span class="macro">abort! </span>{<span class="self">self</span>.<span class="number">1</span>, <span class="string">"`exclusive_maximum` error: {}"</span>, error;
+                help = <span class="string">"See more details: `http://json-schema.org/draft/2020-12/json-schema-validation.html#name-exclusivemaximum`"
             </span>}
         }
     }
@@ -2876,17 +2877,17 @@
     }
 }
 
-<span class="macro">name!</span>(ExclusiveMaximum = <span class="string">&quot;exclusive_maximum&quot;</span>);
+<span class="macro">name!</span>(ExclusiveMaximum = <span class="string">"exclusive_maximum"</span>);
 
-<span class="attr">#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
+<span class="attr">#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
 #[derive(Clone)]
 </span><span class="kw">pub struct </span>ExclusiveMinimum(f64, Ident);
 
 <span class="kw">impl </span>Validate <span class="kw">for </span>ExclusiveMinimum {
     <span class="kw">fn </span>validate(<span class="kw-2">&amp;</span><span class="self">self</span>, validator: <span class="kw">impl </span>Validator) {
         <span class="kw">if let </span><span class="prelude-val">Err</span>(error) = validator.is_valid() {
-            <span class="macro">abort! </span>{<span class="self">self</span>.<span class="number">1</span>, <span class="string">&quot;`exclusive_minimum` error: {}&quot;</span>, error;
-                help = <span class="string">&quot;See more details: `http://json-schema.org/draft/2020-12/json-schema-validation.html#name-exclusiveminimum`&quot;
+            <span class="macro">abort! </span>{<span class="self">self</span>.<span class="number">1</span>, <span class="string">"`exclusive_minimum` error: {}"</span>, error;
+                help = <span class="string">"See more details: `http://json-schema.org/draft/2020-12/json-schema-validation.html#name-exclusiveminimum`"
             </span>}
         }
     }
@@ -2913,17 +2914,17 @@
     }
 }
 
-<span class="macro">name!</span>(ExclusiveMinimum = <span class="string">&quot;exclusive_minimum&quot;</span>);
+<span class="macro">name!</span>(ExclusiveMinimum = <span class="string">"exclusive_minimum"</span>);
 
-<span class="attr">#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
+<span class="attr">#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
 #[derive(Clone)]
 </span><span class="kw">pub struct </span>MaxLength(usize, Ident);
 
 <span class="kw">impl </span>Validate <span class="kw">for </span>MaxLength {
     <span class="kw">fn </span>validate(<span class="kw-2">&amp;</span><span class="self">self</span>, validator: <span class="kw">impl </span>Validator) {
         <span class="kw">if let </span><span class="prelude-val">Err</span>(error) = validator.is_valid() {
-            <span class="macro">abort! </span>{<span class="self">self</span>.<span class="number">1</span>, <span class="string">&quot;`max_length` error: {}&quot;</span>, error;
-                help = <span class="string">&quot;See more details: `http://json-schema.org/draft/2020-12/json-schema-validation.html#name-maxlength`&quot;
+            <span class="macro">abort! </span>{<span class="self">self</span>.<span class="number">1</span>, <span class="string">"`max_length` error: {}"</span>, error;
+                help = <span class="string">"See more details: `http://json-schema.org/draft/2020-12/json-schema-validation.html#name-maxlength`"
             </span>}
         }
     }
@@ -2950,17 +2951,17 @@
     }
 }
 
-<span class="macro">name!</span>(MaxLength = <span class="string">&quot;max_length&quot;</span>);
+<span class="macro">name!</span>(MaxLength = <span class="string">"max_length"</span>);
 
-<span class="attr">#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
+<span class="attr">#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
 #[derive(Clone)]
 </span><span class="kw">pub struct </span>MinLength(usize, Ident);
 
 <span class="kw">impl </span>Validate <span class="kw">for </span>MinLength {
     <span class="kw">fn </span>validate(<span class="kw-2">&amp;</span><span class="self">self</span>, validator: <span class="kw">impl </span>Validator) {
         <span class="kw">if let </span><span class="prelude-val">Err</span>(error) = validator.is_valid() {
-            <span class="macro">abort! </span>{<span class="self">self</span>.<span class="number">1</span>, <span class="string">&quot;`min_length` error: {}&quot;</span>, error;
-                help = <span class="string">&quot;See more details: `http://json-schema.org/draft/2020-12/json-schema-validation.html#name-minlength`&quot;
+            <span class="macro">abort! </span>{<span class="self">self</span>.<span class="number">1</span>, <span class="string">"`min_length` error: {}"</span>, error;
+                help = <span class="string">"See more details: `http://json-schema.org/draft/2020-12/json-schema-validation.html#name-minlength`"
             </span>}
         }
     }
@@ -2987,17 +2988,17 @@
     }
 }
 
-<span class="macro">name!</span>(MinLength = <span class="string">&quot;min_length&quot;</span>);
+<span class="macro">name!</span>(MinLength = <span class="string">"min_length"</span>);
 
-<span class="attr">#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
+<span class="attr">#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
 #[derive(Clone)]
 </span><span class="kw">pub struct </span>Pattern(String, Ident);
 
 <span class="kw">impl </span>Validate <span class="kw">for </span>Pattern {
     <span class="kw">fn </span>validate(<span class="kw-2">&amp;</span><span class="self">self</span>, validator: <span class="kw">impl </span>Validator) {
         <span class="kw">if let </span><span class="prelude-val">Err</span>(error) = validator.is_valid() {
-            <span class="macro">abort! </span>{<span class="self">self</span>.<span class="number">1</span>, <span class="string">&quot;`pattern` error: {}&quot;</span>, error;
-                help = <span class="string">&quot;See more details: `http://json-schema.org/draft/2020-12/json-schema-validation.html#name-pattern`&quot;
+            <span class="macro">abort! </span>{<span class="self">self</span>.<span class="number">1</span>, <span class="string">"`pattern` error: {}"</span>, error;
+                help = <span class="string">"See more details: `http://json-schema.org/draft/2020-12/json-schema-validation.html#name-pattern`"
             </span>}
         }
     }
@@ -3025,17 +3026,17 @@
     }
 }
 
-<span class="macro">name!</span>(Pattern = <span class="string">&quot;pattern&quot;</span>);
+<span class="macro">name!</span>(Pattern = <span class="string">"pattern"</span>);
 
-<span class="attr">#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
+<span class="attr">#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
 #[derive(Clone)]
 </span><span class="kw">pub struct </span>MaxItems(usize, Ident);
 
 <span class="kw">impl </span>Validate <span class="kw">for </span>MaxItems {
     <span class="kw">fn </span>validate(<span class="kw-2">&amp;</span><span class="self">self</span>, validator: <span class="kw">impl </span>Validator) {
         <span class="kw">if let </span><span class="prelude-val">Err</span>(error) = validator.is_valid() {
-            <span class="macro">abort! </span>{<span class="self">self</span>.<span class="number">1</span>, <span class="string">&quot;`max_items` error: {}&quot;</span>, error;
-                help = <span class="string">&quot;See more details: `http://json-schema.org/draft/2020-12/json-schema-validation.html#name-maxitems&quot;
+            <span class="macro">abort! </span>{<span class="self">self</span>.<span class="number">1</span>, <span class="string">"`max_items` error: {}"</span>, error;
+                help = <span class="string">"See more details: `http://json-schema.org/draft/2020-12/json-schema-validation.html#name-maxitems"
             </span>}
         }
     }
@@ -3062,17 +3063,17 @@
     }
 }
 
-<span class="macro">name!</span>(MaxItems = <span class="string">&quot;max_items&quot;</span>);
+<span class="macro">name!</span>(MaxItems = <span class="string">"max_items"</span>);
 
-<span class="attr">#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
+<span class="attr">#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
 #[derive(Clone)]
 </span><span class="kw">pub struct </span>MinItems(usize, Ident);
 
 <span class="kw">impl </span>Validate <span class="kw">for </span>MinItems {
     <span class="kw">fn </span>validate(<span class="kw-2">&amp;</span><span class="self">self</span>, validator: <span class="kw">impl </span>Validator) {
         <span class="kw">if let </span><span class="prelude-val">Err</span>(error) = validator.is_valid() {
-            <span class="macro">abort! </span>{<span class="self">self</span>.<span class="number">1</span>, <span class="string">&quot;`min_items` error: {}&quot;</span>, error;
-                help = <span class="string">&quot;See more details: `http://json-schema.org/draft/2020-12/json-schema-validation.html#name-minitems&quot;
+            <span class="macro">abort! </span>{<span class="self">self</span>.<span class="number">1</span>, <span class="string">"`min_items` error: {}"</span>, error;
+                help = <span class="string">"See more details: `http://json-schema.org/draft/2020-12/json-schema-validation.html#name-minitems"
             </span>}
         }
     }
@@ -3099,9 +3100,9 @@
     }
 }
 
-<span class="macro">name!</span>(MinItems = <span class="string">&quot;min_items&quot;</span>);
+<span class="macro">name!</span>(MinItems = <span class="string">"min_items"</span>);
 
-<span class="attr">#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
+<span class="attr">#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
 #[derive(Clone)]
 </span><span class="kw">pub struct </span>MaxProperties(usize, Ident);
 
@@ -3126,9 +3127,9 @@
     }
 }
 
-<span class="macro">name!</span>(MaxProperties = <span class="string">&quot;max_properties&quot;</span>);
+<span class="macro">name!</span>(MaxProperties = <span class="string">"max_properties"</span>);
 
-<span class="attr">#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
+<span class="attr">#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
 #[derive(Clone)]
 </span><span class="kw">pub struct </span>MinProperties(usize, Ident);
 
@@ -3153,9 +3154,9 @@
     }
 }
 
-<span class="macro">name!</span>(MinProperties = <span class="string">&quot;min_properties&quot;</span>);
+<span class="macro">name!</span>(MinProperties = <span class="string">"min_properties"</span>);
 
-<span class="attr">#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
+<span class="attr">#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
 #[derive(Clone)]
 </span><span class="kw">pub struct </span>SchemaWith(TypePath);
 
@@ -3180,9 +3181,9 @@
     }
 }
 
-<span class="macro">name!</span>(SchemaWith = <span class="string">&quot;schema_with&quot;</span>);
+<span class="macro">name!</span>(SchemaWith = <span class="string">"schema_with"</span>);
 
-<span class="attr">#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
+<span class="attr">#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
 #[derive(Clone)]
 </span><span class="kw">pub struct </span>Description(String);
 
@@ -3213,13 +3214,13 @@
     }
 }
 
-<span class="macro">name!</span>(Description = <span class="string">&quot;description&quot;</span>);
+<span class="macro">name!</span>(Description = <span class="string">"description"</span>);
 
 <span class="doccomment">/// Deprecated feature parsed from macro attributes.
 ///
 /// This feature supports only syntax parsed from utoipa specific macro attributes, it does not
 /// support Rust `#[deprecated]` attribute.
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
 #[derive(Clone)]
 </span><span class="kw">pub struct </span>Deprecated(bool);
 
@@ -3245,9 +3246,9 @@
     }
 }
 
-<span class="macro">name!</span>(Deprecated = <span class="string">&quot;deprecated&quot;</span>);
+<span class="macro">name!</span>(Deprecated = <span class="string">"deprecated"</span>);
 
-<span class="attr">#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
+<span class="attr">#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
 #[derive(Clone)]
 </span><span class="kw">pub struct </span>As(<span class="kw">pub </span>TypePath);
 
@@ -3266,9 +3267,9 @@
     }
 }
 
-<span class="macro">name!</span>(As = <span class="string">&quot;as&quot;</span>);
+<span class="macro">name!</span>(As = <span class="string">"as"</span>);
 
-<span class="attr">#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
+<span class="attr">#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
 #[derive(Clone)]
 </span><span class="kw">pub struct </span>AdditionalProperties(bool);
 
@@ -3292,7 +3293,7 @@
     }
 }
 
-<span class="macro">name!</span>(AdditionalProperties = <span class="string">&quot;additional_properties&quot;</span>);
+<span class="macro">name!</span>(AdditionalProperties = <span class="string">"additional_properties"</span>);
 
 <span class="kw">impl </span>From&lt;AdditionalProperties&gt; <span class="kw">for </span>Feature {
     <span class="kw">fn </span>from(value: AdditionalProperties) -&gt; <span class="self">Self </span>{
@@ -3301,7 +3302,7 @@
 }
 
 <span class="attr">#[derive(Clone)]
-#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
+#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
 </span><span class="kw">pub struct </span>Required(<span class="kw">pub </span>bool);
 
 <span class="kw">impl </span>Required {
@@ -3347,56 +3348,56 @@
     }
 }
 
-<span class="macro">name!</span>(Required = <span class="string">&quot;required&quot;</span>);
+<span class="macro">name!</span>(Required = <span class="string">"required"</span>);
 
 <span class="kw">pub trait </span>Validator {
-    <span class="kw">fn </span>is_valid(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;(), <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt;;
+    <span class="kw">fn </span>is_valid(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;(), <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str&gt;;
 }
 
-<span class="kw">pub struct </span>IsNumber&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw">pub </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>SchemaType&lt;<span class="lifetime">&#39;a</span>&gt;);
+<span class="kw">pub struct </span>IsNumber&lt;<span class="lifetime">'a</span>&gt;(<span class="kw">pub </span><span class="kw-2">&amp;</span><span class="lifetime">'a </span>SchemaType&lt;<span class="lifetime">'a</span>&gt;);
 
-<span class="kw">impl </span>Validator <span class="kw">for </span>IsNumber&lt;<span class="lifetime">&#39;_</span>&gt; {
-    <span class="kw">fn </span>is_valid(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;(), <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt; {
+<span class="kw">impl </span>Validator <span class="kw">for </span>IsNumber&lt;<span class="lifetime">'_</span>&gt; {
+    <span class="kw">fn </span>is_valid(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;(), <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str&gt; {
         <span class="kw">if </span><span class="self">self</span>.<span class="number">0</span>.is_number() {
             <span class="prelude-val">Ok</span>(())
         } <span class="kw">else </span>{
-            <span class="prelude-val">Err</span>(<span class="string">&quot;can only be used with `number` type&quot;</span>)
+            <span class="prelude-val">Err</span>(<span class="string">"can only be used with `number` type"</span>)
         }
     }
 }
 
-<span class="kw">pub struct </span>IsString&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>SchemaType&lt;<span class="lifetime">&#39;a</span>&gt;);
+<span class="kw">pub struct </span>IsString&lt;<span class="lifetime">'a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">'a </span>SchemaType&lt;<span class="lifetime">'a</span>&gt;);
 
-<span class="kw">impl </span>Validator <span class="kw">for </span>IsString&lt;<span class="lifetime">&#39;_</span>&gt; {
-    <span class="kw">fn </span>is_valid(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;(), <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt; {
+<span class="kw">impl </span>Validator <span class="kw">for </span>IsString&lt;<span class="lifetime">'_</span>&gt; {
+    <span class="kw">fn </span>is_valid(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;(), <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str&gt; {
         <span class="kw">if </span><span class="self">self</span>.<span class="number">0</span>.is_string() {
             <span class="prelude-val">Ok</span>(())
         } <span class="kw">else </span>{
-            <span class="prelude-val">Err</span>(<span class="string">&quot;can only be used with `string` type&quot;</span>)
+            <span class="prelude-val">Err</span>(<span class="string">"can only be used with `string` type"</span>)
         }
     }
 }
 
-<span class="kw">pub struct </span>IsInteger&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>SchemaType&lt;<span class="lifetime">&#39;a</span>&gt;);
+<span class="kw">pub struct </span>IsInteger&lt;<span class="lifetime">'a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">'a </span>SchemaType&lt;<span class="lifetime">'a</span>&gt;);
 
-<span class="kw">impl </span>Validator <span class="kw">for </span>IsInteger&lt;<span class="lifetime">&#39;_</span>&gt; {
-    <span class="kw">fn </span>is_valid(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;(), <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt; {
+<span class="kw">impl </span>Validator <span class="kw">for </span>IsInteger&lt;<span class="lifetime">'_</span>&gt; {
+    <span class="kw">fn </span>is_valid(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;(), <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str&gt; {
         <span class="kw">if </span><span class="self">self</span>.<span class="number">0</span>.is_integer() {
             <span class="prelude-val">Ok</span>(())
         } <span class="kw">else </span>{
-            <span class="prelude-val">Err</span>(<span class="string">&quot;can only be used with `integer` type&quot;</span>)
+            <span class="prelude-val">Err</span>(<span class="string">"can only be used with `integer` type"</span>)
         }
     }
 }
 
-<span class="kw">pub struct </span>IsVec&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>TypeTree&lt;<span class="lifetime">&#39;a</span>&gt;);
+<span class="kw">pub struct </span>IsVec&lt;<span class="lifetime">'a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">'a </span>TypeTree&lt;<span class="lifetime">'a</span>&gt;);
 
-<span class="kw">impl </span>Validator <span class="kw">for </span>IsVec&lt;<span class="lifetime">&#39;_</span>&gt; {
-    <span class="kw">fn </span>is_valid(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;(), <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt; {
+<span class="kw">impl </span>Validator <span class="kw">for </span>IsVec&lt;<span class="lifetime">'_</span>&gt; {
+    <span class="kw">fn </span>is_valid(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;(), <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str&gt; {
         <span class="kw">if </span><span class="self">self</span>.<span class="number">0</span>.generic_type == <span class="prelude-val">Some</span>(GenericType::Vec) {
             <span class="prelude-val">Ok</span>(())
         } <span class="kw">else </span>{
-            <span class="prelude-val">Err</span>(<span class="string">&quot;can only be used with `Vec`, `array` or `slice` types&quot;</span>)
+            <span class="prelude-val">Err</span>(<span class="string">"can only be used with `Vec`, `array` or `slice` types"</span>)
         }
     }
 }
@@ -3404,11 +3405,11 @@
 <span class="kw">pub struct </span>AboveZeroUsize(usize);
 
 <span class="kw">impl </span>Validator <span class="kw">for </span>AboveZeroUsize {
-    <span class="kw">fn </span>is_valid(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;(), <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt; {
+    <span class="kw">fn </span>is_valid(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;(), <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str&gt; {
         <span class="kw">if </span><span class="self">self</span>.<span class="number">0 </span>!= <span class="number">0 </span>{
             <span class="prelude-val">Ok</span>(())
         } <span class="kw">else </span>{
-            <span class="prelude-val">Err</span>(<span class="string">&quot;can only be above zero value&quot;</span>)
+            <span class="prelude-val">Err</span>(<span class="string">"can only be above zero value"</span>)
         }
     }
 }
@@ -3416,22 +3417,22 @@
 <span class="kw">pub struct </span>AboveZeroF64(f64);
 
 <span class="kw">impl </span>Validator <span class="kw">for </span>AboveZeroF64 {
-    <span class="kw">fn </span>is_valid(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;(), <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt; {
+    <span class="kw">fn </span>is_valid(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;(), <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str&gt; {
         <span class="kw">if </span><span class="self">self</span>.<span class="number">0 </span>&gt; <span class="number">0.0 </span>{
             <span class="prelude-val">Ok</span>(())
         } <span class="kw">else </span>{
-            <span class="prelude-val">Err</span>(<span class="string">&quot;can only be above zero value&quot;</span>)
+            <span class="prelude-val">Err</span>(<span class="string">"can only be above zero value"</span>)
         }
     }
 }
 
-<span class="kw">pub struct </span>ValidatorChain&lt;<span class="lifetime">&#39;c</span>&gt; {
-    inner: <span class="kw-2">&amp;</span><span class="lifetime">&#39;c </span><span class="kw">dyn </span>Validator,
-    next: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;c </span><span class="kw">dyn </span>Validator&gt;,
+<span class="kw">pub struct </span>ValidatorChain&lt;<span class="lifetime">'c</span>&gt; {
+    inner: <span class="kw-2">&amp;</span><span class="lifetime">'c </span><span class="kw">dyn </span>Validator,
+    next: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'c </span><span class="kw">dyn </span>Validator&gt;,
 }
 
-<span class="kw">impl </span>Validator <span class="kw">for </span>ValidatorChain&lt;<span class="lifetime">&#39;_</span>&gt; {
-    <span class="kw">fn </span>is_valid(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;(), <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt; {
+<span class="kw">impl </span>Validator <span class="kw">for </span>ValidatorChain&lt;<span class="lifetime">'_</span>&gt; {
+    <span class="kw">fn </span>is_valid(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;(), <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str&gt; {
         <span class="self">self</span>.inner.is_valid().and_then(|<span class="kw">_</span>| {
             <span class="kw">if let </span><span class="prelude-val">Some</span>(validator) = <span class="self">self</span>.next.as_ref() {
                 validator.is_valid()
@@ -3443,15 +3444,15 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;c</span>&gt; ValidatorChain&lt;<span class="lifetime">&#39;c</span>&gt; {
-    <span class="kw">pub fn </span>new(validator: <span class="kw-2">&amp;</span><span class="lifetime">&#39;c </span><span class="kw">dyn </span>Validator) -&gt; <span class="self">Self </span>{
+<span class="kw">impl</span>&lt;<span class="lifetime">'c</span>&gt; ValidatorChain&lt;<span class="lifetime">'c</span>&gt; {
+    <span class="kw">pub fn </span>new(validator: <span class="kw-2">&amp;</span><span class="lifetime">'c </span><span class="kw">dyn </span>Validator) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             inner: validator,
             next: <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="kw">pub fn </span>next(<span class="kw-2">mut </span><span class="self">self</span>, validator: <span class="kw-2">&amp;</span><span class="lifetime">&#39;c </span><span class="kw">dyn </span>Validator) -&gt; <span class="self">Self </span>{
+    <span class="kw">pub fn </span>next(<span class="kw-2">mut </span><span class="self">self</span>, validator: <span class="kw-2">&amp;</span><span class="lifetime">'c </span><span class="kw">dyn </span>Validator) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.next = <span class="prelude-val">Some</span>(validator);
 
         <span class="self">self
@@ -3464,15 +3465,15 @@
             <span class="kw">fn </span>parse(input: syn::parse::ParseStream) -&gt; syn::Result&lt;Vec&lt;<span class="kw">crate</span>::component::features::Feature&gt;&gt; {
                 <span class="kw">let </span>names = [$( &lt;<span class="macro">crate::component::features::parse_features!</span>(@as_ident <span class="macro-nonterminal">$feature</span>) <span class="kw">as </span><span class="kw">crate</span>::component::features::Name&gt;::get_name(), )* ];
                 <span class="kw">let </span><span class="kw-2">mut </span>features = Vec::&lt;<span class="kw">crate</span>::component::features::Feature&gt;::new();
-                <span class="kw">let </span>attributes = names.join(<span class="string">&quot;, &quot;</span>);
+                <span class="kw">let </span>attributes = names.join(<span class="string">", "</span>);
 
                 <span class="kw">while </span>!input.is_empty() {
                     <span class="kw">let </span>ident = input.parse::&lt;syn::Ident&gt;().or_else(|<span class="kw">_</span>| {
-                        input.parse::&lt;<span class="macro">syn::Token!</span>[<span class="kw">as</span>]&gt;().map(|as_| syn::Ident::new(<span class="string">&quot;as&quot;</span>, as_.span))
+                        input.parse::&lt;<span class="macro">syn::Token!</span>[<span class="kw">as</span>]&gt;().map(|as_| syn::Ident::new(<span class="string">"as"</span>, as_.span))
                     }).map_err(|error| {
                         syn::Error::new(
                             error.span(),
-                            <span class="macro">format!</span>(<span class="string">&quot;unexpected attribute, expected any of: {attributes}, {error}&quot;</span>),
+                            <span class="macro">format!</span>(<span class="string">"unexpected attribute, expected any of: {attributes}, {error}"</span>),
                         )
                     })<span class="question-mark">?</span>;
                     <span class="kw">let </span>name = <span class="kw-2">&amp;*</span>ident.to_string();
@@ -3488,7 +3489,7 @@
                     )*
 
                     <span class="kw">if </span>!names.contains(<span class="kw-2">&amp;</span>name) {
-                        <span class="kw">return </span><span class="prelude-val">Err</span>(syn::Error::new(ident.span(), <span class="macro">format!</span>(<span class="string">&quot;unexpected attribute: {name}, expected any of: {attributes}&quot;</span>)))
+                        <span class="kw">return </span><span class="prelude-val">Err</span>(syn::Error::new(ident.span(), <span class="macro">format!</span>(<span class="string">"unexpected attribute: {name}, expected any of: {attributes}"</span>)))
                     }
                 }
 

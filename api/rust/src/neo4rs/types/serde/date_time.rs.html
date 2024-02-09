@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/neo4rs-0.7.1/src/types/serde/date_time.rs`."><title>date_time.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="neo4rs" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/neo4rs-0.7.1/src/types/serde/date_time.rs`."><title>date_time.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="neo4rs" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -365,7 +366,7 @@
 });
 
 <span class="kw">impl </span>BoltDateTime {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>map_access(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>MapAccess&lt;<span class="lifetime">&#39;_</span>, Error = DeError&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>map_access(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>MapAccess&lt;<span class="lifetime">'_</span>, Error = DeError&gt; {
         MapDeserializer::new(
             [
                 (Fields::Seconds, <span class="self">self</span>.seconds.value),
@@ -378,7 +379,7 @@
 }
 
 <span class="kw">impl </span>BoltLocalDateTime {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>map_access(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>MapAccess&lt;<span class="lifetime">&#39;_</span>, Error = DeError&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>map_access(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>MapAccess&lt;<span class="lifetime">'_</span>, Error = DeError&gt; {
         MapDeserializer::new(
             [
                 (Fields::Seconds, <span class="self">self</span>.seconds.value),
@@ -390,28 +391,28 @@
 }
 
 <span class="kw">impl </span>BoltDateTimeZoneId {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>seq_access(<span class="kw-2">&amp;</span><span class="self">self</span>, as_naive: bool) -&gt; <span class="kw">impl </span>SeqAccess&lt;<span class="lifetime">&#39;_</span>, Error = DeError&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>seq_access(<span class="kw-2">&amp;</span><span class="self">self</span>, as_naive: bool) -&gt; <span class="kw">impl </span>SeqAccess&lt;<span class="lifetime">'_</span>, Error = DeError&gt; {
         BoltDateTimeZoneIdAccess::dt_as_string(<span class="self">self</span>, as_naive)
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>map_access(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>MapAccess&lt;<span class="lifetime">&#39;_</span>, Error = DeError&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>map_access(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>MapAccess&lt;<span class="lifetime">'_</span>, Error = DeError&gt; {
         BoltDateTimeZoneIdAccess::fields(<span class="self">self</span>)
     }
 }
 
 <span class="kw">impl </span>BoltDuration {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>seq_access(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>SeqAccess&lt;<span class="lifetime">&#39;_</span>, Error = DeError&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>seq_access(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>SeqAccess&lt;<span class="lifetime">'_</span>, Error = DeError&gt; {
         SeqDeserializer::new([<span class="self">self</span>.seconds(), <span class="self">self</span>.nanoseconds()].into_iter())
     }
 }
 
-<span class="kw">struct </span>BoltDateTimeZoneIdAccess&lt;<span class="lifetime">&#39;a</span>, <span class="kw">const </span>N: usize&gt;(
-    <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>BoltDateTimeZoneId,
+<span class="kw">struct </span>BoltDateTimeZoneIdAccess&lt;<span class="lifetime">'a</span>, <span class="kw">const </span>N: usize&gt;(
+    <span class="kw-2">&amp;</span><span class="lifetime">'a </span>BoltDateTimeZoneId,
     Peekable&lt;&lt;[Fields; N] <span class="kw">as </span>IntoIterator&gt;::IntoIter&gt;,
 );
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; BoltDateTimeZoneIdAccess&lt;<span class="lifetime">&#39;a</span>, <span class="number">2</span>&gt; {
-    <span class="kw">fn </span>dt_as_string(value: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>BoltDateTimeZoneId, as_naive: bool) -&gt; <span class="self">Self </span>{
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; BoltDateTimeZoneIdAccess&lt;<span class="lifetime">'a</span>, <span class="number">2</span>&gt; {
+    <span class="kw">fn </span>dt_as_string(value: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>BoltDateTimeZoneId, as_naive: bool) -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>(
             value,
             [
@@ -428,8 +429,8 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; BoltDateTimeZoneIdAccess&lt;<span class="lifetime">&#39;a</span>, <span class="number">3</span>&gt; {
-    <span class="kw">fn </span>fields(value: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>BoltDateTimeZoneId) -&gt; <span class="self">Self </span>{
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; BoltDateTimeZoneIdAccess&lt;<span class="lifetime">'a</span>, <span class="number">3</span>&gt; {
+    <span class="kw">fn </span>fields(value: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>BoltDateTimeZoneId) -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>(
             value,
             [Fields::Seconds, Fields::NanoSeconds, Fields::TzInfo]
@@ -439,26 +440,26 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>, <span class="kw">const </span>N: usize&gt; SeqAccess&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>BoltDateTimeZoneIdAccess&lt;<span class="lifetime">&#39;de</span>, N&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'de</span>, <span class="kw">const </span>N: usize&gt; SeqAccess&lt;<span class="lifetime">'de</span>&gt; <span class="kw">for </span>BoltDateTimeZoneIdAccess&lt;<span class="lifetime">'de</span>, N&gt; {
     <span class="kw">type </span>Error = DeError;
 
     <span class="kw">fn </span>next_element_seed&lt;T&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, seed: T) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;T::Value&gt;, <span class="self">Self</span>::Error&gt;
     <span class="kw">where
-        </span>T: DeserializeSeed&lt;<span class="lifetime">&#39;de</span>&gt;,
+        </span>T: DeserializeSeed&lt;<span class="lifetime">'de</span>&gt;,
     {
         <span class="kw">match </span><span class="self">self</span>.<span class="number">1</span>.next() {
             <span class="prelude-val">Some</span>(Fields::Datetime) =&gt; <span class="self">self
                 </span>.<span class="number">0
                 </span>.try_to_chrono()
                 .map(|dt| dt.to_rfc3339().into_deserializer())
-                .map_err(|<span class="kw">_</span>| Error::custom(<span class="string">&quot;Could not convert into chrono::Datetime&quot;</span>))
+                .map_err(|<span class="kw">_</span>| Error::custom(<span class="string">"Could not convert into chrono::Datetime"</span>))
                 .and_then(|dt| seed.deserialize(dt))
                 .map(<span class="prelude-val">Some</span>),
             <span class="prelude-val">Some</span>(Fields::NaiveDatetime) =&gt; <span class="self">self
                 </span>.<span class="number">0
                 </span>.try_to_chrono()
-                .map(|dt| <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, dt.naive_local()).into_deserializer())
-                .map_err(|<span class="kw">_</span>| Error::custom(<span class="string">&quot;Could not convert into chrono::Datetime&quot;</span>))
+                .map(|dt| <span class="macro">format!</span>(<span class="string">"{:?}"</span>, dt.naive_local()).into_deserializer())
+                .map_err(|<span class="kw">_</span>| Error::custom(<span class="string">"Could not convert into chrono::Datetime"</span>))
                 .and_then(|dt| seed.deserialize(dt))
                 .map(<span class="prelude-val">Some</span>),
             <span class="prelude-val">Some</span>(Fields::Seconds) =&gt; seed
@@ -471,17 +472,17 @@
                 .deserialize(BorrowedStrDeserializer::new(<span class="self">self</span>.<span class="number">0</span>.tz_id.value.as_str()))
                 .map(<span class="prelude-val">Some</span>),
             <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
-            <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(Error::custom(<span class="string">&quot;invalid field&quot;</span>)),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(Error::custom(<span class="string">"invalid field"</span>)),
         }
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>, <span class="kw">const </span>N: usize&gt; MapAccess&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>BoltDateTimeZoneIdAccess&lt;<span class="lifetime">&#39;de</span>, N&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'de</span>, <span class="kw">const </span>N: usize&gt; MapAccess&lt;<span class="lifetime">'de</span>&gt; <span class="kw">for </span>BoltDateTimeZoneIdAccess&lt;<span class="lifetime">'de</span>, N&gt; {
     <span class="kw">type </span>Error = DeError;
 
     <span class="kw">fn </span>next_key_seed&lt;K&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, seed: K) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;K::Value&gt;, <span class="self">Self</span>::Error&gt;
     <span class="kw">where
-        </span>K: DeserializeSeed&lt;<span class="lifetime">&#39;de</span>&gt;,
+        </span>K: DeserializeSeed&lt;<span class="lifetime">'de</span>&gt;,
     {
         <span class="kw">match </span><span class="self">self</span>.<span class="number">1</span>.peek() {
             <span class="prelude-val">Some</span>(field) =&gt; seed.deserialize(field.into_deserializer()).map(<span class="prelude-val">Some</span>),
@@ -491,7 +492,7 @@
 
     <span class="kw">fn </span>next_value_seed&lt;V&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, seed: V) -&gt; <span class="prelude-ty">Result</span>&lt;V::Value, <span class="self">Self</span>::Error&gt;
     <span class="kw">where
-        </span>V: DeserializeSeed&lt;<span class="lifetime">&#39;de</span>&gt;,
+        </span>V: DeserializeSeed&lt;<span class="lifetime">'de</span>&gt;,
     {
         <span class="self">self</span>.next_element_seed(seed).map(|opt| opt.unwrap())
     }
@@ -505,17 +506,17 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>, T: DateTimeIsh&gt; Visitor&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>BoltDateTimeVisitor&lt;T&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'de</span>, T: DateTimeIsh&gt; Visitor&lt;<span class="lifetime">'de</span>&gt; <span class="kw">for </span>BoltDateTimeVisitor&lt;T&gt; {
     <span class="kw">type </span>Value = T;
 
     <span class="kw">fn </span>expecting(<span class="kw-2">&amp;</span><span class="self">self</span>, formatter: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
         formatter.write_str(std::any::type_name::&lt;T&gt;())<span class="question-mark">?</span>;
-        formatter.write_str(<span class="string">&quot; struct&quot;</span>)
+        formatter.write_str(<span class="string">" struct"</span>)
     }
 
     <span class="kw">fn </span>visit_map&lt;A&gt;(<span class="self">self</span>, <span class="kw-2">mut </span>map: A) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Value, A::Error&gt;
     <span class="kw">where
-        </span>A: MapAccess&lt;<span class="lifetime">&#39;de</span>&gt;,
+        </span>A: MapAccess&lt;<span class="lifetime">'de</span>&gt;,
     {
         <span class="kw">let </span><span class="kw-2">mut </span>builder = DateTimeIshBuilder::default();
 
@@ -528,13 +529,13 @@
                 Fields::Days =&gt; builder.days(|| map.next_value())<span class="question-mark">?</span>,
                 Fields::Datetime | Fields::NaiveDatetime =&gt; {
                     <span class="kw">return </span><span class="prelude-val">Err</span>(Error::unknown_field(
-                        <span class="string">&quot;datetime&quot;</span>,
+                        <span class="string">"datetime"</span>,
                         <span class="kw-2">&amp;</span>[
-                            <span class="string">&quot;seconds&quot;</span>,
-                            <span class="string">&quot;nanoseconds&quot;</span>,
-                            <span class="string">&quot;ts_offset_seconds&quot;</span>,
-                            <span class="string">&quot;tz_id&quot;</span>,
-                            <span class="string">&quot;days&quot;</span>,
+                            <span class="string">"seconds"</span>,
+                            <span class="string">"nanoseconds"</span>,
+                            <span class="string">"ts_offset_seconds"</span>,
+                            <span class="string">"tz_id"</span>,
+                            <span class="string">"days"</span>,
                         ],
                     ))
                 }
@@ -545,32 +546,32 @@
 
         <span class="kw">if </span>builder.seconds.is_set() {
             <span class="kw">return </span><span class="prelude-val">Err</span>(Error::unknown_field(
-                <span class="string">&quot;seconds&quot;</span>,
-                <span class="kw-2">&amp;</span>[<span class="string">&quot;nanoseconds&quot;</span>, <span class="string">&quot;ts_offset_seconds&quot;</span>, <span class="string">&quot;tz_id&quot;</span>, <span class="string">&quot;days&quot;</span>],
+                <span class="string">"seconds"</span>,
+                <span class="kw-2">&amp;</span>[<span class="string">"nanoseconds"</span>, <span class="string">"ts_offset_seconds"</span>, <span class="string">"tz_id"</span>, <span class="string">"days"</span>],
             ));
         }
         <span class="kw">if </span>builder.nanoseconds.is_set() {
             <span class="kw">return </span><span class="prelude-val">Err</span>(Error::unknown_field(
-                <span class="string">&quot;nanoseconds&quot;</span>,
-                <span class="kw-2">&amp;</span>[<span class="string">&quot;seconds&quot;</span>, <span class="string">&quot;ts_offset_seconds&quot;</span>, <span class="string">&quot;tz_id&quot;</span>, <span class="string">&quot;days&quot;</span>],
+                <span class="string">"nanoseconds"</span>,
+                <span class="kw-2">&amp;</span>[<span class="string">"seconds"</span>, <span class="string">"ts_offset_seconds"</span>, <span class="string">"tz_id"</span>, <span class="string">"days"</span>],
             ));
         }
         <span class="kw">if </span>builder.tz_offset_seconds.is_set() {
             <span class="kw">return </span><span class="prelude-val">Err</span>(Error::unknown_field(
-                <span class="string">&quot;tz_offset_seconds&quot;</span>,
-                <span class="kw-2">&amp;</span>[<span class="string">&quot;seconds&quot;</span>, <span class="string">&quot;nanoseconds&quot;</span>, <span class="string">&quot;tz_id&quot;</span>, <span class="string">&quot;days&quot;</span>],
+                <span class="string">"tz_offset_seconds"</span>,
+                <span class="kw-2">&amp;</span>[<span class="string">"seconds"</span>, <span class="string">"nanoseconds"</span>, <span class="string">"tz_id"</span>, <span class="string">"days"</span>],
             ));
         }
         <span class="kw">if </span>builder.tz_id.is_set() {
             <span class="kw">return </span><span class="prelude-val">Err</span>(Error::unknown_field(
-                <span class="string">&quot;tz_id&quot;</span>,
-                <span class="kw-2">&amp;</span>[<span class="string">&quot;seconds&quot;</span>, <span class="string">&quot;nanoseconds&quot;</span>, <span class="string">&quot;tz_offset_seconds&quot;</span>, <span class="string">&quot;days&quot;</span>],
+                <span class="string">"tz_id"</span>,
+                <span class="kw-2">&amp;</span>[<span class="string">"seconds"</span>, <span class="string">"nanoseconds"</span>, <span class="string">"tz_offset_seconds"</span>, <span class="string">"days"</span>],
             ));
         }
         <span class="kw">if </span>builder.days.is_set() {
             <span class="kw">return </span><span class="prelude-val">Err</span>(Error::unknown_field(
-                <span class="string">&quot;days&quot;</span>,
-                <span class="kw-2">&amp;</span>[<span class="string">&quot;seconds&quot;</span>, <span class="string">&quot;nanoseconds&quot;</span>, <span class="string">&quot;tz_offset_seconds&quot;</span>, <span class="string">&quot;tz_id&quot;</span>],
+                <span class="string">"days"</span>,
+                <span class="kw-2">&amp;</span>[<span class="string">"seconds"</span>, <span class="string">"nanoseconds"</span>, <span class="string">"tz_offset_seconds"</span>, <span class="string">"tz_id"</span>],
             ));
         }
 
@@ -591,7 +592,7 @@
     <span class="kw">fn </span>seconds&lt;E: Error&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, f: <span class="kw">impl </span>FnOnce() -&gt; <span class="prelude-ty">Result</span>&lt;BoltInteger, E&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;(), E&gt; {
         <span class="self">self</span>.seconds
             .try_insert_with(f)
-            .map_or_else(|<span class="kw">_</span>| <span class="prelude-val">Err</span>(Error::duplicate_field(<span class="string">&quot;seconds&quot;</span>)), |<span class="kw">_</span>| <span class="prelude-val">Ok</span>(()))
+            .map_or_else(|<span class="kw">_</span>| <span class="prelude-val">Err</span>(Error::duplicate_field(<span class="string">"seconds"</span>)), |<span class="kw">_</span>| <span class="prelude-val">Ok</span>(()))
     }
 
     <span class="kw">fn </span>nanoseconds&lt;E: Error&gt;(
@@ -600,7 +601,7 @@
     ) -&gt; <span class="prelude-ty">Result</span>&lt;(), E&gt; {
         <span class="self">self</span>.nanoseconds
             .try_insert_with(f)
-            .map_or_else(|<span class="kw">_</span>| <span class="prelude-val">Err</span>(Error::duplicate_field(<span class="string">&quot;nanoseconds&quot;</span>)), |<span class="kw">_</span>| <span class="prelude-val">Ok</span>(()))
+            .map_or_else(|<span class="kw">_</span>| <span class="prelude-val">Err</span>(Error::duplicate_field(<span class="string">"nanoseconds"</span>)), |<span class="kw">_</span>| <span class="prelude-val">Ok</span>(()))
     }
 
     <span class="kw">fn </span>tz_offset_seconds&lt;E: Error&gt;(
@@ -608,7 +609,7 @@
         f: <span class="kw">impl </span>FnOnce() -&gt; <span class="prelude-ty">Result</span>&lt;BoltInteger, E&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;(), E&gt; {
         <span class="self">self</span>.tz_offset_seconds.try_insert_with(f).map_or_else(
-            |<span class="kw">_</span>| <span class="prelude-val">Err</span>(Error::duplicate_field(<span class="string">&quot;tz_offset_seconds&quot;</span>)),
+            |<span class="kw">_</span>| <span class="prelude-val">Err</span>(Error::duplicate_field(<span class="string">"tz_offset_seconds"</span>)),
             |<span class="kw">_</span>| <span class="prelude-val">Ok</span>(()),
         )
     }
@@ -616,13 +617,13 @@
     <span class="kw">fn </span>tz_id&lt;E: Error&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, f: <span class="kw">impl </span>FnOnce() -&gt; <span class="prelude-ty">Result</span>&lt;BoltString, E&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;(), E&gt; {
         <span class="self">self</span>.tz_id
             .try_insert_with(f)
-            .map_or_else(|<span class="kw">_</span>| <span class="prelude-val">Err</span>(Error::duplicate_field(<span class="string">&quot;tz_id&quot;</span>)), |<span class="kw">_</span>| <span class="prelude-val">Ok</span>(()))
+            .map_or_else(|<span class="kw">_</span>| <span class="prelude-val">Err</span>(Error::duplicate_field(<span class="string">"tz_id"</span>)), |<span class="kw">_</span>| <span class="prelude-val">Ok</span>(()))
     }
 
     <span class="kw">fn </span>days&lt;E: Error&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, f: <span class="kw">impl </span>FnOnce() -&gt; <span class="prelude-ty">Result</span>&lt;BoltInteger, E&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;(), E&gt; {
         <span class="self">self</span>.days
             .try_insert_with(f)
-            .map_or_else(|<span class="kw">_</span>| <span class="prelude-val">Err</span>(Error::duplicate_field(<span class="string">&quot;days&quot;</span>)), |<span class="kw">_</span>| <span class="prelude-val">Ok</span>(()))
+            .map_or_else(|<span class="kw">_</span>| <span class="prelude-val">Err</span>(Error::duplicate_field(<span class="string">"days"</span>)), |<span class="kw">_</span>| <span class="prelude-val">Ok</span>(()))
     }
 }
 
@@ -636,15 +637,15 @@
             seconds: builder
                 .seconds
                 .take()
-                .ok_or_else(|| Error::missing_field(<span class="string">&quot;seconds&quot;</span>))<span class="question-mark">?</span>,
+                .ok_or_else(|| Error::missing_field(<span class="string">"seconds"</span>))<span class="question-mark">?</span>,
             nanoseconds: builder
                 .nanoseconds
                 .take()
-                .ok_or_else(|| Error::missing_field(<span class="string">&quot;nanoseconds&quot;</span>))<span class="question-mark">?</span>,
+                .ok_or_else(|| Error::missing_field(<span class="string">"nanoseconds"</span>))<span class="question-mark">?</span>,
             tz_offset_seconds: builder
                 .tz_offset_seconds
                 .take()
-                .ok_or_else(|| Error::missing_field(<span class="string">&quot;tz_offset_seconds&quot;</span>))<span class="question-mark">?</span>,
+                .ok_or_else(|| Error::missing_field(<span class="string">"tz_offset_seconds"</span>))<span class="question-mark">?</span>,
         })
     }
 }
@@ -655,11 +656,11 @@
             seconds: builder
                 .seconds
                 .take()
-                .ok_or_else(|| Error::missing_field(<span class="string">&quot;seconds&quot;</span>))<span class="question-mark">?</span>,
+                .ok_or_else(|| Error::missing_field(<span class="string">"seconds"</span>))<span class="question-mark">?</span>,
             nanoseconds: builder
                 .nanoseconds
                 .take()
-                .ok_or_else(|| Error::missing_field(<span class="string">&quot;nanoseconds&quot;</span>))<span class="question-mark">?</span>,
+                .ok_or_else(|| Error::missing_field(<span class="string">"nanoseconds"</span>))<span class="question-mark">?</span>,
         })
     }
 }
@@ -670,15 +671,15 @@
             seconds: builder
                 .seconds
                 .take()
-                .ok_or_else(|| Error::missing_field(<span class="string">&quot;seconds&quot;</span>))<span class="question-mark">?</span>,
+                .ok_or_else(|| Error::missing_field(<span class="string">"seconds"</span>))<span class="question-mark">?</span>,
             nanoseconds: builder
                 .nanoseconds
                 .take()
-                .ok_or_else(|| Error::missing_field(<span class="string">&quot;nanoseconds&quot;</span>))<span class="question-mark">?</span>,
+                .ok_or_else(|| Error::missing_field(<span class="string">"nanoseconds"</span>))<span class="question-mark">?</span>,
             tz_id: builder
                 .tz_id
                 .take()
-                .ok_or_else(|| Error::missing_field(<span class="string">&quot;tz_id&quot;</span>))<span class="question-mark">?</span>,
+                .ok_or_else(|| Error::missing_field(<span class="string">"tz_id"</span>))<span class="question-mark">?</span>,
         })
     }
 }

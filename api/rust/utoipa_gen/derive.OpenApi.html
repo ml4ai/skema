@@ -1,6 +1,7 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Generate OpenApi base object with defaults from project settings."><title>OpenApi in utoipa_gen - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../" data-static-root-path="../static.files/" data-current-crate="utoipa_gen" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="sidebar-items.js"></script><script defer src="../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc derive"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button></nav><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../utoipa_gen/index.html">utoipa_gen</a><span class="version">3.5.0</span></h2></div><div class="sidebar-elems"></div></nav><main><div class="width-limiter"><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="main-heading"><h1>Derive Macro <a href="index.html">utoipa_gen</a>::<wbr><a class="derive" href="#">OpenApi</a><button id="copy-path" title="Copy item path to clipboard"><img src="../static.files/clipboard-7571035ce49a181d.svg" width="19" height="18" alt="Copy item path"></button></h1><span class="out-of-band"><a class="src" href="../src/utoipa_gen/lib.rs.html#1389">source</a> · <button id="toggle-all-docs" title="collapse all docs">[<span>&#x2212;</span>]</button></span></div><pre class="rust item-decl"><code>#[derive(OpenApi)]
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Generate OpenApi base object with defaults from project settings."><title>OpenApi in utoipa_gen - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../" data-static-root-path="../static.files/" data-current-crate="utoipa_gen" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="sidebar-items.js"></script><script defer src="../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc derive"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button></nav><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../utoipa_gen/index.html">utoipa_gen</a><span class="version">3.5.0</span></h2></div><div class="sidebar-elems"></div></nav><div class="sidebar-resizer"></div>
+    <main><div class="width-limiter"><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../utoipa_gen/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="main-heading"><h1>Derive Macro <a href="index.html">utoipa_gen</a>::<wbr><a class="derive" href="#">OpenApi</a><button id="copy-path" title="Copy item path to clipboard"><img src="../static.files/clipboard-7571035ce49a181d.svg" width="19" height="18" alt="Copy item path"></button></h1><span class="out-of-band"><a class="src" href="../src/utoipa_gen/lib.rs.html#1389">source</a> · <button id="toggle-all-docs" title="collapse all docs">[<span>&#x2212;</span>]</button></span></div><pre class="rust item-decl"><code>#[derive(OpenApi)]
 {
-    // Attributes available to this derive:
+    <span class="comment">// Attributes available to this derive:</span>
     #[openapi]
 }
 </code></pre><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Generate OpenApi base object with defaults from
@@ -48,7 +49,7 @@ environment variables.</p>
 <ul>
 <li><code>title = ...</code> Define title of the API. It can be literal string.</li>
 <li><code>description = ...</code> Define description of the API. Markdown can be used for rich text
-representation. It can be literal string or <a href="https://doc.rust-lang.org/1.75.0/core/macro.include_str.html" title="macro core::include_str"><code>include_str!</code></a> statement.</li>
+representation. It can be literal string or <a href="https://doc.rust-lang.org/1.76.0/core/macro.include_str.html" title="macro core::include_str"><code>include_str!</code></a> statement.</li>
 <li><code>version = ...</code> Override default version from <em><code>Cargo.toml</code></em>. Value must be literal string.</li>
 <li><code>contact(...)</code> Used to override the whole contact generated from environment variables.
 <ul>
@@ -97,15 +98,15 @@ literal strings.</li>
     Active, InActive, Locked,
 }
 
-<span class="attr">#[utoipa::path(get, path = <span class="string">&quot;/pet&quot;</span>)]
+<span class="attr">#[utoipa::path(get, path = <span class="string">"/pet"</span>)]
 </span><span class="kw">fn </span>get_pet() -&gt; Pet {
     Pet {
-        name: <span class="string">&quot;bob&quot;</span>.to_string(),
+        name: <span class="string">"bob"</span>.to_string(),
         age: <span class="number">8</span>,
     }
 }
 
-<span class="attr">#[utoipa::path(get, path = <span class="string">&quot;/status&quot;</span>)]
+<span class="attr">#[utoipa::path(get, path = <span class="string">"/status"</span>)]
 </span><span class="kw">fn </span>get_status() -&gt; Status {
     Status::Active
 }
@@ -116,14 +117,14 @@ literal strings.</li>
     components(schemas(Pet, Status)),
     security(
         (),
-        (<span class="string">&quot;my_auth&quot; </span>= [<span class="string">&quot;read:items&quot;</span>, <span class="string">&quot;edit:items&quot;</span>]</span>),
-        (<span class="string">&quot;token_jwt&quot; </span>= [])
+        (<span class="string">"my_auth" </span>= [<span class="string">"read:items"</span>, <span class="string">"edit:items"</span>]</span>),
+        (<span class="string">"token_jwt" </span>= [])
     ),
     tags(
-        (name = <span class="string">&quot;pets::api&quot;</span>, description = <span class="string">&quot;All about pets&quot;</span>,
-            external_docs(url = <span class="string">&quot;http://more.about.pets.api&quot;</span>, description = <span class="string">&quot;Find out more&quot;</span>))
+        (name = <span class="string">"pets::api"</span>, description = <span class="string">"All about pets"</span>,
+            external_docs(url = <span class="string">"http://more.about.pets.api"</span>, description = <span class="string">"Find out more"</span>))
     ),
-    external_docs(url = <span class="string">&quot;http://more.about.our.apis&quot;</span>, description = <span class="string">&quot;More about our APIs&quot;</span>)
+    external_docs(url = <span class="string">"http://more.about.our.apis"</span>, description = <span class="string">"More about our APIs"</span>)
 )]
 <span class="kw">struct </span>ApiDoc;</code></pre></div>
 <p><em><strong>Define servers to OpenApi.</strong></em></p>
@@ -131,11 +132,11 @@ literal strings.</li>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code> <span class="attr">#[derive(OpenApi)]
  #[openapi(
      servers(
-         (url = <span class="string">&quot;http://localhost:8989&quot;</span>, description = <span class="string">&quot;Local server&quot;</span>),
-         (url = <span class="string">&quot;http://api.{username}:{port}&quot;</span>, description = <span class="string">&quot;Remote API&quot;</span>,
+         (url = <span class="string">"http://localhost:8989"</span>, description = <span class="string">"Local server"</span>),
+         (url = <span class="string">"http://api.{username}:{port}"</span>, description = <span class="string">"Remote API"</span>,
              variables(
-                 (<span class="string">&quot;username&quot; </span>= (default = <span class="string">&quot;demo&quot;</span>, description = <span class="string">&quot;Default username for API&quot;</span>)),
-                 (<span class="string">&quot;port&quot; </span>= (default = <span class="string">&quot;8080&quot;</span>, enum_values(<span class="string">&quot;8080&quot;</span>, <span class="string">&quot;5000&quot;</span>, <span class="string">&quot;3030&quot;</span>), description = <span class="string">&quot;Supported ports for API&quot;</span>))
+                 (<span class="string">"username" </span>= (default = <span class="string">"demo"</span>, description = <span class="string">"Default username for API"</span>)),
+                 (<span class="string">"port" </span>= (default = <span class="string">"8080"</span>, enum_values(<span class="string">"8080"</span>, <span class="string">"5000"</span>, <span class="string">"3030"</span>), description = <span class="string">"Supported ports for API"</span>))
              )
          )
      )
@@ -146,9 +147,9 @@ variables.</strong></em></p>
 
 <div class="example-wrap compile_fail"><a href="#" class="tooltip" title="This example deliberately fails to compile">ⓘ</a><pre class="rust rust-example-rendered"><code><span class="attr">#[derive(OpenApi)]
 #[openapi(info(
-    title = <span class="string">&quot;title override&quot;</span>,
-    description = <span class="macro">include_str!</span>(<span class="string">&quot;./path/to/content&quot;</span>), <span class="comment">// fail compile cause no such file
-    </span>contact(name = <span class="string">&quot;Test&quot;</span>)
+    title = <span class="string">"title override"</span>,
+    description = <span class="macro">include_str!</span>(<span class="string">"./path/to/content"</span>), <span class="comment">// fail compile cause no such file
+    </span>contact(name = <span class="string">"Test"</span>)
 ))]
 </span><span class="kw">struct </span>ApiDoc;</code></pre></div>
 <p><em><strong>Create OpenAPI with reusable response.</strong></em></p>
@@ -164,7 +165,7 @@ variables.</strong></em></p>
 
 <span class="attr">#[utoipa::path(
     get,
-    path = <span class="string">&quot;/person-list&quot;</span>,
+    path = <span class="string">"/person-list"</span>,
     responses(
         (status = <span class="number">200</span>, response = PersonList)
     )

@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/clap_derive-4.4.7/src/derives/args.rs`."><title>args.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="clap_derive" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../clap_derive/index.html"><img src="https://raw.githubusercontent.com/clap-rs/clap/master/assets/clap.png" alt="clap_derive"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/clap_derive-4.0.21/src/derives/args.rs`."><title>args.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="clap_derive" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><a class="sub-logo-container" href="../../../clap_derive/index.html"><img src="https://raw.githubusercontent.com/clap-rs/clap/master/assets/clap.png" alt="clap_derive"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -699,70 +700,6 @@
 <a href="#699" id="699">699</a>
 <a href="#700" id="700">700</a>
 <a href="#701" id="701">701</a>
-<a href="#702" id="702">702</a>
-<a href="#703" id="703">703</a>
-<a href="#704" id="704">704</a>
-<a href="#705" id="705">705</a>
-<a href="#706" id="706">706</a>
-<a href="#707" id="707">707</a>
-<a href="#708" id="708">708</a>
-<a href="#709" id="709">709</a>
-<a href="#710" id="710">710</a>
-<a href="#711" id="711">711</a>
-<a href="#712" id="712">712</a>
-<a href="#713" id="713">713</a>
-<a href="#714" id="714">714</a>
-<a href="#715" id="715">715</a>
-<a href="#716" id="716">716</a>
-<a href="#717" id="717">717</a>
-<a href="#718" id="718">718</a>
-<a href="#719" id="719">719</a>
-<a href="#720" id="720">720</a>
-<a href="#721" id="721">721</a>
-<a href="#722" id="722">722</a>
-<a href="#723" id="723">723</a>
-<a href="#724" id="724">724</a>
-<a href="#725" id="725">725</a>
-<a href="#726" id="726">726</a>
-<a href="#727" id="727">727</a>
-<a href="#728" id="728">728</a>
-<a href="#729" id="729">729</a>
-<a href="#730" id="730">730</a>
-<a href="#731" id="731">731</a>
-<a href="#732" id="732">732</a>
-<a href="#733" id="733">733</a>
-<a href="#734" id="734">734</a>
-<a href="#735" id="735">735</a>
-<a href="#736" id="736">736</a>
-<a href="#737" id="737">737</a>
-<a href="#738" id="738">738</a>
-<a href="#739" id="739">739</a>
-<a href="#740" id="740">740</a>
-<a href="#741" id="741">741</a>
-<a href="#742" id="742">742</a>
-<a href="#743" id="743">743</a>
-<a href="#744" id="744">744</a>
-<a href="#745" id="745">745</a>
-<a href="#746" id="746">746</a>
-<a href="#747" id="747">747</a>
-<a href="#748" id="748">748</a>
-<a href="#749" id="749">749</a>
-<a href="#750" id="750">750</a>
-<a href="#751" id="751">751</a>
-<a href="#752" id="752">752</a>
-<a href="#753" id="753">753</a>
-<a href="#754" id="754">754</a>
-<a href="#755" id="755">755</a>
-<a href="#756" id="756">756</a>
-<a href="#757" id="757">757</a>
-<a href="#758" id="758">758</a>
-<a href="#759" id="759">759</a>
-<a href="#760" id="760">760</a>
-<a href="#761" id="761">761</a>
-<a href="#762" id="762">762</a>
-<a href="#763" id="763">763</a>
-<a href="#764" id="764">764</a>
-<a href="#765" id="765">765</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018 Guillaume Pinot (@TeXitoi) &lt;texitoi@texitoi.eu&gt;,
 // Kevin Knapp (@kbknapp) &lt;kbknapp@gmail.com&gt;, and
 // Ana Hobden (@hoverbear) &lt;operator@hoverbear.org&gt;
@@ -778,17 +715,22 @@
 // MIT/Apache 2.0 license.
 
 </span><span class="kw">use </span>proc_macro2::{Ident, Span, TokenStream};
+<span class="kw">use </span>proc_macro_error::{abort, abort_call_site};
 <span class="kw">use </span>quote::{format_ident, quote, quote_spanned};
+<span class="kw">use </span>syn::ext::IdentExt;
 <span class="kw">use </span>syn::{
     punctuated::Punctuated, spanned::Spanned, token::Comma, Data, DataStruct, DeriveInput, Field,
-    Fields, FieldsNamed, Generics,
+    Fields, Generics,
 };
 
+<span class="kw">use </span><span class="kw">crate</span>::dummies;
 <span class="kw">use </span><span class="kw">crate</span>::item::{Item, Kind, Name};
 <span class="kw">use </span><span class="kw">crate</span>::utils::{inner_type, sub_type, Sp, Ty};
 
-<span class="kw">pub fn </span>derive_args(input: <span class="kw-2">&amp;</span>DeriveInput) -&gt; <span class="prelude-ty">Result</span>&lt;TokenStream, syn::Error&gt; {
+<span class="kw">pub fn </span>derive_args(input: <span class="kw-2">&amp;</span>DeriveInput) -&gt; TokenStream {
     <span class="kw">let </span>ident = <span class="kw-2">&amp;</span>input.ident;
+
+    dummies::args(ident);
 
     <span class="kw">match </span>input.data {
         Data::Struct(DataStruct {
@@ -796,8 +738,15 @@
             ..
         }) =&gt; {
             <span class="kw">let </span>name = Name::Derived(ident.clone());
-            <span class="kw">let </span>item = Item::from_args_struct(input, name)<span class="question-mark">?</span>;
-            <span class="kw">let </span>fields = collect_args_fields(<span class="kw-2">&amp;</span>item, fields)<span class="question-mark">?</span>;
+            <span class="kw">let </span>item = Item::from_args_struct(input, name);
+            <span class="kw">let </span>fields = fields
+                .named
+                .iter()
+                .map(|field| {
+                    <span class="kw">let </span>item = Item::from_args_field(field, item.casing(), item.env_casing());
+                    (field, item)
+                })
+                .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
             gen_for_struct(<span class="kw-2">&amp;</span>item, ident, <span class="kw-2">&amp;</span>input.generics, <span class="kw-2">&amp;</span>fields)
         }
         Data::Struct(DataStruct {
@@ -805,18 +754,18 @@
             ..
         }) =&gt; {
             <span class="kw">let </span>name = Name::Derived(ident.clone());
-            <span class="kw">let </span>item = Item::from_args_struct(input, name)<span class="question-mark">?</span>;
+            <span class="kw">let </span>item = Item::from_args_struct(input, name);
             <span class="kw">let </span>fields = Punctuated::&lt;Field, Comma&gt;::new();
             <span class="kw">let </span>fields = fields
                 .iter()
                 .map(|field| {
-                    <span class="kw">let </span>item = Item::from_args_field(field, item.casing(), item.env_casing())<span class="question-mark">?</span>;
-                    <span class="prelude-val">Ok</span>((field, item))
+                    <span class="kw">let </span>item = Item::from_args_field(field, item.casing(), item.env_casing());
+                    (field, item)
                 })
-                .collect::&lt;<span class="prelude-ty">Result</span>&lt;Vec&lt;<span class="kw">_</span>&gt;, syn::Error&gt;&gt;()<span class="question-mark">?</span>;
+                .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
             gen_for_struct(<span class="kw-2">&amp;</span>item, ident, <span class="kw-2">&amp;</span>input.generics, <span class="kw-2">&amp;</span>fields)
         }
-        <span class="kw">_ </span>=&gt; <span class="macro">abort_call_site!</span>(<span class="string">&quot;`#[derive(Args)]` only supports non-tuple structs&quot;</span>),
+        <span class="kw">_ </span>=&gt; <span class="macro">abort_call_site!</span>(<span class="string">"`#[derive(Args)]` only supports non-tuple structs"</span>),
     }
 }
 
@@ -825,39 +774,33 @@
     item_name: <span class="kw-2">&amp;</span>Ident,
     generics: <span class="kw-2">&amp;</span>Generics,
     fields: <span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span>Field, Item)],
-) -&gt; <span class="prelude-ty">Result</span>&lt;TokenStream, syn::Error&gt; {
+) -&gt; TokenStream {
     <span class="kw">if </span>!<span class="macro">matches!</span>(<span class="kw-2">&amp;*</span>item.kind(), Kind::Command(<span class="kw">_</span>)) {
         <span class="macro">abort! </span>{ item.kind().span(),
-            <span class="string">&quot;`{}` cannot be used with `command`&quot;</span>,
+            <span class="string">"`{}` cannot be used with `command`"</span>,
             item.kind().name(),
         }
     }
 
     <span class="kw">let </span>(impl_generics, ty_generics, where_clause) = generics.split_for_impl();
 
-    <span class="kw">let </span>constructor = gen_constructor(fields)<span class="question-mark">?</span>;
-    <span class="kw">let </span>updater = gen_updater(fields, <span class="bool-val">true</span>)<span class="question-mark">?</span>;
+    <span class="kw">let </span>constructor = gen_constructor(fields);
+    <span class="kw">let </span>updater = gen_updater(fields, <span class="bool-val">true</span>);
     <span class="kw">let </span>raw_deprecated = raw_deprecated();
 
-    <span class="kw">let </span>app_var = Ident::new(<span class="string">&quot;__clap_app&quot;</span>, Span::call_site());
-    <span class="kw">let </span>augmentation = gen_augment(fields, <span class="kw-2">&amp;</span>app_var, item, <span class="bool-val">false</span>)<span class="question-mark">?</span>;
-    <span class="kw">let </span>augmentation_update = gen_augment(fields, <span class="kw-2">&amp;</span>app_var, item, <span class="bool-val">true</span>)<span class="question-mark">?</span>;
+    <span class="kw">let </span>app_var = Ident::new(<span class="string">"__clap_app"</span>, Span::call_site());
+    <span class="kw">let </span>augmentation = gen_augment(fields, <span class="kw-2">&amp;</span>app_var, item, <span class="bool-val">false</span>);
+    <span class="kw">let </span>augmentation_update = gen_augment(fields, <span class="kw-2">&amp;</span>app_var, item, <span class="bool-val">true</span>);
 
     <span class="kw">let </span>group_id = <span class="kw">if </span>item.skip_group() {
         <span class="macro">quote!</span>(<span class="prelude-val">None</span>)
     } <span class="kw">else </span>{
-        <span class="kw">let </span>group_id = item.group_id();
+        <span class="kw">let </span>group_id = item.ident().unraw().to_string();
         <span class="macro">quote!</span>(<span class="prelude-val">Some</span>(clap::Id::from(#group_id)))
     };
 
-    <span class="prelude-val">Ok</span>(<span class="macro">quote! </span>{
-        <span class="attr">#[allow(
-            dead_code,
-            unreachable_code,
-            unused_variables,
-            unused_braces,
-            unused_qualifications,
-        )]
+    <span class="macro">quote! </span>{
+        <span class="attr">#[allow(dead_code, unreachable_code, unused_variables, unused_braces)]
         #[allow(
             clippy::style,
             clippy::complexity,
@@ -868,10 +811,8 @@
             clippy::nursery,
             clippy::cargo,
             clippy::suspicious_else_formatting,
-            clippy::almost_swapped,
-            clippy::redundant_locals,
         )]
-        #[automatically_derived]
+        #[deny(clippy::correctness)]
         </span><span class="kw">impl </span>#impl_generics clap::FromArgMatches <span class="kw">for </span>#item_name #ty_generics #where_clause {
             <span class="kw">fn </span>from_arg_matches(__clap_arg_matches: <span class="kw-2">&amp;</span>clap::ArgMatches) -&gt; ::std::result::Result&lt;<span class="self">Self</span>, clap::Error&gt; {
                 <span class="self">Self</span>::from_arg_matches_mut(<span class="kw-2">&amp;mut </span>__clap_arg_matches.clone())
@@ -894,13 +835,7 @@
             }
         }
 
-        <span class="attr">#[allow(
-            dead_code,
-            unreachable_code,
-            unused_variables,
-            unused_braces,
-            unused_qualifications,
-        )]
+        <span class="attr">#[allow(dead_code, unreachable_code, unused_variables, unused_braces)]
         #[allow(
             clippy::style,
             clippy::complexity,
@@ -911,22 +846,20 @@
             clippy::nursery,
             clippy::cargo,
             clippy::suspicious_else_formatting,
-            clippy::almost_swapped,
-            clippy::redundant_locals,
         )]
-        #[automatically_derived]
+        #[deny(clippy::correctness)]
         </span><span class="kw">impl </span>#impl_generics clap::Args <span class="kw">for </span>#item_name #ty_generics #where_clause {
             <span class="kw">fn </span>group_id() -&gt; <span class="prelude-ty">Option</span>&lt;clap::Id&gt; {
                 #group_id
             }
-            <span class="kw">fn </span>augment_args&lt;<span class="lifetime">&#39;b</span>&gt;(#app_var: clap::Command) -&gt; clap::Command {
+            <span class="kw">fn </span>augment_args&lt;<span class="lifetime">'b</span>&gt;(#app_var: clap::Command) -&gt; clap::Command {
                 #augmentation
             }
-            <span class="kw">fn </span>augment_args_for_update&lt;<span class="lifetime">&#39;b</span>&gt;(#app_var: clap::Command) -&gt; clap::Command {
+            <span class="kw">fn </span>augment_args_for_update&lt;<span class="lifetime">'b</span>&gt;(#app_var: clap::Command) -&gt; clap::Command {
                 #augmentation_update
             }
         }
-    })
+    }
 }
 
 <span class="doccomment">/// Generate a block of code to add arguments/subcommands corresponding to
@@ -936,12 +869,11 @@
     app_var: <span class="kw-2">&amp;</span>Ident,
     parent_item: <span class="kw-2">&amp;</span>Item,
     override_required: bool,
-) -&gt; <span class="prelude-ty">Result</span>&lt;TokenStream, syn::Error&gt; {
+) -&gt; TokenStream {
     <span class="kw">let </span><span class="kw-2">mut </span>subcommand_specified = <span class="bool-val">false</span>;
-    <span class="kw">let </span><span class="kw-2">mut </span>args = Vec::new();
-    <span class="kw">for </span>(field, item) <span class="kw">in </span>fields {
+    <span class="kw">let </span>args = fields.iter().filter_map(|(field, item)| {
         <span class="kw">let </span>kind = item.kind();
-        <span class="kw">let </span>genned = <span class="kw">match </span><span class="kw-2">&amp;*</span>kind {
+        <span class="kw">match </span><span class="kw-2">&amp;*</span>kind {
             Kind::Command(<span class="kw">_</span>)
             | Kind::Value
             | Kind::Skip(<span class="kw">_</span>, <span class="kw">_</span>)
@@ -949,10 +881,7 @@
             | Kind::ExternalSubcommand =&gt; <span class="prelude-val">None</span>,
             Kind::Subcommand(ty) =&gt; {
                 <span class="kw">if </span>subcommand_specified {
-                    <span class="macro">abort!</span>(
-                        field.span(),
-                        <span class="string">&quot;`#[command(subcommand)]` can only be used once per container&quot;
-                    </span>);
+                    <span class="macro">abort!</span>(field.span(), <span class="string">"`#[command(subcommand)]` can only be used once per container"</span>);
                 }
                 subcommand_specified = <span class="bool-val">true</span>;
 
@@ -960,7 +889,7 @@
                     (Ty::Option, <span class="prelude-val">Some</span>(sub_type)) =&gt; sub_type,
                     <span class="kw">_ </span>=&gt; <span class="kw-2">&amp;</span>field.ty,
                 };
-                <span class="kw">let </span>implicit_methods = <span class="kw">if </span><span class="kw-2">**</span>ty == Ty::Option {
+                <span class="kw">let </span>implicit_methods = <span class="kw">if </span><span class="kw-2">**</span>ty == Ty::Option || override_required {
                     <span class="macro">quote!</span>()
                 } <span class="kw">else </span>{
                     <span class="macro">quote_spanned! </span>{ kind.span()=&gt;
@@ -969,20 +898,10 @@
                     }
                 };
 
-                <span class="kw">let </span>override_methods = <span class="kw">if </span>override_required {
-                    <span class="macro">quote_spanned! </span>{ kind.span()=&gt;
-                        .subcommand_required(<span class="bool-val">false</span>)
-                        .arg_required_else_help(<span class="bool-val">false</span>)
-                    }
-                } <span class="kw">else </span>{
-                    <span class="macro">quote!</span>()
-                };
-
                 <span class="prelude-val">Some</span>(<span class="macro">quote! </span>{
                     <span class="kw">let </span>#app_var = &lt;#subcmd_type <span class="kw">as </span>clap::Subcommand&gt;::augment_subcommands( #app_var );
                     <span class="kw">let </span>#app_var = #app_var
-                        #implicit_methods
-                        #override_methods;
+                        #implicit_methods;
                 })
             }
             Kind::Flatten(ty) =&gt; {
@@ -1041,7 +960,7 @@
                         <span class="kw">if </span>item.is_positional() {
                             <span class="macro">quote_spanned! </span>{ ty.span()=&gt;
                                 .value_name(#value_name)
-                                .num_args(<span class="number">1</span>..)  <span class="comment">// action won&#39;t be sufficient for getting multiple
+                                .num_args(<span class="number">1</span>..)  <span class="comment">// action won't be sufficient for getting multiple
                                 </span>#value_parser
                                 #action
                             }
@@ -1058,7 +977,7 @@
                         <span class="kw">if </span>item.is_positional() {
                             <span class="macro">quote_spanned! </span>{ ty.span()=&gt;
                                 .value_name(#value_name)
-                                .num_args(<span class="number">1</span>..)  <span class="comment">// action won&#39;t be sufficient for getting multiple
+                                .num_args(<span class="number">1</span>..)  <span class="comment">// action won't be sufficient for getting multiple
                                 </span>#value_parser
                                 #action
                             }
@@ -1071,19 +990,11 @@
                         }
                     }
 
-                    Ty::VecVec | Ty::OptionVecVec =&gt; {
-                        <span class="macro">quote_spanned! </span>{ ty.span() =&gt;
-                            .value_name(#value_name)
-                            #value_parser
-                            #action
-                        }
-                    }
-
                     Ty::Other =&gt; {
-                        <span class="kw">let </span>required = item.find_default_method().is_none();
+                        <span class="kw">let </span>required = item.find_default_method().is_none() &amp;&amp; !override_required;
                         <span class="comment">// `ArgAction::takes_values` is assuming `ArgAction::default_value` will be
-                        // set though that won&#39;t always be true but this should be good enough,
-                        // otherwise we&#39;ll report an &quot;arg required&quot; error when unwrapping.
+                        // set though that won't always be true but this should be good enough,
+                        // otherwise we'll report an "arg required" error when unwrapping.
                         </span><span class="kw">let </span>action_value = action.args();
                         <span class="macro">quote_spanned! </span>{ ty.span()=&gt;
                             .value_name(#value_name)
@@ -1101,13 +1012,6 @@
                 } <span class="kw">else </span>{
                     <span class="macro">quote!</span>()
                 };
-                <span class="kw">let </span>override_methods = <span class="kw">if </span>override_required {
-                    <span class="macro">quote_spanned! </span>{ kind.span()=&gt;
-                        .required(<span class="bool-val">false</span>)
-                    }
-                } <span class="kw">else </span>{
-                    <span class="macro">quote!</span>()
-                };
 
                 <span class="prelude-val">Some</span>(<span class="macro">quote_spanned! </span>{ field.span()=&gt;
                     <span class="kw">let </span>#app_var = #app_var.arg({
@@ -1119,17 +1023,12 @@
 
                         <span class="kw">let </span>arg = arg
                             #explicit_methods;
-
-                        <span class="kw">let </span>arg = arg
-                            #override_methods;
-
                         arg
                     });
                 })
             }
-        };
-        args.push(genned);
-    }
+        }
+    });
 
     <span class="kw">let </span>deprecations = <span class="kw">if </span>!override_required {
         parent_item.deprecations()
@@ -1141,7 +1040,7 @@
     <span class="kw">let </span>group_app_methods = <span class="kw">if </span>parent_item.skip_group() {
         <span class="macro">quote!</span>()
     } <span class="kw">else </span>{
-        <span class="kw">let </span>group_id = parent_item.group_id();
+        <span class="kw">let </span>group_id = parent_item.ident().unraw().to_string();
         <span class="kw">let </span>literal_group_members = fields
             .iter()
             .filter_map(|(_field, item)| {
@@ -1158,7 +1057,7 @@
             <span class="kw">let </span>members: [clap::Id; #literal_group_members_len] = [#( clap::Id::from(#literal_group_members) ),* ];
             members
         }};
-        <span class="comment">// HACK: Validation isn&#39;t ready yet for nested arg groups, so just don&#39;t populate the group in
+        <span class="comment">// HACK: Validation isn't ready yet for nested arg groups, so just don't populate the group in
         // that situation
         </span><span class="kw">let </span>possible_group_members_len = fields
             .iter()
@@ -1174,18 +1073,15 @@
             }};
         }
 
-        <span class="kw">let </span>group_methods = parent_item.group_methods();
-
         <span class="macro">quote!</span>(
             .group(
                 clap::ArgGroup::new(#group_id)
                     .multiple(<span class="bool-val">true</span>)
-                    #group_methods
                     .args(#literal_group_members)
             )
         )
     };
-    <span class="prelude-val">Ok</span>(<span class="macro">quote! </span>{{
+    <span class="macro">quote! </span>{{
         #deprecations
         <span class="kw">let </span>#app_var = #app_var
             #initial_app_methods
@@ -1193,20 +1089,20 @@
             ;
         #( #args )*
         #app_var #final_app_methods
-    }})
+    }}
 }
 
-<span class="kw">pub fn </span>gen_constructor(fields: <span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span>Field, Item)]) -&gt; <span class="prelude-ty">Result</span>&lt;TokenStream, syn::Error&gt; {
+<span class="kw">pub fn </span>gen_constructor(fields: <span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span>Field, Item)]) -&gt; TokenStream {
     <span class="kw">let </span>fields = fields.iter().map(|(field, item)| {
         <span class="kw">let </span>field_name = field.ident.as_ref().unwrap();
         <span class="kw">let </span>kind = item.kind();
-        <span class="kw">let </span>arg_matches = <span class="macro">format_ident!</span>(<span class="string">&quot;__clap_arg_matches&quot;</span>);
-        <span class="kw">let </span>genned = <span class="kw">match </span><span class="kw-2">&amp;*</span>kind {
+        <span class="kw">let </span>arg_matches = <span class="macro">format_ident!</span>(<span class="string">"__clap_arg_matches"</span>);
+        <span class="kw">match </span><span class="kw-2">&amp;*</span>kind {
             Kind::Command(<span class="kw">_</span>)
             | Kind::Value
             | Kind::ExternalSubcommand =&gt; {
                 <span class="macro">abort! </span>{ kind.span(),
-                    <span class="string">&quot;`{}` cannot be used with `arg`&quot;</span>,
+                    <span class="string">"`{}` cannot be used with `arg`"</span>,
                     kind.name(),
                 }
             }
@@ -1237,12 +1133,10 @@
                     Ty::Unit |
                     Ty::Vec |
                     Ty::OptionOption |
-                    Ty::OptionVec |
-                    Ty::VecVec |
-                    Ty::OptionVecVec =&gt; {
+                    Ty::OptionVec =&gt; {
                         <span class="macro">abort!</span>(
                             ty.span(),
-                            <span class="string">&quot;{} types are not supported for subcommand&quot;</span>,
+                            <span class="string">"{} types are not supported for subcommand"</span>,
                             ty.as_str()
                         );
                     }
@@ -1264,7 +1158,7 @@
                         <span class="macro">quote_spanned! </span>{ kind.span()=&gt;
                             #field_name: {
                                 <span class="kw">let </span>group_id = &lt;#inner_type <span class="kw">as </span>clap::Args&gt;::group_id()
-                                    .expect(<span class="string">&quot;`#[arg(flatten)]`ed field type implements `Args::group_id`&quot;</span>);
+                                    .expect(<span class="string">"`#[arg(flatten)]`ed field type implements `Args::group_id`"</span>);
                                 <span class="kw">if </span>#arg_matches.contains_id(group_id.as_str()) {
                                     <span class="prelude-val">Some</span>(
                                         &lt;#inner_type <span class="kw">as </span>clap::FromArgMatches&gt;::from_arg_matches_mut(#arg_matches)<span class="question-mark">?
@@ -1278,12 +1172,10 @@
                     Ty::Unit |
                     Ty::Vec |
                     Ty::OptionOption |
-                    Ty::OptionVec |
-                    Ty::VecVec |
-                    Ty::OptionVecVec =&gt; {
+                    Ty::OptionVec =&gt; {
                         <span class="macro">abort!</span>(
                             ty.span(),
-                            <span class="string">&quot;{} types are not supported for flatten&quot;</span>,
+                            <span class="string">"{} types are not supported for flatten"</span>,
                             ty.as_str()
                         );
                     }
@@ -1296,20 +1188,18 @@
             },
 
             Kind::Arg(ty) | Kind::FromGlobal(ty) =&gt; {
-                gen_parsers(item, ty, field_name, field, <span class="prelude-val">None</span>)<span class="question-mark">?
-            </span>}
-        };
-        <span class="prelude-val">Ok</span>(genned)
-    }).collect::&lt;<span class="prelude-ty">Result</span>&lt;Vec&lt;<span class="kw">_</span>&gt;, syn::Error&gt;&gt;()<span class="question-mark">?</span>;
+                gen_parsers(item, ty, field_name, field, <span class="prelude-val">None</span>)
+            }
+        }
+    });
 
-    <span class="prelude-val">Ok</span>(<span class="macro">quote! </span>{{
+    <span class="macro">quote! </span>{{
         #( #fields ),*
-    }})
+    }}
 }
 
-<span class="kw">pub fn </span>gen_updater(fields: <span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span>Field, Item)], use_self: bool) -&gt; <span class="prelude-ty">Result</span>&lt;TokenStream, syn::Error&gt; {
-    <span class="kw">let </span><span class="kw-2">mut </span>genned_fields = Vec::new();
-    <span class="kw">for </span>(field, item) <span class="kw">in </span>fields {
+<span class="kw">pub fn </span>gen_updater(fields: <span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span>Field, Item)], use_self: bool) -&gt; TokenStream {
+    <span class="kw">let </span>fields = fields.iter().map(|(field, item)| {
         <span class="kw">let </span>field_name = field.ident.as_ref().unwrap();
         <span class="kw">let </span>kind = item.kind();
 
@@ -1321,12 +1211,14 @@
         } <span class="kw">else </span>{
             <span class="macro">quote!</span>()
         };
-        <span class="kw">let </span>arg_matches = <span class="macro">format_ident!</span>(<span class="string">&quot;__clap_arg_matches&quot;</span>);
+        <span class="kw">let </span>arg_matches = <span class="macro">format_ident!</span>(<span class="string">"__clap_arg_matches"</span>);
 
-        <span class="kw">let </span>genned = <span class="kw">match </span><span class="kw-2">&amp;*</span>kind {
-            Kind::Command(<span class="kw">_</span>) | Kind::Value | Kind::ExternalSubcommand =&gt; {
+        <span class="kw">match </span><span class="kw-2">&amp;*</span>kind {
+            Kind::Command(<span class="kw">_</span>)
+            | Kind::Value
+            | Kind::ExternalSubcommand =&gt; {
                 <span class="macro">abort! </span>{ kind.span(),
-                    <span class="string">&quot;`{}` cannot be used with `arg`&quot;</span>,
+                    <span class="string">"`{}` cannot be used with `arg`"</span>,
                     kind.name(),
                 }
             }
@@ -1394,20 +1286,17 @@
                         #updater
                     }
                 }
-            }
+            },
 
             Kind::Skip(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="macro">quote!</span>(),
 
-            Kind::Arg(ty) | Kind::FromGlobal(ty) =&gt; {
-                gen_parsers(item, ty, field_name, field, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>access))<span class="question-mark">?
-            </span>}
-        };
-        genned_fields.push(genned);
-    }
+            Kind::Arg(ty) | Kind::FromGlobal(ty) =&gt; gen_parsers(item, ty, field_name, field, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>access)),
+        }
+    });
 
-    <span class="prelude-val">Ok</span>(<span class="macro">quote! </span>{
-        #( #genned_fields )*
-    })
+    <span class="macro">quote! </span>{
+        #( #fields )*
+    }
 }
 
 <span class="kw">fn </span>gen_parsers(
@@ -1416,18 +1305,19 @@
     field_name: <span class="kw-2">&amp;</span>Ident,
     field: <span class="kw-2">&amp;</span>Field,
     update: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>TokenStream&gt;,
-) -&gt; <span class="prelude-ty">Result</span>&lt;TokenStream, syn::Error&gt; {
+) -&gt; TokenStream {
     <span class="kw">let </span>span = ty.span();
     <span class="kw">let </span>convert_type = inner_type(<span class="kw-2">&amp;</span>field.ty);
     <span class="kw">let </span>id = item.id();
     <span class="kw">let </span>get_one = <span class="macro">quote_spanned!</span>(span=&gt; remove_one::&lt;#convert_type&gt;);
     <span class="kw">let </span>get_many = <span class="macro">quote_spanned!</span>(span=&gt; remove_many::&lt;#convert_type&gt;);
-    <span class="kw">let </span>get_occurrences = <span class="macro">quote_spanned!</span>(span=&gt; remove_occurrences::&lt;#convert_type&gt;);
+    <span class="kw">let </span>deref = <span class="macro">quote!</span>(|s| s);
+    <span class="kw">let </span>parse = <span class="macro">quote_spanned!</span>(span=&gt; |s| ::std::result::Result::Ok::&lt;<span class="kw">_</span>, clap::Error&gt;(s));
 
     <span class="comment">// Give this identifier the same hygiene
     // as the `arg_matches` parameter definition. This
     // allows us to refer to `arg_matches` within a `quote_spanned` block
-    </span><span class="kw">let </span>arg_matches = <span class="macro">format_ident!</span>(<span class="string">&quot;__clap_arg_matches&quot;</span>);
+    </span><span class="kw">let </span>arg_matches = <span class="macro">format_ident!</span>(<span class="string">"__clap_arg_matches"</span>);
 
     <span class="kw">let </span>field_value = <span class="kw">match </span><span class="kw-2">**</span>ty {
         Ty::Unit =&gt; {
@@ -1439,14 +1329,19 @@
         Ty::Option =&gt; {
             <span class="macro">quote_spanned! </span>{ ty.span()=&gt;
                 #arg_matches.#get_one(#id)
-            }
+                    .map(#deref)
+                    .map(#parse)
+                    .transpose()<span class="question-mark">?
+            </span>}
         }
 
         Ty::OptionOption =&gt; <span class="macro">quote_spanned! </span>{ ty.span()=&gt;
             <span class="kw">if </span>#arg_matches.contains_id(#id) {
                 <span class="prelude-val">Some</span>(
                     #arg_matches.#get_one(#id)
-                )
+                        .map(#deref)
+                        .map(#parse).transpose()<span class="question-mark">?
+                </span>)
             } <span class="kw">else </span>{
                 <span class="prelude-val">None
             </span>}
@@ -1455,8 +1350,9 @@
         Ty::OptionVec =&gt; <span class="macro">quote_spanned! </span>{ ty.span()=&gt;
             <span class="kw">if </span>#arg_matches.contains_id(#id) {
                 <span class="prelude-val">Some</span>(#arg_matches.#get_many(#id)
-                    .map(|v| v.collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;())
-                    .unwrap_or_else(Vec::new))
+                    .map(|v| v.map(#deref).map::&lt;::std::result::Result&lt;#convert_type, clap::Error&gt;, <span class="kw">_</span>&gt;(#parse).collect::&lt;::std::result::Result&lt;Vec&lt;<span class="kw">_</span>&gt;, clap::Error&gt;&gt;())
+                    .transpose()<span class="question-mark">?
+                    </span>.unwrap_or_else(Vec::new))
             } <span class="kw">else </span>{
                 <span class="prelude-val">None
             </span>}
@@ -1465,31 +1361,23 @@
         Ty::Vec =&gt; {
             <span class="macro">quote_spanned! </span>{ ty.span()=&gt;
                 #arg_matches.#get_many(#id)
-                    .map(|v| v.collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;())
-                    .unwrap_or_else(Vec::new)
+                    .map(|v| v.map(#deref).map::&lt;::std::result::Result&lt;#convert_type, clap::Error&gt;, <span class="kw">_</span>&gt;(#parse).collect::&lt;::std::result::Result&lt;Vec&lt;<span class="kw">_</span>&gt;, clap::Error&gt;&gt;())
+                    .transpose()<span class="question-mark">?
+                    </span>.unwrap_or_else(Vec::new)
             }
         }
-
-        Ty::VecVec =&gt; <span class="macro">quote_spanned! </span>{ ty.span()=&gt;
-            #arg_matches.#get_occurrences(#id)
-                .map(|g| g.map(::std::iter::Iterator::collect).collect::&lt;Vec&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;&gt;())
-                .unwrap_or_else(Vec::new)
-        },
-
-        Ty::OptionVecVec =&gt; <span class="macro">quote_spanned! </span>{ ty.span()=&gt;
-            #arg_matches.#get_occurrences(#id)
-                .map(|g| g.map(::std::iter::Iterator::collect).collect::&lt;Vec&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;&gt;())
-        },
 
         Ty::Other =&gt; {
             <span class="macro">quote_spanned! </span>{ ty.span()=&gt;
                 #arg_matches.#get_one(#id)
-                    .ok_or_else(|| clap::Error::raw(clap::error::ErrorKind::MissingRequiredArgument, <span class="macro">concat!</span>(<span class="string">&quot;The following required argument was not provided: &quot;</span>, #id)))<span class="question-mark">?
+                    .map(#deref)
+                    .ok_or_else(|| clap::Error::raw(clap::error::ErrorKind::MissingRequiredArgument, <span class="macro">format!</span>(<span class="string">"The following required argument was not provided: {}"</span>, #id)))
+                    .and_then(#parse)<span class="question-mark">?
             </span>}
         }
     };
 
-    <span class="kw">let </span>genned = <span class="kw">if let </span><span class="prelude-val">Some</span>(access) = update {
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(access) = update {
         <span class="macro">quote_spanned! </span>{ field.span()=&gt;
             <span class="kw">if </span>#arg_matches.contains_id(#id) {
                 #access
@@ -1498,34 +1386,19 @@
         }
     } <span class="kw">else </span>{
         <span class="macro">quote_spanned!</span>(field.span()=&gt; #field_name: #field_value )
-    };
-    <span class="prelude-val">Ok</span>(genned)
+    }
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;raw-deprecated&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"raw-deprecated"</span>)]
 </span><span class="kw">pub fn </span>raw_deprecated() -&gt; TokenStream {
     <span class="macro">quote! </span>{}
 }
 
-<span class="attr">#[cfg(not(feature = <span class="string">&quot;raw-deprecated&quot;</span>))]
+<span class="attr">#[cfg(not(feature = <span class="string">"raw-deprecated"</span>))]
 </span><span class="kw">pub fn </span>raw_deprecated() -&gt; TokenStream {
     <span class="macro">quote! </span>{
         <span class="attr">#![allow(deprecated)]  </span><span class="comment">// Assuming any deprecation in here will be related to a deprecation in `Args`
 
     </span>}
-}
-
-<span class="kw">pub fn </span>collect_args_fields&lt;<span class="lifetime">&#39;a</span>&gt;(
-    item: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Item,
-    fields: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>FieldsNamed,
-) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Field, Item)&gt;, syn::Error&gt; {
-    fields
-        .named
-        .iter()
-        .map(|field| {
-            <span class="kw">let </span>item = Item::from_args_field(field, item.casing(), item.env_casing())<span class="question-mark">?</span>;
-            <span class="prelude-val">Ok</span>((field, item))
-        })
-        .collect()
 }
 </code></pre></div></section></main></body></html>

@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/strum_macros-0.24.3/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="strum_macros" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/strum_macros-0.24.3/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="strum_macros" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -759,7 +760,7 @@
 //! enums and strings easier in Rust.
 //!
 
-</span><span class="attr">#![recursion_limit = <span class="string">&quot;128&quot;</span>]
+</span><span class="attr">#![recursion_limit = <span class="string">"128"</span>]
 
 </span><span class="kw">extern crate </span>proc_macro;
 
@@ -771,14 +772,14 @@
 <span class="kw">use </span>syn::DeriveInput;
 
 <span class="kw">fn </span>debug_print_generated(ast: <span class="kw-2">&amp;</span>DeriveInput, toks: <span class="kw-2">&amp;</span>TokenStream) {
-    <span class="kw">let </span>debug = env::var(<span class="string">&quot;STRUM_DEBUG&quot;</span>);
+    <span class="kw">let </span>debug = env::var(<span class="string">"STRUM_DEBUG"</span>);
     <span class="kw">if let </span><span class="prelude-val">Ok</span>(s) = debug {
-        <span class="kw">if </span>s == <span class="string">&quot;1&quot; </span>{
-            <span class="macro">println!</span>(<span class="string">&quot;{}&quot;</span>, toks);
+        <span class="kw">if </span>s == <span class="string">"1" </span>{
+            <span class="macro">println!</span>(<span class="string">"{}"</span>, toks);
         }
 
         <span class="kw">if </span>ast.ident == s {
-            <span class="macro">println!</span>(<span class="string">&quot;{}&quot;</span>, toks);
+            <span class="macro">println!</span>(<span class="string">"{}"</span>, toks);
         }
     }
 }
@@ -786,18 +787,18 @@
 <span class="doccomment">/// Converts strings to enum variants based on their name.
 ///
 /// auto-derives `std::str::FromStr` on the enum (for Rust 1.34 and above, `std::convert::TryFrom&lt;&amp;str&gt;`
-/// will be derived as well). Each variant of the enum will match on it&#39;s own name.
-/// This can be overridden using `serialize=&quot;DifferentName&quot;` or `to_string=&quot;DifferentName&quot;`
+/// will be derived as well). Each variant of the enum will match on it's own name.
+/// This can be overridden using `serialize="DifferentName"` or `to_string="DifferentName"`
 /// on the attribute as shown below.
 /// Multiple deserializations can be added to the same variant. If the variant contains additional data,
 /// they will be set to their default values upon deserialization.
 ///
-/// The `default` attribute can be applied to a tuple variant with a single data parameter. When a match isn&#39;t
+/// The `default` attribute can be applied to a tuple variant with a single data parameter. When a match isn't
 /// found, the given variant will be returned and the input string will be captured in the parameter.
 ///
 /// Note that the implementation of `FromStr` by default only matches on the name of the
 /// variant. There is an option to match on different case conversions through the
-/// `#[strum(serialize_all = &quot;snake_case&quot;)]` type attribute.
+/// `#[strum(serialize_all = "snake_case")]` type attribute.
 ///
 /// See the [Additional Attributes](https://docs.rs/strum/0.22/strum/additional_attributes/index.html)
 /// Section for more information on using this feature.
@@ -813,13 +814,13 @@
 /// #[derive(Debug, PartialEq, EnumString)]
 /// enum Color {
 ///     Red,
-///     // The Default value will be inserted into range if we match &quot;Green&quot;.
+///     // The Default value will be inserted into range if we match "Green".
 ///     Green {
 ///         range: usize,
 ///     },
 ///
 ///     // We can match on multiple different patterns.
-///     #[strum(serialize = &quot;blue&quot;, serialize = &quot;b&quot;)]
+///     #[strum(serialize = "blue", serialize = "b")]
 ///     Blue(usize),
 ///
 ///     // Notice that we can disable certain variants from being found
@@ -838,11 +839,11 @@
 ///
 ///     fn from_str(s: &amp;str) -&gt; ::core::result::Result&lt;Color, Self::Err&gt; {
 ///         match s {
-///             &quot;Red&quot; =&gt; ::core::result::Result::Ok(Color::Red),
-///             &quot;Green&quot; =&gt; ::core::result::Result::Ok(Color::Green { range:Default::default() }),
-///             &quot;blue&quot; =&gt; ::core::result::Result::Ok(Color::Blue(Default::default())),
-///             &quot;b&quot; =&gt; ::core::result::Result::Ok(Color::Blue(Default::default())),
-///             s if s.eq_ignore_ascii_case(&quot;Black&quot;) =&gt; ::core::result::Result::Ok(Color::Black),
+///             "Red" =&gt; ::core::result::Result::Ok(Color::Red),
+///             "Green" =&gt; ::core::result::Result::Ok(Color::Green { range:Default::default() }),
+///             "blue" =&gt; ::core::result::Result::Ok(Color::Blue(Default::default())),
+///             "b" =&gt; ::core::result::Result::Ok(Color::Blue(Default::default())),
+///             s if s.eq_ignore_ascii_case("Black") =&gt; ::core::result::Result::Ok(Color::Black),
 ///             _ =&gt; ::core::result::Result::Err(::strum::ParseError::VariantNotFound),
 ///         }
 ///     }
@@ -850,17 +851,17 @@
 /// */
 ///
 /// // simple from string
-/// let color_variant = Color::from_str(&quot;Red&quot;).unwrap();
+/// let color_variant = Color::from_str("Red").unwrap();
 /// assert_eq!(Color::Red, color_variant);
 /// // short version works too
-/// let color_variant = Color::from_str(&quot;b&quot;).unwrap();
+/// let color_variant = Color::from_str("b").unwrap();
 /// assert_eq!(Color::Blue(0), color_variant);
 /// // was disabled for parsing = returns parse-error
-/// let color_variant = Color::from_str(&quot;Yellow&quot;);
+/// let color_variant = Color::from_str("Yellow");
 /// assert!(color_variant.is_err());
 /// // however the variant is still normally usable
-/// println!(&quot;{:?}&quot;, Color::Yellow);
-/// let color_variant = Color::from_str(&quot;bLACk&quot;).unwrap();
+/// println!("{:?}", Color::Yellow);
+/// let color_variant = Color::from_str("bLACk").unwrap();
 /// assert_eq!(Color::Black, color_variant);
 /// ```
 </span><span class="attr">#[proc_macro_derive(EnumString, attributes(strum))]
@@ -873,11 +874,11 @@
     toks.into()
 }
 
-<span class="doccomment">/// Converts enum variants to `&amp;&#39;static str`.
+<span class="doccomment">/// Converts enum variants to `&amp;'static str`.
 ///
 /// Implements `AsRef&lt;str&gt;` on your enum using the same rules as
 /// `Display` for determining what string is returned. The difference is that `as_ref()` returns
-/// a `&amp;str` instead of a `String` so you don&#39;t allocate any additional memory with each call.
+/// a `&amp;str` instead of a `String` so you don't allocate any additional memory with each call.
 ///
 /// ```
 /// // You need to bring the AsRef trait into scope to use it
@@ -886,7 +887,7 @@
 ///
 /// #[derive(AsRefStr, Debug)]
 /// enum Color {
-///     #[strum(serialize = &quot;redred&quot;)]
+///     #[strum(serialize = "redred")]
 ///     Red,
 ///     Green {
 ///         range: usize,
@@ -897,13 +898,13 @@
 ///
 /// // uses the serialize string for Display
 /// let red = Color::Red;
-/// assert_eq!(&quot;redred&quot;, red.as_ref());
+/// assert_eq!("redred", red.as_ref());
 /// // by default the variants Name
 /// let yellow = Color::Yellow;
-/// assert_eq!(&quot;Yellow&quot;, yellow.as_ref());
+/// assert_eq!("Yellow", yellow.as_ref());
 /// // or for string formatting
 /// println!(
-///     &quot;blue: {} green: {}&quot;,
+///     "blue: {} green: {}",
 ///     Color::Blue(10).as_ref(),
 ///     Color::Green { range: 42 }.as_ref()
 /// );
@@ -920,8 +921,8 @@
 
 <span class="doccomment">/// Implements `Strum::VariantNames` which adds an associated constant `VARIANTS` which is an array of discriminant names.
 ///
-/// Adds an `impl` block for the `enum` that adds a static `VARIANTS` array of `&amp;&#39;static str` that are the discriminant names.
-/// This will respect the `serialize_all` attribute on the `enum` (like `#[strum(serialize_all = &quot;snake_case&quot;)]`.
+/// Adds an `impl` block for the `enum` that adds a static `VARIANTS` array of `&amp;'static str` that are the discriminant names.
+/// This will respect the `serialize_all` attribute on the `enum` (like `#[strum(serialize_all = "snake_case")]`.
 ///
 /// ```
 /// // import the macros needed
@@ -930,14 +931,14 @@
 /// use strum::VariantNames;
 ///
 /// #[derive(Debug, EnumString, EnumVariantNames)]
-/// #[strum(serialize_all = &quot;kebab_case&quot;)]
+/// #[strum(serialize_all = "kebab_case")]
 /// enum Color {
 ///     Red,
 ///     Blue,
 ///     Yellow,
 ///     RebeccaPurple,
 /// }
-/// assert_eq!([&quot;red&quot;, &quot;blue&quot;, &quot;yellow&quot;, &quot;rebecca-purple&quot;], Color::VARIANTS);
+/// assert_eq!(["red", "blue", "yellow", "rebecca-purple"], Color::VARIANTS);
 /// ```
 </span><span class="attr">#[proc_macro_derive(EnumVariantNames, attributes(strum))]
 </span><span class="kw">pub fn </span>variant_names(input: proc_macro::TokenStream) -&gt; proc_macro::TokenStream {
@@ -951,8 +952,8 @@
 
 <span class="attr">#[proc_macro_derive(AsStaticStr, attributes(strum))]
 #[deprecated(
-    since = <span class="string">&quot;0.22.0&quot;</span>,
-    note = <span class="string">&quot;please use `#[derive(IntoStaticStr)]` instead&quot;
+    since = <span class="string">"0.22.0"</span>,
+    note = <span class="string">"please use `#[derive(IntoStaticStr)]` instead"
 </span>)]
 </span><span class="kw">pub fn </span>as_static_str(input: proc_macro::TokenStream) -&gt; proc_macro::TokenStream {
     <span class="kw">let </span>ast = <span class="macro">syn::parse_macro_input!</span>(input <span class="kw">as </span>DeriveInput);
@@ -966,34 +967,34 @@
     toks.into()
 }
 
-<span class="doccomment">/// Implements `From&lt;MyEnum&gt; for &amp;&#39;static str` on an enum.
+<span class="doccomment">/// Implements `From&lt;MyEnum&gt; for &amp;'static str` on an enum.
 ///
-/// Implements `From&lt;YourEnum&gt;` and `From&lt;&amp;&#39;a YourEnum&gt;` for `&amp;&#39;static str`. This is
+/// Implements `From&lt;YourEnum&gt;` and `From&lt;&amp;'a YourEnum&gt;` for `&amp;'static str`. This is
 /// useful for turning an enum variant into a static string.
-/// The Rust `std` provides a blanket impl of the reverse direction - i.e. `impl Into&lt;&amp;&#39;static str&gt; for YourEnum`.
+/// The Rust `std` provides a blanket impl of the reverse direction - i.e. `impl Into&lt;&amp;'static str&gt; for YourEnum`.
 ///
 /// ```
 /// use strum_macros::IntoStaticStr;
 ///
 /// #[derive(IntoStaticStr)]
-/// enum State&lt;&#39;a&gt; {
-///     Initial(&amp;&#39;a str),
+/// enum State&lt;'a&gt; {
+///     Initial(&amp;'a str),
 ///     Finished,
 /// }
 ///
-/// fn verify_state&lt;&#39;a&gt;(s: &amp;&#39;a str) {
+/// fn verify_state&lt;'a&gt;(s: &amp;'a str) {
 ///     let mut state = State::Initial(s);
-///     // The following won&#39;t work because the lifetime is incorrect:
-///     // let wrong: &amp;&#39;static str = state.as_ref();
+///     // The following won't work because the lifetime is incorrect:
+///     // let wrong: &amp;'static str = state.as_ref();
 ///     // using the trait implemented by the derive works however:
-///     let right: &amp;&#39;static str = state.into();
-///     assert_eq!(&quot;Initial&quot;, right);
+///     let right: &amp;'static str = state.into();
+///     assert_eq!("Initial", right);
 ///     state = State::Finished;
-///     let done: &amp;&#39;static str = state.into();
-///     assert_eq!(&quot;Finished&quot;, done);
+///     let done: &amp;'static str = state.into();
+///     assert_eq!("Finished", done);
 /// }
 ///
-/// verify_state(&amp;&quot;hello world&quot;.to_string());
+/// verify_state(&amp;"hello world".to_string());
 /// ```
 </span><span class="attr">#[proc_macro_derive(IntoStaticStr, attributes(strum))]
 </span><span class="kw">pub fn </span>into_static_str(input: proc_macro::TokenStream) -&gt; proc_macro::TokenStream {
@@ -1017,7 +1018,7 @@
 ///
 /// #[derive(strum_macros::ToString, Debug)]
 /// enum Color {
-///     #[strum(serialize = &quot;redred&quot;)]
+///     #[strum(serialize = "redred")]
 ///     Red,
 ///     Green {
 ///         range: usize,
@@ -1028,14 +1029,14 @@
 ///
 /// // uses the serialize string for Display
 /// let red = Color::Red;
-/// assert_eq!(String::from(&quot;redred&quot;), red.to_string());
+/// assert_eq!(String::from("redred"), red.to_string());
 /// // by default the variants Name
 /// let yellow = Color::Yellow;
-/// assert_eq!(String::from(&quot;Yellow&quot;), yellow.to_string());
+/// assert_eq!(String::from("Yellow"), yellow.to_string());
 /// ```
 </span><span class="attr">#[deprecated(
-    since = <span class="string">&quot;0.22.0&quot;</span>,
-    note = <span class="string">&quot;please use `#[derive(Display)]` instead. See issue https://github.com/Peternator7/strum/issues/132&quot;
+    since = <span class="string">"0.22.0"</span>,
+    note = <span class="string">"please use `#[derive(Display)]` instead. See issue https://github.com/Peternator7/strum/issues/132"
 </span>)]
 #[proc_macro_derive(ToString, attributes(strum))]
 </span><span class="kw">pub fn </span>to_string(input: proc_macro::TokenStream) -&gt; proc_macro::TokenStream {
@@ -1055,7 +1056,7 @@
 ///
 /// 1. If there is a `to_string` property, this value will be used. There can only be one per variant.
 /// 1. Of the various `serialize` properties, the value with the longest length is chosen. If that
-///    behavior isn&#39;t desired, you should use `to_string`.
+///    behavior isn't desired, you should use `to_string`.
 /// 1. The name of the variant will be used if there are no `serialize` or `to_string` attributes.
 ///
 /// ```
@@ -1065,7 +1066,7 @@
 ///
 /// #[derive(Display, Debug)]
 /// enum Color {
-///     #[strum(serialize = &quot;redred&quot;)]
+///     #[strum(serialize = "redred")]
 ///     Red,
 ///     Green {
 ///         range: usize,
@@ -1076,13 +1077,13 @@
 ///
 /// // uses the serialize string for Display
 /// let red = Color::Red;
-/// assert_eq!(String::from(&quot;redred&quot;), format!(&quot;{}&quot;, red));
+/// assert_eq!(String::from("redred"), format!("{}", red));
 /// // by default the variants Name
 /// let yellow = Color::Yellow;
-/// assert_eq!(String::from(&quot;Yellow&quot;), yellow.to_string());
+/// assert_eq!(String::from("Yellow"), yellow.to_string());
 /// // or for string formatting
 /// println!(
-///     &quot;blue: {} green: {}&quot;,
+///     "blue: {} green: {}",
 ///     Color::Blue(10),
 ///     Color::Green { range: 42 }
 /// );
@@ -1100,7 +1101,7 @@
 ///
 /// Iterate over the variants of an Enum. Any additional data on your variants will be set to `Default::default()`.
 /// The macro implements `strum::IntoEnumIter` on your enum and creates a new type called `YourEnumIter` that is the iterator object.
-/// You cannot derive `EnumIter` on any type with a lifetime bound (`&lt;&#39;a&gt;`) because the iterator would surely
+/// You cannot derive `EnumIter` on any type with a lifetime bound (`&lt;'a&gt;`) because the iterator would surely
 /// create [unbounded lifetimes](https://doc.rust-lang.org/nightly/nomicon/unbounded-lifetimes.html).
 ///
 /// ```
@@ -1117,9 +1118,9 @@
 ///     Yellow,
 /// }
 ///
-/// // It&#39;s simple to iterate over the variants of an enum.
+/// // It's simple to iterate over the variants of an enum.
 /// for color in Color::iter() {
-///     println!(&quot;My favorite color is {:?}&quot;, color);
+///     println!("My favorite color is {:?}", color);
 /// }
 ///
 /// let mut ci = Color::iter();
@@ -1154,7 +1155,7 @@
 /// to allow `match` statements in `const fn`. The no additional data requirement is due to the
 /// inability to use `Default::default()` in a `const fn`.
 ///
-/// You cannot derive `FromRepr` on any type with a lifetime bound (`&lt;&#39;a&gt;`) because the function would surely
+/// You cannot derive `FromRepr` on any type with a lifetime bound (`&lt;'a&gt;`) because the function would surely
 /// create [unbounded lifetimes](https://doc.rust-lang.org/nightly/nomicon/unbounded-lifetimes.html).
 ///
 /// ```
@@ -1227,8 +1228,8 @@
 <span class="doccomment">/// Add a verbose message to an enum variant.
 ///
 /// Encode strings into the enum itself. The `strum_macros::EmumMessage` macro implements the `strum::EnumMessage` trait.
-/// `EnumMessage` looks for `#[strum(message=&quot;...&quot;)]` attributes on your variants.
-/// You can also provided a `detailed_message=&quot;...&quot;` attribute to create a seperate more detailed message than the first.
+/// `EnumMessage` looks for `#[strum(message="...")]` attributes on your variants.
+/// You can also provided a `detailed_message="..."` attribute to create a seperate more detailed message than the first.
 ///
 /// `EnumMessage` also exposes the variants doc comments through `get_documentation()`. This is useful in some scenarios,
 /// but `get_message` should generally be preferred. Rust doc comments are intended for developer facing documentation,
@@ -1243,52 +1244,52 @@
 /// #[allow(dead_code)]
 /// enum Color {
 ///     /// Danger color.
-///     #[strum(message = &quot;Red&quot;, detailed_message = &quot;This is very red&quot;)]
+///     #[strum(message = "Red", detailed_message = "This is very red")]
 ///     Red,
-///     #[strum(message = &quot;Simply Green&quot;)]
+///     #[strum(message = "Simply Green")]
 ///     Green { range: usize },
-///     #[strum(serialize = &quot;b&quot;, serialize = &quot;blue&quot;)]
+///     #[strum(serialize = "b", serialize = "blue")]
 ///     Blue(usize),
 /// }
 ///
 /// // Generated code looks like more or less like this:
 /// /*
 /// impl ::strum::EnumMessage for Color {
-///     fn get_message(&amp;self) -&gt; ::core::option::Option&lt;&amp;&#39;static str&gt; {
+///     fn get_message(&amp;self) -&gt; ::core::option::Option&lt;&amp;'static str&gt; {
 ///         match self {
-///             &amp;Color::Red =&gt; ::core::option::Option::Some(&quot;Red&quot;),
-///             &amp;Color::Green {..} =&gt; ::core::option::Option::Some(&quot;Simply Green&quot;),
+///             &amp;Color::Red =&gt; ::core::option::Option::Some("Red"),
+///             &amp;Color::Green {..} =&gt; ::core::option::Option::Some("Simply Green"),
 ///             _ =&gt; None
 ///         }
 ///     }
 ///
-///     fn get_detailed_message(&amp;self) -&gt; ::core::option::Option&lt;&amp;&#39;static str&gt; {
+///     fn get_detailed_message(&amp;self) -&gt; ::core::option::Option&lt;&amp;'static str&gt; {
 ///         match self {
-///             &amp;Color::Red =&gt; ::core::option::Option::Some(&quot;This is very red&quot;),
-///             &amp;Color::Green {..}=&gt; ::core::option::Option::Some(&quot;Simply Green&quot;),
+///             &amp;Color::Red =&gt; ::core::option::Option::Some("This is very red"),
+///             &amp;Color::Green {..}=&gt; ::core::option::Option::Some("Simply Green"),
 ///             _ =&gt; None
 ///         }
 ///     }
 ///
-///     fn get_documentation(&amp;self) -&gt; ::std::option::Option&lt;&amp;&#39;static str&gt; {
+///     fn get_documentation(&amp;self) -&gt; ::std::option::Option&lt;&amp;'static str&gt; {
 ///         match self {
-///             &amp;Color::Red =&gt; ::std::option::Option::Some(&quot;Danger color.&quot;),
+///             &amp;Color::Red =&gt; ::std::option::Option::Some("Danger color."),
 ///             _ =&gt; None
 ///         }
 ///     }
 ///
-///     fn get_serializations(&amp;self) -&gt; &amp;&#39;static [&amp;&#39;static str] {
+///     fn get_serializations(&amp;self) -&gt; &amp;'static [&amp;'static str] {
 ///         match self {
 ///             &amp;Color::Red =&gt; {
-///                 static ARR: [&amp;&#39;static str; 1] = [&quot;Red&quot;];
+///                 static ARR: [&amp;'static str; 1] = ["Red"];
 ///                 &amp;ARR
 ///             },
 ///             &amp;Color::Green {..}=&gt; {
-///                 static ARR: [&amp;&#39;static str; 1] = [&quot;Green&quot;];
+///                 static ARR: [&amp;'static str; 1] = ["Green"];
 ///                 &amp;ARR
 ///             },
 ///             &amp;Color::Blue (..) =&gt; {
-///                 static ARR: [&amp;&#39;static str; 2] = [&quot;b&quot;, &quot;blue&quot;];
+///                 static ARR: [&amp;'static str; 2] = ["b", "blue"];
 ///                 &amp;ARR
 ///             },
 ///         }
@@ -1297,10 +1298,10 @@
 /// */
 ///
 /// let c = Color::Red;
-/// assert_eq!(&quot;Red&quot;, c.get_message().unwrap());
-/// assert_eq!(&quot;This is very red&quot;, c.get_detailed_message().unwrap());
-/// assert_eq!(&quot;Danger color.&quot;, c.get_documentation().unwrap());
-/// assert_eq!([&quot;Red&quot;], c.get_serializations());
+/// assert_eq!("Red", c.get_message().unwrap());
+/// assert_eq!("This is very red", c.get_detailed_message().unwrap());
+/// assert_eq!("Danger color.", c.get_documentation().unwrap());
+/// assert_eq!(["Red"], c.get_serializations());
 /// ```
 </span><span class="attr">#[proc_macro_derive(EnumMessage, attributes(strum))]
 </span><span class="kw">pub fn </span>enum_messages(input: proc_macro::TokenStream) -&gt; proc_macro::TokenStream {
@@ -1331,27 +1332,27 @@
 /// #[derive(strum_macros::EnumProperty, Debug)]
 /// #[allow(dead_code)]
 /// enum Color {
-///     #[strum(props(Red = &quot;255&quot;, Blue = &quot;255&quot;, Green = &quot;255&quot;))]
+///     #[strum(props(Red = "255", Blue = "255", Green = "255"))]
 ///     White,
-///     #[strum(props(Red = &quot;0&quot;, Blue = &quot;0&quot;, Green = &quot;0&quot;))]
+///     #[strum(props(Red = "0", Blue = "0", Green = "0"))]
 ///     Black,
-///     #[strum(props(Red = &quot;0&quot;, Blue = &quot;255&quot;, Green = &quot;0&quot;))]
+///     #[strum(props(Red = "0", Blue = "255", Green = "0"))]
 ///     Blue,
-///     #[strum(props(Red = &quot;255&quot;, Blue = &quot;0&quot;, Green = &quot;0&quot;))]
+///     #[strum(props(Red = "255", Blue = "0", Green = "0"))]
 ///     Red,
-///     #[strum(props(Red = &quot;0&quot;, Blue = &quot;0&quot;, Green = &quot;255&quot;))]
+///     #[strum(props(Red = "0", Blue = "0", Green = "255"))]
 ///     Green,
 /// }
 ///
 /// let my_color = Color::Red;
 /// let display = format!(
-///     &quot;My color is {:?}. It&#39;s RGB is {},{},{}&quot;,
+///     "My color is {:?}. It's RGB is {},{},{}",
 ///     my_color,
-///     my_color.get_str(&quot;Red&quot;).unwrap(),
-///     my_color.get_str(&quot;Green&quot;).unwrap(),
-///     my_color.get_str(&quot;Blue&quot;).unwrap()
+///     my_color.get_str("Red").unwrap(),
+///     my_color.get_str("Green").unwrap(),
+///     my_color.get_str("Blue").unwrap()
 /// );
-/// assert_eq!(&quot;My color is Red. It\&#39;s RGB is 255,0,0&quot;, &amp;display);
+/// assert_eq!("My color is Red. It\'s RGB is 255,0,0", &amp;display);
 /// ```
 
 </span><span class="attr">#[proc_macro_derive(EnumProperty, attributes(strum))]
@@ -1395,7 +1396,7 @@
 /// #[derive(Debug, EnumDiscriminants)]
 /// #[strum_discriminants(derive(EnumString, EnumMessage))]
 /// enum MyEnum {
-///     #[strum_discriminants(strum(message = &quot;Variant zero&quot;))]
+///     #[strum_discriminants(strum(message = "Variant zero"))]
 ///     Variant0(NonDefault),
 ///     Variant1 { a: NonDefault },
 /// }
@@ -1413,7 +1414,7 @@
 /// // test simple example
 /// assert_eq!(
 ///     MyEnumDiscriminants::Variant0,
-///     MyEnumDiscriminants::from_str(&quot;Variant0&quot;).unwrap()
+///     MyEnumDiscriminants::from_str("Variant0").unwrap()
 /// );
 /// // test rename example combined with EnumIter
 /// assert_eq!(
@@ -1435,7 +1436,7 @@
 /// // Make use of the EnumMessage on the `MyEnumDiscriminants` discriminant.
 /// assert_eq!(
 ///     MyEnumDiscriminants::Variant0.get_message(),
-///     Some(&quot;Variant zero&quot;)
+///     Some("Variant zero")
 /// );
 /// ```
 ///

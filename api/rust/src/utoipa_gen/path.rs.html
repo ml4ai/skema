@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/utoipa-gen-3.5.0/src/path.rs`."><title>path.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="utoipa_gen" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/utoipa-gen-3.5.0/src/path.rs`."><title>path.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="utoipa_gen" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -613,35 +614,35 @@
 <span class="kw">pub mod </span>response;
 <span class="kw">mod </span>status;
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const </span>PATH_STRUCT_PREFIX: <span class="kw-2">&amp;</span>str = <span class="string">&quot;__path_&quot;</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const </span>PATH_STRUCT_PREFIX: <span class="kw-2">&amp;</span>str = <span class="string">"__path_"</span>;
 
 <span class="attr">#[derive(Default)]
-#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
-</span><span class="kw">pub struct </span>PathAttr&lt;<span class="lifetime">&#39;p</span>&gt; {
+#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
+</span><span class="kw">pub struct </span>PathAttr&lt;<span class="lifetime">'p</span>&gt; {
     path_operation: <span class="prelude-ty">Option</span>&lt;PathOperation&gt;,
-    request_body: <span class="prelude-ty">Option</span>&lt;RequestBody&lt;<span class="lifetime">&#39;p</span>&gt;&gt;,
-    responses: Vec&lt;Response&lt;<span class="lifetime">&#39;p</span>&gt;&gt;,
+    request_body: <span class="prelude-ty">Option</span>&lt;RequestBody&lt;<span class="lifetime">'p</span>&gt;&gt;,
+    responses: Vec&lt;Response&lt;<span class="lifetime">'p</span>&gt;&gt;,
     <span class="kw">pub</span>(<span class="kw">super</span>) path: <span class="prelude-ty">Option</span>&lt;String&gt;,
     operation_id: <span class="prelude-ty">Option</span>&lt;Expr&gt;,
     tag: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    params: Vec&lt;Parameter&lt;<span class="lifetime">&#39;p</span>&gt;&gt;,
-    security: <span class="prelude-ty">Option</span>&lt;Array&lt;<span class="lifetime">&#39;p</span>, SecurityRequirementAttr&gt;&gt;,
+    params: Vec&lt;Parameter&lt;<span class="lifetime">'p</span>&gt;&gt;,
+    security: <span class="prelude-ty">Option</span>&lt;Array&lt;<span class="lifetime">'p</span>, SecurityRequirementAttr&gt;&gt;,
     context_path: <span class="prelude-ty">Option</span>&lt;String&gt;,
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;p</span>&gt; PathAttr&lt;<span class="lifetime">&#39;p</span>&gt; {
-    <span class="attr">#[cfg(feature = <span class="string">&quot;auto_into_responses&quot;</span>)]
-    </span><span class="kw">pub fn </span>responses_from_into_responses(<span class="kw-2">&amp;mut </span><span class="self">self</span>, ty: <span class="kw-2">&amp;</span><span class="lifetime">&#39;p </span>syn::TypePath) {
+<span class="kw">impl</span>&lt;<span class="lifetime">'p</span>&gt; PathAttr&lt;<span class="lifetime">'p</span>&gt; {
+    <span class="attr">#[cfg(feature = <span class="string">"auto_into_responses"</span>)]
+    </span><span class="kw">pub fn </span>responses_from_into_responses(<span class="kw-2">&amp;mut </span><span class="self">self</span>, ty: <span class="kw-2">&amp;</span><span class="lifetime">'p </span>syn::TypePath) {
         <span class="self">self</span>.responses
             .push(Response::IntoResponses(Cow::Borrowed(ty)))
     }
 
     <span class="attr">#[cfg(any(
-        feature = <span class="string">&quot;actix_extras&quot;</span>,
-        feature = <span class="string">&quot;rocket_extras&quot;</span>,
-        feature = <span class="string">&quot;axum_extras&quot;
+        feature = <span class="string">"actix_extras"</span>,
+        feature = <span class="string">"rocket_extras"</span>,
+        feature = <span class="string">"axum_extras"
     </span>))]
-    </span><span class="kw">pub fn </span>update_request_body(<span class="kw-2">&amp;mut </span><span class="self">self</span>, request_body: <span class="prelude-ty">Option</span>&lt;<span class="kw">crate</span>::ext::RequestBody&lt;<span class="lifetime">&#39;p</span>&gt;&gt;) {
+    </span><span class="kw">pub fn </span>update_request_body(<span class="kw-2">&amp;mut </span><span class="self">self</span>, request_body: <span class="prelude-ty">Option</span>&lt;<span class="kw">crate</span>::ext::RequestBody&lt;<span class="lifetime">'p</span>&gt;&gt;) {
         <span class="kw">use </span>std::mem;
 
         <span class="kw">if </span><span class="self">self</span>.request_body.is_none() {
@@ -653,11 +654,11 @@
 
     <span class="doccomment">/// Update path with external parameters from extensions.
     </span><span class="attr">#[cfg(any(
-        feature = <span class="string">&quot;actix_extras&quot;</span>,
-        feature = <span class="string">&quot;rocket_extras&quot;</span>,
-        feature = <span class="string">&quot;axum_extras&quot;
+        feature = <span class="string">"actix_extras"</span>,
+        feature = <span class="string">"rocket_extras"</span>,
+        feature = <span class="string">"axum_extras"
     </span>))]
-    </span><span class="kw">pub fn </span>update_parameters_ext&lt;I: IntoIterator&lt;Item = Parameter&lt;<span class="lifetime">&#39;p</span>&gt;&gt;&gt;(
+    </span><span class="kw">pub fn </span>update_parameters_ext&lt;I: IntoIterator&lt;Item = Parameter&lt;<span class="lifetime">'p</span>&gt;&gt;&gt;(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         ext_parameters: I,
     ) {
@@ -680,55 +681,55 @@
     }
 }
 
-<span class="kw">impl </span>Parse <span class="kw">for </span>PathAttr&lt;<span class="lifetime">&#39;_</span>&gt; {
+<span class="kw">impl </span>Parse <span class="kw">for </span>PathAttr&lt;<span class="lifetime">'_</span>&gt; {
     <span class="kw">fn </span>parse(input: syn::parse::ParseStream) -&gt; syn::Result&lt;<span class="self">Self</span>&gt; {
-        <span class="kw">const </span>EXPECTED_ATTRIBUTE_MESSAGE: <span class="kw-2">&amp;</span>str = <span class="string">&quot;unexpected identifier, expected any of: operation_id, path, get, post, put, delete, options, head, patch, trace, connect, request_body, responses, params, tag, security, context_path&quot;</span>;
+        <span class="kw">const </span>EXPECTED_ATTRIBUTE_MESSAGE: <span class="kw-2">&amp;</span>str = <span class="string">"unexpected identifier, expected any of: operation_id, path, get, post, put, delete, options, head, patch, trace, connect, request_body, responses, params, tag, security, context_path"</span>;
         <span class="kw">let </span><span class="kw-2">mut </span>path_attr = PathAttr::default();
 
         <span class="kw">while </span>!input.is_empty() {
             <span class="kw">let </span>ident = input.parse::&lt;Ident&gt;().map_err(|error| {
                 syn::Error::new(
                     error.span(),
-                    <span class="macro">format!</span>(<span class="string">&quot;{EXPECTED_ATTRIBUTE_MESSAGE}, {error}&quot;</span>),
+                    <span class="macro">format!</span>(<span class="string">"{EXPECTED_ATTRIBUTE_MESSAGE}, {error}"</span>),
                 )
             })<span class="question-mark">?</span>;
             <span class="kw">let </span>attribute_name = <span class="kw-2">&amp;*</span>ident.to_string();
 
             <span class="kw">match </span>attribute_name {
-                <span class="string">&quot;operation_id&quot; </span>=&gt; {
+                <span class="string">"operation_id" </span>=&gt; {
                     path_attr.operation_id =
                         <span class="prelude-val">Some</span>(parse_utils::parse_next(input, || Expr::parse(input))<span class="question-mark">?</span>);
                 }
-                <span class="string">&quot;path&quot; </span>=&gt; {
+                <span class="string">"path" </span>=&gt; {
                     path_attr.path = <span class="prelude-val">Some</span>(parse_utils::parse_next_literal_str(input)<span class="question-mark">?</span>);
                 }
-                <span class="string">&quot;request_body&quot; </span>=&gt; {
+                <span class="string">"request_body" </span>=&gt; {
                     path_attr.request_body =
                         <span class="prelude-val">Some</span>(RequestBody::Parsed(input.parse::&lt;RequestBodyAttr&gt;()<span class="question-mark">?</span>));
                 }
-                <span class="string">&quot;responses&quot; </span>=&gt; {
+                <span class="string">"responses" </span>=&gt; {
                     <span class="kw">let </span>responses;
                     <span class="macro">parenthesized!</span>(responses <span class="kw">in </span>input);
                     path_attr.responses =
                         Punctuated::&lt;Response, <span class="macro">Token!</span>[,]&gt;::parse_terminated(<span class="kw-2">&amp;</span>responses)
                             .map(|punctuated| punctuated.into_iter().collect::&lt;Vec&lt;Response&gt;&gt;())<span class="question-mark">?</span>;
                 }
-                <span class="string">&quot;params&quot; </span>=&gt; {
+                <span class="string">"params" </span>=&gt; {
                     <span class="kw">let </span>params;
                     <span class="macro">parenthesized!</span>(params <span class="kw">in </span>input);
                     path_attr.params =
                         Punctuated::&lt;Parameter, <span class="macro">Token!</span>[,]&gt;::parse_terminated(<span class="kw-2">&amp;</span>params)
                             .map(|punctuated| punctuated.into_iter().collect::&lt;Vec&lt;Parameter&gt;&gt;())<span class="question-mark">?</span>;
                 }
-                <span class="string">&quot;tag&quot; </span>=&gt; {
+                <span class="string">"tag" </span>=&gt; {
                     path_attr.tag = <span class="prelude-val">Some</span>(parse_utils::parse_next_literal_str(input)<span class="question-mark">?</span>);
                 }
-                <span class="string">&quot;security&quot; </span>=&gt; {
+                <span class="string">"security" </span>=&gt; {
                     <span class="kw">let </span>security;
                     <span class="macro">parenthesized!</span>(security <span class="kw">in </span>input);
                     path_attr.security = <span class="prelude-val">Some</span>(parse_utils::parse_groups(<span class="kw-2">&amp;</span>security)<span class="question-mark">?</span>)
                 }
-                <span class="string">&quot;context_path&quot; </span>=&gt; {
+                <span class="string">"context_path" </span>=&gt; {
                     path_attr.context_path = <span class="prelude-val">Some</span>(parse_utils::parse_next_literal_str(input)<span class="question-mark">?</span>)
                 }
                 <span class="kw">_ </span>=&gt; {
@@ -755,15 +756,15 @@
 <span class="doccomment">/// Path operation type of response
 ///
 /// Instance of path operation can be formed from str parsing with following supported values:
-///   * &quot;get&quot;
-///   * &quot;post&quot;
-///   * &quot;put&quot;
-///   * &quot;delete&quot;
-///   * &quot;options&quot;
-///   * &quot;head&quot;
-///   * &quot;patch&quot;
-///   * &quot;trace&quot;
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
+///   * "get"
+///   * "post"
+///   * "put"
+///   * "delete"
+///   * "options"
+///   * "head"
+///   * "patch"
+///   * "trace"
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
 </span><span class="kw">pub enum </span>PathOperation {
     Get,
     Post,
@@ -780,11 +781,11 @@
     <span class="doccomment">/// Create path operation from ident
     ///
     /// Ident must have value of http request type as lower case string such as `get`.
-    </span><span class="attr">#[cfg(any(feature = <span class="string">&quot;actix_extras&quot;</span>, feature = <span class="string">&quot;rocket_extras&quot;</span>))]
+    </span><span class="attr">#[cfg(any(feature = <span class="string">"actix_extras"</span>, feature = <span class="string">"rocket_extras"</span>))]
     </span><span class="kw">pub fn </span>from_ident(ident: <span class="kw-2">&amp;</span>Ident) -&gt; <span class="self">Self </span>{
         <span class="kw">match </span>ident.to_string().as_str().parse::&lt;PathOperation&gt;() {
             <span class="prelude-val">Ok</span>(operation) =&gt; operation,
-            <span class="prelude-val">Err</span>(error) =&gt; <span class="macro">abort!</span>(ident.span(), <span class="macro">format!</span>(<span class="string">&quot;{error}&quot;</span>)),
+            <span class="prelude-val">Err</span>(error) =&gt; <span class="macro">abort!</span>(ident.span(), <span class="macro">format!</span>(<span class="string">"{error}"</span>)),
         }
     }
 }
@@ -794,18 +795,18 @@
 
     <span class="kw">fn </span>from_str(s: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Err&gt; {
         <span class="kw">match </span>s {
-            <span class="string">&quot;get&quot; </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::Get),
-            <span class="string">&quot;post&quot; </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::Post),
-            <span class="string">&quot;put&quot; </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::Put),
-            <span class="string">&quot;delete&quot; </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::Delete),
-            <span class="string">&quot;options&quot; </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::Options),
-            <span class="string">&quot;head&quot; </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::Head),
-            <span class="string">&quot;patch&quot; </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::Patch),
-            <span class="string">&quot;trace&quot; </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::Trace),
-            <span class="string">&quot;connect&quot; </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::Connect),
+            <span class="string">"get" </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::Get),
+            <span class="string">"post" </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::Post),
+            <span class="string">"put" </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::Put),
+            <span class="string">"delete" </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::Delete),
+            <span class="string">"options" </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::Options),
+            <span class="string">"head" </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::Head),
+            <span class="string">"patch" </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::Patch),
+            <span class="string">"trace" </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::Trace),
+            <span class="string">"connect" </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::Connect),
             <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(Error::new(
                 std::io::ErrorKind::Other,
-                <span class="string">&quot;invalid PathOperation expected one of: get, post, put, delete, options, head, patch, trace, connect&quot;</span>,
+                <span class="string">"invalid PathOperation expected one of: get, post, put, delete, options, head, patch, trace, connect"</span>,
             )),
         }
     }
@@ -828,8 +829,8 @@
         tokens.extend(path_item_type);
     }
 }
-<span class="kw">pub struct </span>Path&lt;<span class="lifetime">&#39;p</span>&gt; {
-    path_attr: PathAttr&lt;<span class="lifetime">&#39;p</span>&gt;,
+<span class="kw">pub struct </span>Path&lt;<span class="lifetime">'p</span>&gt; {
+    path_attr: PathAttr&lt;<span class="lifetime">'p</span>&gt;,
     fn_name: String,
     path_operation: <span class="prelude-ty">Option</span>&lt;PathOperation&gt;,
     path: <span class="prelude-ty">Option</span>&lt;String&gt;,
@@ -837,8 +838,8 @@
     deprecated: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;p</span>&gt; Path&lt;<span class="lifetime">&#39;p</span>&gt; {
-    <span class="kw">pub fn </span>new(path_attr: PathAttr&lt;<span class="lifetime">&#39;p</span>&gt;, fn_name: <span class="kw-2">&amp;</span>str) -&gt; <span class="self">Self </span>{
+<span class="kw">impl</span>&lt;<span class="lifetime">'p</span>&gt; Path&lt;<span class="lifetime">'p</span>&gt; {
+    <span class="kw">pub fn </span>new(path_attr: PathAttr&lt;<span class="lifetime">'p</span>&gt;, fn_name: <span class="kw-2">&amp;</span>str) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             path_attr,
             fn_name: fn_name.to_string(),
@@ -874,9 +875,9 @@
     </span>}
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;p</span>&gt; ToTokens <span class="kw">for </span>Path&lt;<span class="lifetime">&#39;p</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'p</span>&gt; ToTokens <span class="kw">for </span>Path&lt;<span class="lifetime">'p</span>&gt; {
     <span class="kw">fn </span>to_tokens(<span class="kw-2">&amp;</span><span class="self">self</span>, tokens: <span class="kw-2">&amp;mut </span>proc_macro2::TokenStream) {
-        <span class="kw">let </span>path_struct = <span class="macro">format_ident!</span>(<span class="string">&quot;{}{}&quot;</span>, PATH_STRUCT_PREFIX, <span class="self">self</span>.fn_name);
+        <span class="kw">let </span>path_struct = <span class="macro">format_ident!</span>(<span class="string">"{}{}"</span>, PATH_STRUCT_PREFIX, <span class="self">self</span>.fn_name);
         <span class="kw">let </span>operation_id = <span class="self">self
             </span>.path_attr
             .operation_id
@@ -887,9 +888,9 @@
             }.into()))
             .unwrap_or_else(|| {
                 <span class="macro">abort! </span>{
-                    Span::call_site(), <span class="string">&quot;operation id is not defined for path&quot;</span>;
-                    help = <span class="string">r###&quot;Try to define it in #[utoipa::path(operation_id = {})]&quot;###</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.fn_name;
-                    help = <span class="string">&quot;Did you define the #[utoipa::path(...)] over function?&quot;
+                    Span::call_site(), <span class="string">"operation id is not defined for path"</span>;
+                    help = <span class="string">r###"Try to define it in #[utoipa::path(operation_id = {})]"###</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.fn_name;
+                    help = <span class="string">"Did you define the #[utoipa::path(...)] over function?"
                 </span>}
             });
         <span class="kw">let </span>tag = <span class="kw-2">&amp;*</span><span class="self">self
@@ -904,16 +905,16 @@
             .as_ref()
             .or(<span class="self">self</span>.path_operation.as_ref())
             .unwrap_or_else(|| {
-                <span class="attr">#[cfg(any(feature = <span class="string">&quot;actix_extras&quot;</span>, feature = <span class="string">&quot;rocket_extras&quot;</span>))]
+                <span class="attr">#[cfg(any(feature = <span class="string">"actix_extras"</span>, feature = <span class="string">"rocket_extras"</span>))]
                 </span><span class="kw">let </span>help =
-                    <span class="prelude-val">Some</span>(<span class="string">&quot;Did you forget to define operation path attribute macro e.g #[get(...)]&quot;</span>);
+                    <span class="prelude-val">Some</span>(<span class="string">"Did you forget to define operation path attribute macro e.g #[get(...)]"</span>);
 
-                <span class="attr">#[cfg(not(any(feature = <span class="string">&quot;actix_extras&quot;</span>, feature = <span class="string">&quot;rocket_extras&quot;</span>)))]
+                <span class="attr">#[cfg(not(any(feature = <span class="string">"actix_extras"</span>, feature = <span class="string">"rocket_extras"</span>)))]
                 </span><span class="kw">let </span>help = <span class="prelude-val">None</span>::&lt;<span class="kw-2">&amp;</span>str&gt;;
 
                 <span class="macro">abort! </span>{
-                    Span::call_site(), <span class="string">&quot;path operation is not defined for path&quot;</span>;
-                    help = <span class="string">&quot;Did you forget to define it in #[utoipa::path(get,...)]&quot;</span>;
+                    Span::call_site(), <span class="string">"path operation is not defined for path"</span>;
+                    help = <span class="string">"Did you forget to define it in #[utoipa::path(get,...)]"</span>;
                     help =<span class="question-mark">? </span>help
                 }
             });
@@ -924,16 +925,16 @@
             .as_ref()
             .or(<span class="self">self</span>.path.as_ref())
             .unwrap_or_else(|| {
-                <span class="attr">#[cfg(any(feature = <span class="string">&quot;actix_extras&quot;</span>, feature = <span class="string">&quot;rocket_extras&quot;</span>))]
+                <span class="attr">#[cfg(any(feature = <span class="string">"actix_extras"</span>, feature = <span class="string">"rocket_extras"</span>))]
                 </span><span class="kw">let </span>help =
-                    <span class="prelude-val">Some</span>(<span class="string">&quot;Did you forget to define operation path attribute macro e.g #[get(...)]&quot;</span>);
+                    <span class="prelude-val">Some</span>(<span class="string">"Did you forget to define operation path attribute macro e.g #[get(...)]"</span>);
 
-                <span class="attr">#[cfg(not(any(feature = <span class="string">&quot;actix_extras&quot;</span>, feature = <span class="string">&quot;rocket_extras&quot;</span>)))]
+                <span class="attr">#[cfg(not(any(feature = <span class="string">"actix_extras"</span>, feature = <span class="string">"rocket_extras"</span>)))]
                 </span><span class="kw">let </span>help = <span class="prelude-val">None</span>::&lt;<span class="kw-2">&amp;</span>str&gt;;
 
                 <span class="macro">abort! </span>{
-                    Span::call_site(), <span class="string">&quot;path is not defined for path&quot;</span>;
-                    help = <span class="string">r###&quot;Did you forget to define it in #[utoipa::path(path = &quot;...&quot;)]&quot;###</span>;
+                    Span::call_site(), <span class="string">"path is not defined for path"</span>;
+                    help = <span class="string">r###"Did you forget to define it in #[utoipa::path(path = "...")]"###</span>;
                     help =<span class="question-mark">? </span>help
                 }
             });
@@ -942,7 +943,7 @@
             </span>.path_attr
             .context_path
             .as_ref()
-            .map(|context_path| <span class="macro">format!</span>(<span class="string">&quot;{context_path}{path}&quot;</span>))
+            .map(|context_path| <span class="macro">format!</span>(<span class="string">"{context_path}{path}"</span>))
             .unwrap_or_else(|| path.to_string());
 
         <span class="kw">let </span>operation: Operation = Operation {
@@ -965,7 +966,7 @@
             </span><span class="kw">pub struct </span>#path_struct;
 
             <span class="kw">impl </span>utoipa::Path <span class="kw">for </span>#path_struct {
-                <span class="kw">fn </span>path() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
+                <span class="kw">fn </span>path() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str {
                     #path_with_context_path
                 }
 
@@ -974,7 +975,7 @@
                     <span class="kw">use </span>std::iter::FromIterator;
                     utoipa::openapi::PathItem::new(
                         #path_operation,
-                        #operation.tag(<span class="kw-2">*</span>[<span class="prelude-val">Some</span>(#tag), default_tag, <span class="prelude-val">Some</span>(<span class="string">&quot;crate&quot;</span>)].iter()
+                        #operation.tag(<span class="kw-2">*</span>[<span class="prelude-val">Some</span>(#tag), default_tag, <span class="prelude-val">Some</span>(<span class="string">"crate"</span>)].iter()
                             .flatten()
                             .find(|t| !t.is_empty()).unwrap()
                         )
@@ -985,19 +986,19 @@
     }
 }
 
-<span class="attr">#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
-</span><span class="kw">struct </span>Operation&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="attr">#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
+</span><span class="kw">struct </span>Operation&lt;<span class="lifetime">'a</span>&gt; {
     operation_id: Expr,
-    summary: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>String&gt;,
-    description: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Vec&lt;String&gt;&gt;,
-    deprecated: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="prelude-ty">Option</span>&lt;bool&gt;,
-    parameters: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Vec&lt;Parameter&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
-    request_body: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>RequestBody&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
-    responses: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Vec&lt;Response&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
-    security: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Array&lt;<span class="lifetime">&#39;a</span>, SecurityRequirementAttr&gt;&gt;,
+    summary: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>String&gt;,
+    description: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>Vec&lt;String&gt;&gt;,
+    deprecated: <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="prelude-ty">Option</span>&lt;bool&gt;,
+    parameters: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>Vec&lt;Parameter&lt;<span class="lifetime">'a</span>&gt;&gt;,
+    request_body: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>RequestBody&lt;<span class="lifetime">'a</span>&gt;&gt;,
+    responses: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>Vec&lt;Response&lt;<span class="lifetime">'a</span>&gt;&gt;,
+    security: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>Array&lt;<span class="lifetime">'a</span>, SecurityRequirementAttr&gt;&gt;,
 }
 
-<span class="kw">impl </span>ToTokens <span class="kw">for </span>Operation&lt;<span class="lifetime">&#39;_</span>&gt; {
+<span class="kw">impl </span>ToTokens <span class="kw">for </span>Operation&lt;<span class="lifetime">'_</span>&gt; {
     <span class="kw">fn </span>to_tokens(<span class="kw-2">&amp;</span><span class="self">self</span>, tokens: <span class="kw-2">&amp;mut </span>TokenStream2) {
         tokens.extend(<span class="macro">quote! </span>{ utoipa::openapi::path::OperationBuilder::new() });
 
@@ -1032,7 +1033,7 @@
         }
 
         <span class="kw">if let </span><span class="prelude-val">Some</span>(description) = <span class="self">self</span>.description {
-            <span class="kw">let </span>description = description.join(<span class="string">&quot;\n&quot;</span>);
+            <span class="kw">let </span>description = description.join(<span class="string">"\n"</span>);
 
             <span class="kw">if </span>!description.is_empty() {
                 tokens.extend(<span class="macro">quote! </span>{
@@ -1047,15 +1048,15 @@
     }
 }
 
-<span class="doccomment">/// Represents either `ref(&quot;...&quot;)` or `Type` that can be optionally inlined with `inline(Type)`.
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
-</span><span class="kw">enum </span>PathType&lt;<span class="lifetime">&#39;p</span>&gt; {
+<span class="doccomment">/// Represents either `ref("...")` or `Type` that can be optionally inlined with `inline(Type)`.
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
+</span><span class="kw">enum </span>PathType&lt;<span class="lifetime">'p</span>&gt; {
     Ref(String),
-    MediaType(InlineType&lt;<span class="lifetime">&#39;p</span>&gt;),
+    MediaType(InlineType&lt;<span class="lifetime">'p</span>&gt;),
     InlineSchema(TokenStream2, Type),
 }
 
-<span class="kw">impl </span>Parse <span class="kw">for </span>PathType&lt;<span class="lifetime">&#39;_</span>&gt; {
+<span class="kw">impl </span>Parse <span class="kw">for </span>PathType&lt;<span class="lifetime">'_</span>&gt; {
     <span class="kw">fn </span>parse(input: syn::parse::ParseStream) -&gt; syn::Result&lt;<span class="self">Self</span>&gt; {
         <span class="kw">let </span>fork = input.fork();
         <span class="kw">let </span>is_ref = <span class="kw">if </span>(fork.parse::&lt;<span class="prelude-ty">Option</span>&lt;<span class="macro">Token!</span>[<span class="kw-2">ref</span>]&gt;&gt;()<span class="question-mark">?</span>).is_some() {
@@ -1076,24 +1077,24 @@
 }
 
 <span class="comment">// inline(syn::Type) | syn::Type
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
-</span><span class="kw">struct </span>InlineType&lt;<span class="lifetime">&#39;i</span>&gt; {
-    ty: Cow&lt;<span class="lifetime">&#39;i</span>, Type&gt;,
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
+</span><span class="kw">struct </span>InlineType&lt;<span class="lifetime">'i</span>&gt; {
+    ty: Cow&lt;<span class="lifetime">'i</span>, Type&gt;,
     is_inline: bool,
 }
 
-<span class="kw">impl </span>InlineType&lt;<span class="lifetime">&#39;_</span>&gt; {
-    <span class="doccomment">/// Get&#39;s the underlying [`syn::Type`] as [`TypeTree`].
+<span class="kw">impl </span>InlineType&lt;<span class="lifetime">'_</span>&gt; {
+    <span class="doccomment">/// Get's the underlying [`syn::Type`] as [`TypeTree`].
     </span><span class="kw">fn </span>as_type_tree(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; TypeTree {
         TypeTree::from_type(<span class="kw-2">&amp;</span><span class="self">self</span>.ty)
     }
 }
 
-<span class="kw">impl </span>Parse <span class="kw">for </span>InlineType&lt;<span class="lifetime">&#39;_</span>&gt; {
+<span class="kw">impl </span>Parse <span class="kw">for </span>InlineType&lt;<span class="lifetime">'_</span>&gt; {
     <span class="kw">fn </span>parse(input: syn::parse::ParseStream) -&gt; syn::Result&lt;<span class="self">Self</span>&gt; {
         <span class="kw">let </span>fork = input.fork();
         <span class="kw">let </span>is_inline = <span class="kw">if let </span><span class="prelude-val">Some</span>(ident) = fork.parse::&lt;<span class="prelude-ty">Option</span>&lt;Ident&gt;&gt;()<span class="question-mark">? </span>{
-            ident == <span class="string">&quot;inline&quot; </span>&amp;&amp; fork.peek(Paren)
+            ident == <span class="string">"inline" </span>&amp;&amp; fork.peek(Paren)
         } <span class="kw">else </span>{
             <span class="bool-val">false
         </span>};
@@ -1126,9 +1127,9 @@
     </span><span class="kw">fn </span>is_array(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool;
 }
 
-<span class="kw">impl </span>PathTypeTree <span class="kw">for </span>TypeTree&lt;<span class="lifetime">&#39;_</span>&gt; {
+<span class="kw">impl </span>PathTypeTree <span class="kw">for </span>TypeTree&lt;<span class="lifetime">'_</span>&gt; {
     <span class="doccomment">/// Resolve default content type based on current [`Type`].
-    </span><span class="kw">fn </span>get_default_content_type(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
+    </span><span class="kw">fn </span>get_default_content_type(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str {
         <span class="kw">if </span><span class="self">self</span>.is_array()
             &amp;&amp; <span class="self">self
                 </span>.children
@@ -1141,7 +1142,7 @@
                 })
                 .unwrap_or(<span class="bool-val">false</span>)
         {
-            <span class="string">&quot;application/octet-stream&quot;
+            <span class="string">"application/octet-stream"
         </span>} <span class="kw">else if </span><span class="self">self
             </span>.path
             .as_ref()
@@ -1149,9 +1150,9 @@
             .map(|schema_type| schema_type.is_primitive())
             .unwrap_or(<span class="bool-val">false</span>)
         {
-            <span class="string">&quot;text/plain&quot;
+            <span class="string">"text/plain"
         </span>} <span class="kw">else </span>{
-            <span class="string">&quot;application/json&quot;
+            <span class="string">"application/json"
         </span>}
     }
 

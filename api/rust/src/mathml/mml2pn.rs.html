@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `mathml/src/mml2pn.rs`."><title>mml2pn.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="mathml" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `mathml/src/mml2pn.rs`."><title>mml2pn.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="mathml" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -463,13 +464,13 @@
     <span class="kw">let </span><span class="kw-2">mut </span>mathml_asts = Vec::&lt;Math&gt;::new();
 
     <span class="kw">for </span>line <span class="kw">in </span>lines.flatten() {
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="string">&#39;#&#39;</span>) = <span class="kw-2">&amp;</span>line.chars().next() {
-            <span class="comment">// Ignore lines starting with &#39;#&#39;
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="string">'#'</span>) = <span class="kw-2">&amp;</span>line.chars().next() {
+            <span class="comment">// Ignore lines starting with '#'
         </span>} <span class="kw">else </span>{
             <span class="comment">// Parse MathML into AST
             </span><span class="kw">let </span>math = line
                 .parse::&lt;Math&gt;()
-                .unwrap_or_else(|<span class="kw">_</span>| <span class="macro">panic!</span>(<span class="string">&quot;Unable to parse line {}!&quot;</span>, line));
+                .unwrap_or_else(|<span class="kw">_</span>| <span class="macro">panic!</span>(<span class="string">"Unable to parse line {}!"</span>, line));
             mathml_asts.push(math);
         }
     }
@@ -477,13 +478,13 @@
 }
 
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>Var {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
-        <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.<span class="number">0</span>)
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; fmt::Result {
+        <span class="macro">write!</span>(f, <span class="string">"{}"</span>, <span class="self">self</span>.<span class="number">0</span>)
     }
 }
 
 <span class="doccomment">/// A product of rate and species that is added or subtracted.
-/// THere should just be one rate, but since we&#39;re parsing and there could
+/// THere should just be one rate, but since we're parsing and there could
 /// be noise, this accommodates possibly reading several names of things
 /// that should be combined into a single rate.
 </span><span class="attr">#[derive(Debug, Eq, PartialEq, Hash, Clone, Default)]
@@ -511,7 +512,7 @@
         <span class="kw">if let </span>MathExpression::Mrow(Mrow(exprs)) = <span class="kw-2">&amp;</span>ast.content[<span class="number">0</span>] {
             exprs
         } <span class="kw">else </span>{
-            <span class="macro">panic!</span>(<span class="string">&quot;Exactly one top-level MathExpression found, but it is not an Mrow! We cannot handle this case.&quot;</span>);
+            <span class="macro">panic!</span>(<span class="string">"Exactly one top-level MathExpression found, but it is not an Mrow! We cannot handle this case."</span>);
         }
     } <span class="kw">else </span>{
         <span class="kw-2">&amp;</span>ast.content
@@ -548,14 +549,14 @@
             current_term.vars.push(Var(expr.clone()));
             vars.insert(Var(expr.clone()));
         } <span class="kw">else </span>{
-            <span class="macro">panic!</span>(<span class="string">&quot;Unhandled rhs element {:?}&quot;</span>, expr);
+            <span class="macro">panic!</span>(<span class="string">"Unhandled rhs element {:?}"</span>, expr);
         }
     }
     <span class="kw">if </span>!current_term.vars.is_empty() {
         terms.push(current_term);
     }
 
-    <span class="kw">let </span>lhs_specie = lhs_specie.expect(<span class="string">&quot;Unable to determine the specie on the LHS!&quot;</span>);
+    <span class="kw">let </span>lhs_specie = lhs_specie.expect(<span class="string">"Unable to determine the specie on the LHS!"</span>);
     species.insert(lhs_specie.clone());
     eqns.insert(lhs_specie, terms);
 }
@@ -570,8 +571,8 @@
 </span><span class="kw">struct </span>Coefficient(isize);
 
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>Coefficient {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
-        <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.<span class="number">0</span>)
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; fmt::Result {
+        <span class="macro">write!</span>(f, <span class="string">"{}"</span>, <span class="self">self</span>.<span class="number">0</span>)
     }
 }
 
@@ -581,7 +582,7 @@
 <span class="kw">impl </span>Monomial {
     <span class="kw">fn </span>new(vars: HashSet&lt;Var&gt;) -&gt; Monomial {
         <span class="kw">let </span><span class="kw-2">mut </span>m = Monomial::default();
-        m.<span class="number">0 </span>.<span class="number">0 </span>= Rate(Mn(<span class="string">&quot;1&quot;</span>.to_string()));
+        m.<span class="number">0 </span>.<span class="number">0 </span>= Rate(Mn(<span class="string">"1"</span>.to_string()));
         <span class="kw">for </span>var <span class="kw">in </span>vars {
             m.<span class="number">0 </span>.<span class="number">1</span>.insert(Specie(var.<span class="number">0</span>), Exponent(<span class="number">0</span>));
         }
@@ -590,18 +591,18 @@
 }
 
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>Exponent {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
-        <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.<span class="number">0</span>)
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; fmt::Result {
+        <span class="macro">write!</span>(f, <span class="string">"{}"</span>, <span class="self">self</span>.<span class="number">0</span>)
     }
 }
 
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>Monomial {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
-        <span class="macro">write!</span>(f, <span class="string">&quot;{}(&quot;</span>, <span class="self">self</span>.<span class="number">0 </span>.<span class="number">0</span>)<span class="question-mark">?</span>;
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; fmt::Result {
+        <span class="macro">write!</span>(f, <span class="string">"{}("</span>, <span class="self">self</span>.<span class="number">0 </span>.<span class="number">0</span>)<span class="question-mark">?</span>;
         <span class="kw">for </span>(specie, exponent) <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0 </span>.<span class="number">1 </span>{
-            <span class="macro">write!</span>(f, <span class="string">&quot; {}^{} &quot;</span>, specie, exponent)<span class="question-mark">?</span>;
+            <span class="macro">write!</span>(f, <span class="string">" {}^{} "</span>, specie, exponent)<span class="question-mark">?</span>;
         }
-        <span class="macro">write!</span>(f, <span class="string">&quot;)&quot;</span>)<span class="question-mark">?</span>;
+        <span class="macro">write!</span>(f, <span class="string">")"</span>)<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(())
     }
 }
@@ -647,7 +648,7 @@
                     <span class="kw">if </span>rate_vars.contains(<span class="kw-2">&amp;</span>var) {
                         monomial.<span class="number">0 </span>.<span class="number">0 </span>= Rate(var.<span class="number">0</span>);
                     } <span class="kw">else </span>{
-                        <span class="comment">// TODO: Generalize this to when the coefficients aren&#39;t just 1 and -1.
+                        <span class="comment">// TODO: Generalize this to when the coefficients aren't just 1 and -1.
                         </span>monomial.<span class="number">0 </span>.<span class="number">1</span>.insert(Specie(var.<span class="number">0</span>), Exponent(<span class="number">1</span>));
                     }
                 }
@@ -805,20 +806,20 @@
     /// debugging.
     </span><span class="kw">pub fn </span>to_dot(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
         <span class="kw">let </span>graph = <span class="self">self</span>.to_graph();
-        <span class="kw">let </span><span class="kw-2">mut </span>dot: String = <span class="string">&quot;&quot;</span>.to_owned();
-        dot.push_str(<span class="string">&quot;digraph {\n&quot;</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>dot: String = <span class="string">""</span>.to_owned();
+        dot.push_str(<span class="string">"digraph {\n"</span>);
         <span class="kw">for </span>node <span class="kw">in </span>graph.node_indices() {
-            dot.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;\t {} &quot;</span>, node.index()));
+            dot.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"\t {} "</span>, node.index()));
             <span class="kw">let </span>(label, shape, color) = {
                 <span class="kw">match </span><span class="kw-2">&amp;</span>graph[node] {
-                    PetriNetElement::Specie(specie) =&gt; (<span class="kw-2">&amp;</span>specie.sname, <span class="string">&quot;circle&quot;</span>, <span class="string">&quot;dodgerblue3&quot;</span>),
+                    PetriNetElement::Specie(specie) =&gt; (<span class="kw-2">&amp;</span>specie.sname, <span class="string">"circle"</span>, <span class="string">"dodgerblue3"</span>),
                     PetriNetElement::Transition(transition) =&gt; {
-                        (<span class="kw-2">&amp;</span>transition.tname, <span class="string">&quot;square&quot;</span>, <span class="string">&quot;darkorange2&quot;</span>)
+                        (<span class="kw-2">&amp;</span>transition.tname, <span class="string">"square"</span>, <span class="string">"darkorange2"</span>)
                     }
                 }
             };
             dot.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(
-                <span class="string">&quot;[ label = \&quot;{}\&quot; , shape = {}, color = {}]\n&quot;</span>,
+                <span class="string">"[ label = \"{}\" , shape = {}, color = {}]\n"</span>,
                 label, shape, color
             ));
         }
@@ -826,13 +827,13 @@
         <span class="kw">for </span>edge <span class="kw">in </span>graph.edge_indices() {
             <span class="kw">let </span>(src, dest) = graph.edge_endpoints(edge).unwrap();
             dot.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(
-                <span class="string">&quot;\t {} -&gt; {} [ label = \&quot;{}\&quot; ]\n &quot;</span>,
+                <span class="string">"\t {} -&gt; {} [ label = \"{}\" ]\n "</span>,
                 src.index(),
                 dest.index(),
                 graph[edge]
             ));
         }
-        dot.push(<span class="string">&#39;}&#39;</span>);
+        dot.push(<span class="string">'}'</span>);
         dot
     }
 }
@@ -850,27 +851,27 @@
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_simple_sir_v1() {
-    <span class="kw">let </span>acset_1 = acset::ACSet::from_file(<span class="string">&quot;tests/mml2pn_inputs/simple_sir_v1/mml_list.txt&quot;</span>);
+    <span class="kw">let </span>acset_1 = acset::ACSet::from_file(<span class="string">"tests/mml2pn_inputs/simple_sir_v1/mml_list.txt"</span>);
     <span class="kw">let </span>acset_2: acset::ACSet =
-        serde_json::from_str(<span class="kw-2">&amp;</span>std::fs::read_to_string(<span class="string">&quot;tests/simple_sir_v1_acset.json&quot;</span>).unwrap())
+        serde_json::from_str(<span class="kw-2">&amp;</span>std::fs::read_to_string(<span class="string">"tests/simple_sir_v1_acset.json"</span>).unwrap())
             .unwrap();
     <span class="macro">assert!</span>(test_acset_equality(acset_1, acset_2));
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_simple_sir_v2() {
-    <span class="kw">let </span>acset_1 = acset::ACSet::from_file(<span class="string">&quot;tests/mml2pn_inputs/simple_sir_v2/mml_list.txt&quot;</span>);
+    <span class="kw">let </span>acset_1 = acset::ACSet::from_file(<span class="string">"tests/mml2pn_inputs/simple_sir_v2/mml_list.txt"</span>);
     <span class="kw">let </span>acset_2: acset::ACSet =
-        serde_json::from_str(<span class="kw-2">&amp;</span>std::fs::read_to_string(<span class="string">&quot;tests/simple_sir_v2_acset.json&quot;</span>).unwrap())
+        serde_json::from_str(<span class="kw-2">&amp;</span>std::fs::read_to_string(<span class="string">"tests/simple_sir_v2_acset.json"</span>).unwrap())
             .unwrap();
     <span class="macro">assert!</span>(test_acset_equality(acset_1, acset_2));
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_simple_sir_v3() {
-    <span class="kw">let </span>acset_1 = acset::ACSet::from_file(<span class="string">&quot;tests/mml2pn_inputs/simple_sir_v3/mml_list.txt&quot;</span>);
+    <span class="kw">let </span>acset_1 = acset::ACSet::from_file(<span class="string">"tests/mml2pn_inputs/simple_sir_v3/mml_list.txt"</span>);
     <span class="kw">let </span>acset_2: acset::ACSet =
-        serde_json::from_str(<span class="kw-2">&amp;</span>std::fs::read_to_string(<span class="string">&quot;tests/simple_sir_v3_acset.json&quot;</span>).unwrap())
+        serde_json::from_str(<span class="kw-2">&amp;</span>std::fs::read_to_string(<span class="string">"tests/simple_sir_v3_acset.json"</span>).unwrap())
             .unwrap();
     <span class="macro">assert!</span>(test_acset_equality(acset_1, acset_2));
 }

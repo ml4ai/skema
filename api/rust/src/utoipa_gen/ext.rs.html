@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/utoipa-gen-3.5.0/src/ext.rs`."><title>ext.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="utoipa_gen" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/utoipa-gen-3.5.0/src/ext.rs`."><title>ext.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="utoipa_gen" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -489,7 +490,7 @@
 <a href="#489" id="489">489</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;rocket_extras&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"rocket_extras"</span>)]
 </span><span class="kw">use </span>std::cmp::Ordering;
 
 <span class="kw">use </span>proc_macro2::TokenStream;
@@ -501,42 +502,42 @@
 <span class="kw">use </span><span class="kw">crate</span>::component::{ComponentSchema, ComponentSchemaProps, TypeTree};
 <span class="kw">use </span><span class="kw">crate</span>::path::{PathOperation, PathTypeTree};
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;auto_into_responses&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"auto_into_responses"</span>)]
 </span><span class="kw">pub mod </span>auto_types;
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;actix_extras&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"actix_extras"</span>)]
 </span><span class="kw">pub mod </span>actix;
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;axum_extras&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"axum_extras"</span>)]
 </span><span class="kw">pub mod </span>axum;
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;rocket_extras&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"rocket_extras"</span>)]
 </span><span class="kw">pub mod </span>rocket;
 
 <span class="doccomment">/// Represents single argument of handler operation.
 </span><span class="attr">#[cfg_attr(
     not(any(
-        feature = <span class="string">&quot;actix_extras&quot;</span>,
-        feature = <span class="string">&quot;rocket_extras&quot;</span>,
-        feature = <span class="string">&quot;axum_extras&quot;
+        feature = <span class="string">"actix_extras"</span>,
+        feature = <span class="string">"rocket_extras"</span>,
+        feature = <span class="string">"axum_extras"
     </span>)),
     allow(dead_code)
 )]
-#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
-</span><span class="kw">pub struct </span>ValueArgument&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">pub </span>name: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;,
+#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
+</span><span class="kw">pub struct </span>ValueArgument&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="kw">pub </span>name: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;,
     <span class="attr">#[cfg(any(
-        feature = <span class="string">&quot;actix_extras&quot;</span>,
-        feature = <span class="string">&quot;rocket_extras&quot;</span>,
-        feature = <span class="string">&quot;axum_extras&quot;
+        feature = <span class="string">"actix_extras"</span>,
+        feature = <span class="string">"rocket_extras"</span>,
+        feature = <span class="string">"axum_extras"
     </span>))]
     </span><span class="kw">pub </span>argument_in: ArgumentIn,
-    <span class="kw">pub </span>type_tree: <span class="prelude-ty">Option</span>&lt;TypeTree&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+    <span class="kw">pub </span>type_tree: <span class="prelude-ty">Option</span>&lt;TypeTree&lt;<span class="lifetime">'a</span>&gt;&gt;,
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;actix_extras&quot;</span>)]
-</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;v</span>&gt; From&lt;(MacroArg, TypeTree&lt;<span class="lifetime">&#39;v</span>&gt;)&gt; <span class="kw">for </span>ValueArgument&lt;<span class="lifetime">&#39;v</span>&gt; {
-    <span class="kw">fn </span>from((macro_arg, primitive_arg): (MacroArg, TypeTree&lt;<span class="lifetime">&#39;v</span>&gt;)) -&gt; <span class="self">Self </span>{
+<span class="attr">#[cfg(feature = <span class="string">"actix_extras"</span>)]
+</span><span class="kw">impl</span>&lt;<span class="lifetime">'v</span>&gt; From&lt;(MacroArg, TypeTree&lt;<span class="lifetime">'v</span>&gt;)&gt; <span class="kw">for </span>ValueArgument&lt;<span class="lifetime">'v</span>&gt; {
+    <span class="kw">fn </span>from((macro_arg, primitive_arg): (MacroArg, TypeTree&lt;<span class="lifetime">'v</span>&gt;)) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             name: <span class="kw">match </span>macro_arg {
                 MacroArg::Path(path) =&gt; <span class="prelude-val">Some</span>(Cow::Owned(path.name)),
@@ -549,22 +550,22 @@
 
 <span class="attr">#[cfg_attr(
     not(any(
-        feature = <span class="string">&quot;actix_extras&quot;</span>,
-        feature = <span class="string">&quot;rocket_extras&quot;</span>,
-        feature = <span class="string">&quot;axum_extras&quot;
+        feature = <span class="string">"actix_extras"</span>,
+        feature = <span class="string">"rocket_extras"</span>,
+        feature = <span class="string">"axum_extras"
     </span>)),
     allow(dead_code)
 )]
 </span><span class="doccomment">/// Represents Identifier with `parameter_in` provider function which is used to
 /// update the `parameter_in` to [`Parameter::Struct`].
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
-</span><span class="kw">pub struct </span>IntoParamsType&lt;<span class="lifetime">&#39;a</span>&gt; {
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
+</span><span class="kw">pub struct </span>IntoParamsType&lt;<span class="lifetime">'a</span>&gt; {
     <span class="kw">pub </span>parameter_in_provider: TokenStream,
-    <span class="kw">pub </span>type_path: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">&#39;a</span>, syn::Path&gt;&gt;,
+    <span class="kw">pub </span>type_path: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">'a</span>, syn::Path&gt;&gt;,
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;i</span>&gt; From&lt;(<span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">&#39;i</span>, syn::Path&gt;&gt;, TokenStream)&gt; <span class="kw">for </span>IntoParamsType&lt;<span class="lifetime">&#39;i</span>&gt; {
-    <span class="kw">fn </span>from((type_path, parameter_in_provider): (<span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">&#39;i</span>, syn::Path&gt;&gt;, TokenStream)) -&gt; <span class="self">Self </span>{
+<span class="kw">impl</span>&lt;<span class="lifetime">'i</span>&gt; From&lt;(<span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">'i</span>, syn::Path&gt;&gt;, TokenStream)&gt; <span class="kw">for </span>IntoParamsType&lt;<span class="lifetime">'i</span>&gt; {
+    <span class="kw">fn </span>from((type_path, parameter_in_provider): (<span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">'i</span>, syn::Path&gt;&gt;, TokenStream)) -&gt; <span class="self">Self </span>{
         IntoParamsType {
             parameter_in_provider,
             type_path,
@@ -573,30 +574,30 @@
 }
 
 <span class="attr">#[cfg(any(
-    feature = <span class="string">&quot;actix_extras&quot;</span>,
-    feature = <span class="string">&quot;rocket_extras&quot;</span>,
-    feature = <span class="string">&quot;axum_extras&quot;
+    feature = <span class="string">"actix_extras"</span>,
+    feature = <span class="string">"rocket_extras"</span>,
+    feature = <span class="string">"axum_extras"
 </span>))]
-#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
+#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
 #[derive(PartialEq, Eq)]
 </span><span class="kw">pub enum </span>ArgumentIn {
     Path,
-    <span class="attr">#[cfg(feature = <span class="string">&quot;rocket_extras&quot;</span>)]
+    <span class="attr">#[cfg(feature = <span class="string">"rocket_extras"</span>)]
     </span>Query,
 }
 
-<span class="attr">#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
-</span><span class="kw">pub struct </span>RequestBody&lt;<span class="lifetime">&#39;r</span>&gt; {
-    ty: TypeTree&lt;<span class="lifetime">&#39;r</span>&gt;,
+<span class="attr">#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
+</span><span class="kw">pub struct </span>RequestBody&lt;<span class="lifetime">'r</span>&gt; {
+    ty: TypeTree&lt;<span class="lifetime">'r</span>&gt;,
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;t</span>&gt; From&lt;TypeTree&lt;<span class="lifetime">&#39;t</span>&gt;&gt; <span class="kw">for </span>RequestBody&lt;<span class="lifetime">&#39;t</span>&gt; {
-    <span class="kw">fn </span>from(value: TypeTree&lt;<span class="lifetime">&#39;t</span>&gt;) -&gt; RequestBody&lt;<span class="lifetime">&#39;t</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'t</span>&gt; From&lt;TypeTree&lt;<span class="lifetime">'t</span>&gt;&gt; <span class="kw">for </span>RequestBody&lt;<span class="lifetime">'t</span>&gt; {
+    <span class="kw">fn </span>from(value: TypeTree&lt;<span class="lifetime">'t</span>&gt;) -&gt; RequestBody&lt;<span class="lifetime">'t</span>&gt; {
         <span class="self">Self </span>{ ty: value }
     }
 }
 
-<span class="kw">impl </span>ToTokens <span class="kw">for </span>RequestBody&lt;<span class="lifetime">&#39;_</span>&gt; {
+<span class="kw">impl </span>ToTokens <span class="kw">for </span>RequestBody&lt;<span class="lifetime">'_</span>&gt; {
     <span class="kw">fn </span>to_tokens(<span class="kw-2">&amp;</span><span class="self">self</span>, tokens: <span class="kw-2">&amp;mut </span>TokenStream) {
         <span class="kw">let </span><span class="kw-2">mut </span>actual_body = get_actual_body_type(<span class="kw-2">&amp;</span><span class="self">self</span>.ty).unwrap().clone();
 
@@ -623,7 +624,7 @@
                 features: <span class="prelude-val">None</span>,
                 description: <span class="prelude-val">None</span>,
                 deprecated: <span class="prelude-val">None</span>,
-                object_name: <span class="string">&quot;&quot;</span>,
+                object_name: <span class="string">""</span>,
             });
 
             tokens.extend(<span class="macro">quote_spanned! </span>{actual_body.span.unwrap()=&gt;
@@ -632,57 +633,57 @@
                         utoipa::openapi::content::Content::new(#schema)
                     )
                     .required(<span class="prelude-val">Some</span>(#required))
-                    .description(<span class="prelude-val">Some</span>(<span class="string">&quot;&quot;</span>))
+                    .description(<span class="prelude-val">Some</span>(<span class="string">""</span>))
                     .build()
             })
         };
 
-        <span class="kw">if </span><span class="self">self</span>.ty.is(<span class="string">&quot;Bytes&quot;</span>) {
+        <span class="kw">if </span><span class="self">self</span>.ty.is(<span class="string">"Bytes"</span>) {
             <span class="kw">let </span>bytes_as_bytes_vec = <span class="macro">parse_quote!</span>(Vec&lt;u8&gt;);
             <span class="kw">let </span>ty = TypeTree::from_type(<span class="kw-2">&amp;</span>bytes_as_bytes_vec);
-            create_body_tokens(<span class="string">&quot;application/octet-stream&quot;</span>, <span class="kw-2">&amp;</span>ty);
-        } <span class="kw">else if </span><span class="self">self</span>.ty.is(<span class="string">&quot;Form&quot;</span>) {
-            create_body_tokens(<span class="string">&quot;application/x-www-form-urlencoded&quot;</span>, <span class="kw-2">&amp;</span>actual_body);
+            create_body_tokens(<span class="string">"application/octet-stream"</span>, <span class="kw-2">&amp;</span>ty);
+        } <span class="kw">else if </span><span class="self">self</span>.ty.is(<span class="string">"Form"</span>) {
+            create_body_tokens(<span class="string">"application/x-www-form-urlencoded"</span>, <span class="kw-2">&amp;</span>actual_body);
         } <span class="kw">else </span>{
             create_body_tokens(actual_body.get_default_content_type(), <span class="kw-2">&amp;</span>actual_body);
         };
     }
 }
 
-<span class="kw">fn </span>get_actual_body_type&lt;<span class="lifetime">&#39;t</span>&gt;(ty: <span class="kw-2">&amp;</span><span class="lifetime">&#39;t </span>TypeTree&lt;<span class="lifetime">&#39;t</span>&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;t </span>TypeTree&lt;<span class="lifetime">&#39;t</span>&gt;&gt; {
+<span class="kw">fn </span>get_actual_body_type&lt;<span class="lifetime">'t</span>&gt;(ty: <span class="kw-2">&amp;</span><span class="lifetime">'t </span>TypeTree&lt;<span class="lifetime">'t</span>&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'t </span>TypeTree&lt;<span class="lifetime">'t</span>&gt;&gt; {
     ty.path
         .as_deref()
-        .expect(<span class="string">&quot;RequestBody TypeTree must have syn::Path&quot;</span>)
+        .expect(<span class="string">"RequestBody TypeTree must have syn::Path"</span>)
         .segments
         .iter()
         .find_map(|segment| <span class="kw">match </span><span class="kw-2">&amp;*</span>segment.ident.to_string() {
-            <span class="string">&quot;Json&quot; </span>=&gt; <span class="prelude-val">Some</span>(
+            <span class="string">"Json" </span>=&gt; <span class="prelude-val">Some</span>(
                 ty.children
                     .as_deref()
-                    .expect(<span class="string">&quot;Json must have children&quot;</span>)
+                    .expect(<span class="string">"Json must have children"</span>)
                     .first()
-                    .expect(<span class="string">&quot;Json must have one child&quot;</span>),
+                    .expect(<span class="string">"Json must have one child"</span>),
             ),
-            <span class="string">&quot;Form&quot; </span>=&gt; <span class="prelude-val">Some</span>(
+            <span class="string">"Form" </span>=&gt; <span class="prelude-val">Some</span>(
                 ty.children
                     .as_deref()
-                    .expect(<span class="string">&quot;Form must have children&quot;</span>)
+                    .expect(<span class="string">"Form must have children"</span>)
                     .first()
-                    .expect(<span class="string">&quot;Form must have one child&quot;</span>),
+                    .expect(<span class="string">"Form must have one child"</span>),
             ),
-            <span class="string">&quot;Option&quot; </span>=&gt; get_actual_body_type(
+            <span class="string">"Option" </span>=&gt; get_actual_body_type(
                 ty.children
                     .as_deref()
-                    .expect(<span class="string">&quot;Option must have children&quot;</span>)
+                    .expect(<span class="string">"Option must have children"</span>)
                     .first()
-                    .expect(<span class="string">&quot;Option must have one child&quot;</span>),
+                    .expect(<span class="string">"Option must have one child"</span>),
             ),
-            <span class="string">&quot;Bytes&quot; </span>=&gt; <span class="prelude-val">Some</span>(ty),
+            <span class="string">"Bytes" </span>=&gt; <span class="prelude-val">Some</span>(ty),
             <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         })
 }
 
-<span class="kw">fn </span>find_option_type_tree&lt;<span class="lifetime">&#39;t</span>&gt;(ty: <span class="kw-2">&amp;</span><span class="lifetime">&#39;t </span>TypeTree) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;t </span>TypeTree&lt;<span class="lifetime">&#39;t</span>&gt;&gt; {
+<span class="kw">fn </span>find_option_type_tree&lt;<span class="lifetime">'t</span>&gt;(ty: <span class="kw-2">&amp;</span><span class="lifetime">'t </span>TypeTree) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'t </span>TypeTree&lt;<span class="lifetime">'t</span>&gt;&gt; {
     <span class="kw">let </span>eq = ty.generic_type == <span class="prelude-val">Some</span>(<span class="kw">crate</span>::component::GenericType::Option);
 
     <span class="kw">if </span>!eq {
@@ -694,31 +695,31 @@
     }
 }
 
-<span class="attr">#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
+<span class="attr">#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
 </span><span class="kw">pub struct </span>MacroPath {
     <span class="kw">pub </span>path: String,
     <span class="kw">pub </span>args: Vec&lt;MacroArg&gt;,
 }
 
-<span class="attr">#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
+<span class="attr">#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
 </span><span class="kw">pub enum </span>MacroArg {
     <span class="attr">#[cfg_attr(
-        not(any(feature = <span class="string">&quot;actix_extras&quot;</span>, feature = <span class="string">&quot;rocket_extras&quot;</span>)),
+        not(any(feature = <span class="string">"actix_extras"</span>, feature = <span class="string">"rocket_extras"</span>)),
         allow(dead_code)
     )]
     </span>Path(ArgValue),
-    <span class="attr">#[cfg(feature = <span class="string">&quot;rocket_extras&quot;</span>)]
+    <span class="attr">#[cfg(feature = <span class="string">"rocket_extras"</span>)]
     </span>Query(ArgValue),
 }
 
 <span class="kw">impl </span>MacroArg {
     <span class="doccomment">/// Get ordering by name
-    </span><span class="attr">#[cfg(feature = <span class="string">&quot;rocket_extras&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">"rocket_extras"</span>)]
     </span><span class="kw">fn </span>by_name(a: <span class="kw-2">&amp;</span>MacroArg, b: <span class="kw-2">&amp;</span>MacroArg) -&gt; Ordering {
         a.get_value().name.cmp(<span class="kw-2">&amp;</span>b.get_value().name)
     }
 
-    <span class="attr">#[cfg(feature = <span class="string">&quot;rocket_extras&quot;</span>)]
+    <span class="attr">#[cfg(feature = <span class="string">"rocket_extras"</span>)]
     </span><span class="kw">fn </span>get_value(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>ArgValue {
         <span class="kw">match </span><span class="self">self </span>{
             MacroArg::Path(path) =&gt; path,
@@ -728,13 +729,13 @@
 }
 
 <span class="attr">#[derive(PartialEq, Eq, PartialOrd, Ord)]
-#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
+#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
 </span><span class="kw">pub struct </span>ArgValue {
     <span class="kw">pub </span>name: String,
     <span class="kw">pub </span>original_name: String,
 }
 
-<span class="attr">#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
+<span class="attr">#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
 </span><span class="kw">pub struct </span>ResolvedOperation {
     <span class="kw">pub </span>path_operation: PathOperation,
     <span class="kw">pub </span>path: String,
@@ -743,13 +744,13 @@
 
 <span class="kw">pub trait </span>ArgumentResolver {
     <span class="kw">fn </span>resolve_arguments(
-        <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;_ </span>Punctuated&lt;syn::FnArg, Comma&gt;,
+        <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="lifetime">'_ </span>Punctuated&lt;syn::FnArg, Comma&gt;,
         <span class="kw">_</span>: <span class="prelude-ty">Option</span>&lt;Vec&lt;MacroArg&gt;&gt;,
         <span class="kw">_</span>: String,
     ) -&gt; (
-        <span class="prelude-ty">Option</span>&lt;Vec&lt;ValueArgument&lt;<span class="lifetime">&#39;_</span>&gt;&gt;&gt;,
-        <span class="prelude-ty">Option</span>&lt;Vec&lt;IntoParamsType&lt;<span class="lifetime">&#39;_</span>&gt;&gt;&gt;,
-        <span class="prelude-ty">Option</span>&lt;RequestBody&lt;<span class="lifetime">&#39;_</span>&gt;&gt;,
+        <span class="prelude-ty">Option</span>&lt;Vec&lt;ValueArgument&lt;<span class="lifetime">'_</span>&gt;&gt;&gt;,
+        <span class="prelude-ty">Option</span>&lt;Vec&lt;IntoParamsType&lt;<span class="lifetime">'_</span>&gt;&gt;&gt;,
+        <span class="prelude-ty">Option</span>&lt;RequestBody&lt;<span class="lifetime">'_</span>&gt;&gt;,
     ) {
         (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>)
     }
@@ -770,96 +771,96 @@
 <span class="kw">pub struct </span>PathOperations;
 
 <span class="attr">#[cfg(not(any(
-    feature = <span class="string">&quot;actix_extras&quot;</span>,
-    feature = <span class="string">&quot;rocket_extras&quot;</span>,
-    feature = <span class="string">&quot;axum_extras&quot;
+    feature = <span class="string">"actix_extras"</span>,
+    feature = <span class="string">"rocket_extras"</span>,
+    feature = <span class="string">"axum_extras"
 </span>)))]
 </span><span class="kw">impl </span>ArgumentResolver <span class="kw">for </span>PathOperations {}
 
 <span class="attr">#[cfg(not(any(
-    feature = <span class="string">&quot;actix_extras&quot;</span>,
-    feature = <span class="string">&quot;rocket_extras&quot;</span>,
-    feature = <span class="string">&quot;axum_extras&quot;
+    feature = <span class="string">"actix_extras"</span>,
+    feature = <span class="string">"rocket_extras"</span>,
+    feature = <span class="string">"axum_extras"
 </span>)))]
 </span><span class="kw">impl </span>PathResolver <span class="kw">for </span>PathOperations {}
 
-<span class="attr">#[cfg(not(any(feature = <span class="string">&quot;actix_extras&quot;</span>, feature = <span class="string">&quot;rocket_extras&quot;</span>)))]
+<span class="attr">#[cfg(not(any(feature = <span class="string">"actix_extras"</span>, feature = <span class="string">"rocket_extras"</span>)))]
 </span><span class="kw">impl </span>PathOperationResolver <span class="kw">for </span>PathOperations {}
 
 <span class="attr">#[cfg(any(
-    feature = <span class="string">&quot;actix_extras&quot;</span>,
-    feature = <span class="string">&quot;axum_extras&quot;</span>,
-    feature = <span class="string">&quot;rocket_extras&quot;
+    feature = <span class="string">"actix_extras"</span>,
+    feature = <span class="string">"axum_extras"</span>,
+    feature = <span class="string">"rocket_extras"
 </span>))]
 </span><span class="kw">pub mod </span>fn_arg {
 
     <span class="kw">use </span>proc_macro2::Ident;
     <span class="kw">use </span>proc_macro_error::abort;
-    <span class="attr">#[cfg(any(feature = <span class="string">&quot;actix_extras&quot;</span>, feature = <span class="string">&quot;axum_extras&quot;</span>))]
+    <span class="attr">#[cfg(any(feature = <span class="string">"actix_extras"</span>, feature = <span class="string">"axum_extras"</span>))]
     </span><span class="kw">use </span>quote::quote;
     <span class="kw">use </span>syn::PatStruct;
     <span class="kw">use </span>syn::{punctuated::Punctuated, token::Comma, Pat, PatType};
 
     <span class="kw">use </span><span class="kw">crate</span>::component::TypeTree;
-    <span class="attr">#[cfg(any(feature = <span class="string">&quot;actix_extras&quot;</span>, feature = <span class="string">&quot;axum_extras&quot;</span>))]
+    <span class="attr">#[cfg(any(feature = <span class="string">"actix_extras"</span>, feature = <span class="string">"axum_extras"</span>))]
     </span><span class="kw">use </span><span class="kw">crate</span>::component::ValueType;
 
     <span class="doccomment">/// Http operation handler functions fn argument.
-    </span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
-    </span><span class="kw">pub struct </span>FnArg&lt;<span class="lifetime">&#39;a</span>&gt; {
-        <span class="kw">pub</span>(<span class="kw">super</span>) ty: TypeTree&lt;<span class="lifetime">&#39;a</span>&gt;,
-        <span class="kw">pub</span>(<span class="kw">super</span>) arg_type: FnArgType&lt;<span class="lifetime">&#39;a</span>&gt;,
+    </span><span class="attr">#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
+    </span><span class="kw">pub struct </span>FnArg&lt;<span class="lifetime">'a</span>&gt; {
+        <span class="kw">pub</span>(<span class="kw">super</span>) ty: TypeTree&lt;<span class="lifetime">'a</span>&gt;,
+        <span class="kw">pub</span>(<span class="kw">super</span>) arg_type: FnArgType&lt;<span class="lifetime">'a</span>&gt;,
     }
 
-    <span class="attr">#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
+    <span class="attr">#[cfg_attr(feature = <span class="string">"debug"</span>, derive(Debug))]
     #[derive(PartialEq, Eq, PartialOrd, Ord)]
-    </span><span class="kw">pub enum </span>FnArgType&lt;<span class="lifetime">&#39;t</span>&gt; {
-        Single(<span class="kw-2">&amp;</span><span class="lifetime">&#39;t </span>Ident),
-        Destructed(Vec&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;t </span>Ident&gt;),
+    </span><span class="kw">pub enum </span>FnArgType&lt;<span class="lifetime">'t</span>&gt; {
+        Single(<span class="kw-2">&amp;</span><span class="lifetime">'t </span>Ident),
+        Destructed(Vec&lt;<span class="kw-2">&amp;</span><span class="lifetime">'t </span>Ident&gt;),
     }
 
-    <span class="kw">impl </span>FnArgType&lt;<span class="lifetime">&#39;_</span>&gt; {
+    <span class="kw">impl </span>FnArgType&lt;<span class="lifetime">'_</span>&gt; {
         <span class="doccomment">/// Get best effort name `Ident` for the type. For `FnArgType::Tuple` types it will take the first one
         /// from `Vec`.
-        </span><span class="attr">#[cfg(feature = <span class="string">&quot;rocket_extras&quot;</span>)]
+        </span><span class="attr">#[cfg(feature = <span class="string">"rocket_extras"</span>)]
         </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>get_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Ident {
             <span class="kw">match </span><span class="self">self </span>{
                 <span class="self">Self</span>::Single(ident) =&gt; ident,
                 <span class="comment">// perform best effort name, by just taking the first one from the list
                 </span><span class="self">Self</span>::Destructed(tuple) =&gt; tuple
                     .first()
-                    .expect(<span class="string">&quot;Expected at least one argument in FnArgType::Tuple&quot;</span>),
+                    .expect(<span class="string">"Expected at least one argument in FnArgType::Tuple"</span>),
             }
         }
     }
 
-    <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;(TypeTree&lt;<span class="lifetime">&#39;a</span>&gt;, FnArgType&lt;<span class="lifetime">&#39;a</span>&gt;)&gt; <span class="kw">for </span>FnArg&lt;<span class="lifetime">&#39;a</span>&gt; {
-        <span class="kw">fn </span>from((ty, arg_type): (TypeTree&lt;<span class="lifetime">&#39;a</span>&gt;, FnArgType&lt;<span class="lifetime">&#39;a</span>&gt;)) -&gt; <span class="self">Self </span>{
+    <span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; From&lt;(TypeTree&lt;<span class="lifetime">'a</span>&gt;, FnArgType&lt;<span class="lifetime">'a</span>&gt;)&gt; <span class="kw">for </span>FnArg&lt;<span class="lifetime">'a</span>&gt; {
+        <span class="kw">fn </span>from((ty, arg_type): (TypeTree&lt;<span class="lifetime">'a</span>&gt;, FnArgType&lt;<span class="lifetime">'a</span>&gt;)) -&gt; <span class="self">Self </span>{
             <span class="self">Self </span>{ ty, arg_type }
         }
     }
 
-    <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Ord <span class="kw">for </span>FnArg&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Ord <span class="kw">for </span>FnArg&lt;<span class="lifetime">'a</span>&gt; {
         <span class="kw">fn </span>cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; std::cmp::Ordering {
             <span class="self">self</span>.arg_type.cmp(<span class="kw-2">&amp;</span>other.arg_type)
         }
     }
 
-    <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; PartialOrd <span class="kw">for </span>FnArg&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; PartialOrd <span class="kw">for </span>FnArg&lt;<span class="lifetime">'a</span>&gt; {
         <span class="kw">fn </span>partial_cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;std::cmp::Ordering&gt; {
             <span class="self">self</span>.arg_type.partial_cmp(<span class="kw-2">&amp;</span>other.arg_type)
         }
     }
 
-    <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; PartialEq <span class="kw">for </span>FnArg&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; PartialEq <span class="kw">for </span>FnArg&lt;<span class="lifetime">'a</span>&gt; {
         <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
             <span class="self">self</span>.ty == other.ty &amp;&amp; <span class="self">self</span>.arg_type == other.arg_type
         }
     }
 
-    <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Eq <span class="kw">for </span>FnArg&lt;<span class="lifetime">&#39;a</span>&gt; {}
+    <span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Eq <span class="kw">for </span>FnArg&lt;<span class="lifetime">'a</span>&gt; {}
 
-    <span class="kw">pub fn </span>get_fn_args(fn_args: <span class="kw-2">&amp;</span>Punctuated&lt;syn::FnArg, Comma&gt;) -&gt; <span class="kw">impl </span>Iterator&lt;Item = FnArg&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
+    <span class="kw">pub fn </span>get_fn_args(fn_args: <span class="kw-2">&amp;</span>Punctuated&lt;syn::FnArg, Comma&gt;) -&gt; <span class="kw">impl </span>Iterator&lt;Item = FnArg&lt;<span class="lifetime">'_</span>&gt;&gt; {
         fn_args
             .iter()
             .filter_map(|arg| {
@@ -884,19 +885,19 @@
                 FnArgType::Destructed(tuple.elems.iter().map(|item| {
                     <span class="kw">match </span>item {
                         syn::Pat::Ident(ident) =&gt; <span class="kw-2">&amp;</span>ident.ident,
-                        <span class="kw">_ </span>=&gt; <span class="macro">abort!</span>(item, <span class="string">&quot;expected syn::Ident in get_pat_fn_arg_type Pat::Tuple&quot;</span>)
+                        <span class="kw">_ </span>=&gt; <span class="macro">abort!</span>(item, <span class="string">"expected syn::Ident in get_pat_fn_arg_type Pat::Tuple"</span>)
                     }
                 }).collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;())
             },
             syn::Pat::TupleStruct(tuple_struct) =&gt; {
                 get_pat_fn_arg_type(tuple_struct.elems.first().as_ref().expect(
-                    <span class="string">&quot;PatTuple expected to have at least one element, cannot get fn argument&quot;</span>,
+                    <span class="string">"PatTuple expected to have at least one element, cannot get fn argument"</span>,
                 ))
             },
             syn::Pat::Struct(PatStruct { fields, ..}) =&gt; {
                 <span class="kw">let </span>idents = fields.iter()
                     .map(|field| get_pat_fn_arg_type(<span class="kw-2">&amp;</span>field.pat))
-                    .fold(Vec::&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;_ </span>Ident&gt;::new(), |<span class="kw-2">mut </span>idents, field_type| {
+                    .fold(Vec::&lt;<span class="kw-2">&amp;</span><span class="lifetime">'_ </span>Ident&gt;::new(), |<span class="kw-2">mut </span>idents, field_type| {
                         <span class="kw">if let </span>FnArgType::Single(ident) = field_type {
                             idents.push(ident)
                         }
@@ -906,7 +907,7 @@
                 FnArgType::Destructed(idents)
             }
             <span class="kw">_ </span>=&gt; <span class="macro">abort!</span>(pat,
-                <span class="string">&quot;unexpected syn::Pat, expected syn::Pat::Ident,in get_fn_args, cannot get fn argument name&quot;
+                <span class="string">"unexpected syn::Pat, expected syn::Pat::Ident,in get_fn_args, cannot get fn argument name"
             </span>),
         };
         arg_name
@@ -916,20 +917,20 @@
     </span><span class="kw">fn </span>get_fn_arg_pat_type(fn_arg: <span class="kw-2">&amp;</span>syn::FnArg) -&gt; <span class="kw-2">&amp;</span>PatType {
         <span class="kw">match </span>fn_arg {
             syn::FnArg::Typed(value) =&gt; value,
-            <span class="kw">_ </span>=&gt; <span class="macro">abort!</span>(fn_arg, <span class="string">&quot;unexpected fn argument type, expected FnArg::Typed&quot;</span>),
+            <span class="kw">_ </span>=&gt; <span class="macro">abort!</span>(fn_arg, <span class="string">"unexpected fn argument type, expected FnArg::Typed"</span>),
         }
     }
 
-    <span class="attr">#[cfg(any(feature = <span class="string">&quot;actix_extras&quot;</span>, feature = <span class="string">&quot;axum_extras&quot;</span>))]
+    <span class="attr">#[cfg(any(feature = <span class="string">"actix_extras"</span>, feature = <span class="string">"axum_extras"</span>))]
     </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>with_parameter_in(
-        arg: FnArg&lt;<span class="lifetime">&#39;_</span>&gt;,
+        arg: FnArg&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Option</span>&lt;(
-        <span class="prelude-ty">Option</span>&lt;std::borrow::Cow&lt;<span class="lifetime">&#39;_</span>, syn::Path&gt;&gt;,
+        <span class="prelude-ty">Option</span>&lt;std::borrow::Cow&lt;<span class="lifetime">'_</span>, syn::Path&gt;&gt;,
         proc_macro2::TokenStream,
     )&gt; {
-        <span class="kw">let </span>parameter_in_provider = <span class="kw">if </span>arg.ty.is(<span class="string">&quot;Path&quot;</span>) {
+        <span class="kw">let </span>parameter_in_provider = <span class="kw">if </span>arg.ty.is(<span class="string">"Path"</span>) {
             <span class="macro">quote! </span>{ || <span class="prelude-val">Some </span>(utoipa::openapi::path::ParameterIn::Path) }
-        } <span class="kw">else if </span>arg.ty.is(<span class="string">&quot;Query&quot;</span>) {
+        } <span class="kw">else if </span>arg.ty.is(<span class="string">"Query"</span>) {
             <span class="macro">quote! </span>{ || <span class="prelude-val">Some</span>(utoipa::openapi::path::ParameterIn::Query) }
         } <span class="kw">else </span>{
             <span class="macro">quote! </span>{ || <span class="prelude-val">None </span>}
@@ -938,7 +939,7 @@
         <span class="kw">let </span>type_path = arg
             .ty
             .children
-            .expect(<span class="string">&quot;FnArg TypeTree generic type Path must have children&quot;</span>)
+            .expect(<span class="string">"FnArg TypeTree generic type Path must have children"</span>)
             .into_iter()
             .next()
             .unwrap()
@@ -948,7 +949,7 @@
     }
 
     <span class="comment">// if type is either Path or Query with direct children as Object types without generics
-    </span><span class="attr">#[cfg(any(feature = <span class="string">&quot;actix_extras&quot;</span>, feature = <span class="string">&quot;axum_extras&quot;</span>))]
+    </span><span class="attr">#[cfg(any(feature = <span class="string">"actix_extras"</span>, feature = <span class="string">"axum_extras"</span>))]
     </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>is_into_params(fn_arg: <span class="kw-2">&amp;</span>FnArg) -&gt; bool {
         <span class="kw">use </span><span class="kw">crate</span>::component::GenericType;
         <span class="kw">let </span><span class="kw-2">mut </span>ty = <span class="kw-2">&amp;</span>fn_arg.ty;
@@ -958,12 +959,12 @@
                 .ty
                 .children
                 .as_ref()
-                .expect(<span class="string">&quot;FnArg Option must have children&quot;</span>)
+                .expect(<span class="string">"FnArg Option must have children"</span>)
                 .first()
-                .expect(<span class="string">&quot;FnArg Option must have 1 child&quot;</span>);
+                .expect(<span class="string">"FnArg Option must have 1 child"</span>);
         }
 
-        (ty.is(<span class="string">&quot;Path&quot;</span>) || ty.is(<span class="string">&quot;Query&quot;</span>))
+        (ty.is(<span class="string">"Path"</span>) || ty.is(<span class="string">"Query"</span>))
             &amp;&amp; ty
                 .children
                 .as_ref()
