@@ -380,15 +380,53 @@ class TS2CAST(object):
             source_refs=[self.node_helper.get_source_ref(node)],
         )
 
+    """
+     (keyword_statement [6, 6] - [6, 61]
+      (statement_label_reference [6, 13] - [6, 16])
+      (statement_label_reference [6, 18] - [6, 21])
+      (statement_label_reference [6, 23] - [6, 26])
+      (statement_label_reference [6, 28] - [6, 31])
+      (math_expression [6, 34] - [6, 61]
+        left: (call_expression [6, 34] - [6, 57]
+          (identifier [6, 34] - [6, 37])
+          (argument_list [6, 37] - [6, 57]
+            (math_expression [6, 38] - [6, 53]
+              left: (math_expression [6, 38] - [6, 49]
+                left: (parenthesized_expression [6, 38] - [6, 45]
+                  (math_expression [6, 39] - [6, 44]
+                    left: (identifier [6, 39] - [6, 40])
+                    right: (identifier [6, 43] - [6, 44])))
+                right: (identifier [6, 48] - [6, 49]))
+              right: (number_literal [6, 52] - [6, 53]))
+            (number_literal [6, 55] - [6, 56])))
+        right: (number_literal [6, 60] - [6, 61])))
+    """
+
     def visit_keyword_statement(self, node):
         # NOTE: RETURN is not the only Fortran keyword. GO TO and CONTINUE are also considered keywords
         identifier = self.node_helper.get_identifier(node).lower()
         if node.type == "keyword_statement":
             if "go to" in identifier:
-                statement_label_reference = get_first_child_by_type(node, "statement_label_reference")
+                statement_labels = [
+                    self.node_helper.get_identifier(child)
+                    for child in get_children_by_types(
+                        node, ["statement_label_reference"]
+                    )
+                ]
+                # If there are multiple statement labels, then this is a COMPUTED GO TO
+                # Those are handled as a "_get" access into a List of statement labels with the index determined by the expression
+                if len(statement_labels) > 1:
+                    expr = Call(
+                        func=self.get_gromet_function_node("_get"),
+                        arguments=[
+                            CASTLiteralValue(value_type="List", value=[CASTLiteralValue(value=label, value_type="List") for label in statement_labels]),
+                            self.visit(node.children[-1]),
+                        ],
+                    )
+                    return Goto(label=None, expr=expr)
                 return Goto(
-                    label=self.node_helper.get_identifier(statement_label_reference),
-                    expr=None
+                    label=statement_labels[0],
+                    expr=None,
                 )
             if "continue" in identifier:
                 return self._visit_no_op(node)
@@ -419,10 +457,8 @@ class TS2CAST(object):
 
     def visit_statement_label(self, node):
         """Visitor for fortran statement labels"""
-        return Label(
-            label=self.node_helper.get_identifier(node)
-        )
-    
+        return Label(label=self.node_helper.get_identifier(node))
+
     def visit_fortran_builtin_statement(self, node):
         """Visitor for Fortran keywords that are not classified as keyword_statement by tree-sitter"""
         # All of the node types that fall into this category end with _statment.
