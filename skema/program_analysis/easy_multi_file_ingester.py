@@ -9,7 +9,7 @@ from skema.skema_py.server import SUPPORTED_FILE_EXTENSIONS
 
 def easy_process_file_system(system_name: str, root_path: str, write_to_file=False, original_source=False) -> GrometFNModuleCollection:
     """
-    Processes a file system given a system name and root path. Automatically handles generation of a system_filepaths.txt file and returns a GrometFNModuleCollection.
+    Like process_file_system but doesn't require a system_filepaths.txt file. Returns a GrometFNModuleCollection.
 
     Parameters:
     system_name (str): The name of the system to ingest.
