@@ -55,6 +55,13 @@ pub struct Integral {
     pub integration_variable: Box<MathExpression>,
 }
 
+/// Integral operation
+/*#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
+pub struct SurfaceClosedIntegral {
+    //pub op: Box<MathExpression>,
+    pub row: Mrow,
+}*/
+
 /// Hat operation
 #[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
 pub struct HatComp {
@@ -112,6 +119,8 @@ pub enum MathExpression {
     DownArrowComp(DownArrowComp),
     Integral(Integral),
     LaplacianComp(LaplacianComp),
+    SurfaceClosedIntegral(Box<MathExpression>),
+    SurfaceClosedIntegralNoIntVar(Box<MathExpression>),
     //Differential(Box<MathExpression>, Box<MathExpression>),
     #[default]
     None,
@@ -182,6 +191,9 @@ impl fmt::Display for MathExpression {
             MathExpression::LaplacianComp(LaplacianComp { op, comp }) => {
                 write!(f, "{op}(")?;
                 write!(f, "{comp})")
+            }
+            MathExpression::SurfaceClosedIntegral(row) => {
+                write!(f, "{row})")
             }
             expression => write!(f, "{expression:?}"),
         }

@@ -977,6 +977,52 @@ pub fn integral_with_many_math_expression_integrand(
     )))
 }
 
+/// Surface Closed Integral
+pub fn surface_closed_integral(input: Span) -> IResult<(Operator, MathExpression, MathExpression)> {
+    let (s, (_op, lim)) = ws(delimited(
+        stag!("msubsup"),
+        pair(delimited(stag!("mtext"), tag("∯"), etag!("mtext")), mi),
+        etag!("msubsup"),
+    ))(input)?;
+    let (s, row) = ws(many_till(math_expression, d))(s)?;
+    let (s, int_var) = ws(math_expression)(s)?;
+    let integrand = MathExpression::Mrow(Mrow::new(row.0));
+
+    let int_op = Operator::SurfaceClosedInt;
+    Ok((s, (int_op, integrand, int_var.clone())))
+}
+
+/// Surface Closed Integral
+pub fn surface_closed_integral2(input: Span) -> IResult<MathExpression> {
+    let (s, (_op, _lim)) = ws(delimited(
+        stag!("msubsup"),
+        pair(delimited(stag!("mtext"), tag("∯"), etag!("mtext")), mi),
+        etag!("msubsup"),
+    ))(input)?;
+
+    let (s, row) = ws(many_till(
+        math_expression,
+        pair(delimited(stag!("mo"), dot, etag!("mo")), d),
+    ))(s)?;
+    let (s, int_var) = ws(math_expression)(s)?;
+
+    let mut expression: Vec<MathExpression> = Vec::new();
+    expression.push(MathExpression::Mrow(Mrow::new(row.0)));
+    expression.push(MathExpression::Mo(Operator::Dot));
+    let ci = Ci::new(
+        Some(Type::Real),
+        Box::new(MathExpression::Mi(Mi("dS".to_string()))),
+        None,
+    );
+    expression.push(MathExpression::Ci(ci.clone()));
+    let x = MathExpression::Mrow(Mrow(expression)); //Mrow::new(expression);
+
+    Ok((
+        s,
+        MathExpression::SurfaceClosedIntegralNoIntVar(Box::new(x)),
+    ))
+}
+
 /// Laplacian
 /// Parse Hat operator with components. Example: r \hat{x}
 pub fn laplacian_operation(input: Span) -> IResult<(MathExpression, Ci)> {
@@ -1010,6 +1056,17 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                     })
                 },
             ),
+            /*map(surface_closed_integral2, |row| {
+                MathExpression::Mrow(Mrow(row))
+            }),*/
+            surface_closed_integral2,
+            map(surface_closed_integral, |(operator, comp, var)| {
+                MathExpression::Integral(Integral {
+                    op: Box::new(MathExpression::Mo(operator)),
+                    integrand: Box::new(comp),
+                    integration_variable: Box::new(var),
+                })
+            }),
             map(
                 integral_with_math_expression_integrand,
                 |(operator, comp, var)| {
@@ -1025,6 +1082,7 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
             map(gradient_with_closed_paren, |row| {
                 MathExpression::Mrow(Mrow(row))
             }),
+            //map(surface_closed_integral_operator, MathExpression::Mo),
             map(gradient_subscript, MathExpression::Mo),
             map(div, MathExpression::Mo),
             map(laplacian_operation, |(op, comp)| {

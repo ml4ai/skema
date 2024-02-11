@@ -390,6 +390,9 @@ fn process_math_expression(expr: &MathExpression, expression: &mut String) {
             process_math_expression(comp, expression);
             expression.push_str("^{\\downarrow}");
         }
+        MathExpression::SurfaceClosedIntegral(row) => {
+            process_math_expression(row, expression);
+        }
         t => panic!("Unhandled MathExpression: {:?}", t),
     }
 }
@@ -723,6 +726,12 @@ impl MathExpressionTree {
                     Operator::Laplacian => {
                         expression.push_str(&format!("\\nabla^2 {}", rest[0].to_latex()));
                     }
+                    Operator::SurfaceClosedIntNoIntVar => {
+                        expression.push_str(&format!("\\oiint_S {}", rest[0].to_latex()));
+                    }
+                    Operator::SurfaceClosedInt => {
+                        expression.push_str(&format!("\\oiint_S {} dS", rest[0].to_latex()));
+                    }
                     _ => {
                         expression = "".to_string();
                         return "Contain unsupported operators.".to_string();
@@ -796,7 +805,21 @@ impl MathExpression {
                 } else {
                     x.diff.flatten(tokens);
                 }
+                tokens.push(MathExpression::Mo(Operator::Lparen));
                 x.func.flatten(tokens);
+                tokens.push(MathExpression::Mo(Operator::Rparen));
+                tokens.push(MathExpression::Mo(Operator::Rparen));
+            }
+            MathExpression::SurfaceClosedIntegralNoIntVar(row) => {
+                tokens.push(MathExpression::Mo(Operator::Lparen));
+                tokens.push(MathExpression::Mo(Operator::SurfaceClosedIntNoIntVar));
+                row.flatten(tokens);
+                tokens.push(MathExpression::Mo(Operator::Rparen));
+            }
+            MathExpression::SurfaceClosedIntegral(row) => {
+                tokens.push(MathExpression::Mo(Operator::Lparen));
+                tokens.push(MathExpression::Mo(Operator::SurfaceClosedInt));
+                row.flatten(tokens);
                 tokens.push(MathExpression::Mo(Operator::Rparen));
             }
             // Handles `Laplacian` operator with MathExpression
@@ -1104,7 +1127,8 @@ fn prefix_binding_power(op: &Operator) -> ((), u8) {
         Operator::Tan => ((), 21),
         Operator::Mean => ((), 25),
         Operator::Hat => ((), 25),
-        //Operator::Cross => ((), 25),
+        Operator::SurfaceClosedInt => ((), 25),
+        Operator::SurfaceClosedIntNoIntVar => ((), 25),
         Operator::Grad => ((), 25),
         Operator::Int => ((), 25),
         Operator::GradSub(GradSub { .. }) => ((), 25),
@@ -3063,4 +3087,40 @@ fn test_fourier_law_heat_equation_1_1() {
     assert_eq!(s_exp, "(= Q (* (/ k_{T} ρ) (Laplacian T)))");
     //println!("exp.to_latex()={:?}", exp.to_latex());
     assert_eq!(exp.to_latex(), "Q=\\frac{k_{T}}{\\rho}*(\\nabla^2 T)");
+}
+
+#[test]
+fn test_closed_surface_integral() {
+    let input = "<math>
+    <msubsup><mtext>∯</mtext><mi>S</mi></msubsup>
+    <mrow><mi>&#x2207;</mi><mi>T</mi></mrow>
+    <mo>&#x22C5;</mo><mi>T</mi>
+    <mi>d</mi><mi>S</mi>
+    </math>";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    let s_exp = exp.to_string();
+    assert_eq!(s_exp, "(SurfaceClosedInt (⋅ (Grad T) T))");
+    assert_eq!(exp.to_latex(), "\\oiint_S \\nabla{T} \\cdot T dS");
+}
+
+#[test]
+fn test_fourier_law_heat_equation_2() {
+    let input = "<math>
+    <mfrac><mrow><mi>&#x2202;</mi><mi>Q</mi></mrow><mrow><mi>&#x2202;</mi><mi>t</mi></mrow></mfrac>
+    <mo>=</mo>
+    <mo>&#x2212;</mo><mi>k</mi>
+    <msubsup><mtext>∯</mtext><mi>S</mi></msubsup>
+    <mrow><mi>&#x2207;</mi><mi>T</mi></mrow>
+    <mo>&#x22C5;</mo><mi>d</mi><mi>S</mi>
+    </math>";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    let s_exp = exp.to_string();
+    assert_eq!(
+        s_exp,
+        "(= (D(1, t) Q) (* (- k) (SurfaceClosedInt (⋅ (Grad T) dS))))"
+    );
+    assert_eq!(
+        exp.to_latex(),
+        "\\frac{d Q}{dt}=(-k)*(\\oiint_S \\nabla{T} \\cdot dS)"
+    );
 }

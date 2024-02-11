@@ -100,6 +100,8 @@ pub enum Operator {
     Int,
     MsubsupInt(MsubsupInt),
     Laplacian,
+    SurfaceClosedInt,
+    SurfaceClosedIntNoIntVar,
     // Catchall for operators we haven't explicitly defined as enum variants yet.
     Other(String),
 }
@@ -174,6 +176,15 @@ impl fmt::Display for Operator {
                 write!(f, "Int_{{{sub}}}^{{{sup}}}({integration_variable})")
             }
             Operator::Laplacian => write!(f, "Laplacian"),
+            /*Operator::SurfaceClosedInt(SurfaceClosedInt{limit, integration_variable}) => {
+            write!(f, "SurfaceClosedInt_{limit}({integration_variable})")
+            }*/
+            Operator::SurfaceClosedInt => {
+                write!(f, "SurfaceClosedInt")
+            }
+            Operator::SurfaceClosedIntNoIntVar => {
+                write!(f, "SurfaceClosedInt")
+            }
         }
     }
 }
