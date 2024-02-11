@@ -1056,9 +1056,6 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                     })
                 },
             ),
-            /*map(surface_closed_integral2, |row| {
-                MathExpression::Mrow(Mrow(row))
-            }),*/
             surface_closed_integral2,
             map(surface_closed_integral, |(operator, comp, var)| {
                 MathExpression::Integral(Integral {
@@ -1082,7 +1079,6 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
             map(gradient_with_closed_paren, |row| {
                 MathExpression::Mrow(Mrow(row))
             }),
-            //map(surface_closed_integral_operator, MathExpression::Mo),
             map(gradient_subscript, MathExpression::Mo),
             map(div, MathExpression::Mo),
             map(laplacian_operation, |(op, comp)| {
