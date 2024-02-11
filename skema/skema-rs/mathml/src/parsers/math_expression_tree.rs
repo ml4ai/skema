@@ -655,11 +655,19 @@ impl MathExpressionTree {
                         expression.push('}');
                     }
                     Operator::PartialDerivative(d) => {
-                        expression.push_str("\\frac{\\partial ");
-                        process_expression_parentheses(&mut expression, &rest[0]);
-                        expression.push_str("}{\\partial");
-                        process_math_expression(&d.bound_var.content, &mut expression);
-                        expression.push('}');
+                        if d.order == 1_u8 {
+                            expression.push_str("\\frac{\\partial ");
+                            process_expression_parentheses(&mut expression, &rest[0]);
+                            expression.push_str("}{\\partial");
+                            process_math_expression(&d.bound_var.content, &mut expression);
+                            expression.push('}');
+                        } else if d.order == 2_u8 {
+                            expression.push_str("\\frac{\\partial^2 ");
+                            process_expression_parentheses(&mut expression, &rest[0]);
+                            expression.push_str("}{\\partial ");
+                            process_math_expression(&d.bound_var.content, &mut expression);
+                            expression.push_str("^2}");
+                        }
                     }
                     Operator::Sin => {
                         expression.push_str(&format!("\\sin({})", rest[0].to_latex()));
@@ -3048,11 +3056,8 @@ fn test_snowpack_optics() {
   </mfrac>
     </math>";
     let exp = input.parse::<MathExpressionTree>().unwrap();
-    println!("exp={:?}", exp);
     let s_exp = exp.to_string();
-    println!("s_exp={:?}", s_exp);
     assert_eq!(s_exp, "(= (Mean ω) (/ (Int_{λ_{1}}^{λ_{2}}(λ) (* (* ω I↓) α_{sno})) (Int_{λ_{1}}^{λ_{2}}(λ) (* I↓ α_{sno}))))");
-    println!("exp.to_latex()={:?}", exp.to_latex());
     assert_eq!(exp.to_latex(), "\\langle \\omega \\rangle=\\frac{\\int_{\\lambda_{1}}^{\\lambda_{2}}\\omega(\\lambda)*I^{\\downarrow}(\\lambda)*\\alpha_{sno}(\\lambda) dλ}{\\int_{\\lambda_{1}}^{\\lambda_{2}}I^{\\downarrow}(\\lambda)*\\alpha_{sno}(\\lambda) dλ}");
 }
 
@@ -3063,11 +3068,8 @@ fn test_laplacian() {
     <mi>T</mi>
     </math>";
     let exp = input.parse::<MathExpressionTree>().unwrap();
-    println!("exp={:?}", exp);
     let s_exp = exp.to_string();
-    println!("s_exp={:?}", s_exp);
-    //assert_eq!(s_exp, "(Laplacian T)");
-    println!("exp.to_latex()={:?}", exp.to_latex());
+    assert_eq!(s_exp, "(Laplacian T)");
     assert_eq!(exp.to_latex(), "\\nabla^2 T");
 }
 
@@ -3081,11 +3083,8 @@ fn test_fourier_law_heat_equation_1_1() {
     <mi>T</mi>
     </math>";
     let exp = input.parse::<MathExpressionTree>().unwrap();
-    println!("exp={:?}", exp);
     let s_exp = exp.to_string();
-    //println!("s_exp={:?}", s_exp);
     assert_eq!(s_exp, "(= Q (* (/ k_{T} ρ) (Laplacian T)))");
-    //println!("exp.to_latex()={:?}", exp.to_latex());
     assert_eq!(exp.to_latex(), "Q=\\frac{k_{T}}{\\rho}*(\\nabla^2 T)");
 }
 
@@ -3123,4 +3122,15 @@ fn test_fourier_law_heat_equation_2() {
         exp.to_latex(),
         "\\frac{d Q}{dt}=(-k)*(\\oiint_S \\nabla{T} \\cdot dS)"
     );
+}
+
+#[test]
+fn test_second_order_derivative() {
+    let input = "<math>
+    <mfrac><mrow><msup><mi>&#x2202;</mi><mn>2</mn></msup><mi>T</mi></mrow><mrow><mi>&#x2202;</mi><msup><mi>x</mi><mn>2</mn></msup></mrow></mfrac>
+    </math>";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    let s_exp = exp.to_string();
+    assert_eq!(s_exp, "(PD(2, x) T)");
+    assert_eq!(s_exp, "\\frac{\\partial^2 T}{\\partial x^2}");
 }

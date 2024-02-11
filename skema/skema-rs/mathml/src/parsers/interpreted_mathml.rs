@@ -655,6 +655,100 @@ pub fn first_order_partial_derivative_leibniz_notation(
     )))
 }
 
+/// Parse a second-order partial ordinary derivative written in Leibniz notation.
+pub fn second_order_partial_derivative_leibniz_notation(
+    input: Span,
+) -> IResult<(PartialDerivative, Ci)> {
+    println!("-");
+    let (s, _) = tuple((
+        stag!("mfrac"),
+        stag!("mrow"),
+        stag!("msup"),
+        partial,
+        stag!("mn"),
+        tag("2"),
+        etag!("mn"),
+        etag!("msup"),
+    ))(input)?;
+    let (s, func) = ws(alt((
+        ci_univariate_func,
+        map(
+            ci_unknown,
+            |Ci {
+                 content, func_of, ..
+             }| {
+                Ci {
+                    r#type: Some(Type::Function),
+                    content,
+                    func_of,
+                }
+            },
+        ),
+        ci_subscript_func,
+    )))(s)?;
+    println!("--");
+    let (s, with_respect_to) = delimited(
+        tuple((etag!("mrow"), stag!("mrow"), partial, stag!("msup"))),
+        mi,
+        tuple((
+            stag!("mn"),
+            tag("2"),
+            etag!("mn"),
+            etag!("msup"),
+            etag!("mrow"),
+            etag!("mfrac"),
+        )),
+    )(s)?;
+    println!("---");
+    if let Some(ref ci_vec) = func.func_of {
+        for (indx, bvar) in ci_vec.iter().enumerate() {
+            if Some(bvar.content.clone())
+                == Some(Box::new(MathExpression::Mi(with_respect_to.clone())))
+            {
+                return Ok((
+                    s,
+                    (
+                        PartialDerivative::new(
+                            2,
+                            (indx + 1) as u8,
+                            Ci::new(
+                                Some(Type::Real),
+                                Box::new(MathExpression::Mi(with_respect_to)),
+                                None,
+                            ),
+                        ),
+                        func,
+                    ),
+                ));
+            } else if Some(bvar.content.clone())
+                == Some(Box::new(MathExpression::Mi(Mi("".to_string()))))
+            {
+                return Ok((
+                    s,
+                    (
+                        PartialDerivative::new(
+                            2,
+                            1,
+                            Ci::new(
+                                Some(Type::Real),
+                                Box::new(MathExpression::Mi(with_respect_to)),
+                                None,
+                            ),
+                        ),
+                        func,
+                    ),
+                ));
+            }
+        }
+    }
+    println!("----");
+
+    Err(nom::Err::Error(ParseError::new(
+        "Unable to match  function_of  with with_respect_to".to_string(),
+        input,
+    )))
+}
+
 pub fn newtonian_derivative(input: Span) -> IResult<(Derivative, Ci)> {
     // Get number of dots to recognize the order of the derivative
     let n_dots = delimited(
@@ -1165,92 +1259,124 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                 })
             },
         ),
-        map(
-            first_order_derivative_leibniz_notation,
-            |(
-                Derivative {
-                    order,
-                    var_index,
-                    bound_var,
-                },
-                Ci {
-                    r#type,
-                    content,
-                    func_of,
-                },
-            )| {
-                MathExpression::Differential(Differential {
-                    diff: Box::new(MathExpression::Mo(Operator::Derivative(Derivative {
+        alt((
+            map(
+                first_order_derivative_leibniz_notation,
+                |(
+                    Derivative {
                         order,
                         var_index,
                         bound_var,
-                    }))),
-                    func: Box::new(MathExpression::Ci(Ci {
+                    },
+                    Ci {
                         r#type,
                         content,
                         func_of,
-                    })),
-                })
-            },
-        ),
-        map(
-            first_order_partial_derivative_leibniz_notation,
-            |(
-                PartialDerivative {
-                    order,
-                    var_index,
-                    bound_var,
-                },
-                Ci {
-                    r#type,
-                    content,
-                    func_of,
-                },
-            )| {
-                MathExpression::Differential(Differential {
-                    diff: Box::new(MathExpression::Mo(Operator::PartialDerivative(
-                        PartialDerivative {
+                    },
+                )| {
+                    MathExpression::Differential(Differential {
+                        diff: Box::new(MathExpression::Mo(Operator::Derivative(Derivative {
                             order,
                             var_index,
                             bound_var,
-                        },
-                    ))),
-                    func: Box::new(MathExpression::Ci(Ci {
-                        r#type,
-                        content,
-                        func_of,
-                    })),
-                })
-            },
-        ),
-        map(
-            newtonian_derivative,
-            |(
-                Derivative {
-                    order,
-                    var_index,
-                    bound_var,
+                        }))),
+                        func: Box::new(MathExpression::Ci(Ci {
+                            r#type,
+                            content,
+                            func_of,
+                        })),
+                    })
                 },
-                Ci {
-                    r#type,
-                    content,
-                    func_of,
-                },
-            )| {
-                MathExpression::Differential(Differential {
-                    diff: Box::new(MathExpression::Mo(Operator::Derivative(Derivative {
+            ),
+            map(
+                first_order_partial_derivative_leibniz_notation,
+                |(
+                    PartialDerivative {
                         order,
                         var_index,
                         bound_var,
-                    }))),
-                    func: Box::new(MathExpression::Ci(Ci {
+                    },
+                    Ci {
                         r#type,
                         content,
                         func_of,
-                    })),
-                })
-            },
-        ),
+                    },
+                )| {
+                    MathExpression::Differential(Differential {
+                        diff: Box::new(MathExpression::Mo(Operator::PartialDerivative(
+                            PartialDerivative {
+                                order,
+                                var_index,
+                                bound_var,
+                            },
+                        ))),
+                        func: Box::new(MathExpression::Ci(Ci {
+                            r#type,
+                            content,
+                            func_of,
+                        })),
+                    })
+                },
+            ),
+            map(
+                newtonian_derivative,
+                |(
+                    Derivative {
+                        order,
+                        var_index,
+                        bound_var,
+                    },
+                    Ci {
+                        r#type,
+                        content,
+                        func_of,
+                    },
+                )| {
+                    MathExpression::Differential(Differential {
+                        diff: Box::new(MathExpression::Mo(Operator::Derivative(Derivative {
+                            order,
+                            var_index,
+                            bound_var,
+                        }))),
+                        func: Box::new(MathExpression::Ci(Ci {
+                            r#type,
+                            content,
+                            func_of,
+                        })),
+                    })
+                },
+            ),
+            map(
+                second_order_partial_derivative_leibniz_notation,
+                |(
+                    PartialDerivative {
+                        order,
+                        var_index,
+                        bound_var,
+                    },
+                    Ci {
+                        r#type,
+                        content,
+                        func_of,
+                    },
+                )| {
+                    MathExpression::Differential(Differential {
+                        diff: Box::new(MathExpression::Mo(Operator::PartialDerivative(
+                            PartialDerivative {
+                                order,
+                                var_index,
+                                bound_var,
+                            },
+                        ))),
+                        func: Box::new(MathExpression::Ci(Ci {
+                            r#type,
+                            content,
+                            func_of,
+                        })),
+                    })
+                },
+            ),
+        )),
         map(
             ci_univariate_with_bounds,
             |Ci {
