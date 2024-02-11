@@ -659,7 +659,6 @@ pub fn first_order_partial_derivative_leibniz_notation(
 pub fn second_order_partial_derivative_leibniz_notation(
     input: Span,
 ) -> IResult<(PartialDerivative, Ci)> {
-    println!("-");
     let (s, _) = tuple((
         stag!("mfrac"),
         stag!("mrow"),
@@ -686,7 +685,6 @@ pub fn second_order_partial_derivative_leibniz_notation(
         ),
         ci_subscript_func,
     )))(s)?;
-    println!("--");
     let (s, with_respect_to) = delimited(
         tuple((etag!("mrow"), stag!("mrow"), partial, stag!("msup"))),
         mi,
@@ -699,7 +697,6 @@ pub fn second_order_partial_derivative_leibniz_notation(
             etag!("mfrac"),
         )),
     )(s)?;
-    println!("---");
     if let Some(ref ci_vec) = func.func_of {
         for (indx, bvar) in ci_vec.iter().enumerate() {
             if Some(bvar.content.clone())
@@ -741,7 +738,6 @@ pub fn second_order_partial_derivative_leibniz_notation(
             }
         }
     }
-    println!("----");
 
     Err(nom::Err::Error(ParseError::new(
         "Unable to match  function_of  with with_respect_to".to_string(),
