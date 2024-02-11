@@ -358,9 +358,12 @@ pub async fn model2MET(
     let mut mets = Vec::<MathExpressionTree>::new();
     for equation in mathml_ast.iter() {
         let mut equal_args = Vec::<MathExpressionTree>::new();
-        equal_args.push(MathExpressionTree::Atom(MathExpression::Ci(equation.lhs_var.clone())));
+        equal_args.push(MathExpressionTree::Atom(MathExpression::Ci(
+            equation.lhs_var.clone(),
+        )));
         equal_args.push(equation.rhs.clone());
-        let met = MathExpressionTree::Cons(mathml::ast::operator::Operator::Equals, equal_args.clone());
+        let met =
+            MathExpressionTree::Cons(mathml::ast::operator::Operator::Equals, equal_args.clone());
         mets.push(met.clone());
     }
     HttpResponse::Ok().json(web::Json(mets))
