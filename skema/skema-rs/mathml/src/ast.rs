@@ -2,8 +2,8 @@ use derive_new::new;
 use std::fmt;
 
 pub mod operator;
-use serde::{Deserialize, Serialize};
 use operator::Operator;
+use serde::{Deserialize, Serialize};
 //use crate::ast::MathExpression::SummationOp;
 
 #[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
@@ -47,6 +47,21 @@ pub struct SummationMath {
     pub func: Box<MathExpression>,
 }
 
+/// Integral operation
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
+pub struct Integral {
+    pub op: Box<MathExpression>,
+    pub integrand: Box<MathExpression>,
+    pub integration_variable: Box<MathExpression>,
+}
+
+/// Integral operation
+/*#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
+pub struct SurfaceClosedIntegral {
+    //pub op: Box<MathExpression>,
+    pub row: Mrow,
+}*/
+
 /// Hat operation
 #[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
 pub struct HatComp {
@@ -54,9 +69,26 @@ pub struct HatComp {
     pub comp: Box<MathExpression>,
 }
 
+/// DownArrow
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
+pub struct DownArrowComp {
+    pub op: Box<MathExpression>,
+    pub comp: Box<MathExpression>,
+    pub func_of: Vec<Ci>,
+}
+
+/// Laplacian
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
+pub struct LaplacianComp {
+    pub op: Box<MathExpression>,
+    pub comp: Ci,
+}
+
 /// The MathExpression enum is not faithful to the corresponding element type in MathML 3
 /// (https://www.w3.org/TR/MathML3/appendixa.html#parsing_MathExpression)
-#[derive(Debug, PartialOrd, Ord, PartialEq, Eq, Clone, Hash, Default, new, Deserialize, Serialize)]
+#[derive(
+    Debug, PartialOrd, Ord, PartialEq, Eq, Clone, Hash, Default, new, Deserialize, Serialize,
+)]
 pub enum MathExpression {
     Mi(Mi),
     Mo(Operator),
@@ -84,6 +116,11 @@ pub enum MathExpression {
     AbsoluteSup(Box<MathExpression>, Box<MathExpression>),
     Absolute(Box<MathExpression>, Box<MathExpression>),
     HatComp(HatComp),
+    DownArrowComp(DownArrowComp),
+    Integral(Integral),
+    LaplacianComp(LaplacianComp),
+    SurfaceClosedIntegral(Box<MathExpression>),
+    SurfaceClosedIntegralNoIntVar(Box<MathExpression>),
     //Differential(Box<MathExpression>, Box<MathExpression>),
     #[default]
     None,
@@ -133,6 +170,30 @@ impl fmt::Display for MathExpression {
             MathExpression::HatComp(HatComp { op, comp }) => {
                 write!(f, "{op}")?;
                 write!(f, "{comp}")
+            }
+            MathExpression::DownArrowComp(DownArrowComp {
+                op,
+                comp,
+                func_of: _,
+            }) => {
+                write!(f, "{op}")?;
+                write!(f, "{comp}")
+            }
+            MathExpression::Integral(Integral {
+                op,
+                integrand,
+                integration_variable,
+            }) => {
+                write!(f, "{op}")?;
+                write!(f, "{integrand}")?;
+                write!(f, "{integration_variable}")
+            }
+            MathExpression::LaplacianComp(LaplacianComp { op, comp }) => {
+                write!(f, "{op}(")?;
+                write!(f, "{comp})")
+            }
+            MathExpression::SurfaceClosedIntegral(row) => {
+                write!(f, "{row})")
             }
             expression => write!(f, "{expression:?}"),
         }
