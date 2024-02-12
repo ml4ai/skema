@@ -2855,11 +2855,9 @@ fn test_down_arrow() {
       </msup>
     </math>";
     let exp = input.parse::<MathExpressionTree>().unwrap();
-    println!("exp={:?}", exp);
     let s_exp = exp.to_string();
-    println!("s_exp={:?}", s_exp);
     assert_eq!(s_exp, "I↓");
-    println!("exp.to_latex()={:?}", exp.to_latex());
+    assert_eq!(exp.to_latex(), "I^{\\downarrow}");
 }
 
 #[test]
@@ -2874,10 +2872,7 @@ fn test_down_arrow2() {
       <mo>)</mo>
     </math>";
     let exp = input.parse::<MathExpressionTree>().unwrap();
-    println!("exp={:?}", exp);
     let s_exp = exp.to_string();
-    println!("s_exp={:?}", s_exp);
-    println!("exp.to_latex()={:?}", exp.to_latex());
     assert_eq!(s_exp, "I↓");
     assert_eq!(exp.to_latex(), "I^{\\downarrow}(\\lambda)");
 }
@@ -3130,21 +3125,41 @@ fn test_fourier_law_heat_equation_1_2() {
     <mi>Q</mi>
     <mo>=</mo>
     <mfrac><msub><mi>k</mi><mi>T</mi></msub><mi>&#x03C1;</mi></mfrac>
-    <mrow><mo>(</mo><mfrac><mrow><msup><mi>&#x2202;</mi><mn>2</mn></msup><mi>T</mi></mrow>
-    <mrow><mi>&#x2202;</mi><msup><mi>x</mi><mn>2</mn></msup></mrow></mfrac>
-    <mo>+</mo><mfrac><mrow><msup><mi>&#x2202;</mi><mn>2</mn></msup><mi>T</mi></mrow>
-    <mrow><mi>&#x2202;</mi><msup><mi>y</mi><mn>2</mn></msup></mrow></mfrac><mo>+</mo><mfrac><mrow><msup><mi>&#x2202;</mi><mn>2</mn></msup><mi>T</mi></mrow><mrow><mi>&#x2202;</mi><msup><mi>z</mi><mn>2</mn></msup></mrow></mfrac><mo>)</mo></mrow>
+    <mrow>
+    <mo>(</mo>
+    <mfrac>
+    <mrow><msup><mi>&#x2202;</mi><mn>2</mn></msup><mi>T</mi></mrow>
+    <mrow><mi>&#x2202;</mi><msup><mi>x</mi><mn>2</mn></msup></mrow>
+    </mfrac>
+    <mo>+</mo>
+    <mfrac>
+    <mrow><msup><mi>&#x2202;</mi><mn>2</mn></msup><mi>T</mi></mrow>
+    <mrow><mi>&#x2202;</mi><msup><mi>y</mi><mn>2</mn></msup></mrow>
+    </mfrac>
+    <mo>+</mo>
+    <mfrac>
+    <mrow><msup><mi>&#x2202;</mi><mn>2</mn></msup><mi>T</mi></mrow>
+    <mrow><mi>&#x2202;</mi><msup><mi>z</mi><mn>2</mn></msup></mrow>
+    </mfrac>
+    <mo>)</mo>
+    </mrow>
     </math>";
     let exp = input.parse::<MathExpressionTree>().unwrap();
     let s_exp = exp.to_string();
-    assert_eq!(s_exp, "(= Q (* (/ k_{T} ρ) (+ (+ (PD(2, x) T) (PD(2, y) T)) (PD(2, z) T))))");
+    assert_eq!(
+        s_exp,
+        "(= Q (* (/ k_{T} ρ) (+ (+ (PD(2, x) T) (PD(2, y) T)) (PD(2, z) T))))"
+    );
     assert_eq!(exp.to_latex(), "Q=\\frac{k_{T}}{\\rho}*((\\frac{\\partial^2 T}{\\partial x^2})+(\\frac{\\partial^2 T}{\\partial y^2})+(\\frac{\\partial^2 T}{\\partial z^2}))");
 }
 
 #[test]
 fn test_second_order_derivative() {
     let input = "<math>
-    <mfrac><mrow><msup><mi>&#x2202;</mi><mn>2</mn></msup><mi>T</mi></mrow><mrow><mi>&#x2202;</mi><msup><mi>x</mi><mn>2</mn></msup></mrow></mfrac>
+    <mfrac>
+    <mrow><msup><mi>&#x2202;</mi><mn>2</mn></msup><mi>T</mi></mrow>
+    <mrow><mi>&#x2202;</mi><msup><mi>x</mi><mn>2</mn></msup></mrow>
+    </mfrac>
     </math>";
     let exp = input.parse::<MathExpressionTree>().unwrap();
     let s_exp = exp.to_string();
