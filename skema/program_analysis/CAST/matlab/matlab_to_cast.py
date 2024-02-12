@@ -160,6 +160,7 @@ class MatlabToCast(object):
             value = value[0].upper() + value[1:].lower()
             # store as string, use Python Boolean capitalization.
 
+            value_type = ScalarType.BOOLEAN
             return CASTLiteralValue(
                 value_type=value_type,
                 value = value,
@@ -210,7 +211,7 @@ class MatlabToCast(object):
             val = self.visit_name(node),
             type = self.variable_context.get_type(identifier) if
                 self.variable_context.is_variable(identifier) else "Unknown",
-            default_value = LiteralValue(
+            default_value = CASTLiteralValue(
                 value_type=ScalarType.CHARACTER,
                 value=self.node_helper.get_identifier(node),
                 source_code_data_type=["matlab", MATLAB_VERSION, ScalarType.CHARACTER],
@@ -443,6 +444,7 @@ class MatlabToCast(object):
         """Visitor for numbers """
         number = self.node_helper.get_identifier(node)
         # Check if this is a real value, or an Integer
+        literal_value = self.node_helper.get_identifier(node)
         if "e" in literal_value.lower() or "." in literal_value:
             value_type = "AbstractFloat"
             return CASTLiteralValue(
