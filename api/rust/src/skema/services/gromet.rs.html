@@ -391,6 +391,13 @@
 <a href="#390" id="390">390</a>
 <a href="#391" id="391">391</a>
 <a href="#392" id="392">392</a>
+<a href="#393" id="393">393</a>
+<a href="#394" id="394">394</a>
+<a href="#395" id="395">395</a>
+<a href="#396" id="396">396</a>
+<a href="#397" id="397">397</a>
+<a href="#398" id="398">398</a>
+<a href="#399" id="399">399</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! REST API endpoints related to CRUD operations and other queries on GroMEt objects.
 </span><span class="kw">use </span><span class="kw">crate</span>::config::Config;
 <span class="kw">use </span><span class="kw">crate</span>::database::{parse_gromet_queries, run_queries};
@@ -400,7 +407,7 @@
 <span class="kw">use </span>actix_web::{delete, get, post, put, web, HttpResponse};
 <span class="kw">use </span>mathml::acset::{PetriNet, RegNet};
 
-<span class="kw">use </span>mathml::ast::{MathExpression, <span class="self">self</span>};
+<span class="kw">use </span>mathml::ast::{<span class="self">self</span>, MathExpression};
 <span class="kw">use </span>mathml::parsers::math_expression_tree::MathExpressionTree;
 <span class="kw">use </span>neo4rs;
 <span class="kw">use </span>neo4rs::{query, Error, Node};
@@ -748,24 +755,27 @@
     <span class="kw">let </span>ref_module_id2 = module_id.as_ref();
     <span class="kw">let </span>mathml_ast = module_id2mathml_MET_ast(<span class="kw-2">*</span>ref_module_id1.unwrap(), config1.clone()).<span class="kw">await</span>; <span class="comment">// turns model into mathml ast equations
     </span><span class="kw">let </span>_del_response = delete_module(<span class="kw-2">*</span>ref_module_id2.unwrap(), config1.clone()).<span class="kw">await</span>; <span class="comment">// deletes model from db
-    // now we convert each firstorderode into a MET. The RHS is just ported over, but we need to create the LHS as a derivative and put it into an equation
+                                                                                        // now we convert each firstorderode into a MET. The RHS is just ported over, but we need to create the LHS as a derivative and put it into an equation
     </span><span class="kw">let </span><span class="kw-2">mut </span>mets = Vec::&lt;MathExpressionTree&gt;::new();
     <span class="kw">for </span>equation <span class="kw">in </span>mathml_ast.iter() {
         <span class="kw">let </span><span class="kw-2">mut </span>equal_args = Vec::&lt;MathExpressionTree&gt;::new();
         <span class="kw">let </span>lhs_mi1 = mathml::ast::Mi(<span class="string">""</span>.to_string()); <span class="comment">// blank
         </span><span class="kw">let </span>lhs_mi2 = mathml::ast::Mi(<span class="string">"t"</span>.to_string()); <span class="comment">// differentiation variable
         </span><span class="kw">let </span>lhs_mi3 = mathml::ast::Mi(equation.lhs_var.to_string()); <span class="comment">// state function
-        </span><span class="kw">let </span>lhs_ci1 = mathml::ast::Ci { <span class="comment">// blank
+        </span><span class="kw">let </span>lhs_ci1 = mathml::ast::Ci {
+            <span class="comment">// blank
             </span>r#type: <span class="prelude-val">Some</span>(ast::Type::Real),
             content: Box::new(mathml::ast::MathExpression::Mi(lhs_mi1)),
             func_of: <span class="prelude-val">None</span>,
         };
-        <span class="kw">let </span>lhs_ci2 = mathml::ast::Ci { <span class="comment">// differentiation variable
+        <span class="kw">let </span>lhs_ci2 = mathml::ast::Ci {
+            <span class="comment">// differentiation variable
             </span>r#type: <span class="prelude-val">Some</span>(ast::Type::Real),
             content: Box::new(mathml::ast::MathExpression::Mi(lhs_mi2)),
             func_of: <span class="prelude-val">None</span>,
         };
-        <span class="kw">let </span>lhs_ci3 = mathml::ast::Ci { <span class="comment">// state function
+        <span class="kw">let </span>lhs_ci3 = mathml::ast::Ci {
+            <span class="comment">// state function
             </span>r#type: <span class="prelude-val">Some</span>(ast::Type::Function),
             content: Box::new(mathml::ast::MathExpression::Mi(lhs_mi3)),
             func_of: <span class="prelude-val">Some</span>([lhs_ci1].to_vec()),
@@ -775,10 +785,14 @@
             var_index: <span class="number">1</span>,
             bound_var: lhs_ci2,
         };
-        <span class="kw">let </span>lhs = MathExpressionTree::Cons(mathml::ast::operator::Operator::Derivative(lhs_deriv), [MathExpressionTree::Atom(MathExpression::Ci(lhs_ci3))].to_vec());
+        <span class="kw">let </span>lhs = MathExpressionTree::Cons(
+            mathml::ast::operator::Operator::Derivative(lhs_deriv),
+            [MathExpressionTree::Atom(MathExpression::Ci(lhs_ci3))].to_vec(),
+        );
         equal_args.push(lhs.clone());
         equal_args.push(equation.rhs.clone());
-        <span class="kw">let </span>met = MathExpressionTree::Cons(mathml::ast::operator::Operator::Equals, equal_args.clone());
+        <span class="kw">let </span>met =
+            MathExpressionTree::Cons(mathml::ast::operator::Operator::Equals, equal_args.clone());
         mets.push(met.clone());
     }
     HttpResponse::Ok().json(web::Json(mets))

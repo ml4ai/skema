@@ -148,11 +148,52 @@
 <a href="#147" id="147">147</a>
 <a href="#148" id="148">148</a>
 <a href="#149" id="149">149</a>
+<a href="#150" id="150">150</a>
+<a href="#151" id="151">151</a>
+<a href="#152" id="152">152</a>
+<a href="#153" id="153">153</a>
+<a href="#154" id="154">154</a>
+<a href="#155" id="155">155</a>
+<a href="#156" id="156">156</a>
+<a href="#157" id="157">157</a>
+<a href="#158" id="158">158</a>
+<a href="#159" id="159">159</a>
+<a href="#160" id="160">160</a>
+<a href="#161" id="161">161</a>
+<a href="#162" id="162">162</a>
+<a href="#163" id="163">163</a>
+<a href="#164" id="164">164</a>
+<a href="#165" id="165">165</a>
+<a href="#166" id="166">166</a>
+<a href="#167" id="167">167</a>
+<a href="#168" id="168">168</a>
+<a href="#169" id="169">169</a>
+<a href="#170" id="170">170</a>
+<a href="#171" id="171">171</a>
+<a href="#172" id="172">172</a>
+<a href="#173" id="173">173</a>
+<a href="#174" id="174">174</a>
+<a href="#175" id="175">175</a>
+<a href="#176" id="176">176</a>
+<a href="#177" id="177">177</a>
+<a href="#178" id="178">178</a>
+<a href="#179" id="179">179</a>
+<a href="#180" id="180">180</a>
+<a href="#181" id="181">181</a>
+<a href="#182" id="182">182</a>
+<a href="#183" id="183">183</a>
+<a href="#184" id="184">184</a>
+<a href="#185" id="185">185</a>
+<a href="#186" id="186">186</a>
+<a href="#187" id="187">187</a>
+<a href="#188" id="188">188</a>
+<a href="#189" id="189">189</a>
+<a href="#190" id="190">190</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::ast::Ci;
 <span class="kw">use </span><span class="kw">crate</span>::ast::MathExpression;
 <span class="kw">use </span>derive_new::new;
-<span class="kw">use </span>std::fmt;
 <span class="kw">use </span>serde::{Deserialize, Serialize};
+<span class="kw">use </span>std::fmt;
 
 <span class="doccomment">/// Derivative operator, in line with Spivak notation: http://ceres-solver.org/spivak_notation.html
 </span><span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
@@ -188,6 +229,20 @@
 </span><span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
 </span><span class="kw">pub struct </span>GradSub {
     <span class="kw">pub </span>sub: Box&lt;MathExpression&gt;,
+}
+
+<span class="doccomment">/// Integral
+</span><span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
+</span><span class="kw">pub struct </span>MsubsupInt {
+    <span class="kw">pub </span>sub: Box&lt;MathExpression&gt;,
+    <span class="kw">pub </span>sup: Box&lt;MathExpression&gt;,
+    <span class="kw">pub </span>integration_variable: Box&lt;MathExpression&gt;,
+}
+
+<span class="doccomment">/// MsupDownArrow operation
+</span><span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
+</span><span class="kw">pub struct </span>MsupDownArrow {
+    <span class="kw">pub </span>comp: Box&lt;MathExpression&gt;,
 }
 
 <span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
@@ -231,6 +286,13 @@
     Cross,
     Hat,
     HatOp(HatOp),
+    MsupDownArrow(MsupDownArrow),
+    DownArrow,
+    Int,
+    MsubsupInt(MsubsupInt),
+    Laplacian,
+    SurfaceClosedInt,
+    SurfaceClosedIntNoIntVar,
     <span class="comment">// Catchall for operators we haven't explicitly defined as enum variants yet.
     </span>Other(String),
 }
@@ -280,7 +342,7 @@
             Operator::Arccot =&gt; <span class="macro">write!</span>(f, <span class="string">"Arccot"</span>),
             Operator::Mean =&gt; <span class="macro">write!</span>(f, <span class="string">"Mean"</span>),
             Operator::Grad =&gt; <span class="macro">write!</span>(f, <span class="string">"Grad"</span>),
-            Operator::GradSub(GradSub {sub}) =&gt;{
+            Operator::GradSub(GradSub { sub }) =&gt; {
                 <span class="macro">write!</span>(f, <span class="string">"Grad_{sub})"</span>)
             }
             Operator::Dot =&gt; <span class="macro">write!</span>(f, <span class="string">"⋅"</span>),
@@ -294,6 +356,26 @@
             Operator::Cross =&gt; <span class="macro">write!</span>(f, <span class="string">"×"</span>),
             Operator::Hat =&gt; <span class="macro">write!</span>(f, <span class="string">"Hat"</span>),
             Operator::HatOp(HatOp { comp }) =&gt; <span class="macro">write!</span>(f, <span class="string">"Hat({comp})"</span>),
+            Operator::MsupDownArrow(MsupDownArrow { comp }) =&gt; <span class="macro">write!</span>(f, <span class="string">"{comp}↓"</span>),
+            Operator::DownArrow =&gt; <span class="macro">write!</span>(f, <span class="string">"↓"</span>),
+            Operator::Int =&gt; <span class="macro">write!</span>(f, <span class="string">"Int"</span>),
+            Operator::MsubsupInt(MsubsupInt {
+                sub,
+                sup,
+                integration_variable,
+            }) =&gt; {
+                <span class="macro">write!</span>(f, <span class="string">"Int_{{{sub}}}^{{{sup}}}({integration_variable})"</span>)
+            }
+            Operator::Laplacian =&gt; <span class="macro">write!</span>(f, <span class="string">"Laplacian"</span>),
+            <span class="comment">/*Operator::SurfaceClosedInt(SurfaceClosedInt{limit, integration_variable}) =&gt; {
+            write!(f, "SurfaceClosedInt_{limit}({integration_variable})")
+            }*/
+            </span>Operator::SurfaceClosedInt =&gt; {
+                <span class="macro">write!</span>(f, <span class="string">"SurfaceClosedInt"</span>)
+            }
+            Operator::SurfaceClosedIntNoIntVar =&gt; {
+                <span class="macro">write!</span>(f, <span class="string">"SurfaceClosedInt"</span>)
+            }
         }
     }
 }
