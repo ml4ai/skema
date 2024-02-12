@@ -9,7 +9,9 @@ from fastapi import UploadFile
 from skema.rest.workflows import (
     llm_assisted_codebase_to_pn_amr,
     code_snippets_to_pn_amr,
+    lx_equations_to_amr
 )
+from skema.rest import schema
 from skema.rest.llm_proxy import Dynamics
 from skema.rest.proxies import SKEMA_RS_ADDESS
 from skema.skema_py import server as code2fn
@@ -225,3 +227,19 @@ async def test_any_amr_sidarthe():
     print(f"final amr: {amr}\n")
     # For this test, we are just checking that AMR was generated without crashing. We are not checking for accuracy.
     assert "model" in amr, f"'model' should be in AMR response, but got {amr}"
+
+@pytest.mark.asyncio
+async def test_eq_to_regnet():
+    
+    payload = schema.EquationLatexToAMR(
+        equations = [
+            "\\frac{\\partial x}{\\partial t} = {\\alpha x} - {\\beta x y}",
+            "\\frac{\\partial y}{\\partial t} = {\\alpha x y} - {\\gamma y}"
+        ],
+        model = "regnet",
+    )
+    async with httpx.AsyncClient() as client:
+        regnet_amr_response = await lx_equations_to_amr(payload, client=client)
+    
+    assert "model" in regnet_amr_response, f"'model' should be in AMR response, but got {regnet_amr_response}"
+
