@@ -393,14 +393,14 @@ class MatlabToCast(object):
                     ret.append(get_values(child, []))
                 else:
                     ret.append(self.visit(child))
-            return ret;
+            return ret
 
         values = get_values(node, [])
         value = []
         if len(values) > 0:
             value = values[0]
               
-        value_type="List",
+        value_type=StructureType.LIST
         return CASTLiteralValue(
             value_type=value_type,
             value = value,
@@ -502,7 +502,7 @@ class MatlabToCast(object):
             cell_node = get_first_child_by_type(case_node, "cell")
             # multiple case arguments
             if (cell_node):
-                value_type="List",
+                value_type=StructureType.LIST
                 operand = CASTLiteralValue(
                     value_type=value_type,
                     value = self.visit(cell_node),
