@@ -90,7 +90,7 @@ def fortran_to_cast(
                 out_name = file_name.split(".")[0]
                 print("Writing CAST to " + out_name + "--CAST.json")
                 out_handle = open(out_name + "--CAST.json", "w")
-                out_handle.write(out_cast.to_json_str())
+                out_handle.write(out_cast[0].to_json_str())
 
 if __name__ == "__main__":
     args = get_args()

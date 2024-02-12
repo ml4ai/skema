@@ -12,15 +12,17 @@ import httpx
 import json
 import requests
 
-from fastapi import APIRouter, Depends, File, UploadFile, FastAPI
+from fastapi import APIRouter, Depends, File, UploadFile, FastAPI, Request
 from starlette.responses import JSONResponse
 
 from skema.img2mml import eqn2mml
-from skema.img2mml.eqn2mml import image2mathml_db
+from skema.img2mml.eqn2mml import image2mathml_db, b64_image_to_mml
 from skema.img2mml.api import get_mathml_from_bytes
+from skema.isa.lib import generate_code_graphs, align_eqn_code, convert_to_dict
 from skema.rest import config, schema, utils, llm_proxy
 from skema.rest.proxies import SKEMA_RS_ADDESS
 from skema.skema_py import server as code2fn
+
 
 router = APIRouter()
 
@@ -112,9 +114,51 @@ async def equations_to_latex(data: UploadFile, client: httpx.AsyncClient = Depen
         return f"Error: {response.status_code} {response.text}"
 
 
+# equation images -> base64 -> mml -> latex
+@router.post("/images/base64/equations-to-latex", summary="Equations (images) → MML → LaTeX")
+async def equations_to_latex(request: Request, client: httpx.AsyncClient = Depends(utils.get_client)):
+    """
+    Converts images of equations to LaTeX.
+
+    ### Python example
+
+    Endpoint for generating LaTeX from an input image.
+
+    ```
+    from pathlib import Path
+    import base64
+    import requests
+
+    url = "http://127.0.0.1:8000/workflows/images/base64/equations-to-latex"
+    with Path("test.png").open("rb") as infile:
+      img_bytes = infile.read()
+    img_b64 = base64.b64encode(img_bytes).decode("utf-8")
+    r = requests.post(url, data=img_b64)
+    print(r.text)
+    ```
+    """
+    # Read image data
+    img_b64 = await request.body()
+    mml_res = b64_image_to_mml(img_b64)
+
+    # pass image bytes to get_mathml_from_bytes function
+    proxy_url = f"{SKEMA_RS_ADDESS}/mathml/latex"
+    print(f"MML:\t{mml_res}")
+    print(f"Proxying request to {proxy_url}")
+    response = await client.post(proxy_url, data=mml_res)
+    # Check the response
+    if response.status_code == 200:
+        # The request was successful
+        return response.text
+    else:
+        # The request failed
+        print(f"Error: {response.status_code}")
+        print(response.text)
+        return f"Error: {response.status_code} {response.text}"
+
 # tex equations -> pmml -> amr
 @router.post("/latex/equations-to-amr", summary="Equations (LaTeX) → pMML → AMR")
-async def equations_to_amr(data: schema.EquationLatexToAMR, client: httpx.AsyncClient = Depends(utils.get_client)):
+async def lx_equations_to_amr(data: schema.EquationLatexToAMR, client: httpx.AsyncClient = Depends(utils.get_client)):
     """
     Converts equations (in LaTeX) to AMR.
 
@@ -162,7 +206,7 @@ async def equations_to_amr(data: schema.MmlToAMR, client: httpx.AsyncClient = De
     return res.json()
 
 
-# code snippets -> fn -> petrinet amr 
+# code snippets -> fn -> petrinet amr
 @router.post("/code/snippets-to-pn-amr", summary="Code snippets → PetriNet AMR")
 async def code_snippets_to_pn_amr(system: code2fn.System, client: httpx.AsyncClient = Depends(utils.get_client)):
     gromet = await code2fn.fn_given_filepaths(system)
@@ -271,8 +315,18 @@ async def llm_assisted_codebase_to_pn_amr(zip_file: UploadFile = File(), client:
         for file in zip.namelist():
             file_obj = Path(file)
             if file_obj.suffix in [".py"]:
-                files.append(file)
-                blobs.append(zip.open(file).read().decode("utf-8"))
+                # Skip file if located in a hidden directory or MACOSX artifact
+                valid = True
+                for parent in file_obj.parents:
+                    if parent.name == "_MACOSX":
+                        valid = False
+                        break
+                    elif parent.name.startswith("."):
+                        valid = False
+                        break 
+                if valid:
+                    files.append(file)
+                    blobs.append(zip.open(file).read().decode("utf-8"))
 
     # The source code is a string, so to slice using the line spans, we must first convert it to a list.
     # Then we can convert it back to a string using .join
@@ -328,6 +382,24 @@ async def llm_assisted_codebase_to_pn_amr(zip_file: UploadFile = File(), client:
 
     return amr
 
+# code snippets -> fn -> petrinet amr
+@router.post("/code/snippets-to-MET", summary="Code snippets → MET")
+async def code_snippets_to_MET(system: code2fn.System, client: httpx.AsyncClient = Depends(utils.get_client)):
+    gromet = await code2fn.fn_given_filepaths(system)
+    gromet, _ = utils.fn_preprocessor(gromet)
+    # print(f"gromet:{gromet}")
+    # print(f"client.follow_redirects:\t{client.follow_redirects}")
+    # print(f"client.timeout:\t{client.timeout}")
+    res = await client.put(f"{SKEMA_RS_ADDESS}/models/MET", json=gromet)
+    if res.status_code != 200:
+        return JSONResponse(
+            status_code=400,
+            content={
+                "error": f"MORAE PUT /models/PN failed to process payload ({res.text})",
+                "payload": gromet,
+            },
+        )
+    return res.json()
 
 """ TODO: The regnet endpoints are currently outdated
 # zip archive -> fn -> regnet amr
@@ -345,17 +417,49 @@ async def repo_to_rn_amr(zip_file: UploadFile = File()):
         )
     return res.json()
 """
-"""
-# code snippets -> fn -> Vec<MET> -> ????
-@router.post("/isa/code-align", summary="ISA aided inference")
-async def code_snippets_to_isa_align(system: code2fn.System, client: httpx.AsyncClient = Depends(utils.get_client)):
-    gromet = await code2fn.fn_given_filepaths(system)
+
+# code snippets -> fn -> Vec<MET> -> alignment result
+#              mathml ->    MET   ->
+@router.post("/isa/code-eqn-align", summary="ISA aided inference")
+async def code_snippets_to_isa_align(
+    mml_system: code2fn.MML_System,
+    client: httpx.AsyncClient = Depends(utils.get_client)
+):
+    """
+    Endpoint for ISA aided inference.
+
+    Args:
+        mml_system (code2fn.MML_System): Input data containing MML and system details.
+        client (httpx.AsyncClient): An asynchronous HTTP client dependency.
+
+    Returns:
+        JSONResponse: Response containing aligned equation and code information.
+        # The dictionary of the following data structure
+        # matching_ratio: the matching ratio between the equations 1 and the equation 2
+        # num_diff_edges: the number of different edges between the equations 1 and the equation 2
+        # node_labels1: the name list of the variables and terms in the equation 1
+        # node_labels2: the name list of the variables and terms in the equation 2
+        # aligned_indices1: the aligned indices in the name list of the equation 1 (-1 means missing)
+        # aligned_indices2: the aligned indices in the name list of the equation 2 (-1 means missing)
+        # union_graph: the visualization of the alignment result
+        # perfectly_matched_indices1: strictly matched node indices in Graph 1
+
+    Raises:
+        HTTPException: If there are errors in processing the payload or communication with external services.
+
+    Note:
+        This endpoint takes MML information and system details, processes the data, and communicates with external services
+        to perform ISA aided inference.
+
+    """
+    # Extracting system details using code2fn module
+    gromet = await code2fn.fn_given_filepaths(mml_system.system)
     gromet, _ = utils.fn_preprocessor(gromet)
-    # print(f"gromet:{gromet}")
-    # print(f"client.follow_redirects:\t{client.follow_redirects}")
-    # print(f"client.timeout:\t{client.timeout}")
+
+    # Sending processed data to an external service
     res = await client.put(f"{SKEMA_RS_ADDESS}/models/MET", json=gromet)
-    # res is a vector of MET's from the code (assuming it could extract correctly)
+
+    # Checking the response status and handling errors if any
     if res.status_code != 200:
         return JSONResponse(
             status_code=400,
@@ -364,15 +468,34 @@ async def code_snippets_to_isa_align(system: code2fn.System, client: httpx.Async
                 "payload": gromet,
             },
         )
-    
-    # Liang, if you want to put your ISA portion here?
-    # ISA:
-    #
-    #
-    #
-    #
-    return res.json()
-"""
+    else:
+        # Further processing and communication with the code-exp-graphs service
+        code_graph_res = await client.put(
+            f"{SKEMA_RS_ADDESS}/mathml/code-exp-graphs", json=res.json()
+        )
+
+        # Checking the response status and handling errors if any
+        if code_graph_res.status_code != 200:
+            return JSONResponse(
+                status_code=400,
+                content={
+                    "error": f"code-exp-graphs PUT mathml/code-exp-graphs failed to process payload ({res.json()})",
+                    "payload": res.json(),
+                },
+            )
+
+        # Aligning equation and code
+        alignment_res = align_eqn_code(utils.clean_mml(mml_system.mml), code_graph_res.text)
+
+        # Converting numpy arrays to dictionaries for deserialization
+        converted_alignment_res = convert_to_dict(alignment_res)
+
+        # Returning the final aligned result
+        return JSONResponse(
+            status_code=200,
+            content=converted_alignment_res,
+        )
+
 
 app = FastAPI()
 app.include_router(router)
