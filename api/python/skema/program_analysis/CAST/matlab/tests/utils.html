@@ -94,22 +94,22 @@ def cast(source):
     &#34;&#34;&#34; Return the MatlabToCast output &#34;&#34;&#34;
     # there should only be one CAST object in the cast output list
     cast = MatlabToCast(source = source).out_cast
-    # the cast should be parsable
-    # assert validate(cast) == True
-    # there should be one module in the CAST object
+    # the CAST should be parsable into a graph
+    assert validate_graph_visit(cast) == True
+    # there should be one Module object in the CAST object
     assert len(cast.nodes) == 1
     module = cast.nodes[0]
     assert isinstance(module, Module)
     # return the module body node list
     return module.body
 
-def validate(cast):
-    &#34;&#34;&#34; Test that the cast can be parsed &#34;&#34;&#34;
+def validate_graph_visit(cast):
+    &#34;&#34;&#34; Test that the graph visitor can fully traverse the CAST object &#34;&#34;&#34;
     try:
-        foo = CASTToAGraphVisitor(cast)
-        foo.to_pdf(&#34;/dev/null&#34;)
+        foo = CASTToAGraphVisitor(cast).to_agraph()
         return True
-    except:
+    except Exception as e:
+        print(f&#34;EXCEPTION: {e}&#34;)
         return False</code></pre>
 </details>
 </section>
@@ -133,9 +133,9 @@ def validate(cast):
     &#34;&#34;&#34; Return the MatlabToCast output &#34;&#34;&#34;
     # there should only be one CAST object in the cast output list
     cast = MatlabToCast(source = source).out_cast
-    # the cast should be parsable
-    # assert validate(cast) == True
-    # there should be one module in the CAST object
+    # the CAST should be parsable into a graph
+    assert validate_graph_visit(cast) == True
+    # there should be one Module object in the CAST object
     assert len(cast.nodes) == 1
     module = cast.nodes[0]
     assert isinstance(module, Module)
@@ -194,22 +194,22 @@ def validate(cast):
         assert result.source_refs is not None</code></pre>
 </details>
 </dd>
-<dt id="skema.program_analysis.CAST.matlab.tests.utils.validate"><code class="name flex">
-<span>def <span class="ident">validate</span></span>(<span>cast)</span>
+<dt id="skema.program_analysis.CAST.matlab.tests.utils.validate_graph_visit"><code class="name flex">
+<span>def <span class="ident">validate_graph_visit</span></span>(<span>cast)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Test that the cast can be parsed</p></div>
+<div class="desc"><p>Test that the graph visitor can fully traverse the CAST object</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def validate(cast):
-    &#34;&#34;&#34; Test that the cast can be parsed &#34;&#34;&#34;
+<pre><code class="python">def validate_graph_visit(cast):
+    &#34;&#34;&#34; Test that the graph visitor can fully traverse the CAST object &#34;&#34;&#34;
     try:
-        foo = CASTToAGraphVisitor(cast)
-        foo.to_pdf(&#34;/dev/null&#34;)
+        foo = CASTToAGraphVisitor(cast).to_agraph()
         return True
-    except:
+    except Exception as e:
+        print(f&#34;EXCEPTION: {e}&#34;)
         return False</code></pre>
 </details>
 </dd>
@@ -233,7 +233,7 @@ def validate(cast):
 <ul class="">
 <li><code><a title="skema.program_analysis.CAST.matlab.tests.utils.cast" href="#skema.program_analysis.CAST.matlab.tests.utils.cast">cast</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.matlab.tests.utils.check" href="#skema.program_analysis.CAST.matlab.tests.utils.check">check</a></code></li>
-<li><code><a title="skema.program_analysis.CAST.matlab.tests.utils.validate" href="#skema.program_analysis.CAST.matlab.tests.utils.validate">validate</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.matlab.tests.utils.validate_graph_visit" href="#skema.program_analysis.CAST.matlab.tests.utils.validate_graph_visit">validate_graph_visit</a></code></li>
 </ul>
 </li>
 </ul>

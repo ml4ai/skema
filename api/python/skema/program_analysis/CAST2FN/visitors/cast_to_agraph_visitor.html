@@ -626,6 +626,10 @@ class CASTToAGraphVisitor(CASTVisitor):
             node_uid = uuid.uuid4()
             self.G.add_node(node_uid, label=f&#34;Integer: {node.value}&#34;)
             return node_uid
+        elif node.value_type == ScalarType.CHARACTER:
+            node_uid = uuid.uuid4()
+            self.G.add_node(node_uid, label=f&#34;Character: {str(node.value)}&#34;)
+            return node_uid
         elif node.value_type == ScalarType.BOOLEAN:
             node_uid = uuid.uuid4()
             self.G.add_node(node_uid, label=f&#34;Boolean: {str(node.value)}&#34;)
@@ -1634,6 +1638,10 @@ nodes are visited.</dd>
         if node.value_type == ScalarType.INTEGER:
             node_uid = uuid.uuid4()
             self.G.add_node(node_uid, label=f&#34;Integer: {node.value}&#34;)
+            return node_uid
+        elif node.value_type == ScalarType.CHARACTER:
+            node_uid = uuid.uuid4()
+            self.G.add_node(node_uid, label=f&#34;Character: {str(node.value)}&#34;)
             return node_uid
         elif node.value_type == ScalarType.BOOLEAN:
             node_uid = uuid.uuid4()

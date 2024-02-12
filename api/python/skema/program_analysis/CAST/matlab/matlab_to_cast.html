@@ -167,8 +167,6 @@ class MatlabToCast(object):
         ]: return self.visit_operator(node)
         elif node.type == &#34;string&#34;:
            return self.visit_string(node)
-        elif node.type == &#34;range&#34;:
-           return self.visit_range(node)
         elif node.type == &#34;switch_statement&#34;:
             return self.visit_switch_statement(node)
         else:
@@ -185,16 +183,17 @@ class MatlabToCast(object):
 
     def visit_boolean(self, node):
         &#34;&#34;&#34; Translate Tree-sitter boolean node &#34;&#34;&#34;
-        value_type = &#34;Boolean&#34;
         for child in node.children:
             # set the first letter to upper case for python
             value = child.type
             value = value[0].upper() + value[1:].lower()
             # store as string, use Python Boolean capitalization.
+
+            value_type = ScalarType.BOOLEAN
             return CASTLiteralValue(
                 value_type=value_type,
                 value = value,
-                source_code_data_type=[&#34;matlab&#34;, MATLAB_VERSION, value_type],
+                source_code_data_type=[&#34;matlab&#34;, MATLAB_VERSION, ScalarType.BOOLEAN],
                 source_refs=[self.node_helper.get_source_ref(node)],
             )
 
@@ -241,6 +240,12 @@ class MatlabToCast(object):
             val = self.visit_name(node),
             type = self.variable_context.get_type(identifier) if
                 self.variable_context.is_variable(identifier) else &#34;Unknown&#34;,
+            default_value = CASTLiteralValue(
+                value_type=ScalarType.CHARACTER,
+                value=self.node_helper.get_identifier(node),
+                source_code_data_type=[&#34;matlab&#34;, MATLAB_VERSION, ScalarType.CHARACTER],
+                source_refs=[self.node_helper.get_source_ref(node)]
+            ),
             source_refs = [self.node_helper.get_source_ref(node)],
         )
 
@@ -354,13 +359,17 @@ class MatlabToCast(object):
             start = numbers[0]
             step = 1
             stop = 0
+
+            # two values mean the step is implicitely defined as 1
             if len(numbers) == 2:
                 stop = numbers[1]
 
+            # three values mean the step is explictely defined
             elif len(numbers) == 3:
                 step = numbers[1]
                 stop = numbers[2]
 
+            # create the itrerator based on the range limits and step
             range_name_node = self.variable_context.get_gromet_function_node(&#34;range&#34;)
             iter_name_node = self.variable_context.get_gromet_function_node(&#34;iter&#34;)
             next_name_node = self.variable_context.get_gromet_function_node(&#34;next&#34;)
@@ -394,10 +403,6 @@ class MatlabToCast(object):
                 post = []
             )
 
-
-    def visit_range(self, node):
-        return None
-
     def visit_for_statement(self, node) -&gt; Loop:
         &#34;&#34;&#34; Translate Tree-sitter for loop node into CAST Loop node &#34;&#34;&#34;
 
@@ -411,24 +416,24 @@ class MatlabToCast(object):
     def visit_matrix(self, node):
         &#34;&#34;&#34; Translate the Tree-sitter cell node into a List &#34;&#34;&#34;
 
-        def get_values(element, ret)-&gt; List:
+        def get_values(element, ret):
             for child in get_keyword_children(element):
                 if child.type == &#34;row&#34;: 
                     ret.append(get_values(child, []))
                 else:
                     ret.append(self.visit(child))
-            return ret;
+            return ret
 
         values = get_values(node, [])
         value = []
         if len(values) &gt; 0:
             value = values[0]
-
-        value_type=&#34;List&#34;,
+              
+        value_type=StructureType.LIST
         return CASTLiteralValue(
             value_type=value_type,
             value = value,
-            source_code_data_type=[&#34;matlab&#34;, MATLAB_VERSION, value_type],
+            source_code_data_type=[&#34;matlab&#34;, MATLAB_VERSION, StructureType.LIST],
             source_refs=[self.node_helper.get_source_ref(node)],
         )
 
@@ -463,10 +468,12 @@ class MatlabToCast(object):
             identifier, &#34;Unknown&#34;, [self.node_helper.get_source_ref(node)]
         )
 
+
     def visit_number(self, node) -&gt; CASTLiteralValue:
         &#34;&#34;&#34;Visitor for numbers &#34;&#34;&#34;
-        literal_value = self.node_helper.get_identifier(node)
+        number = self.node_helper.get_identifier(node)
         # Check if this is a real value, or an Integer
+        literal_value = self.node_helper.get_identifier(node)
         if &#34;e&#34; in literal_value.lower() or &#34;.&#34; in literal_value:
             value_type = &#34;AbstractFloat&#34;
             return CASTLiteralValue(
@@ -502,7 +509,7 @@ class MatlabToCast(object):
         return CASTLiteralValue(
             value_type=value_type,
             value=self.node_helper.get_identifier(node),
-            source_code_data_type=[&#34;matlab&#34;, MATLAB_VERSION, value_type],
+            source_code_data_type=[&#34;matlab&#34;, MATLAB_VERSION, ScalarType.CHARACTER],
             source_refs=[self.node_helper.get_source_ref(node)]
         )
 
@@ -524,11 +531,11 @@ class MatlabToCast(object):
             cell_node = get_first_child_by_type(case_node, &#34;cell&#34;)
             # multiple case arguments
             if (cell_node):
-                value_type=&#34;List&#34;,
+                value_type=StructureType.LIST
                 operand = CASTLiteralValue(
                     value_type=value_type,
                     value = self.visit(cell_node),
-                    source_code_data_type=[&#34;matlab&#34;, MATLAB_VERSION, value_type],
+                    source_code_data_type=[&#34;matlab&#34;, MATLAB_VERSION, StructureType.LIST],
                     source_refs=[self.node_helper.get_source_ref(cell_node)]
                 )
                 return self.get_operator(
@@ -577,7 +584,7 @@ class MatlabToCast(object):
 
         return model_ifs[0]
     
-    def get_block(self, node) -&gt; List[AstNode]:
+    def get_block(self, node):
         &#34;&#34;&#34;return all the children of the block as a list of AstNodes&#34;&#34;&#34;
         block = get_first_child_by_type(node, &#34;block&#34;)
         if block:
@@ -593,9 +600,9 @@ class MatlabToCast(object):
             op = op,
             operands = operands,
             source_refs = source_refs
-        )
+        ) 
 
-    def get_gromet_function_node(self, func_name: str) -&gt; Name:
+    def get_gromet_function_node(self, func_name: str):
         if self.variable_context.is_variable(func_name):
             return self.variable_context.get_node(func_name)
 
@@ -719,8 +726,6 @@ class MatlabToCast(object):
         ]: return self.visit_operator(node)
         elif node.type == &#34;string&#34;:
            return self.visit_string(node)
-        elif node.type == &#34;range&#34;:
-           return self.visit_range(node)
         elif node.type == &#34;switch_statement&#34;:
             return self.visit_switch_statement(node)
         else:
@@ -737,16 +742,17 @@ class MatlabToCast(object):
 
     def visit_boolean(self, node):
         &#34;&#34;&#34; Translate Tree-sitter boolean node &#34;&#34;&#34;
-        value_type = &#34;Boolean&#34;
         for child in node.children:
             # set the first letter to upper case for python
             value = child.type
             value = value[0].upper() + value[1:].lower()
             # store as string, use Python Boolean capitalization.
+
+            value_type = ScalarType.BOOLEAN
             return CASTLiteralValue(
                 value_type=value_type,
                 value = value,
-                source_code_data_type=[&#34;matlab&#34;, MATLAB_VERSION, value_type],
+                source_code_data_type=[&#34;matlab&#34;, MATLAB_VERSION, ScalarType.BOOLEAN],
                 source_refs=[self.node_helper.get_source_ref(node)],
             )
 
@@ -793,6 +799,12 @@ class MatlabToCast(object):
             val = self.visit_name(node),
             type = self.variable_context.get_type(identifier) if
                 self.variable_context.is_variable(identifier) else &#34;Unknown&#34;,
+            default_value = CASTLiteralValue(
+                value_type=ScalarType.CHARACTER,
+                value=self.node_helper.get_identifier(node),
+                source_code_data_type=[&#34;matlab&#34;, MATLAB_VERSION, ScalarType.CHARACTER],
+                source_refs=[self.node_helper.get_source_ref(node)]
+            ),
             source_refs = [self.node_helper.get_source_ref(node)],
         )
 
@@ -906,13 +918,17 @@ class MatlabToCast(object):
             start = numbers[0]
             step = 1
             stop = 0
+
+            # two values mean the step is implicitely defined as 1
             if len(numbers) == 2:
                 stop = numbers[1]
 
+            # three values mean the step is explictely defined
             elif len(numbers) == 3:
                 step = numbers[1]
                 stop = numbers[2]
 
+            # create the itrerator based on the range limits and step
             range_name_node = self.variable_context.get_gromet_function_node(&#34;range&#34;)
             iter_name_node = self.variable_context.get_gromet_function_node(&#34;iter&#34;)
             next_name_node = self.variable_context.get_gromet_function_node(&#34;next&#34;)
@@ -946,10 +962,6 @@ class MatlabToCast(object):
                 post = []
             )
 
-
-    def visit_range(self, node):
-        return None
-
     def visit_for_statement(self, node) -&gt; Loop:
         &#34;&#34;&#34; Translate Tree-sitter for loop node into CAST Loop node &#34;&#34;&#34;
 
@@ -963,24 +975,24 @@ class MatlabToCast(object):
     def visit_matrix(self, node):
         &#34;&#34;&#34; Translate the Tree-sitter cell node into a List &#34;&#34;&#34;
 
-        def get_values(element, ret)-&gt; List:
+        def get_values(element, ret):
             for child in get_keyword_children(element):
                 if child.type == &#34;row&#34;: 
                     ret.append(get_values(child, []))
                 else:
                     ret.append(self.visit(child))
-            return ret;
+            return ret
 
         values = get_values(node, [])
         value = []
         if len(values) &gt; 0:
             value = values[0]
-
-        value_type=&#34;List&#34;,
+              
+        value_type=StructureType.LIST
         return CASTLiteralValue(
             value_type=value_type,
             value = value,
-            source_code_data_type=[&#34;matlab&#34;, MATLAB_VERSION, value_type],
+            source_code_data_type=[&#34;matlab&#34;, MATLAB_VERSION, StructureType.LIST],
             source_refs=[self.node_helper.get_source_ref(node)],
         )
 
@@ -1015,10 +1027,12 @@ class MatlabToCast(object):
             identifier, &#34;Unknown&#34;, [self.node_helper.get_source_ref(node)]
         )
 
+
     def visit_number(self, node) -&gt; CASTLiteralValue:
         &#34;&#34;&#34;Visitor for numbers &#34;&#34;&#34;
-        literal_value = self.node_helper.get_identifier(node)
+        number = self.node_helper.get_identifier(node)
         # Check if this is a real value, or an Integer
+        literal_value = self.node_helper.get_identifier(node)
         if &#34;e&#34; in literal_value.lower() or &#34;.&#34; in literal_value:
             value_type = &#34;AbstractFloat&#34;
             return CASTLiteralValue(
@@ -1054,7 +1068,7 @@ class MatlabToCast(object):
         return CASTLiteralValue(
             value_type=value_type,
             value=self.node_helper.get_identifier(node),
-            source_code_data_type=[&#34;matlab&#34;, MATLAB_VERSION, value_type],
+            source_code_data_type=[&#34;matlab&#34;, MATLAB_VERSION, ScalarType.CHARACTER],
             source_refs=[self.node_helper.get_source_ref(node)]
         )
 
@@ -1076,11 +1090,11 @@ class MatlabToCast(object):
             cell_node = get_first_child_by_type(case_node, &#34;cell&#34;)
             # multiple case arguments
             if (cell_node):
-                value_type=&#34;List&#34;,
+                value_type=StructureType.LIST
                 operand = CASTLiteralValue(
                     value_type=value_type,
                     value = self.visit(cell_node),
-                    source_code_data_type=[&#34;matlab&#34;, MATLAB_VERSION, value_type],
+                    source_code_data_type=[&#34;matlab&#34;, MATLAB_VERSION, StructureType.LIST],
                     source_refs=[self.node_helper.get_source_ref(cell_node)]
                 )
                 return self.get_operator(
@@ -1129,7 +1143,7 @@ class MatlabToCast(object):
 
         return model_ifs[0]
     
-    def get_block(self, node) -&gt; List[AstNode]:
+    def get_block(self, node):
         &#34;&#34;&#34;return all the children of the block as a list of AstNodes&#34;&#34;&#34;
         block = get_first_child_by_type(node, &#34;block&#34;)
         if block:
@@ -1145,9 +1159,9 @@ class MatlabToCast(object):
             op = op,
             operands = operands,
             source_refs = source_refs
-        )
+        ) 
 
-    def get_gromet_function_node(self, func_name: str) -&gt; Name:
+    def get_gromet_function_node(self, func_name: str):
         if self.variable_context.is_variable(func_name):
             return self.variable_context.get_node(func_name)
 
@@ -1171,7 +1185,7 @@ class MatlabToCast(object):
 <h3>Methods</h3>
 <dl>
 <dt id="skema.program_analysis.CAST.matlab.matlab_to_cast.MatlabToCast.get_block"><code class="name flex">
-<span>def <span class="ident">get_block</span></span>(<span>self, node) ‑> List[<a title="skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode" href="../../CAST2FN/model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode">AstNode</a>]</span>
+<span>def <span class="ident">get_block</span></span>(<span>self, node)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>return all the children of the block as a list of AstNodes</p></div>
@@ -1179,7 +1193,7 @@ class MatlabToCast(object):
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_block(self, node) -&gt; List[AstNode]:
+<pre><code class="python">def get_block(self, node):
     &#34;&#34;&#34;return all the children of the block as a list of AstNodes&#34;&#34;&#34;
     block = get_first_child_by_type(node, &#34;block&#34;)
     if block:
@@ -1188,7 +1202,7 @@ class MatlabToCast(object):
 </details>
 </dd>
 <dt id="skema.program_analysis.CAST.matlab.matlab_to_cast.MatlabToCast.get_gromet_function_node"><code class="name flex">
-<span>def <span class="ident">get_gromet_function_node</span></span>(<span>self, func_name: str) ‑> <a title="skema.program_analysis.CAST2FN.model.cast.name.Name" href="../../CAST2FN/model/cast/name.html#skema.program_analysis.CAST2FN.model.cast.name.Name">Name</a></span>
+<span>def <span class="ident">get_gromet_function_node</span></span>(<span>self, func_name: str)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -1196,7 +1210,7 @@ class MatlabToCast(object):
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_gromet_function_node(self, func_name: str) -&gt; Name:
+<pre><code class="python">def get_gromet_function_node(self, func_name: str):
     if self.variable_context.is_variable(func_name):
         return self.variable_context.get_node(func_name)</code></pre>
 </details>
@@ -1219,7 +1233,7 @@ class MatlabToCast(object):
         op = op,
         operands = operands,
         source_refs = source_refs
-    )</code></pre>
+    ) </code></pre>
 </details>
 </dd>
 <dt id="skema.program_analysis.CAST.matlab.matlab_to_cast.MatlabToCast.log_visit"><code class="name flex">
@@ -1307,8 +1321,6 @@ class MatlabToCast(object):
     ]: return self.visit_operator(node)
     elif node.type == &#34;string&#34;:
        return self.visit_string(node)
-    elif node.type == &#34;range&#34;:
-       return self.visit_range(node)
     elif node.type == &#34;switch_statement&#34;:
         return self.visit_switch_statement(node)
     else:
@@ -1345,16 +1357,17 @@ class MatlabToCast(object):
 </summary>
 <pre><code class="python">def visit_boolean(self, node):
     &#34;&#34;&#34; Translate Tree-sitter boolean node &#34;&#34;&#34;
-    value_type = &#34;Boolean&#34;
     for child in node.children:
         # set the first letter to upper case for python
         value = child.type
         value = value[0].upper() + value[1:].lower()
         # store as string, use Python Boolean capitalization.
+
+        value_type = ScalarType.BOOLEAN
         return CASTLiteralValue(
             value_type=value_type,
             value = value,
-            source_code_data_type=[&#34;matlab&#34;, MATLAB_VERSION, value_type],
+            source_code_data_type=[&#34;matlab&#34;, MATLAB_VERSION, ScalarType.BOOLEAN],
             source_refs=[self.node_helper.get_source_ref(node)],
         )</code></pre>
 </details>
@@ -1460,6 +1473,12 @@ class MatlabToCast(object):
         val = self.visit_name(node),
         type = self.variable_context.get_type(identifier) if
             self.variable_context.is_variable(identifier) else &#34;Unknown&#34;,
+        default_value = CASTLiteralValue(
+            value_type=ScalarType.CHARACTER,
+            value=self.node_helper.get_identifier(node),
+            source_code_data_type=[&#34;matlab&#34;, MATLAB_VERSION, ScalarType.CHARACTER],
+            source_refs=[self.node_helper.get_source_ref(node)]
+        ),
         source_refs = [self.node_helper.get_source_ref(node)],
     )</code></pre>
 </details>
@@ -1590,13 +1609,17 @@ class MatlabToCast(object):
         start = numbers[0]
         step = 1
         stop = 0
+
+        # two values mean the step is implicitely defined as 1
         if len(numbers) == 2:
             stop = numbers[1]
 
+        # three values mean the step is explictely defined
         elif len(numbers) == 3:
             step = numbers[1]
             stop = numbers[2]
 
+        # create the itrerator based on the range limits and step
         range_name_node = self.variable_context.get_gromet_function_node(&#34;range&#34;)
         iter_name_node = self.variable_context.get_gromet_function_node(&#34;iter&#34;)
         next_name_node = self.variable_context.get_gromet_function_node(&#34;next&#34;)
@@ -1643,24 +1666,24 @@ class MatlabToCast(object):
 <pre><code class="python">def visit_matrix(self, node):
     &#34;&#34;&#34; Translate the Tree-sitter cell node into a List &#34;&#34;&#34;
 
-    def get_values(element, ret)-&gt; List:
+    def get_values(element, ret):
         for child in get_keyword_children(element):
             if child.type == &#34;row&#34;: 
                 ret.append(get_values(child, []))
             else:
                 ret.append(self.visit(child))
-        return ret;
+        return ret
 
     values = get_values(node, [])
     value = []
     if len(values) &gt; 0:
         value = values[0]
-
-    value_type=&#34;List&#34;,
+          
+    value_type=StructureType.LIST
     return CASTLiteralValue(
         value_type=value_type,
         value = value,
-        source_code_data_type=[&#34;matlab&#34;, MATLAB_VERSION, value_type],
+        source_code_data_type=[&#34;matlab&#34;, MATLAB_VERSION, StructureType.LIST],
         source_refs=[self.node_helper.get_source_ref(node)],
     )</code></pre>
 </details>
@@ -1727,8 +1750,9 @@ class MatlabToCast(object):
 </summary>
 <pre><code class="python">def visit_number(self, node) -&gt; CASTLiteralValue:
     &#34;&#34;&#34;Visitor for numbers &#34;&#34;&#34;
-    literal_value = self.node_helper.get_identifier(node)
+    number = self.node_helper.get_identifier(node)
     # Check if this is a real value, or an Integer
+    literal_value = self.node_helper.get_identifier(node)
     if &#34;e&#34; in literal_value.lower() or &#34;.&#34; in literal_value:
         value_type = &#34;AbstractFloat&#34;
         return CASTLiteralValue(
@@ -1770,19 +1794,6 @@ class MatlabToCast(object):
     )</code></pre>
 </details>
 </dd>
-<dt id="skema.program_analysis.CAST.matlab.matlab_to_cast.MatlabToCast.visit_range"><code class="name flex">
-<span>def <span class="ident">visit_range</span></span>(<span>self, node)</span>
-</code></dt>
-<dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def visit_range(self, node):
-    return None</code></pre>
-</details>
-</dd>
 <dt id="skema.program_analysis.CAST.matlab.matlab_to_cast.MatlabToCast.visit_string"><code class="name flex">
 <span>def <span class="ident">visit_string</span></span>(<span>self, node)</span>
 </code></dt>
@@ -1797,7 +1808,7 @@ class MatlabToCast(object):
     return CASTLiteralValue(
         value_type=value_type,
         value=self.node_helper.get_identifier(node),
-        source_code_data_type=[&#34;matlab&#34;, MATLAB_VERSION, value_type],
+        source_code_data_type=[&#34;matlab&#34;, MATLAB_VERSION, ScalarType.CHARACTER],
         source_refs=[self.node_helper.get_source_ref(node)]
     )</code></pre>
 </details>
@@ -1829,11 +1840,11 @@ class MatlabToCast(object):
         cell_node = get_first_child_by_type(case_node, &#34;cell&#34;)
         # multiple case arguments
         if (cell_node):
-            value_type=&#34;List&#34;,
+            value_type=StructureType.LIST
             operand = CASTLiteralValue(
                 value_type=value_type,
                 value = self.visit(cell_node),
-                source_code_data_type=[&#34;matlab&#34;, MATLAB_VERSION, value_type],
+                source_code_data_type=[&#34;matlab&#34;, MATLAB_VERSION, StructureType.LIST],
                 source_refs=[self.node_helper.get_source_ref(cell_node)]
             )
             return self.get_operator(
@@ -1925,7 +1936,6 @@ class MatlabToCast(object):
 <li><code><a title="skema.program_analysis.CAST.matlab.matlab_to_cast.MatlabToCast.visit_name" href="#skema.program_analysis.CAST.matlab.matlab_to_cast.MatlabToCast.visit_name">visit_name</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.matlab.matlab_to_cast.MatlabToCast.visit_number" href="#skema.program_analysis.CAST.matlab.matlab_to_cast.MatlabToCast.visit_number">visit_number</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.matlab.matlab_to_cast.MatlabToCast.visit_operator" href="#skema.program_analysis.CAST.matlab.matlab_to_cast.MatlabToCast.visit_operator">visit_operator</a></code></li>
-<li><code><a title="skema.program_analysis.CAST.matlab.matlab_to_cast.MatlabToCast.visit_range" href="#skema.program_analysis.CAST.matlab.matlab_to_cast.MatlabToCast.visit_range">visit_range</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.matlab.matlab_to_cast.MatlabToCast.visit_string" href="#skema.program_analysis.CAST.matlab.matlab_to_cast.MatlabToCast.visit_string">visit_string</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.matlab.matlab_to_cast.MatlabToCast.visit_switch_statement" href="#skema.program_analysis.CAST.matlab.matlab_to_cast.MatlabToCast.visit_switch_statement">visit_switch_statement</a></code></li>
 </ul>
