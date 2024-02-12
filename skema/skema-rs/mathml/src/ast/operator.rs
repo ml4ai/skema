@@ -1,8 +1,8 @@
 use crate::ast::Ci;
 use crate::ast::MathExpression;
 use derive_new::new;
-use std::fmt;
 use serde::{Deserialize, Serialize};
+use std::fmt;
 
 /// Derivative operator, in line with Spivak notation: http://ceres-solver.org/spivak_notation.html
 #[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
@@ -38,6 +38,20 @@ pub struct HatOp {
 #[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
 pub struct GradSub {
     pub sub: Box<MathExpression>,
+}
+
+/// Integral
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
+pub struct MsubsupInt {
+    pub sub: Box<MathExpression>,
+    pub sup: Box<MathExpression>,
+    pub integration_variable: Box<MathExpression>,
+}
+
+/// MsupDownArrow operation
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
+pub struct MsupDownArrow {
+    pub comp: Box<MathExpression>,
 }
 
 #[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
@@ -81,6 +95,13 @@ pub enum Operator {
     Cross,
     Hat,
     HatOp(HatOp),
+    MsupDownArrow(MsupDownArrow),
+    DownArrow,
+    Int,
+    MsubsupInt(MsubsupInt),
+    Laplacian,
+    SurfaceClosedInt,
+    SurfaceClosedIntNoIntVar,
     // Catchall for operators we haven't explicitly defined as enum variants yet.
     Other(String),
 }
@@ -130,7 +151,7 @@ impl fmt::Display for Operator {
             Operator::Arccot => write!(f, "Arccot"),
             Operator::Mean => write!(f, "Mean"),
             Operator::Grad => write!(f, "Grad"),
-            Operator::GradSub(GradSub {sub}) =>{
+            Operator::GradSub(GradSub { sub }) => {
                 write!(f, "Grad_{sub})")
             }
             Operator::Dot => write!(f, "⋅"),
@@ -144,6 +165,26 @@ impl fmt::Display for Operator {
             Operator::Cross => write!(f, "×"),
             Operator::Hat => write!(f, "Hat"),
             Operator::HatOp(HatOp { comp }) => write!(f, "Hat({comp})"),
+            Operator::MsupDownArrow(MsupDownArrow { comp }) => write!(f, "{comp}↓"),
+            Operator::DownArrow => write!(f, "↓"),
+            Operator::Int => write!(f, "Int"),
+            Operator::MsubsupInt(MsubsupInt {
+                sub,
+                sup,
+                integration_variable,
+            }) => {
+                write!(f, "Int_{{{sub}}}^{{{sup}}}({integration_variable})")
+            }
+            Operator::Laplacian => write!(f, "Laplacian"),
+            /*Operator::SurfaceClosedInt(SurfaceClosedInt{limit, integration_variable}) => {
+            write!(f, "SurfaceClosedInt_{limit}({integration_variable})")
+            }*/
+            Operator::SurfaceClosedInt => {
+                write!(f, "SurfaceClosedInt")
+            }
+            Operator::SurfaceClosedIntNoIntVar => {
+                write!(f, "SurfaceClosedInt")
+            }
         }
     }
 }
