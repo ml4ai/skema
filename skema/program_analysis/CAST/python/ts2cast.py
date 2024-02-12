@@ -594,14 +594,17 @@ class TS2CAST(object):
 
         for_clauses = get_children_by_types(node, ["for_in_clause"])
 
-        loop = None
-        for for_clause in for_clauses:
-            loop = self.handle_for_clause(for_clause)
+        append_call = self.get_gromet_function_node("append") 
+        computation = get_children_by_types(node, COMPREHENSION_OPERATORS)[0]
+        computation_cast = self.visit(computation)
+
+        first_loop = self.handle_for_clause(for_clauses[0])
+        curr_loop = first_loop
+        next_loop = []
+        for for_clause in for_clauses[1:]:
+            next_loop = self.handle_for_clause(for_clause)
 
             if_clauses = get_children_by_types(node, ["if_clause"])
-            append_call = self.get_gromet_function_node("append") 
-            computation = get_children_by_types(node, COMPREHENSION_OPERATORS)[0]
-            computation_cast = self.visit(computation)
 
             if len(if_clauses) > 0:
                 first_if = self.handle_if_clause(if_clauses[0])
@@ -612,15 +615,17 @@ class TS2CAST(object):
                     curr_if.body = [next_if]
                     curr_if = next_if
                 
-                curr_if.body = [Call(func=Attribute(temp_list_name, append_call), arguments=[computation_cast], source_refs=ref)]
-                loop.body[0] = curr_if
+                # curr_if.body = [Call(func=Attribute(temp_list_name, append_call), arguments=[computation_cast], source_refs=ref)]
+                # loop.body[0] = curr_if
             else:
-                loop.body[0] = Call(func=Attribute(temp_list_name, append_call), arguments=[computation_cast], source_refs=ref)
-            
+                curr_loop.body[0] = next_loop# Call(func=Attribute(temp_list_name, append_call), arguments=[computation_cast], source_refs=ref)
+                curr_loop = next_loop
+
+        curr_loop.body[0] = Call(func=Attribute(temp_list_name, append_call), arguments=[computation_cast], source_refs=ref) 
         return_cast = ModelReturn(temp_list_name)
 
         func_name = self.variable_context.generate_func("%comprehension_list")
-        func_def_cast = FunctionDef(name=func_name, func_args=[], body=[temp_asg_cast,loop,return_cast], source_refs=ref)
+        func_def_cast = FunctionDef(name=func_name, func_args=[], body=[temp_asg_cast,first_loop,return_cast], source_refs=ref)
         
         self.generated_fns.append(func_def_cast)
 
