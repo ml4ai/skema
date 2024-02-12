@@ -1,6 +1,7 @@
 //! Structs to represent elements of ACSets (Annotated C-Sets, a concept from category theory).
 //! JSON-serialized ACSets are the form of model exchange between TA1 and TA2.
 use crate::parsers::first_order_ode::{get_terms, FirstOrderODE, PnTerm};
+use crate::parsers::math_expression_tree::MathExpressionTree;
 
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeSet;
@@ -64,7 +65,9 @@ pub struct RegNet {
     pub metadata: Option<Metadata>,
 }
 
-#[derive(Debug, PartialEq, Eq, Clone, Serialize, Deserialize, ToSchema)]
+#[derive(
+    Debug, Default, PartialEq, Eq, Clone, PartialOrd, Ord, Serialize, Deserialize, ToSchema,
+)]
 pub struct Header {
     pub name: String,
     pub schema: String,
@@ -310,6 +313,30 @@ pub struct Distribution {
 pub struct AMRmathml {
     pub model: String,
     pub mathml: Vec<String>,
+}
+
+// -------------------------------------------------------------------------------------------
+// These next structs are for Generalized AMR's
+// -------------------------------------------------------------------------------------------
+#[derive(
+    Debug, Default, PartialEq, Eq, Clone, PartialOrd, Ord, Serialize, Deserialize, ToSchema,
+)]
+pub struct GeneralizedAMR {
+    pub header: Header,
+    pub met: Vec<MathExpressionTree>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub semantics: Option<GeneralSemantics>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub metadata: Option<Metadata>,
+}
+
+#[derive(
+    Debug, Default, PartialEq, Eq, Clone, PartialOrd, Ord, Serialize, Deserialize, ToSchema,
+)]
+pub struct GeneralSemantics {
+    pub states: BTreeSet<State>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub parameters: Option<Vec<Parameter>>
 }
 
 // -------------------------------------------------------------------------------------------
