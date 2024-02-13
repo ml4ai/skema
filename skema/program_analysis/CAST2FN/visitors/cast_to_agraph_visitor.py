@@ -597,6 +597,10 @@ class CASTToAGraphVisitor(CASTVisitor):
             node_uid = uuid.uuid4()
             self.G.add_node(node_uid, label=f"Integer: {node.value}")
             return node_uid
+        elif node.value_type == ScalarType.CHARACTER:
+            node_uid = uuid.uuid4()
+            self.G.add_node(node_uid, label=f"Character: {str(node.value)}")
+            return node_uid
         elif node.value_type == ScalarType.BOOLEAN:
             node_uid = uuid.uuid4()
             self.G.add_node(node_uid, label=f"Boolean: {str(node.value)}")
