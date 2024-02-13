@@ -4,7 +4,7 @@ use derive_new::new;
 use serde::{Deserialize, Serialize};
 use std::fmt;
 
-/// Derivative operator, in line with Spivak notation: http://ceres-solver.org/spivak_notation.html
+/// Total Derivative operator, in line with Spivak notation: http://ceres-solver.org/spivak_notation.html
 #[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
 pub struct Derivative {
     pub order: u8,
@@ -28,7 +28,7 @@ pub struct SumUnderOver {
     pub over: Box<MathExpression>,
 }
 
-/// Hat operation
+/// Hat operation obtains the hat operation with the operation component: e.g. \hat{x}
 #[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
 pub struct HatOp {
     pub comp: Box<MathExpression>,
@@ -40,15 +40,15 @@ pub struct GradSub {
     pub sub: Box<MathExpression>,
 }
 
-/// Integral
+/// Definite Integral with lowlimit, uplimit
 #[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
 pub struct MsubsupInt {
-    pub sub: Box<MathExpression>,
-    pub sup: Box<MathExpression>,
+    pub lowlimit: Box<MathExpression>,
+    pub uplimit: Box<MathExpression>,
     pub integration_variable: Box<MathExpression>,
 }
 
-/// MsupDownArrow operation
+/// MsupDownArrow operation. E.g. Handles I^{↓} operations such that I is `comp` of DownArrow operation
 #[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
 pub struct MsupDownArrow {
     pub comp: Box<MathExpression>,
@@ -56,26 +56,35 @@ pub struct MsupDownArrow {
 
 #[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
 pub enum Operator {
+    /// Addition operator
     Add,
     Multiply,
     Equals,
     Divide,
     Subtract,
     Sqrt,
+    /// Left parenthesis
     Lparen,
+    /// Right parenthesis
     Rparen,
     Compose,
     Factorial,
+    /// Exponential operator
     Exp,
     Power,
     Comma,
+    /// Gradient operator
     Grad,
     GradSub(GradSub),
     Dot,
     Period,
+    /// Divergence operator
     Div,
+    ///Absolute operator
     Abs,
+    /// Total derivative operator, e.g. d/dt
     Derivative(Derivative),
+    /// Partial derivative operator, e.g. ∂/∂t
     PartialDerivative(PartialDerivative),
     Sin,
     Cos,
@@ -90,17 +99,28 @@ pub enum Operator {
     Arccsc,
     Arccot,
     Mean,
+    /// Summation operator
     Sum,
+    /// Summation operator with lowlimit and uplimit
     SumUnderOver(SumUnderOver),
     Cross,
+    /// Hat operator, e.g. \hat
     Hat,
+    /// Hat operator with component, e.g. \hat{x}
     HatOp(HatOp),
+    /// Summation operator with lowlimit and uplimit
     MsupDownArrow(MsupDownArrow),
+    /// ↓ as an operator
     DownArrow,
+    /// Definite Integral
     Int,
+    /// Indefinite Integral with lowlimit and uplimit
     MsubsupInt(MsubsupInt),
     Laplacian,
+    /// Closed surface integral operator --need to include explit dS integration variable when translating to latex
     SurfaceClosedInt,
+    /// Closed surface integral operator -- doesn't need to include explicit dS integration variable when translating to latex
+    /// E.g. \\oiint_S ∇ \cdot dS
     SurfaceClosedIntNoIntVar,
     // Catchall for operators we haven't explicitly defined as enum variants yet.
     Other(String),
@@ -169,16 +189,16 @@ impl fmt::Display for Operator {
             Operator::DownArrow => write!(f, "↓"),
             Operator::Int => write!(f, "Int"),
             Operator::MsubsupInt(MsubsupInt {
-                sub,
-                sup,
+                lowlimit,
+                uplimit,
                 integration_variable,
             }) => {
-                write!(f, "Int_{{{sub}}}^{{{sup}}}({integration_variable})")
+                write!(
+                    f,
+                    "Int_{{{lowlimit}}}^{{{uplimit}}}({integration_variable})"
+                )
             }
             Operator::Laplacian => write!(f, "Laplacian"),
-            /*Operator::SurfaceClosedInt(SurfaceClosedInt{limit, integration_variable}) => {
-            write!(f, "SurfaceClosedInt_{limit}({integration_variable})")
-            }*/
             Operator::SurfaceClosedInt => {
                 write!(f, "SurfaceClosedInt")
             }
