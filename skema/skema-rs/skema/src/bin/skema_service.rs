@@ -60,6 +60,7 @@ async fn main() -> std::io::Result<()> {
             gromet::model2PN,
             gromet::model2RN,
             gromet::model2MET,
+            gromet::model2GAMR,
             ping,
             version
         ),
@@ -70,6 +71,8 @@ async fn main() -> std::io::Result<()> {
                 mathml::ast::operator::Operator,
                 mathml::parsers::decapodes_serialization::DecapodesCollection,
                 mathml::parsers::decapodes_serialization::WiringDiagram,
+                mathml::acset::GeneralizedAMR,
+                mathml::acset::GeneralSemantics,
                 mathml::acset::AMRmathml,
                 mathml::acset::RegNet,
                 mathml::acset::ModelRegNet,
@@ -148,6 +151,7 @@ async fn main() -> std::io::Result<()> {
             .service(gromet::model2PN)
             .service(gromet::model2RN)
             .service(gromet::model2MET)
+            .service(gromet::model2GAMR)
             .service(ping)
             .service(version)
             .service(SwaggerUi::new("/docs/{_:.*}").url("/api-doc/openapi.json", openapi.clone()))
