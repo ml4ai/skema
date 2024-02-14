@@ -724,9 +724,9 @@ impl MathExpressionTree {
                     }
                     Operator::MsubsupInt(x) => {
                         expression.push_str("\\int_{");
-                        process_math_expression(&x.sub, &mut expression);
+                        process_math_expression(&x.lowlimit, &mut expression);
                         expression.push_str("}^{");
-                        process_math_expression(&x.sup, &mut expression);
+                        process_math_expression(&x.uplimit, &mut expression);
                         expression.push('}');
                         expression.push_str(&rest[0].to_latex());
                         expression.push_str(&*format!(" d{}", &*x.integration_variable));
@@ -926,7 +926,6 @@ impl MathExpression {
                 x.comp.flatten(tokens);
                 tokens.push(MathExpression::Mo(Operator::Rparen));
             }
-
             // Handles `Integral` operator with MathExpression
             MathExpression::Integral(x) => {
                 x.op.flatten(tokens);
@@ -2709,7 +2708,9 @@ fn test_hat_operator() {
     </math>";
     let exp = input.parse::<MathExpressionTree>().unwrap();
     let s_exp = exp.to_string();
+    println!("{:?}", exp);
     println!("{:?}", exp.to_latex());
+    println!("{:?}", s_exp);
     assert_eq!(s_exp, "(Hat(z) ζ)");
     assert_eq!(exp.to_latex(), "\\zeta\\hat{z}");
 }
