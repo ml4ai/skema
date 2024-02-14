@@ -189,13 +189,33 @@
 <a href="#188" id="188">188</a>
 <a href="#189" id="189">189</a>
 <a href="#190" id="190">190</a>
+<a href="#191" id="191">191</a>
+<a href="#192" id="192">192</a>
+<a href="#193" id="193">193</a>
+<a href="#194" id="194">194</a>
+<a href="#195" id="195">195</a>
+<a href="#196" id="196">196</a>
+<a href="#197" id="197">197</a>
+<a href="#198" id="198">198</a>
+<a href="#199" id="199">199</a>
+<a href="#200" id="200">200</a>
+<a href="#201" id="201">201</a>
+<a href="#202" id="202">202</a>
+<a href="#203" id="203">203</a>
+<a href="#204" id="204">204</a>
+<a href="#205" id="205">205</a>
+<a href="#206" id="206">206</a>
+<a href="#207" id="207">207</a>
+<a href="#208" id="208">208</a>
+<a href="#209" id="209">209</a>
+<a href="#210" id="210">210</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::ast::Ci;
 <span class="kw">use </span><span class="kw">crate</span>::ast::MathExpression;
 <span class="kw">use </span>derive_new::new;
 <span class="kw">use </span>serde::{Deserialize, Serialize};
 <span class="kw">use </span>std::fmt;
 
-<span class="doccomment">/// Derivative operator, in line with Spivak notation: http://ceres-solver.org/spivak_notation.html
+<span class="doccomment">/// Total Derivative operator, in line with Spivak notation: http://ceres-solver.org/spivak_notation.html
 </span><span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
 </span><span class="kw">pub struct </span>Derivative {
     <span class="kw">pub </span>order: u8,
@@ -219,7 +239,7 @@
     <span class="kw">pub </span>over: Box&lt;MathExpression&gt;,
 }
 
-<span class="doccomment">/// Hat operation
+<span class="doccomment">/// Hat operation obtains the hat operation with the operation component: e.g. \hat{x}
 </span><span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
 </span><span class="kw">pub struct </span>HatOp {
     <span class="kw">pub </span>comp: Box&lt;MathExpression&gt;,
@@ -231,15 +251,15 @@
     <span class="kw">pub </span>sub: Box&lt;MathExpression&gt;,
 }
 
-<span class="doccomment">/// Integral
+<span class="doccomment">/// Definite Integral with lowlimit, uplimit
 </span><span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
 </span><span class="kw">pub struct </span>MsubsupInt {
-    <span class="kw">pub </span>sub: Box&lt;MathExpression&gt;,
-    <span class="kw">pub </span>sup: Box&lt;MathExpression&gt;,
+    <span class="kw">pub </span>lowlimit: Box&lt;MathExpression&gt;,
+    <span class="kw">pub </span>uplimit: Box&lt;MathExpression&gt;,
     <span class="kw">pub </span>integration_variable: Box&lt;MathExpression&gt;,
 }
 
-<span class="doccomment">/// MsupDownArrow operation
+<span class="doccomment">/// MsupDownArrow operation. E.g. Handles I^{↓} operations such that I is `comp` of DownArrow operation
 </span><span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
 </span><span class="kw">pub struct </span>MsupDownArrow {
     <span class="kw">pub </span>comp: Box&lt;MathExpression&gt;,
@@ -247,27 +267,36 @@
 
 <span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
 </span><span class="kw">pub enum </span>Operator {
-    Add,
+    <span class="doccomment">/// Addition operator
+    </span>Add,
     Multiply,
     Equals,
     Divide,
     Subtract,
     Sqrt,
-    Lparen,
-    Rparen,
+    <span class="doccomment">/// Left parenthesis
+    </span>Lparen,
+    <span class="doccomment">/// Right parenthesis
+    </span>Rparen,
     Compose,
     Factorial,
-    Exp,
+    <span class="doccomment">/// Exponential operator
+    </span>Exp,
     Power,
     Comma,
-    Grad,
+    <span class="doccomment">/// Gradient operator
+    </span>Grad,
     GradSub(GradSub),
     Dot,
     Period,
-    Div,
-    Abs,
-    Derivative(Derivative),
-    PartialDerivative(PartialDerivative),
+    <span class="doccomment">/// Divergence operator
+    </span>Div,
+    <span class="doccomment">///Absolute operator
+    </span>Abs,
+    <span class="doccomment">/// Total derivative operator, e.g. d/dt
+    </span>Derivative(Derivative),
+    <span class="doccomment">/// Partial derivative operator, e.g. ∂/∂t
+    </span>PartialDerivative(PartialDerivative),
     Sin,
     Cos,
     Tan,
@@ -281,18 +310,29 @@
     Arccsc,
     Arccot,
     Mean,
-    Sum,
-    SumUnderOver(SumUnderOver),
+    <span class="doccomment">/// Summation operator
+    </span>Sum,
+    <span class="doccomment">/// Summation operator with lowlimit and uplimit
+    </span>SumUnderOver(SumUnderOver),
     Cross,
-    Hat,
-    HatOp(HatOp),
-    MsupDownArrow(MsupDownArrow),
-    DownArrow,
-    Int,
-    MsubsupInt(MsubsupInt),
+    <span class="doccomment">/// Hat operator, e.g. \hat
+    </span>Hat,
+    <span class="doccomment">/// Hat operator with component, e.g. \hat{x}
+    </span>HatOp(HatOp),
+    <span class="doccomment">/// Summation operator with lowlimit and uplimit
+    </span>MsupDownArrow(MsupDownArrow),
+    <span class="doccomment">/// ↓ as an operator
+    </span>DownArrow,
+    <span class="doccomment">/// Definite Integral
+    </span>Int,
+    <span class="doccomment">/// Indefinite Integral with lowlimit and uplimit
+    </span>MsubsupInt(MsubsupInt),
     Laplacian,
-    SurfaceClosedInt,
-    SurfaceClosedIntNoIntVar,
+    <span class="doccomment">/// Closed surface integral operator --need to include explit dS integration variable when translating to latex
+    </span>SurfaceClosedInt,
+    <span class="doccomment">/// Closed surface integral operator -- doesn't need to include explicit dS integration variable when translating to latex
+    /// E.g. \\oiint_S ∇ \cdot dS
+    </span>SurfaceClosedIntNoIntVar,
     <span class="comment">// Catchall for operators we haven't explicitly defined as enum variants yet.
     </span>Other(String),
 }
@@ -360,17 +400,17 @@
             Operator::DownArrow =&gt; <span class="macro">write!</span>(f, <span class="string">"↓"</span>),
             Operator::Int =&gt; <span class="macro">write!</span>(f, <span class="string">"Int"</span>),
             Operator::MsubsupInt(MsubsupInt {
-                sub,
-                sup,
+                lowlimit,
+                uplimit,
                 integration_variable,
             }) =&gt; {
-                <span class="macro">write!</span>(f, <span class="string">"Int_{{{sub}}}^{{{sup}}}({integration_variable})"</span>)
+                <span class="macro">write!</span>(
+                    f,
+                    <span class="string">"Int_{{{lowlimit}}}^{{{uplimit}}}({integration_variable})"
+                </span>)
             }
             Operator::Laplacian =&gt; <span class="macro">write!</span>(f, <span class="string">"Laplacian"</span>),
-            <span class="comment">/*Operator::SurfaceClosedInt(SurfaceClosedInt{limit, integration_variable}) =&gt; {
-            write!(f, "SurfaceClosedInt_{limit}({integration_variable})")
-            }*/
-            </span>Operator::SurfaceClosedInt =&gt; {
+            Operator::SurfaceClosedInt =&gt; {
                 <span class="macro">write!</span>(f, <span class="string">"SurfaceClosedInt"</span>)
             }
             Operator::SurfaceClosedIntNoIntVar =&gt; {

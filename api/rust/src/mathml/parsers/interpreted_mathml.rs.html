@@ -2633,7 +2633,7 @@
 }
 
 <span class="doccomment">/// Laplacian
-/// Parse Hat operator with components. Example: r \hat{x}
+/// Parse laplacian operator with components. Example: ∇^2
 </span><span class="kw">pub fn </span>laplacian_operation(input: Span) -&gt; IResult&lt;(MathExpression, Ci)&gt; {
     <span class="kw">let </span>(s, (_grad, _mn)) = ws(delimited(
         <span class="macro">stag!</span>(<span class="string">"msup"</span>),
