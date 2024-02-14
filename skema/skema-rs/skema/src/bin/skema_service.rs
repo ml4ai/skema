@@ -43,6 +43,7 @@ async fn main() -> std::io::Result<()> {
         paths(
             skema::services::mathml::get_ast_graph,
             skema::services::mathml::get_math_exp_graph,
+            skema::services::mathml::get_code_exp_graph_set,
             skema::services::mathml::get_latex,
             skema::services::mathml::get_acset,
             skema::services::mathml::get_content_mathml,
@@ -134,6 +135,7 @@ async fn main() -> std::io::Result<()> {
             .configure(gromet::configure())
             .service(skema::services::mathml::get_ast_graph)
             .service(skema::services::mathml::get_math_exp_graph)
+            .service(skema::services::mathml::get_code_exp_graph_set)
             .service(skema::services::mathml::get_latex)
             .service(skema::services::mathml::get_content_mathml)
             .service(skema::services::mathml::get_acset)

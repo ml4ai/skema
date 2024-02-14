@@ -1,12 +1,15 @@
 use crate::ast::{operator::Operator, MathExpression, Mi};
 use crate::parsers::math_expression_tree::MathExpressionTree;
 use petgraph::{graph::NodeIndex, Graph};
+use std::collections::HashMap;
 use std::{clone::Clone, collections::VecDeque};
 
 /// Struct for representing mathematical expressions in order to align with source code.
 pub type MathExpressionGraph<'a> = Graph<String, String>;
 
+
 use petgraph::dot::Dot;
+
 use std::string::ToString;
 
 #[derive(Debug, PartialEq, Eq, Clone)]
@@ -62,12 +65,12 @@ fn process_atom_expression(expr: &MathExpression, expression: &mut Expr) {
             process_atom_expression(&x.content, expression);
         }
         MathExpression::Mi(Mi(id)) => {
-            if let Expr::Expression { ops, args, name } = expression {
+            if let Expr::Expression { ops: _, args, name: _ } = expression {
                 args.push(Expr::Atom(Atom::Identifier(id.replace(' ', ""))));
             }
         }
         MathExpression::Mn(number) => {
-            if let Expr::Expression { ops, args, name } = expression {
+            if let Expr::Expression { ops: _, args, name: _ } = expression {
                 args.push(Expr::Atom(Atom::Number(number.replace(' ', ""))));
             }
         }
@@ -77,11 +80,11 @@ fn process_atom_expression(expr: &MathExpression, expression: &mut Expr) {
                 args: Vec::<Expr>::new(),
                 name: String::new(),
             };
-            if let Expr::Expression { ops, args, name } = &mut new_expr {
+            if let Expr::Expression { ops, args: _, name: _ } = &mut new_expr {
                 ops.push(Operator::Sqrt);
                 process_atom_expression(x, &mut new_expr);
             }
-            if let Expr::Expression { ops, args, name } = expression {
+            if let Expr::Expression { ops: _, args, name: _ } = expression {
                 args.push(new_expr.clone());
             }
         }
@@ -91,15 +94,15 @@ fn process_atom_expression(expr: &MathExpression, expression: &mut Expr) {
                 args: Vec::<Expr>::new(),
                 name: String::new(),
             };
-            if let Expr::Expression { ops, args, name } = &mut new_expr {
+            if let Expr::Expression { ops, args: _, name: _ } = &mut new_expr {
                 ops.push(Operator::Other("".to_string()));
                 process_atom_expression(x1, &mut new_expr);
             }
-            if let Expr::Expression { ops, args, name } = &mut new_expr {
+            if let Expr::Expression { ops, args: _, name: _ } = &mut new_expr {
                 ops.push(Operator::Divide);
                 process_atom_expression(x2, &mut new_expr);
             }
-            if let Expr::Expression { ops, args, name } = expression {
+            if let Expr::Expression { ops: _, args, name: _ } = expression {
                 args.push(new_expr.clone());
             }
         }
@@ -109,15 +112,15 @@ fn process_atom_expression(expr: &MathExpression, expression: &mut Expr) {
                 args: Vec::<Expr>::new(),
                 name: String::new(),
             };
-            if let Expr::Expression { ops, args, name } = &mut new_expr {
+            if let Expr::Expression { ops, args: _, name: _ } = &mut new_expr {
                 ops.push(Operator::Other("".to_string()));
                 process_atom_expression(x1, &mut new_expr);
             }
-            if let Expr::Expression { ops, args, name } = &mut new_expr {
+            if let Expr::Expression { ops, args: _, name: _ } = &mut new_expr {
                 ops.push(Operator::Other("^".to_string()));
                 process_atom_expression(x2, &mut new_expr);
             }
-            if let Expr::Expression { ops, args, name } = expression {
+            if let Expr::Expression { ops: _, args, name: _ } = expression {
                 args.push(new_expr.clone());
             }
         }
@@ -127,15 +130,15 @@ fn process_atom_expression(expr: &MathExpression, expression: &mut Expr) {
                 args: Vec::<Expr>::new(),
                 name: String::new(),
             };
-            if let Expr::Expression { ops, args, name } = &mut new_expr {
+            if let Expr::Expression { ops, args: _, name: _ } = &mut new_expr {
                 ops.push(Operator::Other("".to_string()));
                 process_atom_expression(x1, &mut new_expr);
             }
-            if let Expr::Expression { ops, args, name } = &mut new_expr {
+            if let Expr::Expression { ops, args: _, name: _ } = &mut new_expr {
                 ops.push(Operator::Other("_".to_string()));
                 process_atom_expression(x2, &mut new_expr);
             }
-            if let Expr::Expression { ops, args, name } = expression {
+            if let Expr::Expression { ops: _, args, name: _ } = expression {
                 args.push(new_expr.clone());
             }
         }
@@ -145,19 +148,19 @@ fn process_atom_expression(expr: &MathExpression, expression: &mut Expr) {
                 args: Vec::<Expr>::new(),
                 name: String::new(),
             };
-            if let Expr::Expression { ops, args, name } = &mut new_expr {
+            if let Expr::Expression { ops, args: _, name: _ } = &mut new_expr {
                 ops.push(Operator::Other("".to_string()));
                 process_atom_expression(x1, &mut new_expr);
             }
-            if let Expr::Expression { ops, args, name } = &mut new_expr {
+            if let Expr::Expression { ops, args: _, name: _ } = &mut new_expr {
                 ops.push(Operator::Other("_".to_string()));
                 process_atom_expression(x2, &mut new_expr);
             }
-            if let Expr::Expression { ops, args, name } = &mut new_expr {
+            if let Expr::Expression { ops, args: _, name: _ } = &mut new_expr {
                 ops.push(Operator::Other("^".to_string()));
                 process_atom_expression(x3, &mut new_expr);
             }
-            if let Expr::Expression { ops, args, name } = expression {
+            if let Expr::Expression { ops: _, args, name: _ } = expression {
                 args.push(new_expr.clone());
             }
         }
@@ -167,15 +170,15 @@ fn process_atom_expression(expr: &MathExpression, expression: &mut Expr) {
                 args: Vec::<Expr>::new(),
                 name: String::new(),
             };
-            if let Expr::Expression { ops, args, name } = &mut new_expr {
+            if let Expr::Expression { ops, args: _, name: _ } = &mut new_expr {
                 ops.push(Operator::Other("".to_string()));
                 process_atom_expression(x1, &mut new_expr);
             }
-            if let Expr::Expression { ops, args, name } = &mut new_expr {
+            if let Expr::Expression { ops, args: _, name: _ } = &mut new_expr {
                 ops.push(Operator::Other("under".to_string()));
                 process_atom_expression(x2, &mut new_expr);
             }
-            if let Expr::Expression { ops, args, name } = expression {
+            if let Expr::Expression { ops: _, args, name: _ } = expression {
                 args.push(new_expr.clone());
             }
         }
@@ -185,25 +188,25 @@ fn process_atom_expression(expr: &MathExpression, expression: &mut Expr) {
                 args: Vec::<Expr>::new(),
                 name: String::new(),
             };
-            if let Expr::Expression { ops, args, name } = &mut new_expr {
+            if let Expr::Expression { ops, args: _, name: _ } = &mut new_expr {
                 ops.push(Operator::Other("".to_string()));
                 process_atom_expression(x1, &mut new_expr);
             }
-            if let Expr::Expression { ops, args, name } = &mut new_expr {
+            if let Expr::Expression { ops, args: _, name: _ } = &mut new_expr {
                 ops.push(Operator::Other("over".to_string()));
                 process_atom_expression(x2, &mut new_expr);
             }
-            if let Expr::Expression { ops, args, name } = expression {
+            if let Expr::Expression { ops: _, args, name: _ } = expression {
                 args.push(new_expr.clone());
             }
         }
         MathExpression::Mtext(x) => {
-            if let Expr::Expression { ops, args, name } = expression {
+            if let Expr::Expression { ops: _, args, name: _ } = expression {
                 args.push(Expr::Atom(Atom::Identifier(x.replace(' ', ""))));
             }
         }
         MathExpression::Mspace(x) => {
-            if let Expr::Expression { ops, args, name } = expression {
+            if let Expr::Expression { ops: _, args, name: _ } = expression {
                 args.push(Expr::Atom(Atom::Identifier(x.to_string())));
             }
         }
@@ -213,15 +216,15 @@ fn process_atom_expression(expr: &MathExpression, expression: &mut Expr) {
                 args: Vec::<Expr>::new(),
                 name: String::new(),
             };
-            if let Expr::Expression { ops, args, name } = &mut new_expr {
+            if let Expr::Expression { ops, args: _, name: _ } = &mut new_expr {
                 ops.push(Operator::Other("|.|".to_string()));
                 process_atom_expression(x1, &mut new_expr);
             }
-            if let Expr::Expression { ops, args, name } = &mut new_expr {
+            if let Expr::Expression { ops, args: _, name: _ } = &mut new_expr {
                 ops.push(Operator::Other("_".to_string()));
                 process_atom_expression(x2, &mut new_expr);
             }
-            if let Expr::Expression { ops, args, name } = expression {
+            if let Expr::Expression { ops: _, args, name: _ } = expression {
                 args.push(new_expr.clone());
             }
         }
@@ -232,10 +235,10 @@ fn process_atom_expression(expr: &MathExpression, expression: &mut Expr) {
                     args: Vec::<Expr>::new(),
                     name: String::new(),
                 };
-                if let Expr::Expression { ops, args, name } = &mut new_expr {
+                if let Expr::Expression { ops: _, args: _, name: _ } = &mut new_expr {
                     process_atom_expression(me, &mut new_expr);
                 }
-                if let Expr::Expression { ops, args, name } = expression {
+                if let Expr::Expression { ops: _, args, name: _ } = expression {
                     args.push(new_expr.clone());
                 }
             }
@@ -258,26 +261,26 @@ impl MathExpressionTree {
                     name: String::new(),
                 };
                 if is_unary_operator(&head) || (head == Operator::Subtract && rest.len() == 1) {
-                    if let Expr::Expression { ops, args, name } = &mut new_expr {
+                    if let Expr::Expression { ops, args: _, name: _ } = &mut new_expr {
                         ops.push(head);
                         rest[0].clone().to_expr(&mut new_expr);
                     }
                 } else {
-                    if let Expr::Expression { ops, args, name } = &mut new_expr {
+                    if let Expr::Expression { ops, args: _, name: _ } = &mut new_expr {
                         ops.push(Operator::Other("".to_string()));
-                        for (index, r) in rest.iter().enumerate() {
+                        for (index, _r) in rest.iter().enumerate() {
                             if index < rest.len() - 1 {
                                 ops.push(head.clone());
                             }
                         }
                     }
-                    if let Expr::Expression { ops, args, name } = &mut new_expr {
+                    if let Expr::Expression { ops: _, args: _, name: _ } = &mut new_expr {
                         for r in &rest {
                             r.clone().to_expr(&mut new_expr);
                         }
                     }
                 }
-                if let Expr::Expression { ops, args, name } = expr {
+                if let Expr::Expression { ops: _, args, name: _ } = expr {
                     args.push(new_expr.clone());
                 }
             }
@@ -285,7 +288,7 @@ impl MathExpressionTree {
         expr
     }
     pub fn to_graph(self) -> MathExpressionGraph<'static> {
-        let mut expr = self.clone();
+        let expr = self.clone();
         let mut pre_exp = Expr::Expression {
             ops: vec![Operator::Other("root".to_string())],
             args: Vec::<Expr>::new(),
@@ -294,15 +297,15 @@ impl MathExpressionTree {
 
         expr.to_expr(&mut pre_exp);
 
-        if let Expr::Expression { ops, args, name } = &mut pre_exp {
-            for mut arg in args {
+        if let Expr::Expression { ops: _, args, name: _ } = &mut pre_exp {
+            for arg in args {
                 if let Expr::Expression { .. } = arg {
                     arg.group_expr();
                 }
             }
         }
-        if let Expr::Expression { ops, args, name } = &mut pre_exp {
-            for mut arg in args {
+        if let Expr::Expression { ops: _, args, name: _ } = &mut pre_exp {
+            for arg in args {
                 if let Expr::Expression { .. } = arg {
                     arg.collapse_expr();
                 }
@@ -330,16 +333,16 @@ impl MathExpressionTree {
         //         }
         //     }
         // }
-        if let Expr::Expression { ops, args, name } = &mut pre_exp {
-            for mut arg in args {
+        if let Expr::Expression { ops: _, args, name: _ } = &mut pre_exp {
+            for arg in args {
                 if let Expr::Expression { .. } = arg {
                     arg.set_name();
                 }
             }
         }
         let mut g = MathExpressionGraph::new();
-        if let Expr::Expression { ops, args, name } = &mut pre_exp {
-            for mut arg in args {
+        if let Expr::Expression { ops: _, args, name: _ } = &mut pre_exp {
+            for arg in args {
                 if let Expr::Expression { .. } = arg {
                     arg.to_graph(&mut g);
                 }
@@ -613,7 +616,7 @@ impl Expr {
         }
     }
 
-    /// Construct a string representation of the Expression and store it under its 'name' property.
+    /// MathExpressionTree::Construct a string representation of the Expression and store it under its 'name' property.
     pub fn set_name(&mut self) -> String {
         let mut add_paren = false;
         match self {
@@ -1174,6 +1177,30 @@ pub fn get_node_idx(graph: &mut MathExpressionGraph, name: &mut String) -> NodeI
     graph.add_node(name.to_string())
 }
 
+/// Generates a JSON representation of DOT graphs for each MathExpressionTree of the code implementation.
+pub fn get_code_exp_graphs(expressions: Vec<MathExpressionTree>) -> String {
+    let mut graph_json = HashMap::new();
+
+    for (index, expression) in expressions.iter().enumerate() {
+        // Create a new MathExpressionTree representing the outer layer with Operator::Equals
+        // let outer_layer = MathExpressionTree::Cons(
+        //     Operator::Equals,
+        //     vec![
+        //         MathExpressionTree::Atom(MathExpression::Mi(Mi(format!("exp_{}", index + 1)))),
+        //         expression.clone(),
+        //     ],
+        // );
+        let outer_layer = expression.clone();
+        let graph = outer_layer.to_graph();
+        let dot_representation = Dot::new(&graph);
+        let dot_string = dot_representation.to_string();
+
+        // JSON key starts from 1
+        graph_json.insert(index + 1, dot_string);
+    }
+
+    serde_json::to_string_pretty(&graph_json).unwrap()
+}
 #[test]
 fn test_plus_to_graph() {
     let input = "
@@ -1191,8 +1218,7 @@ fn test_plus_to_graph() {
     assert_eq!(
         dot_representation
             .to_string()
-            .replace("\n", "")
-            .replace(" ", ""),
+            .replace(['\n', ' '], ""),
         "digraph{0[label=\"a+b\"]1[label=\"a\"]2[label=\"b\"]1->0[label=\"+\"]2->0[label=\"+\"]}"
     )
 }
@@ -1245,8 +1271,7 @@ fn test_equation_halfar_dome_8_1_to_graph() {
     let g = exp.to_graph();
     let dot_representation = Dot::new(&g);
     assert_eq!(dot_representation.to_string()
-                   .replace("\n", "")
-                   .replace(" ", ""),
+                   .replace(['\n', ' '], ""),
                "digraph{0[label=\"Div(Γ*(H^(n+2))*(Abs(Grad(H))^(n-1))*Grad(H))\"]1[label=\"D(1,t)(H)\"]2[label=\"Γ*(H^(n+2))*(Abs(Grad(H))^(n-1))*Grad(H)\"]3[label=\"Γ\"]4[label=\"H^(n+2)\"]5[label=\"H\"]6[label=\"n+2\"]7[label=\"n\"]8[label=\"2\"]9[label=\"Abs(Grad(H))^(n-1)\"]10[label=\"Abs(Grad(H))\"]11[label=\"Grad(H)\"]12[label=\"n-1\"]13[label=\"1\"]1->0[label=\"=\"]2->0[label=\"Div\"]3->2[label=\"*\"]4->2[label=\"*\"]5->4[label=\"^\"]6->4[label=\"^\"]7->6[label=\"+\"]8->6[label=\"+\"]9->2[label=\"*\"]10->9[label=\"^\"]11->10[label=\"Abs\"]5->11[label=\"Grad\"]12->9[label=\"^\"]7->12[label=\"+\"]13->12[label=\"-\"]11->2[label=\"*\"]}");
 }
 
@@ -1301,7 +1326,152 @@ fn test_equation_sidarthe_1_to_graph() {
     let g = exp.to_graph();
     let dot_representation = Dot::new(&g);
     assert_eq!(dot_representation.to_string()
-                   .replace("\n", "")
-                   .replace(" ", ""),
+                   .replace(['\n', ' '], ""),
                "digraph{0[label=\"-(S)*(α*I+β*D+γ*A+δ*R)\"]1[label=\"D(1,t)(S)\"]2[label=\"-(S)\"]3[label=\"S\"]4[label=\"α*I+β*D+γ*A+δ*R\"]5[label=\"α*I\"]6[label=\"α\"]7[label=\"I\"]8[label=\"β*D\"]9[label=\"β\"]10[label=\"D\"]11[label=\"γ*A\"]12[label=\"γ\"]13[label=\"A\"]14[label=\"δ*R\"]15[label=\"δ\"]16[label=\"R\"]1->0[label=\"=\"]2->0[label=\"*\"]3->2[label=\"-\"]4->0[label=\"*\"]5->4[label=\"+\"]6->5[label=\"*\"]7->5[label=\"*\"]8->4[label=\"+\"]9->8[label=\"*\"]10->8[label=\"*\"]11->4[label=\"+\"]12->11[label=\"*\"]13->11[label=\"*\"]14->4[label=\"+\"]15->14[label=\"*\"]16->14[label=\"*\"]}");
+}
+
+#[test]
+fn test_get_code_exp_graphs() {
+    // Create a sample vector of MathExpressionTree instances
+    let expressions: Vec<MathExpressionTree> = vec![
+        MathExpressionTree::Cons(
+            Operator::Subtract,
+            vec![
+                MathExpressionTree::Cons(
+                    Operator::Multiply,
+                    vec![
+                        MathExpressionTree::Atom(MathExpression::Mi(Mi("I".to_string()))),
+                        MathExpressionTree::Cons(
+                            Operator::Divide,
+                            vec![
+                                MathExpressionTree::Atom(MathExpression::Mi(Mi(
+                                    "epsilon".to_string()
+                                ))),
+                                MathExpressionTree::Atom(MathExpression::Mi(Mi("3".to_string()))),
+                            ],
+                        ),
+                    ],
+                ),
+                MathExpressionTree::Cons(
+                    Operator::Multiply,
+                    vec![
+                        MathExpressionTree::Atom(MathExpression::Mi(Mi("eta".to_string()))),
+                        MathExpressionTree::Atom(MathExpression::Mi(Mi("D".to_string()))),
+                    ],
+                ),
+            ],
+        ),
+        MathExpressionTree::Cons(
+            Operator::Subtract,
+            vec![
+                MathExpressionTree::Cons(
+                    Operator::Multiply,
+                    vec![
+                        MathExpressionTree::Atom(MathExpression::Mi(Mi("zeta".to_string()))),
+                        MathExpressionTree::Atom(MathExpression::Mi(Mi("I".to_string()))),
+                    ],
+                ),
+                MathExpressionTree::Cons(
+                    Operator::Multiply,
+                    vec![
+                        MathExpressionTree::Atom(MathExpression::Mi(Mi("A".to_string()))),
+                        MathExpressionTree::Cons(
+                            Operator::Add,
+                            vec![
+                                MathExpressionTree::Cons(
+                                    Operator::Add,
+                                    vec![
+                                        MathExpressionTree::Atom(MathExpression::Mi(Mi(
+                                            "theta".to_string()
+                                        ))),
+                                        MathExpressionTree::Atom(MathExpression::Mi(Mi(
+                                            "mu".to_string()
+                                        ))),
+                                    ],
+                                ),
+                                MathExpressionTree::Atom(MathExpression::Mi(Mi(
+                                    "kappa".to_string()
+                                ))),
+                            ],
+                        ),
+                    ],
+                ),
+            ],
+        ),
+        MathExpressionTree::Cons(
+            Operator::Subtract,
+            vec![
+                MathExpressionTree::Cons(
+                    Operator::Add,
+                    vec![
+                        MathExpressionTree::Cons(
+                            Operator::Multiply,
+                            vec![
+                                MathExpressionTree::Atom(MathExpression::Mi(Mi("eta".to_string()))),
+                                MathExpressionTree::Atom(MathExpression::Mi(Mi("D".to_string()))),
+                            ],
+                        ),
+                        MathExpressionTree::Cons(
+                            Operator::Multiply,
+                            vec![
+                                MathExpressionTree::Atom(MathExpression::Mi(Mi(
+                                    "theta".to_string()
+                                ))),
+                                MathExpressionTree::Atom(MathExpression::Mi(Mi("A".to_string()))),
+                            ],
+                        ),
+                    ],
+                ),
+                MathExpressionTree::Cons(
+                    Operator::Multiply,
+                    vec![
+                        MathExpressionTree::Atom(MathExpression::Mi(Mi("R".to_string()))),
+                        MathExpressionTree::Cons(
+                            Operator::Add,
+                            vec![
+                                MathExpressionTree::Atom(MathExpression::Mi(Mi("nu".to_string()))),
+                                MathExpressionTree::Atom(MathExpression::Mi(Mi("xi".to_string()))),
+                            ],
+                        ),
+                    ],
+                ),
+            ],
+        ),
+    ];
+
+    // Call the function to generate the JSON representation of DOT graphs
+    let json_result = get_code_exp_graphs(expressions);
+
+    // Parse the JSON string into serde_json::Value
+    let parsed_json: serde_json::Value = serde_json::from_str(&json_result).unwrap();
+
+    // Iterate over each key-value pair in the JSON
+    for (index_str, value) in parsed_json.as_object().unwrap().iter() {
+        // Convert the index string to usize
+        let index = index_str.parse::<usize>().unwrap();
+
+        // Retrieve the DOT graph string for the current index
+        let dot_graph_string = value.as_str().unwrap();
+        println!("{}", dot_graph_string);
+        // Add assertions or validations based on your specific needs
+        match index {
+            1 => {
+                // Test assertions for index 1
+                assert!(dot_graph_string.contains("I*epsilon/3-eta*D"));
+            }
+            2 => {
+                // Test assertions for index 2
+                assert!(dot_graph_string.contains("zeta*I-A*(theta+mu+kappa)"));
+            }
+            3 => {
+                // Test assertions for index 3
+                assert!(dot_graph_string.contains("eta*D+theta*A-R*(nu+xi)"));
+            }
+            // Add more cases as needed for other indices
+            _ => {
+                // Unexpected index, fail the test
+                panic!("Unexpected index: {}", index);
+            }
+        }
+    }
 }
