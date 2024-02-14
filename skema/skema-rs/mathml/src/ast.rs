@@ -1,19 +1,19 @@
 use derive_new::new;
 use std::fmt;
 use utoipa::ToSchema;
-
+use schemars::JsonSchema;
 pub mod operator;
 use operator::Operator;
 use serde::{Deserialize, Serialize};
 //use crate::ast::MathExpression::SummationOp;
 
-#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, JsonSchema)]
 pub struct Mi(pub String);
 
-#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, JsonSchema)]
 pub struct Mrow(pub Vec<MathExpression>);
 
-#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, JsonSchema)]
 pub enum Type {
     Integer,
     Rational,
@@ -29,27 +29,27 @@ pub enum Type {
     Matrix,
 }
 
-#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, JsonSchema)]
 pub struct Ci {
     pub r#type: Option<Type>,
     pub content: Box<MathExpression>,
     pub func_of: Option<Vec<Ci>>,
 }
 
-#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, JsonSchema)]
 pub struct Differential {
     pub diff: Box<MathExpression>,
     pub func: Box<MathExpression>,
 }
 
-#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, JsonSchema)]
 pub struct SummationMath {
     pub op: Box<MathExpression>,
     pub func: Box<MathExpression>,
 }
 
 /// Integral operation
-#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, JsonSchema)]
 pub struct Integral {
     pub op: Box<MathExpression>,
     pub integrand: Box<MathExpression>,
@@ -57,21 +57,21 @@ pub struct Integral {
 }
 
 /// Integral operation
-/*#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
+/*#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, JsonSchema)]
 pub struct SurfaceClosedIntegral {
     //pub op: Box<MathExpression>,
     pub row: Mrow,
 }*/
 
 /// Hat operation
-#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, JsonSchema)]
 pub struct HatComp {
     pub op: Box<MathExpression>,
     pub comp: Box<MathExpression>,
 }
 
 /// DownArrow
-#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, JsonSchema)]
 pub struct DownArrowComp {
     pub op: Box<MathExpression>,
     pub comp: Box<MathExpression>,
@@ -79,7 +79,7 @@ pub struct DownArrowComp {
 }
 
 /// Laplacian
-#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, JsonSchema)]
 pub struct LaplacianComp {
     pub op: Box<MathExpression>,
     pub comp: Ci,
@@ -88,7 +88,7 @@ pub struct LaplacianComp {
 /// The MathExpression enum is not faithful to the corresponding element type in MathML 3
 /// (https://www.w3.org/TR/MathML3/appendixa.html#parsing_MathExpression)
 #[derive(
-    Debug, PartialOrd, Ord, PartialEq, Eq, Clone, Hash, Default, new, Deserialize, Serialize, ToSchema
+    Debug, PartialOrd, Ord, PartialEq, Eq, Clone, Hash, Default, new, Deserialize, Serialize, ToSchema, JsonSchema
 )]
 pub enum MathExpression {
     Mi(Mi),

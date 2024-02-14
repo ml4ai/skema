@@ -4,9 +4,10 @@ use derive_new::new;
 use serde::{Deserialize, Serialize};
 use std::fmt;
 use utoipa::ToSchema;
+use schemars::JsonSchema;
 
 /// Derivative operator, in line with Spivak notation: http://ceres-solver.org/spivak_notation.html
-#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, JsonSchema)]
 pub struct Derivative {
     pub order: u8,
     pub var_index: u8,
@@ -14,7 +15,7 @@ pub struct Derivative {
 }
 
 /// Partial derivative operator
-#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, JsonSchema)]
 pub struct PartialDerivative {
     pub order: u8,
     pub var_index: u8,
@@ -22,7 +23,7 @@ pub struct PartialDerivative {
 }
 
 /// Summation operator with under and over components
-#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, JsonSchema)]
 pub struct SumUnderOver {
     pub op: Box<MathExpression>,
     pub under: Box<MathExpression>,
@@ -30,19 +31,19 @@ pub struct SumUnderOver {
 }
 
 /// Hat operation
-#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, JsonSchema)]
 pub struct HatOp {
     pub comp: Box<MathExpression>,
 }
 
 /// Handles grad operations with subscript. E.g. ∇_{x}
-#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, JsonSchema)]
 pub struct GradSub {
     pub sub: Box<MathExpression>,
 }
 
 /// Integral
-#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, JsonSchema)]
 pub struct MsubsupInt {
     pub sub: Box<MathExpression>,
     pub sup: Box<MathExpression>,
@@ -50,12 +51,12 @@ pub struct MsubsupInt {
 }
 
 /// MsupDownArrow operation
-#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, JsonSchema)]
 pub struct MsupDownArrow {
     pub comp: Box<MathExpression>,
 }
 
-#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, ToSchema)]
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, ToSchema, JsonSchema)]
 pub enum Operator {
     Add,
     Multiply,
