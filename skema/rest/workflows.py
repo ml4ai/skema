@@ -207,7 +207,7 @@ async def equations_to_amr(data: schema.MmlToAMR, client: httpx.AsyncClient = De
 
 
 # equations(pmml or latex) -> MathExpressionTree
-@router.post("/latex/equations-to-met", summary="Equations (LaTeX/pMML) → MathExpressionTree")
+@router.post("/equations-to-met", summary="Equations (LaTeX/pMML) → MathExpressionTree")
 async def equations_to_met(data: schema.EquationToMET, client: httpx.AsyncClient = Depends(utils.get_client)):
     """
     Converts equations (in LaTeX or pMathML) to MathExpressionTree (JSON).
@@ -223,7 +223,7 @@ async def equations_to_met(data: schema.EquationToMET, client: httpx.AsyncClient
 
     url = "http://127.0.0.1:8000"
 
-    r = requests.post(f"{url}/latex/equations-to-met",  json={"equations": equations})
+    r = requests.post(f"{url}/equations-to-met",  json={"equations": equations})
     print(r.json())
     """
     if "</math>" in data.equations[0]:
