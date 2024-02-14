@@ -8,9 +8,14 @@ from skema.gromet.fn import GrometFNModuleCollection
 from skema.skema_py.server import SUPPORTED_FILE_EXTENSIONS
 
 def easy_process_file_system(system_name: str, root_path: str, write_to_file=False, original_source=False) -> GrometFNModuleCollection:
-    """Run a single Python or Fortran file through the CODE2FN pipeline and return the GrometFNModuleCollection.
-    Optionally, output the Gromet JSON to a file.
-    Optionally, include the entire original source code of the file in the GrometFNModuleCollection.
+    """
+    Like process_file_system but doesn't require a system_filepaths.txt file. Returns a GrometFNModuleCollection.
+
+    Parameters:
+    system_name (str): The name of the system to ingest.
+    root_path (str): The relative or absolute path to the directory to ingest
+    write_to_file (bool, optional): Whether or not to output Gromet to file.
+    original_source (bool, optional): Whether or not to include original source code in output Gromet.
     """
     path_obj = Path(root_path).resolve()
     
