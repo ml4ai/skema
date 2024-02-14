@@ -1,5 +1,6 @@
 use derive_new::new;
 use std::fmt;
+use utoipa::ToSchema;
 
 pub mod operator;
 use operator::Operator;
@@ -87,7 +88,7 @@ pub struct LaplacianComp {
 /// The MathExpression enum is not faithful to the corresponding element type in MathML 3
 /// (https://www.w3.org/TR/MathML3/appendixa.html#parsing_MathExpression)
 #[derive(
-    Debug, PartialOrd, Ord, PartialEq, Eq, Clone, Hash, Default, new, Deserialize, Serialize,
+    Debug, PartialOrd, Ord, PartialEq, Eq, Clone, Hash, Default, new, Deserialize, Serialize, ToSchema
 )]
 pub enum MathExpression {
     Mi(Mi),

@@ -65,6 +65,9 @@ async fn main() -> std::io::Result<()> {
         ),
         components(
             schemas(
+                mathml::parsers::math_expression_tree::MathExpressionTree,
+                mathml::ast::MathExpression,
+                mathml::ast::operator::Operator,
                 mathml::parsers::decapodes_serialization::DecapodesCollection,
                 mathml::parsers::decapodes_serialization::WiringDiagram,
                 mathml::acset::AMRmathml,

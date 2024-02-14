@@ -3,6 +3,7 @@ use crate::ast::MathExpression;
 use derive_new::new;
 use serde::{Deserialize, Serialize};
 use std::fmt;
+use utoipa::ToSchema;
 
 /// Derivative operator, in line with Spivak notation: http://ceres-solver.org/spivak_notation.html
 #[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
@@ -54,7 +55,7 @@ pub struct MsupDownArrow {
     pub comp: Box<MathExpression>,
 }
 
-#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, ToSchema)]
 pub enum Operator {
     Add,
     Multiply,

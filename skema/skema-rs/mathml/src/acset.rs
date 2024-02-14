@@ -2,6 +2,8 @@
 //! JSON-serialized ACSets are the form of model exchange between TA1 and TA2.
 use crate::parsers::first_order_ode::{get_terms, FirstOrderODE, PnTerm};
 use crate::parsers::math_expression_tree::MathExpressionTree;
+use crate::ast::operator::{Operator, Derivative};
+use crate::ast::{MathExpression, Ci, Mi, Type};
 
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeSet;
@@ -342,6 +344,103 @@ pub struct GeneralSemantics {
 // -------------------------------------------------------------------------------------------
 // This function takes our previous model form, the ACSet and transforms it to the new TA4 exchange format
 // -------------------------------------------------------------------------------------------
+impl From<Vec<MathExpressionTree>> for GeneralizedAMR {
+    fn from(met_vec: Vec<MathExpressionTree>) -> GeneralizedAMR {
+        let mut states_vec = BTreeSet::<State>::new();
+        let mut parameter_vec = Vec::<Parameter>::new();
+
+
+        // construct state vector, under assumption that only differentialed LHS terms are states
+        for equation in met_vec.iter() {
+            match equation {
+                MathExpressionTree::Cons(ref x, ref y) => { 
+                    match &x {
+                        Operator::Equals => {
+                            match &y[0] {
+                                MathExpressionTree::Cons(Operator::Derivative(_d), ref x1) => {
+                                    let state_name = x1[0].to_string();
+                                    let state = State {
+                                        id: state_name.clone(),
+                                        name: state_name.clone(),
+                                        grounding: None,
+                                        units: None,
+                                    };
+                                    states_vec.insert(state.clone());
+                                }
+                                _ => {println!("Non-differential Equation")}
+                            }
+                        }
+                        _ => {println!("Expected an equation!")}
+                    }
+                }
+                _ => {println!("Expected an equation!")}
+            }
+        }
+
+        // now to construct the parameters vector
+        // might be best to make a first order ODE and pass the get terms thing and then pull all terms from it
+        // would need to flatten the mults and then pull make temp lhs 
+        let mut param_str_vec = Vec::<String>::new();
+        let mut state_str_vec = Vec::<String>::new();
+        for state in states_vec.iter() {
+            state_str_vec.push(state.name.clone());
+        }
+        for equation in met_vec.iter() {
+            let deriv = Ci {
+                r#type: Some(Type::Function),
+                content: Box::new(MathExpression::Mi(Mi("temp".to_string()))),
+                func_of: None,
+            };
+            let fode = FirstOrderODE {
+                lhs_var: deriv.clone(),
+                func_of: [deriv.clone()].to_vec(), // just place holders for construction
+                with_respect_to: deriv.clone(),    // just place holders for construction
+                rhs: equation.clone(),
+            };
+            let terms = get_terms(state_str_vec.clone(), fode);
+            for term in terms.iter() {
+                param_str_vec.extend(term.parameters.clone().into_iter());
+            }
+        }
+
+        // dedup the parameters vector
+        param_str_vec.sort();
+        param_str_vec.dedup();
+
+        // now to make the parameter vec from the strings
+        for param in param_str_vec.iter() {
+            let parameter = Parameter {
+                id: param.clone(),
+                name: Some(param.clone()),
+                ..Default::default()
+            };
+            parameter_vec.push(parameter.clone());
+        }
+
+        let header = Header {
+            name: "".to_string(),
+            schema: "".to_string(),
+            schema_name: "".to_string(),
+            description: "".to_string(),
+            model_version: "".to_string(),
+        };
+
+        let semantics = GeneralSemantics {
+            states: states_vec,
+            parameters: Some(parameter_vec),
+        };
+
+        let gamr = GeneralizedAMR {
+            header: header,
+            met: met_vec.clone(),
+            semantics: Some(semantics),
+            metadata: None
+        };
+
+        return gamr
+    }
+}
+
 impl From<Vec<FirstOrderODE>> for PetriNet {
     fn from(ode_vec: Vec<FirstOrderODE>) -> PetriNet {
         // initialize vecs
