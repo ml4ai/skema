@@ -15,7 +15,7 @@ async def test_post_eqns_to_mets_latex():
     endpoint = "/equations-to-met"
 
     async with AsyncClient(app=app, base_url="http://latex-to-mets-test") as ac:
-        response = await ac.put(endpoint, json={"equations": latex_equations})
+        response = await ac.post(endpoint, json={"equations": latex_equations})
     expected = """
     [{'Cons': ['Equals', [{'Atom': {'Ci': {'type': None, 'content': {'Mi': 'E'}, 'func_of': None}}}, {'Cons': ['Multiply', [{'Atom': {'Ci': {'type': None, 'content': {'Mi': 'm'}, 'func_of': None}}}, {'Cons': ['Power', [{'Atom': {'Ci': {'type': None, 'content': {'Mi': 'c'}, 'func_of': None}}}, {'Atom': {'Mn': '2'}}]]}]]}]]}, {'Cons': ['Equals', [{'Atom': {'Ci': {'type': None, 'content': {'Mi': 'c'}, 'func_of': None}}}, {'Cons': ['Divide', [{'Atom': {'Ci': {'type': None, 'content': {'Mi': 'a'}, 'func_of': None}}}, {'Atom': {'Ci': {'type': None, 'content': {'Mi': 'b'}, 'func_of': None}}}]]}]]}]
     """
@@ -70,7 +70,7 @@ async def test_post_eqns_to_mets_mathml():
     endpoint = "/equations-to-met"
 
     async with AsyncClient(app=app, base_url="http://mathml-to-mets-test") as ac:
-        response = await ac.put(endpoint, json={"equations": mathml_equations})
+        response = await ac.post(endpoint, json={"equations": mathml_equations})
     expected = """
     [{'Cons': ['Equals', [{'Atom': {'Ci': {'type': None, 'content': {'Mi': 'E'}, 'func_of': None}}}, {'Cons': ['Multiply', [{'Atom': {'Ci': {'type': None, 'content': {'Mi': 'm'}, 'func_of': None}}}, {'Cons': ['Power', [{'Atom': {'Ci': {'type': None, 'content': {'Mi': 'c'}, 'func_of': None}}}, {'Atom': {'Mn': '2'}}]]}]]}]]}, {'Cons': ['Equals', [{'Atom': {'Ci': {'type': None, 'content': {'Mi': 'c'}, 'func_of': None}}}, {'Cons': ['Divide', [{'Atom': {'Ci': {'type': None, 'content': {'Mi': 'a'}, 'func_of': None}}}, {'Atom': {'Ci': {'type': None, 'content': {'Mi': 'b'}, 'func_of': None}}}]]}]]}]
     """
