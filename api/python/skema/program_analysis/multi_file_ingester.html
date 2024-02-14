@@ -138,7 +138,7 @@ def process_file_system(
                        
                 # Normalize the path across os and then convert to module dot notation
                 python_module_path = &#34;.&#34;.join(os.path.normpath(os_module_path).split(os.path.sep))
-                python_module_path = python_module_path.replace(&#34;.py&#34;, &#34;&#34;).strip()
+                python_module_path = &#34;.&#34;.join(python_module_path.split(&#34;.&#34;)[0:-1])
                 
                 module_collection.module_index.append(python_module_path)
 
@@ -303,7 +303,7 @@ if __name__ == &#34;__main__&#34;:
                        
                 # Normalize the path across os and then convert to module dot notation
                 python_module_path = &#34;.&#34;.join(os.path.normpath(os_module_path).split(os.path.sep))
-                python_module_path = python_module_path.replace(&#34;.py&#34;, &#34;&#34;).strip()
+                python_module_path = &#34;.&#34;.join(python_module_path.split(&#34;.&#34;)[0:-1])
                 
                 module_collection.module_index.append(python_module_path)
 

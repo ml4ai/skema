@@ -37,9 +37,14 @@ from skema.gromet.fn import GrometFNModuleCollection
 from skema.skema_py.server import SUPPORTED_FILE_EXTENSIONS
 
 def easy_process_file_system(system_name: str, root_path: str, write_to_file=False, original_source=False) -&gt; GrometFNModuleCollection:
-    &#34;&#34;&#34;Run a single Python or Fortran file through the CODE2FN pipeline and return the GrometFNModuleCollection.
-    Optionally, output the Gromet JSON to a file.
-    Optionally, include the entire original source code of the file in the GrometFNModuleCollection.
+    &#34;&#34;&#34;
+    Like process_file_system but doesn&#39;t require a system_filepaths.txt file. Returns a GrometFNModuleCollection.
+
+    Parameters:
+    system_name (str): The name of the system to ingest.
+    root_path (str): The relative or absolute path to the directory to ingest
+    write_to_file (bool, optional): Whether or not to output Gromet to file.
+    original_source (bool, optional): Whether or not to include original source code in output Gromet.
     &#34;&#34;&#34;
     path_obj = Path(root_path).resolve()
     
@@ -93,17 +98,25 @@ if __name__ == &#34;__main__&#34;:
 <span>def <span class="ident">easy_process_file_system</span></span>(<span>system_name: str, root_path: str, write_to_file=False, original_source=False) ‑> skema.gromet.fn.gromet_fn_module_collection.GrometFNModuleCollection</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Run a single Python or Fortran file through the CODE2FN pipeline and return the GrometFNModuleCollection.
-Optionally, output the Gromet JSON to a file.
-Optionally, include the entire original source code of the file in the GrometFNModuleCollection.</p></div>
+<div class="desc"><p>Like process_file_system but doesn't require a system_filepaths.txt file. Returns a GrometFNModuleCollection.</p>
+<p>Parameters:
+system_name (str): The name of the system to ingest.
+root_path (str): The relative or absolute path to the directory to ingest
+write_to_file (bool, optional): Whether or not to output Gromet to file.
+original_source (bool, optional): Whether or not to include original source code in output Gromet.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def easy_process_file_system(system_name: str, root_path: str, write_to_file=False, original_source=False) -&gt; GrometFNModuleCollection:
-    &#34;&#34;&#34;Run a single Python or Fortran file through the CODE2FN pipeline and return the GrometFNModuleCollection.
-    Optionally, output the Gromet JSON to a file.
-    Optionally, include the entire original source code of the file in the GrometFNModuleCollection.
+    &#34;&#34;&#34;
+    Like process_file_system but doesn&#39;t require a system_filepaths.txt file. Returns a GrometFNModuleCollection.
+
+    Parameters:
+    system_name (str): The name of the system to ingest.
+    root_path (str): The relative or absolute path to the directory to ingest
+    write_to_file (bool, optional): Whether or not to output Gromet to file.
+    original_source (bool, optional): Whether or not to include original source code in output Gromet.
     &#34;&#34;&#34;
     path_obj = Path(root_path).resolve()
     
