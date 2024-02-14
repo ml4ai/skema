@@ -6,9 +6,13 @@ use operator::Operator;
 use serde::{Deserialize, Serialize};
 //use crate::ast::MathExpression::SummationOp;
 
+/// Represents identifiers such as variables, function names, constants.
+/// E.g. x , sin, n
 #[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
 pub struct Mi(pub String);
 
+/// Represents groups of any subexpressions
+/// E.g. For a given expression: 2x+4 -->  2 and x are grouped together
 #[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
 pub struct Mrow(pub Vec<MathExpression>);
 
@@ -28,6 +32,8 @@ pub enum Type {
     Matrix,
 }
 
+/// Represents content identifiers such that variables can be have type attribute
+/// to specify what it represents. E.g. function, vector, real,...
 #[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
 pub struct Ci {
     pub r#type: Option<Type>,
@@ -35,19 +41,23 @@ pub struct Ci {
     pub func_of: Option<Vec<Ci>>,
 }
 
+/// Represents the differentiation operator `diff` for functions or expresions `func`
+/// E.g. df/dx
 #[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
 pub struct Differential {
     pub diff: Box<MathExpression>,
     pub func: Box<MathExpression>,
 }
 
+/// Represents sum operator with terms that are summed over
+/// E.g. sum_{i=1}^{K} f(x_i)
 #[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
 pub struct SummationMath {
     pub op: Box<MathExpression>,
     pub func: Box<MathExpression>,
 }
 
-/// Integral operation
+/// Integral operation represents integral over math expressions
 #[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
 pub struct Integral {
     pub op: Box<MathExpression>,
@@ -55,29 +65,16 @@ pub struct Integral {
     pub integration_variable: Box<MathExpression>,
 }
 
-/// Integral operation
-/*#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
-pub struct SurfaceClosedIntegral {
-    //pub op: Box<MathExpression>,
-    pub row: Mrow,
-}*/
-
-/// Hat operation
+/// Represents Hat operator and the contents the hat operator is being applied to.
+/// E.g. f \hat{x}, where `op` will be \hat{x}, `comp` with be the contents
 #[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
 pub struct HatComp {
     pub op: Box<MathExpression>,
     pub comp: Box<MathExpression>,
 }
 
-/// DownArrow
-#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
-pub struct DownArrowComp {
-    pub op: Box<MathExpression>,
-    pub comp: Box<MathExpression>,
-    pub func_of: Vec<Ci>,
-}
-
-/// Laplacian
+/// Laplacian operator of vector calculus which takes in argument `comp`.
+/// E.g. ∇^2 f
 #[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
 pub struct LaplacianComp {
     pub op: Box<MathExpression>,
@@ -92,36 +89,47 @@ pub struct LaplacianComp {
 pub enum MathExpression {
     Mi(Mi),
     Mo(Operator),
+    /// Represents numeric literals such as integers, decimals
     Mn(String),
+    /// Represents square root elements
     Msqrt(Box<MathExpression>),
     Mrow(Mrow),
+    /// Represents the fraction of expressions where first argument is numerator content and second argument is denominator content
     Mfrac(Box<MathExpression>, Box<MathExpression>),
+    /// Represents expressions where first argument is the base and second argument is the superscript
     Msup(Box<MathExpression>, Box<MathExpression>),
+    /// Represents expressions where first argument is the base and second argument is the subscript
     Msub(Box<MathExpression>, Box<MathExpression>),
+    /// Represents expressions where first argument is the base and second argument is the undersubscript
     Munder(Box<MathExpression>, Box<MathExpression>),
+    /// Represents expressions where first argument is the base and second argument is the oversubscript
     Mover(Box<MathExpression>, Box<MathExpression>),
+    /// Represents expressions where first argument is the base, second argument is the subscript, third argument is the superscript
     Msubsup(
         Box<MathExpression>,
         Box<MathExpression>,
         Box<MathExpression>,
     ),
+    /// Represents arbitrary text
     Mtext(String),
+    /// Represents how elements can make changes to their style. E.g. displaystyle
     Mstyle(Vec<MathExpression>),
+    /// Represents empty element with blanck space
     Mspace(String),
+    /// Handles <mo .../>
     MoLine(String),
-    //GroupTuple(Vec<MathExpression>),
     Ci(Ci),
     Differential(Differential),
     SummationMath(SummationMath),
     AbsoluteSup(Box<MathExpression>, Box<MathExpression>),
     Absolute(Box<MathExpression>, Box<MathExpression>),
     HatComp(HatComp),
-    DownArrowComp(DownArrowComp),
     Integral(Integral),
     LaplacianComp(LaplacianComp),
+    /// Represents closed surface integral over contents. E.g. \\oiint_S ∇ \cdot T dS
     SurfaceClosedIntegral(Box<MathExpression>),
+    /// Represents closed surface integral over contents where integration E.g. \\oiint_S ∇ \cdot dS
     SurfaceClosedIntegralNoIntVar(Box<MathExpression>),
-    //Differential(Box<MathExpression>, Box<MathExpression>),
     #[default]
     None,
 }
@@ -168,14 +176,6 @@ impl fmt::Display for MathExpression {
                 write!(f, "{func}")
             }
             MathExpression::HatComp(HatComp { op, comp }) => {
-                write!(f, "{op}")?;
-                write!(f, "{comp}")
-            }
-            MathExpression::DownArrowComp(DownArrowComp {
-                op,
-                comp,
-                func_of: _,
-            }) => {
                 write!(f, "{op}")?;
                 write!(f, "{comp}")
             }
