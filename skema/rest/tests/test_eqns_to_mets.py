@@ -29,7 +29,7 @@ async def test_post_eqns_to_mets_latex():
     ), f"Request was unsuccessful (status code was {response.status_code} instead of 200)"
     # check response
     assert (
-        json.loads(response.text) == expected
+        response.text == expected
     ), f"Response should be {expected}, but instead received {response.text}"
 
 
@@ -84,5 +84,5 @@ async def test_post_eqns_to_mets_mathml():
     ), f"Request was unsuccessful (status code was {response.status_code} instead of 200)"
     # check response
     assert (
-        json.loads(response.text) == expected
+        response.text == expected
     ), f"Response should be {expected}, but instead received {response.text}"
