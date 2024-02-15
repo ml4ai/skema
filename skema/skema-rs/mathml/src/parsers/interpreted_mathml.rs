@@ -1114,7 +1114,7 @@ pub fn surface_closed_integral2(input: Span) -> IResult<MathExpression> {
 }
 
 /// Laplacian
-/// Parse Hat operator with components. Example: r \hat{x}
+/// Parse laplacian operator with components. Example: ∇^2
 pub fn laplacian_operation(input: Span) -> IResult<(MathExpression, Ci)> {
     let (s, (_grad, _mn)) = ws(delimited(
         stag!("msup"),
