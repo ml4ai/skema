@@ -7,7 +7,7 @@ use utoipa::ToSchema;
 use schemars::JsonSchema;
 
 /// Total Derivative operator, in line with Spivak notation: http://ceres-solver.org/spivak_notation.html
-#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, JsonSchema)]
 pub struct Derivative {
     pub order: u8,
     pub var_index: u8,
@@ -31,7 +31,7 @@ pub struct SumUnderOver {
 }
 
 /// Hat operation obtains the hat operation with the operation component: e.g. \hat{x}
-#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, JsonSchema)]
 pub struct HatOp {
     pub comp: Box<MathExpression>,
 }
@@ -43,7 +43,7 @@ pub struct GradSub {
 }
 
 /// Definite Integral with lowlimit, uplimit
-#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, JsonSchema)]
 pub struct MsubsupInt {
     pub lowlimit: Box<MathExpression>,
     pub uplimit: Box<MathExpression>,
@@ -51,7 +51,7 @@ pub struct MsubsupInt {
 }
 
 /// MsupDownArrow operation. E.g. Handles I^{↓} operations such that I is `comp` of DownArrow operation
-#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, JsonSchema)]
 pub struct MsupDownArrow {
     pub comp: Box<MathExpression>,
 }
