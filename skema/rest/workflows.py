@@ -246,6 +246,48 @@ async def equations_to_met(data: schema.EquationToMET, client: httpx.AsyncClient
         )
     return res.json()
 
+
+# equations(pmml or latex) -> Generalized AMR
+@router.post("/equations-to-gamr", summary="Equations (LaTeX/pMML) → MathExpressionTree")
+async def equations_to_gamr(data: schema.EquationToMET, client: httpx.AsyncClient = Depends(utils.get_client)):
+    """
+    Converts equations (in LaTeX or pMathML) to Generalized AMR (JSON).
+
+    ### Python example
+    ```
+    import requests
+
+    equations = [
+        "E=mc^2",
+        "c=\\frac{a}{b}"
+    ]
+
+    url = "http://127.0.0.1:8000"
+
+    r = requests.post(f"{url}/equations-to-gamr",  json={"equations": equations})
+    print(r.json())
+    """
+    if "</math>" in data.equations[0]:
+        eqns: List[str] = [
+            utils.clean_mml(mml) for mml in data.equations
+        ]
+    else:
+        eqns: List[str] = [
+            utils.clean_mml(eqn2mml.get_mathml_from_latex(tex)) for tex in data.equations
+        ]
+
+    res = await client.put(f"{SKEMA_RS_ADDESS}/mathml/g-amr", json=eqns)
+    if res.status_code != 200:
+        return JSONResponse(
+            status_code=400,
+            content={
+                "error": f"PUT /mathml/met failed to process payload with error {res.text}",
+                "payload": eqns,
+            },
+        ) 
+    return res.json()
+
+
 # code snippets -> fn -> petrinet amr
 @router.post("/code/snippets-to-pn-amr", summary="Code snippets → PetriNet AMR")
 async def code_snippets_to_pn_amr(system: code2fn.System, client: httpx.AsyncClient = Depends(utils.get_client)):
@@ -423,7 +465,7 @@ async def llm_assisted_codebase_to_pn_amr(zip_file: UploadFile = File(), client:
     return amr
 
 # code snippets -> fn -> MET
-@router.post("/code/snippets-to-MET", summary="Code snippets → MET")
+@router.post("/code/snippets-to-met", summary="Code snippets → MET")
 async def code_snippets_to_MET(system: code2fn.System, client: httpx.AsyncClient = Depends(utils.get_client)):
     gromet = await code2fn.fn_given_filepaths(system)
     gromet, _ = utils.fn_preprocessor(gromet)
@@ -442,7 +484,7 @@ async def code_snippets_to_MET(system: code2fn.System, client: httpx.AsyncClient
     return res.json()
 
 # code snippets -> fn -> generalized amr
-@router.post("/code/snippets-to-G-AMR", summary="Code snippets → Generalized-AMR")
+@router.post("/code/snippets-to-gamr", summary="Code snippets → Generalized-AMR")
 async def code_snippets_to_G_AMR(system: code2fn.System, client: httpx.AsyncClient = Depends(utils.get_client)):
     gromet = await code2fn.fn_given_filepaths(system)
     gromet, _ = utils.fn_preprocessor(gromet)
