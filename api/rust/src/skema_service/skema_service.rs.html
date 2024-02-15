@@ -154,6 +154,8 @@
 <a href="#153" id="153">153</a>
 <a href="#154" id="154">154</a>
 <a href="#155" id="155">155</a>
+<a href="#156" id="156">156</a>
+<a href="#157" id="157">157</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>actix_web::{get, http::header::ContentType, web::Data, App, HttpResponse, HttpServer};
 <span class="kw">use </span>skema::config::Config;
 <span class="kw">use </span>skema::services::gromet;
@@ -206,6 +208,7 @@
             skema::services::mathml::get_regnet,
             skema::services::mathml::get_amr,
             skema::services::mathml::get_decapodes,
+            skema::services::mathml::get_met,
             gromet::get_model_ids,
             gromet::post_model,
             gromet::delete_model,
@@ -297,6 +300,7 @@
             .service(skema::services::mathml::get_regnet)
             .service(skema::services::mathml::get_amr)
             .service(skema::services::mathml::get_decapodes)
+            .service(skema::services::mathml::get_met)
             .service(gromet::get_model_RN)
             .service(gromet::model2PN)
             .service(gromet::model2RN)
