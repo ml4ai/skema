@@ -16,9 +16,99 @@ async def test_post_eqns_to_mets_latex():
 
     async with AsyncClient(app=app, base_url="http://latex-to-mets-test") as ac:
         response = await ac.post(endpoint, json={"equations": latex_equations})
-    expected = """
-    [{"Cons":["Equals",[{"Atom":{"Ci":{"type":null,"content":{"Mi":"E"},"func_of":null}}},{"Cons":["Multiply",[{"Atom":{"Ci":{"type":null,"content":{"Mi":"m"},"func_of":null}}},{"Cons":["Power",[{"Atom":{"Ci":{"type":null,"content":{"Mi":"c"},"func_of":null}}},{"Atom":{"Mn":"2"}}]]}]]}]]},{"Cons":["Equals",[{"Atom":{"Ci":{"type":null,"content":{"Mi":"c"},"func_of":null}}},{"Cons":["Divide",[{"Atom":{"Ci":{"type":null,"content":{"Mi":"a"},"func_of":null}}},{"Atom":{"Ci":{"type":null,"content":{"Mi":"b"},"func_of":null}}}]]}]]}]
-    """
+    expected = [
+        {
+            "Cons": [
+                "Equals",
+                [
+                    {
+                        "Atom": {
+                            "Ci": {
+                                "type": None,
+                                "content": {"Mi": "E"},
+                                "func_of": None,
+                            }
+                        }
+                    },
+                    {
+                        "Cons": [
+                            "Multiply",
+                            [
+                                {
+                                    "Atom": {
+                                        "Ci": {
+                                            "type": None,
+                                            "content": {"Mi": "m"},
+                                            "func_of": None,
+                                        }
+                                    }
+                                },
+                                {
+                                    "Cons": [
+                                        "Power",
+                                        [
+                                            {
+                                                "Atom": {
+                                                    "Ci": {
+                                                        "type": None,
+                                                        "content": {"Mi": "c"},
+                                                        "func_of": None,
+                                                    }
+                                                }
+                                            },
+                                            {"Atom": {"Mn": "2"}},
+                                        ],
+                                    ]
+                                },
+                            ],
+                        ]
+                    },
+                ],
+            ]
+        },
+        {
+            "Cons": [
+                "Equals",
+                [
+                    {
+                        "Atom": {
+                            "Ci": {
+                                "type": None,
+                                "content": {"Mi": "c"},
+                                "func_of": None,
+                            }
+                        }
+                    },
+                    {
+                        "Cons": [
+                            "Divide",
+                            [
+                                {
+                                    "Atom": {
+                                        "Ci": {
+                                            "type": None,
+                                            "content": {"Mi": "a"},
+                                            "func_of": None,
+                                        }
+                                    }
+                                },
+                                {
+                                    "Atom": {
+                                        "Ci": {
+                                            "type": None,
+                                            "content": {"Mi": "b"},
+                                            "func_of": None,
+                                        }
+                                    }
+                                },
+                            ],
+                        ]
+                    },
+                ],
+            ]
+        },
+    ]
+
     # check for route's existence
     assert (
         any(route.path == endpoint for route in app.routes) == True
@@ -29,7 +119,7 @@ async def test_post_eqns_to_mets_latex():
     ), f"Request was unsuccessful (status code was {response.status_code} instead of 200)"
     # check response
     assert (
-        response.text == expected
+        json.loads(response.text) == expected
     ), f"Response should be {expected}, but instead received {response.text}"
 
 
@@ -71,9 +161,99 @@ async def test_post_eqns_to_mets_mathml():
 
     async with AsyncClient(app=app, base_url="http://mathml-to-mets-test") as ac:
         response = await ac.post(endpoint, json={"equations": mathml_equations})
-    expected = """
-    [{"Cons":["Equals",[{"Atom":{"Ci":{"type":null,"content":{"Mi":"E"},"func_of":null}}},{"Cons":["Multiply",[{"Atom":{"Ci":{"type":null,"content":{"Mi":"m"},"func_of":null}}},{"Cons":["Power",[{"Atom":{"Ci":{"type":null,"content":{"Mi":"c"},"func_of":null}}},{"Atom":{"Mn":"2"}}]]}]]}]]},{"Cons":["Equals",[{"Atom":{"Ci":{"type":null,"content":{"Mi":"c"},"func_of":null}}},{"Cons":["Divide",[{"Atom":{"Ci":{"type":null,"content":{"Mi":"a"},"func_of":null}}},{"Atom":{"Ci":{"type":null,"content":{"Mi":"b"},"func_of":null}}}]]}]]}]
-    """
+    expected = [
+        {
+            "Cons": [
+                "Equals",
+                [
+                    {
+                        "Atom": {
+                            "Ci": {
+                                "type": None,
+                                "content": {"Mi": "E"},
+                                "func_of": None,
+                            }
+                        }
+                    },
+                    {
+                        "Cons": [
+                            "Multiply",
+                            [
+                                {
+                                    "Atom": {
+                                        "Ci": {
+                                            "type": None,
+                                            "content": {"Mi": "m"},
+                                            "func_of": None,
+                                        }
+                                    }
+                                },
+                                {
+                                    "Cons": [
+                                        "Power",
+                                        [
+                                            {
+                                                "Atom": {
+                                                    "Ci": {
+                                                        "type": None,
+                                                        "content": {"Mi": "c"},
+                                                        "func_of": None,
+                                                    }
+                                                }
+                                            },
+                                            {"Atom": {"Mn": "2"}},
+                                        ],
+                                    ]
+                                },
+                            ],
+                        ]
+                    },
+                ],
+            ]
+        },
+        {
+            "Cons": [
+                "Equals",
+                [
+                    {
+                        "Atom": {
+                            "Ci": {
+                                "type": None,
+                                "content": {"Mi": "c"},
+                                "func_of": None,
+                            }
+                        }
+                    },
+                    {
+                        "Cons": [
+                            "Divide",
+                            [
+                                {
+                                    "Atom": {
+                                        "Ci": {
+                                            "type": None,
+                                            "content": {"Mi": "a"},
+                                            "func_of": None,
+                                        }
+                                    }
+                                },
+                                {
+                                    "Atom": {
+                                        "Ci": {
+                                            "type": None,
+                                            "content": {"Mi": "b"},
+                                            "func_of": None,
+                                        }
+                                    }
+                                },
+                            ],
+                        ]
+                    },
+                ],
+            ]
+        },
+    ]
+
     # check for route's existence
     assert (
         any(route.path == endpoint for route in app.routes) == True
@@ -84,5 +264,5 @@ async def test_post_eqns_to_mets_mathml():
     ), f"Request was unsuccessful (status code was {response.status_code} instead of 200)"
     # check response
     assert (
-        response.text == expected
+        json.loads(response.text) == expected
     ), f"Response should be {expected}, but instead received {response.text}"
