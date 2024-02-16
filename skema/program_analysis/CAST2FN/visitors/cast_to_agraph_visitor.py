@@ -11,7 +11,7 @@ from skema.program_analysis.CAST2FN.model.cast import (
     Attribute,
     Call,
     FunctionDef,
-    LiteralValue,
+    CASTLiteralValue,
     Loop,
     ModelBreak,
     ModelContinue,
@@ -550,7 +550,7 @@ class CASTToAGraphVisitor(CASTVisitor):
             if isinstance(node.value, ValueConstructor):
                 op = node.value.operator
                 init_val = node.value.initial_value.value
-                if isinstance(node.value.size, LiteralValue):
+                if isinstance(node.value.size, CASTLiteralValue):
                     size = node.value.size.value
                     id = -1
                 else:
@@ -573,7 +573,7 @@ class CASTToAGraphVisitor(CASTVisitor):
             ), f"cast_to_agraph_visitor LiteralValue: type not supported yet {type(node)}"
 
     @visit.register
-    def _(self, node: LiteralValue):
+    def _(self, node: CASTLiteralValue):
         if node.value_type == ScalarType.INTEGER:
             node_uid = uuid.uuid4()
             self.G.add_node(node_uid, label=f"Integer: {node.value}")
@@ -610,7 +610,7 @@ class CASTToAGraphVisitor(CASTVisitor):
             if isinstance(node.value, ValueConstructor):
                 op = node.value.operator
                 init_val = node.value.initial_value.value
-                if isinstance(node.value.size, LiteralValue):
+                if isinstance(node.value.size, CASTLiteralValue):
                     size = node.value.size.value
                     id = -1
                 else:

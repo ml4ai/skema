@@ -51,7 +51,8 @@ FOR_LOOP_RIGHT_TYPES = [
 WHILE_COND_TYPES = [
     "boolean_operator",
     "call",
-    "comparison_operator"
+    "comparison_operator",
+    "binary_operator"
 ]
 
 # Whatever constructs we see in the 

@@ -19,7 +19,7 @@ from skema.program_analysis.CAST2FN.model.cast.ast_node import AstNode
 from skema.program_analysis.CAST2FN.model.cast.attribute import Attribute
 from skema.program_analysis.CAST2FN.model.cast.call import Call
 from skema.program_analysis.CAST2FN.model.cast.function_def import FunctionDef
-from skema.program_analysis.CAST2FN.model.cast.literal_value import LiteralValue
+from skema.program_analysis.CAST2FN.model.cast.literal_value import CASTLiteralValue
 from skema.program_analysis.CAST2FN.model.cast.loop import Loop
 from skema.program_analysis.CAST2FN.model.cast.model_break import ModelBreak
 from skema.program_analysis.CAST2FN.model.cast.model_continue import ModelContinue

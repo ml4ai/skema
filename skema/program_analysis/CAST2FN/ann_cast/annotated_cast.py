@@ -7,7 +7,7 @@ from skema.program_analysis.CAST2FN.model.cast import (
     Attribute,
     Call,
     FunctionDef,
-    LiteralValue,
+    CASTLiteralValue,
     Loop,
     ModelBreak,
     ModelContinue,
@@ -447,7 +447,7 @@ class AnnCastLiteralValue(AnnCastNode):
         return self.to_dict() == other.to_dict()
 
     def __str__(self):
-        return LiteralValue.__str__(self)
+        return CASTLiteralValue.__str__(self)
 
 
 class AnnCastLoop(AnnCastNode):
