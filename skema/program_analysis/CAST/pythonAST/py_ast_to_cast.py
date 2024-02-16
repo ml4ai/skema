@@ -2008,7 +2008,7 @@ class PyASTToCAST:
                     )
                 ]
 
-        # return [LiteralValue(StructureType.MAP, str(dict(list(zip(k,v)))), source_code_data_type=["Python","3.8",str(dict)], source_refs=ref)]
+        # return [CASTLiteralValue(StructureType.MAP, str(dict(list(zip(k,v)))), source_code_data_type=["Python","3.8",str(dict)], source_refs=ref)]
         return [
             CASTLiteralValue(
                 StructureType.MAP,
@@ -3467,7 +3467,7 @@ class PyASTToCAST:
                     self.visit(piece, prev_scope_id_dict, curr_scope_id_dict)
                 )
             # TODO: How to represent computations like '[0.0] * 1000' in some kind of type constructing system
-            # and then how could we store that in these LiteralValue nodes?
+            # and then how could we store that in these CASTLiteralValue nodes?
             return [
                 CASTLiteralValue(
                     StructureType.LIST, to_ret, source_code_data_type, ref

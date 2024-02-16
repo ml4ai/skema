@@ -6,8 +6,10 @@ from skema.program_analysis.CAST2FN.model.cast import (
     Assignment,
     Attribute,
     Call,
-    FunctionDef,
     CASTLiteralValue,
+    FunctionDef,
+    Goto,
+    Label,
     Loop,
     ModelBreak,
     ModelContinue,
@@ -524,6 +526,45 @@ class AnnCastLoop(AnnCastNode):
     def __str__(self):
         return Loop.__str__(self)
 
+class AnnCastGoto(AnnCastNode):
+    def __init__(self, expr, label, source_refs):
+        super().__init__(self)
+        self.expr = expr 
+        self.label = label 
+        self.source_refs = source_refs
+
+    def to_dict(self):
+        result = super().to_dict()
+        result["expr"] = self.expr.to_dict() if self.expr != None else ""
+        result["label"] = self.label
+        return result
+
+    def equiv(self, other):
+        if not isinstance(other, AnnCastGoto):
+            return False
+        return self.to_dict() == other.to_dict()
+
+    def __str__(self):
+        return Goto.__str__(self)
+
+class AnnCastLabel(AnnCastNode):
+    def __init__(self, label, source_refs):
+        super().__init__(self)
+        self.label = label
+        self.source_refs = source_refs
+
+    def to_dict(self):
+        result = super().to_dict()
+        result["label"] = self.label
+        return result
+
+    def equiv(self, other):
+        if not isinstance(other, AnnCastLabel):
+            return False
+        return self.to_dict() == other.to_dict()
+
+    def __str__(self):
+        return Label.__str__(self)
 
 class AnnCastModelBreak(AnnCastNode):
     def __init__(self, source_refs):
