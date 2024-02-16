@@ -113,8 +113,6 @@ class CastToAnnotatedCastVisitor:
         return AnnCastFunctionDef(name, args, body, node.source_refs)
         
     @_visit.register
-<<<<<<< HEAD
-=======
     def visit_goto(self, node: Goto):
         expr = self.visit(node.expr) if node.expr != None else None
         label = node.label
@@ -126,7 +124,6 @@ class CastToAnnotatedCastVisitor:
         return AnnCastLabel(label, node.source_refs)
         
     @_visit.register
->>>>>>> main
     def visit_literal_value(self, node: CASTLiteralValue):
         if node.value_type == "List[Any]":
             node.value.size = self.visit(
