@@ -54,6 +54,7 @@ class VariableContext(object):
         self.variable_id = 0
         self.iterator_id = 0
         self.stop_condition_id = 0
+        self.function_name_id = 0
 
     def push_context(self):
         &#34;&#34;&#34;Create a new variable context and add it to the stack&#34;&#34;&#34;
@@ -154,6 +155,12 @@ class VariableContext(object):
         self.stop_condition_id += 1
 
         return self.add_variable(symbol, &#34;boolean&#34;, None)
+
+    def generate_func(self, name):
+        symbol = f&#34;{name}_{self.function_name_id}&#34;
+        self.function_name_id += 1
+
+        return self.add_variable(symbol, &#34;unknown&#34;, None)
 
     def enter_record_definition(self, name: str):
         &#34;&#34;&#34;Enter a record definition. Updates the prefix to the name of the record&#34;&#34;&#34;
@@ -210,6 +217,7 @@ class VariableContext(object):
         self.variable_id = 0
         self.iterator_id = 0
         self.stop_condition_id = 0
+        self.function_name_id = 0
 
     def push_context(self):
         &#34;&#34;&#34;Create a new variable context and add it to the stack&#34;&#34;&#34;
@@ -310,6 +318,12 @@ class VariableContext(object):
         self.stop_condition_id += 1
 
         return self.add_variable(symbol, &#34;boolean&#34;, None)
+
+    def generate_func(self, name):
+        symbol = f&#34;{name}_{self.function_name_id}&#34;
+        self.function_name_id += 1
+
+        return self.add_variable(symbol, &#34;unknown&#34;, None)
 
     def enter_record_definition(self, name: str):
         &#34;&#34;&#34;Enter a record definition. Updates the prefix to the name of the record&#34;&#34;&#34;
@@ -405,6 +419,22 @@ class VariableContext(object):
 <pre><code class="python">def exit_record_definition(self):
     &#34;&#34;&#34;Exit a record definition. Resets the prefix to the empty string&#34;&#34;&#34;
     self.prefix.pop()</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST.fortran.variable_context.VariableContext.generate_func"><code class="name flex">
+<span>def <span class="ident">generate_func</span></span>(<span>self, name)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def generate_func(self, name):
+    symbol = f&#34;{name}_{self.function_name_id}&#34;
+    self.function_name_id += 1
+
+    return self.add_variable(symbol, &#34;unknown&#34;, None)</code></pre>
 </details>
 </dd>
 <dt id="skema.program_analysis.CAST.fortran.variable_context.VariableContext.generate_iterator"><code class="name flex">
@@ -618,6 +648,7 @@ class VariableContext(object):
 <li><code><a title="skema.program_analysis.CAST.fortran.variable_context.VariableContext.add_variable" href="#skema.program_analysis.CAST.fortran.variable_context.VariableContext.add_variable">add_variable</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.fortran.variable_context.VariableContext.enter_record_definition" href="#skema.program_analysis.CAST.fortran.variable_context.VariableContext.enter_record_definition">enter_record_definition</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.fortran.variable_context.VariableContext.exit_record_definition" href="#skema.program_analysis.CAST.fortran.variable_context.VariableContext.exit_record_definition">exit_record_definition</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.fortran.variable_context.VariableContext.generate_func" href="#skema.program_analysis.CAST.fortran.variable_context.VariableContext.generate_func">generate_func</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.fortran.variable_context.VariableContext.generate_iterator" href="#skema.program_analysis.CAST.fortran.variable_context.VariableContext.generate_iterator">generate_iterator</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.fortran.variable_context.VariableContext.generate_stop_condition" href="#skema.program_analysis.CAST.fortran.variable_context.VariableContext.generate_stop_condition">generate_stop_condition</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.fortran.variable_context.VariableContext.get_node" href="#skema.program_analysis.CAST.fortran.variable_context.VariableContext.get_node">get_node</a></code></li>

@@ -68,7 +68,8 @@ from skema.program_analysis.CAST.python.node_helper import (
     get_non_control_children,
     FOR_LOOP_LEFT_TYPES,
     FOR_LOOP_RIGHT_TYPES,
-    WHILE_COND_TYPES
+    WHILE_COND_TYPES,
+    COMPREHENSION_OPERATORS
 )
 from skema.program_analysis.CAST.python.util import (
     generate_dummy_source_refs,
@@ -103,6 +104,9 @@ class TS2CAST(object):
                 &#34;python&#34;
             )
         )
+
+        # Generated FNs by comprehensions/lambdas
+        self.generated_fns = []
 
         # Additional variables used in generation
         self.var_count = 0
@@ -160,6 +164,14 @@ class TS2CAST(object):
             return self.visit_literal(node)
         elif node.type in [&#34;list_pattern&#34;, &#34;pattern_list&#34;, &#34;tuple_pattern&#34;]:
             return self.visit_pattern(node)
+        elif node.type == &#34;list_comprehension&#34;:
+            return self.visit_list_comprehension(node)
+        elif node.type == &#34;dictionary_comprehension&#34;:
+            return self.visit_dict_comprehension(node)
+        elif node.type == &#34;lambda&#34;:
+            return self.visit_lambda(node)
+        elif node.type == &#34;pair&#34;:
+            return self.visit_pair(node)
         elif node.type == &#34;while_statement&#34;:
             return self.visit_while(node)
         elif node.type == &#34;for_statement&#34;:
@@ -184,7 +196,7 @@ class TS2CAST(object):
         
         return Module(
             name=None,
-            body=body,
+            body=self.generated_fns + body,
             source_refs = [self.node_helper.get_source_ref(node)]
         )
 
@@ -211,11 +223,11 @@ class TS2CAST(object):
         # Create new variable context
         self.variable_context.push_context()
 
-        parameters = get_children_by_types(node, &#34;parameters&#34;)[0]
+        parameters = get_children_by_types(node, [&#34;parameters&#34;])[0]
         parameters = get_non_control_children(parameters)
         
         # The body of the function is stored in a &#39;block&#39; type node
-        body = get_children_by_types(node, &#34;block&#34;)[0].children
+        body = get_children_by_types(node, [&#34;block&#34;])[0].children
         
 
         func_params = []
@@ -307,7 +319,7 @@ class TS2CAST(object):
         if_condition = self.visit(get_first_child_by_type(node, &#34;comparison_operator&#34;))
 
         # Get the body of the if true part
-        if_true = get_children_by_types(node, &#34;block&#34;)[0].children
+        if_true = get_children_by_types(node, [&#34;block&#34;])[0].children
 
         # Because in tree-sitter the else if, and else aren&#39;t nested, but they&#39;re 
         # in a flat level order, we need to do some arranging of the pieces
@@ -333,7 +345,7 @@ class TS2CAST(object):
         if len(alternatives) &gt; 0:
             final_else = alternatives.pop() 
             alternatives.reverse()
-            final_else_body = get_children_by_types(final_else, &#34;block&#34;)[0].children
+            final_else_body = get_children_by_types(final_else, [&#34;block&#34;])[0].children
             for node in final_else_body:
                 cast = self.visit(node)
                 if isinstance(cast, List):
@@ -517,7 +529,253 @@ class TS2CAST(object):
                 source_refs=[literal_source_ref]
             )
 
+    def handle_for_clause(self, node: Node):
+        # Given the &#34;for x in seq&#34; clause of a list comprehension
+        # we translate it to a CAST for loop, leaving the actual
+        # computation of the body node for the main comprehension handler
+        assert node.type == &#34;for_in_clause&#34;
+        ref = self.node_helper.get_source_ref(node)
 
+        # NOTE: Assumes the left part with the variable is always the 2nd
+        # element in the children and the right part with the actual
+        # function call is on the 4th (last) element of the children
+        left = self.visit(node.children[1])
+        right = self.visit(node.children[-1])
+
+        iterator_name = self.variable_context.generate_iterator()
+        stop_cond_name = self.variable_context.generate_stop_condition()
+        iter_func = self.get_gromet_function_node(&#34;iter&#34;)
+        next_func = self.get_gromet_function_node(&#34;next&#34;)
+        
+        iter_call = Assignment(
+            left = Var(iterator_name, &#34;Iterator&#34;),
+            right = Call(
+                iter_func,
+                arguments=[right]
+            )
+        )
+
+        next_call = Call(
+            next_func,
+            arguments=[Var(iterator_name, &#34;Iterator&#34;)]
+        )
+
+        next_assign = Assignment(
+            left=CASTLiteralValue(
+                &#34;Tuple&#34;,
+                [
+                    left,
+                    Var(iterator_name, &#34;Iterator&#34;),
+                    Var(stop_cond_name, &#34;Boolean&#34;),
+                ],
+                source_code_data_type = [&#34;Python&#34;,PYTHON_VERSION,&#34;Tuple&#34;],
+                source_refs=ref
+            ),
+            right=next_call
+        )
+
+        loop_pre = []
+        loop_pre.append(iter_call)
+        loop_pre.append(next_assign)
+
+        loop_expr = Operator(
+            source_language=&#34;Python&#34;, 
+            interpreter=&#34;Python&#34;, 
+            version=PYTHON_VERSION, 
+            op=&#34;ast.Eq&#34;, 
+            operands=[
+                stop_cond_name,
+                CASTLiteralValue(
+                    ScalarType.BOOLEAN,
+                    False,
+                    [&#34;Python&#34;, PYTHON_VERSION, &#34;boolean&#34;],
+                    source_refs=ref,
+                )
+            ], 
+            source_refs=ref
+        )
+
+        loop_body = [None, next_assign]
+
+        return Loop(pre=loop_pre, expr=loop_expr, body=loop_body, post=[])
+
+    def handle_if_clause(self, node: Node):
+        assert node.type == &#34;if_clause&#34;
+        ref = self.node_helper.get_source_ref(node)
+        conditional = get_children_by_types(node, WHILE_COND_TYPES)[0]
+        cond_cast = self.visit(conditional)
+        
+        return ModelIf(expr=cond_cast,body=[],orelse=[],source_refs=ref)
+
+    def construct_loop_construct(self, node: Node):
+        return []
+
+    def visit_list_comprehension(self, node: Node) -&gt; Call:
+        ref = self.node_helper.get_source_ref(node)
+
+        temp_list_name = self.variable_context.add_variable(
+            &#34;list__temp_&#34;, &#34;Unknown&#34;, [ref]
+        )
+
+        temp_asg_cast = Assignment(
+            left=Var(val=temp_list_name), 
+            right=CASTLiteralValue(value=[], value_type=StructureType.LIST),
+            source_refs = ref
+        )
+
+        append_call = self.get_gromet_function_node(&#34;append&#34;) 
+        computation = get_children_by_types(node, COMPREHENSION_OPERATORS)[0]
+        computation_cast = self.visit(computation)
+
+        # IDEA: When we see a for_clause we start a new loop construct, and collect if_clauses 
+        # as we see them
+        clauses = get_children_by_types(node, [&#34;for_in_clause&#34;, &#34;if_clause&#34;])
+        loop_start = []
+        prev_loop = []
+        
+        if_start = []
+        prev_if = []
+
+        for clause in clauses:
+            if clause.type == &#34;for_in_clause&#34;:
+                new_loop = self.handle_for_clause(clause)
+                if loop_start == []:
+                    loop_start = new_loop
+                    prev_loop = loop_start
+                else:
+                    if prev_if == []:
+                        prev_loop.body[0] = new_loop
+                        prev_loop = new_loop
+                    else:
+                        prev_loop.body[0] = prev_if
+                        prev_if.body = [new_loop]
+                        prev_loop = new_loop
+                        if_start = []
+                        prev_if = []
+            elif clause.type == &#34;if_clause&#34;:
+                new_if = self.handle_if_clause(clause)
+                if if_start == []:
+                    if_start = new_if
+                    prev_if = if_start
+                else:
+                    prev_if.body = [new_if]
+                    prev_if = new_if
+        
+        if prev_if == []:
+            prev_loop.body[0] = Call(func=Attribute(temp_list_name, append_call), arguments=[computation_cast], source_refs=ref)
+        else:
+            prev_loop.body[0] = prev_if
+            prev_if.body = [Call(func=Attribute(temp_list_name, append_call), arguments=[computation_cast], source_refs=ref)]
+
+        return_cast = ModelReturn(temp_list_name)
+
+        func_name = self.variable_context.generate_func(&#34;%comprehension_list&#34;)
+        func_def_cast = FunctionDef(name=func_name, func_args=[], body=[temp_asg_cast,loop_start,return_cast], source_refs=ref)
+        
+        self.generated_fns.append(func_def_cast)
+
+        return Call(func=func_name, arguments=[], source_refs=ref)
+
+    def visit_pair(self, node: Node):
+        key = self.visit(node.children[0])
+        value = self.visit(node.children[2])
+
+        return key,value
+
+    def visit_dict_comprehension(self, node: Node) -&gt; Call:
+        ref = self.node_helper.get_source_ref(node)
+
+        temp_dict_name = self.variable_context.add_variable(
+            &#34;dict__temp_&#34;, &#34;Unknown&#34;, [ref]
+        )
+
+        temp_asg_cast = Assignment(
+            left=Var(val=temp_dict_name),
+            right=CASTLiteralValue(value={}, value_type=StructureType.MAP),
+            source_refs = ref
+        )
+
+        set_call = self.get_gromet_function_node(&#34;_set&#34;)
+        computation = get_children_by_types(node, COMPREHENSION_OPERATORS)[0]
+        computation_cast = self.visit(computation)
+
+        # IDEA: When we see a for_clause we start a new loop construct, and collect if_clauses 
+        # as we see them
+        clauses = get_children_by_types(node, [&#34;for_in_clause&#34;, &#34;if_clause&#34;])
+        loop_start = []
+        prev_loop = []
+        
+        if_start = []
+        prev_if = []
+
+        for clause in clauses:
+            if clause.type == &#34;for_in_clause&#34;:
+                new_loop = self.handle_for_clause(clause)
+                if loop_start == []:
+                    loop_start = new_loop
+                    prev_loop = loop_start
+                else:
+                    if prev_if == []:
+                        prev_loop.body[0] = new_loop
+                        prev_loop = new_loop
+                    else:
+                        prev_loop.body[0] = prev_if
+                        prev_if.body = [new_loop]
+                        prev_loop = new_loop
+                        if_start = []
+                        prev_if = []
+            elif clause.type == &#34;if_clause&#34;:
+                new_if = self.handle_if_clause(clause)
+                if if_start == []:
+                    if_start = new_if
+                    prev_if = if_start
+                else:
+                    prev_if.body = [new_if]
+                    prev_if = new_if
+        
+        if prev_if == []:
+            prev_loop.body[0] = Assignment(left=Var(val=temp_dict_name), right=Call(func=set_call, arguments=[temp_dict_name, computation_cast[0].val, computation_cast[1]], source_refs=ref), source_refs=ref)
+        else:
+            prev_loop.body[0] = prev_if
+            prev_loop = Assignment(left=Var(val=temp_dict_name), right=Call(func=set_call, arguments=[temp_dict_name, computation_cast[0].val, computation_cast[1]], source_refs=ref), source_refs=ref)
+
+        return_cast = ModelReturn(temp_dict_name)
+
+        func_name = self.variable_context.generate_func(&#34;%comprehension_dict&#34;)
+        func_def_cast = FunctionDef(name=func_name, func_args=[], body=[temp_asg_cast,loop_start,return_cast], source_refs=ref)
+
+        self.generated_fns.append(func_def_cast)
+
+        return Call(func=func_name, arguments=[], source_refs=ref)
+    
+
+    def visit_lambda(self, node: Node) -&gt; Call:
+        # TODO: we have to determine how to grab the variables that are being
+        # used in the lambda that aren&#39;t part of the lambda&#39;s arguments
+        ref=self.node_helper.get_source_ref(node)
+        params = get_children_by_types(node, [&#34;lambda_parameters&#34;])[0] 
+        body = get_children_by_types(node, COMPREHENSION_OPERATORS)[0]
+
+        parameters = []
+        for param in params.children:
+            cast = self.visit(param)
+            if isinstance(cast, list):
+                parameters.extend(cast)
+            else:
+                parameters.append(cast)
+
+        body_cast = self.visit(body)
+        func_body = body_cast 
+
+        func_name = self.variable_context.generate_func(&#34;%lambda&#34;)
+        func_def_cast = FunctionDef(name=func_name, func_args=parameters, body=[ModelReturn(value=func_body)], source_refs=ref)
+
+        self.generated_fns.append(func_def_cast)
+        
+        # Collect all the Name node instances to use as arguments for the lambda call
+        args = [par.val if isinstance(par, Var) else par for par in parameters]
+
+        return Call(func=func_name, arguments=args, source_refs=ref)
 
     def visit_while(self, node: Node) -&gt; Loop:
         ref = self.node_helper.get_source_ref(node)
@@ -527,7 +785,7 @@ class TS2CAST(object):
         self.variable_context.push_context()
 
         loop_cond_node = get_children_by_types(node, WHILE_COND_TYPES)[0]
-        loop_body_node = get_children_by_types(node, &#34;block&#34;)[0].children
+        loop_body_node = get_children_by_types(node, [&#34;block&#34;])[0].children
 
         loop_cond = self.visit(loop_cond_node)
 
@@ -596,7 +854,6 @@ class TS2CAST(object):
                     arguments=[Var(iterator_name, &#34;Iterator&#34;)],
                 ),
             )
-
         )
 
         loop_expr = Operator(
@@ -616,7 +873,7 @@ class TS2CAST(object):
             source_refs=ref
         )
 
-        loop_body_node = get_children_by_types(node, &#34;block&#34;)[0].children
+        loop_body_node = get_children_by_types(node, [&#34;block&#34;])[0].children
         loop_body = []
         for node in loop_body_node:
             cast = self.visit(node)
@@ -761,6 +1018,9 @@ def get_name_node(node):
             )
         )
 
+        # Generated FNs by comprehensions/lambdas
+        self.generated_fns = []
+
         # Additional variables used in generation
         self.var_count = 0
 
@@ -817,6 +1077,14 @@ def get_name_node(node):
             return self.visit_literal(node)
         elif node.type in [&#34;list_pattern&#34;, &#34;pattern_list&#34;, &#34;tuple_pattern&#34;]:
             return self.visit_pattern(node)
+        elif node.type == &#34;list_comprehension&#34;:
+            return self.visit_list_comprehension(node)
+        elif node.type == &#34;dictionary_comprehension&#34;:
+            return self.visit_dict_comprehension(node)
+        elif node.type == &#34;lambda&#34;:
+            return self.visit_lambda(node)
+        elif node.type == &#34;pair&#34;:
+            return self.visit_pair(node)
         elif node.type == &#34;while_statement&#34;:
             return self.visit_while(node)
         elif node.type == &#34;for_statement&#34;:
@@ -841,7 +1109,7 @@ def get_name_node(node):
         
         return Module(
             name=None,
-            body=body,
+            body=self.generated_fns + body,
             source_refs = [self.node_helper.get_source_ref(node)]
         )
 
@@ -868,11 +1136,11 @@ def get_name_node(node):
         # Create new variable context
         self.variable_context.push_context()
 
-        parameters = get_children_by_types(node, &#34;parameters&#34;)[0]
+        parameters = get_children_by_types(node, [&#34;parameters&#34;])[0]
         parameters = get_non_control_children(parameters)
         
         # The body of the function is stored in a &#39;block&#39; type node
-        body = get_children_by_types(node, &#34;block&#34;)[0].children
+        body = get_children_by_types(node, [&#34;block&#34;])[0].children
         
 
         func_params = []
@@ -964,7 +1232,7 @@ def get_name_node(node):
         if_condition = self.visit(get_first_child_by_type(node, &#34;comparison_operator&#34;))
 
         # Get the body of the if true part
-        if_true = get_children_by_types(node, &#34;block&#34;)[0].children
+        if_true = get_children_by_types(node, [&#34;block&#34;])[0].children
 
         # Because in tree-sitter the else if, and else aren&#39;t nested, but they&#39;re 
         # in a flat level order, we need to do some arranging of the pieces
@@ -990,7 +1258,7 @@ def get_name_node(node):
         if len(alternatives) &gt; 0:
             final_else = alternatives.pop() 
             alternatives.reverse()
-            final_else_body = get_children_by_types(final_else, &#34;block&#34;)[0].children
+            final_else_body = get_children_by_types(final_else, [&#34;block&#34;])[0].children
             for node in final_else_body:
                 cast = self.visit(node)
                 if isinstance(cast, List):
@@ -1174,7 +1442,253 @@ def get_name_node(node):
                 source_refs=[literal_source_ref]
             )
 
+    def handle_for_clause(self, node: Node):
+        # Given the &#34;for x in seq&#34; clause of a list comprehension
+        # we translate it to a CAST for loop, leaving the actual
+        # computation of the body node for the main comprehension handler
+        assert node.type == &#34;for_in_clause&#34;
+        ref = self.node_helper.get_source_ref(node)
 
+        # NOTE: Assumes the left part with the variable is always the 2nd
+        # element in the children and the right part with the actual
+        # function call is on the 4th (last) element of the children
+        left = self.visit(node.children[1])
+        right = self.visit(node.children[-1])
+
+        iterator_name = self.variable_context.generate_iterator()
+        stop_cond_name = self.variable_context.generate_stop_condition()
+        iter_func = self.get_gromet_function_node(&#34;iter&#34;)
+        next_func = self.get_gromet_function_node(&#34;next&#34;)
+        
+        iter_call = Assignment(
+            left = Var(iterator_name, &#34;Iterator&#34;),
+            right = Call(
+                iter_func,
+                arguments=[right]
+            )
+        )
+
+        next_call = Call(
+            next_func,
+            arguments=[Var(iterator_name, &#34;Iterator&#34;)]
+        )
+
+        next_assign = Assignment(
+            left=CASTLiteralValue(
+                &#34;Tuple&#34;,
+                [
+                    left,
+                    Var(iterator_name, &#34;Iterator&#34;),
+                    Var(stop_cond_name, &#34;Boolean&#34;),
+                ],
+                source_code_data_type = [&#34;Python&#34;,PYTHON_VERSION,&#34;Tuple&#34;],
+                source_refs=ref
+            ),
+            right=next_call
+        )
+
+        loop_pre = []
+        loop_pre.append(iter_call)
+        loop_pre.append(next_assign)
+
+        loop_expr = Operator(
+            source_language=&#34;Python&#34;, 
+            interpreter=&#34;Python&#34;, 
+            version=PYTHON_VERSION, 
+            op=&#34;ast.Eq&#34;, 
+            operands=[
+                stop_cond_name,
+                CASTLiteralValue(
+                    ScalarType.BOOLEAN,
+                    False,
+                    [&#34;Python&#34;, PYTHON_VERSION, &#34;boolean&#34;],
+                    source_refs=ref,
+                )
+            ], 
+            source_refs=ref
+        )
+
+        loop_body = [None, next_assign]
+
+        return Loop(pre=loop_pre, expr=loop_expr, body=loop_body, post=[])
+
+    def handle_if_clause(self, node: Node):
+        assert node.type == &#34;if_clause&#34;
+        ref = self.node_helper.get_source_ref(node)
+        conditional = get_children_by_types(node, WHILE_COND_TYPES)[0]
+        cond_cast = self.visit(conditional)
+        
+        return ModelIf(expr=cond_cast,body=[],orelse=[],source_refs=ref)
+
+    def construct_loop_construct(self, node: Node):
+        return []
+
+    def visit_list_comprehension(self, node: Node) -&gt; Call:
+        ref = self.node_helper.get_source_ref(node)
+
+        temp_list_name = self.variable_context.add_variable(
+            &#34;list__temp_&#34;, &#34;Unknown&#34;, [ref]
+        )
+
+        temp_asg_cast = Assignment(
+            left=Var(val=temp_list_name), 
+            right=CASTLiteralValue(value=[], value_type=StructureType.LIST),
+            source_refs = ref
+        )
+
+        append_call = self.get_gromet_function_node(&#34;append&#34;) 
+        computation = get_children_by_types(node, COMPREHENSION_OPERATORS)[0]
+        computation_cast = self.visit(computation)
+
+        # IDEA: When we see a for_clause we start a new loop construct, and collect if_clauses 
+        # as we see them
+        clauses = get_children_by_types(node, [&#34;for_in_clause&#34;, &#34;if_clause&#34;])
+        loop_start = []
+        prev_loop = []
+        
+        if_start = []
+        prev_if = []
+
+        for clause in clauses:
+            if clause.type == &#34;for_in_clause&#34;:
+                new_loop = self.handle_for_clause(clause)
+                if loop_start == []:
+                    loop_start = new_loop
+                    prev_loop = loop_start
+                else:
+                    if prev_if == []:
+                        prev_loop.body[0] = new_loop
+                        prev_loop = new_loop
+                    else:
+                        prev_loop.body[0] = prev_if
+                        prev_if.body = [new_loop]
+                        prev_loop = new_loop
+                        if_start = []
+                        prev_if = []
+            elif clause.type == &#34;if_clause&#34;:
+                new_if = self.handle_if_clause(clause)
+                if if_start == []:
+                    if_start = new_if
+                    prev_if = if_start
+                else:
+                    prev_if.body = [new_if]
+                    prev_if = new_if
+        
+        if prev_if == []:
+            prev_loop.body[0] = Call(func=Attribute(temp_list_name, append_call), arguments=[computation_cast], source_refs=ref)
+        else:
+            prev_loop.body[0] = prev_if
+            prev_if.body = [Call(func=Attribute(temp_list_name, append_call), arguments=[computation_cast], source_refs=ref)]
+
+        return_cast = ModelReturn(temp_list_name)
+
+        func_name = self.variable_context.generate_func(&#34;%comprehension_list&#34;)
+        func_def_cast = FunctionDef(name=func_name, func_args=[], body=[temp_asg_cast,loop_start,return_cast], source_refs=ref)
+        
+        self.generated_fns.append(func_def_cast)
+
+        return Call(func=func_name, arguments=[], source_refs=ref)
+
+    def visit_pair(self, node: Node):
+        key = self.visit(node.children[0])
+        value = self.visit(node.children[2])
+
+        return key,value
+
+    def visit_dict_comprehension(self, node: Node) -&gt; Call:
+        ref = self.node_helper.get_source_ref(node)
+
+        temp_dict_name = self.variable_context.add_variable(
+            &#34;dict__temp_&#34;, &#34;Unknown&#34;, [ref]
+        )
+
+        temp_asg_cast = Assignment(
+            left=Var(val=temp_dict_name),
+            right=CASTLiteralValue(value={}, value_type=StructureType.MAP),
+            source_refs = ref
+        )
+
+        set_call = self.get_gromet_function_node(&#34;_set&#34;)
+        computation = get_children_by_types(node, COMPREHENSION_OPERATORS)[0]
+        computation_cast = self.visit(computation)
+
+        # IDEA: When we see a for_clause we start a new loop construct, and collect if_clauses 
+        # as we see them
+        clauses = get_children_by_types(node, [&#34;for_in_clause&#34;, &#34;if_clause&#34;])
+        loop_start = []
+        prev_loop = []
+        
+        if_start = []
+        prev_if = []
+
+        for clause in clauses:
+            if clause.type == &#34;for_in_clause&#34;:
+                new_loop = self.handle_for_clause(clause)
+                if loop_start == []:
+                    loop_start = new_loop
+                    prev_loop = loop_start
+                else:
+                    if prev_if == []:
+                        prev_loop.body[0] = new_loop
+                        prev_loop = new_loop
+                    else:
+                        prev_loop.body[0] = prev_if
+                        prev_if.body = [new_loop]
+                        prev_loop = new_loop
+                        if_start = []
+                        prev_if = []
+            elif clause.type == &#34;if_clause&#34;:
+                new_if = self.handle_if_clause(clause)
+                if if_start == []:
+                    if_start = new_if
+                    prev_if = if_start
+                else:
+                    prev_if.body = [new_if]
+                    prev_if = new_if
+        
+        if prev_if == []:
+            prev_loop.body[0] = Assignment(left=Var(val=temp_dict_name), right=Call(func=set_call, arguments=[temp_dict_name, computation_cast[0].val, computation_cast[1]], source_refs=ref), source_refs=ref)
+        else:
+            prev_loop.body[0] = prev_if
+            prev_loop = Assignment(left=Var(val=temp_dict_name), right=Call(func=set_call, arguments=[temp_dict_name, computation_cast[0].val, computation_cast[1]], source_refs=ref), source_refs=ref)
+
+        return_cast = ModelReturn(temp_dict_name)
+
+        func_name = self.variable_context.generate_func(&#34;%comprehension_dict&#34;)
+        func_def_cast = FunctionDef(name=func_name, func_args=[], body=[temp_asg_cast,loop_start,return_cast], source_refs=ref)
+
+        self.generated_fns.append(func_def_cast)
+
+        return Call(func=func_name, arguments=[], source_refs=ref)
+    
+
+    def visit_lambda(self, node: Node) -&gt; Call:
+        # TODO: we have to determine how to grab the variables that are being
+        # used in the lambda that aren&#39;t part of the lambda&#39;s arguments
+        ref=self.node_helper.get_source_ref(node)
+        params = get_children_by_types(node, [&#34;lambda_parameters&#34;])[0] 
+        body = get_children_by_types(node, COMPREHENSION_OPERATORS)[0]
+
+        parameters = []
+        for param in params.children:
+            cast = self.visit(param)
+            if isinstance(cast, list):
+                parameters.extend(cast)
+            else:
+                parameters.append(cast)
+
+        body_cast = self.visit(body)
+        func_body = body_cast 
+
+        func_name = self.variable_context.generate_func(&#34;%lambda&#34;)
+        func_def_cast = FunctionDef(name=func_name, func_args=parameters, body=[ModelReturn(value=func_body)], source_refs=ref)
+
+        self.generated_fns.append(func_def_cast)
+        
+        # Collect all the Name node instances to use as arguments for the lambda call
+        args = [par.val if isinstance(par, Var) else par for par in parameters]
+
+        return Call(func=func_name, arguments=args, source_refs=ref)
 
     def visit_while(self, node: Node) -&gt; Loop:
         ref = self.node_helper.get_source_ref(node)
@@ -1184,7 +1698,7 @@ def get_name_node(node):
         self.variable_context.push_context()
 
         loop_cond_node = get_children_by_types(node, WHILE_COND_TYPES)[0]
-        loop_body_node = get_children_by_types(node, &#34;block&#34;)[0].children
+        loop_body_node = get_children_by_types(node, [&#34;block&#34;])[0].children
 
         loop_cond = self.visit(loop_cond_node)
 
@@ -1253,7 +1767,6 @@ def get_name_node(node):
                     arguments=[Var(iterator_name, &#34;Iterator&#34;)],
                 ),
             )
-
         )
 
         loop_expr = Operator(
@@ -1273,7 +1786,7 @@ def get_name_node(node):
             source_refs=ref
         )
 
-        loop_body_node = get_children_by_types(node, &#34;block&#34;)[0].children
+        loop_body_node = get_children_by_types(node, [&#34;block&#34;])[0].children
         loop_body = []
         for node in loop_body_node:
             cast = self.visit(node)
@@ -1340,6 +1853,19 @@ def get_name_node(node):
 </details>
 <h3>Methods</h3>
 <dl>
+<dt id="skema.program_analysis.CAST.python.ts2cast.TS2CAST.construct_loop_construct"><code class="name flex">
+<span>def <span class="ident">construct_loop_construct</span></span>(<span>self, node: tree_sitter.Node)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def construct_loop_construct(self, node: Node):
+    return []</code></pre>
+</details>
+</dd>
 <dt id="skema.program_analysis.CAST.python.ts2cast.TS2CAST.generate_cast"><code class="name flex">
 <span>def <span class="ident">generate_cast</span></span>(<span>self) ‑> List[<a title="skema.program_analysis.CAST2FN.cast.CAST" href="../../CAST2FN/cast.html#skema.program_analysis.CAST2FN.cast.CAST">CAST</a>]</span>
 </code></dt>
@@ -1372,6 +1898,104 @@ def get_name_node(node):
         return self.variable_context.get_node(func_name)
 
     return self.variable_context.add_variable(func_name, &#34;function&#34;, None)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST.python.ts2cast.TS2CAST.handle_for_clause"><code class="name flex">
+<span>def <span class="ident">handle_for_clause</span></span>(<span>self, node: tree_sitter.Node)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def handle_for_clause(self, node: Node):
+    # Given the &#34;for x in seq&#34; clause of a list comprehension
+    # we translate it to a CAST for loop, leaving the actual
+    # computation of the body node for the main comprehension handler
+    assert node.type == &#34;for_in_clause&#34;
+    ref = self.node_helper.get_source_ref(node)
+
+    # NOTE: Assumes the left part with the variable is always the 2nd
+    # element in the children and the right part with the actual
+    # function call is on the 4th (last) element of the children
+    left = self.visit(node.children[1])
+    right = self.visit(node.children[-1])
+
+    iterator_name = self.variable_context.generate_iterator()
+    stop_cond_name = self.variable_context.generate_stop_condition()
+    iter_func = self.get_gromet_function_node(&#34;iter&#34;)
+    next_func = self.get_gromet_function_node(&#34;next&#34;)
+    
+    iter_call = Assignment(
+        left = Var(iterator_name, &#34;Iterator&#34;),
+        right = Call(
+            iter_func,
+            arguments=[right]
+        )
+    )
+
+    next_call = Call(
+        next_func,
+        arguments=[Var(iterator_name, &#34;Iterator&#34;)]
+    )
+
+    next_assign = Assignment(
+        left=CASTLiteralValue(
+            &#34;Tuple&#34;,
+            [
+                left,
+                Var(iterator_name, &#34;Iterator&#34;),
+                Var(stop_cond_name, &#34;Boolean&#34;),
+            ],
+            source_code_data_type = [&#34;Python&#34;,PYTHON_VERSION,&#34;Tuple&#34;],
+            source_refs=ref
+        ),
+        right=next_call
+    )
+
+    loop_pre = []
+    loop_pre.append(iter_call)
+    loop_pre.append(next_assign)
+
+    loop_expr = Operator(
+        source_language=&#34;Python&#34;, 
+        interpreter=&#34;Python&#34;, 
+        version=PYTHON_VERSION, 
+        op=&#34;ast.Eq&#34;, 
+        operands=[
+            stop_cond_name,
+            CASTLiteralValue(
+                ScalarType.BOOLEAN,
+                False,
+                [&#34;Python&#34;, PYTHON_VERSION, &#34;boolean&#34;],
+                source_refs=ref,
+            )
+        ], 
+        source_refs=ref
+    )
+
+    loop_body = [None, next_assign]
+
+    return Loop(pre=loop_pre, expr=loop_expr, body=loop_body, post=[])</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST.python.ts2cast.TS2CAST.handle_if_clause"><code class="name flex">
+<span>def <span class="ident">handle_if_clause</span></span>(<span>self, node: tree_sitter.Node)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def handle_if_clause(self, node: Node):
+    assert node.type == &#34;if_clause&#34;
+    ref = self.node_helper.get_source_ref(node)
+    conditional = get_children_by_types(node, WHILE_COND_TYPES)[0]
+    cond_cast = self.visit(conditional)
+    
+    return ModelIf(expr=cond_cast,body=[],orelse=[],source_refs=ref)</code></pre>
 </details>
 </dd>
 <dt id="skema.program_analysis.CAST.python.ts2cast.TS2CAST.run"><code class="name flex">
@@ -1430,6 +2054,14 @@ def get_name_node(node):
         return self.visit_literal(node)
     elif node.type in [&#34;list_pattern&#34;, &#34;pattern_list&#34;, &#34;tuple_pattern&#34;]:
         return self.visit_pattern(node)
+    elif node.type == &#34;list_comprehension&#34;:
+        return self.visit_list_comprehension(node)
+    elif node.type == &#34;dictionary_comprehension&#34;:
+        return self.visit_dict_comprehension(node)
+    elif node.type == &#34;lambda&#34;:
+        return self.visit_lambda(node)
+    elif node.type == &#34;pair&#34;:
+        return self.visit_pair(node)
     elif node.type == &#34;while_statement&#34;:
         return self.visit_while(node)
     elif node.type == &#34;for_statement&#34;:
@@ -1566,6 +2198,82 @@ where left and right can either be operators or literals</p></div>
     )</code></pre>
 </details>
 </dd>
+<dt id="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_dict_comprehension"><code class="name flex">
+<span>def <span class="ident">visit_dict_comprehension</span></span>(<span>self, node: tree_sitter.Node) ‑> <a title="skema.program_analysis.CAST2FN.model.cast.call.Call" href="../../CAST2FN/model/cast/call.html#skema.program_analysis.CAST2FN.model.cast.call.Call">Call</a></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def visit_dict_comprehension(self, node: Node) -&gt; Call:
+    ref = self.node_helper.get_source_ref(node)
+
+    temp_dict_name = self.variable_context.add_variable(
+        &#34;dict__temp_&#34;, &#34;Unknown&#34;, [ref]
+    )
+
+    temp_asg_cast = Assignment(
+        left=Var(val=temp_dict_name),
+        right=CASTLiteralValue(value={}, value_type=StructureType.MAP),
+        source_refs = ref
+    )
+
+    set_call = self.get_gromet_function_node(&#34;_set&#34;)
+    computation = get_children_by_types(node, COMPREHENSION_OPERATORS)[0]
+    computation_cast = self.visit(computation)
+
+    # IDEA: When we see a for_clause we start a new loop construct, and collect if_clauses 
+    # as we see them
+    clauses = get_children_by_types(node, [&#34;for_in_clause&#34;, &#34;if_clause&#34;])
+    loop_start = []
+    prev_loop = []
+    
+    if_start = []
+    prev_if = []
+
+    for clause in clauses:
+        if clause.type == &#34;for_in_clause&#34;:
+            new_loop = self.handle_for_clause(clause)
+            if loop_start == []:
+                loop_start = new_loop
+                prev_loop = loop_start
+            else:
+                if prev_if == []:
+                    prev_loop.body[0] = new_loop
+                    prev_loop = new_loop
+                else:
+                    prev_loop.body[0] = prev_if
+                    prev_if.body = [new_loop]
+                    prev_loop = new_loop
+                    if_start = []
+                    prev_if = []
+        elif clause.type == &#34;if_clause&#34;:
+            new_if = self.handle_if_clause(clause)
+            if if_start == []:
+                if_start = new_if
+                prev_if = if_start
+            else:
+                prev_if.body = [new_if]
+                prev_if = new_if
+    
+    if prev_if == []:
+        prev_loop.body[0] = Assignment(left=Var(val=temp_dict_name), right=Call(func=set_call, arguments=[temp_dict_name, computation_cast[0].val, computation_cast[1]], source_refs=ref), source_refs=ref)
+    else:
+        prev_loop.body[0] = prev_if
+        prev_loop = Assignment(left=Var(val=temp_dict_name), right=Call(func=set_call, arguments=[temp_dict_name, computation_cast[0].val, computation_cast[1]], source_refs=ref), source_refs=ref)
+
+    return_cast = ModelReturn(temp_dict_name)
+
+    func_name = self.variable_context.generate_func(&#34;%comprehension_dict&#34;)
+    func_def_cast = FunctionDef(name=func_name, func_args=[], body=[temp_asg_cast,loop_start,return_cast], source_refs=ref)
+
+    self.generated_fns.append(func_def_cast)
+
+    return Call(func=func_name, arguments=[], source_refs=ref)</code></pre>
+</details>
+</dd>
 <dt id="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_expression"><code class="name flex">
 <span>def <span class="ident">visit_expression</span></span>(<span>self, node: tree_sitter.Node)</span>
 </code></dt>
@@ -1646,7 +2354,6 @@ where left and right can either be operators or literals</p></div>
                 arguments=[Var(iterator_name, &#34;Iterator&#34;)],
             ),
         )
-
     )
 
     loop_expr = Operator(
@@ -1666,7 +2373,7 @@ where left and right can either be operators or literals</p></div>
         source_refs=ref
     )
 
-    loop_body_node = get_children_by_types(node, &#34;block&#34;)[0].children
+    loop_body_node = get_children_by_types(node, [&#34;block&#34;])[0].children
     loop_body = []
     for node in loop_body_node:
         cast = self.visit(node)
@@ -1722,11 +2429,11 @@ where left and right can either be operators or literals</p></div>
     # Create new variable context
     self.variable_context.push_context()
 
-    parameters = get_children_by_types(node, &#34;parameters&#34;)[0]
+    parameters = get_children_by_types(node, [&#34;parameters&#34;])[0]
     parameters = get_non_control_children(parameters)
     
     # The body of the function is stored in a &#39;block&#39; type node
-    body = get_children_by_types(node, &#34;block&#34;)[0].children
+    body = get_children_by_types(node, [&#34;block&#34;])[0].children
     
 
     func_params = []
@@ -1799,7 +2506,7 @@ where left and right can either be operators or literals</p></div>
     if_condition = self.visit(get_first_child_by_type(node, &#34;comparison_operator&#34;))
 
     # Get the body of the if true part
-    if_true = get_children_by_types(node, &#34;block&#34;)[0].children
+    if_true = get_children_by_types(node, [&#34;block&#34;])[0].children
 
     # Because in tree-sitter the else if, and else aren&#39;t nested, but they&#39;re 
     # in a flat level order, we need to do some arranging of the pieces
@@ -1825,7 +2532,7 @@ where left and right can either be operators or literals</p></div>
     if len(alternatives) &gt; 0:
         final_else = alternatives.pop() 
         alternatives.reverse()
-        final_else_body = get_children_by_types(final_else, &#34;block&#34;)[0].children
+        final_else_body = get_children_by_types(final_else, [&#34;block&#34;])[0].children
         for node in final_else_body:
             cast = self.visit(node)
             if isinstance(cast, List):
@@ -1859,6 +2566,120 @@ where left and right can either be operators or literals</p></div>
         orelse=if_false_cast, 
         source_refs=[self.node_helper.get_source_ref(node)]
     )</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_lambda"><code class="name flex">
+<span>def <span class="ident">visit_lambda</span></span>(<span>self, node: tree_sitter.Node) ‑> <a title="skema.program_analysis.CAST2FN.model.cast.call.Call" href="../../CAST2FN/model/cast/call.html#skema.program_analysis.CAST2FN.model.cast.call.Call">Call</a></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def visit_lambda(self, node: Node) -&gt; Call:
+    # TODO: we have to determine how to grab the variables that are being
+    # used in the lambda that aren&#39;t part of the lambda&#39;s arguments
+    ref=self.node_helper.get_source_ref(node)
+    params = get_children_by_types(node, [&#34;lambda_parameters&#34;])[0] 
+    body = get_children_by_types(node, COMPREHENSION_OPERATORS)[0]
+
+    parameters = []
+    for param in params.children:
+        cast = self.visit(param)
+        if isinstance(cast, list):
+            parameters.extend(cast)
+        else:
+            parameters.append(cast)
+
+    body_cast = self.visit(body)
+    func_body = body_cast 
+
+    func_name = self.variable_context.generate_func(&#34;%lambda&#34;)
+    func_def_cast = FunctionDef(name=func_name, func_args=parameters, body=[ModelReturn(value=func_body)], source_refs=ref)
+
+    self.generated_fns.append(func_def_cast)
+    
+    # Collect all the Name node instances to use as arguments for the lambda call
+    args = [par.val if isinstance(par, Var) else par for par in parameters]
+
+    return Call(func=func_name, arguments=args, source_refs=ref)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_list_comprehension"><code class="name flex">
+<span>def <span class="ident">visit_list_comprehension</span></span>(<span>self, node: tree_sitter.Node) ‑> <a title="skema.program_analysis.CAST2FN.model.cast.call.Call" href="../../CAST2FN/model/cast/call.html#skema.program_analysis.CAST2FN.model.cast.call.Call">Call</a></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def visit_list_comprehension(self, node: Node) -&gt; Call:
+    ref = self.node_helper.get_source_ref(node)
+
+    temp_list_name = self.variable_context.add_variable(
+        &#34;list__temp_&#34;, &#34;Unknown&#34;, [ref]
+    )
+
+    temp_asg_cast = Assignment(
+        left=Var(val=temp_list_name), 
+        right=CASTLiteralValue(value=[], value_type=StructureType.LIST),
+        source_refs = ref
+    )
+
+    append_call = self.get_gromet_function_node(&#34;append&#34;) 
+    computation = get_children_by_types(node, COMPREHENSION_OPERATORS)[0]
+    computation_cast = self.visit(computation)
+
+    # IDEA: When we see a for_clause we start a new loop construct, and collect if_clauses 
+    # as we see them
+    clauses = get_children_by_types(node, [&#34;for_in_clause&#34;, &#34;if_clause&#34;])
+    loop_start = []
+    prev_loop = []
+    
+    if_start = []
+    prev_if = []
+
+    for clause in clauses:
+        if clause.type == &#34;for_in_clause&#34;:
+            new_loop = self.handle_for_clause(clause)
+            if loop_start == []:
+                loop_start = new_loop
+                prev_loop = loop_start
+            else:
+                if prev_if == []:
+                    prev_loop.body[0] = new_loop
+                    prev_loop = new_loop
+                else:
+                    prev_loop.body[0] = prev_if
+                    prev_if.body = [new_loop]
+                    prev_loop = new_loop
+                    if_start = []
+                    prev_if = []
+        elif clause.type == &#34;if_clause&#34;:
+            new_if = self.handle_if_clause(clause)
+            if if_start == []:
+                if_start = new_if
+                prev_if = if_start
+            else:
+                prev_if.body = [new_if]
+                prev_if = new_if
+    
+    if prev_if == []:
+        prev_loop.body[0] = Call(func=Attribute(temp_list_name, append_call), arguments=[computation_cast], source_refs=ref)
+    else:
+        prev_loop.body[0] = prev_if
+        prev_if.body = [Call(func=Attribute(temp_list_name, append_call), arguments=[computation_cast], source_refs=ref)]
+
+    return_cast = ModelReturn(temp_list_name)
+
+    func_name = self.variable_context.generate_func(&#34;%comprehension_list&#34;)
+    func_def_cast = FunctionDef(name=func_name, func_args=[], body=[temp_asg_cast,loop_start,return_cast], source_refs=ref)
+    
+    self.generated_fns.append(func_def_cast)
+
+    return Call(func=func_name, arguments=[], source_refs=ref)</code></pre>
 </details>
 </dd>
 <dt id="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_literal"><code class="name flex">
@@ -1954,7 +2775,7 @@ where left and right can either be operators or literals</p></div>
     
     return Module(
         name=None,
-        body=body,
+        body=self.generated_fns + body,
         source_refs = [self.node_helper.get_source_ref(node)]
     )</code></pre>
 </details>
@@ -1977,6 +2798,22 @@ where left and right can either be operators or literals</p></div>
     return self.variable_context.add_variable(
         identifier, &#34;Unknown&#34;, [self.node_helper.get_source_ref(node)]
     )</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_pair"><code class="name flex">
+<span>def <span class="ident">visit_pair</span></span>(<span>self, node: tree_sitter.Node)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def visit_pair(self, node: Node):
+    key = self.visit(node.children[0])
+    value = self.visit(node.children[2])
+
+    return key,value</code></pre>
 </details>
 </dd>
 <dt id="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_pattern"><code class="name flex">
@@ -2073,7 +2910,7 @@ where operand is some kind of expression</p></div>
     self.variable_context.push_context()
 
     loop_cond_node = get_children_by_types(node, WHILE_COND_TYPES)[0]
-    loop_body_node = get_children_by_types(node, &#34;block&#34;)[0].children
+    loop_body_node = get_children_by_types(node, [&#34;block&#34;])[0].children
 
     loop_cond = self.visit(loop_cond_node)
 
@@ -2122,22 +2959,29 @@ where operand is some kind of expression</p></div>
 <li>
 <h4><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST">TS2CAST</a></code></h4>
 <ul class="">
+<li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.construct_loop_construct" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.construct_loop_construct">construct_loop_construct</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.generate_cast" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.generate_cast">generate_cast</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.get_gromet_function_node" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.get_gromet_function_node">get_gromet_function_node</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.handle_for_clause" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.handle_for_clause">handle_for_clause</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.handle_if_clause" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.handle_if_clause">handle_if_clause</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.run" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.run">run</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit">visit</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_assignment" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_assignment">visit_assignment</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_binary_op" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_binary_op">visit_binary_op</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_call" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_call">visit_call</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_comparison_op" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_comparison_op">visit_comparison_op</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_dict_comprehension" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_dict_comprehension">visit_dict_comprehension</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_expression" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_expression">visit_expression</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_for" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_for">visit_for</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_function_def" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_function_def">visit_function_def</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_identifier" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_identifier">visit_identifier</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_if_statement" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_if_statement">visit_if_statement</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_lambda" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_lambda">visit_lambda</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_list_comprehension" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_list_comprehension">visit_list_comprehension</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_literal" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_literal">visit_literal</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_module" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_module">visit_module</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_name" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_name">visit_name</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_pair" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_pair">visit_pair</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_pattern" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_pattern">visit_pattern</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_return" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_return">visit_return</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_unary_op" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_unary_op">visit_unary_op</a></code></li>
