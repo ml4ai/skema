@@ -4,27 +4,57 @@ import pkg_resources
 import requests
 import importlib
 import sys
+import re
 import subprocess
 import tempfile
 from pathlib import Path
 
-def module_locate(import_statement: str) -> str:
+from skema.gromet.fn import TypedValue, ImportSourceType, GrometFNModuleDependencyReference
+
+IMPORT_PATTERN = re.compile(r'^\s*(from\s+[^\s]+\s+import\s+[^\s,]+(?:\s*,\s*[^\s,]+)*|import\s+[^\s,]+(?:\s*,\s*[^\s,]+)*)', re.MULTILINE)
+
+def identify_source_type(source: str):
+    if "github" in source:
+        return "Repository"
+    elif "http" in source:
+        return "Url"
+    return "Local"
+        
+
+def extract_imports(source: str):
+    output_references = []
+
+    import_statements = IMPORT_PATTERN.findall(source)
+    modules = set([statement.split()[1]] for statement in import_statements)
+
+    for module in modules:
+        source_value = module_locate(module)
+        source_type = identify_source_type(source_value)
+        output_references.append(
+            GrometFNModuleDependencyReference(
+                name=module,
+                source_reference=TypedValue(
+                    type=source_type,
+                    value=source_value
+        )))
+
+    return output_references
+
+def module_locate(module_name: str) -> str:
     """
     Locates the source of a Python module specified by the import statement.
     If the module is built-in or installed, it returns the file path.
     If the module is on PyPI with a GitHub link, it returns the GitHub URL.
     For PyPI modules, it also attempts to return the tarball URL for the current version.
 
-    :param import_statement: The import statement as a string, e.g., "import os".
+    :param module_name: The name of the module or submodule as a string.
     :return: The module's file path, GitHub URL, or tarball URL.
     """
-    module_name = import_statement.split()[1].split(".")[0]
 
     # Attempt to find the module in the local environment
     try:
         module_obj = importlib.import_module(module_name)
         module_file = getattr(module_obj, '__file__', None)
-        
         if module_file:
             module_path = Path(module_file)
             # Check if it's a package
@@ -57,20 +87,21 @@ def module_locate(import_statement: str) -> str:
 
     return None
 
-    
+
+"""
 # Basic tests 
 print(module_locate("import os"))
 print(module_locate("import requests"))
 print(module_locate("import xml.etree"))
 print(module_locate("import minimal"))
 
-# Complex tests
+# PyDice tests
 print(module_locate("import numpy as np"))
 print(module_locate("import time"))
 print(module_locate("from numba import njit,guvectorize,float64"))
 print(module_locate("import scipy.optimize as opt"))
 print(module_locate("from matplotlib import pyplot as plt"))
-
+"""
 
 
 

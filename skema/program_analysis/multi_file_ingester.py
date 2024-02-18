@@ -17,6 +17,7 @@ from skema.program_analysis.fortran2cast import fortran_to_cast
 from skema.program_analysis.matlab2cast import matlab_to_cast
 from skema.utils.fold import dictionary_to_gromet_json, del_nulls
 from skema.program_analysis.tree_sitter_parsers.build_parsers import LANGUAGES_YAML_FILEPATH
+from skema.program_analysis.module_locate import extract_imports
 
 def get_args():
     parser = argparse.ArgumentParser()
@@ -52,6 +53,7 @@ def process_file_system(
         name=system_name,
         modules=[],
         module_index=[],
+        module_dependancies=[],
         executables=[],
     )
 
@@ -113,6 +115,9 @@ def process_file_system(
                 
                 module_collection.module_index.append(python_module_path)
 
+                # TODO: Check for duplicate modules across files
+                module_collection.module_dependancies.extend(extract_imports(full_file_obj.read_text()))
+
                 # Done: Determine how we know a gromet goes in the 'executable' field
                 # We do this by finding all user_defined top level functions in the Gromet
                 # and check if the name 'main' is among them
@@ -129,6 +134,7 @@ def process_file_system(
                     module_collection.executables.append(
                         len(module_collection.module_index)
                     )
+            
 
         except (Exception,SystemExit) as e:
             os.chdir(cur_dir)
@@ -140,6 +146,7 @@ def process_file_system(
             f.write(
                 dictionary_to_gromet_json(del_nulls(gromet_collection_dict))
             )
+
 
     return module_collection
 
