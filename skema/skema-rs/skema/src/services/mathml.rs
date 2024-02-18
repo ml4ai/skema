@@ -11,8 +11,8 @@ use mathml::parsers::math_expression_tree::{
 
 use mathml::{
     acset::{AMRmathml, PetriNet, RegNet},
-    parsers::first_order_ode::{first_order_ode, FirstOrderODE},
     expression::get_code_exp_graphs,
+    parsers::first_order_ode::{first_order_ode, FirstOrderODE},
 };
 use petgraph::dot::{Config, Dot};
 use utoipa;
@@ -77,7 +77,7 @@ body = String
 #[put("/mathml/code-exp-graphs")]
 pub async fn get_code_exp_graph_set(payload: web::Json<Vec<MathExpressionTree>>) -> String {
     let content = payload.clone();
-    
+
     get_code_exp_graphs(content)
 }
 
