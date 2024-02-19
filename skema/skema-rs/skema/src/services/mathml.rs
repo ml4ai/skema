@@ -55,7 +55,7 @@ pub async fn get_ast_graph(payload: String) -> String {
 )]
 #[put("/mathml/math-exp-graph")]
 pub async fn get_math_exp_graph(payload: String) -> String {
-    let mut contents = payload;
+    let contents = payload;
     let exp = contents.parse::<MathExpressionTree>().unwrap();
     let g = exp.to_graph();
     let dot_representation = Dot::new(&g);
@@ -77,8 +77,8 @@ body = String
 #[put("/mathml/code-exp-graphs")]
 pub async fn get_code_exp_graph_set(payload: web::Json<Vec<MathExpressionTree>>) -> String {
     let content = payload.clone();
-    let json_result = get_code_exp_graphs(content);
-    json_result
+    
+    get_code_exp_graphs(content)
 }
 
 /// Parse a presentation MathML representation of an equation and
@@ -142,6 +142,26 @@ pub async fn get_decapodes(payload: web::Json<Vec<String>>) -> HttpResponse {
         decapodes: deca_vec.clone(),
     };
     HttpResponse::Ok().json(web::Json(decapodes_collection))
+}
+
+/// Return a JSON representation of a METCollection from
+/// an array of MathML strings.
+#[utoipa::path(
+request_body = Vec<String>,
+responses(
+(
+status = 200,
+body = Vec<String>
+)
+)
+)]
+#[put("/mathml/met")]
+pub async fn get_met(payload: web::Json<Vec<String>>) -> HttpResponse {
+    let met_vec: Vec<MathExpressionTree> = payload
+        .iter()
+        .map(|x| x.parse::<MathExpressionTree>().unwrap())
+        .collect();
+    HttpResponse::Ok().json(web::Json(met_vec))
 }
 
 /// Return a JSON representation of a PetriNet ModelRep constructed from an array of MathML strings.
