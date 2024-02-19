@@ -425,11 +425,11 @@ impl From<Vec<MathExpressionTree>> for GeneralizedAMR {
         }
 
         let header = Header {
-            name: "".to_string(),
-            schema: "".to_string(),
-            schema_name: "".to_string(),
-            description: "".to_string(),
-            model_version: "".to_string(),
+            name: "Model".to_string(),
+            schema: "G-AMR".to_string(),
+            schema_name: "Generalized AMR".to_string(),
+            description: "Generalized AMR model from...".to_string(),
+            model_version: "0.1".to_string(),
         };
 
         let semantics = GeneralSemantics {
