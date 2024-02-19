@@ -369,7 +369,10 @@ impl From<Vec<MathExpressionTree>> for GeneralizedAMR {
                                     states_vec.insert(state.clone());
                                     rhs_vec.push(y[1].clone());
                                 }
-                                _ => {println!("Non-differential Equation")}
+                                _ =>{
+                                        println!("Non-differential Equation");
+                                        rhs_vec.push(y[1].clone());
+                                    }
                             }
                         }
                         _ => {println!("Expected an equation!")}
