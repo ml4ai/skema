@@ -142,16 +142,17 @@ def process_file_system(
             print(e)
 
     # Remove duplicate dependancies
+    # Remove imports of local submodules
+    # Remove relative imports
     # TODO: Remove submodules  
-    # TODO: Remove relative imports
-    # TODO: Remove imports of local submodules
+
     seen = set()
     module_collection.module_dependencies = [seen.add(dependency.name) or dependency for dependency in module_collection.module_dependencies if dependency.name not in seen]
-    #filter(module_collection.module_dependencies)
-
+    module_collection.module_dependencies = list(filter(lambda dependency: not dependency.name.startswith("."), module_collection.module_dependencies))
+    module_collection.module_dependencies = list(filter(lambda dependency: dependency.name != system_name, module_collection.module_dependencies))
+    module_collection.module_dependencies = [dependency for dependency in sorted(module_collection.module_dependencies, key=lambda dependency: dependency.name.count('.')) if not any(dependency.name.startswith(f"{other.name}.") for other in module_collection.module_dependencies if other.name != dependency.name)]
+ 
     # NOTE: These cannot be imported at the top-level due to circular dependancies
-    
-    
     from skema.program_analysis.easy_multi_file_ingester import easy_process_file_system
     from skema.program_analysis.url_ingester import process_git_repo, process_archive
 
