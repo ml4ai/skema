@@ -121,6 +121,8 @@ class TS2CAST(object):
             return self.visit_comparison_op(node)
         elif node.type == "assignment":
             return self.visit_assignment(node)
+        elif node.type == "attribute":
+            return self.visit_attribute(node)
         elif node.type == "identifier":
             return self.visit_identifier(node)
         elif node.type == "unary_operator":
@@ -135,6 +137,10 @@ class TS2CAST(object):
             return self.visit_while(node)
         elif node.type == "for_statement":
             return self.visit_for(node)
+        elif node.type == "import_statement":
+            return self.visit_import(node)
+        elif node.type == "import_from_statement":
+            return self.visit_import_from(node)
         else:
             return self._visit_passthrough(node)
 
@@ -487,6 +493,70 @@ class TS2CAST(object):
                 source_code_data_type=["Python", PYTHON_VERSION, str(type((0)))],
                 source_refs=[literal_source_ref]
             )
+
+    def handle_dotted_name(self, import_stmt) -> ModelImport:
+        ref = self.node_helper.get_source_ref(import_stmt)
+        name = self.node_helper.get_identifier(import_stmt)
+        self.visit(name)
+
+        return name
+
+    def handle_aliased_import(self, import_stmt) -> ModelImport:
+        ref = self.node_helper.get_source_ref(import_stmt)
+        dot_name = get_children_by_types(import_stmt,["dotted_name"])[0]
+        name = self.handle_dotted_name(dot_name) 
+        alias = get_children_by_types(import_stmt, ["dotted_name"])[0]
+        self.visit(alias)
+
+        return (name, alias) #ModelImport(name=name, alias=alias, symbol="", all=False, source_refs=ref)
+
+    def visit_import(self, node: Node):
+        ref = self.node_helper.get_source_ref(node)
+        to_ret = []
+
+        names_list = get_children_by_types(node, ["dotted_name", "aliased_import"])
+        for name in names_list:
+            if name.type == "dottted_name":
+                resolved_name = self.handle_dotted_name(name)
+                to_ret.append(ModelImport(name=resolved_name, alias=None, symbol=None, all=False, source_refs=ref))
+            elif name.type == "aliased_import":
+                resolved_name = self.handle_aliased_import(name)
+                to_ret.append(ModelImport(name=resolved_name[0], alias=resolved_name[1], symbol=None, all=False, source_refs=ref))
+
+        return to_ret
+
+    def visit_import_from(self, node: Node):
+        ref = self.node_helper.get_source_ref(node)
+        to_ret = []
+
+        names_list = get_children_by_types(node, ["dotted_name", "aliased_import"])
+        module_name = self.node_helper.get_identifier(names_list[0])
+        self.visit(module_name)
+
+        for name in names_list[1:]:
+            if name.type == "dottted_name":
+                resolved_name = self.handle_dotted_name(name) # self.node_helper.get_identifier(name)
+                self.visit(resolved_name)
+                if "wildcard_import" in name.children:
+                    to_ret.append(ModelImport(name=module_name, alias="", symbol=resolved_name, all=True, source_refs=ref))
+                else:
+                    to_ret.append(ModelImport(name=module_name, alias="", symbol=resolved_name, all=False, source_refs=ref))
+            elif name.type == "aliased_import":
+                resolved_name = self.handle_aliased_import(name)
+                to_ret.append(ModelImport(name=module_name, alias=resolved_name[1], symbol=resolved_name[0], all=False, source_refs=ref))
+            
+            # print(import_stmt.type)
+            # if import_stmt.type == "dottted_name":
+            #     to_ret.append(self.handle_dotted_name(import_stmt))
+            # elif import_stmt.type == "aliased_import":
+            #     import_ret = self.handle_aliased_import(import_stmt)
+            #     print(import_ret)
+            #     print(import_stmt)
+            #     if "wildcard_import" in import_stmt.children:
+            #         import_ret.all = True
+            #     to_ret.append(import_ret)
+
+        return to_ret
 
 
 
