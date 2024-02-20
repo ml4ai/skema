@@ -43,7 +43,7 @@ def get_args():
 
 
 def process_file_system(
-    system_name, path, files, write_to_file=False, original_source=False
+    system_name, path, files, write_to_file=False, original_source=False, dependency_depth=0
 ) -> GrometFNModuleCollection:
     root_dir = path.strip()
     file_list = open(files, "r").readlines()
@@ -143,10 +143,31 @@ def process_file_system(
 
     # Remove duplicate dependancies
     # TODO: Remove submodules  
+    # TODO: Remove relative imports
+    # TODO: Remove imports of local submodules
     seen = set()
     module_collection.module_dependencies = [seen.add(dependency.name) or dependency for dependency in module_collection.module_dependencies if dependency.name not in seen]
-                
+    #filter(module_collection.module_dependencies)
 
+    # NOTE: These cannot be imported at the top-level due to circular dependancies
+    
+    
+    from skema.program_analysis.easy_multi_file_ingester import easy_process_file_system
+    from skema.program_analysis.url_ingester import process_git_repo, process_archive
+
+    if dependency_depth > 0:
+        for index, dependency in enumerate(module_collection.module_dependencies):
+            if dependency.source_reference.type == "Local":
+                dependency_gromet = easy_process_file_system(dependency.name, dependency.source_reference.value, False, False, dependency_depth=dependency_depth-1)
+            elif dependency.source_reference.type == "Url":
+                dependency_gromet = process_archive(dependency.source_reference.value, False, False, dependency_depth=dependency_depth-1)
+            elif dependency.source_reference.type == "Repository":
+                dependency_gromet = process_git_repo(dependency.source_reference.value, None, False, False, dependency_depth=dependency_depth-1)
+            else:
+                continue
+
+            # Flatten dependency gromet onto parent Gromet
+            #module_collection.module_dependencies[index].source_reference = dependency_gromet
     if write_to_file:
         with open(f"{system_name}--Gromet-FN-auto.json", "w") as f:
             gromet_collection_dict = module_collection.to_dict()
