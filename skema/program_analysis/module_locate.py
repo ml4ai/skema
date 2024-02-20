@@ -14,6 +14,8 @@ from skema.gromet.fn import TypedValue, ImportSourceType, GrometFNModuleDependen
 IMPORT_PATTERN = re.compile(r'^\s*(from\s+[^\s]+\s+import\s+[^\s,]+(?:\s*,\s*[^\s,]+)*|import\s+[^\s,]+(?:\s*,\s*[^\s,]+)*)', re.MULTILINE)
 
 def identify_source_type(source: str):
+    if not source:
+        return "Unknown"
     if "github" in source:
         return "Repository"
     elif "http" in source:
@@ -25,7 +27,7 @@ def extract_imports(source: str):
     output_references = []
 
     import_statements = IMPORT_PATTERN.findall(source)
-    modules = set([statement.split()[1]] for statement in import_statements)
+    modules = set(tuple([statement.split()[1] for statement in import_statements]))
 
     for module in modules:
         source_value = module_locate(module)

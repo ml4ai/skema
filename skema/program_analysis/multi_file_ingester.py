@@ -53,7 +53,7 @@ def process_file_system(
         name=system_name,
         modules=[],
         module_index=[],
-        module_dependancies=[],
+        module_dependencies=[],
         executables=[],
     )
 
@@ -116,8 +116,9 @@ def process_file_system(
                 module_collection.module_index.append(python_module_path)
 
                 # TODO: Check for duplicate modules across files
-                module_collection.module_dependancies.extend(extract_imports(full_file_obj.read_text()))
-
+                # TODO: Remove submodule if higher level module is included
+                module_collection.module_dependencies.extend(extract_imports(full_file_obj.read_text()))
+               
                 # Done: Determine how we know a gromet goes in the 'executable' field
                 # We do this by finding all user_defined top level functions in the Gromet
                 # and check if the name 'main' is among them
@@ -139,6 +140,12 @@ def process_file_system(
         except (Exception,SystemExit) as e:
             os.chdir(cur_dir)
             print(e)
+
+    # Remove duplicate dependancies
+    # TODO: Remove submodules  
+    seen = set()
+    module_collection.module_dependencies = [seen.add(dependency.name) or dependency for dependency in module_collection.module_dependencies if dependency.name not in seen]
+                
 
     if write_to_file:
         with open(f"{system_name}--Gromet-FN-auto.json", "w") as f:
