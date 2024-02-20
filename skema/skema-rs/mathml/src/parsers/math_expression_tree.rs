@@ -272,14 +272,43 @@ fn is_unary_operator(op: &Operator) -> bool {
             | Operator::Arccsc
             | Operator::Arccot
             | Operator::Mean
+            | Operator::Int
+            | Operator::Hat
+            | Operator::HatOp(_)
+            | Operator::SumUnderOver(_)
+            | Operator::MsubsupInt(_)
+            | Operator::Laplacian
+            | Operator::SurfaceClosedInt
+            | Operator::SurfaceClosedIntNoIntVar
     )
 }
 
-// Process parentheses in an expression and update the LaTeX string.
-// If the expression is a unary operator, it is added to the LaTeX string as is.
+// Process parentheses in an expression and update the LaTeX string when connected by arithmatic operators like +, -, *, /.
+// If the expression is a unary or multiplication or division operator, it is added to the LaTeX string as is.
 // If the expression is not a unary operator, it is wrapped in parentheses before being added to the LaTeX string.
 // If the expression is an atom, it is added to the LaTeX string directly.
 fn process_expression_parentheses(expression: &mut String, met: &MathExpressionTree) {
+    // Check if the rest vector is not empty and contains a MathExpressionTree::Cons variant.
+    if let MathExpressionTree::Cons(op, _args) = met {
+        // Check if the operator is a unary operator.
+        if is_unary_operator(op) || matches!(op, Operator::Multiply | Operator::Divide) {
+            // If it is a unary operator, add it to the LaTeX string as is.
+            expression.push_str(&met.to_latex().to_string());
+        } else {
+            // If it is not a unary or multiplication or division operator, wrap it in parentheses before adding it to the LaTeX string.
+            expression.push_str(&format!("({})", met.to_latex()));
+        }
+    } else {
+        // If the expression is an atom, add it to the LaTeX string directly.
+        expression.push_str(&met.to_latex().to_string());
+    }
+}
+
+// Process parentheses in an expression and update the LaTeX string when connected by connectors like "_", "^", etc.
+// If the expression is a unary operator, it is added to the LaTeX string as is.
+// If the expression is not a unary operator, it is wrapped in parentheses before being added to the LaTeX string.
+// If the expression is an atom, it is added to the LaTeX string directly.
+fn process_atoms_cons_parentheses(expression: &mut String, met: &MathExpressionTree) {
     // Check if the rest vector is not empty and contains a MathExpressionTree::Cons variant.
     if let MathExpressionTree::Cons(op, _args) = met {
         // Check if the operator is a unary operator.
@@ -516,18 +545,7 @@ impl MathExpressionTree {
                 match head {
                     Operator::Add => {
                         for (index, r) in rest.iter().enumerate() {
-                            if let MathExpressionTree::Cons(op, _) = r {
-                                if is_unary_operator(op) {
-                                    expression.push_str(&r.to_latex().to_string());
-                                } else if let Operator::Add = op {
-                                    expression.push_str(&r.to_latex().to_string());
-                                } else {
-                                    expression.push_str(&format!("({})", r.to_latex()));
-                                }
-                            } else {
-                                expression.push_str(&r.to_latex().to_string());
-                            }
-
+                            expression.push_str(&r.to_latex().to_string());
                             // Add "+" if it's not the last element
                             if index < rest.len() - 1 {
                                 expression.push('+');
@@ -598,23 +616,23 @@ impl MathExpressionTree {
                         expression.push_str(&rest[0].to_latex().to_string());
                     }
                     Operator::Compose => {
-                        process_expression_parentheses(&mut expression, &rest[0]);
+                        process_atoms_cons_parentheses(&mut expression, &rest[0]);
                         expression.push('_');
-                        process_expression_parentheses(&mut expression, &rest[1]);
+                        process_atoms_cons_parentheses(&mut expression, &rest[1]);
                     }
                     Operator::Factorial => {
-                        process_expression_parentheses(&mut expression, &rest[0]);
+                        process_atoms_cons_parentheses(&mut expression, &rest[0]);
                         expression.push('!');
                     }
                     Operator::Power => {
-                        process_expression_parentheses(&mut expression, &rest[0]);
+                        process_atoms_cons_parentheses(&mut expression, &rest[0]);
                         expression.push('^');
                         expression.push_str(&format!("{{{}}}", rest[1].to_latex()));
                     }
                     Operator::Comma => {
-                        process_expression_parentheses(&mut expression, &rest[0]);
+                        process_atoms_cons_parentheses(&mut expression, &rest[0]);
                         expression.push(',');
-                        process_expression_parentheses(&mut expression, &rest[1]);
+                        process_atoms_cons_parentheses(&mut expression, &rest[1]);
                     }
                     Operator::Grad => {
                         expression.push_str("\\nabla{");
@@ -630,19 +648,19 @@ impl MathExpressionTree {
                         expression.push('}');
                     }
                     Operator::Dot => {
-                        process_expression_parentheses(&mut expression, &rest[0]);
+                        process_atoms_cons_parentheses(&mut expression, &rest[0]);
                         expression.push_str(" \\cdot ");
-                        process_expression_parentheses(&mut expression, &rest[1]);
+                        process_atoms_cons_parentheses(&mut expression, &rest[1]);
                     }
                     Operator::Cross => {
-                        process_expression_parentheses(&mut expression, &rest[0]);
+                        process_atoms_cons_parentheses(&mut expression, &rest[0]);
                         expression.push_str(" \\cross ");
-                        process_expression_parentheses(&mut expression, &rest[1]);
+                        process_atoms_cons_parentheses(&mut expression, &rest[1]);
                     }
                     Operator::Div => {
                         expression.push_str("\\nabla \\cdot {");
-                        process_expression_parentheses(&mut expression, &rest[0]);
-                        expression.push('}');
+                        process_atoms_cons_parentheses(&mut expression, &rest[0]);
+                        expression.push_str("}");
                     }
                     Operator::Abs => {
                         expression.push_str(&format!("\\left|{}\\right|", rest[0].to_latex()));
@@ -709,7 +727,7 @@ impl MathExpressionTree {
                         expression.push_str(&format!("\\langle {} \\rangle", rest[0].to_latex()));
                     }
                     Operator::HatOp(x) => {
-                        process_expression_parentheses(&mut expression, &rest[0]);
+                        process_atoms_cons_parentheses(&mut expression, &rest[0]);
                         expression.push_str("\\hat{");
                         process_math_expression(&x.comp, &mut expression);
                         expression.push('}');
@@ -2324,7 +2342,7 @@ fn new_quadratic_equation() {
         s_exp,
         "(= x (/ (- (- b) (√ (- (^ b 2) (* (* 4 a) c)))) (* 2 a)))"
     );
-    assert_eq!(exp.to_latex(), "x=\\frac{(-b)-\\sqrt{b^{2}-(4*a*c)}}{2*a}");
+    assert_eq!(exp.to_latex(), "x=\\frac{(-b)-\\sqrt{b^{2}-4*a*c}}{2*a}");
 }
 
 #[test]
@@ -2521,7 +2539,7 @@ fn test_hydrostatic() {
     println!("exp.to_latex()={:?}", exp.to_latex());
     assert_eq!(
         exp.to_latex(),
-        "\\Phi_{k}=\\Phi_{s}+(R*(\\sum_{l=k}^{K}H_{kl}*T_{vl}))"
+        "\\Phi_{k}=\\Phi_{s}+R*\\sum_{l=k}^{K}H_{kl}*T_{vl}"
     )
 }
 
@@ -2796,7 +2814,7 @@ fn test_gradient_sub() {
     let exp = input.parse::<MathExpressionTree>().unwrap();
     let s_exp = exp.to_string();
     assert_eq!(s_exp, "(Grad_h) (+ p (* g η)))");
-    assert_eq!(exp.to_latex(), "\\nabla_{h}{(p+(g*\\eta))}");
+    assert_eq!(exp.to_latex(), "\\nabla_{h}{(p+g*\\eta)}");
 }
 
 #[test]
@@ -3081,7 +3099,7 @@ fn test_fourier_law_heat_equation_1_1() {
     let exp = input.parse::<MathExpressionTree>().unwrap();
     let s_exp = exp.to_string();
     assert_eq!(s_exp, "(= Q (* (/ k_{T} ρ) (Laplacian T)))");
-    assert_eq!(exp.to_latex(), "Q=\\frac{k_{T}}{\\rho}*(\\nabla^2 T)");
+    assert_eq!(exp.to_latex(), "Q=\\frac{k_{T}}{\\rho}*\\nabla^2 T");
 }
 
 #[test]
@@ -3116,7 +3134,7 @@ fn test_fourier_law_heat_equation_2() {
     );
     assert_eq!(
         exp.to_latex(),
-        "\\frac{d Q}{dt}=(-k)*(\\oiint_S \\nabla{T} \\cdot dS)"
+        "\\frac{d Q}{dt}=(-k)*\\oiint_S \\nabla{T} \\cdot dS"
     );
 }
 
@@ -3151,7 +3169,7 @@ fn test_fourier_law_heat_equation_1_2() {
         s_exp,
         "(= Q (* (/ k_{T} ρ) (+ (+ (PD(2, x) T) (PD(2, y) T)) (PD(2, z) T))))"
     );
-    assert_eq!(exp.to_latex(), "Q=\\frac{k_{T}}{\\rho}*((\\frac{\\partial^2 T}{\\partial x^2})+(\\frac{\\partial^2 T}{\\partial y^2})+(\\frac{\\partial^2 T}{\\partial z^2}))");
+    assert_eq!(exp.to_latex(), "Q=\\frac{k_{T}}{\\rho}*(\\frac{\\partial^2 T}{\\partial x^2}+\\frac{\\partial^2 T}{\\partial y^2}+\\frac{\\partial^2 T}{\\partial z^2})");
 }
 
 #[test]
