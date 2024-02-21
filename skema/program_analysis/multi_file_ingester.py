@@ -141,17 +141,28 @@ def process_file_system(
             os.chdir(cur_dir)
             print(e)
 
-    # Remove duplicate dependancies
-    # Remove imports of local submodules
-    # Remove relative imports
-    # TODO: Remove submodules  
+    def clean_dependencies(dependencies, system_name):
+        # Step 1: Remove duplicates and perform initial filtering in one step.
+        # This uses a dictionary to preserve insertion order (Python 3.7+ guaranteed order).
+        cleaned = {
+            dep.name: dep for dep in dependencies
+            if not dep.name.startswith(".") and dep.name != system_name
+        }.values()
 
-    seen = set()
-    module_collection.module_dependencies = [seen.add(dependency.name) or dependency for dependency in module_collection.module_dependencies if dependency.name not in seen]
-    module_collection.module_dependencies = list(filter(lambda dependency: not dependency.name.startswith("."), module_collection.module_dependencies))
-    module_collection.module_dependencies = list(filter(lambda dependency: dependency.name != system_name, module_collection.module_dependencies))
-    module_collection.module_dependencies = [dependency for dependency in sorted(module_collection.module_dependencies, key=lambda dependency: dependency.name.count('.')) if not any(dependency.name.startswith(f"{other.name}.") for other in module_collection.module_dependencies if other.name != dependency.name)]
+        # Step 2: Sort by the number of dots in the name.
+        sorted_deps = sorted(cleaned, key=lambda dep: dep.name.count('.'))
+
+        # Step 3: Remove submodules of other modules.
+        # This step keeps an entry if no other entry is its "parent" module.
+        final_deps = [
+            dep for i, dep in enumerate(sorted_deps)
+            if not any(dep.name.startswith(other.name + ".") for other in sorted_deps[:i])
+        ]
+
+        return final_deps
  
+    module_collection.module_dependencies = clean_dependencies(module_collection.module_dependencies, system_name)
+    
     # NOTE: These cannot be imported at the top-level due to circular dependancies
     from skema.program_analysis.easy_multi_file_ingester import easy_process_file_system
     from skema.program_analysis.url_ingester import process_git_repo, process_archive
