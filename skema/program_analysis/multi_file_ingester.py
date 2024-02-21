@@ -170,6 +170,7 @@ def process_file_system(
     from skema.program_analysis.url_ingester import process_git_repo, process_archive
     
     if dependency_depth > 0:
+        to_add = []
         for index, dependency in enumerate(module_collection.module_dependencies):
 
             if dependency.source_reference.type == "Local":
@@ -189,7 +190,10 @@ def process_file_system(
                 dependency_gromet.modules[index].is_depenency = True
             module_collection.modules.extend(dependency_gromet.modules)
             module_collection.module_index.extend([f"{element} (dependency)" for element in dependency_gromet.module_index])
-
+            to_add.extend(dependency_gromet.module_dependencies)
+        
+        module_collection.module_dependencies.extend(to_add)
+    
     if write_to_file:
         with open(f"{system_name}--Gromet-FN-auto.json", "w") as f:
             gromet_collection_dict = module_collection.to_dict()
