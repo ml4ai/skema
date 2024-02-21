@@ -329,7 +329,7 @@ async def code_snippets_to_pn_amr(system: code2fn.System, client: httpx.AsyncCli
     import requests
 
     # Single file
-    single_snippet_payload = {"files": ["code.py"], "blobs": ["def sir(\n    s: float, i: float, r: float, beta: float, gamma: float, n: float\n) -> Tuple[float, float, float]:\n    \"\"\"The SIR model, one time step.\"\"\"\n    s_n = (-beta * s * i) + s\n    i_n = (beta * s * i - gamma * i) + i\n    r_n = gamma * i + r\n    scale = n / (s_n + i_n + r_n)\n    return s_n * scale, i_n * scale, r_n * scale"],}
+    single_snippet_payload = {"files": ["code.py"], "blobs": ["def sir(s: float, i: float, r: float, beta: float, gamma: float, n: float) -> Tuple[float, float, float]:\n    \"\"\"The SIR model, one time step.\"\"\"\n    s_n = (-beta * s * i) + s\n    i_n = (beta * s * i - gamma * i) + i\n    r_n = gamma * i + r\n    scale = n / (s_n + i_n + r_n)\n    return s_n * scale, i_n * scale, r_n * scale"],}
 
     response = requests.post("http://0.0.0.0:8000/workflows/code/snippets-to-met", json=single_snippet_payload)
     gromet_json = response.json()
@@ -539,7 +539,7 @@ async def code_snippets_to_MET(system: code2fn.System, client: httpx.AsyncClient
     import requests
 
     # Single file
-    single_snippet_payload = {"files": ["code.py"], "blobs": ["def sir(\n    s: float, i: float, r: float, beta: float, gamma: float, n: float\n) -> Tuple[float, float, float]:\n    \"\"\"The SIR model, one time step.\"\"\"\n    s_n = (-beta * s * i) + s\n    i_n = (beta * s * i - gamma * i) + i\n    r_n = gamma * i + r\n    scale = n / (s_n + i_n + r_n)\n    return s_n * scale, i_n * scale, r_n * scale"],}
+    single_snippet_payload = {"files": ["code.py"], "blobs": ["def sir(s: float, i: float, r: float, beta: float, gamma: float, n: float) -> Tuple[float, float, float]:\n    \"\"\"The SIR model, one time step.\"\"\"\n    s_n = (-beta * s * i) + s\n    i_n = (beta * s * i - gamma * i) + i\n    r_n = gamma * i + r\n    scale = n / (s_n + i_n + r_n)\n    return s_n * scale, i_n * scale, r_n * scale"],}
 
     response = requests.post("http://0.0.0.0:8000/workflows/code/snippets-to-met", json=single_snippet_payload)
     gromet_json = response.json()
@@ -573,7 +573,7 @@ async def code_snippets_to_G_AMR(system: code2fn.System, client: httpx.AsyncClie
     import requests
 
     # Single file
-    single_snippet_payload = {"files": ["code.py"], "blobs": ["def sir(\n    s: float, i: float, r: float, beta: float, gamma: float, n: float\n) -> Tuple[float, float, float]:\n    \"\"\"The SIR model, one time step.\"\"\"\n    s_n = (-beta * s * i) + s\n    i_n = (beta * s * i - gamma * i) + i\n    r_n = gamma * i + r\n    scale = n / (s_n + i_n + r_n)\n    return s_n * scale, i_n * scale, r_n * scale"],}
+    single_snippet_payload = {"files": ["code.py"], "blobs": ["def sir(s: float, i: float, r: float, beta: float, gamma: float, n: float) -> Tuple[float, float, float]:\n    \"\"\"The SIR model, one time step.\"\"\"\n    s_n = (-beta * s * i) + s\n    i_n = (beta * s * i - gamma * i) + i\n    r_n = gamma * i + r\n    scale = n / (s_n + i_n + r_n)\n    return s_n * scale, i_n * scale, r_n * scale"],}
     
     response = requests.post("http://0.0.0.0:8000/workflows/code/snippets-to-gamr", json=single_snippet_payload)
     gromet_json = response.json()
