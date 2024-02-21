@@ -36,6 +36,14 @@ Processors:
 @Singleton
 class HomeController @Inject()(cc: ControllerComponents) extends AbstractController(cc) {
   val logger: Logger = LoggerFactory.getLogger(this.getClass)
+
+  // config
+  val config = ConfigFactory.load()
+  val appVersion: String = config[String]("skema.version")
+  val contextWindowSize: Int = config[Int]("ScenarioContext.windowSize")
+  val contextEngineType: String = config[String]("ScenarioContext.engineType")
+
+
   logger.info("Initializing the OdinEngine ...")
 
   // Make one of each of these now and share it with the pipelines.
@@ -47,17 +55,15 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
   val miraEmbeddingsGrounder = TextReadingPipeline.newGrounder(fastNlpProcessorOpt, chosenEngineOpt = Some("miraembeddings"))
 
   val processorOpt = None//Some(DocumentByWord.processor)
-  // TODO Add the window parameter to the configuration file.
-  val cosmosPipeline = new CosmosTextReadingPipeline(contextWindowSize = 3, processorOpt, odinEngineOpt, Some(miraEmbeddingsGrounder))
-  // TODO Add the window parameter to the configuration file.
+  // Context engine config
+
+  val cosmosPipeline = new CosmosTextReadingPipeline(contextWindowSize = contextWindowSize, contextEngineType, processorOpt, odinEngineOpt, Some(miraEmbeddingsGrounder))
   val plainTextPipeline = new TextReadingPipelineWithContext(processorOpt, odinEngineOpt, Some(miraEmbeddingsGrounder))
 
   logger.info("Completed Initialization ...")
 
 
-  // config
-  val config = ConfigFactory.load()
-  val appVersion: String = config[String]("skema.version")
+
 
   // -----------------------------------------------------------------
   // Home page

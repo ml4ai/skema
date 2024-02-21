@@ -55,6 +55,7 @@ async def equations_to_amr(data: schema.EquationImagesToAMR, client: httpx.Async
     url = "0.0.0.0"
     r = requests.post(f"{url}/workflows/images/base64/equations-to-amr", json={"images": images_b64, "model": "regnet"})
     r.json()
+    ```
     """
     mml: List[str] = [
         utils.clean_mml(eqn2mml.b64_image_to_mml(img)) for img in data.images
@@ -173,6 +174,7 @@ async def lx_equations_to_amr(data: schema.EquationLatexToAMR, client: httpx.Asy
     url = "0.0.0.0"
     r = requests.post(f"{url}/workflows/latex/equations-to-amr", json={"equations": equations, "model": "regnet"})
     r.json()
+    ```
     """
     mml: List[str] = [
         utils.clean_mml(eqn2mml.get_mathml_from_latex(tex)) for tex in data.equations
@@ -193,6 +195,31 @@ async def lx_equations_to_amr(data: schema.EquationLatexToAMR, client: httpx.Asy
 # pmml -> amr
 @router.post("/pmml/equations-to-amr", summary="Equations pMML → AMR")
 async def equations_to_amr(data: schema.MmlToAMR, client: httpx.AsyncClient = Depends(utils.get_client)):
+    """
+    Converts equations (in LaTeX or pMathML) to MathExpressionTree (JSON).
+
+    ### Python example
+    ```
+    import requests
+
+    payload = {
+        "equations": 
+        [
+            "<math><mfrac><mrow><mi>d</mi><mi>E</mi></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mo>=</mo><mi>&#x03B2;</mi><mi>I</mi><mi>S</mi><mo>&#x2212;</mo><mi>&#x03B4;</mi><mi>E</mi></math>",
+            "<math><mfrac><mrow><mi>d</mi><mi>R</mi></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mo>=</mo><mi>(1&#x2212;&#x03B1;)</mi><mi>&#x03B3;</mi><mi>I</mi></math>",
+            "<math><mfrac><mrow><mi>d</mi><mi>I</mi></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mo>=</mo><mi>&#x03B4;</mi><mi>E</mi><mo>&#x2212;</mo><mi>(1&#x2212;&#x03B1;)</mi><mi>&#x03B3;</mi><mi>I</mi><mo>&#x2212;</mo><mi>&#x03B1;</mi><mi>&#x03C1;</mi><mi>I</mi></math>",
+            "<math><mfrac><mrow><mi>d</mi><mi>D</mi></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mo>=</mo><mi>&#x03B1;</mi><mi>&#x03C1;</mi><mi>I</mi></math>",
+            "<math><mfrac><mrow><mi>d</mi><mi>S</mi></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mo>=</mo><mo>&#x2212;</mo><mi>&#x03B2;</mi><mi>I</mi><mi>S</mi></math>"
+        ],
+        "model": "petrinet"
+    }
+
+    url = "http://127.0.0.1:8000"
+
+    r = requests.post(f"{url}/workflows/pmml/equations-to-amr",  json=payload)
+    print(r.json())
+    ```
+    """
     payload = {"mathml": data.equations, "model": data.model}
     res = await client.put(f"{SKEMA_RS_ADDESS}/mathml/amr", json=payload)
     if res.status_code != 200:
@@ -223,17 +250,16 @@ async def equations_to_met(data: schema.EquationToMET, client: httpx.AsyncClient
 
     url = "http://127.0.0.1:8000"
 
-    r = requests.post(f"{url}/equations-to-met",  json={"equations": equations})
+    r = requests.post(f"{url}/workflows/equations-to-met",  json={"equations": equations})
     print(r.json())
+    ```
     """
-    if "</math>" in data.equations[0]:
-        eqns: List[str] = [
-            utils.clean_mml(mml) for mml in data.equations
-        ]
-    else:
-        eqns: List[str] = [
-            utils.clean_mml(eqn2mml.get_mathml_from_latex(tex)) for tex in data.equations
-        ]
+    eqns: List[str] = []
+    for eqn in data.equations:
+        if "</math>" in eqn:
+            eqns.append(utils.clean_mml(eqn))
+        else:
+            eqns.append(utils.clean_mml(eqn2mml.get_mathml_from_latex(eqn)))
 
     res = await client.put(f"{SKEMA_RS_ADDESS}/mathml/met", json=eqns)
     if res.status_code != 200:
@@ -246,9 +272,65 @@ async def equations_to_met(data: schema.EquationToMET, client: httpx.AsyncClient
         )
     return res.json()
 
+
+# equations(pmml or latex) -> Generalized AMR
+@router.post("/equations-to-gamr", summary="Equations (LaTeX/pMML) → Generalized AMR")
+async def equations_to_gamr(data: schema.EquationToMET, client: httpx.AsyncClient = Depends(utils.get_client)):
+    """
+    Converts equations (in LaTeX or pMathML) to Generalized AMR (JSON).
+
+    ### Python example
+    ```
+    import requests
+
+    equations = [
+        "E=mc^2",
+        "c=\\frac{a}{b}"
+    ]
+
+    url = "http://127.0.0.1:8000"
+
+    r = requests.post(f"{url}/workflows/equations-to-gamr",  json={"equations": equations})
+    print(r.json())
+    ```
+    """
+    eqns: List[str] = []
+    for eqn in data.equations:
+        if "</math>" in eqn:
+            eqns.append(utils.clean_mml(eqn))
+        else:
+            eqns.append(utils.clean_mml(eqn2mml.get_mathml_from_latex(eqn)))
+
+    res = await client.put(f"{SKEMA_RS_ADDESS}/mathml/g-amr", json=eqns)
+    if res.status_code != 200:
+        return JSONResponse(
+            status_code=400,
+            content={
+                "error": f"PUT /mathml/met failed to process payload with error {res.text}",
+                "payload": eqns,
+            },
+        ) 
+    return res.json()
+
+
 # code snippets -> fn -> petrinet amr
 @router.post("/code/snippets-to-pn-amr", summary="Code snippets → PetriNet AMR")
 async def code_snippets_to_pn_amr(system: code2fn.System, client: httpx.AsyncClient = Depends(utils.get_client)):
+    """
+    Code snippets to Petrinet AMR workflow. This endpoint takes a code snippet, assumed to contain dynamics, and extracts the 
+    Math Expression Tree of the dynamics, which is then converted into a Petrinet AMR.
+
+    ### Python example
+    ```
+    import requests
+
+    # Single file
+    single_snippet_payload = {"files": ["code.py"], "blobs": ["def sir(s: float, i: float, r: float, beta: float, gamma: float, n: float) -> Tuple[float, float, float]:\n    \"\"\"The SIR model, one time step.\"\"\"\n    s_n = (-beta * s * i) + s\n    i_n = (beta * s * i - gamma * i) + i\n    r_n = gamma * i + r\n    scale = n / (s_n + i_n + r_n)\n    return s_n * scale, i_n * scale, r_n * scale"],}
+
+    response = requests.post("http://0.0.0.0:8000/workflows/code/snippets-to-met", json=single_snippet_payload)
+    gromet_json = response.json()
+    ```
+    """
     gromet = await code2fn.fn_given_filepaths(system)
     gromet, _ = utils.fn_preprocessor(gromet)
     # print(f"gromet:{gromet}")
@@ -290,6 +372,21 @@ async def code_snippets_to_rn_amr(system: code2fn.System):
     "/code/codebase-to-pn-amr", summary="Code repo (zip archive) → PetriNet AMR"
 )
 async def repo_to_pn_amr(zip_file: UploadFile = File(), client: httpx.AsyncClient = Depends(utils.get_client)):
+    """
+    Codebase to AMR workflow. This endpoint uses an a simple algorithm to identify the dynamics and then we slice 
+    that portion of the code to extract dynamics from it.
+
+    ### Python example
+    ```
+    import requests
+
+    files = {
+        'zip_archive': open('model_source.zip')
+    }
+    response = requests.post("localhost:8000/workflows/code/codebase-to-pn-amr", files=files)
+    amr = response.json()
+    ```
+    """
     gromet = await code2fn.fn_given_filepaths_zip(zip_file)
     gromet, _ = utils.fn_preprocessor(gromet)
     res = await client.put(f"{SKEMA_RS_ADDESS}/models/PN", json=gromet)
@@ -310,7 +407,10 @@ async def repo_to_pn_amr(zip_file: UploadFile = File(), client: httpx.AsyncClien
     summary="Code repo (zip archive) → PetriNet AMR",
 )
 async def llm_assisted_codebase_to_pn_amr(zip_file: UploadFile = File(), client: httpx.AsyncClient = Depends(utils.get_client)):
-    """Codebase->AMR workflow using an llm to extract the dynamics line span.
+    """
+    Codebase to AMR workflow. This endpoint uses an LLM to identify the dynamics and then we slice 
+    that portion of the code to extract dynamics from it.
+
     ### Python example
     ```
     import requests
@@ -320,6 +420,7 @@ async def llm_assisted_codebase_to_pn_amr(zip_file: UploadFile = File(), client:
     }
     response = requests.post("localhost:8000/workflows/code/llm-assisted-codebase-to-pn-amr", files=files)
     amr = response.json()
+    ```
     """
     # NOTE: Opening the zip file mutates the object and prevents it from being reopened.
     # Since llm_proxy also needs to open the zip file, we should send a copy instead.
@@ -422,9 +523,24 @@ async def llm_assisted_codebase_to_pn_amr(zip_file: UploadFile = File(), client:
 
     return amr
 
-# code snippets -> fn -> petrinet amr
-@router.post("/code/snippets-to-MET", summary="Code snippets → MET")
+# code snippets -> fn -> MET
+@router.post("/code/snippets-to-met", summary="Code snippets → MET")
 async def code_snippets_to_MET(system: code2fn.System, client: httpx.AsyncClient = Depends(utils.get_client)):
+    """
+    Code snippets to Math Expression Tree workflow. This endpoint takes a code snippet, assumed to contain dynamics, and extracts the 
+    Math Expression Tree of the dynamics. 
+
+    ### Python example
+    ```
+    import requests
+
+    # Single file
+    single_snippet_payload = {"files": ["code.py"], "blobs": ["def sir(s: float, i: float, r: float, beta: float, gamma: float, n: float) -> Tuple[float, float, float]:\n    \"\"\"The SIR model, one time step.\"\"\"\n    s_n = (-beta * s * i) + s\n    i_n = (beta * s * i - gamma * i) + i\n    r_n = gamma * i + r\n    scale = n / (s_n + i_n + r_n)\n    return s_n * scale, i_n * scale, r_n * scale"],}
+
+    response = requests.post("http://0.0.0.0:8000/workflows/code/snippets-to-met", json=single_snippet_payload)
+    gromet_json = response.json()
+    ```
+    """
     gromet = await code2fn.fn_given_filepaths(system)
     gromet, _ = utils.fn_preprocessor(gromet)
     # print(f"gromet:{gromet}")
@@ -441,22 +557,40 @@ async def code_snippets_to_MET(system: code2fn.System, client: httpx.AsyncClient
         )
     return res.json()
 
-""" TODO: The regnet endpoints are currently outdated
-# zip archive -> fn -> regnet amr
-@router.post("/code/codebase-to-rn-amr", summary="Code repo (zip archive) → RegNet AMR")
-async def repo_to_rn_amr(zip_file: UploadFile = File()):
-    gromet = await code2fn.fn_given_filepaths_zip(zip_file)
-    res = requests.put(f"{SKEMA_RS_ADDESS}/models/RN", json=gromet)
+# code snippets -> fn -> generalized amr
+@router.post("/code/snippets-to-gamr", summary="Code snippets → Generalized-AMR")
+async def code_snippets_to_G_AMR(system: code2fn.System, client: httpx.AsyncClient = Depends(utils.get_client)):
+    """
+    Code snippets to Generalized AMR workflow. This endpoint takes a code snippet, assumed to contain dynamics, and extracts the 
+    Math Expression Tree of the dynamics and then converts that to our Generalized AMR represenation. 
+
+    ### Python example
+    ```
+    import requests
+
+    # Single file
+    single_snippet_payload = {"files": ["code.py"], "blobs": ["def sir(s: float, i: float, r: float, beta: float, gamma: float, n: float) -> Tuple[float, float, float]:\n    \"\"\"The SIR model, one time step.\"\"\"\n    s_n = (-beta * s * i) + s\n    i_n = (beta * s * i - gamma * i) + i\n    r_n = gamma * i + r\n    scale = n / (s_n + i_n + r_n)\n    return s_n * scale, i_n * scale, r_n * scale"],}
+    
+    response = requests.post("http://0.0.0.0:8000/workflows/code/snippets-to-gamr", json=single_snippet_payload)
+    gromet_json = response.json()
+    ```
+    """
+    gromet = await code2fn.fn_given_filepaths(system)
+    gromet, _ = utils.fn_preprocessor(gromet)
+    # print(f"gromet:{gromet}")
+    # print(f"client.follow_redirects:\t{client.follow_redirects}")
+    # print(f"client.timeout:\t{client.timeout}")
+    res = await client.put(f"{SKEMA_RS_ADDESS}/models/G-AMR", json=gromet)
     if res.status_code != 200:
         return JSONResponse(
             status_code=400,
             content={
-                "error": f"MORAE POST /models/RN failed to process payload",
+                "error": f"MORAE PUT /models/PN failed to process payload ({res.text})",
                 "payload": gromet,
             },
         )
     return res.json()
-"""
+
 
 # code snippets -> fn -> Vec<MET> -> alignment result
 #              mathml ->    MET   ->
