@@ -106,7 +106,9 @@ class System(BaseModel):
     ),
     dependency_depth: Optional[int] = Field(
         default=0,
-        description="The depth at which to ingest dependencies into Gromet. i.e. 0=Ingest no dependencies, 1=Ingest system dependencies, 2+=Ingest dependency dependencies.",
+        ge=0,
+        le=1,
+        description="The depth at which to ingest dependencies into Gromet. i.e. 0=Ingest no dependencies, 1=Ingest system dependencies. Accepted values: [0,1]",
         examples = [
             1
         ]
