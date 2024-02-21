@@ -1,6 +1,7 @@
 //! Pratt parsing module to construct S-expressions from presentation MathML.
 //! This is based on the nice tutorial at https://matklad.github.io/2020/04/13/simple-but-powerful-pratt-parsing.html
-
+use utoipa::ToSchema;
+use schemars::JsonSchema;
 use crate::{
     ast::{
         operator::{
@@ -22,7 +23,7 @@ use crate::parsers::first_order_ode::{first_order_ode, FirstOrderODE};
 ///New whitespace handler before parsing
 
 /// An S-expression like structure to represent mathematical expressions.
-#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, ToSchema, JsonSchema)]
 pub enum MathExpressionTree {
     Atom(MathExpression),
     Cons(Operator, Vec<MathExpressionTree>),
@@ -729,7 +730,7 @@ impl MathExpressionTree {
                         process_math_expression(&x.uplimit, &mut expression);
                         expression.push('}');
                         expression.push_str(&rest[0].to_latex());
-                        expression.push_str(&*format!(" d{}", &*x.integration_variable));
+                        expression.push_str(&format!(" d{}", &*x.integration_variable));
                     }
                     Operator::Laplacian => {
                         expression.push_str(&format!("\\nabla^2 {}", rest[0].to_latex()));
