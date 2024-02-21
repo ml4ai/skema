@@ -62,6 +62,7 @@ def process_file_system(
     for f in file_list:
         full_file = os.path.join(os.path.normpath(root_dir), f.strip("\n"))
         full_file_obj = Path(full_file)
+
         try:
             # To maintain backwards compatibility for the process_file_system function, for now we will determine the language by file extension
             if full_file_obj.suffix in language_yaml_obj["python"]["extensions"]:
@@ -96,7 +97,7 @@ def process_file_system(
                     # and then convert back into a string representing the full file    
                     file_text = "".join(open(full_file).readlines())
                     source_metadata[0].files[0].source_string = file_text
-
+                    
 
                 # Then, after we generate the GroMEt we store it in the 'modules' field
                 # and store its path in the 'module_index' field
@@ -179,7 +180,10 @@ def process_file_system(
                 continue
 
             # Flatten dependency gromet onto parent Gromet
-            #module_collection.module_dependencies[index].source_reference = dependency_gromet
+            for index in range(len(dependency_gromet.modules)):
+                dependency_gromet.modules[index].is_depenency = True
+            module_collection.modules.extend(dependency_gromet.modules)
+            module_collection.module_index.extend([f"{element} (dependency)" for element in dependency_gromet.module_index])
     if write_to_file:
         with open(f"{system_name}--Gromet-FN-auto.json", "w") as f:
             gromet_collection_dict = module_collection.to_dict()
