@@ -258,11 +258,16 @@ fn is_unary_operator(op: &Operator) -> bool {
             | Operator::Power
             | Operator::Gradient(_)
             | Operator::Summation(_)
+            | Operator::HatOp(_)
             | Operator::Div
             | Operator::Abs
+            | Operator::Laplacian
             | Operator::Derivative(_)
             | Operator::PartialDerivative(_)
             | Operator::DDerivative(_)
+            | Operator::Int(_)
+            | Operator::SurfaceClosedInt
+            | Operator::DownArrow(_)
             | Operator::Sin
             | Operator::Cos
             | Operator::Tan
