@@ -4,7 +4,7 @@ use derive_new::new;
 use serde::{Deserialize, Serialize};
 use std::fmt;
 
-/// Total Derivative operator, in line with Spivak notation: http://ceres-solver.org/spivak_notation.html
+/// Total Derivative operator, e.g. dS/dt . in line with Spivak notation: http://ceres-solver.org/spivak_notation.html
 #[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
 pub struct Derivative {
     pub order: u8,
@@ -12,7 +12,15 @@ pub struct Derivative {
     pub bound_var: Ci,
 }
 
-/// Partial derivative operator
+/// D Derivative operator, e.g. DS/Dt . in line with Spivak notation: http://ceres-solver.org/spivak_notation.html
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
+pub struct DDerivative {
+    pub order: u8,
+    pub var_index: u8,
+    pub bound_var: Ci,
+}
+
+/// Partial derivative operator. e.g. ∂S/∂t
 #[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
 pub struct PartialDerivative {
     pub order: u8,
@@ -20,12 +28,11 @@ pub struct PartialDerivative {
     pub bound_var: Ci,
 }
 
-/// Summation operator with under and over components
+/// Summation operator has the option of having lowlimit and uplimit components
 #[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
-pub struct SumUnderOver {
-    pub op: Box<MathExpression>,
-    pub under: Box<MathExpression>,
-    pub over: Box<MathExpression>,
+pub struct Summation {
+    pub lowlimit: Option<Box<MathExpression>>,
+    pub uplimit: Option<Box<MathExpression>>,
 }
 
 /// Hat operation obtains the hat operation with the operation component: e.g. \hat{x}
@@ -34,23 +41,26 @@ pub struct HatOp {
     pub comp: Box<MathExpression>,
 }
 
-/// Handles grad operations with subscript. E.g. ∇_{x}
+/// Gradient operation has the option of handling grad operations with subscript. E.g. ∇_{x}
 #[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
-pub struct GradSub {
-    pub sub: Box<MathExpression>,
+pub struct Gradient {
+    pub subscript: Option<Box<MathExpression>>,
 }
 
-/// Definite Integral with lowlimit, uplimit
+/// Integral can be definite or indefinite with `integration_variable`
+/// as it has the option of having `lowlimit`, `uplimit`
 #[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
-pub struct MsubsupInt {
-    pub lowlimit: Box<MathExpression>,
-    pub uplimit: Box<MathExpression>,
+pub struct Int {
+    pub lowlimit: Option<Box<MathExpression>>,
+    pub uplimit: Option<Box<MathExpression>>,
     pub integration_variable: Box<MathExpression>,
 }
 
-/// MsupDownArrow operation. E.g. Handles I^{↓} operations such that I is `comp` of DownArrow operation
+/// Handles ↓ as an operator such that {comp}↓_{sub}^{sup} can parse
 #[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
-pub struct MsupDownArrow {
+pub struct DownArrow {
+    pub sub: Option<Box<MathExpression>>,
+    pub sup: Option<Box<MathExpression>>,
     pub comp: Box<MathExpression>,
 }
 
@@ -58,25 +68,33 @@ pub struct MsupDownArrow {
 pub enum Operator {
     /// Addition operator
     Add,
+    /// Multiplication operator
     Multiply,
+    /// Equals operator
     Equals,
+    /// Division operator
     Divide,
+    /// Subtraction operator
     Subtract,
+    /// Squre root operator
     Sqrt,
     /// Left parenthesis
     Lparen,
     /// Right parenthesis
     Rparen,
+    /// Composition operator
     Compose,
+    /// Factorial operator
     Factorial,
     /// Exponential operator
     Exp,
+    /// Power (exponent) operator
     Power,
-    Comma,
     /// Gradient operator
-    Grad,
-    GradSub(GradSub),
+    Gradient(Gradient),
+    /// Dot product operator
     Dot,
+    Comma,
     Period,
     /// Divergence operator
     Div,
@@ -86,6 +104,8 @@ pub enum Operator {
     Derivative(Derivative),
     /// Partial derivative operator, e.g. ∂/∂t
     PartialDerivative(PartialDerivative),
+    /// Partial derivative operator, e.g. D/Dt
+    DDerivative(DDerivative),
     Sin,
     Cos,
     Tan,
@@ -98,30 +118,28 @@ pub enum Operator {
     Arcsec,
     Arccsc,
     Arccot,
+    /// Mean operator
     Mean,
     /// Summation operator
-    Sum,
-    /// Summation operator with lowlimit and uplimit
-    SumUnderOver(SumUnderOver),
+    Summation(Summation),
+    /// Cross product operator
     Cross,
     /// Hat operator, e.g. \hat
     Hat,
     /// Hat operator with component, e.g. \hat{x}
     HatOp(HatOp),
-    /// Summation operator with lowlimit and uplimit
-    MsupDownArrow(MsupDownArrow),
     /// ↓ as an operator
-    DownArrow,
-    /// Definite Integral
-    Int,
-    /// Indefinite Integral with lowlimit and uplimit
-    MsubsupInt(MsubsupInt),
+    DownArrow(DownArrow),
+    /// Integrals
+    Int(Int),
+    /// Laplacian operator
     Laplacian,
     /// Closed surface integral operator --need to include explit dS integration variable when translating to latex
     SurfaceClosedInt,
     /// Closed surface integral operator -- doesn't need to include explicit dS integration variable when translating to latex
     /// E.g. \\oiint_S ∇ \cdot dS
     SurfaceClosedIntNoIntVar,
+    Vector,
     // Catchall for operators we haven't explicitly defined as enum variants yet.
     Other(String),
 }
@@ -154,6 +172,13 @@ impl fmt::Display for Operator {
             }) => {
                 write!(f, "PD({order}, {bound_var})")
             }
+            Operator::DDerivative(DDerivative {
+                order,
+                var_index: _,
+                bound_var,
+            }) => {
+                write!(f, "DD({order}, {bound_var})")
+            }
             Operator::Exp => write!(f, "exp"),
             Operator::Power => write!(f, "^"),
             Operator::Other(op) => write!(f, "{op}"),
@@ -170,34 +195,42 @@ impl fmt::Display for Operator {
             Operator::Arccsc => write!(f, "Arccsc"),
             Operator::Arccot => write!(f, "Arccot"),
             Operator::Mean => write!(f, "Mean"),
-            Operator::Grad => write!(f, "Grad"),
-            Operator::GradSub(GradSub { sub }) => {
-                write!(f, "Grad_{sub})")
-            }
+            Operator::Vector => write!(f, "Vec"),
+            Operator::Gradient(Gradient { subscript }) => match subscript {
+                Some(sub) => write!(f, "Grad_{sub}"),
+                None => write!(f, "Grad"),
+            },
             Operator::Dot => write!(f, "⋅"),
             Operator::Period => write!(f, ""),
             Operator::Div => write!(f, "Div"),
             Operator::Abs => write!(f, "Abs"),
-            Operator::Sum => write!(f, "∑"),
-            Operator::SumUnderOver(SumUnderOver { op, under, over }) => {
-                write!(f, "{op}_{{{under}}}^{{{over}}}")
-            }
-            Operator::Cross => write!(f, "×"),
-            Operator::Hat => write!(f, "Hat"),
-            Operator::HatOp(HatOp { comp }) => write!(f, "Hat({comp})"),
-            Operator::MsupDownArrow(MsupDownArrow { comp }) => write!(f, "{comp}↓"),
-            Operator::DownArrow => write!(f, "↓"),
-            Operator::Int => write!(f, "Int"),
-            Operator::MsubsupInt(MsubsupInt {
+            Operator::Summation(Summation { lowlimit, uplimit }) => match (lowlimit, uplimit) {
+                (Some(low), Some(up)) => write!(f, "Sum_{{{low}}}^{{{up}}}"),
+                (Some(low), None) => write!(f, "Sum_{{{low}}}"),
+                (None, Some(up)) => write!(f, "Sum^{{{up}}}"),
+                (None, None) => write!(f, "Sum"),
+            },
+            Operator::Int(Int {
                 lowlimit,
                 uplimit,
                 integration_variable,
-            }) => {
-                write!(
-                    f,
-                    "Int_{{{lowlimit}}}^{{{uplimit}}}({integration_variable})"
-                )
-            }
+            }) => match (lowlimit, uplimit) {
+                (Some(low), Some(up)) => {
+                    write!(f, "Int_{{{low}}}^{{{up}}}({integration_variable})")
+                }
+                (Some(low), None) => write!(f, "Int_{{{low}}}({integration_variable})"),
+                (None, Some(up)) => write!(f, "Int^{{{up}}}(integration_variable)"),
+                (None, None) => write!(f, "Int"),
+            },
+            Operator::DownArrow(DownArrow { sub, sup, comp }) => match (sub, sup) {
+                (Some(low), Some(up)) => write!(f, "{comp}↓_{{{low}}}^{{{up}}}"),
+                (Some(low), None) => write!(f, "{comp}↓_{{{low}}}"),
+                (None, Some(up)) => write!(f, "{comp}↓^{{{up}}}"),
+                (None, None) => write!(f, "{comp}↓"),
+            },
+            Operator::Cross => write!(f, "×"),
+            Operator::Hat => write!(f, "Hat"),
+            Operator::HatOp(HatOp { comp }) => write!(f, "Hat({comp})"),
             Operator::Laplacian => write!(f, "Laplacian"),
             Operator::SurfaceClosedInt => {
                 write!(f, "SurfaceClosedInt")
