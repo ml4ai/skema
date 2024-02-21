@@ -213,9 +213,11 @@
 <a href="#212" id="212">212</a>
 <a href="#213" id="213">213</a>
 <a href="#214" id="214">214</a>
+<a href="#215" id="215">215</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>derive_new::new;
 <span class="kw">use </span>std::fmt;
-
+<span class="kw">use </span>utoipa::ToSchema;
+<span class="kw">use </span>schemars::JsonSchema;
 <span class="kw">pub mod </span>operator;
 <span class="kw">use </span>operator::Operator;
 <span class="kw">use </span>serde::{Deserialize, Serialize};
@@ -223,15 +225,15 @@
 
 </span><span class="doccomment">/// Represents identifiers such as variables, function names, constants.
 /// E.g. x , sin, n
-</span><span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
+</span><span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, JsonSchema)]
 </span><span class="kw">pub struct </span>Mi(<span class="kw">pub </span>String);
 
 <span class="doccomment">/// Represents groups of any subexpressions
 /// E.g. For a given expression: 2x+4 --&gt;  2 and x are grouped together
-</span><span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
+</span><span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, JsonSchema)]
 </span><span class="kw">pub struct </span>Mrow(<span class="kw">pub </span>Vec&lt;MathExpression&gt;);
 
-<span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
+<span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, JsonSchema)]
 </span><span class="kw">pub enum </span>Type {
     Integer,
     Rational,
@@ -249,7 +251,7 @@
 
 <span class="doccomment">/// Represents content identifiers such that variables can be have type attribute
 /// to specify what it represents. E.g. function, vector, real,...
-</span><span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
+</span><span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, JsonSchema)]
 </span><span class="kw">pub struct </span>Ci {
     <span class="kw">pub </span>r#type: <span class="prelude-ty">Option</span>&lt;Type&gt;,
     <span class="kw">pub </span>content: Box&lt;MathExpression&gt;,
@@ -258,7 +260,7 @@
 
 <span class="doccomment">/// Represents the differentiation operator `diff` for functions or expresions `func`
 /// E.g. df/dx
-</span><span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
+</span><span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, JsonSchema)]
 </span><span class="kw">pub struct </span>Differential {
     <span class="kw">pub </span>diff: Box&lt;MathExpression&gt;,
     <span class="kw">pub </span>func: Box&lt;MathExpression&gt;,
@@ -266,14 +268,14 @@
 
 <span class="doccomment">/// Represents sum operator with terms that are summed over
 /// E.g. sum_{i=1}^{K} f(x_i)
-</span><span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
+</span><span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, JsonSchema)]
 </span><span class="kw">pub struct </span>SummationMath {
     <span class="kw">pub </span>op: Box&lt;MathExpression&gt;,
     <span class="kw">pub </span>func: Box&lt;MathExpression&gt;,
 }
 
 <span class="doccomment">/// Integral operation represents integral over math expressions
-</span><span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
+</span><span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, JsonSchema)]
 </span><span class="kw">pub struct </span>Integral {
     <span class="kw">pub </span>op: Box&lt;MathExpression&gt;,
     <span class="kw">pub </span>integrand: Box&lt;MathExpression&gt;,
@@ -282,7 +284,7 @@
 
 <span class="doccomment">/// Represents Hat operator and the contents the hat operator is being applied to.
 /// E.g. f \hat{x}, where `op` will be \hat{x}, `comp` with be the contents
-</span><span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
+</span><span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, JsonSchema)]
 </span><span class="kw">pub struct </span>HatComp {
     <span class="kw">pub </span>op: Box&lt;MathExpression&gt;,
     <span class="kw">pub </span>comp: Box&lt;MathExpression&gt;,
@@ -290,7 +292,7 @@
 
 <span class="doccomment">/// Laplacian operator of vector calculus which takes in argument `comp`.
 /// E.g. ∇^2 f
-</span><span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
+</span><span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, JsonSchema)]
 </span><span class="kw">pub struct </span>LaplacianComp {
     <span class="kw">pub </span>op: Box&lt;MathExpression&gt;,
     <span class="kw">pub </span>comp: Ci,
@@ -299,7 +301,7 @@
 <span class="doccomment">/// The MathExpression enum is not faithful to the corresponding element type in MathML 3
 /// (https://www.w3.org/TR/MathML3/appendixa.html#parsing_MathExpression)
 </span><span class="attr">#[derive(
-    Debug, PartialOrd, Ord, PartialEq, Eq, Clone, Hash, Default, new, Deserialize, Serialize,
+    Debug, PartialOrd, Ord, PartialEq, Eq, Clone, Hash, Default, new, Deserialize, Serialize, ToSchema, JsonSchema
 )]
 </span><span class="kw">pub enum </span>MathExpression {
     Mi(Mi),

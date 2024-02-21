@@ -3168,10 +3168,12 @@
 <a href="#3167" id="3167">3167</a>
 <a href="#3168" id="3168">3168</a>
 <a href="#3169" id="3169">3169</a>
+<a href="#3170" id="3170">3170</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Pratt parsing module to construct S-expressions from presentation MathML.
 //! This is based on the nice tutorial at https://matklad.github.io/2020/04/13/simple-but-powerful-pratt-parsing.html
-
-</span><span class="kw">use crate</span>::{
+</span><span class="kw">use </span>utoipa::ToSchema;
+<span class="kw">use </span>schemars::JsonSchema;
+<span class="kw">use crate</span>::{
     ast::{
         operator::{
             Derivative, GradSub, HatOp, MsubsupInt, MsupDownArrow, Operator, PartialDerivative,
@@ -3192,7 +3194,7 @@
 <span class="doccomment">///New whitespace handler before parsing
 
 /// An S-expression like structure to represent mathematical expressions.
-</span><span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
+</span><span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, ToSchema, JsonSchema)]
 </span><span class="kw">pub enum </span>MathExpressionTree {
     Atom(MathExpression),
     Cons(Operator, Vec&lt;MathExpressionTree&gt;),
@@ -3899,7 +3901,7 @@
                         process_math_expression(<span class="kw-2">&amp;</span>x.uplimit, <span class="kw-2">&amp;mut </span>expression);
                         expression.push(<span class="string">'}'</span>);
                         expression.push_str(<span class="kw-2">&amp;</span>rest[<span class="number">0</span>].to_latex());
-                        expression.push_str(<span class="kw-2">&amp;*</span><span class="macro">format!</span>(<span class="string">" d{}"</span>, <span class="kw-2">&amp;*</span>x.integration_variable));
+                        expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">" d{}"</span>, <span class="kw-2">&amp;*</span>x.integration_variable));
                     }
                     Operator::Laplacian =&gt; {
                         expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"\\nabla^2 {}"</span>, rest[<span class="number">0</span>].to_latex()));

@@ -142,13 +142,18 @@
 <a href="#141" id="141">141</a>
 <a href="#142" id="142">142</a>
 <a href="#143" id="143">143</a>
+<a href="#144" id="144">144</a>
+<a href="#145" id="145">145</a>
+<a href="#146" id="146">146</a>
+<a href="#147" id="147">147</a>
+<a href="#148" id="148">148</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>clap::Parser;
 
 <span class="kw">pub use </span>mathml::mml2pn::{ACSet, Term};
-
+<span class="kw">use </span>std::fs;
 <span class="comment">// new imports
-</span><span class="kw">use </span>mathml::acset::PetriNet;
-
+</span><span class="kw">use </span>mathml::acset::{PetriNet, GeneralizedAMR};
+<span class="kw">use </span>schemars::{schema_for};
 <span class="kw">use </span>neo4rs::{query, Node};
 <span class="kw">use </span>skema::config::Config;
 <span class="kw">use </span>skema::model_extraction::module_id2mathml_MET_ast;
@@ -210,28 +215,33 @@
             env::var(<span class="string">"SKEMA_GRAPH_DB_HOST"</span>).unwrap_or(<span class="string">"graphdb-bolt.askem.lum.ai"</span>.to_string());
         <span class="kw">let </span>db_port = env::var(<span class="string">"SKEMA_GRAPH_DB_PORT"</span>).unwrap_or(<span class="string">"443"</span>.to_string());
 
-        <span class="kw">let </span>config = Config {
+        <span class="kw">let </span>schema = <span class="macro">schema_for!</span>(GeneralizedAMR);
+        <span class="kw">let </span>data = <span class="macro">format!</span>(<span class="string">"{}"</span>, serde_json::to_string_pretty(<span class="kw-2">&amp;</span>schema).unwrap());
+        fs::write(<span class="string">"./schema.txt"</span>, data).expect(<span class="string">"Unable to write file"</span>);
+        <span class="comment">/* 
+        let config = Config {
             db_protocol: db_protocol.clone(),
             db_host: db_host.clone(),
             db_port: db_port.parse::&lt;u16&gt;().unwrap(),
         };
 
-        <span class="kw">let </span>_response = module_query(config.clone()).<span class="kw">await</span>;
+        let _response = module_query(config.clone()).await;
 
-        <span class="kw">let </span><span class="kw-2">mut </span>ids = Vec::&lt;i64&gt;::new();
-        <span class="kw">let </span>graph = Arc::new(config.graphdb_connection().<span class="kw">await</span>);
-        <span class="kw">let </span><span class="kw-2">mut </span>result = graph
-            .execute(query(<span class="string">"MATCH (n:Module) RETURN n"</span>))
-            .<span class="kw">await
-            </span>.unwrap();
-        <span class="kw">while let </span><span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(row)) = result.next().<span class="kw">await </span>{
-            <span class="kw">let </span>node: Node = row.get(<span class="string">"n"</span>).unwrap();
+        let mut ids = Vec::&lt;i64&gt;::new();
+        let graph = Arc::new(config.graphdb_connection().await);
+        let mut result = graph
+            .execute(query("MATCH (n:Module) RETURN n"))
+            .await
+            .unwrap();
+        while let Ok(Some(row)) = result.next().await {
+            let node: Node = row.get("n").unwrap();
             ids.push(node.id());
         }
-        <span class="macro">println!</span>(<span class="string">"{:?}"</span>, ids.clone());
-        <span class="kw">let </span>math_content = module_id2mathml_MET_ast(ids[ids.len() - <span class="number">1</span>], config.clone()).<span class="kw">await</span>;
-        <span class="kw">let </span>pn_amr = PetriNet::from(math_content);
-        <span class="comment">//println!("{:?}", math_content.clone());
+        println!("{:?}", ids.clone());
+        let math_content = module_id2mathml_MET_ast(ids[ids.len() - 1], config.clone()).await;
+        let pn_amr = PetriNet::from(math_content);
+        */
+        //println!("{:?}", math_content.clone());
         //println!("\nAMR from code: {:?}", PetriNet::from(math_content));
 
         //let input_src = "../../data/mml2pn_inputs/testing_eqns/sidarthe_mml.txt";

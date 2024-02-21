@@ -209,14 +209,18 @@
 <a href="#208" id="208">208</a>
 <a href="#209" id="209">209</a>
 <a href="#210" id="210">210</a>
+<a href="#211" id="211">211</a>
+<a href="#212" id="212">212</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::ast::Ci;
 <span class="kw">use </span><span class="kw">crate</span>::ast::MathExpression;
 <span class="kw">use </span>derive_new::new;
 <span class="kw">use </span>serde::{Deserialize, Serialize};
 <span class="kw">use </span>std::fmt;
+<span class="kw">use </span>utoipa::ToSchema;
+<span class="kw">use </span>schemars::JsonSchema;
 
 <span class="doccomment">/// Total Derivative operator, in line with Spivak notation: http://ceres-solver.org/spivak_notation.html
-</span><span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
+</span><span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, JsonSchema)]
 </span><span class="kw">pub struct </span>Derivative {
     <span class="kw">pub </span>order: u8,
     <span class="kw">pub </span>var_index: u8,
@@ -224,7 +228,7 @@
 }
 
 <span class="doccomment">/// Partial derivative operator
-</span><span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
+</span><span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, JsonSchema)]
 </span><span class="kw">pub struct </span>PartialDerivative {
     <span class="kw">pub </span>order: u8,
     <span class="kw">pub </span>var_index: u8,
@@ -232,7 +236,7 @@
 }
 
 <span class="doccomment">/// Summation operator with under and over components
-</span><span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
+</span><span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, JsonSchema)]
 </span><span class="kw">pub struct </span>SumUnderOver {
     <span class="kw">pub </span>op: Box&lt;MathExpression&gt;,
     <span class="kw">pub </span>under: Box&lt;MathExpression&gt;,
@@ -240,19 +244,19 @@
 }
 
 <span class="doccomment">/// Hat operation obtains the hat operation with the operation component: e.g. \hat{x}
-</span><span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
+</span><span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, JsonSchema)]
 </span><span class="kw">pub struct </span>HatOp {
     <span class="kw">pub </span>comp: Box&lt;MathExpression&gt;,
 }
 
 <span class="doccomment">/// Handles grad operations with subscript. E.g. ∇_{x}
-</span><span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
+</span><span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, JsonSchema)]
 </span><span class="kw">pub struct </span>GradSub {
     <span class="kw">pub </span>sub: Box&lt;MathExpression&gt;,
 }
 
 <span class="doccomment">/// Definite Integral with lowlimit, uplimit
-</span><span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
+</span><span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, JsonSchema)]
 </span><span class="kw">pub struct </span>MsubsupInt {
     <span class="kw">pub </span>lowlimit: Box&lt;MathExpression&gt;,
     <span class="kw">pub </span>uplimit: Box&lt;MathExpression&gt;,
@@ -260,12 +264,12 @@
 }
 
 <span class="doccomment">/// MsupDownArrow operation. E.g. Handles I^{↓} operations such that I is `comp` of DownArrow operation
-</span><span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
+</span><span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, JsonSchema)]
 </span><span class="kw">pub struct </span>MsupDownArrow {
     <span class="kw">pub </span>comp: Box&lt;MathExpression&gt;,
 }
 
-<span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
+<span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, ToSchema, JsonSchema)]
 </span><span class="kw">pub enum </span>Operator {
     <span class="doccomment">/// Addition operator
     </span>Add,

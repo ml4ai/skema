@@ -272,6 +272,26 @@
 <a href="#271" id="271">271</a>
 <a href="#272" id="272">272</a>
 <a href="#273" id="273">273</a>
+<a href="#274" id="274">274</a>
+<a href="#275" id="275">275</a>
+<a href="#276" id="276">276</a>
+<a href="#277" id="277">277</a>
+<a href="#278" id="278">278</a>
+<a href="#279" id="279">279</a>
+<a href="#280" id="280">280</a>
+<a href="#281" id="281">281</a>
+<a href="#282" id="282">282</a>
+<a href="#283" id="283">283</a>
+<a href="#284" id="284">284</a>
+<a href="#285" id="285">285</a>
+<a href="#286" id="286">286</a>
+<a href="#287" id="287">287</a>
+<a href="#288" id="288">288</a>
+<a href="#289" id="289">289</a>
+<a href="#290" id="290">290</a>
+<a href="#291" id="291">291</a>
+<a href="#292" id="292">292</a>
+<a href="#293" id="293">293</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>actix_web::{post, put, web, HttpResponse};
 <span class="kw">use </span>mathml::parsers::decapodes_serialization::{
     to_wiring_diagram, DecapodesCollection, WiringDiagram,
@@ -282,9 +302,9 @@
 <span class="kw">use </span>mathml::parsers::math_expression_tree::{
     preprocess_mathml_for_to_latex, replace_unicode_with_symbols,
 };
-
+<span class="kw">use </span>serde_json::from_str;
 <span class="kw">use </span>mathml::{
-    acset::{AMRmathml, PetriNet, RegNet},
+    acset::{AMRmathml, PetriNet, RegNet, GeneralizedAMR},
     parsers::first_order_ode::{first_order_ode, FirstOrderODE},
     expression::get_code_exp_graphs,
 };
@@ -436,6 +456,26 @@ body = Vec&lt;String&gt;
         .map(|x| x.parse::&lt;MathExpressionTree&gt;().unwrap())
         .collect();
     HttpResponse::Ok().json(web::Json(met_vec))
+}
+
+<span class="doccomment">/// Return a JSON of a Generalized AMR from
+/// an array of MET strings.
+</span><span class="attr">#[utoipa::path(
+    request_body = Vec&lt;String&gt;,
+    responses(
+    (
+    status = <span class="number">200</span>,
+    body = GeneralizedAMR
+    )
+    )
+    )]
+#[put(<span class="string">"/mathml/g-amr"</span>)]
+</span><span class="kw">pub async fn </span>get_gamr(payload: web::Json&lt;Vec&lt;String&gt;&gt;) -&gt; HttpResponse {
+    <span class="kw">let </span>met_vec: Vec&lt;MathExpressionTree&gt; = payload
+        .iter()
+        .map(|x| x.parse::&lt;MathExpressionTree&gt;().unwrap())
+        .collect();
+    HttpResponse::Ok().json(web::Json(GeneralizedAMR::from(met_vec)))
 }
 
 <span class="doccomment">/// Return a JSON representation of a PetriNet ModelRep constructed from an array of MathML strings.

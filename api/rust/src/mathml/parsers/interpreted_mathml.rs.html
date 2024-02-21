@@ -1769,7 +1769,7 @@
 <span class="doccomment">/// Handles downarrow operation (↓) in Superscript with includes function of content
 /// E.g. T^↓(x)
 </span><span class="kw">pub fn </span>downarrow_operator_with_bounds(input: Span) -&gt; IResult&lt;Ci&gt; {
-    <span class="kw">let </span>(s, (comp, op)) = ws(delimited(
+    <span class="kw">let </span>(s, (comp, _op)) = ws(delimited(
         <span class="macro">stag!</span>(<span class="string">"msup"</span>),
         pair(
             mi,
@@ -1807,7 +1807,7 @@
 <span class="doccomment">/// Handles downarrow operation (↓) in Superscript
 /// E.g. T^↓
 </span><span class="kw">pub fn </span>downarrow_operator_no_bounds(input: Span) -&gt; IResult&lt;Ci&gt; {
-    <span class="kw">let </span>(s, (comp, op)) = ws(delimited(
+    <span class="kw">let </span>(s, (comp, _op)) = ws(delimited(
         <span class="macro">stag!</span>(<span class="string">"msup"</span>),
         pair(mi, delimited(<span class="macro">stag!</span>(<span class="string">"mo"</span>), down_arrow, <span class="macro">etag!</span>(<span class="string">"mo"</span>))),
         <span class="macro">etag!</span>(<span class="string">"msup"</span>),
@@ -2588,7 +2588,7 @@
 
 <span class="doccomment">/// Surface Closed Integral
 </span><span class="kw">pub fn </span>surface_closed_integral(input: Span) -&gt; IResult&lt;(Operator, MathExpression, MathExpression)&gt; {
-    <span class="kw">let </span>(s, (_op, lim)) = ws(delimited(
+    <span class="kw">let </span>(s, (_op, _lim)) = ws(delimited(
         <span class="macro">stag!</span>(<span class="string">"msubsup"</span>),
         pair(delimited(<span class="macro">stag!</span>(<span class="string">"mtext"</span>), tag(<span class="string">"∯"</span>), <span class="macro">etag!</span>(<span class="string">"mtext"</span>)), mi),
         <span class="macro">etag!</span>(<span class="string">"msubsup"</span>),
@@ -2613,7 +2613,7 @@
         math_expression,
         pair(delimited(<span class="macro">stag!</span>(<span class="string">"mo"</span>), dot, <span class="macro">etag!</span>(<span class="string">"mo"</span>)), d),
     ))(s)<span class="question-mark">?</span>;
-    <span class="kw">let </span>(s, int_var) = ws(math_expression)(s)<span class="question-mark">?</span>;
+    <span class="kw">let </span>(s, _int_var) = ws(math_expression)(s)<span class="question-mark">?</span>;
 
     <span class="kw">let </span><span class="kw-2">mut </span>expression: Vec&lt;MathExpression&gt; = Vec::new();
     expression.push(MathExpression::Mrow(Mrow::new(row.<span class="number">0</span>)));
