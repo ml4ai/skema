@@ -103,6 +103,13 @@ class System(BaseModel):
                 }
             }
         }],
+    ),
+    dependency_depth: Optional[int] = Field(
+        default=0,
+        description="The depth at which to ingest dependencies into Gromet. i.e. 0=Ingest no dependencies, 1=Ingest system dependencies, 2+=Ingest dependency dependencies.",
+        examples = [
+            1
+        ]
     )
 
 
@@ -217,6 +224,7 @@ async def system_to_gromet(system: System):
             system.system_name or "",
             str(Path(tmp_path, system.root_name or "")),
             str(system_filepaths),
+            dependency_depth=system.dependency_depth
         )
 
     # Attempt to enrich the system with comments. May return the same system if Rust isn't insalled.

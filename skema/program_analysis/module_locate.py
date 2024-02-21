@@ -18,7 +18,7 @@ def identify_source_type(source: str):
         return "Unknown"
     if "github" in source:
         return "Repository"
-    elif "http" in source:
+    elif source.startswith("http"):
         return "Url"
     return "Local"
         
