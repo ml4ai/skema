@@ -103,7 +103,7 @@ class System(BaseModel):
                 }
             }
         }],
-    ),
+    )
     dependency_depth: Optional[int] = Field(
         default=0,
         ge=0,
@@ -113,7 +113,7 @@ class System(BaseModel):
             1
         ]
     )
-
+    
 
 class MML_System(BaseModel):
     """
@@ -326,7 +326,6 @@ async def fn_given_filepaths(system: System):
     response = requests.post("http://0.0.0.0:8000/fn-given-filepaths", json=system)
     gromet_json = response.json()
     """
-
     return await system_to_gromet(system)
 
 

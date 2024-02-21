@@ -191,14 +191,14 @@ def test_dependency_depth():
         "blobs": [
             "import minimal"
         ],
-        "dependency_depth": -1
+        "dependency_depth": 1
     }
 
     response = client.post("/code2fn/fn-given-filepaths", json=system)
     gromet_collection = response.json()
     assert response.status_code == 200
-    assert len(gromet_collection.module_dependencies) > 1
-    
+    assert len(gromet_collection["module_dependencies"]) > 1
+
 
 def test_dependency_depth_missing():
     system = {
@@ -211,7 +211,7 @@ def test_dependency_depth_missing():
     response = client.post("/code2fn/fn-given-filepaths", json=system)
     gromet_collection = response.json()
     assert response.status_code == 200
-    assert len(gromet_collection.module_dependencies) == 1
+    assert len(gromet_collection["module_dependencies"]) == 1
 
 
 def test_dependency_depth_invalid():
