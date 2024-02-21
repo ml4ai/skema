@@ -1,6 +1,7 @@
 use derive_new::new;
 use std::fmt;
-
+use utoipa::ToSchema;
+use schemars::JsonSchema;
 pub mod operator;
 use operator::Operator;
 use serde::{Deserialize, Serialize};
@@ -8,15 +9,15 @@ use serde::{Deserialize, Serialize};
 
 /// Represents identifiers such as variables, function names, constants.
 /// E.g. x , sin, n
-#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, JsonSchema)]
 pub struct Mi(pub String);
 
 /// Represents groups of any subexpressions
 /// E.g. For a given expression: 2x+4 -->  2 and x are grouped together
-#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, JsonSchema)]
 pub struct Mrow(pub Vec<MathExpression>);
 
-#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, JsonSchema)]
 pub enum Type {
     Integer,
     Rational,
@@ -34,7 +35,7 @@ pub enum Type {
 
 /// Represents content identifiers such that variables can be have type attribute
 /// to specify what it represents. E.g. function, vector, real,...
-#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, JsonSchema)]
 pub struct Ci {
     pub r#type: Option<Type>,
     pub content: Box<MathExpression>,
@@ -43,7 +44,7 @@ pub struct Ci {
 
 /// Represents the differentiation operator `diff` for functions or expresions `func`
 /// E.g. df/dx
-#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, JsonSchema)]
 pub struct Differential {
     pub diff: Box<MathExpression>,
     pub func: Box<MathExpression>,
@@ -51,14 +52,14 @@ pub struct Differential {
 
 /// Represents sum operator with terms that are summed over
 /// E.g. sum_{i=1}^{K} f(x_i)
-#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, JsonSchema)]
 pub struct SummationMath {
     pub op: Box<MathExpression>,
     pub func: Box<MathExpression>,
 }
 
 /// Integral operation represents integral over math expressions
-#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, JsonSchema)]
 pub struct Integral {
     pub op: Box<MathExpression>,
     pub integrand: Box<MathExpression>,
@@ -67,7 +68,7 @@ pub struct Integral {
 
 /// Represents Hat operator and the contents the hat operator is being applied to.
 /// E.g. f \hat{x}, where `op` will be \hat{x}, `comp` with be the contents
-#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, JsonSchema)]
 pub struct HatComp {
     pub op: Box<MathExpression>,
     pub comp: Box<MathExpression>,
@@ -75,7 +76,7 @@ pub struct HatComp {
 
 /// Laplacian operator of vector calculus which takes in argument `comp`.
 /// E.g. ∇^2 f
-#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, JsonSchema)]
 pub struct LaplacianComp {
     pub op: Box<MathExpression>,
     pub comp: Ci,
@@ -84,7 +85,7 @@ pub struct LaplacianComp {
 /// The MathExpression enum is not faithful to the corresponding element type in MathML 3
 /// (https://www.w3.org/TR/MathML3/appendixa.html#parsing_MathExpression)
 #[derive(
-    Debug, PartialOrd, Ord, PartialEq, Eq, Clone, Hash, Default, new, Deserialize, Serialize,
+    Debug, PartialOrd, Ord, PartialEq, Eq, Clone, Hash, Default, new, Deserialize, Serialize, ToSchema, JsonSchema
 )]
 pub enum MathExpression {
     Mi(Mi),

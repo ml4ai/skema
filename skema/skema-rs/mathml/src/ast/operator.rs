@@ -3,9 +3,12 @@ use crate::ast::MathExpression;
 use derive_new::new;
 use serde::{Deserialize, Serialize};
 use std::fmt;
+use utoipa::ToSchema;
+use schemars::JsonSchema;
+
 
 /// Total Derivative operator, e.g. dS/dt . in line with Spivak notation: http://ceres-solver.org/spivak_notation.html
-#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, JsonSchema)]
 pub struct Derivative {
     pub order: u8,
     pub var_index: u8,
@@ -21,7 +24,7 @@ pub struct DDerivative {
 }
 
 /// Partial derivative operator. e.g. ∂S/∂t
-#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, JsonSchema)]
 pub struct PartialDerivative {
     pub order: u8,
     pub var_index: u8,
@@ -36,7 +39,7 @@ pub struct Summation {
 }
 
 /// Hat operation obtains the hat operation with the operation component: e.g. \hat{x}
-#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, JsonSchema)]
 pub struct HatOp {
     pub comp: Box<MathExpression>,
 }
@@ -64,7 +67,7 @@ pub struct DownArrow {
     pub comp: Box<MathExpression>,
 }
 
-#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, ToSchema, JsonSchema)]
 pub enum Operator {
     /// Addition operator
     Add,
