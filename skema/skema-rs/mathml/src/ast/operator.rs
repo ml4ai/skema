@@ -1,14 +1,15 @@
 use crate::ast::Ci;
 use crate::ast::MathExpression;
 use derive_new::new;
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use std::fmt;
 use utoipa::ToSchema;
-use schemars::JsonSchema;
-
 
 /// Total Derivative operator, e.g. dS/dt . in line with Spivak notation: http://ceres-solver.org/spivak_notation.html
-#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, JsonSchema)]
+#[derive(
+    Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, JsonSchema,
+)]
 pub struct Derivative {
     pub order: u8,
     pub var_index: u8,
@@ -16,7 +17,20 @@ pub struct Derivative {
 }
 
 /// D Derivative operator, e.g. DS/Dt . in line with Spivak notation: http://ceres-solver.org/spivak_notation.html
-#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
+#[derive(
+    Debug,
+    Ord,
+    PartialOrd,
+    PartialEq,
+    Eq,
+    Clone,
+    Hash,
+    new,
+    Deserialize,
+    Serialize,
+    ToSchema,
+    JsonSchema,
+)]
 pub struct DDerivative {
     pub order: u8,
     pub var_index: u8,
@@ -24,7 +38,20 @@ pub struct DDerivative {
 }
 
 /// Partial derivative operator. e.g. ∂S/∂t
-#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, JsonSchema)]
+#[derive(
+    Debug,
+    Ord,
+    PartialOrd,
+    PartialEq,
+    Eq,
+    Clone,
+    Hash,
+    new,
+    Deserialize,
+    Serialize,
+    ToSchema,
+    JsonSchema,
+)]
 pub struct PartialDerivative {
     pub order: u8,
     pub var_index: u8,
@@ -32,42 +59,120 @@ pub struct PartialDerivative {
 }
 
 /// Summation operator has the option of having lowlimit and uplimit components
-#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
+#[derive(
+    Debug,
+    Ord,
+    PartialOrd,
+    PartialEq,
+    Eq,
+    Clone,
+    Hash,
+    new,
+    Deserialize,
+    Serialize,
+    ToSchema,
+    JsonSchema,
+)]
 pub struct Summation {
-    pub lowlimit: Option<Box<MathExpression>>,
-    pub uplimit: Option<Box<MathExpression>>,
+    pub lower_bound: Option<Box<MathExpression>>,
+    pub upper_bound: Option<Box<MathExpression>>,
 }
 
 /// Hat operation obtains the hat operation with the operation component: e.g. \hat{x}
-#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, JsonSchema)]
+#[derive(
+    Debug,
+    Ord,
+    PartialOrd,
+    PartialEq,
+    Eq,
+    Clone,
+    Hash,
+    new,
+    Deserialize,
+    Serialize,
+    ToSchema,
+    JsonSchema,
+)]
 pub struct HatOp {
     pub comp: Box<MathExpression>,
 }
 
 /// Gradient operation has the option of handling grad operations with subscript. E.g. ∇_{x}
-#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
+#[derive(
+    Debug,
+    Ord,
+    PartialOrd,
+    PartialEq,
+    Eq,
+    Clone,
+    Hash,
+    new,
+    Deserialize,
+    Serialize,
+    ToSchema,
+    JsonSchema,
+)]
 pub struct Gradient {
     pub subscript: Option<Box<MathExpression>>,
 }
 
 /// Integral can be definite or indefinite with `integration_variable`
 /// as it has the option of having `lowlimit`, `uplimit`
-#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
+#[derive(
+    Debug,
+    Ord,
+    PartialOrd,
+    PartialEq,
+    Eq,
+    Clone,
+    Hash,
+    new,
+    Deserialize,
+    Serialize,
+    ToSchema,
+    JsonSchema,
+)]
 pub struct Int {
-    pub lowlimit: Option<Box<MathExpression>>,
-    pub uplimit: Option<Box<MathExpression>>,
+    pub lower_limit: Option<Box<MathExpression>>,
+    pub upper_limit: Option<Box<MathExpression>>,
     pub integration_variable: Box<MathExpression>,
 }
 
 /// Handles ↓ as an operator such that {comp}↓_{sub}^{sup} can parse
-#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
+#[derive(
+    Debug,
+    Ord,
+    PartialOrd,
+    PartialEq,
+    Eq,
+    Clone,
+    Hash,
+    new,
+    Deserialize,
+    Serialize,
+    ToSchema,
+    JsonSchema,
+)]
 pub struct DownArrow {
     pub sub: Option<Box<MathExpression>>,
     pub sup: Option<Box<MathExpression>>,
     pub comp: Box<MathExpression>,
 }
 
-#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, ToSchema, JsonSchema)]
+#[derive(
+    Debug,
+    Ord,
+    PartialOrd,
+    PartialEq,
+    Eq,
+    Clone,
+    Hash,
+    new,
+    Deserialize,
+    Serialize,
+    ToSchema,
+    JsonSchema,
+)]
 pub enum Operator {
     /// Addition operator
     Add,
@@ -131,17 +236,15 @@ pub enum Operator {
     Hat,
     /// Hat operator with component, e.g. \hat{x}
     HatOp(HatOp),
-    /// ↓ as an operator
+    /// ↓ as an operator e.g. I↓ indicates downward diffuse radiative fluxes per unit indcident flux
     DownArrow(DownArrow),
     /// Integrals
     Int(Int),
     /// Laplacian operator
     Laplacian,
     /// Closed surface integral operator --need to include explit dS integration variable when translating to latex
-    SurfaceClosedInt,
-    /// Closed surface integral operator -- doesn't need to include explicit dS integration variable when translating to latex
-    /// E.g. \\oiint_S ∇ \cdot dS
-    SurfaceClosedIntNoIntVar,
+    SurfaceInt,
+    /// Vector operator
     Vector,
     // Catchall for operators we haven't explicitly defined as enum variants yet.
     Other(String),
@@ -180,7 +283,7 @@ impl fmt::Display for Operator {
                 var_index: _,
                 bound_var,
             }) => {
-                write!(f, "DD({order}, {bound_var})")
+                write!(f, "D({order}, {bound_var})")
             }
             Operator::Exp => write!(f, "exp"),
             Operator::Power => write!(f, "^"),
@@ -207,17 +310,20 @@ impl fmt::Display for Operator {
             Operator::Period => write!(f, ""),
             Operator::Div => write!(f, "Div"),
             Operator::Abs => write!(f, "Abs"),
-            Operator::Summation(Summation { lowlimit, uplimit }) => match (lowlimit, uplimit) {
+            Operator::Summation(Summation {
+                lower_bound,
+                upper_bound,
+            }) => match (lower_bound, upper_bound) {
                 (Some(low), Some(up)) => write!(f, "Sum_{{{low}}}^{{{up}}}"),
                 (Some(low), None) => write!(f, "Sum_{{{low}}}"),
                 (None, Some(up)) => write!(f, "Sum^{{{up}}}"),
                 (None, None) => write!(f, "Sum"),
             },
             Operator::Int(Int {
-                lowlimit,
-                uplimit,
+                lower_limit,
+                upper_limit,
                 integration_variable,
-            }) => match (lowlimit, uplimit) {
+            }) => match (lower_limit, upper_limit) {
                 (Some(low), Some(up)) => {
                     write!(f, "Int_{{{low}}}^{{{up}}}({integration_variable})")
                 }
@@ -235,11 +341,8 @@ impl fmt::Display for Operator {
             Operator::Hat => write!(f, "Hat"),
             Operator::HatOp(HatOp { comp }) => write!(f, "Hat({comp})"),
             Operator::Laplacian => write!(f, "Laplacian"),
-            Operator::SurfaceClosedInt => {
-                write!(f, "SurfaceClosedInt")
-            }
-            Operator::SurfaceClosedIntNoIntVar => {
-                write!(f, "SurfaceClosedInt")
+            Operator::SurfaceInt => {
+                write!(f, "SurfaceInt")
             }
         }
     }

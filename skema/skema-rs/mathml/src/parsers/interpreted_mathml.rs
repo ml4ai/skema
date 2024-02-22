@@ -231,6 +231,7 @@ pub fn over_term(input: Span) -> IResult<MathExpression> {
         |(x, y)| MathExpression::Mover(Box::new(x), Box::new(y)),
     ))(input)?;
     if let MathExpression::Mover(ref x, ref y) = over.clone() {
+        //if MathExpression::Mo(Operator::Other("^".to_string())) == **y{
         if MathExpression::Mo(Operator::Hat) == **y {
             let new_op = Operator::HatOp(HatOp::new(x.clone()));
             return Ok((s, MathExpression::Mo(new_op)));
@@ -1223,50 +1224,55 @@ pub fn integral_with_many_math_expression_integrand(
     )))
 }
 
-/// Surface Closed Integral
-pub fn surface_closed_integral(input: Span) -> IResult<(Operator, MathExpression, MathExpression)> {
+/// Parses closed surface integral over contents where integration E.g. \\oiint_S ∇ \cdot dS
+pub fn surface_closed_integral(input: Span) -> IResult<MathExpression> {
     let (s, (_op, _lim)) = ws(delimited(
-        stag!("msubsup"),
+        alt((stag!("msubsup"), stag!("msub"))),
         pair(delimited(stag!("mtext"), tag("∯"), etag!("mtext")), mi),
-        etag!("msubsup"),
+        alt((etag!("msubsup"), etag!("msub"))),
     ))(input)?;
     let (s, row) = ws(many_till(math_expression, d))(s)?;
     let (s, int_var) = ws(math_expression)(s)?;
-    let integrand = MathExpression::Mrow(Mrow::new(row.0));
 
-    let int_op = Operator::SurfaceClosedInt;
-    Ok((s, (int_op, integrand, int_var.clone())))
+    let mut expression: Vec<MathExpression> = Vec::new();
+    expression.push(MathExpression::Mrow(Mrow::new(row.0)));
+    let ci = Ci::new(
+        Some(Type::Real),
+        Box::new(MathExpression::Mi(Mi(format!("d{}", int_var)))),
+        None,
+    );
+    expression.push(MathExpression::Ci(ci.clone()));
+    let x = MathExpression::Mrow(Mrow(expression));
+
+    Ok((s, MathExpression::SurfaceIntegral(Box::new(x))))
 }
 
 /// Surface Closed Integral
 pub fn surface_closed_integral2(input: Span) -> IResult<MathExpression> {
     let (s, (_op, _lim)) = ws(delimited(
-        stag!("msubsup"),
+        alt((stag!("msubsup"), stag!("msub"))),
         pair(delimited(stag!("mtext"), tag("∯"), etag!("mtext")), mi),
-        etag!("msubsup"),
+        alt((etag!("msubsup"), etag!("msub"))),
     ))(input)?;
 
     let (s, row) = ws(many_till(
         math_expression,
         pair(delimited(stag!("mo"), dot, etag!("mo")), d),
     ))(s)?;
-    let (s, _int_var) = ws(math_expression)(s)?;
+    let (s, int_var) = ws(math_expression)(s)?;
 
     let mut expression: Vec<MathExpression> = Vec::new();
     expression.push(MathExpression::Mrow(Mrow::new(row.0)));
     expression.push(MathExpression::Mo(Operator::Dot));
     let ci = Ci::new(
         Some(Type::Real),
-        Box::new(MathExpression::Mi(Mi("dS".to_string()))),
+        Box::new(MathExpression::Mi(Mi(format!("d{}", int_var)))),
         None,
     );
     expression.push(MathExpression::Ci(ci.clone()));
-    let x = MathExpression::Mrow(Mrow(expression)); //Mrow::new(expression);
+    let x = MathExpression::Mrow(Mrow(expression));
 
-    Ok((
-        s,
-        MathExpression::SurfaceClosedIntegralNoIntVar(Box::new(x)),
-    ))
+    Ok((s, MathExpression::SurfaceIntegral(Box::new(x))))
 }
 
 /// Laplacian
@@ -1303,13 +1309,14 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                 },
             ),
             surface_closed_integral2,
-            map(surface_closed_integral, |(operator, comp, var)| {
+            surface_closed_integral,
+            /*map(surface_closed_integral, |(operator, comp, var)| {
                 MathExpression::Integral(Integral {
                     op: Box::new(MathExpression::Mo(operator)),
                     integrand: Box::new(comp),
                     integration_variable: Box::new(var),
                 })
-            }),
+            }),*/
             map(
                 integral_with_math_expression_integrand,
                 |(operator, comp, var)| {
@@ -1379,11 +1386,17 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
             map(change_in_variable, MathExpression::Ci),
             map(
                 munderover_summation,
-                |(Summation { uplimit, lowlimit }, comp)| {
+                |(
+                    Summation {
+                        lower_bound,
+                        upper_bound,
+                    },
+                    comp,
+                )| {
                     MathExpression::SummationMath(SummationMath {
                         op: Box::new(MathExpression::Mo(Operator::Summation(Summation {
-                            uplimit,
-                            lowlimit,
+                            lower_bound,
+                            upper_bound,
                         }))),
                         func: Box::new(MathExpression::Mrow(comp)),
                     })
@@ -1391,11 +1404,17 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
             ),
             map(
                 munder_summation,
-                |(Summation { uplimit, lowlimit }, comp)| {
+                |(
+                    Summation {
+                        lower_bound,
+                        upper_bound,
+                    },
+                    comp,
+                )| {
                     MathExpression::SummationMath(SummationMath {
                         op: Box::new(MathExpression::Mo(Operator::Summation(Summation {
-                            uplimit,
-                            lowlimit,
+                            lower_bound,
+                            upper_bound,
                         }))),
                         func: Box::new(MathExpression::Mrow(comp)),
                     })

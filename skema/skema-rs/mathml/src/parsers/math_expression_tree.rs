@@ -1,7 +1,5 @@
 //! Pratt parsing module to construct S-expressions from presentation MathML.
 //! This is based on the nice tutorial at https://matklad.github.io/2020/04/13/simple-but-powerful-pratt-parsing.html
-use utoipa::ToSchema;
-use schemars::JsonSchema;
 use crate::{
     ast::{
         operator::{
@@ -15,15 +13,30 @@ use crate::{
 use derive_new::new;
 use nom::error::Error;
 use regex::Regex;
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use std::{fmt, str::FromStr};
+use utoipa::ToSchema;
 
 #[cfg(test)]
 use crate::parsers::first_order_ode::{first_order_ode, FirstOrderODE};
 ///New whitespace handler before parsing
 
 /// An S-expression like structure to represent mathematical expressions.
-#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, ToSchema, JsonSchema)]
+#[derive(
+    Debug,
+    Ord,
+    PartialOrd,
+    PartialEq,
+    Eq,
+    Clone,
+    Hash,
+    new,
+    Deserialize,
+    Serialize,
+    ToSchema,
+    JsonSchema,
+)]
 pub enum MathExpressionTree {
     Atom(MathExpression),
     Cons(Operator, Vec<MathExpressionTree>),
@@ -266,7 +279,7 @@ fn is_unary_operator(op: &Operator) -> bool {
             | Operator::PartialDerivative(_)
             | Operator::DDerivative(_)
             | Operator::Int(_)
-            | Operator::SurfaceClosedInt
+            | Operator::SurfaceInt
             | Operator::DownArrow(_)
             | Operator::Sin
             | Operator::Cos
@@ -423,7 +436,7 @@ fn process_math_expression(expr: &MathExpression, expression: &mut String) {
                 expression.push_str("{\\downarrow}");
             }
         },
-        MathExpression::SurfaceClosedIntegral(row) => {
+        MathExpression::SurfaceIntegral(row) => {
             process_math_expression(row, expression);
         }
         MathExpression::Mo(Operator::Other(x)) => {
@@ -770,7 +783,7 @@ impl MathExpressionTree {
                         process_math_expression(&x.comp, &mut expression);
                         expression.push('}');
                     }
-                    Operator::Summation(x) => match (&x.lowlimit, &x.uplimit) {
+                    Operator::Summation(x) => match (&x.lower_bound, &x.upper_bound) {
                         (Some(low), Some(up)) => {
                             expression.push_str("\\sum_{");
                             expression.push_str(&format!("{}", low));
@@ -827,7 +840,7 @@ impl MathExpressionTree {
                             expression.push_str(&rest[0].to_latex());
                         }
                     },
-                    Operator::Int(x) => match (&x.lowlimit, &x.uplimit) {
+                    Operator::Int(x) => match (&x.lower_limit, &x.upper_limit) {
                         (Some(low), Some(up)) => {
                             expression.push_str("\\int_{");
                             process_math_expression(low, &mut expression);
@@ -857,11 +870,8 @@ impl MathExpressionTree {
                     Operator::Laplacian => {
                         expression.push_str(&format!("\\nabla^2 {}", rest[0].to_latex()));
                     }
-                    Operator::SurfaceClosedIntNoIntVar => {
+                    Operator::SurfaceInt => {
                         expression.push_str(&format!("\\oiint_S {}", rest[0].to_latex()));
-                    }
-                    Operator::SurfaceClosedInt => {
-                        expression.push_str(&format!("\\oiint_S {} dS", rest[0].to_latex()));
                     }
                     _ => {
                         expression = "".to_string();
@@ -944,25 +954,14 @@ impl MathExpression {
                         x.diff.flatten(tokens);
                     }
                 }
-                /*if x.diff == Box::new(MathExpression::Mo(Operator::Gradient(_))) {
-                    tokens.push(MathExpression::Mo(Operator::Grad));
-                } else {
-                    x.diff.flatten(tokens);
-                }*/
                 tokens.push(MathExpression::Mo(Operator::Lparen));
                 x.func.flatten(tokens);
                 tokens.push(MathExpression::Mo(Operator::Rparen));
                 tokens.push(MathExpression::Mo(Operator::Rparen));
             }
-            MathExpression::SurfaceClosedIntegralNoIntVar(row) => {
+            MathExpression::SurfaceIntegral(row) => {
                 tokens.push(MathExpression::Mo(Operator::Lparen));
-                tokens.push(MathExpression::Mo(Operator::SurfaceClosedIntNoIntVar));
-                row.flatten(tokens);
-                tokens.push(MathExpression::Mo(Operator::Rparen));
-            }
-            MathExpression::SurfaceClosedIntegral(row) => {
-                tokens.push(MathExpression::Mo(Operator::Lparen));
-                tokens.push(MathExpression::Mo(Operator::SurfaceClosedInt));
+                tokens.push(MathExpression::Mo(Operator::SurfaceInt));
                 row.flatten(tokens);
                 tokens.push(MathExpression::Mo(Operator::Rparen));
             }
@@ -988,12 +987,8 @@ impl MathExpression {
             MathExpression::Msup(base, superscript) => {
                 if *superscript == Box::new(MathExpression::Mo(Operator::Other("↓".to_string())))
                 {
-                    //if let MathExpression::Mo(Operator::Other("↓".to_string())) = &**superscript {
                     base.flatten(tokens);
-                    println!("--");
                     tokens.push(MathExpression::Mo(Operator::Other("↓".to_string())));
-                    //tokens.push(MathExpression::Mi(Mi("↓".to_string())));
-                    //superscript.flatten(tokens);
                 } else if let MathExpression::Ci(x) = &**base {
                     if x.content == Box::new(MathExpression::Mi(Mi("e".to_string()))) {
                         tokens.push(MathExpression::Mo(Operator::Exp));
@@ -1045,14 +1040,23 @@ impl MathExpression {
                 tokens.push(MathExpression::Mo(Operator::Rparen));
                 tokens.push(MathExpression::Mo(Operator::Rparen));
             }
+            // Handles `Hat` operator with MathExpression
+            MathExpression::HatComp(x) => {
+                x.op.flatten(tokens);
+                tokens.push(MathExpression::Mo(Operator::Lparen));
+                x.comp.flatten(tokens);
+                tokens.push(MathExpression::Mo(Operator::Rparen));
+            }
             MathExpression::Mover(base, over) => {
-                if MathExpression::Mo(Operator::Mean) == **over {
+                if *over == Box::new(MathExpression::Mo(Operator::Other("^".to_string()))) {
+                    base.flatten(tokens);
+                    tokens.push(MathExpression::Mo(Operator::Other("^".to_string())));
+                } else if MathExpression::Mo(Operator::Mean) == **over {
                     tokens.push(MathExpression::Mo(Operator::Mean));
                     tokens.push(MathExpression::Mo(Operator::Lparen));
                     base.flatten(tokens);
                     tokens.push(MathExpression::Mo(Operator::Rparen));
-                }
-                if MathExpression::Mo(Operator::Vector) == **over {
+                } else if MathExpression::Mo(Operator::Vector) == **over {
                     tokens.push(MathExpression::Mo(Operator::Vector));
                     tokens.push(MathExpression::Mo(Operator::Lparen));
                     base.flatten(tokens);
@@ -1066,13 +1070,7 @@ impl MathExpression {
                 x.func.flatten(tokens);
                 tokens.push(MathExpression::Mo(Operator::Rparen));
             }
-            // Handles `Hat` operator with MathExpression
-            MathExpression::HatComp(x) => {
-                x.op.flatten(tokens);
-                tokens.push(MathExpression::Mo(Operator::Lparen));
-                x.comp.flatten(tokens);
-                tokens.push(MathExpression::Mo(Operator::Rparen));
-            }
+
             // Handles `Integral` operator with MathExpression
             MathExpression::Integral(x) => {
                 x.op.flatten(tokens);
@@ -1282,8 +1280,7 @@ fn prefix_binding_power(op: &Operator) -> ((), u8) {
         Operator::Mean => ((), 25),
         Operator::Hat => ((), 25),
         Operator::Vector => ((), 25),
-        Operator::SurfaceClosedInt => ((), 25),
-        Operator::SurfaceClosedIntNoIntVar => ((), 25),
+        Operator::SurfaceInt => ((), 25),
         Operator::Gradient(Gradient { .. }) => ((), 25),
         Operator::Derivative(Derivative { .. }) => ((), 25),
         Operator::PartialDerivative(PartialDerivative { .. }) => ((), 25),
@@ -3249,7 +3246,7 @@ fn test_fourier_law_heat_equation_1_1() {
     let exp = input.parse::<MathExpressionTree>().unwrap();
     let s_exp = exp.to_string();
     assert_eq!(s_exp, "(= Q (* (/ k_{T} ρ) (Laplacian T)))");
-    assert_eq!(exp.to_latex(), "Q=\\frac{k_{T}}{\\rho}*(\\nabla^2 T)");
+    assert_eq!(exp.to_latex(), "Q=\\frac{k_{T}}{\\rho}*\\nabla^2 T");
 }
 
 #[test]
@@ -3262,8 +3259,8 @@ fn test_closed_surface_integral() {
     </math>";
     let exp = input.parse::<MathExpressionTree>().unwrap();
     let s_exp = exp.to_string();
-    assert_eq!(s_exp, "(SurfaceClosedInt (⋅ (Grad T) T))");
-    assert_eq!(exp.to_latex(), "\\oiint_S \\nabla{T} \\cdot T dS");
+    assert_eq!(s_exp, "(SurfaceInt (* (⋅ (Grad T) T) dS))");
+    assert_eq!(exp.to_latex(), "\\oiint_S \\nabla{T} \\cdot T*dS");
 }
 
 #[test]
@@ -3280,11 +3277,11 @@ fn test_fourier_law_heat_equation_2() {
     let s_exp = exp.to_string();
     assert_eq!(
         s_exp,
-        "(= (PD(1, t) Q) (* (- k) (SurfaceClosedInt (⋅ (Grad T) dS))))"
+        "(= (PD(1, t) Q) (* (- k) (SurfaceInt (⋅ (Grad T) dS))))"
     );
     assert_eq!(
         exp.to_latex(),
-        "\\frac{\\partial Q}{\\partial t}=(-k)*(\\oiint_S \\nabla{T} \\cdot dS)"
+        "\\frac{\\partial Q}{\\partial t}=(-k)*\\oiint_S \\nabla{T} \\cdot dS"
     );
 }
 
@@ -3390,7 +3387,7 @@ fn test_conservation_of_momentum_fluid_equation_1() {
     </math>";
     let exp = input.parse::<MathExpressionTree>().unwrap();
     let s_exp = exp.to_string();
-    assert_eq!(s_exp, "(= (- (DD(1, t) u) (* f v)) (* (- g) (PD(1, x) η)))");
+    assert_eq!(s_exp, "(= (- (D(1, t) u) (* f v)) (* (- g) (PD(1, x) η)))");
     assert_eq!(
         exp.to_latex(),
         "\\frac{D u}{Dt}-(f*v)=(-g)*\\frac{\\partial \\eta}{\\partial x}"
