@@ -995,11 +995,11 @@ impl MathExpression {
             }
             // Insert implicit `exponential` and `power` operators
             MathExpression::Msup(base, superscript) => {
-                if *superscript == Box::new(MathExpression::Mo(Operator::Other("↓".to_string())))
+                /*if *superscript == Box::new(MathExpression::Mo(Operator::Other("↓".to_string())))
                 {
                     base.flatten(tokens);
                     tokens.push(MathExpression::Mo(Operator::Other("↓".to_string())));
-                } else if let MathExpression::Ci(x) = &**base {
+                } else*/ if let MathExpression::Ci(x) = &**base {
                     if x.content == Box::new(MathExpression::Mi(Mi("e".to_string()))) {
                         tokens.push(MathExpression::Mo(Operator::Exp));
                         tokens.push(MathExpression::Mo(Operator::Lparen));
@@ -3031,6 +3031,7 @@ fn test_down_arrow() {
       </msup>
     </math>";
     let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", exp);
     let s_exp = exp.to_string();
     assert_eq!(s_exp, "I^\\downarrow");
     assert_eq!(exp.to_latex(), "I^\\downarrow");

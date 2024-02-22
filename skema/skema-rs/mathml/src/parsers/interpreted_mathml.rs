@@ -205,8 +205,10 @@ pub fn superscript(input: Span) -> IResult<MathExpression> {
     ))(input)?;
     if let MathExpression::Msup(ref x, ref y) = sup.clone() {
         if MathExpression::Mo(Operator::Other("↓".to_string())) == **y {
+            let comp = Mi::new("\\downarrow".to_string());
             let new_op = Operator::Other("↓".to_string());
-            return Ok((s, MathExpression::Mo(new_op)));
+            //return Ok((s, MathExpression::Mo(new_op)));
+            return Ok((s, MathExpression::Mi(comp)));
         } else {
             return Ok((s, sup));
         }
@@ -279,7 +281,9 @@ pub fn downarrow_operator_with_bounds(input: Span) -> IResult<Ci> {
         parenthesized_identifier,
         parenthesized_msub_identifier,
     )))(s)?;
-    let operator = Operator::Other(format!("{}^\\downarrow", MathExpression::Mi(comp.clone())));
+    println!("-");
+    let comp = Mi::new(format!("{}^\\downarrow", MathExpression::Mi(comp.clone())));
+    println!("--");
     let mut ci_func_of: Vec<Ci> = Vec::new();
     for bvar in bound_vars {
         let b = Ci::new(Some(Type::Real), Box::new(MathExpression::Mi(bvar)), None);
@@ -289,7 +293,7 @@ pub fn downarrow_operator_with_bounds(input: Span) -> IResult<Ci> {
         s,
         Ci::new(
             Some(Type::Function),
-            Box::new(MathExpression::Mo(operator)),
+            Box::new(MathExpression::Mi(comp)),
             Some(ci_func_of),
         ),
     ))
@@ -310,13 +314,13 @@ pub fn downarrow_operator_no_bounds(input: Span) -> IResult<Ci> {
         ),
         etag!("msup"),
     ))(input)?;
-    let operator = Operator::Other(format!("{}^\\downarrow", MathExpression::Mi(comp.clone())));
+    let comp = Mi::new(format!("{}^\\downarrow", MathExpression::Mi(comp.clone())));
 
     Ok((
         s,
         Ci::new(
             Some(Type::Function),
-            Box::new(MathExpression::Mo(operator)),
+            Box::new(MathExpression::Mi(comp)),
             None,
         ),
     ))

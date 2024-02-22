@@ -5,7 +5,7 @@ use crate::model_extraction::module_id2mathml_MET_ast;
 use crate::ModuleCollection;
 use actix_web::web::ServiceConfig;
 use actix_web::{delete, get, post, put, web, HttpResponse};
-use mathml::acset::{PetriNet, RegNet, GeneralizedAMR};
+use mathml::acset::{GeneralizedAMR, PetriNet, RegNet};
 
 use mathml::ast::{self, MathExpression};
 use mathml::parsers::math_expression_tree::MathExpressionTree;
