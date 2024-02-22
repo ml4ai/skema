@@ -14,6 +14,7 @@ pub struct Derivative {
     pub order: u8,
     pub var_index: u8,
     pub bound_var: Ci,
+    pub has_uppercase_d: bool,
 }
 
 /// D Derivative operator, e.g. DS/Dt . in line with Spivak notation: http://ceres-solver.org/spivak_notation.html
@@ -93,7 +94,7 @@ pub struct Summation {
     ToSchema,
     JsonSchema,
 )]
-pub struct HatOp {
+pub struct Hat {
     pub comp: Box<MathExpression>,
 }
 
@@ -136,27 +137,6 @@ pub struct Int {
     pub lower_limit: Option<Box<MathExpression>>,
     pub upper_limit: Option<Box<MathExpression>>,
     pub integration_variable: Box<MathExpression>,
-}
-
-/// Handles ↓ as an operator such that {comp}↓_{sub}^{sup} can parse
-#[derive(
-    Debug,
-    Ord,
-    PartialOrd,
-    PartialEq,
-    Eq,
-    Clone,
-    Hash,
-    new,
-    Deserialize,
-    Serialize,
-    ToSchema,
-    JsonSchema,
-)]
-pub struct DownArrow {
-    pub sub: Option<Box<MathExpression>>,
-    pub sup: Option<Box<MathExpression>>,
-    pub comp: Box<MathExpression>,
 }
 
 #[derive(
@@ -212,8 +192,6 @@ pub enum Operator {
     Derivative(Derivative),
     /// Partial derivative operator, e.g. ∂/∂t
     PartialDerivative(PartialDerivative),
-    /// Partial derivative operator, e.g. D/Dt
-    DDerivative(DDerivative),
     Sin,
     Cos,
     Tan,
@@ -232,12 +210,8 @@ pub enum Operator {
     Summation(Summation),
     /// Cross product operator
     Cross,
-    /// Hat operator, e.g. \hat
-    Hat,
     /// Hat operator with component, e.g. \hat{x}
-    HatOp(HatOp),
-    /// ↓ as an operator e.g. I↓ indicates downward diffuse radiative fluxes per unit indcident flux
-    DownArrow(DownArrow),
+    Hat(Hat),
     /// Integrals
     Int(Int),
     /// Laplacian operator
@@ -268,6 +242,7 @@ impl fmt::Display for Operator {
                 order,
                 var_index: _,
                 bound_var,
+                has_uppercase_d: _,
             }) => {
                 write!(f, "D({order}, {bound_var})")
             }
@@ -277,13 +252,6 @@ impl fmt::Display for Operator {
                 bound_var,
             }) => {
                 write!(f, "PD({order}, {bound_var})")
-            }
-            Operator::DDerivative(DDerivative {
-                order,
-                var_index: _,
-                bound_var,
-            }) => {
-                write!(f, "D({order}, {bound_var})")
             }
             Operator::Exp => write!(f, "exp"),
             Operator::Power => write!(f, "^"),
@@ -331,15 +299,8 @@ impl fmt::Display for Operator {
                 (None, Some(up)) => write!(f, "Int^{{{up}}}(integration_variable)"),
                 (None, None) => write!(f, "Int"),
             },
-            Operator::DownArrow(DownArrow { sub, sup, comp }) => match (sub, sup) {
-                (Some(low), Some(up)) => write!(f, "{comp}↓_{{{low}}}^{{{up}}}"),
-                (Some(low), None) => write!(f, "{comp}↓_{{{low}}}"),
-                (None, Some(up)) => write!(f, "{comp}↓^{{{up}}}"),
-                (None, None) => write!(f, "{comp}↓"),
-            },
             Operator::Cross => write!(f, "×"),
-            Operator::Hat => write!(f, "Hat"),
-            Operator::HatOp(HatOp { comp }) => write!(f, "Hat({comp})"),
+            Operator::Hat(Hat { comp }) => write!(f, "Hat({comp})"),
             Operator::Laplacian => write!(f, "Laplacian"),
             Operator::SurfaceInt => {
                 write!(f, "SurfaceInt")

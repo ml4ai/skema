@@ -283,6 +283,7 @@ pub fn to_decapodes_serialization(
                 order,
                 var_index: _,
                 bound_var,
+                has_uppercase_d: _,
             }) => {
                 table_counts.operation_count += 1;
                 let temp_str = format!("•{}", (table_counts.operation_count));
@@ -302,7 +303,7 @@ pub fn to_decapodes_serialization(
                 tables.unary_operators.push(unary.clone());
                 tgt_idx
             }
-            Operator::Gradient(x) => {
+            Operator::Gradient(_x) => {
                 table_counts.operation_count += 1;
                 let temp_str = format!("•{}", (table_counts.operation_count));
                 let temp_variable = Variable {

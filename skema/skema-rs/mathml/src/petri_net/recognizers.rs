@@ -69,6 +69,7 @@ pub fn recognize_leibniz_differential_operator<'a>(
                     Box::new(MathExpression::Mi(Mi(denom_var.trim().to_string()))),
                     None,
                 ),
+                false,
             )),
             function_candidate.unwrap(),
         ))

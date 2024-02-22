@@ -100,6 +100,27 @@ pub struct LaplacianComp {
     pub comp: Ci,
 }
 
+/// Handles ↓  such that {comp}↓_{sub}^{sup} can parse
+#[derive(
+    Debug,
+    Ord,
+    PartialOrd,
+    PartialEq,
+    Eq,
+    Clone,
+    Hash,
+    new,
+    Deserialize,
+    Serialize,
+    ToSchema,
+    JsonSchema,
+)]
+pub struct DownArrow {
+    pub sub: Option<Box<MathExpression>>,
+    pub sup: Option<Box<MathExpression>>,
+    pub comp: Box<MathExpression>,
+}
+
 /// The MathExpression enum is not faithful to the corresponding element type in MathML 3
 /// (https://www.w3.org/TR/MathML3/appendixa.html#parsing_MathExpression)
 #[derive(
@@ -159,8 +180,8 @@ pub enum MathExpression {
     LaplacianComp(LaplacianComp),
     /// Represents closed surface integral over contents. E.g. \\oiint_S ∇ \cdot T dS
     SurfaceIntegral(Box<MathExpression>),
-    /// Represents closed surface integral over contents where integration E.g. \\oiint_S ∇ \cdot dS
-    //SurfaceClosedIntegralNoIntVar(Box<MathExpression>),
+    /// ↓ as an operator e.g. I↓ indicates downward diffuse radiative fluxes per unit indcident flux
+    DownArrow(DownArrow),
     #[default]
     None,
 }
@@ -226,6 +247,12 @@ impl fmt::Display for MathExpression {
             MathExpression::SurfaceIntegral(row) => {
                 write!(f, "{row})")
             }
+            MathExpression::DownArrow(DownArrow { sub, sup, comp }) => match (sub, sup) {
+                (Some(low), Some(up)) => write!(f, "{comp}↓_{{{low}}}^{{{up}}}"),
+                (Some(low), None) => write!(f, "{comp}↓_{{{low}}}"),
+                (None, Some(up)) => write!(f, "{comp}↓^{{{up}}}"),
+                (None, None) => write!(f, "{comp}↓"),
+            },
             expression => write!(f, "{expression:?}"),
         }
     }

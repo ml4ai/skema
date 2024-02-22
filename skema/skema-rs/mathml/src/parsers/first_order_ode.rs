@@ -128,7 +128,7 @@ pub fn first_order_ode(input: Span) -> IResult<FirstOrderODE> {
 impl FirstOrderODE {
     pub fn to_cmml(&self) -> String {
         let lhs_expression_tree = MathExpressionTree::Cons(
-            Operator::Derivative(Derivative::new(1, 1, self.with_respect_to.clone())),
+            Operator::Derivative(Derivative::new(1, 1, self.with_respect_to.clone(), false)),
             vec![MathExpressionTree::Atom(MathExpression::Ci(
                 self.lhs_var.clone(),
             ))],
@@ -1040,6 +1040,7 @@ fn test_first_order_derivative_leibniz_notation_with_implicit_time_dependence() 
                     Box::new(MathExpression::Mi(Mi("t".to_string()))),
                     None,
                 ),
+                false,
             ),
             Ci::new(
                 Some(Type::Function),
@@ -1072,6 +1073,7 @@ fn test_first_order_derivative_leibniz_notation_with_explicit_time_dependence() 
                     Box::new(MathExpression::Mi(Mi("t".to_string()))),
                     None,
                 ),
+                false,
             ),
             Ci::new(
                 Some(Type::Function),
@@ -1154,6 +1156,7 @@ fn test_msub_derivative() {
                     Box::new(MathExpression::Mi(Mi("t".to_string()))),
                     None,
                 ),
+                false,
             ),
             Ci::new(
                 Some(Type::Function),

@@ -233,11 +233,6 @@ pub fn mean(input: Span) -> IResult<Operator> {
     Ok((s, op))
 }
 
-pub fn hat(input: Span) -> IResult<Operator> {
-    let (s, op) = value(Operator::Hat, alt((ws(tag("^")), ws(tag("&#x5E;")))))(input)?;
-    Ok((s, op))
-}
-
 pub fn dot(input: Span) -> IResult<Operator> {
     let (s, op) = value(Operator::Dot, alt((ws(tag("⋅")), ws(tag("&#x22c5;")))))(input)?;
     Ok((s, op))
@@ -267,7 +262,6 @@ pub fn operator(input: Span) -> IResult<Operator> {
         lparen,
         rparen,
         mean,
-        hat,
         multiply,
         divide,
         dot,

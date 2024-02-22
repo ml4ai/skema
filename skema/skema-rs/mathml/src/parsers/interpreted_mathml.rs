@@ -6,17 +6,14 @@
 
 use crate::{
     ast::{
-        operator::{
-            DDerivative, Derivative, DownArrow, Gradient, HatOp, Int, Operator, PartialDerivative,
-            Summation,
-        },
+        operator::{Derivative, Gradient, Hat, Int, Operator, PartialDerivative, Summation},
         Ci, Differential, HatComp, Integral, LaplacianComp, Math, MathExpression, Mi, Mrow,
         SummationMath, Type,
     },
     parsers::generic_mathml::{
-        add, attribute, cross, divide, dot, elem_many0, equals, etag, hat, lparen, mean, mi, mn,
-        msub, msubsup, mtext, multiply, rparen, stag, subtract, tag_parser, vector, ws,
-        xml_declaration, IResult, ParseError, Span,
+        add, attribute, cross, divide, dot, elem_many0, equals, etag, lparen, mean, mi, mn, msub,
+        msubsup, mtext, multiply, rparen, stag, subtract, tag_parser, vector, ws, xml_declaration,
+        IResult, ParseError, Span,
     },
 };
 
@@ -36,7 +33,7 @@ pub fn operator(input: Span) -> IResult<Operator> {
     let (s, op) = ws(delimited(
         stag!("mo"),
         alt((
-            add, subtract, multiply, divide, equals, lparen, rparen, mean, dot, cross, hat, vector,
+            add, subtract, multiply, divide, equals, lparen, rparen, mean, dot, cross, vector,
         )),
         etag!("mo"),
     ))(input)?;
@@ -203,11 +200,10 @@ pub fn superscript(input: Span) -> IResult<MathExpression> {
         tag_parser!("msup", pair(math_expression, math_expression)),
         |(x, y)| MathExpression::Msup(Box::new(x), Box::new(y)),
     ))(input)?;
-    if let MathExpression::Msup(ref x, ref y) = sup.clone() {
+    if let MathExpression::Msup(ref _x, ref y) = sup.clone() {
         if MathExpression::Mo(Operator::Other("↓".to_string())) == **y {
             let comp = Mi::new("\\downarrow".to_string());
-            let new_op = Operator::Other("↓".to_string());
-            //return Ok((s, MathExpression::Mo(new_op)));
+            let _new_op = Operator::Other("↓".to_string());
             return Ok((s, MathExpression::Mi(comp)));
         } else {
             return Ok((s, sup));
@@ -233,9 +229,9 @@ pub fn over_term(input: Span) -> IResult<MathExpression> {
         |(x, y)| MathExpression::Mover(Box::new(x), Box::new(y)),
     ))(input)?;
     if let MathExpression::Mover(ref x, ref y) = over.clone() {
-        //if MathExpression::Mo(Operator::Other("^".to_string())) == **y{
-        if MathExpression::Mo(Operator::Hat) == **y {
-            let new_op = Operator::HatOp(HatOp::new(x.clone()));
+        if MathExpression::Mo(Operator::Other("^".to_string())) == **y {
+            //if MathExpression::Mo(Operator::Hat) == **y {
+            let new_op = Operator::Hat(Hat::new(x.clone()));
             return Ok((s, MathExpression::Mo(new_op)));
         } else {
             return Ok((s, over));
@@ -252,6 +248,34 @@ pub fn over_term(input: Span) -> IResult<MathExpression> {
 pub fn hat_operator(input: Span) -> IResult<(MathExpression, MathExpression)> {
     let (s, (comp, op)) = pair(mi, over_term)(input)?;
     Ok((s, (op, MathExpression::Mi(comp))))
+}
+
+/// Handles downarrow operation (↓) in Superscript
+/// E.g. r \hat{x}
+pub fn hat_with_comps(input: Span) -> IResult<Ci> {
+    let (s, (base, _over)) = ws(delimited(
+        stag!("mover"),
+        pair(
+            mi,
+            delimited(
+                stag!("mo"),
+                alt((ws(tag("^")), ws(tag("&#x5E;")))),
+                etag!("mo"),
+            ),
+        ),
+        etag!("mover"),
+    ))(input)?;
+
+    //let comp = Mi::new(format!("\\hat{{{}}}", MathExpression::Mi(base.clone())));
+    let operator = Operator::Hat(Hat::new(Box::new(MathExpression::Mi(base.clone()))));
+    Ok((
+        s,
+        Ci::new(
+            Some(Type::Function),
+            Box::new(MathExpression::Mo(operator)),
+            None,
+        ),
+    ))
 }
 
 /// Handles downarrow operation (↓) in Superscript with includes function of content
@@ -427,6 +451,7 @@ pub fn first_order_with_func_in_parenthesis(input: Span) -> IResult<(Derivative,
                     Box::new(MathExpression::Mi(with_respect_to)),
                     None,
                 ),
+                false,
             ),
             Mrow(func),
         ),
@@ -507,6 +532,7 @@ pub fn first_order_derivative_leibniz_notation(input: Span) -> IResult<(Derivati
                                 Box::new(MathExpression::Mi(with_respect_to)),
                                 None,
                             ),
+                            false,
                         ),
                         func,
                     ),
@@ -525,6 +551,7 @@ pub fn first_order_derivative_leibniz_notation(input: Span) -> IResult<(Derivati
                                 Box::new(MathExpression::Mi(with_respect_to)),
                                 None,
                             ),
+                            false,
                         ),
                         func,
                     ),
@@ -685,7 +712,7 @@ pub fn first_order_partial_derivative_leibniz_notation(
 }
 
 /// Parse a first-order partial ordinary derivative written in Leibniz notation.
-pub fn first_order_dderivative_leibniz_notation(input: Span) -> IResult<(DDerivative, Ci)> {
+pub fn first_order_dderivative_leibniz_notation(input: Span) -> IResult<(Derivative, Ci)> {
     let (s, _) = tuple((stag!("mfrac"), stag!("mrow"), D))(input)?;
     let (s, func) = ws(alt((
         ci_univariate_func,
@@ -717,7 +744,7 @@ pub fn first_order_dderivative_leibniz_notation(input: Span) -> IResult<(DDeriva
                 return Ok((
                     s,
                     (
-                        DDerivative::new(
+                        Derivative::new(
                             1,
                             (indx + 1) as u8,
                             Ci::new(
@@ -725,6 +752,7 @@ pub fn first_order_dderivative_leibniz_notation(input: Span) -> IResult<(DDeriva
                                 Box::new(MathExpression::Mi(with_respect_to)),
                                 None,
                             ),
+                            true,
                         ),
                         func,
                     ),
@@ -735,7 +763,7 @@ pub fn first_order_dderivative_leibniz_notation(input: Span) -> IResult<(DDeriva
                 return Ok((
                     s,
                     (
-                        DDerivative::new(
+                        Derivative::new(
                             1,
                             1,
                             Ci::new(
@@ -743,6 +771,7 @@ pub fn first_order_dderivative_leibniz_notation(input: Span) -> IResult<(DDeriva
                                 Box::new(MathExpression::Mi(with_respect_to)),
                                 None,
                             ),
+                            true,
                         ),
                         func,
                     ),
@@ -752,7 +781,7 @@ pub fn first_order_dderivative_leibniz_notation(input: Span) -> IResult<(DDeriva
     }
 
     Err(nom::Err::Error(ParseError::new(
-        "Unable to match  function_of  with with_respect_to".to_string(),
+        "Unable to match  function_of with with_respect_to".to_string(),
         input,
     )))
 }
@@ -907,6 +936,7 @@ pub fn newtonian_derivative(input: Span) -> IResult<(Derivative, Ci)> {
                 order,
                 1,
                 Ci::new(Some(Type::Real), new_with_respect_to, None),
+                false,
             ),
             func,
         ),
@@ -957,7 +987,7 @@ pub fn div(input: Span) -> IResult<Operator> {
 }
 
 pub fn gradient(input: Span) -> IResult<Operator> {
-    let (s, op) = ws(alt((
+    let (s, _op) = ws(alt((
         delimited(
             stag!("mo"),
             alt((ws(tag("∇")), ws(tag("&#x2207;")))),
@@ -1165,7 +1195,7 @@ pub fn int_with_math_expression_integrand(
     let int_op = Operator::Int(operator);
     let (s, _) = ws(alt((etag!("mrow"), tag(""))))(s)?;
 
-    return Ok((s, (int_op, integrand, int_var)));
+    Ok((s, (int_op, integrand, int_var)))
 }
 
 /// Parser for Msubsup integral that handles integrand with MathExpression
@@ -1343,6 +1373,7 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                 })
             }),
             map(laplacian, MathExpression::Mo),
+            map(hat_with_comps, MathExpression::Ci),
             map(hat_operator, |(op, row)| {
                 MathExpression::HatComp(HatComp {
                     op: Box::new(op),
@@ -1451,6 +1482,7 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                         order,
                         var_index,
                         bound_var,
+                        has_uppercase_d,
                     },
                     Ci {
                         r#type,
@@ -1463,6 +1495,7 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                             order,
                             var_index,
                             bound_var,
+                            has_uppercase_d,
                         }))),
                         func: Box::new(MathExpression::Ci(Ci {
                             r#type,
@@ -1505,10 +1538,11 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
             map(
                 first_order_dderivative_leibniz_notation,
                 |(
-                    DDerivative {
+                    Derivative {
                         order,
                         var_index,
                         bound_var,
+                        has_uppercase_d,
                     },
                     Ci {
                         r#type,
@@ -1517,10 +1551,11 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                     },
                 )| {
                     MathExpression::Differential(Differential {
-                        diff: Box::new(MathExpression::Mo(Operator::DDerivative(DDerivative {
+                        diff: Box::new(MathExpression::Mo(Operator::Derivative(Derivative {
                             order,
                             var_index,
                             bound_var,
+                            has_uppercase_d,
                         }))),
                         func: Box::new(MathExpression::Ci(Ci {
                             r#type,
@@ -1537,6 +1572,7 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                         order,
                         var_index,
                         bound_var,
+                        has_uppercase_d,
                     },
                     Ci {
                         r#type,
@@ -1549,6 +1585,7 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                             order,
                             var_index,
                             bound_var,
+                            has_uppercase_d,
                         }))),
                         func: Box::new(MathExpression::Ci(Ci {
                             r#type,
@@ -1632,6 +1669,7 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                     order,
                     var_index,
                     bound_var,
+                    has_uppercase_d,
                 },
                 comp,
             )| {
@@ -1640,6 +1678,7 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                         order,
                         var_index,
                         bound_var,
+                        has_uppercase_d,
                     }))),
                     func: Box::new(MathExpression::Mrow(comp)),
                 })
