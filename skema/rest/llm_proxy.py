@@ -94,7 +94,7 @@ async def get_lines_of_model(zip_file: UploadFile = File()) -> List[Dynamics]:
     # initialize the models
     openai = ChatOpenAI(
         temperature=temperature,
-        model_name='gpt-3.5-turbo',
+        model_name='gpt-3.5-turbo-0613',
         openai_api_key=SKEMA_OPENAI_KEY
     )
 
@@ -140,10 +140,11 @@ async def get_lines_of_model(zip_file: UploadFile = File()) -> List[Dynamics]:
             # get metadata entry for function
             for entry in response_zip['modules'][0]['fn_array']:
                 try:
+                    print(f"Entry trying to get name and metadata idx from: {entry['b'][0]} looking for {function_name}")
                     if entry['b'][0]['name'][0:len(function_name)] == function_name:
                         metadata_idx = entry['b'][0]['metadata']
                 except:
-                    continue
+                    print(f"failed to find {function_name}")
 
             # get line span using metadata
             for (i,metadata) in enumerate(response_zip['modules'][0]['metadata_collection']):

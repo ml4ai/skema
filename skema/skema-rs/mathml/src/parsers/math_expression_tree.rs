@@ -729,7 +729,7 @@ impl MathExpressionTree {
                         process_math_expression(&x.sup, &mut expression);
                         expression.push('}');
                         expression.push_str(&rest[0].to_latex());
-                        expression.push_str(&*format!(" d{}", &*x.integration_variable));
+                        expression.push_str(&format!(" d{}", &*x.integration_variable));
                     }
                     Operator::Laplacian => {
                         expression.push_str(&format!("\\nabla^2 {}", rest[0].to_latex()));
