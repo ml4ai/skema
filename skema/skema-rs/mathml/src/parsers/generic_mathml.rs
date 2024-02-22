@@ -252,6 +252,19 @@ pub fn cross(input: Span) -> IResult<Operator> {
     Ok((s, op))
 }
 
+pub fn down_arrow(input: Span) -> IResult<Operator> {
+    let (s, op) = value(
+        Operator::DownArrow,
+        alt((ws(tag("↓")), ws(tag("&#x2193;")))),
+    )(input)?;
+    Ok((s, op))
+}
+
+pub fn int(input: Span) -> IResult<Operator> {
+    let (s, op) = value(Operator::Int, alt((ws(tag("∫")), ws(tag("&#x222b;")))))(input)?;
+    Ok((s, op))
+}
+
 fn operator_other(input: Span) -> IResult<Operator> {
     let (s, consumed) = ws(recognize(not_line_ending))(input)?;
     let op = Operator::Other(consumed.to_string());
@@ -273,6 +286,8 @@ pub fn operator(input: Span) -> IResult<Operator> {
         dot,
         cross,
         period,
+        down_arrow,
+        int,
         operator_other,
     ))(input)?;
     Ok((s, op))

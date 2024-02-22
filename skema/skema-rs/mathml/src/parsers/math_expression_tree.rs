@@ -1,9 +1,13 @@
 //! Pratt parsing module to construct S-expressions from presentation MathML.
 //! This is based on the nice tutorial at https://matklad.github.io/2020/04/13/simple-but-powerful-pratt-parsing.html
-
+use utoipa::ToSchema;
+use schemars::JsonSchema;
 use crate::{
     ast::{
-        operator::{Derivative, GradSub, HatOp, Operator, PartialDerivative, SumUnderOver},
+        operator::{
+            Derivative, GradSub, HatOp, MsubsupInt, MsupDownArrow, Operator, PartialDerivative,
+            SumUnderOver,
+        },
         Math, MathExpression, Mi, Mrow,
     },
     parsers::interpreted_mathml::interpreted_math,
@@ -19,7 +23,7 @@ use crate::parsers::first_order_ode::{first_order_ode, FirstOrderODE};
 ///New whitespace handler before parsing
 
 /// An S-expression like structure to represent mathematical expressions.
-#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize)]
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, ToSchema, JsonSchema)]
 pub enum MathExpressionTree {
     Atom(MathExpression),
     Cons(Operator, Vec<MathExpressionTree>),
@@ -269,14 +273,43 @@ fn is_unary_operator(op: &Operator) -> bool {
             | Operator::Arccsc
             | Operator::Arccot
             | Operator::Mean
+            | Operator::Int
+            | Operator::Hat
+            | Operator::HatOp(_)
+            | Operator::SumUnderOver(_)
+            | Operator::MsubsupInt(_)
+            | Operator::Laplacian
+            | Operator::SurfaceClosedInt
+            | Operator::SurfaceClosedIntNoIntVar
     )
 }
 
-// Process parentheses in an expression and update the LaTeX string.
-// If the expression is a unary operator, it is added to the LaTeX string as is.
+// Process parentheses in an expression and update the LaTeX string when connected by arithmatic operators like +, -, *, /.
+// If the expression is a unary or multiplication or division operator, it is added to the LaTeX string as is.
 // If the expression is not a unary operator, it is wrapped in parentheses before being added to the LaTeX string.
 // If the expression is an atom, it is added to the LaTeX string directly.
 fn process_expression_parentheses(expression: &mut String, met: &MathExpressionTree) {
+    // Check if the rest vector is not empty and contains a MathExpressionTree::Cons variant.
+    if let MathExpressionTree::Cons(op, _args) = met {
+        // Check if the operator is a unary operator.
+        if is_unary_operator(op) || matches!(op, Operator::Multiply | Operator::Divide) {
+            // If it is a unary operator, add it to the LaTeX string as is.
+            expression.push_str(&met.to_latex().to_string());
+        } else {
+            // If it is not a unary or multiplication or division operator, wrap it in parentheses before adding it to the LaTeX string.
+            expression.push_str(&format!("({})", met.to_latex()));
+        }
+    } else {
+        // If the expression is an atom, add it to the LaTeX string directly.
+        expression.push_str(&met.to_latex().to_string());
+    }
+}
+
+// Process parentheses in an expression and update the LaTeX string when connected by connectors like "_", "^", etc.
+// If the expression is a unary operator, it is added to the LaTeX string as is.
+// If the expression is not a unary operator, it is wrapped in parentheses before being added to the LaTeX string.
+// If the expression is an atom, it is added to the LaTeX string directly.
+fn process_atoms_cons_parentheses(expression: &mut String, met: &MathExpressionTree) {
     // Check if the rest vector is not empty and contains a MathExpressionTree::Cons variant.
     if let MathExpressionTree::Cons(op, _args) = met {
         // Check if the operator is a unary operator.
@@ -382,6 +415,13 @@ fn process_math_expression(expr: &MathExpression, expression: &mut String) {
             for me in vec_me.0.iter() {
                 process_math_expression(me, expression);
             }
+        }
+        MathExpression::Mo(Operator::MsupDownArrow(MsupDownArrow { comp })) => {
+            process_math_expression(comp, expression);
+            expression.push_str("^{\\downarrow}");
+        }
+        MathExpression::SurfaceClosedIntegral(row) => {
+            process_math_expression(row, expression);
         }
         t => panic!("Unhandled MathExpression: {:?}", t),
     }
@@ -506,18 +546,7 @@ impl MathExpressionTree {
                 match head {
                     Operator::Add => {
                         for (index, r) in rest.iter().enumerate() {
-                            if let MathExpressionTree::Cons(op, _) = r {
-                                if is_unary_operator(op) {
-                                    expression.push_str(&r.to_latex().to_string());
-                                } else if let Operator::Add = op {
-                                    expression.push_str(&r.to_latex().to_string());
-                                } else {
-                                    expression.push_str(&format!("({})", r.to_latex()));
-                                }
-                            } else {
-                                expression.push_str(&r.to_latex().to_string());
-                            }
-
+                            expression.push_str(&r.to_latex().to_string());
                             // Add "+" if it's not the last element
                             if index < rest.len() - 1 {
                                 expression.push('+');
@@ -588,38 +617,51 @@ impl MathExpressionTree {
                         expression.push_str(&rest[0].to_latex().to_string());
                     }
                     Operator::Compose => {
-                        process_expression_parentheses(&mut expression, &rest[0]);
+                        process_atoms_cons_parentheses(&mut expression, &rest[0]);
                         expression.push('_');
-                        process_expression_parentheses(&mut expression, &rest[1]);
+                        process_atoms_cons_parentheses(&mut expression, &rest[1]);
                     }
                     Operator::Factorial => {
-                        process_expression_parentheses(&mut expression, &rest[0]);
+                        process_atoms_cons_parentheses(&mut expression, &rest[0]);
                         expression.push('!');
                     }
                     Operator::Power => {
-                        process_expression_parentheses(&mut expression, &rest[0]);
+                        process_atoms_cons_parentheses(&mut expression, &rest[0]);
                         expression.push('^');
                         expression.push_str(&format!("{{{}}}", rest[1].to_latex()));
                     }
                     Operator::Comma => {
-                        process_expression_parentheses(&mut expression, &rest[0]);
+                        process_atoms_cons_parentheses(&mut expression, &rest[0]);
                         expression.push(',');
-                        process_expression_parentheses(&mut expression, &rest[1]);
+                        process_atoms_cons_parentheses(&mut expression, &rest[1]);
                     }
                     Operator::Grad => {
                         expression.push_str("\\nabla{");
                         process_expression_parentheses(&mut expression, &rest[0]);
                         expression.push('}');
                     }
-                    Operator::Dot => {
+                    Operator::GradSub(x) => {
+                        expression.push_str("\\nabla_{");
+                        process_math_expression(&x.sub, &mut expression);
+                        expression.push('}');
+                        expression.push('{');
                         process_expression_parentheses(&mut expression, &rest[0]);
+                        expression.push('}');
+                    }
+                    Operator::Dot => {
+                        process_atoms_cons_parentheses(&mut expression, &rest[0]);
                         expression.push_str(" \\cdot ");
-                        process_expression_parentheses(&mut expression, &rest[1]);
+                        process_atoms_cons_parentheses(&mut expression, &rest[1]);
+                    }
+                    Operator::Cross => {
+                        process_atoms_cons_parentheses(&mut expression, &rest[0]);
+                        expression.push_str(" \\cross ");
+                        process_atoms_cons_parentheses(&mut expression, &rest[1]);
                     }
                     Operator::Div => {
                         expression.push_str("\\nabla \\cdot {");
-                        process_expression_parentheses(&mut expression, &rest[0]);
-                        expression.push('}');
+                        process_atoms_cons_parentheses(&mut expression, &rest[0]);
+                        expression.push_str("}");
                     }
                     Operator::Abs => {
                         expression.push_str(&format!("\\left|{}\\right|", rest[0].to_latex()));
@@ -630,6 +672,21 @@ impl MathExpressionTree {
                         expression.push_str("}{d");
                         process_math_expression(&d.bound_var.content, &mut expression);
                         expression.push('}');
+                    }
+                    Operator::PartialDerivative(d) => {
+                        if d.order == 1_u8 {
+                            expression.push_str("\\frac{\\partial ");
+                            process_expression_parentheses(&mut expression, &rest[0]);
+                            expression.push_str("}{\\partial");
+                            process_math_expression(&d.bound_var.content, &mut expression);
+                            expression.push('}');
+                        } else if d.order == 2_u8 {
+                            expression.push_str("\\frac{\\partial^2 ");
+                            process_expression_parentheses(&mut expression, &rest[0]);
+                            expression.push_str("}{\\partial ");
+                            process_math_expression(&d.bound_var.content, &mut expression);
+                            expression.push_str("^2}");
+                        }
                     }
                     Operator::Sin => {
                         expression.push_str(&format!("\\sin({})", rest[0].to_latex()));
@@ -669,6 +726,38 @@ impl MathExpressionTree {
                     }
                     Operator::Mean => {
                         expression.push_str(&format!("\\langle {} \\rangle", rest[0].to_latex()));
+                    }
+                    Operator::HatOp(x) => {
+                        process_atoms_cons_parentheses(&mut expression, &rest[0]);
+                        expression.push_str("\\hat{");
+                        process_math_expression(&x.comp, &mut expression);
+                        expression.push('}');
+                    }
+                    Operator::SumUnderOver(x) => {
+                        expression.push_str("\\sum_{");
+                        expression.push_str(&format!("{}", x.under));
+                        expression.push_str("}^{");
+                        expression.push_str(&format!("{}", x.over));
+                        expression.push('}');
+                        expression.push_str(&rest[0].to_latex());
+                    }
+                    Operator::MsubsupInt(x) => {
+                        expression.push_str("\\int_{");
+                        process_math_expression(&x.lowlimit, &mut expression);
+                        expression.push_str("}^{");
+                        process_math_expression(&x.uplimit, &mut expression);
+                        expression.push('}');
+                        expression.push_str(&rest[0].to_latex());
+                        expression.push_str(&format!(" d{}", &*x.integration_variable));
+                    }
+                    Operator::Laplacian => {
+                        expression.push_str(&format!("\\nabla^2 {}", rest[0].to_latex()));
+                    }
+                    Operator::SurfaceClosedIntNoIntVar => {
+                        expression.push_str(&format!("\\oiint_S {}", rest[0].to_latex()));
+                    }
+                    Operator::SurfaceClosedInt => {
+                        expression.push_str(&format!("\\oiint_S {} dS", rest[0].to_latex()));
                     }
                     _ => {
                         expression = "".to_string();
@@ -743,7 +832,28 @@ impl MathExpression {
                 } else {
                     x.diff.flatten(tokens);
                 }
+                tokens.push(MathExpression::Mo(Operator::Lparen));
                 x.func.flatten(tokens);
+                tokens.push(MathExpression::Mo(Operator::Rparen));
+                tokens.push(MathExpression::Mo(Operator::Rparen));
+            }
+            MathExpression::SurfaceClosedIntegralNoIntVar(row) => {
+                tokens.push(MathExpression::Mo(Operator::Lparen));
+                tokens.push(MathExpression::Mo(Operator::SurfaceClosedIntNoIntVar));
+                row.flatten(tokens);
+                tokens.push(MathExpression::Mo(Operator::Rparen));
+            }
+            MathExpression::SurfaceClosedIntegral(row) => {
+                tokens.push(MathExpression::Mo(Operator::Lparen));
+                tokens.push(MathExpression::Mo(Operator::SurfaceClosedInt));
+                row.flatten(tokens);
+                tokens.push(MathExpression::Mo(Operator::Rparen));
+            }
+            // Handles `Laplacian` operator with MathExpression
+            MathExpression::LaplacianComp(x) => {
+                tokens.push(MathExpression::Mo(Operator::Lparen));
+                x.op.flatten(tokens);
+                x.comp.content.flatten(tokens);
                 tokens.push(MathExpression::Mo(Operator::Rparen));
             }
             // Insert implicit division operators, and wrap numerators and denominators in
@@ -757,9 +867,12 @@ impl MathExpression {
                 denominator.flatten(tokens);
                 tokens.push(MathExpression::Mo(Operator::Rparen));
             }
-            /// Insert implicit `exponential` and `power` operators
+            // Insert implicit `exponential` and `power` operators
             MathExpression::Msup(base, superscript) => {
-                if let MathExpression::Ci(x) = &**base {
+                if let MathExpression::Mo(Operator::DownArrow) = &**superscript {
+                    base.flatten(tokens);
+                    tokens.push(MathExpression::Mo(Operator::DownArrow));
+                } else if let MathExpression::Ci(x) = &**base {
                     if x.content == Box::new(MathExpression::Mi(Mi("e".to_string()))) {
                         tokens.push(MathExpression::Mo(Operator::Exp));
                         tokens.push(MathExpression::Mo(Operator::Lparen));
@@ -818,17 +931,25 @@ impl MathExpression {
                     tokens.push(MathExpression::Mo(Operator::Rparen));
                 }
             }
+            // Handles `Summation` operator with MathExpression
             MathExpression::SummationMath(x) => {
                 tokens.push(MathExpression::Mo(Operator::Lparen));
                 x.op.flatten(tokens);
                 x.func.flatten(tokens);
                 tokens.push(MathExpression::Mo(Operator::Rparen));
             }
+            // Handles `Hat` operator with MathExpression
             MathExpression::HatComp(x) => {
-                //tokens.push(MathExpression::Mo(Operator::Lparen));
                 x.op.flatten(tokens);
                 tokens.push(MathExpression::Mo(Operator::Lparen));
                 x.comp.flatten(tokens);
+                tokens.push(MathExpression::Mo(Operator::Rparen));
+            }
+            // Handles `Integral` operator with MathExpression
+            MathExpression::Integral(x) => {
+                x.op.flatten(tokens);
+                tokens.push(MathExpression::Mo(Operator::Lparen));
+                x.integrand.flatten(tokens);
                 tokens.push(MathExpression::Mo(Operator::Rparen));
             }
             t => tokens.push(t.clone()),
@@ -1032,16 +1153,21 @@ fn prefix_binding_power(op: &Operator) -> ((), u8) {
         Operator::Tan => ((), 21),
         Operator::Mean => ((), 25),
         Operator::Hat => ((), 25),
-        //Operator::Cross => ((), 25),
+        Operator::SurfaceClosedInt => ((), 25),
+        Operator::SurfaceClosedIntNoIntVar => ((), 25),
         Operator::Grad => ((), 25),
+        Operator::Int => ((), 25),
         Operator::GradSub(GradSub { .. }) => ((), 25),
         Operator::Derivative(Derivative { .. }) => ((), 25),
         Operator::PartialDerivative(PartialDerivative { .. }) => ((), 25),
         Operator::Div => ((), 25),
+        Operator::Laplacian => ((), 25),
         Operator::Abs => ((), 25),
         Operator::Sqrt => ((), 25),
         Operator::SumUnderOver(SumUnderOver { .. }) => ((), 25),
         Operator::HatOp(HatOp { .. }) => ((), 25),
+        Operator::MsubsupInt(MsubsupInt { .. }) => ((), 25),
+        Operator::MsupDownArrow(MsupDownArrow { .. }) => ((), 25),
         _ => panic!("Bad operator: {:?}", op),
     }
 }
@@ -1050,7 +1176,7 @@ fn prefix_binding_power(op: &Operator) -> ((), u8) {
 fn postfix_binding_power(op: &Operator) -> Option<(u8, ())> {
     let res = match op {
         Operator::Factorial => (11, ()),
-        //Operator::HatOp(HatOp { .. }) => (11, ()),
+        Operator::DownArrow => (11, ()),
         _ => return None,
     };
     Some(res)
@@ -1607,7 +1733,9 @@ fn test_absolute_value() {
     ";
     let exp = input.parse::<MathExpressionTree>().unwrap();
     let s_exp = exp.to_string();
+    let latex_exp = exp.to_latex();
     assert_eq!(s_exp, "(Abs (Grad H))");
+    assert_eq!(latex_exp, "\\left|\\nabla{H}\\right|");
 }
 #[test]
 fn test_another_absolute() {
@@ -1840,6 +1968,7 @@ fn test_sexp2latex_derivative() {
     </math>
     ";
     let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", exp);
     let latex_exp = exp.to_latex();
     assert_eq!(latex_exp, "\\frac{d S}{dt}");
 }
@@ -2214,7 +2343,7 @@ fn new_quadratic_equation() {
         s_exp,
         "(= x (/ (- (- b) (√ (- (^ b 2) (* (* 4 a) c)))) (* 2 a)))"
     );
-    assert_eq!(exp.to_latex(), "x=\\frac{(-b)-\\sqrt{b^{2}-(4*a*c)}}{2*a}");
+    assert_eq!(exp.to_latex(), "x=\\frac{(-b)-\\sqrt{b^{2}-4*a*c}}{2*a}");
 }
 
 #[test]
@@ -2288,6 +2417,18 @@ fn test_sidarthe_equation() {
 }
 
 #[test]
+fn test_change_in_variable() {
+    let input = "<math>
+    <mi>&#x0394;</mi>
+    <mi>t</mi>
+</math>
+    ";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    let s_exp = exp.to_string();
+    println!("latex_exp = {:?}", exp.to_latex());
+    assert_eq!(s_exp, "Δt");
+}
+#[test]
 fn test_heating_rate() {
     let input = "<math>
     <msub>
@@ -2347,6 +2488,8 @@ fn test_sum_munderover() {
     let exp = input.parse::<MathExpressionTree>().unwrap();
     let s_exp = exp.to_string();
     assert_eq!(s_exp, "(∑_{l=k}^{K} S)");
+    println!("exp.to_latex()={:?}", exp.to_latex());
+    assert_eq!(exp.to_latex(), "\\sum_{l=k}^{K}S");
 }
 
 #[test]
@@ -2394,6 +2537,11 @@ fn test_hydrostatic() {
         s_exp,
         "(= Φ_{k} (+ Φ_{s} (* R (∑_{l=k}^{K} (* H_{kl} T_{vl})))))"
     );
+    println!("exp.to_latex()={:?}", exp.to_latex());
+    assert_eq!(
+        exp.to_latex(),
+        "\\Phi_{k}=\\Phi_{s}+R*\\sum_{l=k}^{K}H_{kl}*T_{vl}"
+    )
 }
 
 #[test]
@@ -2465,6 +2613,7 @@ fn test_cross_product() {
     let exp = input.parse::<MathExpressionTree>().unwrap();
     let s_exp = exp.to_string();
     assert_eq!(s_exp, "(× f u)");
+    assert_eq!(exp.to_latex(), "f \\cross u")
 }
 #[test]
 fn test_dot_product() {
@@ -2476,6 +2625,7 @@ fn test_dot_product() {
     let exp = input.parse::<MathExpressionTree>().unwrap();
     let s_exp = exp.to_string();
     assert_eq!(s_exp, "(⋅ f u)");
+    assert_eq!(exp.to_latex(), "f \\cdot u")
 }
 
 #[test]
@@ -2577,7 +2727,11 @@ fn test_hat_operator() {
     </math>";
     let exp = input.parse::<MathExpressionTree>().unwrap();
     let s_exp = exp.to_string();
+    println!("{:?}", exp);
+    println!("{:?}", exp.to_latex());
+    println!("{:?}", s_exp);
     assert_eq!(s_exp, "(Hat(z) ζ)");
+    assert_eq!(exp.to_latex(), "\\zeta\\hat{z}");
 }
 
 #[test]
@@ -2645,6 +2799,26 @@ fn test_mi_dot_gradient() {
 }
 
 #[test]
+fn test_gradient_sub() {
+    let input = "<math>
+    <msub>
+    <mi>∇</mi>
+    <mi>h</mi>
+    </msub>
+    <mo>(</mo>
+    <mi>p</mi>
+    <mo>+</mo>
+    <mi>g</mi>
+    <mi>η</mi>
+    <mo>)</mo>
+    </math>";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    let s_exp = exp.to_string();
+    assert_eq!(s_exp, "(Grad_h) (+ p (* g η)))");
+    assert_eq!(exp.to_latex(), "\\nabla_{h}{(p+g*\\eta)}");
+}
+
+#[test]
 fn test_momentum_conservation() {
     let input = "<math>
     <msub>
@@ -2690,4 +2864,325 @@ fn test_momentum_conservation() {
     let exp = input.parse::<MathExpressionTree>().unwrap();
     let s_exp = exp.to_string();
     assert_eq!(s_exp, "(= (PD(1, t) u) (+ (- (- (- (* (- (⋅ v Grad)) u) (× f u)) (Grad_h) (+ p (* g η)))) (Div τ)) F_{u}))");
+}
+
+#[test]
+fn test_down_arrow() {
+    let input = "<math>
+    <msup>
+        <mi>I</mi>
+        <mo>&#x2193;</mo>
+      </msup>
+    </math>";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    let s_exp = exp.to_string();
+    assert_eq!(s_exp, "I↓");
+    assert_eq!(exp.to_latex(), "I^{\\downarrow}");
+}
+
+#[test]
+fn test_down_arrow2() {
+    let input = "<math>
+    <msup>
+        <mi>I</mi>
+        <mo>&#x2193;</mo>
+      </msup>
+      <mo>(</mo>
+      <mi>λ</mi>
+      <mo>)</mo>
+    </math>";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    let s_exp = exp.to_string();
+    assert_eq!(s_exp, "I↓");
+    assert_eq!(exp.to_latex(), "I^{\\downarrow}(\\lambda)");
+}
+
+#[test]
+fn test_integral1() {
+    let input = "<math>
+    <msubsup>
+        <mo>&#x222b;</mo>
+        <mrow>
+          <msub>
+            <mi>λ</mi>
+            <mn>1</mn>
+          </msub>
+        </mrow>
+        <mrow>
+          <msub>
+            <mi>λ</mi>
+            <mn>2</mn>
+          </msub>
+        </mrow>
+      </msubsup>
+    <msup>
+    <mi>x</mi>
+    <mn>2</mn>
+    </msup>
+    <mi>d</mi>
+    <mi>x</mi>
+    </math>";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", exp);
+    let s_exp = exp.to_string();
+    println!("s_exp={:?}", s_exp);
+    assert_eq!(s_exp, "(Int_{λ_{1}}^{λ_{2}}(x) (^ x 2))");
+    println!("exp.to_latex()={:?}", exp.to_latex());
+    assert_eq!(
+        exp.to_latex(),
+        "\\int_{\\lambda_{1}}^{\\lambda_{2}}x^{2} dx"
+    );
+}
+
+#[test]
+fn test_integral2() {
+    let input = "<math>
+    <mrow>
+      <msubsup>
+        <mo>&#x222b;</mo>
+        <mrow>
+          <msub>
+            <mi>λ</mi>
+            <mn>1</mn>
+          </msub>
+        </mrow>
+        <mrow>
+          <msub>
+            <mi>λ</mi>
+            <mn>2</mn>
+          </msub>
+        </mrow>
+      </msubsup>
+      <mi>ω</mi>
+      <mo>(</mo>
+      <mi>λ</mi>
+      <mo>)</mo>
+        <mi>I</mi>
+      <mo>(</mo>
+      <mi>λ</mi>
+      <mo>)</mo>
+      <msub>
+        <mi>α</mi>
+        <mrow>
+          <mtext>sno </mtext>
+        </mrow>
+      </msub>
+      <mo>(</mo>
+      <mi>λ</mi>
+      <mo>)</mo>
+        <mi>d</mi>
+      <mi>λ</mi>
+    </mrow>
+    </math>";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", exp);
+    let s_exp = exp.to_string();
+    println!("s_exp={:?}", s_exp);
+    assert_eq!(s_exp, "(Int_{λ_{1}}^{λ_{2}}(λ) (* (* ω I) α_{sno}))");
+    println!("exp.to_latex()={:?}", exp.to_latex());
+    assert_eq!(exp.to_latex(), "\\int_{\\lambda_{1}}^{\\lambda_{2}}\\omega(\\lambda)*I(\\lambda)*\\alpha_{sno}(\\lambda) dλ");
+}
+
+#[test]
+fn test_snowpack_optics() {
+    let input = "<math>
+    <mrow>
+    <mover>
+      <mi>ω</mi>
+      <mo>¯</mo>
+    </mover>
+  </mrow>
+  <mo>=</mo>
+  <mfrac>
+    <mrow>
+      <msubsup>
+        <mo>&#x222b;</mo>
+        <mrow>
+          <msub>
+            <mi>λ</mi>
+            <mn>1</mn>
+          </msub>
+        </mrow>
+        <mrow>
+          <msub>
+            <mi>λ</mi>
+            <mn>2</mn>
+          </msub>
+        </mrow>
+      </msubsup>
+      <mi>ω</mi>
+      <mo>(</mo>
+      <mi>λ</mi>
+      <mo>)</mo>
+      <msup>
+        <mi>I</mi>
+        <mo>&#x2193;</mo>
+      </msup>
+      <mo>(</mo>
+      <mi>λ</mi>
+      <mo>)</mo>
+      <msub>
+        <mi>α</mi>
+        <mrow>
+          <mtext>sno </mtext>
+        </mrow>
+      </msub>
+      <mo>(</mo>
+      <mi>λ</mi>
+      <mo>)</mo>
+        <mi>d</mi>
+      <mi>λ</mi>
+    </mrow>
+    <mrow>
+      <msubsup>
+        <mo>&#x222b;</mo>
+        <mrow>
+          <msub>
+            <mi>λ</mi>
+            <mn>1</mn>
+          </msub>
+        </mrow>
+        <mrow>
+          <msub>
+            <mi>λ</mi>
+            <mn>2</mn>
+          </msub>
+        </mrow>
+      </msubsup>
+      <msup>
+        <mi>I</mi>
+        <mo>&#x2193;</mo>
+      </msup>
+      <mo>(</mo>
+      <mi>λ</mi>
+      <mo>)</mo>
+      <msub>
+        <mi>α</mi>
+        <mrow>
+          <mtext>sno </mtext>
+        </mrow>
+      </msub>
+      <mo>(</mo>
+      <mi>λ</mi>
+      <mo>)</mo>
+        <mi>d</mi>
+      <mi>λ</mi>
+    </mrow>
+  </mfrac>
+    </math>";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    let s_exp = exp.to_string();
+    assert_eq!(s_exp, "(= (Mean ω) (/ (Int_{λ_{1}}^{λ_{2}}(λ) (* (* ω I↓) α_{sno})) (Int_{λ_{1}}^{λ_{2}}(λ) (* I↓ α_{sno}))))");
+    assert_eq!(exp.to_latex(), "\\langle \\omega \\rangle=\\frac{\\int_{\\lambda_{1}}^{\\lambda_{2}}\\omega(\\lambda)*I^{\\downarrow}(\\lambda)*\\alpha_{sno}(\\lambda) dλ}{\\int_{\\lambda_{1}}^{\\lambda_{2}}I^{\\downarrow}(\\lambda)*\\alpha_{sno}(\\lambda) dλ}");
+}
+
+#[test]
+fn test_laplacian() {
+    let input = "<math>
+    <msup><mi>&#x2207;</mi><mn>2</mn></msup>
+    <mi>T</mi>
+    </math>";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    let s_exp = exp.to_string();
+    assert_eq!(s_exp, "(Laplacian T)");
+    assert_eq!(exp.to_latex(), "\\nabla^2 T");
+}
+
+#[test]
+fn test_fourier_law_heat_equation_1_1() {
+    let input = "<math>
+    <mi>Q</mi>
+    <mo>=</mo>
+    <mfrac><msub><mi>k</mi><mi>T</mi></msub><mi>&#x03C1;</mi></mfrac>
+    <msup><mi>&#x2207;</mi><mn>2</mn></msup>
+    <mi>T</mi>
+    </math>";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    let s_exp = exp.to_string();
+    assert_eq!(s_exp, "(= Q (* (/ k_{T} ρ) (Laplacian T)))");
+    assert_eq!(exp.to_latex(), "Q=\\frac{k_{T}}{\\rho}*\\nabla^2 T");
+}
+
+#[test]
+fn test_closed_surface_integral() {
+    let input = "<math>
+    <msubsup><mtext>∯</mtext><mi>S</mi></msubsup>
+    <mrow><mi>&#x2207;</mi><mi>T</mi></mrow>
+    <mo>&#x22C5;</mo><mi>T</mi>
+    <mi>d</mi><mi>S</mi>
+    </math>";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    let s_exp = exp.to_string();
+    assert_eq!(s_exp, "(SurfaceClosedInt (⋅ (Grad T) T))");
+    assert_eq!(exp.to_latex(), "\\oiint_S \\nabla{T} \\cdot T dS");
+}
+
+#[test]
+fn test_fourier_law_heat_equation_2() {
+    let input = "<math>
+    <mfrac><mrow><mi>&#x2202;</mi><mi>Q</mi></mrow><mrow><mi>&#x2202;</mi><mi>t</mi></mrow></mfrac>
+    <mo>=</mo>
+    <mo>&#x2212;</mo><mi>k</mi>
+    <msubsup><mtext>∯</mtext><mi>S</mi></msubsup>
+    <mrow><mi>&#x2207;</mi><mi>T</mi></mrow>
+    <mo>&#x22C5;</mo><mi>d</mi><mi>S</mi>
+    </math>";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    let s_exp = exp.to_string();
+    assert_eq!(
+        s_exp,
+        "(= (D(1, t) Q) (* (- k) (SurfaceClosedInt (⋅ (Grad T) dS))))"
+    );
+    assert_eq!(
+        exp.to_latex(),
+        "\\frac{d Q}{dt}=(-k)*\\oiint_S \\nabla{T} \\cdot dS"
+    );
+}
+
+#[test]
+fn test_fourier_law_heat_equation_1_2() {
+    let input = "<math>
+    <mi>Q</mi>
+    <mo>=</mo>
+    <mfrac><msub><mi>k</mi><mi>T</mi></msub><mi>&#x03C1;</mi></mfrac>
+    <mrow>
+    <mo>(</mo>
+    <mfrac>
+    <mrow><msup><mi>&#x2202;</mi><mn>2</mn></msup><mi>T</mi></mrow>
+    <mrow><mi>&#x2202;</mi><msup><mi>x</mi><mn>2</mn></msup></mrow>
+    </mfrac>
+    <mo>+</mo>
+    <mfrac>
+    <mrow><msup><mi>&#x2202;</mi><mn>2</mn></msup><mi>T</mi></mrow>
+    <mrow><mi>&#x2202;</mi><msup><mi>y</mi><mn>2</mn></msup></mrow>
+    </mfrac>
+    <mo>+</mo>
+    <mfrac>
+    <mrow><msup><mi>&#x2202;</mi><mn>2</mn></msup><mi>T</mi></mrow>
+    <mrow><mi>&#x2202;</mi><msup><mi>z</mi><mn>2</mn></msup></mrow>
+    </mfrac>
+    <mo>)</mo>
+    </mrow>
+    </math>";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    let s_exp = exp.to_string();
+    assert_eq!(
+        s_exp,
+        "(= Q (* (/ k_{T} ρ) (+ (+ (PD(2, x) T) (PD(2, y) T)) (PD(2, z) T))))"
+    );
+    assert_eq!(exp.to_latex(), "Q=\\frac{k_{T}}{\\rho}*(\\frac{\\partial^2 T}{\\partial x^2}+\\frac{\\partial^2 T}{\\partial y^2}+\\frac{\\partial^2 T}{\\partial z^2})");
+}
+
+#[test]
+fn test_second_order_derivative() {
+    let input = "<math>
+    <mfrac>
+    <mrow><msup><mi>&#x2202;</mi><mn>2</mn></msup><mi>T</mi></mrow>
+    <mrow><mi>&#x2202;</mi><msup><mi>x</mi><mn>2</mn></msup></mrow>
+    </mfrac>
+    </math>";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    let s_exp = exp.to_string();
+    assert_eq!(s_exp, "(PD(2, x) T)");
+    assert_eq!(exp.to_latex(), "\\frac{\\partial^2 T}{\\partial x^2}");
 }

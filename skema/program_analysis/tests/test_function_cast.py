@@ -7,7 +7,7 @@ from skema.program_analysis.CAST2FN.model.cast import (
     Name,
     FunctionDef,
     Call,
-    LiteralValue,
+    CASTLiteralValue,
     Operator,
     ModelReturn
 )
@@ -73,7 +73,7 @@ def test_fun1():
     assert func_def_body.value.operands[0].name == "x"
     assert func_def_body.value.operands[0].id == 1
 
-    assert isinstance(func_def_body.value.operands[1], LiteralValue)
+    assert isinstance(func_def_body.value.operands[1], CASTLiteralValue)
     assert func_def_body.value.operands[1].value == "2"
 
     #######################################################
@@ -90,7 +90,7 @@ def test_fun1():
     assert func_call_node.func.id == 0
 
     assert len(func_call_node.arguments) == 1
-    assert isinstance(func_call_node.arguments[0], LiteralValue)
+    assert isinstance(func_call_node.arguments[0], CASTLiteralValue)
     assert func_call_node.arguments[0].value_type == "Integer"
     assert func_call_node.arguments[0].value == "2"
 
@@ -115,7 +115,7 @@ def test_fun2():
     assert func_def_body.value.operands[0].name == "x"
     assert func_def_body.value.operands[0].id == 1
 
-    assert isinstance(func_def_body.value.operands[1], LiteralValue)
+    assert isinstance(func_def_body.value.operands[1], CASTLiteralValue)
     assert func_def_body.value.operands[1].value == "3"
 
     #######################################################
@@ -132,7 +132,7 @@ def test_fun2():
     assert func_call_node.func.id == 0
 
     assert len(func_call_node.arguments) == 1
-    assert isinstance(func_call_node.arguments[0], LiteralValue)
+    assert isinstance(func_call_node.arguments[0], CASTLiteralValue)
     assert func_call_node.arguments[0].value_type == "Integer"
     assert func_call_node.arguments[0].value == "2"
 
@@ -175,7 +175,7 @@ def test_fun3():
     assert func_def_body.value.operands[0].name == "x"
     assert func_def_body.value.operands[0].id == 1
 
-    assert isinstance(func_def_body.value.operands[1], LiteralValue)
+    assert isinstance(func_def_body.value.operands[1], CASTLiteralValue)
     assert func_def_body.value.operands[1].value == "3"
 
     #######################################################
@@ -192,7 +192,7 @@ def test_fun3():
     assert func_call_node.func.id == 0
 
     assert len(func_call_node.arguments) == 1
-    assert isinstance(func_call_node.arguments[0], LiteralValue)
+    assert isinstance(func_call_node.arguments[0], CASTLiteralValue)
     assert func_call_node.arguments[0].value_type == "Integer"
     assert func_call_node.arguments[0].value == "2"
 
@@ -242,7 +242,7 @@ def test_fun4():
     assert func_def_body.right.operands[0].name == "x"
     assert func_def_body.right.operands[0].id == 1
 
-    assert isinstance(func_def_body.right.operands[1], LiteralValue)
+    assert isinstance(func_def_body.right.operands[1], CASTLiteralValue)
     assert func_def_body.right.operands[1].value == "3"
     assert func_def_body.right.operands[1].value_type == "Integer"
 
@@ -284,11 +284,11 @@ def test_fun4():
     assert func_call_node.func.id == 0
 
     assert len(func_call_node.arguments) == 2
-    assert isinstance(func_call_node.arguments[0], LiteralValue)
+    assert isinstance(func_call_node.arguments[0], CASTLiteralValue)
     assert func_call_node.arguments[0].value_type == "Integer"
     assert func_call_node.arguments[0].value == "2"
 
-    assert isinstance(func_call_node.arguments[1], LiteralValue)
+    assert isinstance(func_call_node.arguments[1], CASTLiteralValue)
     assert func_call_node.arguments[1].value_type == "Integer"
     assert func_call_node.arguments[1].value == "1"
 

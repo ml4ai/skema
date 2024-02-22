@@ -5,9 +5,9 @@ use crate::model_extraction::module_id2mathml_MET_ast;
 use crate::ModuleCollection;
 use actix_web::web::ServiceConfig;
 use actix_web::{delete, get, post, put, web, HttpResponse};
-use mathml::acset::{PetriNet, RegNet};
+use mathml::acset::{PetriNet, RegNet, GeneralizedAMR};
 
-use mathml::ast::MathExpression;
+use mathml::ast::{self, MathExpression};
 use mathml::parsers::math_expression_tree::MathExpressionTree;
 use neo4rs;
 use neo4rs::{query, Error, Node};
@@ -355,13 +355,114 @@ pub async fn model2MET(
     let ref_module_id2 = module_id.as_ref();
     let mathml_ast = module_id2mathml_MET_ast(*ref_module_id1.unwrap(), config1.clone()).await; // turns model into mathml ast equations
     let _del_response = delete_module(*ref_module_id2.unwrap(), config1.clone()).await; // deletes model from db
+                                                                                        // now we convert each firstorderode into a MET. The RHS is just ported over, but we need to create the LHS as a derivative and put it into an equation
     let mut mets = Vec::<MathExpressionTree>::new();
     for equation in mathml_ast.iter() {
         let mut equal_args = Vec::<MathExpressionTree>::new();
-        equal_args.push(MathExpressionTree::Atom(MathExpression::Ci(equation.lhs_var.clone())));
+        let lhs_mi1 = mathml::ast::Mi("".to_string()); // blank
+        let lhs_mi2 = mathml::ast::Mi("t".to_string()); // differentiation variable
+        let lhs_mi3 = mathml::ast::Mi(equation.lhs_var.to_string()); // state function
+        let lhs_ci1 = mathml::ast::Ci {
+            // blank
+            r#type: Some(ast::Type::Real),
+            content: Box::new(mathml::ast::MathExpression::Mi(lhs_mi1)),
+            func_of: None,
+        };
+        let lhs_ci2 = mathml::ast::Ci {
+            // differentiation variable
+            r#type: Some(ast::Type::Real),
+            content: Box::new(mathml::ast::MathExpression::Mi(lhs_mi2)),
+            func_of: None,
+        };
+        let lhs_ci3 = mathml::ast::Ci {
+            // state function
+            r#type: Some(ast::Type::Function),
+            content: Box::new(mathml::ast::MathExpression::Mi(lhs_mi3)),
+            func_of: Some([lhs_ci1].to_vec()),
+        };
+        let lhs_deriv = mathml::ast::operator::Derivative {
+            order: 1,
+            var_index: 1,
+            bound_var: lhs_ci2,
+        };
+        let lhs = MathExpressionTree::Cons(
+            mathml::ast::operator::Operator::Derivative(lhs_deriv),
+            [MathExpressionTree::Atom(MathExpression::Ci(lhs_ci3))].to_vec(),
+        );
+        equal_args.push(lhs.clone());
         equal_args.push(equation.rhs.clone());
-        let met = MathExpressionTree::Cons(mathml::ast::operator::Operator::Equals, equal_args.clone());
+        let met =
+            MathExpressionTree::Cons(mathml::ast::operator::Operator::Equals, equal_args.clone());
         mets.push(met.clone());
     }
     HttpResponse::Ok().json(web::Json(mets))
+}
+
+/// This returns a Generalized AMR from a gromet.
+#[allow(non_snake_case)]
+#[utoipa::path(
+    request_body = ModuleCollection,
+    responses(
+        (
+            status = 200, description = "Successfully retrieved MET",
+            body = GeneralizedAMR
+        )
+    )
+)]
+#[put("/models/G-AMR")]
+pub async fn model2GAMR(
+    payload: web::Json<ModuleCollection>,
+    config: web::Data<Config>,
+) -> HttpResponse {
+    let config1 = Config {
+        db_host: config.db_host.clone(),
+        db_port: config.db_port,
+        db_protocol: config.db_protocol.clone(),
+    };
+    let module_id = push_model_to_db(payload.into_inner(), config1.clone()).await; // pushes model to db and gets id
+    let ref_module_id1 = module_id.as_ref();
+    let ref_module_id2 = module_id.as_ref();
+    let mathml_ast = module_id2mathml_MET_ast(*ref_module_id1.unwrap(), config1.clone()).await; // turns model into mathml ast equations
+    let _del_response = delete_module(*ref_module_id2.unwrap(), config1.clone()).await; // deletes model from db
+                                                                                        // now we convert each firstorderode into a MET. The RHS is just ported over, but we need to create the LHS as a derivative and put it into an equation
+    let mut mets = Vec::<MathExpressionTree>::new();
+    for equation in mathml_ast.iter() {
+        let mut equal_args = Vec::<MathExpressionTree>::new();
+        let lhs_mi1 = mathml::ast::Mi("".to_string()); // blank
+        let lhs_mi2 = mathml::ast::Mi("t".to_string()); // differentiation variable
+        let lhs_mi3 = mathml::ast::Mi(equation.lhs_var.to_string()); // state function
+        let lhs_ci1 = mathml::ast::Ci {
+            // blank
+            r#type: Some(ast::Type::Real),
+            content: Box::new(mathml::ast::MathExpression::Mi(lhs_mi1)),
+            func_of: None,
+        };
+        let lhs_ci2 = mathml::ast::Ci {
+            // differentiation variable
+            r#type: Some(ast::Type::Real),
+            content: Box::new(mathml::ast::MathExpression::Mi(lhs_mi2)),
+            func_of: None,
+        };
+        let lhs_ci3 = mathml::ast::Ci {
+            // state function
+            r#type: Some(ast::Type::Function),
+            content: Box::new(mathml::ast::MathExpression::Mi(lhs_mi3)),
+            func_of: Some([lhs_ci1].to_vec()),
+        };
+        let lhs_deriv = mathml::ast::operator::Derivative {
+            order: 1,
+            var_index: 1,
+            bound_var: lhs_ci2,
+        };
+        let lhs = MathExpressionTree::Cons(
+            mathml::ast::operator::Operator::Derivative(lhs_deriv),
+            [MathExpressionTree::Atom(MathExpression::Ci(lhs_ci3))].to_vec(),
+        );
+        equal_args.push(lhs.clone());
+        equal_args.push(equation.rhs.clone());
+        let met =
+            MathExpressionTree::Cons(mathml::ast::operator::Operator::Equals, equal_args.clone());
+        mets.push(met.clone());
+    }
+    HttpResponse::Ok().json(web::Json(GeneralizedAMR::from(mets)))
 }

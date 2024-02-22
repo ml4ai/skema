@@ -229,8 +229,37 @@ pub fn get_terms(sys_states: Vec<String>, ode: FirstOrderODE) -> Vec<PnTerm> {
                 println!("Warning unsupported case");
             }
         },
-        Atom(_x) => {
-            println!("Warning unexpected RHS structure")
+        Atom(ref x) => {
+            // also need to construct a partial term here to handle distribution of just a parameter
+            let mut is_state = false;
+            for state in sys_states.iter() {
+                if x.to_string() == *state {
+                    is_state = true;
+                }
+            }
+            if is_state {
+                let temp_term = PnTerm {
+                    dyn_state: "temp".to_string(),
+                    exp_states: [x.to_string().clone()].to_vec(),
+                    polarity: true,
+                    expression: "".to_string(),
+                    parameters: Vec::<String>::new(),
+                    sub_terms: None,
+                    math_vec: None,
+                };
+                terms.push(temp_term.clone());
+            } else {
+                let temp_term = PnTerm {
+                    dyn_state: "temp".to_string(),
+                    exp_states: Vec::<String>::new(),
+                    polarity: true,
+                    expression: "".to_string(),
+                    parameters: [x.to_string().clone()].to_vec(),
+                    sub_terms: None,
+                    math_vec: None,
+                };
+                terms.push(temp_term.clone());
+            }
         }
     }
     terms

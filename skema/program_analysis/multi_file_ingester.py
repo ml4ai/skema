@@ -56,6 +56,7 @@ def process_file_system(
     )
 
     language_yaml_obj = yaml.safe_load(LANGUAGES_YAML_FILEPATH.read_text())
+    cur_dir = os.getcwd()
     for f in file_list:
         full_file = os.path.join(os.path.normpath(root_dir), f.strip("\n"))
         full_file_obj = Path(full_file)
@@ -79,7 +80,6 @@ def process_file_system(
                 cast_list = [cast]
 
             for cast_module in cast_list:
-                cur_dir = os.getcwd()
                 os.chdir(os.path.join(os.getcwd(), path))
                 generated_gromet = ann_cast_pipeline(
                     cast_module, gromet=True, to_file=False, from_obj=True
@@ -109,7 +109,7 @@ def process_file_system(
                        
                 # Normalize the path across os and then convert to module dot notation
                 python_module_path = ".".join(os.path.normpath(os_module_path).split(os.path.sep))
-                python_module_path = python_module_path.replace(".py", "").strip()
+                python_module_path = ".".join(python_module_path.split(".")[0:-1])
                 
                 module_collection.module_index.append(python_module_path)
 
@@ -130,9 +130,9 @@ def process_file_system(
                         len(module_collection.module_index)
                     )
 
-        except ImportError as e:
-            print("FAILURE")
-            raise e
+        except (Exception,SystemExit) as e:
+            os.chdir(cur_dir)
+            print(e)
 
     if write_to_file:
         with open(f"{system_name}--Gromet-FN-auto.json", "w") as f:

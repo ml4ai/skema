@@ -5,7 +5,7 @@ from skema.program_analysis.CAST2FN.model.cast import (
     Assignment,
     Var,
     Name,
-    LiteralValue,
+    CASTLiteralValue,
     ModelIf,
     Operator
 )
@@ -71,7 +71,7 @@ def test_cond1():
     assert isinstance(asg_node.left.val, Name)
     assert asg_node.left.val.name == "x"
 
-    assert isinstance(asg_node.right, LiteralValue)
+    assert isinstance(asg_node.right, CASTLiteralValue)
     assert asg_node.right.value_type == "Integer"
     assert asg_node.right.value == '2'
 
@@ -83,7 +83,7 @@ def test_cond1():
     assert isinstance(cond_expr, Operator)
     assert cond_expr.op == "ast.Lt"
     assert isinstance(cond_expr.operands[0], Name)
-    assert isinstance(cond_expr.operands[1], LiteralValue)
+    assert isinstance(cond_expr.operands[1], CASTLiteralValue)
 
     assert len(cond_body) == 1
     assert isinstance(cond_body[0], Assignment)
@@ -111,7 +111,7 @@ def test_cond2():
     assert asg_node.left.val.name == "x"
     assert asg_node.left.val.id == 0
 
-    assert isinstance(asg_node.right, LiteralValue)
+    assert isinstance(asg_node.right, CASTLiteralValue)
     assert asg_node.right.value_type == "Integer"
     assert asg_node.right.value == '2'
     
@@ -122,7 +122,7 @@ def test_cond2():
     assert asg_node.left.val.name == "y"
     assert asg_node.left.val.id == 1
 
-    assert isinstance(asg_node.right, LiteralValue)
+    assert isinstance(asg_node.right, CASTLiteralValue)
     assert asg_node.right.value_type == "Integer"
     assert asg_node.right.value == '3'
 
@@ -135,7 +135,7 @@ def test_cond2():
     assert cond_expr.op == "ast.Lt"
     assert isinstance(cond_expr.operands[0], Name)
     assert cond_expr.operands[0].name == "x"
-    assert isinstance(cond_expr.operands[1], LiteralValue)
+    assert isinstance(cond_expr.operands[1], CASTLiteralValue)
     assert cond_expr.operands[1].value_type == "Integer"
     assert cond_expr.operands[1].value == "5"
 
@@ -143,13 +143,13 @@ def test_cond2():
     assert isinstance(cond_body[0], Assignment)
     assert isinstance(cond_body[0].left, Var)
     assert cond_body[0].left.val.name == "x"
-    assert isinstance(cond_body[0].right, LiteralValue)
+    assert isinstance(cond_body[0].right, CASTLiteralValue)
     assert cond_body[0].right.value == "1"
 
     assert isinstance(cond_body[1], Assignment)
     assert isinstance(cond_body[1].left, Var)
     assert cond_body[1].left.val.name == "y"
-    assert isinstance(cond_body[1].right, LiteralValue)
+    assert isinstance(cond_body[1].right, CASTLiteralValue)
     assert cond_body[1].right.value == "2"
 
     assert isinstance(cond_body[2], Assignment)

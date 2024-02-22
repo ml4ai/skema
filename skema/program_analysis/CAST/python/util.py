@@ -1,10 +1,10 @@
 from typing import List
-from skema.program_analysis.CAST2FN.model.cast import AstNode, LiteralValue, SourceRef
+from skema.program_analysis.CAST2FN.model.cast import AstNode, CASTLiteralValue, SourceRef
 
 
 def generate_dummy_source_refs(node: AstNode) -> AstNode:
     """Walks a tree of AstNodes replacing any null SourceRefs with a dummy value"""
-    if isinstance(node, LiteralValue) and not node.source_code_data_type:
+    if isinstance(node, CASTLiteralValue) and not node.source_code_data_type:
         node.source_code_data_type = ["Fortran", "Fotran95", "None"]
     if not node.source_refs:
         node.source_refs = [SourceRef("", -1, -1, -1, -1)]
@@ -32,10 +32,10 @@ def get_op(operator):
         '<=' : 'ast.LtE',
         '>'  : 'ast.Gt',
         '>=' : 'ast.GtE',
+        '%' : 'ast.Mod',
         # ast.UAdd: 'ast.UAdd',
         # ast.USub: 'ast.USub',
         # ast.FloorDiv: 'ast.FloorDiv',
-        # ast.Mod: 'ast.Mod',
         # ast.Pow: 'ast.Pow',
         # ast.LShift: 'ast.LShift',
         # ast.RShift: 'ast.RShift',

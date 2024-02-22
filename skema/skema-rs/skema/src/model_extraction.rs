@@ -303,12 +303,22 @@ pub fn get_args_MET(
             // asummption it is atomic
             if graph[node].label.clone() == *"Literal" {
                 let temp_string = graph[node].value.clone().unwrap().value.replace('\"', "");
-                let arg2 = MathExpressionTree::Atom(MathExpression::Mi(Mi(temp_string.clone())));
-                args.push(arg2.clone());
+                let arg2 = MathExpression::Mi(Mi(temp_string.clone()));
+                let ci_arg = Ci {
+                    r#type: Some(mathml::ast::Type::Real),
+                    content: Box::new(arg2),
+                    func_of: None,
+                };
+                args.push(MathExpressionTree::Atom(MathExpression::Ci(ci_arg.clone())));
             } else {
                 let temp_string = graph[node].name.as_ref().unwrap().clone();
-                let arg2 = MathExpressionTree::Atom(MathExpression::Mi(Mi(temp_string.clone())));
-                args.push(arg2.clone());
+                let arg2 = MathExpression::Mi(Mi(temp_string.clone()));
+                let ci_arg = Ci {
+                    r#type: Some(mathml::ast::Type::Real),
+                    content: Box::new(arg2),
+                    func_of: None,
+                };
+                args.push(MathExpressionTree::Atom(MathExpression::Ci(ci_arg.clone())));
             }
         }
 
