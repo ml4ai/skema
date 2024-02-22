@@ -9,7 +9,7 @@ use mathml::parsers::math_expression_tree::{
     preprocess_mathml_for_to_latex, replace_unicode_with_symbols,
 };
 use mathml::{
-    acset::{AMRmathml, PetriNet, RegNet},
+    acset::{AMRmathml, PetriNet, RegNet, GeneralizedAMR},
     expression::get_code_exp_graphs,
     parsers::first_order_ode::{first_order_ode, FirstOrderODE},
 };
