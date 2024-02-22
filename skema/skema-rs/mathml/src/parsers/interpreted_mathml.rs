@@ -281,9 +281,7 @@ pub fn downarrow_operator_with_bounds(input: Span) -> IResult<Ci> {
         parenthesized_identifier,
         parenthesized_msub_identifier,
     )))(s)?;
-    println!("-");
     let comp = Mi::new(format!("{}^\\downarrow", MathExpression::Mi(comp.clone())));
-    println!("--");
     let mut ci_func_of: Vec<Ci> = Vec::new();
     for bvar in bound_vars {
         let b = Ci::new(Some(Type::Real), Box::new(MathExpression::Mi(bvar)), None);
