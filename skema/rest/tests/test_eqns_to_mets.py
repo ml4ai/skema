@@ -6,11 +6,24 @@ import json
 
 @pytest.mark.ci_only
 @pytest.mark.asyncio
-async def test_post_eqns_to_mets_latex():
+async def test_post_eqns_to_mets_mathml_latex():
     """
     Test case for /equations-to-met.
     """
-    latex_equations = ["E=mc^2", "c=\\frac{a}{b}"]
+    latex_equations = [
+        """
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+          <mi>E</mi>
+          <mo>=</mo>
+          <mi>m</mi>
+          <msup>
+            <mi>c</mi>
+            <mn>2</mn>
+          </msup>
+        </math>
+        """,
+        "c=\\frac{a}{b}",
+    ]
 
     endpoint = "/equations-to-met"
 
@@ -125,22 +138,12 @@ async def test_post_eqns_to_mets_latex():
 
 @pytest.mark.ci_only
 @pytest.mark.asyncio
-async def test_post_eqns_to_mets_mathml():
+async def test_post_eqns_to_mets_latex_mathml():
     """
     Test case for /equations-to-met.
     """
     mathml_equations = [
-        """
-        <math xmlns="http://www.w3.org/1998/Math/MathML">
-          <mi>E</mi>
-          <mo>=</mo>
-          <mi>m</mi>
-          <msup>
-            <mi>c</mi>
-            <mn>2</mn>
-          </msup>
-        </math>
-        """,
+        "E=mc^2",
         """
         <math xmlns="http://www.w3.org/1998/Math/MathML">
           <mi>c</mi>
