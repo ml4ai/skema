@@ -3169,6 +3169,24 @@
 <a href="#3168" id="3168">3168</a>
 <a href="#3169" id="3169">3169</a>
 <a href="#3170" id="3170">3170</a>
+<a href="#3171" id="3171">3171</a>
+<a href="#3172" id="3172">3172</a>
+<a href="#3173" id="3173">3173</a>
+<a href="#3174" id="3174">3174</a>
+<a href="#3175" id="3175">3175</a>
+<a href="#3176" id="3176">3176</a>
+<a href="#3177" id="3177">3177</a>
+<a href="#3178" id="3178">3178</a>
+<a href="#3179" id="3179">3179</a>
+<a href="#3180" id="3180">3180</a>
+<a href="#3181" id="3181">3181</a>
+<a href="#3182" id="3182">3182</a>
+<a href="#3183" id="3183">3183</a>
+<a href="#3184" id="3184">3184</a>
+<a href="#3185" id="3185">3185</a>
+<a href="#3186" id="3186">3186</a>
+<a href="#3187" id="3187">3187</a>
+<a href="#3188" id="3188">3188</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Pratt parsing module to construct S-expressions from presentation MathML.
 //! This is based on the nice tutorial at https://matklad.github.io/2020/04/13/simple-but-powerful-pratt-parsing.html
 </span><span class="kw">use </span>utoipa::ToSchema;
@@ -3444,14 +3462,43 @@
             | Operator::Arccsc
             | Operator::Arccot
             | Operator::Mean
+            | Operator::Int
+            | Operator::Hat
+            | Operator::HatOp(<span class="kw">_</span>)
+            | Operator::SumUnderOver(<span class="kw">_</span>)
+            | Operator::MsubsupInt(<span class="kw">_</span>)
+            | Operator::Laplacian
+            | Operator::SurfaceClosedInt
+            | Operator::SurfaceClosedIntNoIntVar
     )
 }
 
-<span class="comment">// Process parentheses in an expression and update the LaTeX string.
-// If the expression is a unary operator, it is added to the LaTeX string as is.
+<span class="comment">// Process parentheses in an expression and update the LaTeX string when connected by arithmatic operators like +, -, *, /.
+// If the expression is a unary or multiplication or division operator, it is added to the LaTeX string as is.
 // If the expression is not a unary operator, it is wrapped in parentheses before being added to the LaTeX string.
 // If the expression is an atom, it is added to the LaTeX string directly.
 </span><span class="kw">fn </span>process_expression_parentheses(expression: <span class="kw-2">&amp;mut </span>String, met: <span class="kw-2">&amp;</span>MathExpressionTree) {
+    <span class="comment">// Check if the rest vector is not empty and contains a MathExpressionTree::Cons variant.
+    </span><span class="kw">if let </span>MathExpressionTree::Cons(op, _args) = met {
+        <span class="comment">// Check if the operator is a unary operator.
+        </span><span class="kw">if </span>is_unary_operator(op) || <span class="macro">matches!</span>(op, Operator::Multiply | Operator::Divide) {
+            <span class="comment">// If it is a unary operator, add it to the LaTeX string as is.
+            </span>expression.push_str(<span class="kw-2">&amp;</span>met.to_latex().to_string());
+        } <span class="kw">else </span>{
+            <span class="comment">// If it is not a unary or multiplication or division operator, wrap it in parentheses before adding it to the LaTeX string.
+            </span>expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"({})"</span>, met.to_latex()));
+        }
+    } <span class="kw">else </span>{
+        <span class="comment">// If the expression is an atom, add it to the LaTeX string directly.
+        </span>expression.push_str(<span class="kw-2">&amp;</span>met.to_latex().to_string());
+    }
+}
+
+<span class="comment">// Process parentheses in an expression and update the LaTeX string when connected by connectors like "_", "^", etc.
+// If the expression is a unary operator, it is added to the LaTeX string as is.
+// If the expression is not a unary operator, it is wrapped in parentheses before being added to the LaTeX string.
+// If the expression is an atom, it is added to the LaTeX string directly.
+</span><span class="kw">fn </span>process_atoms_cons_parentheses(expression: <span class="kw-2">&amp;mut </span>String, met: <span class="kw-2">&amp;</span>MathExpressionTree) {
     <span class="comment">// Check if the rest vector is not empty and contains a MathExpressionTree::Cons variant.
     </span><span class="kw">if let </span>MathExpressionTree::Cons(op, _args) = met {
         <span class="comment">// Check if the operator is a unary operator.
@@ -3688,18 +3735,7 @@
                 <span class="kw">match </span>head {
                     Operator::Add =&gt; {
                         <span class="kw">for </span>(index, r) <span class="kw">in </span>rest.iter().enumerate() {
-                            <span class="kw">if let </span>MathExpressionTree::Cons(op, <span class="kw">_</span>) = r {
-                                <span class="kw">if </span>is_unary_operator(op) {
-                                    expression.push_str(<span class="kw-2">&amp;</span>r.to_latex().to_string());
-                                } <span class="kw">else if let </span>Operator::Add = op {
-                                    expression.push_str(<span class="kw-2">&amp;</span>r.to_latex().to_string());
-                                } <span class="kw">else </span>{
-                                    expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"({})"</span>, r.to_latex()));
-                                }
-                            } <span class="kw">else </span>{
-                                expression.push_str(<span class="kw-2">&amp;</span>r.to_latex().to_string());
-                            }
-
+                            expression.push_str(<span class="kw-2">&amp;</span>r.to_latex().to_string());
                             <span class="comment">// Add "+" if it's not the last element
                             </span><span class="kw">if </span>index &lt; rest.len() - <span class="number">1 </span>{
                                 expression.push(<span class="string">'+'</span>);
@@ -3770,23 +3806,23 @@
                         expression.push_str(<span class="kw-2">&amp;</span>rest[<span class="number">0</span>].to_latex().to_string());
                     }
                     Operator::Compose =&gt; {
-                        process_expression_parentheses(<span class="kw-2">&amp;mut </span>expression, <span class="kw-2">&amp;</span>rest[<span class="number">0</span>]);
+                        process_atoms_cons_parentheses(<span class="kw-2">&amp;mut </span>expression, <span class="kw-2">&amp;</span>rest[<span class="number">0</span>]);
                         expression.push(<span class="string">'_'</span>);
-                        process_expression_parentheses(<span class="kw-2">&amp;mut </span>expression, <span class="kw-2">&amp;</span>rest[<span class="number">1</span>]);
+                        process_atoms_cons_parentheses(<span class="kw-2">&amp;mut </span>expression, <span class="kw-2">&amp;</span>rest[<span class="number">1</span>]);
                     }
                     Operator::Factorial =&gt; {
-                        process_expression_parentheses(<span class="kw-2">&amp;mut </span>expression, <span class="kw-2">&amp;</span>rest[<span class="number">0</span>]);
+                        process_atoms_cons_parentheses(<span class="kw-2">&amp;mut </span>expression, <span class="kw-2">&amp;</span>rest[<span class="number">0</span>]);
                         expression.push(<span class="string">'!'</span>);
                     }
                     Operator::Power =&gt; {
-                        process_expression_parentheses(<span class="kw-2">&amp;mut </span>expression, <span class="kw-2">&amp;</span>rest[<span class="number">0</span>]);
+                        process_atoms_cons_parentheses(<span class="kw-2">&amp;mut </span>expression, <span class="kw-2">&amp;</span>rest[<span class="number">0</span>]);
                         expression.push(<span class="string">'^'</span>);
                         expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"{{{}}}"</span>, rest[<span class="number">1</span>].to_latex()));
                     }
                     Operator::Comma =&gt; {
-                        process_expression_parentheses(<span class="kw-2">&amp;mut </span>expression, <span class="kw-2">&amp;</span>rest[<span class="number">0</span>]);
+                        process_atoms_cons_parentheses(<span class="kw-2">&amp;mut </span>expression, <span class="kw-2">&amp;</span>rest[<span class="number">0</span>]);
                         expression.push(<span class="string">','</span>);
-                        process_expression_parentheses(<span class="kw-2">&amp;mut </span>expression, <span class="kw-2">&amp;</span>rest[<span class="number">1</span>]);
+                        process_atoms_cons_parentheses(<span class="kw-2">&amp;mut </span>expression, <span class="kw-2">&amp;</span>rest[<span class="number">1</span>]);
                     }
                     Operator::Grad =&gt; {
                         expression.push_str(<span class="string">"\\nabla{"</span>);
@@ -3802,19 +3838,19 @@
                         expression.push(<span class="string">'}'</span>);
                     }
                     Operator::Dot =&gt; {
-                        process_expression_parentheses(<span class="kw-2">&amp;mut </span>expression, <span class="kw-2">&amp;</span>rest[<span class="number">0</span>]);
+                        process_atoms_cons_parentheses(<span class="kw-2">&amp;mut </span>expression, <span class="kw-2">&amp;</span>rest[<span class="number">0</span>]);
                         expression.push_str(<span class="string">" \\cdot "</span>);
-                        process_expression_parentheses(<span class="kw-2">&amp;mut </span>expression, <span class="kw-2">&amp;</span>rest[<span class="number">1</span>]);
+                        process_atoms_cons_parentheses(<span class="kw-2">&amp;mut </span>expression, <span class="kw-2">&amp;</span>rest[<span class="number">1</span>]);
                     }
                     Operator::Cross =&gt; {
-                        process_expression_parentheses(<span class="kw-2">&amp;mut </span>expression, <span class="kw-2">&amp;</span>rest[<span class="number">0</span>]);
+                        process_atoms_cons_parentheses(<span class="kw-2">&amp;mut </span>expression, <span class="kw-2">&amp;</span>rest[<span class="number">0</span>]);
                         expression.push_str(<span class="string">" \\cross "</span>);
-                        process_expression_parentheses(<span class="kw-2">&amp;mut </span>expression, <span class="kw-2">&amp;</span>rest[<span class="number">1</span>]);
+                        process_atoms_cons_parentheses(<span class="kw-2">&amp;mut </span>expression, <span class="kw-2">&amp;</span>rest[<span class="number">1</span>]);
                     }
                     Operator::Div =&gt; {
                         expression.push_str(<span class="string">"\\nabla \\cdot {"</span>);
-                        process_expression_parentheses(<span class="kw-2">&amp;mut </span>expression, <span class="kw-2">&amp;</span>rest[<span class="number">0</span>]);
-                        expression.push(<span class="string">'}'</span>);
+                        process_atoms_cons_parentheses(<span class="kw-2">&amp;mut </span>expression, <span class="kw-2">&amp;</span>rest[<span class="number">0</span>]);
+                        expression.push_str(<span class="string">"}"</span>);
                     }
                     Operator::Abs =&gt; {
                         expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"\\left|{}\\right|"</span>, rest[<span class="number">0</span>].to_latex()));
@@ -3881,7 +3917,7 @@
                         expression.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"\\langle {} \\rangle"</span>, rest[<span class="number">0</span>].to_latex()));
                     }
                     Operator::HatOp(x) =&gt; {
-                        process_expression_parentheses(<span class="kw-2">&amp;mut </span>expression, <span class="kw-2">&amp;</span>rest[<span class="number">0</span>]);
+                        process_atoms_cons_parentheses(<span class="kw-2">&amp;mut </span>expression, <span class="kw-2">&amp;</span>rest[<span class="number">0</span>]);
                         expression.push_str(<span class="string">"\\hat{"</span>);
                         process_math_expression(<span class="kw-2">&amp;</span>x.comp, <span class="kw-2">&amp;mut </span>expression);
                         expression.push(<span class="string">'}'</span>);
@@ -5496,7 +5532,7 @@
         s_exp,
         <span class="string">"(= x (/ (- (- b) (√ (- (^ b 2) (* (* 4 a) c)))) (* 2 a)))"
     </span>);
-    <span class="macro">assert_eq!</span>(exp.to_latex(), <span class="string">"x=\\frac{(-b)-\\sqrt{b^{2}-(4*a*c)}}{2*a}"</span>);
+    <span class="macro">assert_eq!</span>(exp.to_latex(), <span class="string">"x=\\frac{(-b)-\\sqrt{b^{2}-4*a*c}}{2*a}"</span>);
 }
 
 <span class="attr">#[test]
@@ -5693,7 +5729,7 @@
     <span class="macro">println!</span>(<span class="string">"exp.to_latex()={:?}"</span>, exp.to_latex());
     <span class="macro">assert_eq!</span>(
         exp.to_latex(),
-        <span class="string">"\\Phi_{k}=\\Phi_{s}+(R*(\\sum_{l=k}^{K}H_{kl}*T_{vl}))"
+        <span class="string">"\\Phi_{k}=\\Phi_{s}+R*\\sum_{l=k}^{K}H_{kl}*T_{vl}"
     </span>)
 }
 
@@ -5968,7 +6004,7 @@
     <span class="kw">let </span>exp = input.parse::&lt;MathExpressionTree&gt;().unwrap();
     <span class="kw">let </span>s_exp = exp.to_string();
     <span class="macro">assert_eq!</span>(s_exp, <span class="string">"(Grad_h) (+ p (* g η)))"</span>);
-    <span class="macro">assert_eq!</span>(exp.to_latex(), <span class="string">"\\nabla_{h}{(p+(g*\\eta))}"</span>);
+    <span class="macro">assert_eq!</span>(exp.to_latex(), <span class="string">"\\nabla_{h}{(p+g*\\eta)}"</span>);
 }
 
 <span class="attr">#[test]
@@ -6253,7 +6289,7 @@
     <span class="kw">let </span>exp = input.parse::&lt;MathExpressionTree&gt;().unwrap();
     <span class="kw">let </span>s_exp = exp.to_string();
     <span class="macro">assert_eq!</span>(s_exp, <span class="string">"(= Q (* (/ k_{T} ρ) (Laplacian T)))"</span>);
-    <span class="macro">assert_eq!</span>(exp.to_latex(), <span class="string">"Q=\\frac{k_{T}}{\\rho}*(\\nabla^2 T)"</span>);
+    <span class="macro">assert_eq!</span>(exp.to_latex(), <span class="string">"Q=\\frac{k_{T}}{\\rho}*\\nabla^2 T"</span>);
 }
 
 <span class="attr">#[test]
@@ -6288,7 +6324,7 @@
     </span>);
     <span class="macro">assert_eq!</span>(
         exp.to_latex(),
-        <span class="string">"\\frac{d Q}{dt}=(-k)*(\\oiint_S \\nabla{T} \\cdot dS)"
+        <span class="string">"\\frac{d Q}{dt}=(-k)*\\oiint_S \\nabla{T} \\cdot dS"
     </span>);
 }
 
@@ -6323,7 +6359,7 @@
         s_exp,
         <span class="string">"(= Q (* (/ k_{T} ρ) (+ (+ (PD(2, x) T) (PD(2, y) T)) (PD(2, z) T))))"
     </span>);
-    <span class="macro">assert_eq!</span>(exp.to_latex(), <span class="string">"Q=\\frac{k_{T}}{\\rho}*((\\frac{\\partial^2 T}{\\partial x^2})+(\\frac{\\partial^2 T}{\\partial y^2})+(\\frac{\\partial^2 T}{\\partial z^2}))"</span>);
+    <span class="macro">assert_eq!</span>(exp.to_latex(), <span class="string">"Q=\\frac{k_{T}}{\\rho}*(\\frac{\\partial^2 T}{\\partial x^2}+\\frac{\\partial^2 T}{\\partial y^2}+\\frac{\\partial^2 T}{\\partial z^2})"</span>);
 }
 
 <span class="attr">#[test]
