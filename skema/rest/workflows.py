@@ -254,14 +254,12 @@ async def equations_to_met(data: schema.EquationToMET, client: httpx.AsyncClient
     print(r.json())
     ```
     """
-    if "</math>" in data.equations[0]:
-        eqns: List[str] = [
-            utils.clean_mml(mml) for mml in data.equations
-        ]
-    else:
-        eqns: List[str] = [
-            utils.clean_mml(eqn2mml.get_mathml_from_latex(tex)) for tex in data.equations
-        ]
+    eqns: List[str] = []
+    for eqn in data.equations:
+        if "</math>" in eqn:
+            eqns.append(utils.clean_mml(eqn))
+        else:
+            eqns.append(utils.clean_mml(eqn2mml.get_mathml_from_latex(eqn)))
 
     res = await client.put(f"{SKEMA_RS_ADDESS}/mathml/met", json=eqns)
     if res.status_code != 200:
@@ -296,14 +294,12 @@ async def equations_to_gamr(data: schema.EquationToMET, client: httpx.AsyncClien
     print(r.json())
     ```
     """
-    if "</math>" in data.equations[0]:
-        eqns: List[str] = [
-            utils.clean_mml(mml) for mml in data.equations
-        ]
-    else:
-        eqns: List[str] = [
-            utils.clean_mml(eqn2mml.get_mathml_from_latex(tex)) for tex in data.equations
-        ]
+    eqns: List[str] = []
+    for eqn in data.equations:
+        if "</math>" in eqn:
+            eqns.append(utils.clean_mml(eqn))
+        else:
+            eqns.append(utils.clean_mml(eqn2mml.get_mathml_from_latex(eqn)))
 
     res = await client.put(f"{SKEMA_RS_ADDESS}/mathml/g-amr", json=eqns)
     if res.status_code != 200:
