@@ -2698,7 +2698,7 @@ fn test_hydrostatic() {
     println!("exp.to_latex()={:?}", exp.to_latex());
     assert_eq!(
         exp.to_latex(),
-        "\\Phi_{k}=\\Phi_{s}+(R*\\sum_{l=k}^{K}H_{kl}*T_{vl})"
+        "\\Phi_{k}=\\Phi_{s}+R*\\sum_{l=k}^{K}H_{kl}*T_{vl}"
     )
 }
 
@@ -2971,7 +2971,7 @@ fn test_gradient_sub() {
     let exp = input.parse::<MathExpressionTree>().unwrap();
     let s_exp = exp.to_string();
     assert_eq!(s_exp, "(Grad_h (+ p (* g η)))");
-    assert_eq!(exp.to_latex(), "\\nabla_{h}{(p+(g*\\eta))}");
+    assert_eq!(exp.to_latex(), "\\nabla_{h}{(p+g*\\eta)}");
 }
 
 #[test]
@@ -3400,7 +3400,7 @@ fn test_conservation_of_momentum_fluid_equation_1() {
     assert_eq!(s_exp, "(= (- (D(1, t) u) (* f v)) (* (- g) (PD(1, x) η)))");
     assert_eq!(
         exp.to_latex(),
-        "\\frac{D u}{Dt}-(f*v)=(-g)*\\frac{\\partial \\eta}{\\partial x}"
+        "\\frac{D u}{Dt}-f*v=(-g)*\\frac{\\partial \\eta}{\\partial x}"
     );
 }
 
