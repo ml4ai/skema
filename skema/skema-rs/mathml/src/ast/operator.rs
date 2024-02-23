@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 use std::fmt;
 use utoipa::ToSchema;
 
-/// Total Derivative operator, e.g. dS/dt . in line with Spivak notation: http://ceres-solver.org/spivak_notation.html
+/// Derivative operator, in line with Spivak notation: http://ceres-solver.org/spivak_notation.html
 #[derive(
     Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, JsonSchema,
 )]
@@ -17,7 +17,7 @@ pub struct Derivative {
     pub derivative_notation: DerivativeNotation,
 }
 
-//All the stuff that was in the LaTeX equation that we need to reproduce the original LaTeX equation
+/// All the stuff that was in the LaTeX equation that we need to reproduce the original LaTeX equation
 #[derive(
     Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, JsonSchema,
 )]
@@ -141,7 +141,7 @@ pub enum Operator {
     Divide,
     /// Subtraction operator
     Subtract,
-    /// Squre root operator
+    /// Square root operator
     Sqrt,
     /// Left parenthesis
     Lparen,
