@@ -511,12 +511,12 @@ impl MathExpressionTree {
                         order,
                         var_index,
                         bound_var,
-                        derivative_notation,
+                        notation,
                     }) if (*order, *var_index) == (1_u8, 1_u8) => {
-                        if *derivative_notation == DerivativeNotation::LeibnizTotal {
+                        if *notation == DerivativeNotation::LeibnizTotal {
                             content_mathml.push_str("<diff/>");
                             content_mathml.push_str(&format!("<bvar>{}</bar>", bound_var));
-                        } else if *derivative_notation == DerivativeNotation::LeibnizPartialStandard
+                        } else if *notation == DerivativeNotation::LeibnizPartialStandard
                         {
                             content_mathml.push_str("<partialdiff/>");
                             content_mathml.push_str(&format!("<bvar>{}</bar>", bound_var));
@@ -712,7 +712,7 @@ impl MathExpressionTree {
                     Operator::Abs => {
                         expression.push_str(&format!("\\left|{}\\right|", rest[0].to_latex()));
                     }
-                    Operator::Derivative(d) => match d.derivative_notation {
+                    Operator::Derivative(d) => match d.notation {
                         DerivativeNotation::LeibnizTotal => {
                             expression.push_str("\\frac{d ");
                             process_expression_parentheses(&mut expression, &rest[0]);
