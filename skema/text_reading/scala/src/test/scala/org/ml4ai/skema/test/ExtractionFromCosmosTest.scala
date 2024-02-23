@@ -17,7 +17,7 @@ class ExtractionFromCosmosTest extends Test {
       "./src/test/resources/documents_5FebCHIME_SIR--COSMOS-data.json",
       "./src/test/resources/documents_5FebCHIME_SVIIvR--COSMOS-data.json"
     )
-    val cosmosPipeline = new CosmosTextReadingPipeline(contextWindowSize = 3)
+    val cosmosPipeline = new CosmosTextReadingPipeline(contextWindowSize = 3, contextEngineType = "heuristic")
     val expected = {
       val ujsonValues = jsonPaths.map { jsonPath =>
         val json = cosmosPipeline.extractMentionsFromJsonAndSerialize(jsonPath)

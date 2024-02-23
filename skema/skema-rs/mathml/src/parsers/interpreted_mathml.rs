@@ -250,7 +250,7 @@ pub fn hat_operator(input: Span) -> IResult<(MathExpression, MathExpression)> {
 /// Handles downarrow operation (↓) in Superscript with includes function of content
 /// E.g. T^↓(x)
 pub fn downarrow_operator_with_bounds(input: Span) -> IResult<Ci> {
-    let (s, (comp, op)) = ws(delimited(
+    let (s, (comp, _op)) = ws(delimited(
         stag!("msup"),
         pair(
             mi,
@@ -288,7 +288,7 @@ pub fn downarrow_operator_with_bounds(input: Span) -> IResult<Ci> {
 /// Handles downarrow operation (↓) in Superscript
 /// E.g. T^↓
 pub fn downarrow_operator_no_bounds(input: Span) -> IResult<Ci> {
-    let (s, (comp, op)) = ws(delimited(
+    let (s, (comp, _op)) = ws(delimited(
         stag!("msup"),
         pair(mi, delimited(stag!("mo"), down_arrow, etag!("mo"))),
         etag!("msup"),
@@ -1069,7 +1069,7 @@ pub fn integral_with_many_math_expression_integrand(
 
 /// Surface Closed Integral
 pub fn surface_closed_integral(input: Span) -> IResult<(Operator, MathExpression, MathExpression)> {
-    let (s, (_op, lim)) = ws(delimited(
+    let (s, (_op, _lim)) = ws(delimited(
         stag!("msubsup"),
         pair(delimited(stag!("mtext"), tag("∯"), etag!("mtext")), mi),
         etag!("msubsup"),
@@ -1094,7 +1094,7 @@ pub fn surface_closed_integral2(input: Span) -> IResult<MathExpression> {
         math_expression,
         pair(delimited(stag!("mo"), dot, etag!("mo")), d),
     ))(s)?;
-    let (s, int_var) = ws(math_expression)(s)?;
+    let (s, _int_var) = ws(math_expression)(s)?;
 
     let mut expression: Vec<MathExpression> = Vec::new();
     expression.push(MathExpression::Mrow(Mrow::new(row.0)));
@@ -1114,7 +1114,7 @@ pub fn surface_closed_integral2(input: Span) -> IResult<MathExpression> {
 }
 
 /// Laplacian
-/// Parse Hat operator with components. Example: r \hat{x}
+/// Parse laplacian operator with components. Example: ∇^2
 pub fn laplacian_operation(input: Span) -> IResult<(MathExpression, Ci)> {
     let (s, (_grad, _mn)) = ws(delimited(
         stag!("msup"),

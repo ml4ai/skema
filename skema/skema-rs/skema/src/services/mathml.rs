@@ -8,9 +8,9 @@ use mathml::parsers::math_expression_tree::MathExpressionTree;
 use mathml::parsers::math_expression_tree::{
     preprocess_mathml_for_to_latex, replace_unicode_with_symbols,
 };
-
+use serde_json::from_str;
 use mathml::{
-    acset::{AMRmathml, PetriNet, RegNet},
+    acset::{AMRmathml, PetriNet, RegNet, GeneralizedAMR},
     parsers::first_order_ode::{first_order_ode, FirstOrderODE},
     expression::get_code_exp_graphs,
 };
@@ -142,6 +142,46 @@ pub async fn get_decapodes(payload: web::Json<Vec<String>>) -> HttpResponse {
         decapodes: deca_vec.clone(),
     };
     HttpResponse::Ok().json(web::Json(decapodes_collection))
+}
+
+/// Return a JSON representation of a METCollection from
+/// an array of MathML strings.
+#[utoipa::path(
+request_body = Vec<String>,
+responses(
+(
+status = 200,
+body = Vec<String>
+)
+)
+)]
+#[put("/mathml/met")]
+pub async fn get_met(payload: web::Json<Vec<String>>) -> HttpResponse {
+    let met_vec: Vec<MathExpressionTree> = payload
+        .iter()
+        .map(|x| x.parse::<MathExpressionTree>().unwrap())
+        .collect();
+    HttpResponse::Ok().json(web::Json(met_vec))
+}
+
+/// Return a JSON of a Generalized AMR from
+/// an array of MET strings.
+#[utoipa::path(
+    request_body = Vec<String>,
+    responses(
+    (
+    status = 200,
+    body = GeneralizedAMR
+    )
+    )
+    )]
+#[put("/mathml/g-amr")]
+pub async fn get_gamr(payload: web::Json<Vec<String>>) -> HttpResponse {
+    let met_vec: Vec<MathExpressionTree> = payload
+        .iter()
+        .map(|x| x.parse::<MathExpressionTree>().unwrap())
+        .collect();
+    HttpResponse::Ok().json(web::Json(GeneralizedAMR::from(met_vec)))
 }
 
 /// Return a JSON representation of a PetriNet ModelRep constructed from an array of MathML strings.
