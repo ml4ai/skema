@@ -385,7 +385,7 @@ pub async fn model2MET(
             order: 1,
             var_index: 1,
             bound_var: lhs_ci2,
-            derivative_notation: DerivativeNotation::LeibnizTotal,
+            notation: DerivativeNotation::LeibnizTotal,
         };
         let lhs = MathExpressionTree::Cons(
             mathml::ast::operator::Operator::Derivative(lhs_deriv),
@@ -455,7 +455,7 @@ pub async fn model2GAMR(
             order: 1,
             var_index: 1,
             bound_var: lhs_ci2,
-            derivative_notation: DerivativeNotation::LeibnizTotal,
+            notation: DerivativeNotation::LeibnizTotal,
         };
         let lhs = MathExpressionTree::Cons(
             mathml::ast::operator::Operator::Derivative(lhs_deriv),

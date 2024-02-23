@@ -95,7 +95,7 @@ pub struct Gradient {
 }
 
 /// Integral can be definite or indefinite with `integration_variable`
-/// as it has the option of having `lowlimit`, `uplimit`
+/// as it has the option of having `lower_limit`, `upper_limit`
 #[derive(
     Debug,
     Ord,
