@@ -14,6 +14,7 @@ use neo4rs::{query, Error, Node};
 use std::collections::HashMap;
 use std::sync::Arc;
 
+use mathml::ast::operator::DerivativeNotation;
 use utoipa;
 
 pub fn configure() -> impl FnOnce(&mut ServiceConfig) {
@@ -384,7 +385,7 @@ pub async fn model2MET(
             order: 1,
             var_index: 1,
             bound_var: lhs_ci2,
-            has_uppercase_d: false,
+            derivative_notation: DerivativeNotation::LeibnizTotal,
         };
         let lhs = MathExpressionTree::Cons(
             mathml::ast::operator::Operator::Derivative(lhs_deriv),
@@ -454,7 +455,7 @@ pub async fn model2GAMR(
             order: 1,
             var_index: 1,
             bound_var: lhs_ci2,
-            has_uppercase_d: false,
+            derivative_notation: DerivativeNotation::LeibnizTotal,
         };
         let lhs = MathExpressionTree::Cons(
             mathml::ast::operator::Operator::Derivative(lhs_deriv),

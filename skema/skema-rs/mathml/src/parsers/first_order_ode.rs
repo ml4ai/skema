@@ -31,6 +31,7 @@ use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::str::FromStr;
 
+use crate::ast::operator::DerivativeNotation;
 #[cfg(test)]
 use crate::{ast::Mi, parsers::generic_mathml::test_parser};
 
@@ -128,7 +129,12 @@ pub fn first_order_ode(input: Span) -> IResult<FirstOrderODE> {
 impl FirstOrderODE {
     pub fn to_cmml(&self) -> String {
         let lhs_expression_tree = MathExpressionTree::Cons(
-            Operator::Derivative(Derivative::new(1, 1, self.with_respect_to.clone(), false)),
+            Operator::Derivative(Derivative::new(
+                1,
+                1,
+                self.with_respect_to.clone(),
+                DerivativeNotation::LeibnizTotal,
+            )),
             vec![MathExpressionTree::Atom(MathExpression::Ci(
                 self.lhs_var.clone(),
             ))],
@@ -1040,7 +1046,7 @@ fn test_first_order_derivative_leibniz_notation_with_implicit_time_dependence() 
                     Box::new(MathExpression::Mi(Mi("t".to_string()))),
                     None,
                 ),
-                false,
+                DerivativeNotation::LeibnizTotal,
             ),
             Ci::new(
                 Some(Type::Function),
@@ -1073,7 +1079,7 @@ fn test_first_order_derivative_leibniz_notation_with_explicit_time_dependence() 
                     Box::new(MathExpression::Mi(Mi("t".to_string()))),
                     None,
                 ),
-                false,
+                DerivativeNotation::LeibnizTotal,
             ),
             Ci::new(
                 Some(Type::Function),
@@ -1156,7 +1162,7 @@ fn test_msub_derivative() {
                     Box::new(MathExpression::Mi(Mi("t".to_string()))),
                     None,
                 ),
-                false,
+                DerivativeNotation::LeibnizTotal,
             ),
             Ci::new(
                 Some(Type::Function),

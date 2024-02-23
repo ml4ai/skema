@@ -6,7 +6,7 @@
 
 use crate::{
     ast::{
-        operator::{Derivative, Gradient, Hat, Int, Operator, PartialDerivative, Summation},
+        operator::{Derivative, DerivativeNotation, Gradient, Hat, Int, Operator, Summation},
         Ci, Differential, HatComp, Integral, LaplacianComp, Math, MathExpression, Mi, Mrow,
         SummationMath, Type,
     },
@@ -451,7 +451,7 @@ pub fn first_order_with_func_in_parenthesis(input: Span) -> IResult<(Derivative,
                     Box::new(MathExpression::Mi(with_respect_to)),
                     None,
                 ),
-                false,
+                DerivativeNotation::LeibnizTotal,
             ),
             Mrow(func),
         ),
@@ -460,9 +460,7 @@ pub fn first_order_with_func_in_parenthesis(input: Span) -> IResult<(Derivative,
 
 /// Parse first order partial derivative where the function of derivative is within a parenthesis
 /// e.g. ∂/∂t ( S(t)* I(t) )
-pub fn first_order_partial_with_func_in_parenthesis(
-    input: Span,
-) -> IResult<(PartialDerivative, Mrow)> {
+pub fn first_order_partial_with_func_in_parenthesis(input: Span) -> IResult<(Derivative, Mrow)> {
     let (s, _) = pair(stag!("mfrac"), partial)(input)?;
     let (s, with_respect_to) = delimited(
         tuple((stag!("mrow"), partial)),
@@ -477,7 +475,7 @@ pub fn first_order_partial_with_func_in_parenthesis(
     Ok((
         s,
         (
-            PartialDerivative::new(
+            Derivative::new(
                 1,
                 1,
                 Ci::new(
@@ -485,6 +483,7 @@ pub fn first_order_partial_with_func_in_parenthesis(
                     Box::new(MathExpression::Mi(with_respect_to)),
                     None,
                 ),
+                DerivativeNotation::LeibnizPartialStandard,
             ),
             Mrow(func),
         ),
@@ -532,7 +531,7 @@ pub fn first_order_derivative_leibniz_notation(input: Span) -> IResult<(Derivati
                                 Box::new(MathExpression::Mi(with_respect_to)),
                                 None,
                             ),
-                            false,
+                            DerivativeNotation::LeibnizTotal,
                         ),
                         func,
                     ),
@@ -551,7 +550,7 @@ pub fn first_order_derivative_leibniz_notation(input: Span) -> IResult<(Derivati
                                 Box::new(MathExpression::Mi(with_respect_to)),
                                 None,
                             ),
-                            false,
+                            DerivativeNotation::LeibnizTotal,
                         ),
                         func,
                     ),
@@ -567,9 +566,7 @@ pub fn first_order_derivative_leibniz_notation(input: Span) -> IResult<(Derivati
 }
 
 /// Parse first order partial derivative. Example: ∂_{t} S
-pub fn first_order_partial_derivative_partial_func(
-    input: Span,
-) -> IResult<(PartialDerivative, Ci)> {
+pub fn first_order_partial_derivative_partial_func(input: Span) -> IResult<(Derivative, Ci)> {
     let (s, _) = tuple((stag!("msub"), partial))(input)?;
     let (s, with_respect_to) = ws(terminated(mi, etag!("msub")))(s)?;
     let (s, func) = ws(alt((
@@ -596,7 +593,7 @@ pub fn first_order_partial_derivative_partial_func(
                 return Ok((
                     s,
                     (
-                        PartialDerivative::new(
+                        Derivative::new(
                             1,
                             (indx + 1) as u8,
                             Ci::new(
@@ -604,6 +601,7 @@ pub fn first_order_partial_derivative_partial_func(
                                 Box::new(MathExpression::Mi(with_respect_to)),
                                 None,
                             ),
+                            DerivativeNotation::LeibnizPartialCompact,
                         ),
                         func,
                     ),
@@ -614,7 +612,7 @@ pub fn first_order_partial_derivative_partial_func(
                 return Ok((
                     s,
                     (
-                        PartialDerivative::new(
+                        Derivative::new(
                             1,
                             1,
                             Ci::new(
@@ -622,6 +620,7 @@ pub fn first_order_partial_derivative_partial_func(
                                 Box::new(MathExpression::Mi(with_respect_to)),
                                 None,
                             ),
+                            DerivativeNotation::LeibnizPartialCompact,
                         ),
                         func,
                     ),
@@ -637,9 +636,7 @@ pub fn first_order_partial_derivative_partial_func(
 }
 
 /// Parse a first-order partial ordinary derivative written in Leibniz notation.
-pub fn first_order_partial_derivative_leibniz_notation(
-    input: Span,
-) -> IResult<(PartialDerivative, Ci)> {
+pub fn first_order_partial_derivative_leibniz_notation(input: Span) -> IResult<(Derivative, Ci)> {
     let (s, _) = tuple((stag!("mfrac"), stag!("mrow"), partial))(input)?;
     let (s, func) = ws(alt((
         ci_univariate_func,
@@ -671,7 +668,7 @@ pub fn first_order_partial_derivative_leibniz_notation(
                 return Ok((
                     s,
                     (
-                        PartialDerivative::new(
+                        Derivative::new(
                             1,
                             (indx + 1) as u8,
                             Ci::new(
@@ -679,6 +676,7 @@ pub fn first_order_partial_derivative_leibniz_notation(
                                 Box::new(MathExpression::Mi(with_respect_to)),
                                 None,
                             ),
+                            DerivativeNotation::LeibnizPartialStandard,
                         ),
                         func,
                     ),
@@ -689,7 +687,7 @@ pub fn first_order_partial_derivative_leibniz_notation(
                 return Ok((
                     s,
                     (
-                        PartialDerivative::new(
+                        Derivative::new(
                             1,
                             1,
                             Ci::new(
@@ -697,6 +695,7 @@ pub fn first_order_partial_derivative_leibniz_notation(
                                 Box::new(MathExpression::Mi(with_respect_to)),
                                 None,
                             ),
+                            DerivativeNotation::LeibnizPartialStandard,
                         ),
                         func,
                     ),
@@ -752,7 +751,7 @@ pub fn first_order_dderivative_leibniz_notation(input: Span) -> IResult<(Derivat
                                 Box::new(MathExpression::Mi(with_respect_to)),
                                 None,
                             ),
-                            true,
+                            DerivativeNotation::DNotation,
                         ),
                         func,
                     ),
@@ -771,7 +770,7 @@ pub fn first_order_dderivative_leibniz_notation(input: Span) -> IResult<(Derivat
                                 Box::new(MathExpression::Mi(with_respect_to)),
                                 None,
                             ),
-                            true,
+                            DerivativeNotation::DNotation,
                         ),
                         func,
                     ),
@@ -787,9 +786,7 @@ pub fn first_order_dderivative_leibniz_notation(input: Span) -> IResult<(Derivat
 }
 
 /// Parse a second-order partial ordinary derivative written in Leibniz notation.
-pub fn second_order_partial_derivative_leibniz_notation(
-    input: Span,
-) -> IResult<(PartialDerivative, Ci)> {
+pub fn second_order_partial_derivative_leibniz_notation(input: Span) -> IResult<(Derivative, Ci)> {
     let (s, _) = tuple((
         stag!("mfrac"),
         stag!("mrow"),
@@ -836,7 +833,7 @@ pub fn second_order_partial_derivative_leibniz_notation(
                 return Ok((
                     s,
                     (
-                        PartialDerivative::new(
+                        Derivative::new(
                             2,
                             (indx + 1) as u8,
                             Ci::new(
@@ -844,6 +841,7 @@ pub fn second_order_partial_derivative_leibniz_notation(
                                 Box::new(MathExpression::Mi(with_respect_to)),
                                 None,
                             ),
+                            DerivativeNotation::LeibnizPartialStandard,
                         ),
                         func,
                     ),
@@ -854,7 +852,7 @@ pub fn second_order_partial_derivative_leibniz_notation(
                 return Ok((
                     s,
                     (
-                        PartialDerivative::new(
+                        Derivative::new(
                             2,
                             1,
                             Ci::new(
@@ -862,6 +860,7 @@ pub fn second_order_partial_derivative_leibniz_notation(
                                 Box::new(MathExpression::Mi(with_respect_to)),
                                 None,
                             ),
+                            DerivativeNotation::LeibnizPartialStandard,
                         ),
                         func,
                     ),
@@ -936,7 +935,7 @@ pub fn newtonian_derivative(input: Span) -> IResult<(Derivative, Ci)> {
                 order,
                 1,
                 Ci::new(Some(Type::Real), new_with_respect_to, None),
-                false,
+                DerivativeNotation::Newton,
             ),
             func,
         ),
@@ -1342,13 +1341,6 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
             ),
             surface_closed_integral2,
             surface_closed_integral,
-            /*map(surface_closed_integral, |(operator, comp, var)| {
-                MathExpression::Integral(Integral {
-                    op: Box::new(MathExpression::Mo(operator)),
-                    integrand: Box::new(comp),
-                    integration_variable: Box::new(var),
-                })
-            }),*/
             map(
                 integral_with_math_expression_integrand,
                 |(operator, comp, var)| {
@@ -1386,10 +1378,11 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
         map(
             first_order_partial_derivative_partial_func,
             |(
-                PartialDerivative {
+                Derivative {
                     order,
                     var_index,
                     bound_var,
+                    derivative_notation,
                 },
                 Ci {
                     r#type,
@@ -1398,13 +1391,12 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                 },
             )| {
                 MathExpression::Differential(Differential {
-                    diff: Box::new(MathExpression::Mo(Operator::PartialDerivative(
-                        PartialDerivative {
-                            order,
-                            var_index,
-                            bound_var,
-                        },
-                    ))),
+                    diff: Box::new(MathExpression::Mo(Operator::Derivative(Derivative {
+                        order,
+                        var_index,
+                        bound_var,
+                        derivative_notation,
+                    }))),
                     func: Box::new(MathExpression::Ci(Ci {
                         r#type,
                         content,
@@ -1482,7 +1474,7 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                         order,
                         var_index,
                         bound_var,
-                        has_uppercase_d,
+                        derivative_notation,
                     },
                     Ci {
                         r#type,
@@ -1495,7 +1487,7 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                             order,
                             var_index,
                             bound_var,
-                            has_uppercase_d,
+                            derivative_notation,
                         }))),
                         func: Box::new(MathExpression::Ci(Ci {
                             r#type,
@@ -1508,10 +1500,11 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
             map(
                 first_order_partial_derivative_leibniz_notation,
                 |(
-                    PartialDerivative {
+                    Derivative {
                         order,
                         var_index,
                         bound_var,
+                        derivative_notation,
                     },
                     Ci {
                         r#type,
@@ -1520,13 +1513,12 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                     },
                 )| {
                     MathExpression::Differential(Differential {
-                        diff: Box::new(MathExpression::Mo(Operator::PartialDerivative(
-                            PartialDerivative {
-                                order,
-                                var_index,
-                                bound_var,
-                            },
-                        ))),
+                        diff: Box::new(MathExpression::Mo(Operator::Derivative(Derivative {
+                            order,
+                            var_index,
+                            bound_var,
+                            derivative_notation,
+                        }))),
                         func: Box::new(MathExpression::Ci(Ci {
                             r#type,
                             content,
@@ -1542,7 +1534,7 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                         order,
                         var_index,
                         bound_var,
-                        has_uppercase_d,
+                        derivative_notation,
                     },
                     Ci {
                         r#type,
@@ -1555,7 +1547,7 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                             order,
                             var_index,
                             bound_var,
-                            has_uppercase_d,
+                            derivative_notation,
                         }))),
                         func: Box::new(MathExpression::Ci(Ci {
                             r#type,
@@ -1572,7 +1564,7 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                         order,
                         var_index,
                         bound_var,
-                        has_uppercase_d,
+                        derivative_notation,
                     },
                     Ci {
                         r#type,
@@ -1585,7 +1577,7 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                             order,
                             var_index,
                             bound_var,
-                            has_uppercase_d,
+                            derivative_notation,
                         }))),
                         func: Box::new(MathExpression::Ci(Ci {
                             r#type,
@@ -1598,10 +1590,11 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
             map(
                 second_order_partial_derivative_leibniz_notation,
                 |(
-                    PartialDerivative {
+                    Derivative {
                         order,
                         var_index,
                         bound_var,
+                        derivative_notation,
                     },
                     Ci {
                         r#type,
@@ -1610,13 +1603,12 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                     },
                 )| {
                     MathExpression::Differential(Differential {
-                        diff: Box::new(MathExpression::Mo(Operator::PartialDerivative(
-                            PartialDerivative {
-                                order,
-                                var_index,
-                                bound_var,
-                            },
-                        ))),
+                        diff: Box::new(MathExpression::Mo(Operator::Derivative(Derivative {
+                            order,
+                            var_index,
+                            bound_var,
+                            derivative_notation,
+                        }))),
                         func: Box::new(MathExpression::Ci(Ci {
                             r#type,
                             content,
@@ -1669,7 +1661,7 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                     order,
                     var_index,
                     bound_var,
-                    has_uppercase_d,
+                    derivative_notation,
                 },
                 comp,
             )| {
@@ -1678,7 +1670,7 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                         order,
                         var_index,
                         bound_var,
-                        has_uppercase_d,
+                        derivative_notation,
                     }))),
                     func: Box::new(MathExpression::Mrow(comp)),
                 })
@@ -1687,21 +1679,21 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
         map(
             first_order_partial_with_func_in_parenthesis,
             |(
-                PartialDerivative {
+                Derivative {
                     order,
                     var_index,
                     bound_var,
+                    derivative_notation,
                 },
                 comp,
             )| {
                 MathExpression::Differential(Differential {
-                    diff: Box::new(MathExpression::Mo(Operator::PartialDerivative(
-                        PartialDerivative {
-                            order,
-                            var_index,
-                            bound_var,
-                        },
-                    ))),
+                    diff: Box::new(MathExpression::Mo(Operator::Derivative(Derivative {
+                        order,
+                        var_index,
+                        bound_var,
+                        derivative_notation,
+                    }))),
                     func: Box::new(MathExpression::Mrow(comp)),
                 })
             },

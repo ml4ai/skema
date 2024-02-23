@@ -39,7 +39,6 @@ fn is_unary_operator(op: &Operator) -> bool {
         | Operator::Div
         | Operator::Abs
         | Operator::Derivative(_)
-        | Operator::PartialDerivative(_)
         | Operator::Sin
         | Operator::Cos
         | Operator::Tan

@@ -2,7 +2,7 @@
 //! This is based on the nice tutorial at https://matklad.github.io/2020/04/13/simple-but-powerful-pratt-parsing.html
 use crate::{
     ast::{
-        operator::{Derivative, Gradient, Hat, Int, Operator, PartialDerivative, Summation},
+        operator::{Derivative, DerivativeNotation, Gradient, Hat, Int, Operator, Summation},
         Math, MathExpression, Mi, Mrow,
     },
     parsers::interpreted_mathml::interpreted_math,
@@ -273,7 +273,6 @@ fn is_unary_operator(op: &Operator) -> bool {
             | Operator::Abs
             | Operator::Laplacian
             | Operator::Derivative(_)
-            | Operator::PartialDerivative(_)
             | Operator::Int(_)
             | Operator::SurfaceInt
             | Operator::Sin
@@ -512,18 +511,16 @@ impl MathExpressionTree {
                         order,
                         var_index,
                         bound_var,
-                        has_uppercase_d: _,
+                        derivative_notation,
                     }) if (*order, *var_index) == (1_u8, 1_u8) => {
-                        content_mathml.push_str("<diff/>");
-                        content_mathml.push_str(&format!("<bvar>{}</bar>", bound_var));
-                    }
-                    Operator::PartialDerivative(PartialDerivative {
-                        order,
-                        var_index,
-                        bound_var,
-                    }) if (*order, *var_index) == (1_u8, 1_u8) => {
-                        content_mathml.push_str("<partialdiff/>");
-                        content_mathml.push_str(&format!("<bvar>{}</bar>", bound_var));
+                        if *derivative_notation == DerivativeNotation::LeibnizTotal {
+                            content_mathml.push_str("<diff/>");
+                            content_mathml.push_str(&format!("<bvar>{}</bar>", bound_var));
+                        } else if *derivative_notation == DerivativeNotation::LeibnizPartialStandard
+                        {
+                            content_mathml.push_str("<partialdiff/>");
+                            content_mathml.push_str(&format!("<bvar>{}</bar>", bound_var));
+                        }
                     }
                     _ => {}
                 }
@@ -720,36 +717,55 @@ impl MathExpressionTree {
                     Operator::Abs => {
                         expression.push_str(&format!("\\left|{}\\right|", rest[0].to_latex()));
                     }
-                    Operator::Derivative(d) => {
-                        if d.has_uppercase_d {
-                            expression.push_str("\\frac{D ");
-                            process_expression_parentheses(&mut expression, &rest[0]);
-                            expression.push_str("}{D");
-                            process_math_expression(&d.bound_var.content, &mut expression);
-                            expression.push('}');
-                        } else {
+                    Operator::Derivative(d) => match d.derivative_notation {
+                        DerivativeNotation::LeibnizTotal => {
                             expression.push_str("\\frac{d ");
                             process_expression_parentheses(&mut expression, &rest[0]);
                             expression.push_str("}{d");
                             process_math_expression(&d.bound_var.content, &mut expression);
                             expression.push('}');
                         }
-                    }
-                    Operator::PartialDerivative(d) => {
-                        if d.order == 1_u8 {
-                            expression.push_str("\\frac{\\partial ");
-                            process_expression_parentheses(&mut expression, &rest[0]);
-                            expression.push_str("}{\\partial ");
+                        DerivativeNotation::LeibnizPartialStandard => {
+                            if d.order == 1_u8 {
+                                expression.push_str("\\frac{\\partial ");
+                                process_expression_parentheses(&mut expression, &rest[0]);
+                                expression.push_str("}{\\partial ");
+                                process_math_expression(&d.bound_var.content, &mut expression);
+                                expression.push('}');
+                            } else if d.order == 2_u8 {
+                                expression.push_str("\\frac{\\partial^2 ");
+                                process_expression_parentheses(&mut expression, &rest[0]);
+                                expression.push_str("}{\\partial ");
+                                process_math_expression(&d.bound_var.content, &mut expression);
+                                expression.push_str("^2}");
+                            }
+                        }
+                        DerivativeNotation::LeibnizPartialCompact => {
+                            expression.push_str("\\partial_{");
                             process_math_expression(&d.bound_var.content, &mut expression);
                             expression.push('}');
-                        } else if d.order == 2_u8 {
-                            expression.push_str("\\frac{\\partial^2 ");
-                            process_expression_parentheses(&mut expression, &rest[0]);
-                            expression.push_str("}{\\partial ");
-                            process_math_expression(&d.bound_var.content, &mut expression);
-                            expression.push_str("^2}");
                         }
-                    }
+                        DerivativeNotation::Newton => {
+                            if d.order == 1_u8 {
+                                expression.push_str("\\dot_{");
+                                process_math_expression(&d.bound_var.content, &mut expression);
+                                expression.push('}');
+                            }
+                        }
+                        DerivativeNotation::DNotation => {
+                            expression.push_str("\\frac{D ");
+                            process_expression_parentheses(&mut expression, &rest[0]);
+                            expression.push_str("}{D");
+                            process_math_expression(&d.bound_var.content, &mut expression);
+                            expression.push('}');
+                        }
+                        DerivativeNotation::Lagrange => {
+                            if d.order == 1_u8 {
+                                process_math_expression(&d.bound_var.content, &mut expression);
+                                expression.push_str("^\\prime");
+                            }
+                        }
+                    },
                     Operator::Sin => {
                         expression.push_str(&format!("\\sin({})", rest[0].to_latex()));
                     }
@@ -1260,7 +1276,6 @@ fn prefix_binding_power(op: &Operator) -> ((), u8) {
         Operator::SurfaceInt => ((), 25),
         Operator::Gradient(Gradient { .. }) => ((), 25),
         Operator::Derivative(Derivative { .. }) => ((), 25),
-        Operator::PartialDerivative(PartialDerivative { .. }) => ((), 25),
         Operator::Div => ((), 25),
         Operator::Laplacian => ((), 25),
         Operator::Abs => ((), 25),
@@ -2762,7 +2777,7 @@ fn test_partial_with_msub_t() {
     </math>";
     let exp = input.parse::<MathExpressionTree>().unwrap();
     let s_exp = exp.to_string();
-    assert_eq!(s_exp, "(PD(1, t) S)");
+    assert_eq!(s_exp, "(∂_{t}) S)");
 }
 
 #[test]
@@ -2903,7 +2918,7 @@ fn test_vector_invariant_form() {
     let exp = input.parse::<MathExpressionTree>().unwrap();
     let s_exp = exp.to_string();
     //assert_eq!(s_exp, "(= (+ (PD(1, t) u) (× (+ (Hat(z) ζ) f) u)) (- (Grad (+ (* g (+ h b)) (* (/ 1 2) (⋅ u u))))))");
-    assert_eq!(s_exp, "(= (+ (PD(1, t) u) (× (+ (* ζ Hat(z)) f) u)) (- (Grad (+ (* g (+ h b)) (* (/ 1 2) (⋅ u u))))))");
+    assert_eq!(s_exp, "(= (+ (∂_{t}) u) (× (+ (* ζ Hat(z)) f) u)) (- (Grad (+ (* g (+ h b)) (* (/ 1 2) (⋅ u u))))))");
 }
 
 #[test]
@@ -2986,7 +3001,7 @@ fn test_momentum_conservation() {
     </math>";
     let exp = input.parse::<MathExpressionTree>().unwrap();
     let s_exp = exp.to_string();
-    assert_eq!(s_exp, "(= (PD(1, t) u) (+ (- (- (- (* (- (⋅ v Grad)) u) (× f u)) (Grad_h (+ p (* g η)))) (Div τ)) F_{u}))");
+    assert_eq!(s_exp, "(= (∂_{t}) u) (+ (- (- (- (* (- (⋅ v Grad)) u) (× f u)) (Grad_h (+ p (* g η)))) (Div τ)) F_{u}))");
 }
 
 #[test]

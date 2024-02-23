@@ -14,52 +14,23 @@ pub struct Derivative {
     pub order: u8,
     pub var_index: u8,
     pub bound_var: Ci,
-    pub has_uppercase_d: bool,
+    pub derivative_notation: DerivativeNotation,
 }
 
-/// D Derivative operator, e.g. DS/Dt . in line with Spivak notation: http://ceres-solver.org/spivak_notation.html
+//All the stuff that was in the LaTeX equation that we need to reproduce the original LaTeX equation
 #[derive(
-    Debug,
-    Ord,
-    PartialOrd,
-    PartialEq,
-    Eq,
-    Clone,
-    Hash,
-    new,
-    Deserialize,
-    Serialize,
-    ToSchema,
-    JsonSchema,
+    Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, JsonSchema,
 )]
-pub struct DDerivative {
-    pub order: u8,
-    pub var_index: u8,
-    pub bound_var: Ci,
+pub enum DerivativeNotation {
+    LeibnizTotal,           // e.g. df/dx
+    LeibnizPartialStandard, // e.g. ∂f/∂x
+    LeibnizPartialCompact,  // e.g ∂_x
+    Newton,                 // dot notation, e.g. \dot{f}
+    DNotation,              // Df/Dx
+    Lagrange,               // prime notation, e.g. f'
 }
 
-/// Partial derivative operator. e.g. ∂S/∂t
-#[derive(
-    Debug,
-    Ord,
-    PartialOrd,
-    PartialEq,
-    Eq,
-    Clone,
-    Hash,
-    new,
-    Deserialize,
-    Serialize,
-    ToSchema,
-    JsonSchema,
-)]
-pub struct PartialDerivative {
-    pub order: u8,
-    pub var_index: u8,
-    pub bound_var: Ci,
-}
-
-/// Summation operator has the option of having lowlimit and uplimit components
+/// Summation operator has the option of having lower bound and upper bound components
 #[derive(
     Debug,
     Ord,
@@ -190,8 +161,6 @@ pub enum Operator {
     Abs,
     /// Total derivative operator, e.g. d/dt
     Derivative(Derivative),
-    /// Partial derivative operator, e.g. ∂/∂t
-    PartialDerivative(PartialDerivative),
     Sin,
     Cos,
     Tan,
@@ -242,17 +211,15 @@ impl fmt::Display for Operator {
                 order,
                 var_index: _,
                 bound_var,
-                has_uppercase_d: _,
-            }) => {
-                write!(f, "D({order}, {bound_var})")
-            }
-            Operator::PartialDerivative(PartialDerivative {
-                order,
-                var_index: _,
-                bound_var,
-            }) => {
-                write!(f, "PD({order}, {bound_var})")
-            }
+                derivative_notation,
+            }) => match derivative_notation {
+                DerivativeNotation::LeibnizTotal => write!(f, "D({order}, {bound_var})"),
+                DerivativeNotation::LeibnizPartialStandard => write!(f, "PD({order}, {bound_var})"),
+                DerivativeNotation::LeibnizPartialCompact => write!(f, "∂_{{{bound_var}}})"),
+                DerivativeNotation::Newton => write!(f, "D({order}, {bound_var})"),
+                DerivativeNotation::Lagrange => write!(f, "D({order}, {bound_var})"),
+                DerivativeNotation::DNotation => write!(f, "D({order}, {bound_var})"),
+            },
             Operator::Exp => write!(f, "exp"),
             Operator::Power => write!(f, "^"),
             Operator::Other(op) => write!(f, "{op}"),
