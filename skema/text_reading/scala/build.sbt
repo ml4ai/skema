@@ -27,7 +27,6 @@ libraryDependencies ++= {
     "org.clulab"                 %% "processors-corenlp"                  % procVer,
     "com.lihaoyi"                %% "requests"                            % "0.7.1",
     "org.scala-lang.modules"     %% "scala-xml"                           % "1.0.6",
-    "org.scalatest"              %% "scalatest"                           % "3.0.9" % Test,
     "com.lihaoyi"                %% "ujson"                               % uJsonVer,
     "com.lihaoyi"                %% "upickle"                             % uJsonVer,
     "com.lihaoyi"                %% "ujson-json4s"                        % uJsonVer,
@@ -35,8 +34,15 @@ libraryDependencies ++= {
     "xml-apis"                    % "xml-apis"                            % "1.4.01",
     "com.github.scopt"           %% "scopt"                               % "4.1.0",
     "com.lihaoyi"                %% "requests"                            % "0.1.8",
+    "io.cequence"                %% "openai-scala-client"                 % "1.0.0.RC.1",
+    "org.scalatest"               %% "scalatest"                            % "3.0.9" % Test,
   )
 }
+
+dependencyOverrides ++= Seq(
+  "org.scalactic"               %% "scalactic"                            % "3.0.9",
+  "org.scalatest"               %% "scalatest"                            % "3.0.9" % Test,
+)
 
 lazy val root = project in file(".")
 

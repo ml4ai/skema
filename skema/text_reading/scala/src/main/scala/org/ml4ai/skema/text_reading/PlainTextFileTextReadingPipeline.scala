@@ -4,7 +4,7 @@ import org.clulab.odin.Mention
 import org.clulab.processors.Processor
 import org.clulab.utils.FileUtils
 import org.ml4ai.skema.text_reading.grounding.Grounder
-import org.ml4ai.skema.text_reading.scenario_context.{ContextEngine, CosmosOrderer, SentenceIndexOrderer}
+import org.ml4ai.skema.text_reading.scenario_context.{HeuristicContextEngine, CosmosOrderer, SentenceIndexOrderer}
 import org.ml4ai.skema.text_reading.serializer.SkemaJSONSerializer
 
 import java.io.File
@@ -28,7 +28,7 @@ class PlainTextFileTextReadingPipeline(contextWindowSize: Int, processorOpt: Opt
     val mentions = this.extractMentions(text, Some(fileName))._2  // TODO Make this a case class for legibility
 
     // Resolve scenario context
-    val scenarioContextEngine = new ContextEngine(windowSize = contextWindowSize, mentions, SentenceIndexOrderer)
+    val scenarioContextEngine = new HeuristicContextEngine(windowSize = contextWindowSize, mentions, SentenceIndexOrderer)
     val mentionsWithScenarioContext = mentions map scenarioContextEngine.resolveContext
     logger.info(s"Finished annotation of $filePath")
     mentionsWithScenarioContext

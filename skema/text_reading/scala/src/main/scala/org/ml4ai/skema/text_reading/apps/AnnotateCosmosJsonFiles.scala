@@ -16,7 +16,7 @@ object AnnotateCosmosJsonFiles extends App with Logging{
 
   OParser.parse(parser, args, ArgsConfig()) match {
     case Some(config) =>
-      val textReadingPipeline = new CosmosTextReadingPipeline(contextWindowSize = 3) // TODO Add the window parameter to the configuration file
+      val textReadingPipeline = new CosmosTextReadingPipeline(contextWindowSize = config.contextWindowSize, contextEngineType = config.contextEngineType)
 
       logger.info(s"Starting process with ${config.inputFiles} arguments")
 
