@@ -298,7 +298,7 @@ pub fn to_decapodes_serialization(
                 let mut derivative_str = String::new();
                 if *derivative_notation == DerivativeNotation::LeibnizTotal {
                     derivative_str.push_str(&*format!("D({},{})", order, bound_var));
-                } else if *derivative_notation == DerivativeNotation::LeibnizPartialStandard{
+                } else if *derivative_notation == DerivativeNotation::LeibnizPartialStandard {
                     derivative_str.push_str(&*format!("PD({},{})", order, bound_var));
                 }
                 let unary = UnaryOperator {

@@ -159,25 +159,35 @@ pub enum Operator {
     Gradient(Gradient),
     /// Dot product operator
     Dot,
-    Comma,
-    Period,
     /// Divergence operator
     Div,
-    ///Absolute operator
+    ///Absolute value
     Abs,
-    /// Total derivative operator, e.g. d/dt
+    /// Includes derivative operator with varying derivative notation
     Derivative(Derivative),
+    /// Sine function
     Sin,
+    /// Cosine function
     Cos,
+    /// Tangent function
     Tan,
+    /// Secant function
     Sec,
+    /// Cosecant function
     Csc,
+    /// Cotangent function
     Cot,
+    /// Arcsine function
     Arcsin,
+    /// Arccosine function
     Arccos,
+    /// Arctangent function
     Arctan,
+    /// Arcsecant function
     Arcsec,
+    /// Arccosecant function
     Arccsc,
+    /// Arccotangent function
     Arccot,
     /// Mean operator
     Mean,
@@ -211,7 +221,6 @@ impl fmt::Display for Operator {
             Operator::Lparen => write!(f, "("),
             Operator::Rparen => write!(f, ")"),
             Operator::Compose => write!(f, "."),
-            Operator::Comma => write!(f, ","),
             Operator::Factorial => write!(f, "!"),
             Operator::Derivative(Derivative {
                 order,
@@ -248,7 +257,6 @@ impl fmt::Display for Operator {
                 None => write!(f, "Grad"),
             },
             Operator::Dot => write!(f, "⋅"),
-            Operator::Period => write!(f, ""),
             Operator::Div => write!(f, "Div"),
             Operator::Abs => write!(f, "Abs"),
             Operator::Summation(Summation {

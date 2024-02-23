@@ -218,16 +218,6 @@ pub fn rparen(input: Span) -> IResult<Operator> {
     Ok((s, op))
 }
 
-pub fn comma(input: Span) -> IResult<Operator> {
-    let (s, op) = value(Operator::Comma, ws(tag(",")))(input)?;
-    Ok((s, op))
-}
-
-pub fn period(input: Span) -> IResult<Operator> {
-    let (s, op) = value(Operator::Period, ws(tag(".")))(input)?;
-    Ok((s, op))
-}
-
 pub fn mean(input: Span) -> IResult<Operator> {
     let (s, op) = value(Operator::Mean, ws(tag("¯")))(input)?;
     Ok((s, op))
@@ -266,7 +256,6 @@ pub fn operator(input: Span) -> IResult<Operator> {
         divide,
         dot,
         cross,
-        period,
         vector,
         operator_other,
     ))(input)?;

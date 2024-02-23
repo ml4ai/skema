@@ -674,11 +674,6 @@ impl MathExpressionTree {
                         expression.push('^');
                         expression.push_str(&format!("{{{}}}", rest[1].to_latex()));
                     }
-                    Operator::Comma => {
-                        process_atoms_cons_parentheses(&mut expression, &rest[0]);
-                        expression.push(',');
-                        process_atoms_cons_parentheses(&mut expression, &rest[1]);
-                    }
                     Operator::Gradient(x) => match &x.subscript {
                         Some(sub) => {
                             expression.push_str("\\nabla_{");
