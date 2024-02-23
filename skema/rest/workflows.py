@@ -71,7 +71,7 @@ async def equation_to_amrs(data: schema.EquationsToAMRs, client: httpx.AsyncClie
                 },
             )
     elif data.model == "gamr":
-        res = await client.put(f"{SKEMA_RS_ADDESS}/mathml/gamr", json=eqns)
+        res = await client.put(f"{SKEMA_RS_ADDESS}/mathml/g-amr", json=eqns)
         if res.status_code != 200:
             return JSONResponse(
                 status_code=400,
@@ -118,7 +118,7 @@ async def code_snippets_to_amrs(system: code2fn.System, client: httpx.AsyncClien
     # Single file
     single_snippet_payload = {"files": ["code.py"], "blobs": ["def sir(s: float, i: float, r: float, beta: float, gamma: float, n: float) -> Tuple[float, float, float]:\n    \"\"\"The SIR model, one time step.\"\"\"\n    s_n = (-beta * s * i) + s\n    i_n = (beta * s * i - gamma * i) + i\n    r_n = gamma * i + r\n    scale = n / (s_n + i_n + r_n)\n    return s_n * scale, i_n * scale, r_n * scale"], "model": "petrinet"}
 
-    response = requests.post("http://0.0.0.0:8000/workflows/code/snippets-to-met", json=single_snippet_payload)
+    response = requests.post("http://0.0.0.0:8000/workflows/consolidated/code-snippets-to-amrs", json=single_snippet_payload)
     gromet_json = response.json()
     ```
     """
