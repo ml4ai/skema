@@ -22,12 +22,18 @@ pub struct Derivative {
     Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, JsonSchema,
 )]
 pub enum DerivativeNotation {
-    LeibnizTotal,           // e.g. df/dx
-    LeibnizPartialStandard, // e.g. ∂f/∂x
-    LeibnizPartialCompact,  // e.g ∂_x
-    Newton,                 // dot notation, e.g. \dot{f}
-    DNotation,              // Df/Dx
-    Lagrange,               // prime notation, e.g. f'
+    /// e.g. df/dx
+    LeibnizTotal,
+    /// e.g. ∂f/∂x
+    LeibnizPartialStandard,
+    /// e.g ∂_x
+    LeibnizPartialCompact,
+    /// dot notation, e.g. \dot{f}
+    Newton,
+    /// Df/Dx
+    DNotation,
+    /// prime notation, e.g. f'
+    Lagrange,
 }
 
 /// Summation operator has the option of having lower bound and upper bound components
