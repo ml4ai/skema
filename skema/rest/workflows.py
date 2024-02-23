@@ -27,11 +27,159 @@ from skema.skema_py import server as code2fn
 router = APIRouter()
 
 
+# equations [mathml, latex] -> amrs [Petrinet, Regnet, GAMR, MET, Decapode]
+@router.post(
+    "/consolidated/equations-to-amr", summary="equations [mathml, latex] → AMRs [Petrinet, Regnet, GAMR, MET, Decapode]"
+)
+async def equation_to_amrs(data: schema.EquationsToAMRs, client: httpx.AsyncClient = Depends(utils.get_client)):
+    """
+    Converts equations (in LaTeX or MathML) to an AMR (Petrinet, Regnet, GAMR, MET, or Decapode).
+
+    ### Python example
+    ```
+    import requests
+
+    equations = [
+      "\\frac{\\delta x}{\\delta t} = {\\alpha x} - {\\beta x y}",
+      "\\frac{\\delta y}{\\delta t} = {\\alpha x y} - {\\gamma y}"
+    ]
+    url = "0.0.0.0"
+    r = requests.post(f"{url}/consolidated/equations-to-amr", json={"equations": equations, "model": "regnet"})
+    r.json()
+    ```
+    """
+    eqns = utils.parse_equations(data.equations)
+    if data.model == "petrinet" or data.model == "regnet":
+        payload = {"mathml": data.equations, "model": data.model}
+        res = await client.put(f"{SKEMA_RS_ADDESS}/mathml/amr", json=payload)
+        if res.status_code != 200:
+            return JSONResponse(
+                status_code=400,
+                content={
+                    "error": f"MORAE PUT /mathml/amr failed to process payload with error {res.text}",
+                    "payload": payload,
+                },
+            )
+    elif data.model == "met":
+        res = await client.put(f"{SKEMA_RS_ADDESS}/mathml/met", json=eqns)
+        if res.status_code != 200:
+            return JSONResponse(
+                status_code=400,
+                content={
+                    "error": f"PUT /mathml/met failed to process payload with error {res.text}",
+                    "payload": eqns,
+                },
+            )
+    elif data.model == "gamr":
+        res = await client.put(f"{SKEMA_RS_ADDESS}/mathml/gamr", json=eqns)
+        if res.status_code != 200:
+            return JSONResponse(
+                status_code=400,
+                content={
+                    "error": f"PUT /mathml/met failed to process payload with error {res.text}",
+                    "payload": eqns,
+                },
+            )
+    elif data.model == "decapode":
+        res = await client.put(f"{SKEMA_RS_ADDESS}/mathml/decapodes", json=eqns)
+        if res.status_code != 200:
+            return JSONResponse(
+                status_code=400,
+                content={
+                    "error": f"PUT /mathml/met failed to process payload with error {res.text}",
+                    "payload": eqns,
+                },
+            )
+    else:
+        return JSONResponse(
+            status_code=401,
+            content={
+                "error": f"{data.model} is not a supported model type",
+                "payload": eqns,
+            },
+        )
+
+
+    return res.json()
+    
+# Code Snippets -> amrs [Petrinet, Regnet, GAMR, MET]
+@router.post(
+    "/consolidated/code-snippets-to-amrs", summary="code snippets → AMRs [Petrinet, Regnet, GAMR, MET, Decapode]"
+)
+async def code_snippets_to_amrs(system: code2fn.System, client: httpx.AsyncClient = Depends(utils.get_client)):
+    """
+    Code snippets to AMR workflow. This endpoint takes a code snippet, assumed to contain dynamics, and extracts the 
+    Math Expression Tree of the dynamics, which is then converted into an AMR of the specified type.
+
+    ### Python example
+    ```
+    import requests
+
+    # Single file
+    single_snippet_payload = {"files": ["code.py"], "blobs": ["def sir(s: float, i: float, r: float, beta: float, gamma: float, n: float) -> Tuple[float, float, float]:\n    \"\"\"The SIR model, one time step.\"\"\"\n    s_n = (-beta * s * i) + s\n    i_n = (beta * s * i - gamma * i) + i\n    r_n = gamma * i + r\n    scale = n / (s_n + i_n + r_n)\n    return s_n * scale, i_n * scale, r_n * scale"], "model": "petrinet"}
+
+    response = requests.post("http://0.0.0.0:8000/workflows/code/snippets-to-met", json=single_snippet_payload)
+    gromet_json = response.json()
+    ```
+    """
+    gromet = await code2fn.fn_given_filepaths(system)
+    gromet, _ = utils.fn_preprocessor(gromet)
+    if system.model == "petrinet":
+        res = await client.put(f"{SKEMA_RS_ADDESS}/models/PN", json=gromet)
+        if res.status_code != 200:
+            return JSONResponse(
+                status_code=400,
+                content={
+                    "error": f"MORAE PUT /models/PN failed to process payload ({res.text})",
+                    "payload": gromet,
+                },
+            )
+    elif system.model == "regnet":
+        res = await client.put(f"{SKEMA_RS_ADDESS}/models/RN", json=gromet)
+        if res.status_code != 200:
+            return JSONResponse(
+                status_code=400,
+                content={
+                    "error": f"MORAE PUT /models/RN failed to process payload ({res.text})",
+                    "payload": gromet,
+                },
+            )
+    elif system.model == "met":
+        res = await client.put(f"{SKEMA_RS_ADDESS}/models/MET", json=gromet)
+        if res.status_code != 200:
+            return JSONResponse(
+                status_code=400,
+                content={
+                    "error": f"MORAE PUT /models/MET failed to process payload ({res.text})",
+                    "payload": gromet,
+                },
+            )
+    elif system.model == "gamr":
+        res = await client.put(f"{SKEMA_RS_ADDESS}/models/G-AMR", json=gromet)
+        if res.status_code != 200:
+            return JSONResponse(
+                status_code=400,
+                content={
+                    "error": f"MORAE PUT /models/G-AMR failed to process payload ({res.text})",
+                    "payload": gromet,
+                },
+            )
+    else:
+        return JSONResponse(
+            status_code=401,
+            content={
+                "error": f"{system.model} is not a supported model type",
+                "payload": gromet,
+            },
+        )
+    return res.json()
+
+
 # equation images -> mml -> amr
 @router.post(
     "/images/base64/equations-to-amr", summary="Equations (base64 images) → MML → AMR"
 )
-async def equations_to_amr(data: schema.EquationImagesToAMR, client: httpx.AsyncClient = Depends(utils.get_client)):
+async def equations_img_to_amr(data: schema.EquationImagesToAMR, client: httpx.AsyncClient = Depends(utils.get_client)):
     """
     Converts images of equations to AMR.
 
@@ -76,7 +224,7 @@ async def equations_to_amr(data: schema.EquationImagesToAMR, client: httpx.Async
 
 # equation images -> mml -> latex
 @router.post("/images/equations-to-latex", summary="Equations (images) → MML → LaTeX")
-async def equations_to_latex(data: UploadFile, client: httpx.AsyncClient = Depends(utils.get_client)):
+async def equations_img_to_latex(data: UploadFile, client: httpx.AsyncClient = Depends(utils.get_client)):
     """
     Converts images of equations to LaTeX.
 
@@ -254,12 +402,7 @@ async def equations_to_met(data: schema.EquationToMET, client: httpx.AsyncClient
     print(r.json())
     ```
     """
-    eqns: List[str] = []
-    for eqn in data.equations:
-        if "</math>" in eqn:
-            eqns.append(utils.clean_mml(eqn))
-        else:
-            eqns.append(utils.clean_mml(eqn2mml.get_mathml_from_latex(eqn)))
+    eqns = utils.parse_equations(data.equations)
 
     res = await client.put(f"{SKEMA_RS_ADDESS}/mathml/met", json=eqns)
     if res.status_code != 200:
@@ -294,12 +437,7 @@ async def equations_to_gamr(data: schema.EquationToMET, client: httpx.AsyncClien
     print(r.json())
     ```
     """
-    eqns: List[str] = []
-    for eqn in data.equations:
-        if "</math>" in eqn:
-            eqns.append(utils.clean_mml(eqn))
-        else:
-            eqns.append(utils.clean_mml(eqn2mml.get_mathml_from_latex(eqn)))
+    eqns = utils.parse_equations(data.equations)
 
     res = await client.put(f"{SKEMA_RS_ADDESS}/mathml/g-amr", json=eqns)
     if res.status_code != 200:

@@ -71,6 +71,11 @@ class System(BaseModel):
             "#Variable declaration\nx=2\n#Function definition\ndef foo(x):\n    '''Increment the input variable'''\n    return x+1",
         ]],
     )
+    model: Optional[str] = Field(
+        default="petrinet",
+        description="A model name for the type of amr to get out",
+        examples=["regnet"],
+    )
     system_name: Optional[str] = Field(
         default=None,
         description="A model name to associate with the provided code",
