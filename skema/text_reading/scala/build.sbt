@@ -9,7 +9,8 @@ resolvers ++= Seq(
 
 libraryDependencies ++= {
   val breezeVer = "1.2"
-  val procVer = "9.0.0-RC2"
+  val procVer = "9.0.0-RC4"
+  val pdf2txtVer = "1.2.0-RC4"
   val uJsonVer = "2.0.0"
 
   Seq(
@@ -21,7 +22,7 @@ libraryDependencies ++= {
     "org.clulab"                 %% "epidemiology-embeddings-model-ser"   % "1.0.0",
 //    "org.clulab"                  % "spaceweather-model-unigram-ser"      % "1.0.0",
     "org.clulab"                  % "glove-840b-300d"                     % "0.1.0" % Test,
-    "org.clulab"                 %% "pdf2txt"                             % "1.2.0-RC2",
+    "org.clulab"                 %% "pdf2txt"                             % pdf2txtVer,
     "com.typesafe.play"          %% "play-json"                           % "2.9.3",
     "org.clulab"                 %% "processors-main"                     % procVer,
     "org.clulab"                 %% "processors-corenlp"                  % procVer,
