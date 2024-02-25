@@ -7,7 +7,7 @@ from typing import List
 from askem_extractions.data_model import AttributeCollection, AttributeType, AnchoredEntity
 from bs4 import BeautifulSoup, Comment
 
-from skema.img2mml import eqn2mml
+from skema.img2mml.api import get_mathml_from_latex
 from skema.rest import config
 from skema.rest.schema import TextReadingEvaluationResults, AMRLinkingEvaluationResults
 
@@ -161,7 +161,7 @@ def parse_equations(eqns: List[str]) -> List[str]:
         if "</math>" in eqn:
             parsed_eqns.append(clean_mml(eqn))
         else:
-            parsed_eqns.append(clean_mml(eqn2mml.get_mathml_from_latex(eqn)))
+            parsed_eqns.append(clean_mml(get_mathml_from_latex(eqn)))
     return parsed_eqns
 
 def extraction_matches_annotation(extraction: AnchoredEntity, annotation: Dict[str, Any], json_contents: Dict) -> bool:
