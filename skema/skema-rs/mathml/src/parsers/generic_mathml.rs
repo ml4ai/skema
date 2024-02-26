@@ -221,11 +221,30 @@ pub fn rparen(input: Span) -> IResult<Operator> {
     Ok((s, op))
 }
 
+pub fn comma(input: Span) -> IResult<Operator> {
+    let (s, op) = value(Operator::Comma, ws(tag(",")))(input)?;
+    Ok((s, op))
+}
+
+pub fn period(input: Span) -> IResult<Operator> {
+    let (s, op) = value(Operator::Period, ws(tag(".")))(input)?;
+    Ok((s, op))
+}
+
 pub fn mean(input: Span) -> IResult<Operator> {
     let (s, op) = value(Operator::Mean, ws(tag("¯")))(input)?;
     Ok((s, op))
 }
 
+pub fn hat(input: Span) -> IResult<Operator> {
+    let (s, op) = value(Operator::Hat, alt((ws(tag("^")), ws(tag("&#x5E;")))))(input)?;
+    Ok((s, op))
+}
+
+pub fn grad(input: Span) -> IResult<Operator> {
+    let (s, op) = value(Operator::Grad, alt((ws(tag("∇")), ws(tag("&#x2207;")))))(input)?;
+    Ok((s, op))
+}
 pub fn dot(input: Span) -> IResult<Operator> {
     let (s, op) = value(Operator::Dot, alt((ws(tag("⋅")), ws(tag("&#x22c5;")))))(input)?;
     Ok((s, op))
@@ -236,12 +255,20 @@ pub fn cross(input: Span) -> IResult<Operator> {
     Ok((s, op))
 }
 
-pub fn vector(input: Span) -> IResult<Operator> {
-    let (s, op) = value(Operator::Vector, alt((ws(tag("→")), ws(tag("&#x2192;")))))(input)?;
+pub fn down_arrow(input: Span) -> IResult<Operator> {
+    let (s, op) = value(
+        Operator::DownArrow,
+        alt((ws(tag("↓")), ws(tag("&#x2193;")))),
+    )(input)?;
     Ok((s, op))
 }
 
-pub fn operator_other(input: Span) -> IResult<Operator> {
+pub fn int(input: Span) -> IResult<Operator> {
+    let (s, op) = value(Operator::Int, alt((ws(tag("∫")), ws(tag("&#x222b;")))))(input)?;
+    Ok((s, op))
+}
+
+fn operator_other(input: Span) -> IResult<Operator> {
     let (s, consumed) = ws(recognize(not_line_ending))(input)?;
     let op = Operator::Other(consumed.to_string());
     Ok((s, op))
@@ -255,11 +282,15 @@ pub fn operator(input: Span) -> IResult<Operator> {
         lparen,
         rparen,
         mean,
+        hat,
         multiply,
         divide,
+        grad,
         dot,
         cross,
-        vector,
+        period,
+        down_arrow,
+        int,
         operator_other,
     ))(input)?;
     Ok((s, op))
