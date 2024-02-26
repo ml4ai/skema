@@ -199,7 +199,10 @@ pub fn multiply(input: Span) -> IResult<Operator> {
 }
 
 pub fn divide(input: Span) -> IResult<Operator> {
-    let (s, op) = value(Operator::Divide, alt((ws(tag("∕")), ws(tag("/")), ws(tag("&#x2215;")))))(input)?;
+    let (s, op) = value(
+        Operator::Divide,
+        alt((ws(tag("∕")), ws(tag("/")), ws(tag("&#x2215;")))),
+    )(input)?;
     Ok((s, op))
 }
 

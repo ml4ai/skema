@@ -3418,7 +3418,6 @@ fn test_conservation_of_mass_equation_2() {
     );
 }
 
-
 #[test]
 fn test_new_equation1() {
     let input = "<math>

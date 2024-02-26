@@ -82,9 +82,7 @@ fn empty_parenthesis(input: Span) -> IResult<Vec<Mi>> {
 /// Example: S(t)
 pub fn ci_univariate_with_bounds(input: Span) -> IResult<Ci> {
     let (s, (Mi(x), bound_vars)) = tuple((
-        alt((mi,
-             delimited(stag!("mrow"),mi, etag!("mrow")),
-        )),
+        alt((mi, delimited(stag!("mrow"), mi, etag!("mrow")))),
         alt((parenthesized_identifier, parenthesized_msub_identifier)),
     ))(input)?;
     let mut ci_func_of: Vec<Ci> = Vec::new();
@@ -1620,7 +1618,6 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                 },
             ),
         )),
-
         map(
             ci_univariate_with_bounds,
             |Ci {
@@ -1645,7 +1642,18 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                 })
             },
         ),
-
+        map(
+            ci_subscript_func,
+            |Ci {
+                 content, func_of, ..
+             }| {
+                MathExpression::Ci(Ci {
+                    r#type: Some(Type::Real),
+                    content,
+                    func_of,
+                })
+            },
+        ),
         map(
             first_order_with_func_in_parenthesis,
             |(
