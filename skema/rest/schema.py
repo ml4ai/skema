@@ -67,7 +67,21 @@ class EquationToMET(BaseModel):
         examples=[[
             r"\frac{\partial x}{\partial t} = {\alpha x} - {\beta x y}",
             r"\frac{\partial y}{\partial t} = {\alpha x y} - {\gamma y}",
+            "<math><mfrac><mrow><mi>d</mi><mi>Susceptible</mi></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mo>=</mo><mo>−</mo><mi>Infection</mi><mi>Infected</mi><mi>Susceptible</mi></math>",
         ]],
+    )
+
+class EquationsToAMRs(BaseModel):
+    equations: List[str] = Field(
+        description="Equations in LaTeX or pMathML",
+        examples=[[
+            r"\frac{\partial x}{\partial t} = {\alpha x} - {\beta x y}",
+            r"\frac{\partial y}{\partial t} = {\alpha x y} - {\gamma y}",
+            "<math><mfrac><mrow><mi>d</mi><mi>Susceptible</mi></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mo>=</mo><mo>−</mo><mi>Infection</mi><mi>Infected</mi><mi>Susceptible</mi></math>",
+        ]],
+    )
+    model: Literal["regnet", "petrinet", "met", "gamr", "decapode"] = Field(
+        description="The model type", examples=["gamr"]
     )
 
 class MmlToAMR(BaseModel):

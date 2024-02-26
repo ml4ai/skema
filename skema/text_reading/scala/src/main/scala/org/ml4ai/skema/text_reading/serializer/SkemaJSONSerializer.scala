@@ -267,7 +267,7 @@ object SkemaJSONSerializer {
       val pairs = for {
         (m: Mention, path: odin.SynPath) <- innermap.toList
         edgeUJson = DirectedGraph.triplesToEdges[String](path.toList).map(_.toUJson)
-      } yield (m.id, edgeUJson)
+      } yield (MentionOps(m).id, edgeUJson)
       pairs.toMap
     }
     simplePathMap
@@ -348,7 +348,7 @@ object SkemaJSONSerializer {
 
     def toUJson: ujson.Value = {
       ujson.Obj(
-        "id" -> TextBoundMentionOps(tb).id,
+        "id" -> new TextBoundMentionOps(tb).id,
         "type" -> "TextBoundMention",
         "text" -> tb.text,
         "labels" -> tb.labels,
@@ -371,7 +371,7 @@ object SkemaJSONSerializer {
     def toUJson: ujson.Value = {
       ujson.Obj(
         "type" -> "RelationMention",
-        "id" -> RelationMentionOps(rm).id,
+        "id" -> new RelationMentionOps(rm).id,
         "text" -> rm.text,
         "labels" -> rm.labels,
         "arguments" -> argsToUJson(rm.arguments),
@@ -393,7 +393,7 @@ object SkemaJSONSerializer {
     def toUJson: ujson.Value = {
       ujson.Obj(
         "type" -> "EventMention",
-        "id" -> EventMentionOps(em).id,
+        "id" -> new EventMentionOps(em).id,
         "text" -> em.text,
         "labels" -> em.labels,
         "trigger" -> AutomatesTextBoundMentionOps(em.trigger).toUJson,
@@ -416,7 +416,7 @@ object SkemaJSONSerializer {
       val argHashes = for {
         (role, mns) <- args
         bh = stringHash(s"role:$role")
-        hs = mns.map(_.equivalenceHash)
+        hs = mns.map(MentionOps(_).equivalenceHash)
       } yield mix(bh, unorderedHash(hs))
       val h0 = stringHash("org.clulab.odin.Mention.arguments")
       finalizeHash(h0, unorderedHash(argHashes))
@@ -444,7 +444,7 @@ object SkemaJSONSerializer {
       // args
       val h7 = mix(h6, argsHash(cm.arguments))
       // trigger
-      val h8 = mix(h7, TextBoundMentionOps(cm.trigger).equivalenceHash)
+      val h8 = mix(h7, new TextBoundMentionOps(cm.trigger).equivalenceHash)
       finalizeHash(h8, 8)
     }
 

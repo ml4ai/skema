@@ -3,9 +3,11 @@ import httpx
 from collections import defaultdict
 from typing import Any, Dict
 
+from typing import List
 from askem_extractions.data_model import AttributeCollection, AttributeType, AnchoredEntity
 from bs4 import BeautifulSoup, Comment
 
+from skema.img2mml.api import get_mathml_from_latex
 from skema.rest import config
 from skema.rest.schema import TextReadingEvaluationResults, AMRLinkingEvaluationResults
 
@@ -151,6 +153,16 @@ def clean_mml(mml: str) -> str:
             del tag[attr]
     return str(soup).replace("\n", "")
 
+
+def parse_equations(eqns: List[str]) -> List[str]:
+    """Parses the equations based on if they are mathml or latex"""
+    parsed_eqns: List[str] = []
+    for eqn in eqns:
+        if "</math>" in eqn:
+            parsed_eqns.append(clean_mml(eqn))
+        else:
+            parsed_eqns.append(clean_mml(get_mathml_from_latex(eqn)))
+    return parsed_eqns
 
 def extraction_matches_annotation(extraction: AnchoredEntity, annotation: Dict[str, Any], json_contents: Dict) -> bool:
     """ Determines whether the extraction matches the annotation"""
