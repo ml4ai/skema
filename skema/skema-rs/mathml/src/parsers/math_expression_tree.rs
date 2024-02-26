@@ -3417,3 +3417,18 @@ fn test_conservation_of_mass_equation_2() {
         "\\frac{\\partial \\rho}{\\partial t}=-\\nabla \\cdot {(\\vec{\\mu}*\\rho)}"
     );
 }
+
+
+#[test]
+fn test_new_equation1() {
+    let input = "<math>
+    <msub><mi>p</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo>=</mo><mrow><mi>R</mi></mrow><mo>(</mo><msub><mi>t</mi><mi>j</mi></msub><mo>)</mo><mi>w</mi><mo>(</mo><msub><mi>t</mi><mi>i</mi></msub><mo>&#x2212;</mo><msub><mi>t</mi><mi>j</mi></msub><mo>)</mo><mo>/</mo><mi>&#x03BB;</mi><mo>(</mo><msub><mi>t</mi><mi>i</mi></msub><mo>)</mo>
+    </math>";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    let s_exp = exp.to_string();
+    assert_eq!(s_exp, "(= p_{ij} (* (* R w) (/ (- t_{i} t_{j}) λ)))");
+    assert_eq!(
+        exp.to_latex(),
+        "p_{ij}=R(t_{j})*w*\\frac{t_{i}-t_{j}}{\\lambda(t_{i})}"
+    );
+}
