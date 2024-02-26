@@ -251,8 +251,6 @@ class TS2CAST(object):
 
     def visit_call(self, node: Node) -> Call:
         ref = self.node_helper.get_source_ref(node)
-        # func_identifier = get_first_child_by_type(node, "identifier")
-        # func_name = self.visit(func_identifier) #self.node_helper.get_identifier(func_identifier)
 
         func_cast = self.visit(node.children[0])
 
@@ -286,7 +284,7 @@ class TS2CAST(object):
 
         # Function calls only want the 'Name' part of the 'Var' that the visit returns
         return Call(
-            func=func_name, 
+            func=func_cast, 
             arguments=func_args, 
             source_refs=[ref]
         )
@@ -533,7 +531,7 @@ class TS2CAST(object):
         alias = get_children_by_types(import_stmt, ["identifier"])[0]
         self.visit(alias)
 
-        return (name, self.node_helper.get_identifier(alias)) #ModelImport(name=name, alias=alias, symbol="", all=False, source_refs=ref)
+        return (name, self.node_helper.get_identifier(alias)) 
 
     def visit_import(self, node: Node):
         ref = self.node_helper.get_source_ref(node)
@@ -558,16 +556,15 @@ class TS2CAST(object):
         names_list = get_children_by_types(node, ["dotted_name", "aliased_import"])
         wild_card = get_children_by_types(node, ["wildcard_import"])
         module_name = self.node_helper.get_identifier(names_list[0])
-        self.visit(names_list[0])
 
         # if "wildcard_import" exists then it'll be in the list
         if len(wild_card) == 1:
-            to_ret.append(ModelImport(name=module_name, alias="", symbol="", all=True, source_refs=ref))
+            to_ret.append(ModelImport(name=module_name, alias=None, symbol=None, all=True, source_refs=ref))
         else:
             for name in names_list[1:]:
                 if name.type == "dotted_name":
                     resolved_name = self.handle_dotted_name(name) 
-                    to_ret.append(ModelImport(name=module_name, alias="", symbol=resolved_name, all=False, source_refs=ref))
+                    to_ret.append(ModelImport(name=module_name, alias=None, symbol=resolved_name, all=False, source_refs=ref))
                 elif name.type == "aliased_import":
                     resolved_name = self.handle_aliased_import(name)
                     self.aliases[resolved_name[1]] = resolved_name[0]
@@ -581,7 +578,7 @@ class TS2CAST(object):
         obj_cast = self.visit(obj)
         attr_cast = self.visit(attr)
 
-        return Attribute(value=obj_cast, attr=attr_cast, source_refs=ref)
+        return Attribute(value= get_name_node(obj_cast), attr=get_name_node(attr_cast), source_refs=ref)
 
 
     def visit_while(self, node: Node) -> Loop:
