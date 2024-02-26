@@ -990,6 +990,9 @@
 <a href="#989" id="989">989</a>
 <a href="#990" id="990">990</a>
 <a href="#991" id="991">991</a>
+<a href="#992" id="992">992</a>
+<a href="#993" id="993">993</a>
+<a href="#994" id="994">994</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Structs to represent elements of ACSets (Annotated C-Sets, a concept from category theory).
 //! JSON-serialized ACSets are the form of model exchange between TA1 and TA2.
 </span><span class="kw">use </span><span class="kw">crate</span>::parsers::first_order_ode::{get_terms, FirstOrderODE, PnTerm};
@@ -1185,12 +1188,16 @@
 }
 
 <span class="attr">#[derive(
-    Debug, Default, PartialEq, Eq, PartialOrd, Ord, Clone, Serialize, Deserialize, ToSchema, JsonSchema,
+    Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Serialize, Deserialize, ToSchema, JsonSchema,
 )]
 </span><span class="kw">pub struct </span>Initial {
     <span class="kw">pub </span>target: String,
     <span class="kw">pub </span>expression: String,
     <span class="kw">pub </span>expression_mathml: String,
+}
+
+<span class="kw">impl </span>Default <span class="kw">for </span>Initial {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{ Initial { target: <span class="string">"temp"</span>.to_string(), expression: <span class="string">"0"</span>.to_string(), expression_mathml: <span class="string">"&lt;math&gt;&lt;\\math&gt;"</span>.to_string() } }
 }
 
 <span class="attr">#[derive(
@@ -1461,7 +1468,6 @@
             };
             <span class="kw">let </span>initials = Initial {
                 target: ode.lhs_var.to_string().clone(),
-                expression: <span class="string">""</span>.to_string(),
                 ..Default::default()
             };
             <span class="comment">/*let parameters = Parameter {
