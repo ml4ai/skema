@@ -11,9 +11,10 @@ from zipfile import ZipFile
 
 import pandas as pd
 import requests
+import httpx
 from askem_extractions.data_model import AttributeCollection
 from askem_extractions.importers import import_arizona
-from fastapi import APIRouter, FastAPI, UploadFile, Response, status
+from fastapi import APIRouter, Depends, FastAPI, UploadFile, Response, status
 
 from skema.rest.proxies import SKEMA_TR_ADDRESS, MIT_TR_ADDRESS, OPENAI_KEY, COSMOS_ADDRESS
 from skema.rest.schema import (
@@ -22,7 +23,7 @@ from skema.rest.schema import (
     TextReadingDocumentResults,
     TextReadingError, MiraGroundingInputs, MiraGroundingOutputItem, TextReadingEvaluationResults,
 )
-from skema.rest.utils import compute_text_reading_evaluation
+from skema.rest import utils
 
 router = APIRouter()
 
@@ -663,9 +664,11 @@ def healthcheck() -> int:
     return status_code
 
 
-@router.get("/eval", response_model=TextReadingEvaluationResults, status_code=200)
+@router.get("/eval", response_model=TextReadingEvaluationResults, status_code=200, deprecated=True)
 def quantitative_eval() -> TextReadingEvaluationResults:
-    """ Compares the SIDARTHE paper extractions against ground truth extractions """
+    """ Compares the SIDARTHE paper extractions against ground truth extractions. This path stays for compatibility
+    with the dashboard, but will be removed in the near future as the dashboard is updated to run dynamically the POST
+    path"""
 
     # Read ground truth annotations
     with (Path(__file__).parents[0] / "data" / "sidarthe_annotations.json").open() as f:
@@ -674,19 +677,21 @@ def quantitative_eval() -> TextReadingEvaluationResults:
     # Read the SKEMA extractions
     extractions = AttributeCollection.from_json(Path(__file__).parents[0] / "data" / "extractions_sidarthe_skema.json")
 
-    return compute_text_reading_evaluation(gt_data, extractions)
+    return utils.compute_text_reading_evaluation(gt_data, extractions)
 
 
 @router.post("/eval", response_model=TextReadingEvaluationResults, status_code=200)
-def quantitative_eval(extractions_file: UploadFile, gt_annotations: UploadFile):
+def quantitative_eval(extractions_file: UploadFile,
+                      gt_annotations: UploadFile, json_text: UploadFile) -> TextReadingEvaluationResults:
     """
-    # Gets performance metrics of a set of text extractions againts a ground truth annotations file.
+    # Gets performance metrics of a set of text extractions against a ground truth annotations file.
 
     ## Example:
     ```python
     files = {
         "extractions_file": ("paper_variable_extractions.json", open("paper_variable_extractions.json", 'rb')),
         "gt_annotations": ("paper_gt_annotations.json", open("paper_gt_annotations.json", 'rb')),
+        "json_text": ("paper_cosmos_output.json", open("paper_cosmos_output.json", 'rb')),
     }
 
     response = requests.post(f"{endpoint}/text-reading/eval", files=files)
@@ -695,8 +700,9 @@ def quantitative_eval(extractions_file: UploadFile, gt_annotations: UploadFile):
     """
 
     gt_data = json.load(gt_annotations.file)
+    json_contents = json.load(json_text.file)
 
-    # Support both Attribute Collections serialized and within the envelop of this rest API
+    # Support both Attribute Collections serialized and within the envelope of this rest API
     extractions_json = json.load(extractions_file.file)
     try:
         extractions = AttributeCollection.from_json(extractions_json)
@@ -711,7 +717,7 @@ def quantitative_eval(extractions_file: UploadFile, gt_annotations: UploadFile):
         extractions = AttributeCollection(
             attributes=list(it.chain.from_iterable(c.attributes for c in collections)))
 
-    return compute_text_reading_evaluation(gt_data, extractions)
+    return utils.compute_text_reading_evaluation(gt_data, extractions, json_contents)
 
 
 app = FastAPI()

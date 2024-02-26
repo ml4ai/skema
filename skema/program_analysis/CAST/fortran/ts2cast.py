@@ -1,5 +1,6 @@
 import json
 import os.path
+import time
 from pathlib import Path
 from typing import Any, Dict, List, Union
 
@@ -9,8 +10,9 @@ from skema.program_analysis.CAST2FN.cast import CAST
 from skema.program_analysis.CAST2FN.model.cast import (
     Module,
     SourceRef,
+    ModelBreak,
     Assignment,
-    LiteralValue,
+    CASTLiteralValue,
     Var,
     VarType,
     Name,
@@ -25,6 +27,8 @@ from skema.program_analysis.CAST2FN.model.cast import (
     ModelIf,
     RecordDef,
     Attribute,
+    Label,
+    Goto,
 )
 
 from skema.program_analysis.CAST.fortran.variable_context import VariableContext
@@ -32,6 +36,7 @@ from skema.program_analysis.CAST.fortran.node_helper import (
     NodeHelper,
     remove_comments,
     get_children_by_types,
+    get_children_except_types,
     get_first_child_by_type,
     get_control_children,
     get_non_control_children,
@@ -41,7 +46,20 @@ from skema.program_analysis.CAST.fortran.node_helper import (
 from skema.program_analysis.CAST.fortran.util import generate_dummy_source_refs
 
 from skema.program_analysis.CAST.fortran.preprocessor.preprocess import preprocess
-from skema.program_analysis.tree_sitter_parsers.build_parsers import INSTALLED_LANGUAGES_FILEPATH
+from skema.program_analysis.tree_sitter_parsers.build_parsers import (
+    INSTALLED_LANGUAGES_FILEPATH,
+)
+
+builtin_statements = set(
+    [
+        "read_statement",
+        "write_statement",
+        "rewind_statement",
+        "open_statement",
+        "print_statement",
+    ]
+)
+
 
 class TS2CAST(object):
     def __init__(self, source_file_path: str):
@@ -49,18 +67,13 @@ class TS2CAST(object):
         self.path = Path(source_file_path)
         self.source_file_name = self.path.name
         self.source = preprocess(self.path)
-        
+
         # Run tree-sitter on preprocessor output to generate parse tree
         parser = Parser()
-        parser.set_language(
-            Language(
-                INSTALLED_LANGUAGES_FILEPATH,
-                "fortran"
-            )
-        )
+        parser.set_language(Language(INSTALLED_LANGUAGES_FILEPATH, "fortran"))
         self.tree = parser.parse(bytes(self.source, "utf8"))
         self.root_node = remove_comments(self.tree.root_node)
-        #print(self.root_node.sexp())
+
         # Walking data
         self.variable_context = VariableContext()
         self.node_helper = NodeHelper(self.source, self.source_file_name)
@@ -68,14 +81,16 @@ class TS2CAST(object):
         # Start visiting
         self.out_cast = self.generate_cast()
         #print(self.out_cast[0].to_json_str())
-        
+
     def generate_cast(self) -> List[CAST]:
-        '''Interface for generating CAST.'''
+        """Interface for generating CAST."""
         modules = self.run(self.root_node)
-        return [CAST([generate_dummy_source_refs(module)], "Fortran") for module in modules]
-        
+        return [
+            CAST([generate_dummy_source_refs(module)], "Fortran") for module in modules
+        ]
+
     def run(self, root) -> List[Module]:
-        '''Top level visitor function. Will return between 1-3 Module objects.'''
+        """Top level visitor function. Will return between 1-3 Module objects."""
         # A program can have between 1-3 modules
         # 1. A module body
         # 2. A program body
@@ -97,17 +112,18 @@ class TS2CAST(object):
                     body.extend(child_cast)
                 elif isinstance(child_cast, AstNode):
                     body.append(child_cast)
-            modules.append(Module(
-                name=None,
-                body=body,
-                source_refs=[self.node_helper.get_source_ref(root)]
-            ))
-    
+            modules.append(
+                Module(
+                    name=None,
+                    body=body,
+                    source_refs=[self.node_helper.get_source_ref(root)],
+                )
+            )
 
         return modules
 
     def visit(self, node: Node):
-        if node.type in ["program", "module"] :
+        if node.type in ["program", "module"]:
             return self.visit_module(node)
         elif node.type == "internal_procedures":
             return self.visit_internal_procedures(node)
@@ -125,7 +141,11 @@ class TS2CAST(object):
             return self.visit_identifier(node)
         elif node.type == "name":
             return self.visit_name(node)
-        elif node.type in ["math_expression", "relational_expression"]:
+        elif node.type in [
+            "unary_expression",
+            "math_expression",
+            "relational_expression",
+        ]:
             return self.visit_math_expression(node)
         elif node.type in [
             "number_literal",
@@ -136,11 +156,15 @@ class TS2CAST(object):
             return self.visit_literal(node)
         elif node.type == "keyword_statement":
             return self.visit_keyword_statement(node)
+        elif node.type == "statement_label":
+            return self.visit_statement_label(node)
+        elif node.type in builtin_statements:
+            return self.visit_fortran_builtin_statement(node)
         elif node.type == "extent_specifier":
             return self.visit_extent_specifier(node)
-        elif node.type == "do_loop_statement":
+        elif node.type in ["do_loop_statement"]:
             return self.visit_do_loop_statement(node)
-        elif node.type == "if_statement":
+        elif node.type in ["if_statement", "else_if_clause", "else_clause"]:
             return self.visit_if_statement(node)
         elif node.type == "logical_expression":
             return self.visit_logical_expression(node)
@@ -152,9 +176,9 @@ class TS2CAST(object):
             return self._visit_passthrough(node)
 
     def visit_module(self, node: Node) -> Module:
-        '''Visitor for program and module statement. Returns a Module object'''
+        """Visitor for program and module statement. Returns a Module object"""
         self.variable_context.push_context()
-        
+
         program_body = []
         for child in node.children[1:-1]:  # Ignore the start and end program statement
             child_cast = self.visit(child)
@@ -162,17 +186,17 @@ class TS2CAST(object):
                 program_body.extend(child_cast)
             elif isinstance(child_cast, AstNode):
                 program_body.append(child_cast)
-    
+
         self.variable_context.pop_context()
-        
+
         return Module(
-            name=None, #TODO: Fill out name field
+            name=None,  # TODO: Fill out name field
             body=program_body,
-            source_refs = [self.node_helper.get_source_ref(node)]
+            source_refs=[self.node_helper.get_source_ref(node)],
         )
 
     def visit_internal_procedures(self, node: Node) -> List[FunctionDef]:
-        '''Visitor for internal procedures. Returns list of FunctionDef'''
+        """Visitor for internal procedures. Returns list of FunctionDef"""
         internal_procedures = get_children_by_types(node, ["function", "subroutine"])
         return [self.visit(procedure) for procedure in internal_procedures]
 
@@ -212,16 +236,20 @@ class TS2CAST(object):
         self.variable_context.push_context()
 
         # Top level statement node
-        statement_node = get_children_by_types(node, ["subroutine_statement", "function_statement"])[0]
+
+        statement_node = get_children_by_types(
+            node, ["subroutine_statement", "function_statement"]
+        )[0]
+
         name_node = get_first_child_by_type(statement_node, "name")
         name = self.visit(
             name_node
         )  # Visit the name node to add it to the variable context
 
         # If this is a function, check for return type and return value
-        intrinsic_type = None
-        return_value = None
         if node.type == "function":
+            intrinsic_type = None
+            return_value = None
             signature_qualifiers = get_children_by_types(
                 statement_node, ["intrinsic_type", "function_result"]
             )
@@ -234,20 +262,20 @@ class TS2CAST(object):
                 elif qualifier.type == "function_result":
                     return_value = self.visit(
                         get_first_child_by_type(qualifier, "identifier")
-                    )  # TODO: UPDATE NODES
-                    self.variable_context.add_return_value(return_value.val.name)
+                    ).val
+                    self.variable_context.add_return_value(return_value.name)
 
-        # #TODO: What happens if function doesn't return anything?
-        # If this is a function, and there is no explicit results variable, then we will assume the return value is the name of the function
-        if not return_value:
-            self.variable_context.add_return_value(
-                self.node_helper.get_identifier(name_node)
-            )
+            # NOTE: In the case of a function specifically, if there is no explicit return value, the return value will be the name of the function
+            # TODO: Should this be a node instead
+            if not return_value:
+                self.variable_context.add_return_value(
+                    self.node_helper.get_identifier(name_node)
+                )
+                return_value = self.visit(name_node)
 
-        # If funciton has both, then we also need to update the type of the return value in the variable context
-        # It does not explicity have to be declared
-        if return_value and intrinsic_type:
-            self.variable_context.update_type(return_value.val.name, intrinsic_type)
+            # If funciton has both an explicit intrinsic type, then we also need to update the type of the return value in the variable context
+            if intrinsic_type:
+                self.variable_context.update_type(return_value.name, intrinsic_type)
 
         # Generating the function arguments by walking the parameters node
         func_args = []
@@ -299,9 +327,21 @@ class TS2CAST(object):
         # Pull relevent nodes
         # A subroutine and function won't neccessarily have an arguments node.
         # So we should be careful about trying to access it.
-        function_node = get_children_by_types(node, ["unary_expression", "subroutine", "identifier",])[0]
+
+        function_node = get_children_by_types(
+            node,
+            [
+                "unary_expression",
+                "subroutine",
+                "identifier",
+                "derived_type_member_expression",
+            ],
+        )[0]
+        if function_node.type == "derived_type_member_expression":
+            return self.visit_derived_type_member_expression(function_node)
+
         arguments_node = get_first_child_by_type(node, "argument_list")
-        
+
         # If this is a unary expression (+foo()) the identifier will be nested.
         # TODO: If this is a non '+' unary expression, how do we add it to the CAST?
         if function_node.type == "unary_expression":
@@ -340,9 +380,58 @@ class TS2CAST(object):
             source_refs=[self.node_helper.get_source_ref(node)],
         )
 
+    """
+     (keyword_statement [6, 6] - [6, 61]
+      (statement_label_reference [6, 13] - [6, 16])
+      (statement_label_reference [6, 18] - [6, 21])
+      (statement_label_reference [6, 23] - [6, 26])
+      (statement_label_reference [6, 28] - [6, 31])
+      (math_expression [6, 34] - [6, 61]
+        left: (call_expression [6, 34] - [6, 57]
+          (identifier [6, 34] - [6, 37])
+          (argument_list [6, 37] - [6, 57]
+            (math_expression [6, 38] - [6, 53]
+              left: (math_expression [6, 38] - [6, 49]
+                left: (parenthesized_expression [6, 38] - [6, 45]
+                  (math_expression [6, 39] - [6, 44]
+                    left: (identifier [6, 39] - [6, 40])
+                    right: (identifier [6, 43] - [6, 44])))
+                right: (identifier [6, 48] - [6, 49]))
+              right: (number_literal [6, 52] - [6, 53]))
+            (number_literal [6, 55] - [6, 56])))
+        right: (number_literal [6, 60] - [6, 61])))
+    """
+
     def visit_keyword_statement(self, node):
-        # Currently, the only keyword_identifier produced by tree-sitter is Return
-        # However, there may be other instances
+        # NOTE: RETURN is not the only Fortran keyword. GO TO and CONTINUE are also considered keywords
+        identifier = self.node_helper.get_identifier(node).lower()
+        if node.type == "keyword_statement":
+            if "go to" in identifier:
+                statement_labels = [
+                    self.node_helper.get_identifier(child)
+                    for child in get_children_by_types(
+                        node, ["statement_label_reference"]
+                    )
+                ]
+                # If there are multiple statement labels, then this is a COMPUTED GO TO
+                # Those are handled as a "_get" access into a List of statement labels with the index determined by the expression
+                if len(statement_labels) > 1:
+                    expr = Call(
+                        func=self.get_gromet_function_node("_get"),
+                        arguments=[
+                            CASTLiteralValue(value_type="List", value=[CASTLiteralValue(value=label, value_type="List") for label in statement_labels]),
+                            self.visit(node.children[-1]),
+                        ],
+                    )
+                    return Goto(label=None, expr=expr)
+                return Goto(
+                    label=statement_labels[0],
+                    expr=None,
+                )
+            if "continue" in identifier:
+                return self._visit_no_op(node)
+            if "exit" in identifier:
+                return ModelBreak(source_refs=[self.node_helper.get_source_ref(node)])
 
         # In Fortran the return statement doesn't return a value (there is the obsolete "alternative return")
         # We keep track of values that need to be returned in the variable context
@@ -351,28 +440,51 @@ class TS2CAST(object):
         ]  # TODO: Make function for this
 
         if len(return_values) == 1:
-            # TODO: Fix this case
             value = self.variable_context.get_node(list(return_values)[0])
         elif len(return_values) > 1:
-            value = LiteralValue(
+            value = CASTLiteralValue(
                 value_type="Tuple",
-                value=[
-                    Var(
-                        val=self.variable_context.get_node(ret),
-                        type=self.variable_context.get_type(ret),
-                        default_value=None,
-                        source_refs=None,
-                    )
-                    for ret in return_values
-                ],
-                source_code_data_type=None,  # TODO: REFACTOR
+                value=[self.variable_context.get_node(ret) for ret in return_values],
+                source_code_data_type=None,
                 source_refs=None,
             )
         else:
-            value = LiteralValue(val=None, type=None, source_refs=None)
+            value = CASTLiteralValue(value=None, value_type=None, source_refs=None)
 
         return ModelReturn(
             value=value, source_refs=[self.node_helper.get_source_ref(node)]
+        )
+
+    def visit_statement_label(self, node):
+        """Visitor for fortran statement labels"""
+        return Label(label=self.node_helper.get_identifier(node))
+
+    def visit_fortran_builtin_statement(self, node):
+        """Visitor for Fortran keywords that are not classified as keyword_statement by tree-sitter"""
+        # All of the node types that fall into this category end with _statment.
+        # So the function name will be the node type with _statement removed (write, read, open, ...)
+        func = self.get_gromet_function_node(node.type.replace("_statement", ""))
+
+        arguments = []
+
+        return Call(
+            func=func,
+            arguments=arguments,
+            source_language="Fortran",
+            source_language_version=None,
+            source_refs=[self.node_helper.get_source_ref(node)],
+        )
+
+    def visit_print_statement(self, node):
+        func = self.get_gromet_function_node("print")
+
+        arguments = []
+
+        return Call(
+            func=func,
+            arguments=arguments,
+            source_language=None,
+            source_language_version=None,
         )
 
     def visit_use_statement(self, node):
@@ -396,7 +508,7 @@ class TS2CAST(object):
                 alias=import_alias,
                 all=import_all,
                 symbol=None,
-                source_refs=None,
+                source_refs=[self.node_helper.get_source_ref(node)],
             )
         else:
             imports = []
@@ -434,24 +546,15 @@ class TS2CAST(object):
             (body) ...
         """
 
-        # First check for
-        # TODO: Add do until Loop support
-        while_statement_node = get_first_child_by_type(node, "while_statement")
-        if while_statement_node:
+        loop_control_node = get_first_child_by_type(node, "loop_contrel_expression")
+        if not loop_control_node:
             return self._visit_while(node)
 
         # If there is a loop control expression, the first body node will be the node after the loop_control_expression
         # It is valid Fortran to have a single itteration do loop as well.
-        # TODO: Add support for single itteration do-loop
         # NOTE: This code is for the creation of the main body. The do loop will still add some additional nodes at the end of this body.
-        body = []
         body_start_index = 1 + get_first_child_index(node, "loop_control_expression")
-        for body_node in node.children[body_start_index:]:
-            child_cast = self.visit(body_node)
-            if isinstance(child_cast, List):
-                body.extend(child_cast)
-            elif isinstance(child_cast, AstNode):
-                body.append(child_cast)
+        body = self.generate_cast_body(node.children[body_start_index:])
 
         # For the init and expression fields, we first need to determine if we are in a regular "do" or a "do while" loop
         # PRE:
@@ -462,7 +565,7 @@ class TS2CAST(object):
             itterator, start, stop = [
                 self.visit(child) for child in loop_control_children
             ]
-            step = LiteralValue("Integer", "1")
+            step = CASTLiteralValue("Integer", "1")
         elif len(loop_control_children) == 4:
             itterator, start, stop, step = [
                 self.visit(child) for child in loop_control_children
@@ -494,7 +597,7 @@ class TS2CAST(object):
         # (i, generated_iter_0, sc_0) = next(generated_iter_0)
         pre.append(
             Assignment(
-                left=LiteralValue(
+                left=CASTLiteralValue(
                     "Tuple",
                     [
                         itterator,
@@ -515,7 +618,7 @@ class TS2CAST(object):
             op="!=",  # TODO: Should this be == or !=
             operands=[
                 Var(stop_condition_name_node, "Boolean"),
-                LiteralValue("Boolean", True),
+                CASTLiteralValue("Boolean", True),
             ],
         )
 
@@ -524,7 +627,7 @@ class TS2CAST(object):
         # We just need to append the iterator next call
         body.append(
             Assignment(
-                left=LiteralValue(
+                left=CASTLiteralValue(
                     "Tuple",
                     [
                         itterator,
@@ -566,93 +669,66 @@ class TS2CAST(object):
         #  (else_clause)
         #  (end_if_statement)
 
-        if_condition = self.visit(get_first_child_by_type(node, "parenthesized_expression"))
-
-        child_types = [child.type for child in node.children]
-
-        try:
-            elseif_index = child_types.index("elseif_clause")
-        except ValueError:
-            elseif_index = -1
-
-        try:
-            else_index = child_types.index("else_clause")
-        except ValueError:
-            else_index = -1
-
-        if elseif_index != -1:
-            body_stop_index = elseif_index
-        else:
-            body_stop_index = else_index
-
-        # Single line if conditions don't have a 'then' or 'end if' clause. 
-        # So the starting index for the body can either be 2 or 3.
-        then_index = get_first_child_index(node, "then")
-        if then_index:
-            body_start_index = then_index+1
-        else:
-            body_start_index = 2
-            body_stop_index = len(node.children)
-
-        prev = None
-        orelse = None
-        # If there are else_if statements, they need
-        if elseif_index != -1:
-            orelse = ModelIf()
-            prev = orelse
-            for condition in node.children[elseif_index:else_index]:
-                if condition.type == "comment":
-                    continue
-                elseif_expr = self.visit(condition.children[2])
-                elseif_body = [self.visit(child) for child in condition.children[4:]]
-                
-                prev.orelse = ModelIf(elseif_expr, elseif_body, [])
-                prev = prev.orelse
-
-        if else_index != -1:
-            else_body = [
-                self.visit(child) for child in node.children[else_index].children[1:]
-            ]
-            if prev:
-                prev.orelse = else_body
-            else:
-                orelse = else_body
-
-        # TODO: This orelse logic has gotten a little complex, we might want to refactor this.
-        if isinstance(orelse, ModelIf):
-            orelse = orelse.orelse
-        if orelse:
-            if isinstance(orelse, ModelIf):
-                orelse = [orelse]
-
-        return ModelIf(
-            expr=self.visit(node.children[1]),
-            body=[self.visit(child) for child in node.children[body_start_index:body_stop_index]],
-            orelse=orelse if orelse else [],
+        # TODO: Can you have a parenthesized expression as a body node
+        body_nodes = get_children_except_types(
+            node,
+            [
+                "if",
+                "elseif",
+                "else",
+                "then",
+                "parenthesized_expression",
+                "elseif_clause",
+                "else_clause",
+                "end_if_statement",
+            ],
         )
+        body = self.generate_cast_body(body_nodes)
+
+        expr_node = get_first_child_by_type(node, "parenthesized_expression")
+        expr = None
+        if expr_node:
+            expr = self.visit(expr_node)
+
+        elseif_nodes = get_children_by_types(node, ["elseif_clause"])
+        elseif_cast = [self.visit(elseif_clause) for elseif_clause in elseif_nodes]
+        for i in range(len(elseif_cast) - 1):
+            elseif_cast[i].orelse = [elseif_cast[i + 1]]
+
+        else_node = get_first_child_by_type(node, "else_clause")
+        else_cast = None
+        if else_node:
+            else_cast = self.visit(else_node)
+
+        orelse = []
+        if len(elseif_cast) > 0:
+            orelse = [elseif_cast[0]]
+        elif else_cast:
+            orelse = else_cast.body
+
+        return ModelIf(expr=expr, body=body, orelse=orelse)
 
     def visit_logical_expression(self, node):
         """Visitior for logical expression (i.e. true and false) which is used in compound conditional"""
         # If this is a .not. operator, we need to pass it on to the math_expression visitor
         if len(node.children) < 3:
             return self.visit_math_expression(node)
-        
-        literal_value_false = LiteralValue("Boolean", False)
-        literal_value_true = LiteralValue("Boolean", True)
-        
+
+        literal_value_false = CASTLiteralValue("Boolean", False)
+        literal_value_true = CASTLiteralValue("Boolean", True)
+
         # AND: Right side goes in body if, left side in condition
-        # OR: Right side goes in body else, left side in condition 
+        # OR: Right side goes in body else, left side in condition
         left, operator, right = node.children
-        
+
         # First we need to check if this is logical and or a logical or
         # The tehcnical types for these are \.or\. and \.and\. so to simplify things we can use the in keyword
-        is_or = "or" in operator.type 
-        
-        top_if = ModelIf()
+        is_or = "or" in operator.type
 
+        top_if = ModelIf()
         top_if_expr = self.visit(left)
         top_if.expr = top_if_expr
-        
+
         bottom_if_expr = self.visit(right)
         if is_or:
             top_if.orelse = [bottom_if_expr]
@@ -677,8 +753,8 @@ class TS2CAST(object):
             source_refs=[self.node_helper.get_source_ref(node)],
         )
 
-    def visit_literal(self, node) -> LiteralValue:
-        """Visitor for literals. Returns a LiteralValue"""
+    def visit_literal(self, node) -> CASTLiteralValue:
+        """Visitor for literals. Returns a CASTLiteralValue"""
         literal_type = node.type
         literal_value = self.node_helper.get_identifier(node)
         literal_source_ref = self.node_helper.get_source_ref(node)
@@ -686,14 +762,14 @@ class TS2CAST(object):
         if literal_type == "number_literal":
             # Check if this is a real value, or an Integer
             if "e" in literal_value.lower() or "." in literal_value:
-                return LiteralValue(
+                return CASTLiteralValue(
                     value_type="AbstractFloat",
                     value=literal_value,
                     source_code_data_type=["Fortran", "Fortran95", "real"],
                     source_refs=[literal_source_ref],
                 )
             else:
-                return LiteralValue(
+                return CASTLiteralValue(
                     value_type="Integer",
                     value=literal_value,
                     source_code_data_type=["Fortran", "Fortran95", "integer"],
@@ -701,7 +777,7 @@ class TS2CAST(object):
                 )
 
         elif literal_type == "string_literal":
-            return LiteralValue(
+            return CASTLiteralValue(
                 value_type="Character",
                 value=literal_value,
                 source_code_data_type=["Fortran", "Fortran95", "character"],
@@ -709,7 +785,7 @@ class TS2CAST(object):
             )
 
         elif literal_type == "boolean_literal":
-            return LiteralValue(
+            return CASTLiteralValue(
                 value_type="Boolean",
                 value=literal_value,
                 source_code_data_type=["Fortran", "Fortran95", "logical"],
@@ -725,7 +801,7 @@ class TS2CAST(object):
             if implied_do_loop_expression_node:
                 return self._visit_implied_do_loop(implied_do_loop_expression_node)
 
-            return LiteralValue(
+            return CASTLiteralValue(
                 value_type="List",
                 value=[
                     self.visit(element) for element in get_non_control_children(node)
@@ -764,6 +840,10 @@ class TS2CAST(object):
         for operand in get_non_control_children(node):
             operands.append(self.visit(operand))
 
+            # For operators, we will only need the name node since we are not allocating space
+            if operand.type == "identifier":
+                operands[-1] = operands[-1].val
+
         return Operator(
             source_language="Fortran",
             interpreter=None,
@@ -800,11 +880,15 @@ class TS2CAST(object):
             type_map = {
                 "integer": "Integer",
                 "real": "AbstractFloat",
-                "complex": None,
+                "double precision": "AbstractFloat",
+                "complex": "Tuple",  # Complex is a Tuple (rational,irrational),
                 "logical": "Boolean",
                 "character": "String",
             }
-            variable_type = type_map[self.node_helper.get_identifier(intrinsic_type_node)]
+            # NOTE: Identifiers are case sensitive, so we always need to make sure we are comparing to the lower() version
+            variable_type = type_map[
+                self.node_helper.get_identifier(intrinsic_type_node).lower()
+            ]
         elif derived_type_node:
             variable_type = self.node_helper.get_identifier(
                 get_first_child_by_type(derived_type_node, "type_name", recurse=True),
@@ -842,15 +926,11 @@ class TS2CAST(object):
                                 )
                             ),
                             right=self.visit(variable.children[2]),
-                            source_refs=[
-                                self.node_helper.get_source_ref(variable)
-                            ],
+                            source_refs=[self.node_helper.get_source_ref(variable)],
                         )
                     )
-                    vars[-1].left.type = "dimension"
-                    self.variable_context.update_type(
-                        vars[-1].left.val.name, "dimension"
-                    )
+                    vars[-1].left.type = "List"
+                    self.variable_context.update_type(vars[-1].left.val.name, "List")
                 else:
                     # If its a regular assignment, we can update the type normally
                     vars.append(self.visit(variable))
@@ -868,8 +948,8 @@ class TS2CAST(object):
                 # Declaring a dimension variable using the x(1:5) format. It will look like a call expression in tree-sitter.
                 # We treat it like an identifier by visiting its identifier node. Then the type gets overridden by "dimension"
                 vars.append(self.visit(get_first_child_by_type(variable, "identifier")))
-                vars[-1].type = "dimension"
-                self.variable_context.update_type(vars[-1].val.name, "dimension")
+                vars[-1].type = "List"
+                self.variable_context.update_type(vars[-1].val.name, "List")
 
         # By default, all variables are added to a function's list of return values
         # If the intent is actually in, then we need to remove them from the list
@@ -890,9 +970,9 @@ class TS2CAST(object):
         # Fortran uses the character ':' to differentiate these values
         argument_pointer = 0
         arguments = [
-            LiteralValue("None", "None"),
-            LiteralValue("None", "None"),
-            LiteralValue("None", "None"),
+            CASTLiteralValue("None", "None"),
+            CASTLiteralValue("None", "None"),
+            CASTLiteralValue("None", "None"),
         ]
         for child in node.children:
             if child.type == ":":
@@ -940,7 +1020,7 @@ class TS2CAST(object):
         # If we tell the variable context we are in a record definition, it will append the type name as a prefix to all defined variables.
         self.variable_context.enter_record_definition(record_name)
 
-        # TODO: Full support for this requires handling the contains statement generally
+        # Note:
         funcs = []
         derived_type_procedures_node = get_first_child_by_type(
             node, "derived_type_procedures"
@@ -1010,11 +1090,16 @@ class TS2CAST(object):
         else:
             # We shouldn't be accessing get_node directly, since it may not exist in the case of an import.
             # Instead, we should visit the identifier node which will add it to the variable context automatically if it doesn't exist.
-            value = self.visit(get_first_child_by_type(node, "identifier", recurse=True))
+            value = self.visit(
+                get_first_child_by_type(node, "identifier", recurse=True)
+            )
 
-        attr = self.node_helper.get_identifier(
-            get_first_child_by_type(node, "type_member", recurse=True)
-        )
+        # NOTE: Attribue should be a Name node, NOT a string or Var node
+        # attr = self.node_helper.get_identifier(
+        #    get_first_child_by_type(node, "type_member", recurse=True)
+        # )
+        # print(self.node_helper.get_identifier(get_first_child_by_type(node, "type_member", recurse=True)))
+        attr = self.visit_name(get_first_child_by_type(node, "type_member"))
 
         return Attribute(
             value=value,
@@ -1039,7 +1124,7 @@ class TS2CAST(object):
 
         # If there are more than one arguments, then this is a multi dimensional array and we need to use an extended slice
         if len(argument_nodes) > 1:
-            dimension_list = LiteralValue()
+            dimension_list = CASTLiteralValue()
             dimension_list.value_type = "List"
             dimension_list.value = []
             for argument in argument_nodes:
@@ -1091,23 +1176,27 @@ class TS2CAST(object):
         """
         while_statement_node = get_first_child_by_type(node, "while_statement")
 
-        # The first body node will be the node after the while_statement
-        body = []
-        body_start_index = 1 + get_first_child_index(node, "while_statement")
-        for body_node in node.children[body_start_index:]:
-            child_cast = self.visit(body_node)
-            if isinstance(child_cast, List):
-                body.extend(child_cast)
-            elif isinstance(child_cast, AstNode):
-                body.append(child_cast)
+        # Fortran has certain while(True) constructs that won't contain a while_statement node
+        if not while_statement_node:
+            body_start_index = 0
+            expr = CASTLiteralValue(
+                value_type="Boolean",
+                value="True",
+            )
+        else:
+            body_start_index = 1 + get_first_child_index(node, "while_statement")
+            # We don't have explicit handling for parenthesized_expression, but the passthrough handler will make sure that we visit the expression correctly.
+            expr = self.visit(
+                get_first_child_by_type(
+                    while_statement_node, "parenthesized_expression"
+                )
+            )
 
-        # We don't have explicit handling for parenthesized_expression, but the passthrough handler will make sure that we visit the expression correctly.
-        expr = self.visit(
-            get_first_child_by_type(while_statement_node, "parenthesized_expression")
-        )
+        # The first body node will be the node after the while_statement
+        body = self.generate_cast_body(node.children[body_start_index:])
 
         return Loop(
-            pre=[],  # TODO: Should pre and post contain anything?
+            pre=[],
             expr=expr,
             body=body,
             post=[],
@@ -1125,7 +1214,7 @@ class TS2CAST(object):
             itterator, start, stop = [
                 self.visit(child) for child in loop_control_children
             ]
-            step = LiteralValue("Integer", "1")
+            step = CASTLiteralValue("Integer", "1")
         elif len(loop_control_children) == 4:
             itterator, start, stop, step = [
                 self.visit(child) for child in loop_control_children
@@ -1153,6 +1242,15 @@ class TS2CAST(object):
             if child_cast:
                 return child_cast
 
+    def _visit_no_op(self, node):
+        """For unsupported idioms, we can generate a no op instruction so that the body is not empty"""
+        return Call(
+            func=self.get_gromet_function_node("no_op"),
+            source_language=None,
+            source_language_version=None,
+            arguments=[],
+        )
+
     def get_gromet_function_node(self, func_name: str) -> Name:
         # Idealy, we would be able to create a dummy node and just call the name visitor.
         # However, tree-sitter does not allow you to create or modify nodes, so we have to recreate the logic here.
@@ -1160,3 +1258,19 @@ class TS2CAST(object):
             return self.variable_context.get_node(func_name)
 
         return self.variable_context.add_variable(func_name, "function", None)
+
+    def generate_cast_body(self, body_nodes: List):
+        body = []
+        for node in body_nodes:
+            cast = self.visit(node)
+            if isinstance(cast, AstNode):
+                body.append(cast)
+            elif isinstance(cast, List):
+                body.extend(cast)
+
+        # Gromet doesn't support empty bodies, so we should create a no_op instead
+        if len(body) == 0:
+            body.append(self._visit_no_op(None))
+
+        # TODO: How to add more support for source references
+        return body

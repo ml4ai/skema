@@ -7,8 +7,7 @@ from pathlib import Path
 from typing import List, Dict, Optional
 from io import BytesIO
 from zipfile import ZipFile
-from urllib.request import urlopen
-from fastapi import APIRouter, FastAPI, Body, File, UploadFile
+from fastapi import APIRouter, FastAPI, status, Body, File, UploadFile
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
@@ -72,6 +71,11 @@ class System(BaseModel):
             "#Variable declaration\nx=2\n#Function definition\ndef foo(x):\n    '''Increment the input variable'''\n    return x+1",
         ]],
     )
+    model: Optional[str] = Field(
+        default="petrinet",
+        description="A model name for the type of amr to get out",
+        examples=["regnet"],
+    )
     system_name: Optional[str] = Field(
         default=None,
         description="A model name to associate with the provided code",
@@ -107,6 +111,17 @@ class System(BaseModel):
     )
 
 
+class MML_System(BaseModel):
+    """
+        Pydantic BaseModel representing a system with MML (MathML).
+
+        Attributes:
+            mml (str): The MML equation.
+            system (System): An instance of the System class representing system details.
+        """
+    mml: str
+    system: System
+
 async def system_to_enriched_system(system: System) -> System:
     """Takes a System as input and enriches it with comments by running the tree-sitter comment extractor."""
 
@@ -131,29 +146,46 @@ async def system_to_enriched_system(system: System) -> System:
     comments = {"files": {}}
     for file_path, result in zip(file_paths, results):
         comments["files"][str(file_path)] = result
-    system.comments = MultiFileCommentResponse.parse_obj(comments)
+    system.comments = MultiFileCommentResponse(**comments)
 
     return system
 
-
+# returns an abbreviated Dict representing a GrometFNModuleCollection
 async def system_to_gromet(system: System):
     """Convert a System to Gromet JSON"""
 
     # We maintain a log of warnings and error to pass back to the user.
     # This allows us to warn the user about unsupported file extensions.
     server_log = []
+    to_remove = []
+    for index, (file, blob) in enumerate(zip(system.files, system.blobs)):
+        valid = True
 
-    # Check for unsupported files before processing. They will be removed and the user will be warned.
-    unsupported_files = [
-        file
-        for file in system.files
-        if Path(file).suffix not in SUPPORTED_FILE_EXTENSIONS
-    ]
-    for file in unsupported_files:
-        unsupported_file_str = f"WARNING: Ingestion of file extension {Path(file).suffix} for file {file} is not supported and will be skipped."
-        print(unsupported_file_str)
-        system.files.remove(file)
-        server_log.append(unsupported_file_str)
+        # Itterate over parent directories to check for unsupported file paths
+        path_obj = Path(file)
+        for parent in path_obj.parents:
+            if parent.name == "_MACOSX":
+                unsupported_file_str = f"WARNING: Ingestion of files in _MACOSX directory not supported. File {file} will be skipped. "
+                valid = False
+            elif parent.name.startswith("."):
+                unsupported_file_str = f"WARNING: File {file} is in a hidden directory and will be skipped."
+                valid = False
+
+        # Check file extension is in the list of supported file extensions
+        if Path(file).suffix not in SUPPORTED_FILE_EXTENSIONS:
+            unsupported_file_str = f"WARNING: Ingestion of file extension {Path(file).suffix} for file {file} is not supported and will be skipped."
+            valid = False
+        
+        if not valid:
+            to_remove.append(index)
+            print(unsupported_file_str)
+            server_log.append(unsupported_file_str)
+
+    # Remove files to prevent ingestion. Removed in reverse sorted order since each removal shifts the indecies.
+    for index in sorted(to_remove, reverse=True):
+        system.files.pop(index)
+        system.blobs.pop(index)
+    
 
     # If there are no supported files, then we will return an empty GrometFNModuleCollection with a top-level Debug metadata
     if len(system.files) == 0:
@@ -226,9 +258,14 @@ async def system_to_gromet(system: System):
 router = APIRouter()
 
 
-@router.get("/ping", summary="Ping endpoint to test health of service")
-def ping() -> int:
-    return 200
+@router.get(
+    "/healthcheck", 
+    summary="Ping endpoint to test health of service",
+    status_code=status.HTTP_200_OK,
+    response_model=int
+)
+def healthcheck() -> int:
+    return status.HTTP_200_OK
 
 
 @router.get(

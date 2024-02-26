@@ -34,28 +34,28 @@ class GroundingAttachment(val candidates:Seq[GroundingCandidate]) extends Automa
   })
 }
 
-class LocationContextAttachment(locations:Seq[Mention]) extends AutomatesAttachment {
+class LocationContextAttachment(locations:Seq[String]) extends AutomatesAttachment {
   override def toJson: JsValue = Json.arr(locations map {
     l => Json.obj(
-      "scenarioLocation" -> l.text
+      "scenarioLocation" -> l
     )
   })
 
   override def toUJson: Value = ujson.Obj(
-    "scenarioLocation" -> (locations map (_.text)).distinct
+    "scenarioLocation" -> locations.distinct
   )
 }
 
-class TimeContextAttachment(times:Seq[Mention]) extends AutomatesAttachment {
+class TimeContextAttachment(times:Seq[String]) extends AutomatesAttachment {
   override def toJson: JsValue = Json.arr(times map {
     l => Json.obj(
-      "scenarioTime" -> l.text
+      "scenarioTime" -> l
     )
   })
 
 
   override def toUJson: Value = ujson.Obj(
-    "scenarioTime" -> (times map (_.text)).distinct
+    "scenarioTime" -> times.distinct
   )
 }
 

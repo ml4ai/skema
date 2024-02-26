@@ -1,3 +1,4 @@
+import itertools
 from typing import List, Dict
 from skema.program_analysis.CAST2FN.model.cast import SourceRef
 
@@ -24,41 +25,77 @@ CONTROL_CHARACTERS = [
     "not"
 ]
 
+# Whatever constructs we see in the left
+# part of the for loop construct
+# for LEFT in RIGHT: 
+FOR_LOOP_LEFT_TYPES = [
+    "identifier",
+    "tuple_pattern",
+    "pattern_list",
+    "list_pattern"
+]
+
+# Whatever constructs we see in the right
+# part of the for loop construct
+# for LEFT in RIGHT: 
+FOR_LOOP_RIGHT_TYPES = [
+    "call",
+    "identifier",
+    "list",
+    "tuple",
+    "attribute"
+]
+
+# Whatever constructs we see in the conditional
+# part of the while loop
+WHILE_COND_TYPES = [
+    "boolean_operator",
+    "call",
+    "comparison_operator",
+    "binary_operator"
+]
+
+# Whatever constructs we see in the 
+# list/dict comprehensions
+COMPREHENSION_OPERATORS = [
+    "binary_operator",
+    "call",
+    "identifier",
+    "attribute",
+    "pair"
+]
+
+
 class NodeHelper():
     def __init__(self, source: str, source_file_name: str):
         self.source = source
         self.source_file_name = source_file_name
 
+        # get_identifier optimization variables
+        self.source_lines = source.splitlines(keepends=True)
+        self.line_lengths = [len(line) for line in self.source_lines]
+        self.line_length_sums = [0] + list(itertools.accumulate(self.line_lengths))
+    
+    def get_identifier(self, node: Node) -> str:
+        """Given a node, return the identifier it represents. ie. The code between node.start_point and node.end_point"""
+        start_line, start_column = node.start_point
+        end_line, end_column = node.end_point
+
+        # Edge case for when an identifier is on the very first line of the code
+        # We can't index into the line_length_sums
+        start_index = self.line_length_sums[start_line] + start_column        
+        if start_line == end_line:
+            end_index = start_index + (end_column-start_column)
+        else:
+            end_index = self.line_length_sums[end_line] + end_column
+
+        return self.source[start_index:end_index]
 
     def get_source_ref(self, node: Node) -> SourceRef:
         """Given a node and file name, return a CAST SourceRef object."""
         row_start, col_start = node.start_point
         row_end, col_end = node.end_point
         return SourceRef(self.source_file_name, col_start, col_end, row_start, row_end)
-
-
-    def get_identifier(self, node: Node) -> str:
-        """Given a node, return the identifier it represents. ie. The code between node.start_point and node.end_point"""
-        line_num = 0
-        column_num = 0
-        in_identifier = False
-        identifier = ""
-        for i, char in enumerate(self.source):
-            if line_num == node.start_point[0] and column_num == node.start_point[1]:
-                in_identifier = True
-            elif line_num == node.end_point[0] and column_num == node.end_point[1]:
-                break
-
-            if char == "\n":
-                line_num += 1
-                column_num = 0
-            else:
-                column_num += 1
-
-            if in_identifier:
-                identifier += char
-
-        return identifier
 
     def get_operator(self, node: Node) -> str:
         """Given a unary/binary operator node, return the operator it contains"""

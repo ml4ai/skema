@@ -83,7 +83,7 @@ async def comments_extract_zip(
                 }
 
     return comment_service.extract_comments_multi(
-        MultiFileCommentRequest.parse_obj(request)
+        MultiFileCommentRequest(**request)
     )
 
 app = FastAPI()

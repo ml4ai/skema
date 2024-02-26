@@ -1,5 +1,4 @@
 use actix_web::{get, http::header::ContentType, web::Data, App, HttpResponse, HttpServer};
-use clap::Parser;
 use skema::config::Config;
 use skema::services::gromet;
 use std::env;
@@ -44,29 +43,38 @@ async fn main() -> std::io::Result<()> {
         paths(
             skema::services::mathml::get_ast_graph,
             skema::services::mathml::get_math_exp_graph,
+            skema::services::mathml::get_code_exp_graph_set,
             skema::services::mathml::get_latex,
             skema::services::mathml::get_acset,
             skema::services::mathml::get_content_mathml,
             skema::services::mathml::get_regnet,
             skema::services::mathml::get_amr,
             skema::services::mathml::get_decapodes,
+            skema::services::mathml::get_met,
+            skema::services::mathml::get_gamr,
             gromet::get_model_ids,
             gromet::post_model,
             gromet::delete_model,
             gromet::get_named_opos,
             gromet::get_named_opis,
             gromet::get_named_ports,
-            gromet::get_subgraph,
             gromet::get_model_RN,
             gromet::model2PN,
             gromet::model2RN,
+            gromet::model2MET,
+            gromet::model2GAMR,
             ping,
             version
         ),
         components(
             schemas(
+                mathml::parsers::math_expression_tree::MathExpressionTree,
+                mathml::ast::MathExpression,
+                mathml::ast::operator::Operator,
                 mathml::parsers::decapodes_serialization::DecapodesCollection,
                 mathml::parsers::decapodes_serialization::WiringDiagram,
+                mathml::acset::GeneralizedAMR,
+                mathml::acset::GeneralSemantics,
                 mathml::acset::AMRmathml,
                 mathml::acset::RegNet,
                 mathml::acset::ModelRegNet,
@@ -117,9 +125,9 @@ async fn main() -> std::io::Result<()> {
     let version_hash = env::var("APP_VERSION").unwrap_or("?????".to_string());
     let host_env = env::var("SKEMA_RS_HOST").unwrap_or("0.0.0.0".to_string());
     let port_env = env::var("SKEMA_RS_PORT").unwrap_or("8080".to_string());
+    let db_protocol = env::var("SKEMA_GRAPH_DB_PROTO").unwrap_or("bolt+s://".to_string());
     let db_host = env::var("SKEMA_GRAPH_DB_HOST").unwrap_or("127.0.0.1".to_string());
     let db_port = env::var("SKEMA_GRAPH_DB_PORT").unwrap_or("7687".to_string());
-
 
     let mut openapi = ApiDoc::openapi();
     openapi.info.version = version_hash.to_string();
@@ -127,21 +135,27 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(move || {
         App::new()
             .app_data(Data::new(Config {
+                db_protocol: db_protocol.clone(),
                 db_host: db_host.clone(),
-                db_port: db_port.parse::<u16>().unwrap()
+                db_port: db_port.parse::<u16>().unwrap(),
             }))
             .configure(gromet::configure())
             .service(skema::services::mathml::get_ast_graph)
             .service(skema::services::mathml::get_math_exp_graph)
+            .service(skema::services::mathml::get_code_exp_graph_set)
             .service(skema::services::mathml::get_latex)
             .service(skema::services::mathml::get_content_mathml)
             .service(skema::services::mathml::get_acset)
             .service(skema::services::mathml::get_regnet)
             .service(skema::services::mathml::get_amr)
             .service(skema::services::mathml::get_decapodes)
+            .service(skema::services::mathml::get_met)
+            .service(skema::services::mathml::get_gamr)
             .service(gromet::get_model_RN)
             .service(gromet::model2PN)
             .service(gromet::model2RN)
+            .service(gromet::model2MET)
+            .service(gromet::model2GAMR)
             .service(ping)
             .service(version)
             .service(SwaggerUi::new("/docs/{_:.*}").url("/api-doc/openapi.json", openapi.clone()))

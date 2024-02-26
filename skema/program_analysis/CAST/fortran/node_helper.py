@@ -1,7 +1,9 @@
+import itertools
 from typing import List, Dict
-from skema.program_analysis.CAST2FN.model.cast import SourceRef
 
 from tree_sitter import Node
+
+from skema.program_analysis.CAST2FN.model.cast import SourceRef
 
 CONTROL_CHARACTERS = [
     ",",
@@ -38,7 +40,11 @@ class NodeHelper():
         self.source = source
         self.source_file_name = source_file_name
 
-
+        # get_identifier optimization variables
+        self.source_lines = source.splitlines(keepends=True)
+        self.line_lengths = [len(line) for line in self.source_lines]
+        self.line_length_sums = list(itertools.accumulate(self.line_lengths))#[sum(self.line_lengths[:i+1]) for i in range(len(self.source_lines))]
+        
     def get_source_ref(self, node: Node) -> SourceRef:
         """Given a node and file name, return a CAST SourceRef object."""
         row_start, col_start = node.start_point
@@ -48,26 +54,16 @@ class NodeHelper():
 
     def get_identifier(self, node: Node) -> str:
         """Given a node, return the identifier it represents. ie. The code between node.start_point and node.end_point"""
-        line_num = 0
-        column_num = 0
-        in_identifier = False
-        identifier = ""
-        for i, char in enumerate(self.source):
-            if line_num == node.start_point[0] and column_num == node.start_point[1]:
-                in_identifier = True
-            elif line_num == node.end_point[0] and column_num == node.end_point[1]:
-                break
+        start_line, start_column = node.start_point
+        end_line, end_column = node.end_point
 
-            if char == "\n":
-                line_num += 1
-                column_num = 0
-            else:
-                column_num += 1
+        start_index = self.line_length_sums[start_line-1] + start_column
+        if start_line == end_line:
+            end_index = start_index + (end_column-start_column)
+        else:
+            end_index = self.line_length_sums[end_line] + end_column
 
-            if in_identifier:
-                identifier += char
-
-        return identifier
+        return self.source[start_index:end_index]
 
 def remove_comments(node: Node):
     """Remove comment nodes from tree-sitter parse tree"""
@@ -102,6 +98,9 @@ def get_children_by_types(node: Node, types: List):
     """Takes in a node and a list of types as inputs and returns all children matching those types. Otherwise, return an empty list"""
     return [child for child in node.children if child.type in types]
 
+def get_children_except_types(node: Node, types: List):
+    """Takes in a node and a list of types as inputs and returns all children not matching those types. Otherwise, return an empty list"""
+    return [child for child in node.children if child.type not in types]
 
 def get_first_child_index(node, type: str):
     """Get the index of the first child of node with type type."""

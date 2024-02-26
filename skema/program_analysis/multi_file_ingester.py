@@ -2,6 +2,8 @@ import argparse
 import glob
 import sys
 import os.path
+import yaml
+from pathlib import Path
 from typing import List
 
 from skema.gromet import GROMET_VERSION
@@ -14,7 +16,7 @@ from skema.program_analysis.python2cast import python_to_cast
 from skema.program_analysis.fortran2cast import fortran_to_cast
 from skema.program_analysis.matlab2cast import matlab_to_cast
 from skema.utils.fold import dictionary_to_gromet_json, del_nulls
-
+from skema.program_analysis.tree_sitter_parsers.build_parsers import LANGUAGES_YAML_FILEPATH
 
 def get_args():
     parser = argparse.ArgumentParser()
@@ -53,16 +55,18 @@ def process_file_system(
         executables=[],
     )
 
+    language_yaml_obj = yaml.safe_load(LANGUAGES_YAML_FILEPATH.read_text())
+    cur_dir = os.getcwd()
     for f in file_list:
         full_file = os.path.join(os.path.normpath(root_dir), f.strip("\n"))
-        
+        full_file_obj = Path(full_file)
         try:
             # To maintain backwards compatibility for the process_file_system function, for now we will determine the language by file extension
-            if full_file.endswith(".py"):
+            if full_file_obj.suffix in language_yaml_obj["python"]["extensions"]:
                 cast = python_to_cast(full_file, cast_obj=True)
-            elif full_file.endswith(".m"):
+            elif full_file_obj.suffix in language_yaml_obj["matlab"]["extensions"]:
                 cast = matlab_to_cast(full_file, cast_obj=True)
-            elif full_file.endswith(".F") or full_file.endswith(".f95"):
+            elif full_file_obj.suffix in language_yaml_obj["fortran"]["extensions"]:
                 cast = fortran_to_cast(full_file, cast_obj=True)
             else:
                 print(f"File extension not supported for {full_file}")
@@ -76,7 +80,6 @@ def process_file_system(
                 cast_list = [cast]
 
             for cast_module in cast_list:
-                cur_dir = os.getcwd()
                 os.chdir(os.path.join(os.getcwd(), path))
                 generated_gromet = ann_cast_pipeline(
                     cast_module, gromet=True, to_file=False, from_obj=True
@@ -106,7 +109,7 @@ def process_file_system(
                        
                 # Normalize the path across os and then convert to module dot notation
                 python_module_path = ".".join(os.path.normpath(os_module_path).split(os.path.sep))
-                python_module_path = python_module_path.replace(".py", "").strip()
+                python_module_path = ".".join(python_module_path.split(".")[0:-1])
                 
                 module_collection.module_index.append(python_module_path)
 
@@ -127,9 +130,9 @@ def process_file_system(
                         len(module_collection.module_index)
                     )
 
-        except ImportError as e:
-            print("FAILURE")
-            raise e
+        except (Exception,SystemExit) as e:
+            os.chdir(cur_dir)
+            print(e)
 
     if write_to_file:
         with open(f"{system_name}--Gromet-FN-auto.json", "w") as f:

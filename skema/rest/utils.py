@@ -1,10 +1,24 @@
+import itertools as it
+import httpx
 from collections import defaultdict
 from typing import Any, Dict
-import itertools as it
-from askem_extractions.data_model import AttributeCollection, AttributeType, Mention
+
+from typing import List
+from askem_extractions.data_model import AttributeCollection, AttributeType, AnchoredEntity
 from bs4 import BeautifulSoup, Comment
 
+from skema.img2mml.api import get_mathml_from_latex
+from skema.rest import config
 from skema.rest.schema import TextReadingEvaluationResults, AMRLinkingEvaluationResults
+
+
+# see https://stackoverflow.com/a/74401249
+async def get_client():
+    # create a new client for each request
+    async with httpx.AsyncClient(timeout=config.SKEMA_RS_DEFAULT_TIMEOUT, follow_redirects=True) as client:
+        # yield the client to the endpoint function
+        yield client
+        # close the client when the request is done
 
 
 def fn_preprocessor(function_network: Dict[str, Any]):
@@ -26,21 +40,22 @@ def fn_preprocessor(function_network: Dict[str, Any]):
     keys_to_check = ['bf', 'wff', 'wfopi', 'wfopo', 'wopio']
     metadata_keys_to_check = ['line_begin', 'line_end', 'col_begin', 'col_end']
     for key in metadata_keys_to_check:
-        try: 
+        try:
             for (i, entry) in enumerate(fn_data['modules'][0]['metadata_collection']):
                 try:
                     for (j, datum) in enumerate(entry):
                         try:
                             if datum[key] == -1:
                                 datum[key] = 1
-                                logs.append(f"The {j + 1}'th metadata in the {i+1} metadata index has -1 for the {key} entry")
+                                logs.append(
+                                    f"The {j + 1}'th metadata in the {i + 1} metadata index has -1 for the {key} entry")
                         except:
                             continue
                 except:
                     continue
         except:
             continue
-                    
+
     for key in keys_to_check:
         if key == 'bf':
             try:
@@ -73,7 +88,7 @@ def fn_preprocessor(function_network: Dict[str, Any]):
                         if entry['tgt'] == -1:
                             try:
                                 fn_data['modules'][0]['fn'][key].remove(entry)
-                                logs.append(f"The {i+1}'th {key} wire in the top level bf is targeting -1")
+                                logs.append(f"The {i + 1}'th {key} wire in the top level bf is targeting -1")
                             except:
                                 entry['tgt'] = 1
                     except:
@@ -109,18 +124,19 @@ def fn_preprocessor(function_network: Dict[str, Any]):
                 except:
                     continue
             else:
-                try: 
+                try:
                     for (i, entry) in enumerate(reversed(fn_ent[key])):
                         if entry['tgt'] == -1:
                             try:
                                 fn_ent[key][i].remove(entry)
-                                logs.append(f"The {i+1}'th {key} wire in the {j+1}'th fn_array is targeting -1")
+                                logs.append(f"The {i + 1}'th {key} wire in the {j + 1}'th fn_array is targeting -1")
                             except:
                                 entry['tgt'] = 1
                 except:
                     continue
 
     return fn_data, logs
+
 
 def clean_mml(mml: str) -> str:
     """Cleans/sterilizes pMML for AMR generation service"""
@@ -138,7 +154,17 @@ def clean_mml(mml: str) -> str:
     return str(soup).replace("\n", "")
 
 
-def extraction_matches_annotation(mention: Mention, annotation: Dict[str, Any]) -> bool:
+def parse_equations(eqns: List[str]) -> List[str]:
+    """Parses the equations based on if they are mathml or latex"""
+    parsed_eqns: List[str] = []
+    for eqn in eqns:
+        if "</math>" in eqn:
+            parsed_eqns.append(clean_mml(eqn))
+        else:
+            parsed_eqns.append(clean_mml(get_mathml_from_latex(eqn)))
+    return parsed_eqns
+
+def extraction_matches_annotation(extraction: AnchoredEntity, annotation: Dict[str, Any], json_contents: Dict) -> bool:
     """ Determines whether the extraction matches the annotation"""
 
     # First iteration of the matching algorithm
@@ -147,12 +173,14 @@ def extraction_matches_annotation(mention: Mention, annotation: Dict[str, Any]) 
     gt_text = annotation["text"]
 
     # Get the extractions text
-    m_text = mention.extraction_source.surrounding_passage
+    src = extraction.extraction_source
+    m_text = json_contents[src.block]['content'][src.char_start:src.char_end]
 
-    return gt_text in m_text
+    return gt_text in m_text or m_text in gt_text
 
 
-def compute_text_reading_evaluation(gt_data: list, attributes: AttributeCollection) -> TextReadingEvaluationResults:
+def compute_text_reading_evaluation(gt_data: list, attributes: AttributeCollection,
+                                    json_contents: Dict) -> TextReadingEvaluationResults:
     """ Compute the coverage of text reading extractions """
 
     # Get the extractions from the attribute collection
@@ -165,24 +193,32 @@ def compute_text_reading_evaluation(gt_data: list, attributes: AttributeCollecti
             page = a["page"]
             annotations_by_page[page].append(a)
 
+    def annotation_key(a: Dict):
+        return a['page'], tuple(a['start_xy']), a['text']
+
     # Count the matches
     tp, tn, fp, fn = 0, 0, 0, 0
+    matched_annotations = set()
     for e in extractions:
+        matched = False
         for m in e.mentions:
-            if m.extraction_source is not None:
-                te = m.extraction_source
-                if te.page is not None:
-                    e_page = te.page
-                    page_annotations = annotations_by_page[e_page]
-                    matched = False
-                    for a in page_annotations:
-                        if extraction_matches_annotation(m, a):
-                            matched = True
-                            tp += 1
-                            break
-                    if not matched:
-                        fp += 1
+            if not matched:
+                if m.extraction_source is not None:
+                    te = m.extraction_source
+                    if te.page is not None:
+                        e_page = te.page
+                        page_annotations = annotations_by_page[e_page]
 
+                        for a in page_annotations:
+                            key = annotation_key(a)
+                            if key not in matched_annotations:
+                                if extraction_matches_annotation(m, a, json_contents):
+                                    matched_annotations.add(key)
+                                    matched = True
+                                    tp += 1
+                                    break
+                        if not matched:
+                            fp += 1
 
     recall = tp / len(gt_data)
     precision = tp / (tp + fp + 0.00000000001)

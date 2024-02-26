@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-
 
-from fastapi import FastAPI, File
+from fastapi import Depends, FastAPI, APIRouter, status
 from skema.isa.lib import align_mathml_eqs
+import skema.isa.data as isa_data
+from skema.rest import utils
 from pydantic import BaseModel
+import httpx
 
-# Create a web app using FastAPI
+from skema.rest.proxies import SKEMA_RS_ADDESS
 
-app = FastAPI()
+router = APIRouter()
 
 
 # Model for ISA_Result
@@ -15,17 +18,39 @@ class ISA_Result(BaseModel):
     union_graph: str = None
 
 
-@app.get("/ping", summary="Ping endpoint to test health of service")
-def ping():
-    return "The ISA service is running."
+@router.get(
+    "/healthcheck", 
+    summary="Status of ISA service",
+    response_model=int,
+    status_code=status.HTTP_200_OK
+)
+async def healthcheck(client: httpx.AsyncClient = Depends(utils.get_client)) -> int:
+    res = await client.get(f"{SKEMA_RS_ADDESS}/ping")
+    return res.status_code
 
 
-@app.put("/align-eqns", summary="Align two MathML equations")
+@router.post(
+    "/align-eqns", 
+    summary="Align two MathML equations"
+)
 async def align_eqns(
-    file1: str, file2: str, mention_json1: str = "", mention_json2: str = ""
+    mml1: str, mml2: str, mention_json1: str = "", mention_json2: str = ""
 ) -> ISA_Result:
-    """
+    f"""
     Endpoint for align two MathML equations.
+
+    ### Python example
+
+    ```
+    import requests
+
+    request = {{
+        "mml1": {isa_data.mml},
+        "mml2": {isa_data.mml}
+    }}
+
+    response=requests.post("/isa/align-eqns", json=request)
+    res = response.json()
     """
     (
         matching_ratio,
@@ -36,8 +61,16 @@ async def align_eqns(
         aligned_indices2,
         union_graph,
         perfectly_matched_indices1,
-    ) = align_mathml_eqs(file1, file2, mention_json1, mention_json2)
-    ir = ISA_Result()
-    ir.matching_ratio = matching_ratio
-    ir.union_graph = union_graph.to_string()
-    return ir
+    ) = align_mathml_eqs(mml1, mml2, mention_json1, mention_json2)
+    return ISA_Result(
+      matching_ratio = matching_ratio,
+      union_graph = union_graph.to_string()
+    )
+
+
+app = FastAPI()
+app.include_router(
+    router,
+    prefix="/isa",
+    tags=["isa"],
+)
