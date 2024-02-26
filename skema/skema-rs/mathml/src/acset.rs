@@ -311,16 +311,22 @@ pub struct Identifier {
 }
 
 #[derive(
-    Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Serialize, Deserialize, ToSchema, JsonSchema,
+    Debug,
+    Default,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Clone,
+    Serialize,
+    Deserialize,
+    ToSchema,
+    JsonSchema,
 )]
 pub struct Initial {
     pub target: String,
     pub expression: String,
     pub expression_mathml: String,
-}
-
-impl Default for Initial {
-    fn default() -> Self { Initial { target: "temp".to_string(), expression: "0".to_string(), expression_mathml: "<math><\\math>".to_string() } }
 }
 
 #[derive(
@@ -688,6 +694,7 @@ impl From<Vec<FirstOrderODE>> for PetriNet {
             };
             let initials = Initial {
                 target: ode.lhs_var.to_string().clone(),
+                expression: "".to_string(),
                 ..Default::default()
             };
             /*let parameters = Parameter {
