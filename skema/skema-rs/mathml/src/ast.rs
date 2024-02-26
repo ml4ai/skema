@@ -202,7 +202,7 @@ impl fmt::Display for MathExpression {
             MathExpression::Msub(base, subscript) => {
                 write!(f, "{base}_{{{subscript}}}")
             }
-            MathExpression::Msubsup(base, subscript, superscript) => {
+            MathExpression::Msubsup(base, subscript,superscript)=>{
                 write!(f, "{base}_{{{subscript}}}^{{{superscript}}}")
             }
             MathExpression::Mo(op) => {
@@ -222,37 +222,6 @@ impl fmt::Display for MathExpression {
                 write!(f, "{:?}", base)?;
                 write!(f, "{superscript:?}")
             }
-            MathExpression::Mtext(text) => write!(f, "{}", text),
-            MathExpression::SummationMath(SummationMath { op, func }) => {
-                write!(f, "{op}")?;
-                write!(f, "{func}")
-            }
-            MathExpression::HatComp(HatComp { op, comp }) => {
-                write!(f, "{op}")?;
-                write!(f, "{comp}")
-            }
-            MathExpression::Integral(Integral {
-                op,
-                integrand,
-                integration_variable,
-            }) => {
-                write!(f, "{op}")?;
-                write!(f, "{integrand}")?;
-                write!(f, "{integration_variable}")
-            }
-            MathExpression::LaplacianComp(LaplacianComp { op, comp }) => {
-                write!(f, "{op}(")?;
-                write!(f, "{comp})")
-            }
-            MathExpression::SurfaceIntegral(row) => {
-                write!(f, "{row})")
-            }
-            MathExpression::DownArrow(DownArrow { sub, sup, comp }) => match (sub, sup) {
-                (Some(low), Some(up)) => write!(f, "{comp}↓_{{{low}}}^{{{up}}}"),
-                (Some(low), None) => write!(f, "{comp}↓_{{{low}}}"),
-                (None, Some(up)) => write!(f, "{comp}↓^{{{up}}}"),
-                (None, None) => write!(f, "{comp}↓"),
-            },
             expression => write!(f, "{expression:?}"),
         }
     }

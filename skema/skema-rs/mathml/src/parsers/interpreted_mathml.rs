@@ -11,9 +11,9 @@ use crate::{
         SummationMath, Type,
     },
     parsers::generic_mathml::{
-        add, attribute, cross, divide, dot, elem_many0, equals, etag, lparen, mean, mi, mn, msub,
-        msubsup, mtext, multiply, rparen, stag, subtract, tag_parser, vector, ws, xml_declaration,
-        IResult, ParseError, Span,
+        add, attribute, dot, elem_many0, equals, etag, grad, lparen, mean, mi, mn, msqrt, msub,
+        msubsup, multiply, rparen, stag, subtract, tag_parser, ws, xml_declaration, IResult,
+        ParseError, Span,
     },
 };
 
@@ -1725,18 +1725,30 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                 func_of: None,
             })
         }),
-        alt((
-            absolute,
-            sqrt,
-            map(operator, MathExpression::Mo),
-            map(gradient, MathExpression::Mo),
-            mn,
-            msub,
-            superscript,
-            mfrac,
-            mtext,
-            over_term,
-        )),
+        map(
+            grad_func,
+            |(
+                op,
+                Ci {
+                    r#type,
+                    content,
+                    func_of,
+                },
+            )| {
+                MathExpression::Differential(Differential {
+                    diff: Box::new(MathExpression::Mo(op)),
+                    func: Box::new(MathExpression::Ci(Ci {
+                        r#type,
+                        content,
+                        func_of,
+                    })),
+                })
+            },
+        ),
+        absolute,
+        map(operator, MathExpression::Mo),
+        map(gradient, MathExpression::Mo),
+        alt((mn, msub, superscript, msqrt, mfrac, over_term)),
         map(mrow, MathExpression::Mrow),
         msubsup,
     )))(input)
