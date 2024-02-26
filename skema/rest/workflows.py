@@ -9,6 +9,7 @@ from io import BytesIO
 from typing import List
 from pathlib import Path
 import httpx
+import requests
 
 from fastapi import APIRouter, Depends, File, UploadFile, FastAPI, Request
 from starlette.responses import JSONResponse
@@ -79,7 +80,7 @@ async def equation_to_amrs(data: schema.EquationsToAMRs, client: httpx.AsyncClie
     """
     eqns = utils.parse_equations(data.equations)
     if data.model == "petrinet" or data.model == "regnet":
-        payload = {"mathml": data.equations, "model": data.model}
+        payload = {"mathml": eqns, "model": data.model}
         res = await client.put(f"{SKEMA_RS_ADDESS}/mathml/amr", json=payload)
         if res.status_code != 200:
             res_new = await client.put(f"{SKEMA_RS_ADDESS}/mathml/g-amr", json=eqns)
