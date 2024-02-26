@@ -9,7 +9,8 @@ from fastapi import UploadFile
 from skema.rest.workflows import (
     llm_assisted_codebase_to_pn_amr,
     code_snippets_to_pn_amr,
-    lx_equations_to_amr
+    lx_equations_to_amr,
+    equation_to_amrs
 )
 from skema.rest import schema
 from skema.rest.llm_proxy import Dynamics
@@ -242,4 +243,19 @@ async def test_eq_to_regnet():
         regnet_amr_response = await lx_equations_to_amr(payload, client=client)
     
     assert "model" in regnet_amr_response, f"'model' should be in AMR response, but got {regnet_amr_response}"
+
+@pytest.mark.asyncio
+async def test_eq_to_gamr():
+    
+    payload = schema.EquationsToAMRs(
+        equations = [
+            "\\frac{\\partial x}{\\partial t} = {\\alpha x} - {\\beta x y}",
+            "\\frac{\\partial y}{\\partial t} = {\\alpha x y} - {\\gamma y}"
+        ],
+        model = "gamr",
+    )
+    async with httpx.AsyncClient() as client:
+        regnet_amr_response = await equation_to_amrs(payload, client=client)
+    
+    assert "met" in regnet_amr_response, f"'met' should be in AMR response, but got {regnet_amr_response}"
 
