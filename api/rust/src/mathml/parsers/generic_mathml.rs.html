@@ -874,7 +874,7 @@
 }
 
 <span class="kw">pub fn </span>divide(input: Span) -&gt; IResult&lt;Operator&gt; {
-    <span class="kw">let </span>(s, op) = value(Operator::Divide, alt((ws(tag(<span class="string">"∕"</span>)), ws(tag(<span class="string">"&amp;#x2215;"</span>)))))(input)<span class="question-mark">?</span>;
+    <span class="kw">let </span>(s, op) = value(Operator::Divide, alt((ws(tag(<span class="string">"∕"</span>)), ws(tag(<span class="string">"/"</span>)), ws(tag(<span class="string">"&amp;#x2215;"</span>)))))(input)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((s, op))
 }
 
