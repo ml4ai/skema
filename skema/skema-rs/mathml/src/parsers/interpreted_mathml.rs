@@ -1382,7 +1382,7 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                     order,
                     var_index,
                     bound_var,
-                    derivative_notation,
+                    notation,
                 },
                 Ci {
                     r#type,
@@ -1395,7 +1395,7 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                         order,
                         var_index,
                         bound_var,
-                        derivative_notation,
+                        notation,
                     }))),
                     func: Box::new(MathExpression::Ci(Ci {
                         r#type,
@@ -1474,7 +1474,7 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                         order,
                         var_index,
                         bound_var,
-                        derivative_notation,
+                        notation,
                     },
                     Ci {
                         r#type,
@@ -1487,7 +1487,7 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                             order,
                             var_index,
                             bound_var,
-                            derivative_notation,
+                            notation,
                         }))),
                         func: Box::new(MathExpression::Ci(Ci {
                             r#type,
@@ -1504,7 +1504,7 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                         order,
                         var_index,
                         bound_var,
-                        derivative_notation,
+                        notation,
                     },
                     Ci {
                         r#type,
@@ -1517,7 +1517,7 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                             order,
                             var_index,
                             bound_var,
-                            derivative_notation,
+                            notation,
                         }))),
                         func: Box::new(MathExpression::Ci(Ci {
                             r#type,
@@ -1534,7 +1534,7 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                         order,
                         var_index,
                         bound_var,
-                        derivative_notation,
+                        notation,
                     },
                     Ci {
                         r#type,
@@ -1547,7 +1547,7 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                             order,
                             var_index,
                             bound_var,
-                            derivative_notation,
+                            notation,
                         }))),
                         func: Box::new(MathExpression::Ci(Ci {
                             r#type,
@@ -1564,7 +1564,7 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                         order,
                         var_index,
                         bound_var,
-                        derivative_notation,
+                        notation,
                     },
                     Ci {
                         r#type,
@@ -1577,7 +1577,7 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                             order,
                             var_index,
                             bound_var,
-                            derivative_notation,
+                            notation,
                         }))),
                         func: Box::new(MathExpression::Ci(Ci {
                             r#type,
@@ -1594,7 +1594,7 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                         order,
                         var_index,
                         bound_var,
-                        derivative_notation,
+                        notation,
                     },
                     Ci {
                         r#type,
@@ -1607,7 +1607,7 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                             order,
                             var_index,
                             bound_var,
-                            derivative_notation,
+                            notation,
                         }))),
                         func: Box::new(MathExpression::Ci(Ci {
                             r#type,
@@ -1661,7 +1661,7 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                     order,
                     var_index,
                     bound_var,
-                    derivative_notation,
+                    notation,
                 },
                 comp,
             )| {
@@ -1670,7 +1670,7 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                         order,
                         var_index,
                         bound_var,
-                        derivative_notation,
+                        notation,
                     }))),
                     func: Box::new(MathExpression::Mrow(comp)),
                 })
@@ -1683,7 +1683,7 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                     order,
                     var_index,
                     bound_var,
-                    derivative_notation,
+                    notation,
                 },
                 comp,
             )| {
@@ -1692,7 +1692,7 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                         order,
                         var_index,
                         bound_var,
-                        derivative_notation,
+                        notation,
                     }))),
                     func: Box::new(MathExpression::Mrow(comp)),
                 })

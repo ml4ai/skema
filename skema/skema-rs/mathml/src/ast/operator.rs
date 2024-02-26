@@ -14,7 +14,7 @@ pub struct Derivative {
     pub order: u8,
     pub var_index: u8,
     pub bound_var: Ci,
-    pub derivative_notation: DerivativeNotation,
+    pub notation: DerivativeNotation,
 }
 
 /// All the stuff that was in the LaTeX equation that we need to reproduce the original LaTeX equation
@@ -95,7 +95,7 @@ pub struct Gradient {
 }
 
 /// Integral can be definite or indefinite with `integration_variable`
-/// as it has the option of having `lowlimit`, `uplimit`
+/// as it has the option of having `lower_limit`, `upper_limit`
 #[derive(
     Debug,
     Ord,
@@ -226,8 +226,8 @@ impl fmt::Display for Operator {
                 order,
                 var_index: _,
                 bound_var,
-                derivative_notation,
-            }) => match derivative_notation {
+                notation,
+            }) => match notation {
                 DerivativeNotation::LeibnizTotal => write!(f, "D({order}, {bound_var})"),
                 DerivativeNotation::LeibnizPartialStandard => write!(f, "PD({order}, {bound_var})"),
                 DerivativeNotation::LeibnizPartialCompact => write!(f, "∂_{{{bound_var}}})"),

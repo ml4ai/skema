@@ -284,7 +284,7 @@ pub fn to_decapodes_serialization(
                 order,
                 var_index: _,
                 bound_var,
-                derivative_notation,
+                notation,
             }) => {
                 table_counts.operation_count += 1;
                 let temp_str = format!("•{}", (table_counts.operation_count));
@@ -296,9 +296,9 @@ pub fn to_decapodes_serialization(
                 table_counts.variable_count += 1;
                 let tgt_idx = table_counts.variable_count;
                 let mut derivative_str = String::new();
-                if *derivative_notation == DerivativeNotation::LeibnizTotal {
+                if *notation == DerivativeNotation::LeibnizTotal {
                     derivative_str.push_str(&*format!("D({},{})", order, bound_var));
-                } else if *derivative_notation == DerivativeNotation::LeibnizPartialStandard {
+                } else if *notation == DerivativeNotation::LeibnizPartialStandard {
                     derivative_str.push_str(&*format!("PD({},{})", order, bound_var));
                 }
                 let unary = UnaryOperator {
