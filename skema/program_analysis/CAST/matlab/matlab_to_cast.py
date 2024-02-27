@@ -495,7 +495,7 @@ class MatlabToCast(object):
             cell_node = get_first_child_by_type(case_node, "cell")
             # multiple case arguments
             if (cell_node):
-                value_type=StructureType.LIST,
+                value_type=StructureType.LIST
                 operand = CASTLiteralValue(
                     value_type=value_type,
                     value = self.visit(cell_node),
