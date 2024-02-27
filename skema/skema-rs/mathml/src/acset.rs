@@ -488,6 +488,7 @@ impl From<Vec<FirstOrderODE>> for PetriNet {
             initial_vec.push(initials.clone());
             states_vec.insert(states.clone());
             state_string_list.push(ode.lhs_var.to_string().clone()); // used later for transition parsing
+            println!("ode.rhs: {:?}", ode.rhs.to_string().clone());
         }
 
         // now for the construction of the transitions and their results
@@ -496,11 +497,16 @@ impl From<Vec<FirstOrderODE>> for PetriNet {
         for ode in ode_vec.iter() {
             dirty_terms.append(&mut get_terms(state_string_list.clone(), ode.clone()));
         }
-
         // now to trim off terms that are for euler methods, dyn_state != exp_state && parameters.len() != 0
+        // this conditional does nothing now, but is kept in case we need to turn it on later.
         for term in dirty_terms.iter() {
-            if term.dyn_state != term.exp_states[0] || !term.parameters.is_empty() {
-                terms.push(term.clone());
+            println!("-----\nterm: {:?}\n-----", term.clone());
+            if !term.exp_states.is_empty() {
+                if term.dyn_state != term.exp_states[0] || !term.parameters.is_empty() {
+                    terms.push(term.clone());
+                } else {
+                    terms.push(term.clone());
+                }
             }
         }
         for term in terms.iter() {
