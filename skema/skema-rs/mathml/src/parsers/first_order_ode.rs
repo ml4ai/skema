@@ -11,7 +11,7 @@ use crate::{
         interpreted_mathml::{
             ci_univariate_with_bounds, ci_univariate_without_bounds, ci_unknown_with_bounds,
             ci_unknown_without_bounds, first_order_derivative_leibniz_notation, math_expression,
-            newtonian_derivative, operator,
+            newtonian_derivative, operator, first_order_partial_derivative_leibniz_notation, first_order_partial_derivative_partial_func, first_order_dderivative_leibniz_notation
         },
         math_expression_tree::MathExpressionTree,
     },
@@ -40,7 +40,7 @@ use crate::{ast::Mi, parsers::generic_mathml::test_parser};
 /// in Leibniz or Newtonian notation.
 #[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
 pub struct FirstOrderODE {
-    /// The variable/univariate function) on the LHS of the equation that is being
+    /// The variable/univariate function on the LHS of the equation that is being
     /// differentiated. This variable may be referred to as a 'specie', 'state', or 'vertex' in the
     /// context of discussions about Petri Nets and RegNets.
     pub lhs_var: Ci,
@@ -58,7 +58,7 @@ pub fn first_order_ode(input: Span) -> IResult<FirstOrderODE> {
     // Recognize LHS derivative
     let (s, (derivative, ci)) = alt((
         first_order_derivative_leibniz_notation,
-        newtonian_derivative,
+        newtonian_derivative, first_order_partial_derivative_leibniz_notation, first_order_partial_derivative_partial_func, first_order_dderivative_leibniz_notation
     ))(s)?;
     //let ci = binding.content;
     //let parenthesized = ci.func_of.clone();
