@@ -152,9 +152,9 @@
 <span class="kw">pub use </span>mathml::mml2pn::{ACSet, Term};
 <span class="kw">use </span>std::fs;
 <span class="comment">// new imports
-</span><span class="kw">use </span>mathml::acset::{PetriNet, GeneralizedAMR};
-<span class="kw">use </span>schemars::{schema_for};
+</span><span class="kw">use </span>mathml::acset::{GeneralizedAMR, PetriNet};
 <span class="kw">use </span>neo4rs::{query, Node};
+<span class="kw">use </span>schemars::schema_for;
 <span class="kw">use </span>skema::config::Config;
 <span class="kw">use </span>skema::model_extraction::module_id2mathml_MET_ast;
 <span class="kw">use </span>std::env;
@@ -218,7 +218,7 @@
         <span class="kw">let </span>schema = <span class="macro">schema_for!</span>(GeneralizedAMR);
         <span class="kw">let </span>data = <span class="macro">format!</span>(<span class="string">"{}"</span>, serde_json::to_string_pretty(<span class="kw-2">&amp;</span>schema).unwrap());
         fs::write(<span class="string">"./schema.txt"</span>, data).expect(<span class="string">"Unable to write file"</span>);
-        <span class="comment">/* 
+        <span class="comment">/*
         let config = Config {
             db_protocol: db_protocol.clone(),
             db_host: db_host.clone(),

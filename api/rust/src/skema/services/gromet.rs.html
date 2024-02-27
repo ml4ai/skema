@@ -467,6 +467,9 @@
 <a href="#466" id="466">466</a>
 <a href="#467" id="467">467</a>
 <a href="#468" id="468">468</a>
+<a href="#469" id="469">469</a>
+<a href="#470" id="470">470</a>
+<a href="#471" id="471">471</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! REST API endpoints related to CRUD operations and other queries on GroMEt objects.
 </span><span class="kw">use </span><span class="kw">crate</span>::config::Config;
 <span class="kw">use </span><span class="kw">crate</span>::database::{parse_gromet_queries, run_queries};
@@ -474,7 +477,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::ModuleCollection;
 <span class="kw">use </span>actix_web::web::ServiceConfig;
 <span class="kw">use </span>actix_web::{delete, get, post, put, web, HttpResponse};
-<span class="kw">use </span>mathml::acset::{PetriNet, RegNet, GeneralizedAMR};
+<span class="kw">use </span>mathml::acset::{GeneralizedAMR, PetriNet, RegNet};
 
 <span class="kw">use </span>mathml::ast::{<span class="self">self</span>, MathExpression};
 <span class="kw">use </span>mathml::parsers::math_expression_tree::MathExpressionTree;
@@ -483,6 +486,7 @@
 <span class="kw">use </span>std::collections::HashMap;
 <span class="kw">use </span>std::sync::Arc;
 
+<span class="kw">use </span>mathml::ast::operator::DerivativeNotation;
 <span class="kw">use </span>utoipa;
 
 <span class="kw">pub fn </span>configure() -&gt; <span class="kw">impl </span>FnOnce(<span class="kw-2">&amp;mut </span>ServiceConfig) {
@@ -853,6 +857,7 @@
             order: <span class="number">1</span>,
             var_index: <span class="number">1</span>,
             bound_var: lhs_ci2,
+            notation: DerivativeNotation::LeibnizTotal,
         };
         <span class="kw">let </span>lhs = MathExpressionTree::Cons(
             mathml::ast::operator::Operator::Derivative(lhs_deriv),
@@ -922,6 +927,7 @@
             order: <span class="number">1</span>,
             var_index: <span class="number">1</span>,
             bound_var: lhs_ci2,
+            notation: DerivativeNotation::LeibnizTotal,
         };
         <span class="kw">let </span>lhs = MathExpressionTree::Cons(
             mathml::ast::operator::Operator::Derivative(lhs_deriv),

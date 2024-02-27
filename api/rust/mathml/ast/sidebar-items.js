@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["MathExpression","Type"],"mod":["operator"],"struct":["Ci","Differential","HatComp","Integral","LaplacianComp","Math","Mi","Mrow","SummationMath"]};
+window.SIDEBAR_ITEMS = {"enum":["MathExpression","Type"],"mod":["operator"],"struct":["Ci","Differential","DownArrow","HatComp","Integral","LaplacianComp","Math","Mi","Mrow","SummationMath"]};

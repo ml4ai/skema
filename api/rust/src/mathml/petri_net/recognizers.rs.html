@@ -158,10 +158,25 @@
 <a href="#157" id="157">157</a>
 <a href="#158" id="158">158</a>
 <a href="#159" id="159">159</a>
+<a href="#160" id="160">160</a>
+<a href="#161" id="161">161</a>
+<a href="#162" id="162">162</a>
+<a href="#163" id="163">163</a>
+<a href="#164" id="164">164</a>
+<a href="#165" id="165">165</a>
+<a href="#166" id="166">166</a>
+<a href="#167" id="167">167</a>
+<a href="#168" id="168">168</a>
+<a href="#169" id="169">169</a>
+<a href="#170" id="170">170</a>
+<a href="#171" id="171">171</a>
+<a href="#172" id="172">172</a>
+<a href="#173" id="173">173</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! This module contains functions for predicate testing of MathML elements, as well as extracting
 //! semantically-meaningful objects from MathML expressions.
 
-</span><span class="kw">use </span><span class="kw">crate</span>::ast::{
+</span><span class="kw">use </span><span class="kw">crate</span>::ast::operator::DerivativeNotation;
+<span class="kw">use </span><span class="kw">crate</span>::ast::{
     operator::{Derivative, Operator},
     Ci, MathExpression,
     MathExpression::{Mfrac, Mn, Mo, Mover, Mrow, Msub},
@@ -217,9 +232,7 @@
         }
     }
 
-    <span class="kw">if </span>(numerator_contains_d &amp;&amp; denominator_contains_d)
-        || (numerator_contains_partial &amp;&amp; denominator_contains_partial)
-    {
+    <span class="kw">if </span>numerator_contains_d &amp;&amp; denominator_contains_d {
         <span class="prelude-val">Ok</span>((
             Operator::new_derivative(Derivative::new(
                 <span class="number">1</span>,
@@ -229,6 +242,21 @@
                     Box::new(MathExpression::Mi(Mi(denom_var.trim().to_string()))),
                     <span class="prelude-val">None</span>,
                 ),
+                DerivativeNotation::LeibnizTotal,
+            )),
+            function_candidate.unwrap(),
+        ))
+    } <span class="kw">else if </span>numerator_contains_partial &amp;&amp; denominator_contains_partial {
+        <span class="prelude-val">Ok</span>((
+            Operator::new_derivative(Derivative::new(
+                <span class="number">1</span>,
+                <span class="number">1</span>,
+                Ci::new(
+                    <span class="prelude-val">Some</span>(Type::Real),
+                    Box::new(MathExpression::Mi(Mi(denom_var.trim().to_string()))),
+                    <span class="prelude-val">None</span>,
+                ),
+                DerivativeNotation::LeibnizPartialStandard,
             )),
             function_candidate.unwrap(),
         ))
