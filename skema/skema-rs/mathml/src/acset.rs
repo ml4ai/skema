@@ -690,15 +690,26 @@ impl From<Vec<FirstOrderODE>> for PetriNet {
         }
 
         // now we construct transitions from unpaired terms, assuming them to be sources and sinks
+        // This should also support sources and sinks that are state dependent. 
         if !terms.is_empty() {
             for (i, term) in terms.iter().enumerate() {
                 if term.polarity {
                     let mut input = Vec::<String>::new();
+                    let mut exp_eq_dyn = false;
 
-                    let output = [term.dyn_state.clone()].to_vec();
+                    let mut output = [term.dyn_state.clone()].to_vec();
 
                     for state in term.exp_states.iter() {
                         input.push(state.clone());
+                        if *state == term.dyn_state.clone() {
+                            exp_eq_dyn = true;
+                        }
+                    }
+
+                    // I think if the expression equals the dynamic state both in the input and output get 
+                    if exp_eq_dyn {
+                        input.push(term.dyn_state.clone());
+                        output.push(term.dyn_state.clone());
                     }
 
                     let transitions = Transition {
