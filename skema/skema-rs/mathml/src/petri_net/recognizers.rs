@@ -1,6 +1,7 @@
 //! This module contains functions for predicate testing of MathML elements, as well as extracting
 //! semantically-meaningful objects from MathML expressions.
 
+use crate::ast::operator::DerivativeNotation;
 use crate::ast::{
     operator::{Derivative, Operator},
     Ci, MathExpression,
@@ -57,9 +58,7 @@ pub fn recognize_leibniz_differential_operator<'a>(
         }
     }
 
-    if (numerator_contains_d && denominator_contains_d)
-        || (numerator_contains_partial && denominator_contains_partial)
-    {
+    if numerator_contains_d && denominator_contains_d {
         Ok((
             Operator::new_derivative(Derivative::new(
                 1,
@@ -69,6 +68,21 @@ pub fn recognize_leibniz_differential_operator<'a>(
                     Box::new(MathExpression::Mi(Mi(denom_var.trim().to_string()))),
                     None,
                 ),
+                DerivativeNotation::LeibnizTotal,
+            )),
+            function_candidate.unwrap(),
+        ))
+    } else if numerator_contains_partial && denominator_contains_partial {
+        Ok((
+            Operator::new_derivative(Derivative::new(
+                1,
+                1,
+                Ci::new(
+                    Some(Type::Real),
+                    Box::new(MathExpression::Mi(Mi(denom_var.trim().to_string()))),
+                    None,
+                ),
+                DerivativeNotation::LeibnizPartialStandard,
             )),
             function_candidate.unwrap(),
         ))

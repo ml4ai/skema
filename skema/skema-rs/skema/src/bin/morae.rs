@@ -3,9 +3,9 @@ use clap::Parser;
 pub use mathml::mml2pn::{ACSet, Term};
 use std::fs;
 // new imports
-use mathml::acset::{PetriNet, GeneralizedAMR};
-use schemars::{schema_for};
+use mathml::acset::{GeneralizedAMR, PetriNet};
 use neo4rs::{query, Node};
+use schemars::schema_for;
 use skema::config::Config;
 use skema::model_extraction::module_id2mathml_MET_ast;
 use std::env;
@@ -69,7 +69,7 @@ async fn main() {
         let schema = schema_for!(GeneralizedAMR);
         let data = format!("{}", serde_json::to_string_pretty(&schema).unwrap());
         fs::write("./schema.txt", data).expect("Unable to write file");
-        /* 
+        /*
         let config = Config {
             db_protocol: db_protocol.clone(),
             db_host: db_host.clone(),

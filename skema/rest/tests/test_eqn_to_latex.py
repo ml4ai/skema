@@ -21,7 +21,7 @@ async def test_post_image_to_latex():
     # see https://fastapi.tiangolo.com/advanced/async-tests/#async-tests
     async with AsyncClient(app=app, base_url="http://eqn-to-latex-test") as ac:
         response = await ac.post(endpoint, files=files)
-    expected = "\\frac{d H}{dt}=\\nabla \\cdot {(\\Gamma*H^{n+2}*\\left|\\nabla{H}\\right|^{n-1}*\\nabla{H})}"
+    expected = "\\frac{\\partial H}{\\partial t}=\\nabla \\cdot {(\\Gamma*H^{n+2}*\\left|\\nabla{H}\\right|^{n-1}*\\nabla{H})}"
     # check for route's existence
     assert (
         any(route.path == endpoint for route in app.routes) == True
@@ -50,7 +50,7 @@ async def test_post_image_to_latex_base64():
     # see https://fastapi.tiangolo.com/advanced/async-tests/#async-tests
     async with AsyncClient(app=app, base_url="http://eqn-to-latex-base64-test") as ac:
         response = await ac.post(endpoint, data=img_b64)
-    expected = "\\frac{d H}{dt}=\\nabla \\cdot {(\\Gamma*H^{n+2}*\\left|\\nabla{H}\\right|^{n-1}*\\nabla{H})}"
+    expected = "\\frac{\\partial H}{\\partial t}=\\nabla \\cdot {(\\Gamma*H^{n+2}*\\left|\\nabla{H}\\right|^{n-1}*\\nabla{H})}"
     # check for route's existence
     assert (
         any(route.path == endpoint for route in app.routes) == True
