@@ -5,7 +5,7 @@ use crate::model_extraction::module_id2mathml_MET_ast;
 use crate::ModuleCollection;
 use actix_web::web::ServiceConfig;
 use actix_web::{delete, get, post, put, web, HttpResponse};
-use mathml::acset::{PetriNet, RegNet, GeneralizedAMR};
+use mathml::acset::{GeneralizedAMR, PetriNet, RegNet};
 
 use mathml::ast::{self, MathExpression};
 use mathml::parsers::math_expression_tree::MathExpressionTree;
@@ -14,6 +14,7 @@ use neo4rs::{query, Error, Node};
 use std::collections::HashMap;
 use std::sync::Arc;
 
+use mathml::ast::operator::DerivativeNotation;
 use utoipa;
 
 pub fn configure() -> impl FnOnce(&mut ServiceConfig) {
@@ -384,6 +385,7 @@ pub async fn model2MET(
             order: 1,
             var_index: 1,
             bound_var: lhs_ci2,
+            notation: DerivativeNotation::LeibnizTotal,
         };
         let lhs = MathExpressionTree::Cons(
             mathml::ast::operator::Operator::Derivative(lhs_deriv),
@@ -453,6 +455,7 @@ pub async fn model2GAMR(
             order: 1,
             var_index: 1,
             bound_var: lhs_ci2,
+            notation: DerivativeNotation::LeibnizTotal,
         };
         let lhs = MathExpressionTree::Cons(
             mathml::ast::operator::Operator::Derivative(lhs_deriv),

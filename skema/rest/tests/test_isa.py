@@ -37,7 +37,7 @@ def test_align_eqns():
     ), f"Response should be 1.0, but instead received {response.text}"
     # check response of union_graph
     assert (
-        json.loads(response.text)["union_graph"] == expected
+        str(json.loads(response.text)["union_graph"]) == expected
     ), f"Response should be {expected}, but instead received {response.text}"
 
 
