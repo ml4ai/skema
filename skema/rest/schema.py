@@ -81,7 +81,7 @@ class EquationsToAMRs(BaseModel):
         ]],
     )
     model: Literal["regnet", "petrinet", "met", "gamr", "decapode"] = Field(
-        description="The model type", examples=[["gamr"], ["regnet"], ["petrinet"], ["met"], ["decapode"]]
+        description="The model type", examples=["gamr"]
     )
 
 class MmlToAMR(BaseModel):
