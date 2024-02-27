@@ -9,7 +9,6 @@ from io import BytesIO
 from typing import List
 from pathlib import Path
 import httpx
-import json
 import requests
 
 from fastapi import APIRouter, Depends, File, UploadFile, FastAPI, Request
@@ -33,8 +32,10 @@ router = APIRouter()
 )
 async def equation_to_amrs(data: schema.EquationsToAMRs, client: httpx.AsyncClient = Depends(utils.get_client)):
     """
-    Converts equations (in LaTeX or MathML) to an AMR (Petrinet, Regnet, GAMR, MET, or Decapode).
-
+    Converts equations (in LaTeX or MathML) to an AMR (Petrinet, Regnet, GAMR, MET, or Decapode). 
+    
+    ## If Petrinet or Regnet is selected and the conversion fails, we fall back to converting to a Generalized AMR. 
+    ---
     ### Python example
     ```
     import requests
@@ -47,19 +48,51 @@ async def equation_to_amrs(data: schema.EquationsToAMRs, client: httpx.AsyncClie
     r = requests.post(f"{url}/consolidated/equations-to-amr", json={"equations": equations, "model": "regnet"})
     r.json()
     ```
+    ---
+    parameters:
+      - name: equations
+        - schema:
+          - type: array
+          - items:
+            - type: string
+        - required: true
+        - description: This is a list of equations, in either pMathML or LaTeX
+      - name: model
+        - type: string
+        - required: true
+        - description: This specifies the type of model that the output AMR will be in
+        - examples:
+          - Petrinet:
+            - summary: For making a petrinet
+            - value: "petrinet"
+          - Regnet:
+            - summary: For making a regnet
+            - value: "regnet"
+          - Decapode:
+            - summary: For making a decapode
+            - value: "decapode"
+          - Generalized AMR:
+            - summary: For making a generalized AMR
+            - value: "gamr"
+          - Math Expression Tree:
+            - summary: For making a Math Expression Tree
+            - value: "met"
     """
     eqns = utils.parse_equations(data.equations)
     if data.model == "petrinet" or data.model == "regnet":
-        payload = {"mathml": data.equations, "model": data.model}
+        payload = {"mathml": eqns, "model": data.model}
         res = await client.put(f"{SKEMA_RS_ADDESS}/mathml/amr", json=payload)
         if res.status_code != 200:
-            return JSONResponse(
-                status_code=400,
-                content={
-                    "error": f"MORAE PUT /mathml/amr failed to process payload with error {res.text}",
-                    "payload": payload,
-                },
-            )
+            res_new = await client.put(f"{SKEMA_RS_ADDESS}/mathml/g-amr", json=eqns)
+            if res_new.status_code != 200:
+                return JSONResponse(
+                    status_code=402,
+                    content={
+                        "error": f"Attempted creation of {data.model} AMR, which failed. Then tried creation of Generalized AMR, which also failed with the following error {res_new.text}. Please check equations, seen as pMathML below.",
+                        "payload": eqns,
+                    },
+                )
+            res = res_new
     elif data.model == "met":
         res = await client.put(f"{SKEMA_RS_ADDESS}/mathml/met", json=eqns)
         if res.status_code != 200:
@@ -104,7 +137,7 @@ async def equation_to_amrs(data: schema.EquationsToAMRs, client: httpx.AsyncClie
     
 # Code Snippets -> amrs [Petrinet, Regnet, GAMR, MET]
 @router.post(
-    "/consolidated/code-snippets-to-amrs", summary="code snippets → AMRs [Petrinet, Regnet, GAMR, MET, Decapode]"
+    "/consolidated/code-snippets-to-amrs", summary="code snippets → AMRs [Petrinet, Regnet, GAMR, MET]"
 )
 async def code_snippets_to_amrs(system: code2fn.System, client: httpx.AsyncClient = Depends(utils.get_client)):
     """
