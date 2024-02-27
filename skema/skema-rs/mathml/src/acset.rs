@@ -1,10 +1,10 @@
 //! Structs to represent elements of ACSets (Annotated C-Sets, a concept from category theory).
 //! JSON-serialized ACSets are the form of model exchange between TA1 and TA2.
-use crate::ast::operator::Operator;
-use crate::ast::{Ci, MathExpression, Mi, Type};
 use crate::parsers::first_order_ode::{get_terms, FirstOrderODE, PnTerm};
 use crate::parsers::math_expression_tree::MathExpressionTree;
-use schemars::JsonSchema;
+use crate::ast::operator::{Operator};
+use crate::ast::{MathExpression, Ci, Mi, Type};
+use schemars::{JsonSchema};
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeSet;
 use utoipa;
@@ -13,32 +13,24 @@ use utoipa::ToSchema;
 // We keep our ACSet representation in addition to the new SKEMA model representation since it is
 // more compact and easy to work with for development.
 
-#[derive(
-    Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Serialize, Deserialize, ToSchema, JsonSchema,
-)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Serialize, Deserialize, ToSchema, JsonSchema)]
 pub struct Specie {
     pub sname: String,
     pub uid: usize,
 }
 
-#[derive(
-    Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Serialize, Deserialize, ToSchema, JsonSchema,
-)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Serialize, Deserialize, ToSchema, JsonSchema)]
 pub struct ACSetTransition {
     pub tname: String,
 }
 
-#[derive(
-    Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Serialize, Deserialize, ToSchema, JsonSchema,
-)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Serialize, Deserialize, ToSchema, JsonSchema)]
 pub struct InputArc {
     pub it: usize,
     pub is: usize,
 }
 
-#[derive(
-    Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Serialize, Deserialize, ToSchema, JsonSchema,
-)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Serialize, Deserialize, ToSchema, JsonSchema)]
 pub struct OutputArc {
     pub ot: usize,
     pub os: usize,
@@ -46,17 +38,7 @@ pub struct OutputArc {
 
 #[allow(non_snake_case)]
 #[derive(
-    Debug,
-    Default,
-    PartialEq,
-    Eq,
-    PartialOrd,
-    Ord,
-    Clone,
-    Serialize,
-    Deserialize,
-    ToSchema,
-    JsonSchema,
+    Debug, Default, PartialEq, Eq, PartialOrd, Ord, Clone, Serialize, Deserialize, ToSchema, JsonSchema,
 )]
 pub struct ACSet {
     pub S: Vec<Specie>,
@@ -86,17 +68,7 @@ pub struct RegNet {
 }
 
 #[derive(
-    Debug,
-    Default,
-    PartialEq,
-    Eq,
-    Clone,
-    PartialOrd,
-    Ord,
-    Serialize,
-    Deserialize,
-    ToSchema,
-    JsonSchema,
+    Debug, Default, PartialEq, Eq, Clone, PartialOrd, Ord, Serialize, Deserialize, ToSchema, JsonSchema,
 )]
 pub struct Header {
     pub name: String,
@@ -126,51 +98,21 @@ pub struct ModelPetriNet {
 }
 
 #[derive(
-    Debug,
-    Default,
-    PartialEq,
-    Eq,
-    Clone,
-    PartialOrd,
-    Ord,
-    Serialize,
-    Deserialize,
-    ToSchema,
-    JsonSchema,
+    Debug, Default, PartialEq, Eq, Clone, PartialOrd, Ord, Serialize, Deserialize, ToSchema, JsonSchema,
 )]
 pub struct Metadata {
     pub placeholder: String, // once we finalize the metadata data struct fill in this data struct
 }
 
 #[derive(
-    Debug,
-    Default,
-    PartialEq,
-    Eq,
-    Clone,
-    PartialOrd,
-    Ord,
-    Serialize,
-    Deserialize,
-    ToSchema,
-    JsonSchema,
+    Debug, Default, PartialEq, Eq, Clone, PartialOrd, Ord, Serialize, Deserialize, ToSchema, JsonSchema,
 )]
 pub struct Semantics {
     pub ode: Ode,
 }
 
 #[derive(
-    Debug,
-    Default,
-    PartialEq,
-    Eq,
-    Clone,
-    PartialOrd,
-    Ord,
-    Serialize,
-    Deserialize,
-    ToSchema,
-    JsonSchema,
+    Debug, Default, PartialEq, Eq, Clone, PartialOrd, Ord, Serialize, Deserialize, ToSchema, JsonSchema,
 )]
 pub struct Ode {
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -186,17 +128,7 @@ pub struct Ode {
 }
 
 #[derive(
-    Debug,
-    Default,
-    PartialEq,
-    Eq,
-    Clone,
-    PartialOrd,
-    Ord,
-    Serialize,
-    Deserialize,
-    ToSchema,
-    JsonSchema,
+    Debug, Default, PartialEq, Eq, Clone, PartialOrd, Ord, Serialize, Deserialize, ToSchema, JsonSchema,
 )]
 pub struct Observable {
     id: String,
@@ -211,17 +143,7 @@ pub struct Observable {
 }
 
 #[derive(
-    Debug,
-    Default,
-    PartialEq,
-    Eq,
-    Clone,
-    PartialOrd,
-    Ord,
-    Serialize,
-    Deserialize,
-    ToSchema,
-    JsonSchema,
+    Debug, Default, PartialEq, Eq, Clone, PartialOrd, Ord, Serialize, Deserialize, ToSchema, JsonSchema,
 )]
 pub struct RegState {
     pub id: String,
@@ -237,17 +159,7 @@ pub struct RegState {
 }
 
 #[derive(
-    Debug,
-    Default,
-    PartialEq,
-    Eq,
-    Clone,
-    PartialOrd,
-    Ord,
-    Serialize,
-    Deserialize,
-    ToSchema,
-    JsonSchema,
+    Debug, Default, PartialEq, Eq, Clone, PartialOrd, Ord, Serialize, Deserialize, ToSchema, JsonSchema,
 )]
 pub struct State {
     pub id: String,
@@ -259,17 +171,7 @@ pub struct State {
 }
 
 #[derive(
-    Debug,
-    Default,
-    PartialEq,
-    Eq,
-    PartialOrd,
-    Ord,
-    Clone,
-    Serialize,
-    Deserialize,
-    ToSchema,
-    JsonSchema,
+    Debug, Default, PartialEq, Eq, PartialOrd, Ord, Clone, Serialize, Deserialize, ToSchema, JsonSchema,
 )]
 pub struct Units {
     pub expression: String,
@@ -277,51 +179,21 @@ pub struct Units {
 }
 
 #[derive(
-    Debug,
-    Default,
-    PartialEq,
-    Eq,
-    Clone,
-    PartialOrd,
-    Ord,
-    Serialize,
-    Deserialize,
-    ToSchema,
-    JsonSchema,
+    Debug, Default, PartialEq, Eq, Clone, PartialOrd, Ord, Serialize, Deserialize, ToSchema, JsonSchema,
 )]
 pub struct Grounding {
     pub identifiers: Identifier,
 }
 
 #[derive(
-    Debug,
-    Default,
-    PartialEq,
-    Eq,
-    PartialOrd,
-    Ord,
-    Clone,
-    Serialize,
-    Deserialize,
-    ToSchema,
-    JsonSchema,
+    Debug, Default, PartialEq, Eq, PartialOrd, Ord, Clone, Serialize, Deserialize, ToSchema, JsonSchema,
 )]
 pub struct Identifier {
     pub ido: String,
 }
 
 #[derive(
-    Debug,
-    Default,
-    PartialEq,
-    Eq,
-    PartialOrd,
-    Ord,
-    Clone,
-    Serialize,
-    Deserialize,
-    ToSchema,
-    JsonSchema,
+    Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Serialize, Deserialize, ToSchema, JsonSchema,
 )]
 pub struct Initial {
     pub target: String,
@@ -329,18 +201,12 @@ pub struct Initial {
     pub expression_mathml: String,
 }
 
+impl Default for Initial {
+    fn default() -> Self { Initial { target: "temp".to_string(), expression: "0".to_string(), expression_mathml: "<math><\\math>".to_string() } }
+}
+
 #[derive(
-    Debug,
-    Default,
-    PartialEq,
-    Eq,
-    PartialOrd,
-    Ord,
-    Clone,
-    Serialize,
-    Deserialize,
-    ToSchema,
-    JsonSchema,
+    Debug, Default, PartialEq, Eq, PartialOrd, Ord, Clone, Serialize, Deserialize, ToSchema, JsonSchema,
 )]
 pub struct Rate {
     pub target: String,
@@ -349,17 +215,7 @@ pub struct Rate {
 }
 
 #[derive(
-    Debug,
-    Default,
-    PartialEq,
-    Eq,
-    Clone,
-    PartialOrd,
-    Ord,
-    Serialize,
-    Deserialize,
-    ToSchema,
-    JsonSchema,
+    Debug, Default, PartialEq, Eq, Clone, PartialOrd, Ord, Serialize, Deserialize, ToSchema, JsonSchema,
 )]
 pub struct RegTransition {
     pub id: String,
@@ -385,17 +241,7 @@ pub struct RegTransition {
 }
 
 #[derive(
-    Debug,
-    Default,
-    PartialEq,
-    Eq,
-    Clone,
-    PartialOrd,
-    Ord,
-    Serialize,
-    Deserialize,
-    ToSchema,
-    JsonSchema,
+    Debug, Default, PartialEq, Eq, Clone, PartialOrd, Ord, Serialize, Deserialize, ToSchema, JsonSchema,
 )]
 pub struct Transition {
     pub id: String,
@@ -421,17 +267,7 @@ pub struct Transition {
 }
 
 #[derive(
-    Debug,
-    Default,
-    PartialEq,
-    Eq,
-    Clone,
-    PartialOrd,
-    Ord,
-    Serialize,
-    Deserialize,
-    ToSchema,
-    JsonSchema,
+    Debug, Default, PartialEq, Eq, Clone, PartialOrd, Ord, Serialize, Deserialize, ToSchema, JsonSchema,
 )]
 pub struct Properties {
     pub name: String,
@@ -440,17 +276,7 @@ pub struct Properties {
 }
 
 #[derive(
-    Debug,
-    Default,
-    PartialEq,
-    Eq,
-    Clone,
-    PartialOrd,
-    Ord,
-    Serialize,
-    Deserialize,
-    ToSchema,
-    JsonSchema,
+    Debug, Default, PartialEq, Eq, Clone, PartialOrd, Ord, Serialize, Deserialize, ToSchema, JsonSchema,
 )]
 pub struct Parameter {
     pub id: String,
@@ -469,17 +295,7 @@ pub struct Parameter {
 }
 
 #[derive(
-    Debug,
-    Default,
-    PartialEq,
-    Eq,
-    Clone,
-    PartialOrd,
-    Ord,
-    Serialize,
-    Deserialize,
-    ToSchema,
-    JsonSchema,
+    Debug, Default, PartialEq, Eq, Clone, PartialOrd, Ord, Serialize, Deserialize, ToSchema, JsonSchema,
 )]
 pub struct Time {
     id: String,
@@ -488,17 +304,7 @@ pub struct Time {
 }
 
 #[derive(
-    Debug,
-    Default,
-    PartialEq,
-    Eq,
-    Clone,
-    PartialOrd,
-    Ord,
-    Serialize,
-    Deserialize,
-    ToSchema,
-    JsonSchema,
+    Debug, Default, PartialEq, Eq, Clone, PartialOrd, Ord, Serialize, Deserialize, ToSchema, JsonSchema,
 )]
 pub struct Distribution {
     #[serde(rename = "type")]
@@ -508,17 +314,7 @@ pub struct Distribution {
 
 // This is for the routing of mathml for various endpoints to extract the appropriate AMR
 #[derive(
-    Debug,
-    Default,
-    PartialEq,
-    Eq,
-    Clone,
-    PartialOrd,
-    Ord,
-    Serialize,
-    Deserialize,
-    ToSchema,
-    JsonSchema,
+    Debug, Default, PartialEq, Eq, Clone, PartialOrd, Ord, Serialize, Deserialize, ToSchema, JsonSchema,
 )]
 pub struct AMRmathml {
     pub model: String,
@@ -529,17 +325,7 @@ pub struct AMRmathml {
 // These next structs are for Generalized AMR's
 // -------------------------------------------------------------------------------------------
 #[derive(
-    Debug,
-    Default,
-    PartialEq,
-    Eq,
-    Clone,
-    PartialOrd,
-    Ord,
-    Serialize,
-    Deserialize,
-    ToSchema,
-    JsonSchema,
+    Debug, Default, PartialEq, Eq, Clone, PartialOrd, Ord, Serialize, Deserialize, ToSchema, JsonSchema
 )]
 pub struct GeneralizedAMR {
     pub header: Header,
@@ -551,22 +337,12 @@ pub struct GeneralizedAMR {
 }
 
 #[derive(
-    Debug,
-    Default,
-    PartialEq,
-    Eq,
-    Clone,
-    PartialOrd,
-    Ord,
-    Serialize,
-    Deserialize,
-    ToSchema,
-    JsonSchema,
+    Debug, Default, PartialEq, Eq, Clone, PartialOrd, Ord, Serialize, Deserialize, ToSchema, JsonSchema
 )]
 pub struct GeneralSemantics {
     pub states: BTreeSet<State>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub parameters: Option<Vec<Parameter>>,
+    pub parameters: Option<Vec<Parameter>>
 }
 
 // -------------------------------------------------------------------------------------------
@@ -578,40 +354,41 @@ impl From<Vec<MathExpressionTree>> for GeneralizedAMR {
         let mut parameter_vec = Vec::<Parameter>::new();
         let mut rhs_vec = Vec::<MathExpressionTree>::new();
 
+
         // construct state vector, under assumption that only differentialed LHS terms are states
         for equation in met_vec.iter() {
             match equation {
-                MathExpressionTree::Cons(ref x, ref y) => match &x {
-                    Operator::Equals => match &y[0] {
-                        MathExpressionTree::Cons(Operator::Derivative(_d), ref x1) => {
-                            let state_name = x1[0].to_string();
-                            let state = State {
-                                id: state_name.clone(),
-                                name: state_name.clone(),
-                                grounding: None,
-                                units: None,
-                            };
-                            states_vec.insert(state.clone());
-                            rhs_vec.push(y[1].clone());
+                MathExpressionTree::Cons(ref x, ref y) => { 
+                    match &x {
+                        Operator::Equals => {
+                            match &y[0] {
+                                MathExpressionTree::Cons(Operator::Derivative(_d), ref x1) => {
+                                    let state_name = x1[0].to_string();
+                                    let state = State {
+                                        id: state_name.clone(),
+                                        name: state_name.clone(),
+                                        grounding: None,
+                                        units: None,
+                                    };
+                                    states_vec.insert(state.clone());
+                                    rhs_vec.push(y[1].clone());
+                                }
+                                _ =>{
+                                        println!("Non-differential Equation");
+                                        rhs_vec.push(y[1].clone());
+                                    }
+                            }
                         }
-                        _ => {
-                            println!("Non-differential Equation");
-                            rhs_vec.push(y[1].clone());
-                        }
-                    },
-                    _ => {
-                        println!("Expected an equation!")
+                        _ => {println!("Expected an equation!")}
                     }
-                },
-                _ => {
-                    println!("Expected an equation!")
                 }
+                _ => {println!("Expected an equation!")}
             }
         }
 
         // now to construct the parameters vector
         // might be best to make a first order ODE and pass the get terms thing and then pull all terms from it
-        // would need to flatten the mults and then pull make temp lhs
+        // would need to flatten the mults and then pull make temp lhs 
         let mut param_str_vec = Vec::<String>::new();
         let mut state_str_vec = Vec::<String>::new();
         for state in states_vec.iter() {
@@ -664,11 +441,13 @@ impl From<Vec<MathExpressionTree>> for GeneralizedAMR {
             parameters: Some(parameter_vec),
         };
 
+        
+
         GeneralizedAMR {
             header,
             met: met_vec.clone(),
             semantics: Some(semantics),
-            metadata: None,
+            metadata: None
         }
     }
 }
@@ -694,7 +473,6 @@ impl From<Vec<FirstOrderODE>> for PetriNet {
             };
             let initials = Initial {
                 target: ode.lhs_var.to_string().clone(),
-                expression: "".to_string(),
                 ..Default::default()
             };
             /*let parameters = Parameter {
