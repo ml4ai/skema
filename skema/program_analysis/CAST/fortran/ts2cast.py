@@ -81,6 +81,8 @@ class TS2CAST(object):
         # Start visiting
         self.out_cast = self.generate_cast()
         #print(self.out_cast[0].to_json_str())
+        #for key in self.variable_context.class_functions.keys():
+        #    print(key)
 
     def generate_cast(self) -> List[CAST]:
         """Interface for generating CAST."""
@@ -105,13 +107,7 @@ class TS2CAST(object):
         # TODO: Research the above
         outer_body_nodes = get_children_by_types(root, ["function", "subroutine"])
         if len(outer_body_nodes) > 0:
-            body = []
-            for body_node in outer_body_nodes:
-                child_cast = self.visit(body_node)
-                if isinstance(child_cast, List):
-                    body.extend(child_cast)
-                elif isinstance(child_cast, AstNode):
-                    body.append(child_cast)
+            body = self.generate_cast_body(outer_body_nodes)
             modules.append(
                 Module(
                     name=None,
@@ -179,14 +175,8 @@ class TS2CAST(object):
         """Visitor for program and module statement. Returns a Module object"""
         self.variable_context.push_context()
 
-        program_body = []
-        for child in node.children[1:-1]:  # Ignore the start and end program statement
-            child_cast = self.visit(child)
-            if isinstance(child_cast, List):
-                program_body.extend(child_cast)
-            elif isinstance(child_cast, AstNode):
-                program_body.append(child_cast)
-
+        program_body = self.generate_cast_body(node.children[1:-1])
+      
         self.variable_context.pop_context()
 
         return Module(
@@ -1271,12 +1261,14 @@ class TS2CAST(object):
 
     def generate_cast_body(self, body_nodes: List):
         body = []
+     
         for node in body_nodes:
             cast = self.visit(node)
+        
             if isinstance(cast, AstNode):
                 body.append(cast)
             elif isinstance(cast, List):
-                body.extend(cast)
+                body.extend([element for element in cast if element is not None])
 
         # Gromet doesn't support empty bodies, so we should create a no_op instead
         if len(body) == 0:
@@ -1284,3 +1276,5 @@ class TS2CAST(object):
 
         # TODO: How to add more support for source references
         return body
+
+#TS2CAST("PhotosynthesisMod.F90")
