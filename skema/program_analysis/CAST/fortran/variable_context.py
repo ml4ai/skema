@@ -153,6 +153,8 @@ class VariableContext(object):
         self.internal = False
 
     def register_module_function(self, function: str):
+        # Fortran variables are case INSENSITIVE so we should lower it first
+        function = function.lower() 
         function_def = FunctionDef(
             name=Name(
                 name="",
@@ -169,9 +171,11 @@ class VariableContext(object):
 
 
     def is_class_function(self, function: str):
+        function = function.lower() 
         return function in self.class_functions
 
     def copy_class_function(self, function: str, function_def: FunctionDef ):
+        function = function.lower() 
         self.class_functions[function].name = function_def.name
         self.class_functions[function].func_args = function_def.func_args
         self.class_functions[function].body = function_def.body
