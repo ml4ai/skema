@@ -81,8 +81,6 @@ class TS2CAST(object):
         # Start visiting
         self.out_cast = self.generate_cast()
         #print(self.out_cast[0].to_json_str())
-        #for key in self.variable_context.class_functions.keys():
-        #    print(key)
 
     def generate_cast(self) -> List[CAST]:
         """Interface for generating CAST."""
@@ -1277,4 +1275,3 @@ class TS2CAST(object):
         # TODO: How to add more support for source references
         return body
 
-#TS2CAST("PhotosynthesisMod.F90")
