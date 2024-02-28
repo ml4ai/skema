@@ -1052,6 +1052,11 @@
 <a href="#1051" id="1051">1051</a>
 <a href="#1052" id="1052">1052</a>
 <a href="#1053" id="1053">1053</a>
+<a href="#1054" id="1054">1054</a>
+<a href="#1055" id="1055">1055</a>
+<a href="#1056" id="1056">1056</a>
+<a href="#1057" id="1057">1057</a>
+<a href="#1058" id="1058">1058</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Structs to represent elements of ACSets (Annotated C-Sets, a concept from category theory).
 //! JSON-serialized ACSets are the form of model exchange between TA1 and TA2.
 </span><span class="kw">use </span><span class="kw">crate</span>::parsers::first_order_ode::{get_terms, FirstOrderODE, PnTerm};
@@ -2034,11 +2039,6 @@
             <span class="kw">if </span>term.exp_states.len() &gt; <span class="number">1 </span>{
                 <span class="kw">let </span><span class="kw-2">mut </span>output = [term.dyn_state.clone()].to_vec();
                 <span class="kw">let </span><span class="kw-2">mut </span>input = term.exp_states.clone();
-                <span class="kw">for </span>state <span class="kw">in </span>term.exp_states.iter() {
-                    <span class="kw">if </span><span class="kw-2">*</span>state != term.dyn_state {
-                        output.push(state.clone());
-                    }
-                }
 
                 <span class="kw">let </span>param_len = term.parameters.len();
 
@@ -2052,6 +2052,16 @@
                 input.dedup();
                 output.sort();
                 output.dedup();
+
+                <span class="kw">if </span>input.clone().len() &gt; <span class="number">1 </span>{
+                    <span class="kw">let </span>old_input = input.clone();
+                    input = [].to_vec();
+                    <span class="kw">for </span>term <span class="kw">in </span>old_input.clone().iter() {
+                        <span class="kw">if </span><span class="kw-2">*</span>term != output[<span class="number">0</span>] {
+                            input.push(term.clone());
+                        }
+                    }
+                }
 
                 <span class="kw">let </span>trans = RegTransition {
                     id: <span class="macro">format!</span>(<span class="string">"s{}"</span>, i.clone()),
