@@ -231,7 +231,7 @@ class TS2CAST(object):
         #     (function_result) - Optional
         #       (identifier)
         #  (body_node) ...
-
+     
         # Create a new variable context
         self.variable_context.push_context()
 
@@ -316,6 +316,19 @@ class TS2CAST(object):
         # Pop variable context off of stack before leaving this scope
         self.variable_context.pop_context()
 
+        
+        # If this is a class function, we need to associate the function def with the class
+        # We should also return None here so we don't duplicate the function def
+        if self.variable_context.is_class_function(name.name):
+            self.variable_context.copy_class_function(name.name,
+            FunctionDef(
+            name=name,
+            func_args=func_args,
+            body=body,
+            source_refs=[self.node_helper.get_source_ref(node)],
+        ))
+            return None
+        
         return FunctionDef(
             name=name,
             func_args=func_args,
@@ -1020,20 +1033,17 @@ class TS2CAST(object):
         # If we tell the variable context we are in a record definition, it will append the type name as a prefix to all defined variables.
         self.variable_context.enter_record_definition(record_name)
 
-        # Note:
+        # Note: In derived type declarations, functions are only declared. The actual definition will be in the outer module.
         funcs = []
-        derived_type_procedures_node = get_first_child_by_type(
+        if derived_type_procedures_node := get_first_child_by_type(
             node, "derived_type_procedures"
-        )
-        if derived_type_procedures_node:
+        ):
             for procedure_node in get_children_by_types(
                 derived_type_procedures_node, ["procedure_statement"]
             ):
-                funcs.append(
-                    self.visit_name(
-                        get_first_child_by_type(procedure_node, "method_name")
-                    )
-                )
+                function_name = self.node_helper.get_identifier(get_first_child_by_type(procedure_node, "method_name", recurse=True))
+                funcs.append(self.variable_context.register_module_function(function_name))
+               
 
         # A derived type can only have variable declarations in its body.
         fields = []
