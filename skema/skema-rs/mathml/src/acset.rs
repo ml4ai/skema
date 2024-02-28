@@ -865,13 +865,14 @@ impl From<Vec<FirstOrderODE>> for RegNet {
             // This finishes the construction of the state
             let mut counter = 0;
             for term in terms.iter() {
-                if term.exp_states.len() == 1 && term.exp_states[0] == term.dyn_state {
+                if term.exp_states.len() == 1 && term.exp_states[0] == *state {
                     // note this is only grabbing one term. This is somewhat limited by the current AMR schema
                     // it assumes only a simple single parameter for this Date: 08/10/23
                     r_state.rate_constant = Some(term.parameters[0].clone());
                     r_state.sign = Some(term.polarity);
                     // This adds the edges for the environment couplings
-                    let prop = Properties {
+                    //---DO WE INCLUDE THE SINGLE TRANSITION?---
+                    /*let prop = Properties {
                         name: term.parameters[0].clone(),
                         rate_constant: None,
                     };
@@ -883,7 +884,7 @@ impl From<Vec<FirstOrderODE>> for RegNet {
                         grounding: None,
                         properties: Some(prop.clone()),
                     };
-                    transitions_vec.insert(self_trans.clone());
+                    transitions_vec.insert(self_trans.clone()); */
                     counter += 1;
                 }
             }
@@ -904,8 +905,9 @@ impl From<Vec<FirstOrderODE>> for RegNet {
 
         // first for the polarity pairs of terms we need to construct the transistions
         let mut transition_pair = Vec::<(PnTerm, PnTerm)>::new();
-        for term1 in terms.clone().iter() {
-            for term2 in terms.clone().iter() {
+        let mut paired_indicies = Vec::<usize>::new();
+        for (i, term1) in terms.clone().iter().enumerate() {
+            for (j, term2) in terms.clone().iter().enumerate() {
                 if term1.polarity != term2.polarity
                     && term1.parameters == term2.parameters
                     && term1.polarity
@@ -913,8 +915,18 @@ impl From<Vec<FirstOrderODE>> for RegNet {
                     // first term is positive, second is negative
                     let temp_pair = (term1.clone(), term2.clone());
                     transition_pair.push(temp_pair);
+                    paired_indicies.push(i);
+                    paired_indicies.push(j);
                 }
             }
+        }
+
+        paired_indicies.sort();
+        paired_indicies.dedup();
+
+        let mut unpaired_terms = terms.clone();
+        for i in paired_indicies.iter().rev() {
+            unpaired_terms.remove(*i);
         }
 
         for (i, t) in transition_pair.iter().enumerate() {
@@ -946,12 +958,6 @@ impl From<Vec<FirstOrderODE>> for RegNet {
                     }
                 }
 
-                let _transitions = Transition {
-                    id: format!("t{}", i.clone()),
-                    input: Some(t.1.exp_states.clone()),
-                    output: Some(output.clone()),
-                    ..Default::default()
-                };
                 let prop = Properties {
                     // once again the assumption of only one parameters for transition
                     name: t.0.parameters[0].clone(),
@@ -960,6 +966,36 @@ impl From<Vec<FirstOrderODE>> for RegNet {
                 let trans = RegTransition {
                     id: format!("t{}", i.clone()),
                     source: Some(t.1.exp_states.clone()),
+                    target: Some(output.clone()),
+                    sign: Some(true),
+                    grounding: None,
+                    properties: Some(prop.clone()),
+                };
+                transitions_vec.insert(trans.clone());
+            }
+        }
+
+        for (i, term) in unpaired_terms.iter().enumerate() {
+            println!("Term: {:?}", term.clone());
+            if term.exp_states.len() > 1 {
+                let mut output = [term.dyn_state.clone()].to_vec();
+
+                for state in term.exp_states.iter() {
+                    if *state != term.dyn_state {
+                        output.push(state.clone());
+                    }
+                }
+
+                let param_len = term.parameters.len();
+
+                let prop = Properties {
+                    // once again the assumption of only one parameters for transition
+                    name: term.parameters[param_len - 1].clone(),
+                    rate_constant: None,
+                };
+                let trans = RegTransition {
+                    id: format!("s{}", i.clone()),
+                    source: Some(term.exp_states.clone()),
                     target: Some(output.clone()),
                     sign: Some(true),
                     grounding: None,
