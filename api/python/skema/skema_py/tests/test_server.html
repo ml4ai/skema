@@ -214,6 +214,52 @@ def test_hidden_files():
     assert gromet_collection[&#34;metadata_collection&#34;][0][0][&#34;gromet_type&#34;] == &#34;Debug&#34;
     assert gromet_collection[&#34;metadata_collection&#34;][0][0][&#34;severity&#34;] == &#34;ERROR&#34;
 
+def test_dependency_depth():
+    system = {
+        &#34;files&#34;: [&#34;dependency.py&#34;],
+        &#34;blobs&#34;: [
+            &#34;import minimal&#34;
+        ],
+        &#34;dependency_depth&#34;: 1
+    }
+
+    response = client.post(&#34;/code2fn/fn-given-filepaths&#34;, json=system)
+    gromet_collection = response.json()
+    assert response.status_code == 200
+    assert len(gromet_collection[&#34;module_dependencies&#34;]) &gt; 1
+
+
+def test_dependency_depth_missing():
+    system = {
+        &#34;files&#34;: [&#34;dependency.py&#34;],
+        &#34;blobs&#34;: [
+            &#34;import minimal&#34;
+        ],
+    }
+
+    response = client.post(&#34;/code2fn/fn-given-filepaths&#34;, json=system)
+    gromet_collection = response.json()
+    assert response.status_code == 200
+    assert len(gromet_collection[&#34;module_dependencies&#34;]) == 1
+
+
+def test_dependency_depth_invalid():
+    system = {
+        &#34;files&#34;: [&#34;dependency.py&#34;],
+        &#34;blobs&#34;: [
+            &#34;import minimal&#34;
+        ],
+        &#34;dependency_depth&#34;: -1
+    }
+
+    response = client.post(&#34;/code2fn/fn-given-filepaths&#34;, json=system)
+    gromet_collection = response.json()
+    assert response.status_code == 422
+    
+    system[&#34;dependency_depth&#34;] = 5
+    response = client.post(&#34;/code2fn/fn-given-filepaths&#34;, json=system)
+    gromet_collection = response.json()
+    assert response.status_code == 422
 
 def test_gromet_object_count():
     &#34;&#34;&#34;Test case for get-object-count endpoint&#34;&#34;&#34;
@@ -254,6 +300,81 @@ def test_get_pyacset():
 <section>
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
+<dt id="skema.skema_py.tests.test_server.test_dependency_depth"><code class="name flex">
+<span>def <span class="ident">test_dependency_depth</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_dependency_depth():
+    system = {
+        &#34;files&#34;: [&#34;dependency.py&#34;],
+        &#34;blobs&#34;: [
+            &#34;import minimal&#34;
+        ],
+        &#34;dependency_depth&#34;: 1
+    }
+
+    response = client.post(&#34;/code2fn/fn-given-filepaths&#34;, json=system)
+    gromet_collection = response.json()
+    assert response.status_code == 200
+    assert len(gromet_collection[&#34;module_dependencies&#34;]) &gt; 1</code></pre>
+</details>
+</dd>
+<dt id="skema.skema_py.tests.test_server.test_dependency_depth_invalid"><code class="name flex">
+<span>def <span class="ident">test_dependency_depth_invalid</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_dependency_depth_invalid():
+    system = {
+        &#34;files&#34;: [&#34;dependency.py&#34;],
+        &#34;blobs&#34;: [
+            &#34;import minimal&#34;
+        ],
+        &#34;dependency_depth&#34;: -1
+    }
+
+    response = client.post(&#34;/code2fn/fn-given-filepaths&#34;, json=system)
+    gromet_collection = response.json()
+    assert response.status_code == 422
+    
+    system[&#34;dependency_depth&#34;] = 5
+    response = client.post(&#34;/code2fn/fn-given-filepaths&#34;, json=system)
+    gromet_collection = response.json()
+    assert response.status_code == 422</code></pre>
+</details>
+</dd>
+<dt id="skema.skema_py.tests.test_server.test_dependency_depth_missing"><code class="name flex">
+<span>def <span class="ident">test_dependency_depth_missing</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_dependency_depth_missing():
+    system = {
+        &#34;files&#34;: [&#34;dependency.py&#34;],
+        &#34;blobs&#34;: [
+            &#34;import minimal&#34;
+        ],
+    }
+
+    response = client.post(&#34;/code2fn/fn-given-filepaths&#34;, json=system)
+    gromet_collection = response.json()
+    assert response.status_code == 200
+    assert len(gromet_collection[&#34;module_dependencies&#34;]) == 1</code></pre>
+</details>
+</dd>
 <dt id="skema.skema_py.tests.test_server.test_fn_given_filepaths"><code class="name flex">
 <span>def <span class="ident">test_fn_given_filepaths</span></span>(<span>)</span>
 </code></dt>
@@ -569,6 +690,9 @@ def test_get_pyacset():
 </li>
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
+<li><code><a title="skema.skema_py.tests.test_server.test_dependency_depth" href="#skema.skema_py.tests.test_server.test_dependency_depth">test_dependency_depth</a></code></li>
+<li><code><a title="skema.skema_py.tests.test_server.test_dependency_depth_invalid" href="#skema.skema_py.tests.test_server.test_dependency_depth_invalid">test_dependency_depth_invalid</a></code></li>
+<li><code><a title="skema.skema_py.tests.test_server.test_dependency_depth_missing" href="#skema.skema_py.tests.test_server.test_dependency_depth_missing">test_dependency_depth_missing</a></code></li>
 <li><code><a title="skema.skema_py.tests.test_server.test_fn_given_filepaths" href="#skema.skema_py.tests.test_server.test_fn_given_filepaths">test_fn_given_filepaths</a></code></li>
 <li><code><a title="skema.skema_py.tests.test_server.test_fn_given_filepaths_optional_fields" href="#skema.skema_py.tests.test_server.test_fn_given_filepaths_optional_fields">test_fn_given_filepaths_optional_fields</a></code></li>
 <li><code><a title="skema.skema_py.tests.test_server.test_fn_given_filepaths_zip" href="#skema.skema_py.tests.test_server.test_fn_given_filepaths_zip">test_fn_given_filepaths_zip</a></code></li>
