@@ -185,6 +185,52 @@ def test_hidden_files():
     assert gromet_collection["metadata_collection"][0][0]["gromet_type"] == "Debug"
     assert gromet_collection["metadata_collection"][0][0]["severity"] == "ERROR"
 
+def test_dependency_depth():
+    system = {
+        "files": ["dependency.py"],
+        "blobs": [
+            "import minimal"
+        ],
+        "dependency_depth": 1
+    }
+
+    response = client.post("/code2fn/fn-given-filepaths", json=system)
+    gromet_collection = response.json()
+    assert response.status_code == 200
+    assert len(gromet_collection["module_dependencies"]) > 1
+
+
+def test_dependency_depth_missing():
+    system = {
+        "files": ["dependency.py"],
+        "blobs": [
+            "import minimal"
+        ],
+    }
+
+    response = client.post("/code2fn/fn-given-filepaths", json=system)
+    gromet_collection = response.json()
+    assert response.status_code == 200
+    assert len(gromet_collection["module_dependencies"]) == 1
+
+
+def test_dependency_depth_invalid():
+    system = {
+        "files": ["dependency.py"],
+        "blobs": [
+            "import minimal"
+        ],
+        "dependency_depth": -1
+    }
+
+    response = client.post("/code2fn/fn-given-filepaths", json=system)
+    gromet_collection = response.json()
+    assert response.status_code == 422
+    
+    system["dependency_depth"] = 5
+    response = client.post("/code2fn/fn-given-filepaths", json=system)
+    gromet_collection = response.json()
+    assert response.status_code == 422
 
 def test_gromet_object_count():
     """Test case for get-object-count endpoint"""

@@ -109,7 +109,16 @@ class System(BaseModel):
             }
         }],
     )
-
+    dependency_depth: Optional[int] = Field(
+        default=0,
+        ge=0,
+        le=1,
+        description="The depth at which to ingest dependencies into Gromet. i.e. 0=Ingest no dependencies, 1=Ingest system dependencies. Accepted values: [0,1]",
+        examples = [
+            1
+        ]
+    )
+    
 
 class MML_System(BaseModel):
     """
@@ -222,6 +231,7 @@ async def system_to_gromet(system: System):
             system.system_name or "",
             str(Path(tmp_path, system.root_name or "")),
             str(system_filepaths),
+            dependency_depth=system.dependency_depth
         )
 
     # Attempt to enrich the system with comments. May return the same system if Rust isn't insalled.
@@ -321,7 +331,6 @@ async def fn_given_filepaths(system: System):
     response = requests.post("http://0.0.0.0:8000/fn-given-filepaths", json=system)
     gromet_json = response.json()
     """
-
     return await system_to_gromet(system)
 
 
