@@ -1324,6 +1324,43 @@ pub fn laplacian_operation(input: Span) -> IResult<(MathExpression, Ci)> {
     Ok((s, (op, comp)))
 }
 
+
+pub fn minimum_with_content(input: Span) -> IResult<(MathExpression, Vec<MathExpression>)> {
+    let (s, _x) = ws(pair(delimited(
+        stag!("mi"),
+        ws(tag("min")),
+        etag!("mi"),
+    ),alt((delimited(
+        stag!("mo"),
+        //ws(tag("&#x2061;")),
+        ws(tag("\u{2061}")),
+        etag!("mo")), tag("")))
+    ))(input)?;
+    let op = Operator::Min;
+
+    let mo_lparen = delimited(stag!("mo"), lparen, etag!("mo"));
+    let mo_rparen = delimited(stag!("mo"), rparen, etag!("mo"));
+    let mo_mrow_lparen = delimited(tag("<mrow><mo>"), lparen, tag("</mo>"));
+    let mo_mrow_rparen = delimited(tag("<mo>"), rparen, tag("</mo></mrow>"));
+    let mo_comma = delimited(stag!("mo"), ws(tag(",")), etag!("mo"));
+    let (s, bound_vars) = delimited(
+        alt((mo_lparen, mo_mrow_lparen)),
+        separated_list1(mo_comma, msub),
+        alt((mo_mrow_rparen, mo_rparen)),
+    )(s)?;
+
+    let mut vec_exp: Vec<MathExpression> = Vec::new();
+    for bvar in bound_vars {
+        let b = MathExpression::Ci(Ci::new(Some(Type::Real), Box::new(bvar), None));
+        vec_exp.push(b.clone());
+        vec_exp.push(MathExpression::Mo(Operator::Comma));
+    }
+    let Some(_) = vec_exp.pop() else { todo!() };
+
+    Ok((s, (MathExpression::Mo(op), vec_exp)))
+
+}
+
 /// Parser for math expressions. This varies from the one in the generic_mathml module, since it
 /// assumes that expressions such as S(t) are actually univariate functions.
 pub fn math_expression(input: Span) -> IResult<MathExpression> {
@@ -1358,6 +1395,8 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
             }),
             map(gradient_with_subscript, MathExpression::Mo),
             map(div, MathExpression::Mo),
+            map(minimum_with_content, |(op, vec_exp)| MathExpression::Minimize(Box::new(op),vec_exp)
+            ),
             map(laplacian_operation, |(op, comp)| {
                 MathExpression::LaplacianComp(LaplacianComp {
                     op: Box::new(op),

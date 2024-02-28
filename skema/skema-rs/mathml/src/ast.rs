@@ -182,6 +182,7 @@ pub enum MathExpression {
     SurfaceIntegral(Box<MathExpression>),
     /// ↓ as an operator e.g. I↓ indicates downward diffuse radiative fluxes per unit indcident flux
     DownArrow(DownArrow),
+    Minimize(Box<MathExpression>, Vec<MathExpression>),
     #[default]
     None,
 }
@@ -253,6 +254,12 @@ impl fmt::Display for MathExpression {
                 (None, Some(up)) => write!(f, "{comp}↓^{{{up}}}"),
                 (None, None) => write!(f, "{comp}↓"),
             },
+            MathExpression::Minimize(op, row) => {
+                for e in row {
+                    write!(f, "{}", e)?;
+                }
+                Ok(())
+            }
             expression => write!(f, "{expression:?}"),
         }
     }

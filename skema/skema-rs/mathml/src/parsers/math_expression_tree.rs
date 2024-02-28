@@ -865,6 +865,14 @@ impl MathExpressionTree {
                     Operator::SurfaceInt => {
                         expression.push_str(&format!("\\oiint_S {}", rest[0].to_latex()));
                     }
+                    Operator::Min => {
+                        expression.push_str(&format!("\\min {}", rest[0].to_latex()));
+                    }
+                    Operator::Comma => {
+                        process_atoms_cons_parentheses(&mut expression, &rest[0]);
+                        expression.push(',');
+                        process_atoms_cons_parentheses(&mut expression, &rest[1]);
+                    }
                     _ => {
                         expression = "".to_string();
                         return "Contain unsupported operators.".to_string();
@@ -1011,6 +1019,18 @@ impl MathExpression {
                 tokens.push(MathExpression::Mo(Operator::Lparen));
                 superscript.flatten(tokens);
                 tokens.push(MathExpression::Mo(Operator::Rparen));
+            }
+            MathExpression::Minimize(_op, vec) => {
+                tokens.push(MathExpression::Mo(Operator::Lparen));
+                tokens.push(MathExpression::Mo(Operator::Min));
+                //row.flatten(tokens);
+                tokens.push(MathExpression::Mo(Operator::Lparen));
+                for v in vec {
+                    tokens.push(v.clone());
+                }
+                tokens.push(MathExpression::Mo(Operator::Rparen));
+                tokens.push(MathExpression::Mo(Operator::Rparen));
+
             }
             MathExpression::Absolute(_operator, components) => {
                 tokens.push(MathExpression::Mo(Operator::Lparen));
@@ -1275,6 +1295,7 @@ fn prefix_binding_power(op: &Operator) -> ((), u8) {
         Operator::Laplacian => ((), 25),
         Operator::Abs => ((), 25),
         Operator::Sqrt => ((), 25),
+        Operator::Min => ((), 25),
         Operator::Summation(Summation { .. }) => ((), 25),
         Operator::Hat(Hat { .. }) => ((), 25),
         Operator::Int(Int { .. }) => ((), 25),
@@ -1304,7 +1325,7 @@ fn infix_binding_power(op: &Operator) -> Option<(u8, u8)> {
         Operator::Power => (16, 15),
         Operator::Dot => (18, 17),
         Operator::Cross => (18, 17),
-        //Operator::Comma => (18, 17),
+        Operator::Comma => (14, 13),
         Operator::Other(op) => panic!("Unhandled operator: {}!", op),
         _ => return None,
     };
@@ -1911,6 +1932,7 @@ fn test_equation_halfar_dome() {
         s_exp,
         "(= (PD(1, t) H) (Div (* (* (* Γ (^ H (+ n 2))) (^ (Abs (Grad H)) (- n 1))) (Grad H))))"
     );
+    assert_eq!(exp.to_latex(), "\\frac{\\partial H}{\\partial t}=\\nabla \\cdot {(\\Gamma*H^{n+2}*\\left|\\nabla{H}\\right|^{n-1}*\\nabla{H})}");
 }
 
 #[test]
@@ -3429,5 +3451,48 @@ fn test_new_equation1() {
     assert_eq!(
         exp.to_latex(),
         "p_{ij}=R(t_{j})*w*\\frac{t_{i}-t_{j}}{\\lambda(t_{i})}"
+    );
+}
+
+#[test]
+fn test_clm4_5__8_2() {
+    let input = "<math>
+  <msub>
+    <mi>A</mi>
+    <mi>n</mi>
+  </msub>
+  <mo>=</mo>
+  <mi>min</mi>
+  <mo>&#x2061;</mo>
+  <mo>(</mo>
+  <msub>
+    <mi>A</mi>
+    <mi>c</mi>
+  </msub>
+  <mo>,</mo>
+  <msub>
+    <mi>A</mi>
+    <mi>j</mi>
+  </msub>
+  <mo>,</mo>
+  <msub>
+    <mi>A</mi>
+    <mi>p</mi>
+  </msub>
+  <mo>)</mo>
+  <mo>&#x2212;</mo>
+  <msub>
+    <mi>R</mi>
+    <mi>d</mi>
+  </msub>
+  <mo>.</mo>
+    </math>";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", exp);
+    let s_exp = exp.to_string();
+    assert_eq!(s_exp, "(= A_{n} (- (Min (, A_{c} (, A_{j} A_{p}))) R_{d}))");
+    assert_eq!(
+        exp.to_latex(),
+        "A_{n}=(\\min A_{c},(A_{j},A_{p}))-R_{d}"
     );
 }

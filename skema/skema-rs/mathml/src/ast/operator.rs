@@ -205,6 +205,9 @@ pub enum Operator {
     SurfaceInt,
     /// Vector operator
     Vector,
+    Comma,
+    /// Minimum operator
+    Min,
     // Catchall for operators we haven't explicitly defined as enum variants yet.
     Other(String),
 }
@@ -286,6 +289,8 @@ impl fmt::Display for Operator {
             Operator::SurfaceInt => {
                 write!(f, "SurfaceInt")
             }
+            Operator::Min => write!(f, "Min"),
+            Operator::Comma => write!(f, ","),
         }
     }
 }
