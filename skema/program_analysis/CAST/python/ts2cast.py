@@ -279,7 +279,7 @@ class TS2CAST(object):
             elif isinstance(cast, AstNode):
                 func_args.append(cast)
 
-        if get_name_node(func_name) == "range":
+        if get_name_node(func_cast).name == "range":
             start_step_value = CASTLiteralValue(
                 ScalarType.INTEGER, 
                 value="1",
