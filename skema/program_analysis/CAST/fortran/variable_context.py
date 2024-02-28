@@ -153,7 +153,16 @@ class VariableContext(object):
         self.internal = False
 
     def register_module_function(self, function: str):
-        function_def = FunctionDef()
+        function_def = FunctionDef(
+            name=Name(
+                name="",
+                id=-1,
+                source_refs=[]
+            ),
+            func_args=[],
+            body=[],
+            source_refs=[]
+        )
         self.class_functions[function] = function_def
 
         return function_def
