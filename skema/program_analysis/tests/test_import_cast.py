@@ -131,9 +131,9 @@ def test_import3():
     assert len(exit_node.arguments) == 0
 
     func_call = exit_node.func
-    assert isinstance(func_call, Var)
-    assert func_call.val.name == "exit"
-    assert func_call.val.id == 1 
+    assert isinstance(func_call, Name)
+    assert func_call.name == "exit"
+    assert func_call.id == 0 
 
 def test_import4():
     cast = generate_cast(import4())
@@ -271,14 +271,14 @@ def test_import6():
 
     assert isinstance(cr_node, Call)
     assert len(cr_node.arguments) == 0
-    assert isinstance(cr_node.func, Var)
-    assert isinstance(cr_node.func.val, Name)
-    assert cr_node.func.val.name == "copyright"
-    assert cr_node.func.val.id == 2
+    # assert isinstance(cr_node.func, Var)
+    assert isinstance(cr_node.func, Name)
+    assert cr_node.func.name == "copyright"
+    assert cr_node.func.id == 1
 
     assert isinstance(exit_node, Call)
     assert len(exit_node.arguments) == 0
-    assert isinstance(exit_node.func, Var)
-    assert isinstance(exit_node.func.val, Name)
-    assert exit_node.func.val.name == "exit"
-    assert exit_node.func.val.id == 1
+    # assert isinstance(exit_node.func, Var)
+    assert isinstance(exit_node.func, Name)
+    assert exit_node.func.name == "exit"
+    assert exit_node.func.id == 0

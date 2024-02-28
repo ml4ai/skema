@@ -266,7 +266,7 @@ class TS2CAST(object):
 
         func_cast = self.visit(node.children[0])
 
-        func_name = get_name_node(func_cast)        
+        func_name = get_func_name_node(func_cast)        
 
         arg_list = get_first_child_by_type(node, "argument_list")
         args = get_non_control_children(arg_list)
@@ -279,7 +279,7 @@ class TS2CAST(object):
             elif isinstance(cast, AstNode):
                 func_args.append(cast)
 
-        if func_name.name == "range":
+        if get_name_node(func_name) == "range":
             start_step_value = CASTLiteralValue(
                 ScalarType.INTEGER, 
                 value="1",
@@ -296,7 +296,7 @@ class TS2CAST(object):
 
         # Function calls only want the 'Name' part of the 'Var' that the visit returns
         return Call(
-            func=func_cast, 
+            func=func_name, 
             arguments=func_args, 
             source_refs=[ref]
         )
@@ -1040,3 +1040,12 @@ def get_name_node(node):
         return cur_node.val
     else:
         return node
+
+def get_func_name_node(node):
+    # Given a CAST node, we attempt to extract the appropriate name element
+    # from it. 
+    cur_node = node
+    if isinstance(cur_node, Var):
+        return cur_node.val
+    else:
+        return cur_node 
