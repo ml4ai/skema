@@ -979,7 +979,7 @@ impl From<Vec<FirstOrderODE>> for RegNet {
             println!("Term: {:?}", term.clone());
             if term.exp_states.len() > 1 {
                 let mut output = [term.dyn_state.clone()].to_vec();
-
+                let mut input = term.exp_states.clone();
                 for state in term.exp_states.iter() {
                     if *state != term.dyn_state {
                         output.push(state.clone());
@@ -993,9 +993,15 @@ impl From<Vec<FirstOrderODE>> for RegNet {
                     name: term.parameters[param_len - 1].clone(),
                     rate_constant: None,
                 };
+
+                input.sort();
+                input.dedup();
+                output.sort();
+                output.dedup();
+
                 let trans = RegTransition {
                     id: format!("s{}", i.clone()),
-                    source: Some(term.exp_states.clone()),
+                    source: Some(input.clone()),
                     target: Some(output.clone()),
                     sign: Some(true),
                     grounding: None,
