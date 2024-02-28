@@ -993,6 +993,65 @@
 <a href="#992" id="992">992</a>
 <a href="#993" id="993">993</a>
 <a href="#994" id="994">994</a>
+<a href="#995" id="995">995</a>
+<a href="#996" id="996">996</a>
+<a href="#997" id="997">997</a>
+<a href="#998" id="998">998</a>
+<a href="#999" id="999">999</a>
+<a href="#1000" id="1000">1000</a>
+<a href="#1001" id="1001">1001</a>
+<a href="#1002" id="1002">1002</a>
+<a href="#1003" id="1003">1003</a>
+<a href="#1004" id="1004">1004</a>
+<a href="#1005" id="1005">1005</a>
+<a href="#1006" id="1006">1006</a>
+<a href="#1007" id="1007">1007</a>
+<a href="#1008" id="1008">1008</a>
+<a href="#1009" id="1009">1009</a>
+<a href="#1010" id="1010">1010</a>
+<a href="#1011" id="1011">1011</a>
+<a href="#1012" id="1012">1012</a>
+<a href="#1013" id="1013">1013</a>
+<a href="#1014" id="1014">1014</a>
+<a href="#1015" id="1015">1015</a>
+<a href="#1016" id="1016">1016</a>
+<a href="#1017" id="1017">1017</a>
+<a href="#1018" id="1018">1018</a>
+<a href="#1019" id="1019">1019</a>
+<a href="#1020" id="1020">1020</a>
+<a href="#1021" id="1021">1021</a>
+<a href="#1022" id="1022">1022</a>
+<a href="#1023" id="1023">1023</a>
+<a href="#1024" id="1024">1024</a>
+<a href="#1025" id="1025">1025</a>
+<a href="#1026" id="1026">1026</a>
+<a href="#1027" id="1027">1027</a>
+<a href="#1028" id="1028">1028</a>
+<a href="#1029" id="1029">1029</a>
+<a href="#1030" id="1030">1030</a>
+<a href="#1031" id="1031">1031</a>
+<a href="#1032" id="1032">1032</a>
+<a href="#1033" id="1033">1033</a>
+<a href="#1034" id="1034">1034</a>
+<a href="#1035" id="1035">1035</a>
+<a href="#1036" id="1036">1036</a>
+<a href="#1037" id="1037">1037</a>
+<a href="#1038" id="1038">1038</a>
+<a href="#1039" id="1039">1039</a>
+<a href="#1040" id="1040">1040</a>
+<a href="#1041" id="1041">1041</a>
+<a href="#1042" id="1042">1042</a>
+<a href="#1043" id="1043">1043</a>
+<a href="#1044" id="1044">1044</a>
+<a href="#1045" id="1045">1045</a>
+<a href="#1046" id="1046">1046</a>
+<a href="#1047" id="1047">1047</a>
+<a href="#1048" id="1048">1048</a>
+<a href="#1049" id="1049">1049</a>
+<a href="#1050" id="1050">1050</a>
+<a href="#1051" id="1051">1051</a>
+<a href="#1052" id="1052">1052</a>
+<a href="#1053" id="1053">1053</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Structs to represent elements of ACSets (Annotated C-Sets, a concept from category theory).
 //! JSON-serialized ACSets are the form of model exchange between TA1 and TA2.
 </span><span class="kw">use </span><span class="kw">crate</span>::parsers::first_order_ode::{get_terms, FirstOrderODE, PnTerm};
@@ -1483,7 +1542,8 @@
             </span>initial_vec.push(initials.clone());
             states_vec.insert(states.clone());
             state_string_list.push(ode.lhs_var.to_string().clone()); <span class="comment">// used later for transition parsing
-        </span>}
+            </span><span class="macro">println!</span>(<span class="string">"ode.rhs: {:?}"</span>, ode.rhs.to_string().clone());
+        }
 
         <span class="comment">// now for the construction of the transitions and their results
 
@@ -1491,11 +1551,16 @@
         </span><span class="kw">for </span>ode <span class="kw">in </span>ode_vec.iter() {
             dirty_terms.append(<span class="kw-2">&amp;mut </span>get_terms(state_string_list.clone(), ode.clone()));
         }
-
         <span class="comment">// now to trim off terms that are for euler methods, dyn_state != exp_state &amp;&amp; parameters.len() != 0
+        // this conditional does nothing now, but is kept in case we need to turn it on later.
         </span><span class="kw">for </span>term <span class="kw">in </span>dirty_terms.iter() {
-            <span class="kw">if </span>term.dyn_state != term.exp_states[<span class="number">0</span>] || !term.parameters.is_empty() {
-                terms.push(term.clone());
+            <span class="macro">println!</span>(<span class="string">"-----\nterm: {:?}\n-----"</span>, term.clone());
+            <span class="kw">if </span>!term.exp_states.is_empty() {
+                <span class="kw">if </span>term.dyn_state != term.exp_states[<span class="number">0</span>] || !term.parameters.is_empty() {
+                    terms.push(term.clone());
+                } <span class="kw">else </span>{
+                    terms.push(term.clone());
+                }
             }
         }
         <span class="kw">for </span>term <span class="kw">in </span>terms.iter() {
@@ -1679,15 +1744,26 @@
         }
 
         <span class="comment">// now we construct transitions from unpaired terms, assuming them to be sources and sinks
+        // This should also support sources and sinks that are state dependent. 
         </span><span class="kw">if </span>!terms.is_empty() {
             <span class="kw">for </span>(i, term) <span class="kw">in </span>terms.iter().enumerate() {
                 <span class="kw">if </span>term.polarity {
                     <span class="kw">let </span><span class="kw-2">mut </span>input = Vec::&lt;String&gt;::new();
+                    <span class="kw">let </span><span class="kw-2">mut </span>exp_eq_dyn = <span class="bool-val">false</span>;
 
-                    <span class="kw">let </span>output = [term.dyn_state.clone()].to_vec();
+                    <span class="kw">let </span><span class="kw-2">mut </span>output = [term.dyn_state.clone()].to_vec();
 
                     <span class="kw">for </span>state <span class="kw">in </span>term.exp_states.iter() {
                         input.push(state.clone());
+                        <span class="kw">if </span><span class="kw-2">*</span>state == term.dyn_state.clone() {
+                            exp_eq_dyn = <span class="bool-val">true</span>;
+                        }
+                    }
+
+                    <span class="comment">// I think if the expression equals the dynamic state both in the input and output get 
+                    </span><span class="kw">if </span>exp_eq_dyn {
+                        input.push(term.dyn_state.clone());
+                        output.push(term.dyn_state.clone());
                     }
 
                     <span class="kw">let </span>transitions = Transition {
@@ -1843,26 +1919,27 @@
             <span class="comment">// This finishes the construction of the state
             </span><span class="kw">let </span><span class="kw-2">mut </span>counter = <span class="number">0</span>;
             <span class="kw">for </span>term <span class="kw">in </span>terms.iter() {
-                <span class="kw">if </span>term.exp_states.len() == <span class="number">1 </span>&amp;&amp; term.exp_states[<span class="number">0</span>] == term.dyn_state {
+                <span class="kw">if </span>term.exp_states.len() == <span class="number">1 </span>&amp;&amp; term.exp_states[<span class="number">0</span>] == <span class="kw-2">*</span>state {
                     <span class="comment">// note this is only grabbing one term. This is somewhat limited by the current AMR schema
                     // it assumes only a simple single parameter for this Date: 08/10/23
                     </span>r_state.rate_constant = <span class="prelude-val">Some</span>(term.parameters[<span class="number">0</span>].clone());
                     r_state.sign = <span class="prelude-val">Some</span>(term.polarity);
                     <span class="comment">// This adds the edges for the environment couplings
-                    </span><span class="kw">let </span>prop = Properties {
-                        name: term.parameters[<span class="number">0</span>].clone(),
-                        rate_constant: <span class="prelude-val">None</span>,
+                    //---DO WE INCLUDE THE SINGLE TRANSITION?---
+                    /*let prop = Properties {
+                        name: term.parameters[0].clone(),
+                        rate_constant: None,
                     };
-                    <span class="kw">let </span>self_trans = RegTransition {
-                        id: <span class="macro">format!</span>(<span class="string">"s{}"</span>, counter.clone()),
-                        source: <span class="prelude-val">Some</span>([term.dyn_state.clone()].to_vec()),
-                        target: <span class="prelude-val">Some</span>([term.dyn_state.clone()].to_vec()),
-                        sign: <span class="prelude-val">Some</span>(term.polarity),
-                        grounding: <span class="prelude-val">None</span>,
-                        properties: <span class="prelude-val">Some</span>(prop.clone()),
+                    let self_trans = RegTransition {
+                        id: format!("s{}", counter.clone()),
+                        source: Some([term.dyn_state.clone()].to_vec()),
+                        target: Some([term.dyn_state.clone()].to_vec()),
+                        sign: Some(term.polarity),
+                        grounding: None,
+                        properties: Some(prop.clone()),
                     };
-                    transitions_vec.insert(self_trans.clone());
-                    counter += <span class="number">1</span>;
+                    transitions_vec.insert(self_trans.clone()); */
+                    </span>counter += <span class="number">1</span>;
                 }
             }
             <span class="comment">// This adds the intial values from the state variables into the parameters vec
@@ -1882,8 +1959,9 @@
 
         // first for the polarity pairs of terms we need to construct the transistions
         </span><span class="kw">let </span><span class="kw-2">mut </span>transition_pair = Vec::&lt;(PnTerm, PnTerm)&gt;::new();
-        <span class="kw">for </span>term1 <span class="kw">in </span>terms.clone().iter() {
-            <span class="kw">for </span>term2 <span class="kw">in </span>terms.clone().iter() {
+        <span class="kw">let </span><span class="kw-2">mut </span>paired_indicies = Vec::&lt;usize&gt;::new();
+        <span class="kw">for </span>(i, term1) <span class="kw">in </span>terms.clone().iter().enumerate() {
+            <span class="kw">for </span>(j, term2) <span class="kw">in </span>terms.clone().iter().enumerate() {
                 <span class="kw">if </span>term1.polarity != term2.polarity
                     &amp;&amp; term1.parameters == term2.parameters
                     &amp;&amp; term1.polarity
@@ -1891,8 +1969,18 @@
                     <span class="comment">// first term is positive, second is negative
                     </span><span class="kw">let </span>temp_pair = (term1.clone(), term2.clone());
                     transition_pair.push(temp_pair);
+                    paired_indicies.push(i);
+                    paired_indicies.push(j);
                 }
             }
+        }
+
+        paired_indicies.sort();
+        paired_indicies.dedup();
+
+        <span class="kw">let </span><span class="kw-2">mut </span>unpaired_terms = terms.clone();
+        <span class="kw">for </span>i <span class="kw">in </span>paired_indicies.iter().rev() {
+            unpaired_terms.remove(<span class="kw-2">*</span>i);
         }
 
         <span class="kw">for </span>(i, t) <span class="kw">in </span>transition_pair.iter().enumerate() {
@@ -1924,12 +2012,6 @@
                     }
                 }
 
-                <span class="kw">let </span>_transitions = Transition {
-                    id: <span class="macro">format!</span>(<span class="string">"t{}"</span>, i.clone()),
-                    input: <span class="prelude-val">Some</span>(t.<span class="number">1</span>.exp_states.clone()),
-                    output: <span class="prelude-val">Some</span>(output.clone()),
-                    ..Default::default()
-                };
                 <span class="kw">let </span>prop = Properties {
                     <span class="comment">// once again the assumption of only one parameters for transition
                     </span>name: t.<span class="number">0</span>.parameters[<span class="number">0</span>].clone(),
@@ -1938,6 +2020,42 @@
                 <span class="kw">let </span>trans = RegTransition {
                     id: <span class="macro">format!</span>(<span class="string">"t{}"</span>, i.clone()),
                     source: <span class="prelude-val">Some</span>(t.<span class="number">1</span>.exp_states.clone()),
+                    target: <span class="prelude-val">Some</span>(output.clone()),
+                    sign: <span class="prelude-val">Some</span>(<span class="bool-val">true</span>),
+                    grounding: <span class="prelude-val">None</span>,
+                    properties: <span class="prelude-val">Some</span>(prop.clone()),
+                };
+                transitions_vec.insert(trans.clone());
+            }
+        }
+
+        <span class="kw">for </span>(i, term) <span class="kw">in </span>unpaired_terms.iter().enumerate() {
+            <span class="macro">println!</span>(<span class="string">"Term: {:?}"</span>, term.clone());
+            <span class="kw">if </span>term.exp_states.len() &gt; <span class="number">1 </span>{
+                <span class="kw">let </span><span class="kw-2">mut </span>output = [term.dyn_state.clone()].to_vec();
+                <span class="kw">let </span><span class="kw-2">mut </span>input = term.exp_states.clone();
+                <span class="kw">for </span>state <span class="kw">in </span>term.exp_states.iter() {
+                    <span class="kw">if </span><span class="kw-2">*</span>state != term.dyn_state {
+                        output.push(state.clone());
+                    }
+                }
+
+                <span class="kw">let </span>param_len = term.parameters.len();
+
+                <span class="kw">let </span>prop = Properties {
+                    <span class="comment">// once again the assumption of only one parameters for transition
+                    </span>name: term.parameters[param_len - <span class="number">1</span>].clone(),
+                    rate_constant: <span class="prelude-val">None</span>,
+                };
+
+                input.sort();
+                input.dedup();
+                output.sort();
+                output.dedup();
+
+                <span class="kw">let </span>trans = RegTransition {
+                    id: <span class="macro">format!</span>(<span class="string">"s{}"</span>, i.clone()),
+                    source: <span class="prelude-val">Some</span>(input.clone()),
                     target: <span class="prelude-val">Some</span>(output.clone()),
                     sign: <span class="prelude-val">Some</span>(<span class="bool-val">true</span>),
                     grounding: <span class="prelude-val">None</span>,
