@@ -24,8 +24,8 @@ class TestConjDescrSerialization extends ExtractionTest {
     deserializedMentions.head.document.equivalenceHash should equal (DescrMentions.head.document.equivalenceHash)
     deserializedMentions.head.text should equal(DescrMentions.head.text)
     deserializedMentions.head.sentence should equal(DescrMentions.head.sentence)
-    val hashesDeser = deserializedMentions.map(_.equivalenceHash)
-    val hashesOrig = DescrMentions.map(_.equivalenceHash)
+    val hashesDeser = deserializedMentions.map(MentionOps(_).equivalenceHash)
+    val hashesOrig = DescrMentions.map(MentionOps(_).equivalenceHash)
     hashesDeser should equal(hashesOrig)
   }
 
@@ -55,8 +55,8 @@ class TestConjDescrSerialization extends ExtractionTest {
     deserializedMentions.head.document.equivalenceHash should equal(DescrMentions.head.document.equivalenceHash)
     deserializedMentions.head.text should equal(DescrMentions.head.text)
     deserializedMentions.head.sentence should equal(DescrMentions.head.sentence)
-    val hashesDeser = deserializedMentions.map(_.equivalenceHash)
-    val hashesOrig = DescrMentions.map(_.equivalenceHash)
+    val hashesDeser = deserializedMentions.map(MentionOps(_).equivalenceHash)
+    val hashesOrig = DescrMentions.map(MentionOps(_).equivalenceHash)
     hashesDeser should equal(hashesOrig)
   }
 

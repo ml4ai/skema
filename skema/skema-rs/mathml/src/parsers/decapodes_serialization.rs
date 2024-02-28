@@ -1,3 +1,4 @@
+use crate::ast::operator::DerivativeNotation;
 use crate::ast::{
     operator::{Derivative, Operator},
     MathExpression,
@@ -283,6 +284,7 @@ pub fn to_decapodes_serialization(
                 order,
                 var_index: _,
                 bound_var,
+                notation,
             }) => {
                 table_counts.operation_count += 1;
                 let temp_str = format!("•{}", (table_counts.operation_count));
@@ -293,7 +295,12 @@ pub fn to_decapodes_serialization(
                 tables.variables.push(temp_variable.clone());
                 table_counts.variable_count += 1;
                 let tgt_idx = table_counts.variable_count;
-                let derivative_str = format!("D({},{})", order, bound_var);
+                let mut derivative_str = String::new();
+                if *notation == DerivativeNotation::LeibnizTotal {
+                    derivative_str.push_str(&*format!("D({},{})", order, bound_var));
+                } else if *notation == DerivativeNotation::LeibnizPartialStandard {
+                    derivative_str.push_str(&*format!("PD({},{})", order, bound_var));
+                }
                 let unary = UnaryOperator {
                     src: to_decapodes_serialization(&rest[0], tables, table_counts),
                     tgt: tgt_idx,
@@ -302,7 +309,7 @@ pub fn to_decapodes_serialization(
                 tables.unary_operators.push(unary.clone());
                 tgt_idx
             }
-            Operator::Grad => {
+            Operator::Gradient(_x) => {
                 table_counts.operation_count += 1;
                 let temp_str = format!("•{}", (table_counts.operation_count));
                 let temp_variable = Variable {
@@ -451,7 +458,7 @@ fn test_serialize_halfar_dome() {
     let expression = input.parse::<MathExpressionTree>().unwrap();
     let wiring_diagram = to_wiring_diagram(&expression);
     let json = to_decapodes_json(wiring_diagram);
-    assert_eq!(json,"{\"Var\":[{\"type\":\"infer\",\"name\":\"•1\"},{\"type\":\"infer\",\"name\":\"mult_1\"},{\"type\":\"infer\",\"name\":\"mult_2\"},{\"type\":\"infer\",\"name\":\"mult_3\"},{\"type\":\"infer\",\"name\":\"Γ\"},{\"type\":\"infer\",\"name\":\"•2\"},{\"type\":\"infer\",\"name\":\"H\"},{\"type\":\"infer\",\"name\":\"sum_1\"},{\"type\":\"infer\",\"name\":\"n\"},{\"type\":\"Literal\",\"name\":\"2\"},{\"type\":\"infer\",\"name\":\"•3\"},{\"type\":\"infer\",\"name\":\"•4\"},{\"type\":\"infer\",\"name\":\"•5\"},{\"type\":\"infer\",\"name\":\"•6\"},{\"type\":\"Literal\",\"name\":\"1\"},{\"type\":\"infer\",\"name\":\"•7\"},{\"type\":\"infer\",\"name\":\"•8\"}],\"Op1\":[{\"src\":7,\"tgt\":13,\"op1\":\"Grad\"},{\"src\":13,\"tgt\":12,\"op1\":\"Abs\"},{\"src\":7,\"tgt\":16,\"op1\":\"Grad\"},{\"src\":2,\"tgt\":1,\"op1\":\"Div\"},{\"src\":7,\"tgt\":17,\"op1\":\"D(1,t)\"}],\"Op2\":[{\"proj1\":7,\"proj2\":8,\"res\":6,\"op2\":\"^\"},{\"proj1\":5,\"proj2\":6,\"res\":4,\"op2\":\"*\"},{\"proj1\":9,\"proj2\":15,\"res\":14,\"op2\":\"-\"},{\"proj1\":12,\"proj2\":14,\"res\":11,\"op2\":\"^\"},{\"proj1\":4,\"proj2\":11,\"res\":3,\"op2\":\"*\"},{\"proj1\":3,\"proj2\":16,\"res\":2,\"op2\":\"*\"}],\"Σ\":[{\"sum\":8}],\"Summand\":[{\"summand\":9,\"summation\":1},{\"summand\":10,\"summation\":1}]}");
+    assert_eq!(json, "{\"Var\":[{\"type\":\"infer\",\"name\":\"•1\"},{\"type\":\"infer\",\"name\":\"mult_1\"},{\"type\":\"infer\",\"name\":\"mult_2\"},{\"type\":\"infer\",\"name\":\"mult_3\"},{\"type\":\"infer\",\"name\":\"Γ\"},{\"type\":\"infer\",\"name\":\"•2\"},{\"type\":\"infer\",\"name\":\"H\"},{\"type\":\"infer\",\"name\":\"sum_1\"},{\"type\":\"infer\",\"name\":\"n\"},{\"type\":\"Literal\",\"name\":\"2\"},{\"type\":\"infer\",\"name\":\"•3\"},{\"type\":\"infer\",\"name\":\"•4\"},{\"type\":\"infer\",\"name\":\"•5\"},{\"type\":\"infer\",\"name\":\"•6\"},{\"type\":\"Literal\",\"name\":\"1\"},{\"type\":\"infer\",\"name\":\"•7\"},{\"type\":\"infer\",\"name\":\"•8\"}],\"Op1\":[{\"src\":7,\"tgt\":13,\"op1\":\"Grad\"},{\"src\":13,\"tgt\":12,\"op1\":\"Abs\"},{\"src\":7,\"tgt\":16,\"op1\":\"Grad\"},{\"src\":2,\"tgt\":1,\"op1\":\"Div\"},{\"src\":7,\"tgt\":17,\"op1\":\"PD(1,t)\"}],\"Op2\":[{\"proj1\":7,\"proj2\":8,\"res\":6,\"op2\":\"^\"},{\"proj1\":5,\"proj2\":6,\"res\":4,\"op2\":\"*\"},{\"proj1\":9,\"proj2\":15,\"res\":14,\"op2\":\"-\"},{\"proj1\":12,\"proj2\":14,\"res\":11,\"op2\":\"^\"},{\"proj1\":4,\"proj2\":11,\"res\":3,\"op2\":\"*\"},{\"proj1\":3,\"proj2\":16,\"res\":2,\"op2\":\"*\"}],\"Σ\":[{\"sum\":8}],\"Summand\":[{\"summand\":9,\"summation\":1},{\"summand\":10,\"summation\":1}]}");
 }
 
 #[test]
@@ -498,7 +505,7 @@ fn test_serialize_from_image_3_1() {
     let expression = input.parse::<MathExpressionTree>().unwrap();
     let wiring_diagram = to_wiring_diagram(&expression);
     let json = to_decapodes_json(wiring_diagram);
-    assert_eq!(json,"{\"Var\":[{\"type\":\"infer\",\"name\":\"•1\"},{\"type\":\"infer\",\"name\":\"mult_1\"},{\"type\":\"infer\",\"name\":\"mult_2\"},{\"type\":\"infer\",\"name\":\"mult_3\"},{\"type\":\"infer\",\"name\":\"Γ\"},{\"type\":\"infer\",\"name\":\"•2\"},{\"type\":\"infer\",\"name\":\"H\"},{\"type\":\"infer\",\"name\":\"sum_1\"},{\"type\":\"infer\",\"name\":\"n\"},{\"type\":\"Literal\",\"name\":\"2\"},{\"type\":\"infer\",\"name\":\"•3\"},{\"type\":\"infer\",\"name\":\"•4\"},{\"type\":\"infer\",\"name\":\"•5\"},{\"type\":\"infer\",\"name\":\"•6\"},{\"type\":\"Literal\",\"name\":\"1\"},{\"type\":\"infer\",\"name\":\"•7\"},{\"type\":\"infer\",\"name\":\"•8\"}],\"Op1\":[{\"src\":7,\"tgt\":13,\"op1\":\"Grad\"},{\"src\":13,\"tgt\":12,\"op1\":\"Abs\"},{\"src\":7,\"tgt\":16,\"op1\":\"Grad\"},{\"src\":2,\"tgt\":1,\"op1\":\"Div\"},{\"src\":7,\"tgt\":17,\"op1\":\"D(1,t)\"}],\"Op2\":[{\"proj1\":7,\"proj2\":8,\"res\":6,\"op2\":\"^\"},{\"proj1\":5,\"proj2\":6,\"res\":4,\"op2\":\"*\"},{\"proj1\":9,\"proj2\":15,\"res\":14,\"op2\":\"-\"},{\"proj1\":12,\"proj2\":14,\"res\":11,\"op2\":\"^\"},{\"proj1\":4,\"proj2\":11,\"res\":3,\"op2\":\"*\"},{\"proj1\":3,\"proj2\":16,\"res\":2,\"op2\":\"*\"}],\"Σ\":[{\"sum\":8}],\"Summand\":[{\"summand\":9,\"summation\":1},{\"summand\":10,\"summation\":1}]}");
+    assert_eq!(json, "{\"Var\":[{\"type\":\"infer\",\"name\":\"•1\"},{\"type\":\"infer\",\"name\":\"mult_1\"},{\"type\":\"infer\",\"name\":\"mult_2\"},{\"type\":\"infer\",\"name\":\"mult_3\"},{\"type\":\"infer\",\"name\":\"Γ\"},{\"type\":\"infer\",\"name\":\"•2\"},{\"type\":\"infer\",\"name\":\"H\"},{\"type\":\"infer\",\"name\":\"sum_1\"},{\"type\":\"infer\",\"name\":\"n\"},{\"type\":\"Literal\",\"name\":\"2\"},{\"type\":\"infer\",\"name\":\"•3\"},{\"type\":\"infer\",\"name\":\"•4\"},{\"type\":\"infer\",\"name\":\"•5\"},{\"type\":\"infer\",\"name\":\"•6\"},{\"type\":\"Literal\",\"name\":\"1\"},{\"type\":\"infer\",\"name\":\"•7\"},{\"type\":\"infer\",\"name\":\"•8\"}],\"Op1\":[{\"src\":7,\"tgt\":13,\"op1\":\"Grad\"},{\"src\":13,\"tgt\":12,\"op1\":\"Abs\"},{\"src\":7,\"tgt\":16,\"op1\":\"Grad\"},{\"src\":2,\"tgt\":1,\"op1\":\"Div\"},{\"src\":7,\"tgt\":17,\"op1\":\"PD(1,t)\"}],\"Op2\":[{\"proj1\":7,\"proj2\":8,\"res\":6,\"op2\":\"^\"},{\"proj1\":5,\"proj2\":6,\"res\":4,\"op2\":\"*\"},{\"proj1\":9,\"proj2\":15,\"res\":14,\"op2\":\"-\"},{\"proj1\":12,\"proj2\":14,\"res\":11,\"op2\":\"^\"},{\"proj1\":4,\"proj2\":11,\"res\":3,\"op2\":\"*\"},{\"proj1\":3,\"proj2\":16,\"res\":2,\"op2\":\"*\"}],\"Σ\":[{\"sum\":8}],\"Summand\":[{\"summand\":9,\"summation\":1},{\"summand\":10,\"summation\":1}]}");
 }
 
 #[test]

@@ -10,6 +10,8 @@ import java.io.File
 case class ArgsConfig(
                        outDir: File = new File("."),
                        annotateGrounding: Boolean = false,
+                       contextWindowSize: Int = 3,
+                       contextEngineType: String = "heuristic",
                        inputFiles: Seq[File] = Seq(),
                      )
 
@@ -35,6 +37,12 @@ object CommandLineArgumentParser {
           .required()
           .action((x, c) => c.copy(outDir = x)).withFallback(() => new File("."))
           .text("directory to write the output files to"),
+        opt[Int]('w', "contextWindowSize")
+          .optional()
+          .action((w, args) => args.copy(contextWindowSize = w)).withFallback(() => 3),
+        opt[String]('w', "contextEngineType")
+          .optional()
+          .action((t, args) => args.copy(contextEngineType = t)).withFallback(() => "heuristic"),
         opt[Unit]('a', "annotateGrounding")
           .action((_, c) => c.copy(annotateGrounding = true))
           .text("Writes grounding file for human annotation"),

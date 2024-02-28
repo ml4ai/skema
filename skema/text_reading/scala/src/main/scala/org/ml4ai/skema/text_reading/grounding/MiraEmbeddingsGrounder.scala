@@ -141,7 +141,13 @@ object MiraEmbeddingsGrounder{
   def loadWordEmbeddingsFromResource(resourcePath:String): WordEmbeddingMap = {
     val inputStreamer = new InputStreamer(this)
     val inputStream = inputStreamer.getResourceAsStream(resourcePath)
-    val buildType: CompactWordEmbeddingMap.BuildType = CompactWordEmbeddingMap.loadSer(inputStream)
+    val buildType:CompactWordEmbeddingMap.BuildType =
+      if(resourcePath.toLowerCase.endsWith("kryo"))
+         CompactWordEmbeddingMap.loadKryo(inputStream)
+      else if(resourcePath.toLowerCase.endsWith("ser"))
+        CompactWordEmbeddingMap.loadSer(inputStream)
+      else
+        CompactWordEmbeddingMap.loadTxt(inputStream)
     //  val wordEmbeddingsMap = new CompactWordEmbeddingMap(buildType)
     val wordEmbeddingsMap = new MemoryMappedWordEmbeddingMap(buildType)
 

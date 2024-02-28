@@ -2,12 +2,12 @@ package org.ml4ai.skema.text_reading.cosmosjson
 
 import java.io.File
 import java.nio.file.Path
-
 import com.typesafe.config.Config
 import ai.lum.common.ConfigUtils._
 import ai.lum.common.FileUtils._
 
 import scala.collection.mutable.ArrayBuffer
+import scala.util.{Failure, Success, Try}
 
 object CosmosJsonProcessor {
   def mkDocument(file: File): CosmosDocument = {
@@ -64,8 +64,11 @@ object CosmosJsonProcessor {
         currentBlockIdx = 0
         currentPage = newCurrentPage
       } else currentBlockIdx += 1
-      val cosObj = mkCosmosObject(block, currentBlockIdx)
-      cosmosObjects.append(cosObj)
+      Try(mkCosmosObject(block, currentBlockIdx)) match {
+        case Success(cosObj) => cosmosObjects.append(cosObj)
+        case Failure(_) => ()
+      }
+
     }
     CosmosDocument(combineBlocks(cosmosObjects))
   }

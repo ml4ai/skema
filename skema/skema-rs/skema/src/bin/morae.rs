@@ -1,11 +1,11 @@
 use clap::Parser;
 
 pub use mathml::mml2pn::{ACSet, Term};
-
+use std::fs;
 // new imports
-use mathml::acset::PetriNet;
-
+use mathml::acset::{GeneralizedAMR, PetriNet};
 use neo4rs::{query, Node};
+use schemars::schema_for;
 use skema::config::Config;
 use skema::model_extraction::module_id2mathml_MET_ast;
 use std::env;
@@ -66,6 +66,10 @@ async fn main() {
             env::var("SKEMA_GRAPH_DB_HOST").unwrap_or("graphdb-bolt.askem.lum.ai".to_string());
         let db_port = env::var("SKEMA_GRAPH_DB_PORT").unwrap_or("443".to_string());
 
+        let schema = schema_for!(GeneralizedAMR);
+        let data = format!("{}", serde_json::to_string_pretty(&schema).unwrap());
+        fs::write("./schema.txt", data).expect("Unable to write file");
+        /*
         let config = Config {
             db_protocol: db_protocol.clone(),
             db_host: db_host.clone(),
@@ -87,6 +91,7 @@ async fn main() {
         println!("{:?}", ids.clone());
         let math_content = module_id2mathml_MET_ast(ids[ids.len() - 1], config.clone()).await;
         let pn_amr = PetriNet::from(math_content);
+        */
         //println!("{:?}", math_content.clone());
         //println!("\nAMR from code: {:?}", PetriNet::from(math_content));
 

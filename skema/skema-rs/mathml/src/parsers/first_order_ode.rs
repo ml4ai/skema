@@ -11,7 +11,7 @@ use crate::{
         interpreted_mathml::{
             ci_univariate_with_bounds, ci_univariate_without_bounds, ci_unknown_with_bounds,
             ci_unknown_without_bounds, first_order_derivative_leibniz_notation, math_expression,
-            newtonian_derivative, operator,
+            newtonian_derivative, operator, first_order_partial_derivative_leibniz_notation, first_order_partial_derivative_partial_func, first_order_dderivative_leibniz_notation
         },
         math_expression_tree::MathExpressionTree,
     },
@@ -31,6 +31,7 @@ use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::str::FromStr;
 
+use crate::ast::operator::DerivativeNotation;
 #[cfg(test)]
 use crate::{ast::Mi, parsers::generic_mathml::test_parser};
 
@@ -39,7 +40,7 @@ use crate::{ast::Mi, parsers::generic_mathml::test_parser};
 /// in Leibniz or Newtonian notation.
 #[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
 pub struct FirstOrderODE {
-    /// The variable/univariate function) on the LHS of the equation that is being
+    /// The variable/univariate function on the LHS of the equation that is being
     /// differentiated. This variable may be referred to as a 'specie', 'state', or 'vertex' in the
     /// context of discussions about Petri Nets and RegNets.
     pub lhs_var: Ci,
@@ -57,7 +58,7 @@ pub fn first_order_ode(input: Span) -> IResult<FirstOrderODE> {
     // Recognize LHS derivative
     let (s, (derivative, ci)) = alt((
         first_order_derivative_leibniz_notation,
-        newtonian_derivative,
+        newtonian_derivative, first_order_partial_derivative_leibniz_notation, first_order_partial_derivative_partial_func, first_order_dderivative_leibniz_notation
     ))(s)?;
     //let ci = binding.content;
     //let parenthesized = ci.func_of.clone();
@@ -128,7 +129,12 @@ pub fn first_order_ode(input: Span) -> IResult<FirstOrderODE> {
 impl FirstOrderODE {
     pub fn to_cmml(&self) -> String {
         let lhs_expression_tree = MathExpressionTree::Cons(
-            Operator::Derivative(Derivative::new(1, 1, self.with_respect_to.clone())),
+            Operator::Derivative(Derivative::new(
+                1,
+                1,
+                self.with_respect_to.clone(),
+                DerivativeNotation::LeibnizTotal,
+            )),
             vec![MathExpressionTree::Atom(MathExpression::Ci(
                 self.lhs_var.clone(),
             ))],
@@ -229,8 +235,37 @@ pub fn get_terms(sys_states: Vec<String>, ode: FirstOrderODE) -> Vec<PnTerm> {
                 println!("Warning unsupported case");
             }
         },
-        Atom(_x) => {
-            println!("Warning unexpected RHS structure")
+        Atom(ref x) => {
+            // also need to construct a partial term here to handle distribution of just a parameter
+            let mut is_state = false;
+            for state in sys_states.iter() {
+                if x.to_string() == *state {
+                    is_state = true;
+                }
+            }
+            if is_state {
+                let temp_term = PnTerm {
+                    dyn_state: "temp".to_string(),
+                    exp_states: [x.to_string().clone()].to_vec(),
+                    polarity: true,
+                    expression: "".to_string(),
+                    parameters: Vec::<String>::new(),
+                    sub_terms: None,
+                    math_vec: None,
+                };
+                terms.push(temp_term.clone());
+            } else {
+                let temp_term = PnTerm {
+                    dyn_state: "temp".to_string(),
+                    exp_states: Vec::<String>::new(),
+                    polarity: true,
+                    expression: "".to_string(),
+                    parameters: [x.to_string().clone()].to_vec(),
+                    sub_terms: None,
+                    math_vec: None,
+                };
+                terms.push(temp_term.clone());
+            }
         }
     }
     terms
@@ -1011,6 +1046,7 @@ fn test_first_order_derivative_leibniz_notation_with_implicit_time_dependence() 
                     Box::new(MathExpression::Mi(Mi("t".to_string()))),
                     None,
                 ),
+                DerivativeNotation::LeibnizTotal,
             ),
             Ci::new(
                 Some(Type::Function),
@@ -1043,6 +1079,7 @@ fn test_first_order_derivative_leibniz_notation_with_explicit_time_dependence() 
                     Box::new(MathExpression::Mi(Mi("t".to_string()))),
                     None,
                 ),
+                DerivativeNotation::LeibnizTotal,
             ),
             Ci::new(
                 Some(Type::Function),
@@ -1125,6 +1162,7 @@ fn test_msub_derivative() {
                     Box::new(MathExpression::Mi(Mi("t".to_string()))),
                     None,
                 ),
+                DerivativeNotation::LeibnizTotal,
             ),
             Ci::new(
                 Some(Type::Function),
