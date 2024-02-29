@@ -499,11 +499,18 @@ async def integrated_pdf_extractions(
         json_extractions = extractions.model_dump_json()
         extractions_ufile = UploadFile(file=io.BytesIO(json_extractions.encode('utf-8')))
         for amr in amrs:
-            aligned_amr = metal_proxy.link_amr(
-                amr_type="petrinet",                # Resolve in runtime
-                amr_file=amr,
-                text_extractions_file=extractions_ufile)
-            aligned_amrs.append(aligned_amr)
+            try:
+                aligned_amr = metal_proxy.link_amr(
+                    amr_type="petrinet",                # Resolve in runtime
+                    amr_file=amr,
+                    text_extractions_file=extractions_ufile)
+                aligned_amrs.append(aligned_amr)
+            except Exception as e:
+                error = TextReadingError(pipeline="AMR Linker", message=f"Error annotating {amr.filename}: {e}")
+                if extractions.generalized_errors is None:
+                    extractions.generalized_errors = [error]
+                else:
+                    extractions.generalized_errors.append(error)
 
     extractions.aligned_amrs = aligned_amrs
 
