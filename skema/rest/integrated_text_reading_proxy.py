@@ -505,7 +505,7 @@ async def integrated_pdf_extractions(
                 text_extractions_file=extractions_ufile)
             aligned_amrs.append(aligned_amr)
 
-    extractions.aligned_amr = aligned_amrs
+    extractions.aligned_amrs = aligned_amrs
 
     return extractions
 
