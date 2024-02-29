@@ -980,11 +980,6 @@ impl From<Vec<FirstOrderODE>> for RegNet {
             if term.exp_states.len() > 1 {
                 let mut output = [term.dyn_state.clone()].to_vec();
                 let mut input = term.exp_states.clone();
-                for state in term.exp_states.iter() {
-                    if *state != term.dyn_state {
-                        output.push(state.clone());
-                    }
-                }
 
                 let param_len = term.parameters.len();
 
@@ -998,6 +993,16 @@ impl From<Vec<FirstOrderODE>> for RegNet {
                 input.dedup();
                 output.sort();
                 output.dedup();
+
+                if input.clone().len() > 1 {
+                    let old_input = input.clone();
+                    input = [].to_vec();
+                    for term in old_input.clone().iter() {
+                        if *term != output[0] {
+                            input.push(term.clone());
+                        }
+                    }
+                }
 
                 let trans = RegTransition {
                     id: format!("s{}", i.clone()),
