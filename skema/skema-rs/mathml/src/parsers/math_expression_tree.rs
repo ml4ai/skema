@@ -1,5 +1,6 @@
 //! Pratt parsing module to construct S-expressions from presentation MathML.
 //! This is based on the nice tutorial at https://matklad.github.io/2020/04/13/simple-but-powerful-pratt-parsing.html
+use crate::ast::VectorNotation;
 use crate::{
     ast::{
         operator::{Derivative, DerivativeNotation, Gradient, Hat, Int, Operator, Summation},
@@ -288,7 +289,6 @@ fn is_unary_operator(op: &Operator) -> bool {
             | Operator::Arccsc
             | Operator::Arccot
             | Operator::Mean
-            | Operator::Vector
     )
 }
 
@@ -340,17 +340,55 @@ fn process_math_expression(expr: &MathExpression, expression: &mut String) {
     match expr {
         // If it's a Ci variant, recursively process its content
         MathExpression::Ci(x) => {
-            process_math_expression(&x.content, expression);
-            if let Some(func_of_vec) = &x.func_of {
-                if !func_of_vec.is_empty() && !func_of_vec[0].content.to_string().is_empty() {
-                    expression.push('(');
-                    for (index, func_ci) in func_of_vec.iter().enumerate() {
-                        process_math_expression(&func_ci.content, expression);
-                        if index < func_of_vec.len() - 1 {
-                            expression.push(',');
+            if let Some(vec_comp) = &x.notation {
+                if VectorNotation::Arrow == *vec_comp {
+                    expression.push_str("\\vec{");
+                    process_math_expression(&x.content, expression);
+                    expression.push('}');
+                    if let Some(func_of_vec) = &x.func_of {
+                        if !func_of_vec.is_empty() && !func_of_vec[0].content.to_string().is_empty()
+                        {
+                            expression.push('(');
+                            for (index, func_ci) in func_of_vec.iter().enumerate() {
+                                process_math_expression(&func_ci.content, expression);
+                                if index < func_of_vec.len() - 1 {
+                                    expression.push(',');
+                                }
+                            }
+                            expression.push(')');
                         }
                     }
-                    expression.push(')');
+                } else if VectorNotation::Bold == *vec_comp {
+                    expression.push_str("\\bold{");
+                    process_math_expression(&x.content, expression);
+                    expression.push('}');
+                    if let Some(func_of_vec) = &x.func_of {
+                        if !func_of_vec.is_empty() && !func_of_vec[0].content.to_string().is_empty()
+                        {
+                            expression.push('(');
+                            for (index, func_ci) in func_of_vec.iter().enumerate() {
+                                process_math_expression(&func_ci.content, expression);
+                                if index < func_of_vec.len() - 1 {
+                                    expression.push(',');
+                                }
+                            }
+                            expression.push(')');
+                        }
+                    }
+                }
+            } else {
+                process_math_expression(&x.content, expression);
+                if let Some(func_of_vec) = &x.func_of {
+                    if !func_of_vec.is_empty() && !func_of_vec[0].content.to_string().is_empty() {
+                        expression.push('(');
+                        for (index, func_ci) in func_of_vec.iter().enumerate() {
+                            process_math_expression(&func_ci.content, expression);
+                            if index < func_of_vec.len() - 1 {
+                                expression.push(',');
+                            }
+                        }
+                        expression.push(')');
+                    }
                 }
             }
         }
@@ -516,8 +554,7 @@ impl MathExpressionTree {
                         if *notation == DerivativeNotation::LeibnizTotal {
                             content_mathml.push_str("<diff/>");
                             content_mathml.push_str(&format!("<bvar>{}</bar>", bound_var));
-                        } else if *notation == DerivativeNotation::LeibnizPartialStandard
-                        {
+                        } else if *notation == DerivativeNotation::LeibnizPartialStandard {
                             content_mathml.push_str("<partialdiff/>");
                             content_mathml.push_str(&format!("<bvar>{}</bar>", bound_var));
                         }
@@ -689,11 +726,6 @@ impl MathExpressionTree {
                             expression.push('}');
                         }
                     },
-                    Operator::Vector => {
-                        expression.push_str("\\vec{");
-                        process_expression_parentheses(&mut expression, &rest[0]);
-                        expression.push('}');
-                    }
                     Operator::Dot => {
                         process_atoms_cons_parentheses(&mut expression, &rest[0]);
                         expression.push_str(" \\cdot ");
@@ -1030,7 +1062,6 @@ impl MathExpression {
                 }
                 tokens.push(MathExpression::Mo(Operator::Rparen));
                 tokens.push(MathExpression::Mo(Operator::Rparen));
-
             }
             MathExpression::Absolute(_operator, components) => {
                 tokens.push(MathExpression::Mo(Operator::Lparen));
@@ -1061,11 +1092,6 @@ impl MathExpression {
                     tokens.push(MathExpression::Mo(Operator::Other("^".to_string())));
                 } else if MathExpression::Mo(Operator::Mean) == **over {
                     tokens.push(MathExpression::Mo(Operator::Mean));
-                    tokens.push(MathExpression::Mo(Operator::Lparen));
-                    base.flatten(tokens);
-                    tokens.push(MathExpression::Mo(Operator::Rparen));
-                } else if MathExpression::Mo(Operator::Vector) == **over {
-                    tokens.push(MathExpression::Mo(Operator::Vector));
                     tokens.push(MathExpression::Mo(Operator::Lparen));
                     base.flatten(tokens);
                     tokens.push(MathExpression::Mo(Operator::Rparen));
@@ -1286,8 +1312,6 @@ fn prefix_binding_power(op: &Operator) -> ((), u8) {
         Operator::Sin => ((), 21),
         Operator::Tan => ((), 21),
         Operator::Mean => ((), 25),
-        //Operator::Hat => ((), 25),
-        Operator::Vector => ((), 25),
         Operator::SurfaceInt => ((), 25),
         Operator::Gradient(Gradient { .. }) => ((), 25),
         Operator::Derivative(Derivative { .. }) => ((), 25),
@@ -3406,12 +3430,14 @@ fn test_conservation_of_momentum_fluid_equation_1() {
 
 #[test]
 fn test_vector_notation() {
-    let input = "<math>
+    let input = "
+    <math>
     <mover><mi>v</mi><mo>&#x2192;</mo></mover>
     </math>";
     let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", exp);
     let s_exp = exp.to_string();
-    assert_eq!(s_exp, "(Vec v)");
+    assert_eq!(s_exp, "v");
     assert_eq!(exp.to_latex(), "\\vec{v}");
 }
 
@@ -3433,10 +3459,10 @@ fn test_conservation_of_mass_equation_2() {
     </math>";
     let exp = input.parse::<MathExpressionTree>().unwrap();
     let s_exp = exp.to_string();
-    assert_eq!(s_exp, "(= (PD(1, t) ρ) (- (Div (* (Vec μ) ρ))))");
+    assert_eq!(s_exp, "(= (PD(1, t) ρ) (- (Div (* ρ μ))))");
     assert_eq!(
         exp.to_latex(),
-        "\\frac{\\partial \\rho}{\\partial t}=-\\nabla \\cdot {(\\vec{\\mu}*\\rho)}"
+        "\\frac{\\partial \\rho}{\\partial t}=-\\nabla \\cdot {(\\rho*\\vec{\\mu})}"
     );
 }
 
@@ -3491,8 +3517,5 @@ fn test_clm4_5__8_2() {
     println!("exp={:?}", exp);
     let s_exp = exp.to_string();
     assert_eq!(s_exp, "(= A_{n} (- (Min (, A_{c} (, A_{j} A_{p}))) R_{d}))");
-    assert_eq!(
-        exp.to_latex(),
-        "A_{n}=(\\min A_{c},(A_{j},A_{p}))-R_{d}"
-    );
+    assert_eq!(exp.to_latex(), "A_{n}=(\\min A_{c},(A_{j},A_{p}))-R_{d}");
 }

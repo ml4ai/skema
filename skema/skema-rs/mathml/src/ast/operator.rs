@@ -203,8 +203,6 @@ pub enum Operator {
     Laplacian,
     /// Closed surface integral operator --need to include explit dS integration variable when translating to latex
     SurfaceInt,
-    /// Vector operator
-    Vector,
     Comma,
     /// Minimum operator
     Min,
@@ -254,7 +252,6 @@ impl fmt::Display for Operator {
             Operator::Arccsc => write!(f, "Arccsc"),
             Operator::Arccot => write!(f, "Arccot"),
             Operator::Mean => write!(f, "Mean"),
-            Operator::Vector => write!(f, "Vec"),
             Operator::Gradient(Gradient { subscript }) => match subscript {
                 Some(sub) => write!(f, "Grad_{sub}"),
                 None => write!(f, "Grad"),

@@ -48,6 +48,16 @@ pub struct Ci {
     pub r#type: Option<Type>,
     pub content: Box<MathExpression>,
     pub func_of: Option<Vec<Ci>>,
+    pub notation: Option<VectorNotation>,
+}
+
+/// Vector notation call for Ci being bold or an arrow
+#[derive(
+    Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, JsonSchema,
+)]
+pub enum VectorNotation {
+    Bold,
+    Arrow,
 }
 
 /// Represents the differentiation operator `diff` for functions or expresions `func`
@@ -195,6 +205,7 @@ impl fmt::Display for MathExpression {
                 r#type: _,
                 content,
                 func_of: _,
+                notation: _,
             }) => write!(f, "{}", content),
             MathExpression::Mn(number) => write!(f, "{}", number),
             MathExpression::Msup(base, superscript) => {

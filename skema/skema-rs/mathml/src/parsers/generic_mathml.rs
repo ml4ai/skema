@@ -236,23 +236,17 @@ pub fn cross(input: Span) -> IResult<Operator> {
     Ok((s, op))
 }
 
-pub fn vector(input: Span) -> IResult<Operator> {
-    let (s, op) = value(Operator::Vector, alt((ws(tag("→")), ws(tag("&#x2192;")))))(input)?;
-    Ok((s, op))
-}
-
 pub fn minimum(input: Span) -> IResult<Operator> {
-    let (s, _x) = ws(delimited(
-        stag!("mi"),
-        ws(tag("min")),
-        etag!("mi"),
-    ))(input)?;
-    let (s, _op) = ws(alt((delimited(
-        stag!("mo"),
-        //ws(tag("&#x2061;")),
-        ws(tag("\u{2061}")),
-        etag!("mo")), tag("")))
-    )(input)?;
+    let (s, _x) = ws(delimited(stag!("mi"), ws(tag("min")), etag!("mi")))(input)?;
+    let (s, _op) = ws(alt((
+        delimited(
+            stag!("mo"),
+            //ws(tag("&#x2061;")),
+            ws(tag("\u{2061}")),
+            etag!("mo"),
+        ),
+        tag(""),
+    )))(input)?;
     let op = Operator::Min;
     Ok((s, op))
 }
@@ -275,7 +269,6 @@ pub fn operator(input: Span) -> IResult<Operator> {
         divide,
         dot,
         cross,
-        vector,
         operator_other,
     ))(input)?;
     Ok((s, op))
