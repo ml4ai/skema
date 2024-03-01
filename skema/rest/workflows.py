@@ -19,6 +19,7 @@ from skema.img2mml.eqn2mml import image2mathml_db, b64_image_to_mml
 from skema.img2mml.api import get_mathml_from_bytes
 from skema.isa.lib import generate_code_graphs, align_eqn_code, convert_to_dict
 from skema.rest import config, schema, utils, llm_proxy
+from skema.rest.equation_extraction import process_pdf_and_images
 from skema.rest.proxies import SKEMA_RS_ADDESS
 from skema.skema_py import server as code2fn
 
@@ -839,6 +840,58 @@ async def code_snippets_to_isa_align(
         return JSONResponse(
             status_code=200,
             content=converted_alignment_res,
+        )
+
+
+# PDF -> [COSMOS] -> Equation images -> [MIT Service] -> Equation JSON
+@router.post(
+    "/equations_extraction",
+    summary="PDF -> [COSMOS] -> Equation images -> [MIT Service] -> Equation JSON",
+)
+async def equations_extraction(
+    equation_extraction_system: code2fn.Equation_Extraction_System,
+):
+    """
+    Extracts images of equations from PDF and Generates the JSON info.
+
+    ### Python example
+
+    Endpoint for extracting images of equations from PDF.
+
+    ```
+    import requests
+
+    # Define the URL for the API endpoint
+    url: str = "http://127.0.0.1:8000/workflows/equations_extraction"
+
+    # Specify the local path to the PDF file
+    pdf_local_path: str = "your PDF path"
+
+    # Specify the folder path where images will be saved
+    save_folder: str = "your save folder path"
+
+    # Specify your OpenAI API key
+    gpt_key: str = "your openai key here"
+
+    # Send a POST request to the API endpoint
+    response = requests.post(url, json={"pdf_local_path": pdf_local_path, "save_folder": save_folder, "gpt_key": gpt_key})
+    ```
+    """
+    try:
+        process_pdf_and_images(
+            equation_extraction_system.pdf_local_path,
+            equation_extraction_system.save_folder,
+            equation_extraction_system.gpt_key,
+        )
+        return JSONResponse(
+            status_code=200,
+            content={"message": "Images extracted and processed successfully."},
+        )
+
+    except Exception as e:
+        return JSONResponse(
+            status_code=400,
+            content={"error": str(e)},
         )
 
 
