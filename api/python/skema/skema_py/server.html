@@ -160,6 +160,21 @@ class MML_System(BaseModel):
     mml: str
     system: System
 
+
+class Equation_Extraction_System(BaseModel):
+    &#34;&#34;&#34;
+    Pydantic BaseModel representing a system with equation extraction.
+
+    Attributes:
+        pdf_local_path (str): the local path to the PDF file
+        save_folder (str): the folder path where images will be saved
+        gpt_key (str): your OpenAI API key
+    &#34;&#34;&#34;
+
+    pdf_local_path: str
+    save_folder: str
+    gpt_key: str
+
 async def system_to_enriched_system(system: System) -&gt; System:
     &#34;&#34;&#34;Takes a System as input and enriches it with comments by running the tree-sitter comment extractor.&#34;&#34;&#34;
 
@@ -1050,6 +1065,75 @@ def healthcheck() -&gt; int:
 <section>
 <h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
+<dt id="skema.skema_py.server.Equation_Extraction_System"><code class="flex name class">
+<span>class <span class="ident">Equation_Extraction_System</span></span>
+<span>(</span><span>**data: Any)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Pydantic BaseModel representing a system with equation extraction.</p>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>pdf_local_path</code></strong> :&ensp;<code>str</code></dt>
+<dd>the local path to the PDF file</dd>
+<dt><strong><code>save_folder</code></strong> :&ensp;<code>str</code></dt>
+<dd>the folder path where images will be saved</dd>
+<dt><strong><code>gpt_key</code></strong> :&ensp;<code>str</code></dt>
+<dd>your OpenAI API key</dd>
+</dl>
+<p>Create a new model by parsing and validating input data from keyword arguments.</p>
+<p>Raises [<code>ValidationError</code>][pydantic_core.ValidationError] if the input data cannot be
+validated to form a valid model.</p>
+<p><code>self</code> is explicitly positional-only to allow <code>self</code> as a field name.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Equation_Extraction_System(BaseModel):
+    &#34;&#34;&#34;
+    Pydantic BaseModel representing a system with equation extraction.
+
+    Attributes:
+        pdf_local_path (str): the local path to the PDF file
+        save_folder (str): the folder path where images will be saved
+        gpt_key (str): your OpenAI API key
+    &#34;&#34;&#34;
+
+    pdf_local_path: str
+    save_folder: str
+    gpt_key: str</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>pydantic.main.BaseModel</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="skema.skema_py.server.Equation_Extraction_System.gpt_key"><code class="name">var <span class="ident">gpt_key</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.skema_py.server.Equation_Extraction_System.model_computed_fields"><code class="name">var <span class="ident">model_computed_fields</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.skema_py.server.Equation_Extraction_System.model_config"><code class="name">var <span class="ident">model_config</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.skema_py.server.Equation_Extraction_System.model_fields"><code class="name">var <span class="ident">model_fields</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.skema_py.server.Equation_Extraction_System.pdf_local_path"><code class="name">var <span class="ident">pdf_local_path</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.skema_py.server.Equation_Extraction_System.save_folder"><code class="name">var <span class="ident">save_folder</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
 <dt id="skema.skema_py.server.MML_System"><code class="flex name class">
 <span>class <span class="ident">MML_System</span></span>
 <span>(</span><span>**data: Any)</span>
@@ -1385,6 +1469,17 @@ validated to form a valid model.</p>
 </li>
 <li><h3><a href="#header-classes">Classes</a></h3>
 <ul>
+<li>
+<h4><code><a title="skema.skema_py.server.Equation_Extraction_System" href="#skema.skema_py.server.Equation_Extraction_System">Equation_Extraction_System</a></code></h4>
+<ul class="">
+<li><code><a title="skema.skema_py.server.Equation_Extraction_System.gpt_key" href="#skema.skema_py.server.Equation_Extraction_System.gpt_key">gpt_key</a></code></li>
+<li><code><a title="skema.skema_py.server.Equation_Extraction_System.model_computed_fields" href="#skema.skema_py.server.Equation_Extraction_System.model_computed_fields">model_computed_fields</a></code></li>
+<li><code><a title="skema.skema_py.server.Equation_Extraction_System.model_config" href="#skema.skema_py.server.Equation_Extraction_System.model_config">model_config</a></code></li>
+<li><code><a title="skema.skema_py.server.Equation_Extraction_System.model_fields" href="#skema.skema_py.server.Equation_Extraction_System.model_fields">model_fields</a></code></li>
+<li><code><a title="skema.skema_py.server.Equation_Extraction_System.pdf_local_path" href="#skema.skema_py.server.Equation_Extraction_System.pdf_local_path">pdf_local_path</a></code></li>
+<li><code><a title="skema.skema_py.server.Equation_Extraction_System.save_folder" href="#skema.skema_py.server.Equation_Extraction_System.save_folder">save_folder</a></code></li>
+</ul>
+</li>
 <li>
 <h4><code><a title="skema.skema_py.server.MML_System" href="#skema.skema_py.server.MML_System">MML_System</a></code></h4>
 <ul class="">
