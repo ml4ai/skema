@@ -710,6 +710,7 @@ impl From<Vec<FirstOrderODE>> for PetriNet {
             initial_vec.push(initials.clone());
             states_vec.insert(states.clone());
             state_string_list.push(ode.lhs_var.to_string().clone()); // used later for transition parsing
+            println!("ode.rhs: {:?}", ode.rhs.to_string().clone());
         }
 
         // now for the construction of the transitions and their results
@@ -718,11 +719,16 @@ impl From<Vec<FirstOrderODE>> for PetriNet {
         for ode in ode_vec.iter() {
             dirty_terms.append(&mut get_terms(state_string_list.clone(), ode.clone()));
         }
-
         // now to trim off terms that are for euler methods, dyn_state != exp_state && parameters.len() != 0
+        // this conditional does nothing now, but is kept in case we need to turn it on later.
         for term in dirty_terms.iter() {
-            if term.dyn_state != term.exp_states[0] || !term.parameters.is_empty() {
-                terms.push(term.clone());
+            println!("-----\nterm: {:?}\n-----", term.clone());
+            if !term.exp_states.is_empty() {
+                if term.dyn_state != term.exp_states[0] || !term.parameters.is_empty() {
+                    terms.push(term.clone());
+                } else {
+                    terms.push(term.clone());
+                }
             }
         }
         for term in terms.iter() {
@@ -906,15 +912,26 @@ impl From<Vec<FirstOrderODE>> for PetriNet {
         }
 
         // now we construct transitions from unpaired terms, assuming them to be sources and sinks
+        // This should also support sources and sinks that are state dependent. 
         if !terms.is_empty() {
             for (i, term) in terms.iter().enumerate() {
                 if term.polarity {
                     let mut input = Vec::<String>::new();
+                    let mut exp_eq_dyn = false;
 
-                    let output = [term.dyn_state.clone()].to_vec();
+                    let mut output = [term.dyn_state.clone()].to_vec();
 
                     for state in term.exp_states.iter() {
                         input.push(state.clone());
+                        if *state == term.dyn_state.clone() {
+                            exp_eq_dyn = true;
+                        }
+                    }
+
+                    // I think if the expression equals the dynamic state both in the input and output get 
+                    if exp_eq_dyn {
+                        input.push(term.dyn_state.clone());
+                        output.push(term.dyn_state.clone());
                     }
 
                     let transitions = Transition {
@@ -1070,13 +1087,14 @@ impl From<Vec<FirstOrderODE>> for RegNet {
             // This finishes the construction of the state
             let mut counter = 0;
             for term in terms.iter() {
-                if term.exp_states.len() == 1 && term.exp_states[0] == term.dyn_state {
+                if term.exp_states.len() == 1 && term.exp_states[0] == *state {
                     // note this is only grabbing one term. This is somewhat limited by the current AMR schema
                     // it assumes only a simple single parameter for this Date: 08/10/23
                     r_state.rate_constant = Some(term.parameters[0].clone());
                     r_state.sign = Some(term.polarity);
                     // This adds the edges for the environment couplings
-                    let prop = Properties {
+                    //---DO WE INCLUDE THE SINGLE TRANSITION?---
+                    /*let prop = Properties {
                         name: term.parameters[0].clone(),
                         rate_constant: None,
                     };
@@ -1088,7 +1106,7 @@ impl From<Vec<FirstOrderODE>> for RegNet {
                         grounding: None,
                         properties: Some(prop.clone()),
                     };
-                    transitions_vec.insert(self_trans.clone());
+                    transitions_vec.insert(self_trans.clone()); */
                     counter += 1;
                 }
             }
@@ -1109,8 +1127,9 @@ impl From<Vec<FirstOrderODE>> for RegNet {
 
         // first for the polarity pairs of terms we need to construct the transistions
         let mut transition_pair = Vec::<(PnTerm, PnTerm)>::new();
-        for term1 in terms.clone().iter() {
-            for term2 in terms.clone().iter() {
+        let mut paired_indicies = Vec::<usize>::new();
+        for (i, term1) in terms.clone().iter().enumerate() {
+            for (j, term2) in terms.clone().iter().enumerate() {
                 if term1.polarity != term2.polarity
                     && term1.parameters == term2.parameters
                     && term1.polarity
@@ -1118,8 +1137,18 @@ impl From<Vec<FirstOrderODE>> for RegNet {
                     // first term is positive, second is negative
                     let temp_pair = (term1.clone(), term2.clone());
                     transition_pair.push(temp_pair);
+                    paired_indicies.push(i);
+                    paired_indicies.push(j);
                 }
             }
+        }
+
+        paired_indicies.sort();
+        paired_indicies.dedup();
+
+        let mut unpaired_terms = terms.clone();
+        for i in paired_indicies.iter().rev() {
+            unpaired_terms.remove(*i);
         }
 
         for (i, t) in transition_pair.iter().enumerate() {
@@ -1151,12 +1180,6 @@ impl From<Vec<FirstOrderODE>> for RegNet {
                     }
                 }
 
-                let _transitions = Transition {
-                    id: format!("t{}", i.clone()),
-                    input: Some(t.1.exp_states.clone()),
-                    output: Some(output.clone()),
-                    ..Default::default()
-                };
                 let prop = Properties {
                     // once again the assumption of only one parameters for transition
                     name: t.0.parameters[0].clone(),
@@ -1165,6 +1188,47 @@ impl From<Vec<FirstOrderODE>> for RegNet {
                 let trans = RegTransition {
                     id: format!("t{}", i.clone()),
                     source: Some(t.1.exp_states.clone()),
+                    target: Some(output.clone()),
+                    sign: Some(true),
+                    grounding: None,
+                    properties: Some(prop.clone()),
+                };
+                transitions_vec.insert(trans.clone());
+            }
+        }
+
+        for (i, term) in unpaired_terms.iter().enumerate() {
+            println!("Term: {:?}", term.clone());
+            if term.exp_states.len() > 1 {
+                let mut output = [term.dyn_state.clone()].to_vec();
+                let mut input = term.exp_states.clone();
+
+                let param_len = term.parameters.len();
+
+                let prop = Properties {
+                    // once again the assumption of only one parameters for transition
+                    name: term.parameters[param_len - 1].clone(),
+                    rate_constant: None,
+                };
+
+                input.sort();
+                input.dedup();
+                output.sort();
+                output.dedup();
+
+                if input.clone().len() > 1 {
+                    let old_input = input.clone();
+                    input = [].to_vec();
+                    for term in old_input.clone().iter() {
+                        if *term != output[0] {
+                            input.push(term.clone());
+                        }
+                    }
+                }
+
+                let trans = RegTransition {
+                    id: format!("s{}", i.clone()),
+                    source: Some(input.clone()),
                     target: Some(output.clone()),
                     sign: Some(true),
                     grounding: None,

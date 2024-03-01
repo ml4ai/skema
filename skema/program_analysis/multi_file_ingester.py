@@ -17,6 +17,7 @@ from skema.program_analysis.fortran2cast import fortran_to_cast
 from skema.program_analysis.matlab2cast import matlab_to_cast
 from skema.utils.fold import dictionary_to_gromet_json, del_nulls
 from skema.program_analysis.tree_sitter_parsers.build_parsers import LANGUAGES_YAML_FILEPATH
+from skema.program_analysis.module_locate import extract_imports
 
 def get_args():
     parser = argparse.ArgumentParser()
@@ -42,7 +43,7 @@ def get_args():
 
 
 def process_file_system(
-    system_name, path, files, write_to_file=False, original_source=False
+    system_name, path, files, write_to_file=False, original_source=False, dependency_depth=0
 ) -> GrometFNModuleCollection:
     root_dir = path.strip()
     file_list = open(files, "r").readlines()
@@ -52,6 +53,7 @@ def process_file_system(
         name=system_name,
         modules=[],
         module_index=[],
+        module_dependencies=[],
         executables=[],
     )
 
@@ -60,6 +62,7 @@ def process_file_system(
     for f in file_list:
         full_file = os.path.join(os.path.normpath(root_dir), f.strip("\n"))
         full_file_obj = Path(full_file)
+
         try:
             # To maintain backwards compatibility for the process_file_system function, for now we will determine the language by file extension
             if full_file_obj.suffix in language_yaml_obj["python"]["extensions"]:
@@ -94,7 +97,7 @@ def process_file_system(
                     # and then convert back into a string representing the full file    
                     file_text = "".join(open(full_file).readlines())
                     source_metadata[0].files[0].source_string = file_text
-
+                    
 
                 # Then, after we generate the GroMEt we store it in the 'modules' field
                 # and store its path in the 'module_index' field
@@ -113,6 +116,10 @@ def process_file_system(
                 
                 module_collection.module_index.append(python_module_path)
 
+                # TODO: Check for duplicate modules across files
+                # TODO: Remove submodule if higher level module is included
+                module_collection.module_dependencies.extend(extract_imports(full_file_obj.read_text()))
+               
                 # Done: Determine how we know a gromet goes in the 'executable' field
                 # We do this by finding all user_defined top level functions in the Gromet
                 # and check if the name 'main' is among them
@@ -129,17 +136,71 @@ def process_file_system(
                     module_collection.executables.append(
                         len(module_collection.module_index)
                     )
+            
 
         except (Exception,SystemExit) as e:
             os.chdir(cur_dir)
             print(e)
 
+    def clean_dependencies(dependencies, system_name):
+        # Step 1: Remove duplicates and perform initial filtering in one step.
+        # This uses a dictionary to preserve insertion order (Python 3.7+ guaranteed order).
+        cleaned = {
+            dep.name: dep for dep in dependencies
+            if not dep.name.startswith(".") and dep.name != system_name
+        }.values()
+
+        # Step 2: Sort by the number of dots in the name.
+        sorted_deps = sorted(cleaned, key=lambda dep: dep.name.count('.'))
+
+        # Step 3: Remove submodules of other modules.
+        # This step keeps an entry if no other entry is its "parent" module.
+        final_deps = [
+            dep for i, dep in enumerate(sorted_deps)
+            if not any(dep.name.startswith(other.name + ".") for other in sorted_deps[:i])
+        ]
+
+        return final_deps
+ 
+    module_collection.module_dependencies = clean_dependencies(module_collection.module_dependencies, system_name)
+    
+    # NOTE: These cannot be imported at the top-level due to circular dependancies
+    from skema.program_analysis.single_file_ingester import process_file
+    from skema.program_analysis.easy_multi_file_ingester import easy_process_file_system
+    from skema.program_analysis.url_ingester import process_git_repo, process_archive
+    
+    if dependency_depth > 0:
+        to_add = []
+        for index, dependency in enumerate(module_collection.module_dependencies):
+
+            if dependency.source_reference.type == "Local":
+                if Path(dependency.source_reference.value).is_dir():
+                    dependency_gromet = easy_process_file_system(dependency.name, dependency.source_reference.value, False, False, dependency_depth=dependency_depth-1)
+                else:
+                    dependency_gromet = process_file(dependency.source_reference.value, False, False, dependency_depth=dependency_depth-1)
+            elif dependency.source_reference.type == "Url":
+                dependency_gromet = process_archive(dependency.source_reference.value, False, False, dependency_depth=dependency_depth-1)
+            elif dependency.source_reference.type == "Repository":
+                dependency_gromet = process_git_repo(dependency.source_reference.value, None, False, False, dependency_depth=dependency_depth-1)
+            else:
+                continue
+            
+            # Flatten dependency gromet onto parent Gromet
+            for index in range(len(dependency_gromet.modules)):
+                dependency_gromet.modules[index].is_depenency = True
+            module_collection.modules.extend(dependency_gromet.modules)
+            module_collection.module_index.extend([f"{element} (dependency)" for element in dependency_gromet.module_index])
+            to_add.extend(dependency_gromet.module_dependencies)
+        
+        module_collection.module_dependencies.extend(to_add)
+    
     if write_to_file:
         with open(f"{system_name}--Gromet-FN-auto.json", "w") as f:
             gromet_collection_dict = module_collection.to_dict()
             f.write(
                 dictionary_to_gromet_json(del_nulls(gromet_collection_dict))
             )
+
 
     return module_collection
 
