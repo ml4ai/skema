@@ -2684,8 +2684,11 @@ class ToGrometPass:
             # is not inlined or part of an assignment we don't visit the
             # arguments as that's already been handled by the primitive handler
             # if not is_primitive(func_name, "CAST") or (from_assignment or is_inline(func_name)):
+            keyword_arg_len = len(self.symtab_functions()[func_name])
+            visited_args = 0
             for arg in node.arguments:
                 self.visit(arg, parent_gromet_fn, node)
+                visited_args += 1
 
                 parent_gromet_fn.pif = insert_gromet_object(
                     parent_gromet_fn.pif, GrometPort(box=call_bf_idx)
@@ -2768,6 +2771,16 @@ class ToGrometPass:
                         GrometWire(src=pif_idx, tgt=len(parent_gromet_fn.pof))
                     )
                     # if isinstance(arg.right)
+            
+            # the number of visited args matches the number of keyword args
+            # if we used them all
+            # otherwise if more keyword args exist than visited args
+            # we need to add some ports
+            if keyword_arg_len > visited_args:
+                for i in range(keyword_arg_len - visited_args - 1):
+                    parent_gromet_fn.pif = insert_gromet_object(
+                        parent_gromet_fn.pif, GrometPort(box=call_bf_idx)
+                    )
 
         if from_call or from_operator or from_assignment or from_loop:
             # Operator and calls need a pof appended here because they dont
@@ -3095,8 +3108,9 @@ class ToGrometPass:
 
         # Update the functions symbol table with its index in the FN array
         # This is currently used for wiring function names as parameters to function calls
+        # Also used to keep track of default values in a function's arguments
         functions = self.symtab_functions()
-        functions[node.name.name] = (node.name.name, idx)
+        functions[node.name.name] = (node.name.name, idx, [])
 
         metadata = self.create_source_code_reference(ref)
 
@@ -3179,6 +3193,7 @@ class ToGrometPass:
                         ),
                     )
                 else:
+                    functions[node.name.name][2].append(arg.default_value.value)
                     new_gromet.opi = insert_gromet_object(
                         new_gromet.opi,
                         GrometPort(
