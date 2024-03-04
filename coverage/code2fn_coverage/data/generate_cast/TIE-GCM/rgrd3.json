@@ -15,12 +15,14 @@ Traceback (most recent call last):
     modules = self.run(self.root_node)
   File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST/fortran/ts2cast.py", line 101, in run
     modules.append(self.visit(context))
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST/fortran/ts2cast.py", line 127, in visit
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST/fortran/ts2cast.py", line 121, in visit
     return self.visit_module(node)
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST/fortran/ts2cast.py", line 184, in visit_module
-    child_cast = self.visit(child)
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST/fortran/ts2cast.py", line 139, in visit
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST/fortran/ts2cast.py", line 176, in visit_module
+    program_body = self.generate_cast_body(node.children[1:-1])
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST/fortran/ts2cast.py", line 1264, in generate_cast_body
+    cast = self.visit(node)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST/fortran/ts2cast.py", line 133, in visit
     return self.visit_assignment_statement(node)
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST/fortran/ts2cast.py", line 743, in visit_assignment_statement
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST/fortran/ts2cast.py", line 744, in visit_assignment_statement
     left, _, right = node.children
 ValueError: too many values to unpack (expected 3)

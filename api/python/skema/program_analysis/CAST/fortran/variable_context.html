@@ -31,6 +31,7 @@
 from skema.program_analysis.CAST2FN.model.cast import (
     Var,
     Name,
+    FunctionDef
 )
 
 class VariableContext(object):
@@ -56,6 +57,8 @@ class VariableContext(object):
         self.stop_condition_id = 0
         self.function_name_id = 0
 
+        self.class_functions = {&#34;_class&#34;: {&#34;function&#34;: FunctionDef()}}
+    
     def push_context(self):
         &#34;&#34;&#34;Create a new variable context and add it to the stack&#34;&#34;&#34;
         
@@ -175,7 +178,36 @@ class VariableContext(object):
         self.internal = True
 
     def unset_internal(self):
-        self.internal = False</code></pre>
+        self.internal = False
+
+    def register_module_function(self, function: str):
+        # Fortran variables are case INSENSITIVE so we should lower it first
+        function = function.lower() 
+        function_def = FunctionDef(
+            name=Name(
+                name=&#34;&#34;,
+                id=-1,
+                source_refs=[]
+            ),
+            func_args=[],
+            body=[],
+            source_refs=[]
+        )
+        self.class_functions[function] = function_def
+
+        return function_def
+
+
+    def is_class_function(self, function: str):
+        function = function.lower() 
+        return function in self.class_functions
+
+    def copy_class_function(self, function: str, function_def: FunctionDef ):
+        function = function.lower() 
+        self.class_functions[function].name = function_def.name
+        self.class_functions[function].func_args = function_def.func_args
+        self.class_functions[function].body = function_def.body
+        self.class_functions[function].source_refs = function_def.source_refs</code></pre>
 </details>
 </section>
 <section>
@@ -219,6 +251,8 @@ class VariableContext(object):
         self.stop_condition_id = 0
         self.function_name_id = 0
 
+        self.class_functions = {&#34;_class&#34;: {&#34;function&#34;: FunctionDef()}}
+    
     def push_context(self):
         &#34;&#34;&#34;Create a new variable context and add it to the stack&#34;&#34;&#34;
         
@@ -338,7 +372,36 @@ class VariableContext(object):
         self.internal = True
 
     def unset_internal(self):
-        self.internal = False</code></pre>
+        self.internal = False
+
+    def register_module_function(self, function: str):
+        # Fortran variables are case INSENSITIVE so we should lower it first
+        function = function.lower() 
+        function_def = FunctionDef(
+            name=Name(
+                name=&#34;&#34;,
+                id=-1,
+                source_refs=[]
+            ),
+            func_args=[],
+            body=[],
+            source_refs=[]
+        )
+        self.class_functions[function] = function_def
+
+        return function_def
+
+
+    def is_class_function(self, function: str):
+        function = function.lower() 
+        return function in self.class_functions
+
+    def copy_class_function(self, function: str, function_def: FunctionDef ):
+        function = function.lower() 
+        self.class_functions[function].name = function_def.name
+        self.class_functions[function].func_args = function_def.func_args
+        self.class_functions[function].body = function_def.body
+        self.class_functions[function].source_refs = function_def.source_refs</code></pre>
 </details>
 <h3>Methods</h3>
 <dl>
@@ -391,6 +454,23 @@ class VariableContext(object):
     else:
         self.all_symbols[full_symbol_name] = self.context[-1][full_symbol_name]
     return cast_name</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST.fortran.variable_context.VariableContext.copy_class_function"><code class="name flex">
+<span>def <span class="ident">copy_class_function</span></span>(<span>self, function: str, function_def: <a title="skema.program_analysis.CAST2FN.model.cast.function_def.FunctionDef" href="../../CAST2FN/model/cast/function_def.html#skema.program_analysis.CAST2FN.model.cast.function_def.FunctionDef">FunctionDef</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def copy_class_function(self, function: str, function_def: FunctionDef ):
+    function = function.lower() 
+    self.class_functions[function].name = function_def.name
+    self.class_functions[function].func_args = function_def.func_args
+    self.class_functions[function].body = function_def.body
+    self.class_functions[function].source_refs = function_def.source_refs</code></pre>
 </details>
 </dd>
 <dt id="skema.program_analysis.CAST.fortran.variable_context.VariableContext.enter_record_definition"><code class="name flex">
@@ -501,6 +581,20 @@ class VariableContext(object):
     return self.all_symbols[symbol][&#34;type&#34;]</code></pre>
 </details>
 </dd>
+<dt id="skema.program_analysis.CAST.fortran.variable_context.VariableContext.is_class_function"><code class="name flex">
+<span>def <span class="ident">is_class_function</span></span>(<span>self, function: str)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def is_class_function(self, function: str):
+    function = function.lower() 
+    return function in self.class_functions</code></pre>
+</details>
+</dd>
 <dt id="skema.program_analysis.CAST.fortran.variable_context.VariableContext.is_variable"><code class="name flex">
 <span>def <span class="ident">is_variable</span></span>(<span>self, symbol: str) ‑> bool</span>
 </code></dt>
@@ -562,6 +656,33 @@ class VariableContext(object):
 
     self.context.append({})
     self.context_return_values.append(set())</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST.fortran.variable_context.VariableContext.register_module_function"><code class="name flex">
+<span>def <span class="ident">register_module_function</span></span>(<span>self, function: str)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def register_module_function(self, function: str):
+    # Fortran variables are case INSENSITIVE so we should lower it first
+    function = function.lower() 
+    function_def = FunctionDef(
+        name=Name(
+            name=&#34;&#34;,
+            id=-1,
+            source_refs=[]
+        ),
+        func_args=[],
+        body=[],
+        source_refs=[]
+    )
+    self.class_functions[function] = function_def
+
+    return function_def</code></pre>
 </details>
 </dd>
 <dt id="skema.program_analysis.CAST.fortran.variable_context.VariableContext.remove_return_value"><code class="name flex">
@@ -646,6 +767,7 @@ class VariableContext(object):
 <ul class="">
 <li><code><a title="skema.program_analysis.CAST.fortran.variable_context.VariableContext.add_return_value" href="#skema.program_analysis.CAST.fortran.variable_context.VariableContext.add_return_value">add_return_value</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.fortran.variable_context.VariableContext.add_variable" href="#skema.program_analysis.CAST.fortran.variable_context.VariableContext.add_variable">add_variable</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.fortran.variable_context.VariableContext.copy_class_function" href="#skema.program_analysis.CAST.fortran.variable_context.VariableContext.copy_class_function">copy_class_function</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.fortran.variable_context.VariableContext.enter_record_definition" href="#skema.program_analysis.CAST.fortran.variable_context.VariableContext.enter_record_definition">enter_record_definition</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.fortran.variable_context.VariableContext.exit_record_definition" href="#skema.program_analysis.CAST.fortran.variable_context.VariableContext.exit_record_definition">exit_record_definition</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.fortran.variable_context.VariableContext.generate_func" href="#skema.program_analysis.CAST.fortran.variable_context.VariableContext.generate_func">generate_func</a></code></li>
@@ -653,9 +775,11 @@ class VariableContext(object):
 <li><code><a title="skema.program_analysis.CAST.fortran.variable_context.VariableContext.generate_stop_condition" href="#skema.program_analysis.CAST.fortran.variable_context.VariableContext.generate_stop_condition">generate_stop_condition</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.fortran.variable_context.VariableContext.get_node" href="#skema.program_analysis.CAST.fortran.variable_context.VariableContext.get_node">get_node</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.fortran.variable_context.VariableContext.get_type" href="#skema.program_analysis.CAST.fortran.variable_context.VariableContext.get_type">get_type</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.fortran.variable_context.VariableContext.is_class_function" href="#skema.program_analysis.CAST.fortran.variable_context.VariableContext.is_class_function">is_class_function</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.fortran.variable_context.VariableContext.is_variable" href="#skema.program_analysis.CAST.fortran.variable_context.VariableContext.is_variable">is_variable</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.fortran.variable_context.VariableContext.pop_context" href="#skema.program_analysis.CAST.fortran.variable_context.VariableContext.pop_context">pop_context</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.fortran.variable_context.VariableContext.push_context" href="#skema.program_analysis.CAST.fortran.variable_context.VariableContext.push_context">push_context</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.fortran.variable_context.VariableContext.register_module_function" href="#skema.program_analysis.CAST.fortran.variable_context.VariableContext.register_module_function">register_module_function</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.fortran.variable_context.VariableContext.remove_return_value" href="#skema.program_analysis.CAST.fortran.variable_context.VariableContext.remove_return_value">remove_return_value</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.fortran.variable_context.VariableContext.set_internal" href="#skema.program_analysis.CAST.fortran.variable_context.VariableContext.set_internal">set_internal</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.fortran.variable_context.VariableContext.unset_internal" href="#skema.program_analysis.CAST.fortran.variable_context.VariableContext.unset_internal">unset_internal</a></code></li>
