@@ -105,13 +105,7 @@ class TS2CAST(object):
         # TODO: Research the above
         outer_body_nodes = get_children_by_types(root, ["function", "subroutine"])
         if len(outer_body_nodes) > 0:
-            body = []
-            for body_node in outer_body_nodes:
-                child_cast = self.visit(body_node)
-                if isinstance(child_cast, List):
-                    body.extend(child_cast)
-                elif isinstance(child_cast, AstNode):
-                    body.append(child_cast)
+            body = self.generate_cast_body(outer_body_nodes)
             modules.append(
                 Module(
                     name=None,
@@ -179,14 +173,8 @@ class TS2CAST(object):
         """Visitor for program and module statement. Returns a Module object"""
         self.variable_context.push_context()
 
-        program_body = []
-        for child in node.children[1:-1]:  # Ignore the start and end program statement
-            child_cast = self.visit(child)
-            if isinstance(child_cast, List):
-                program_body.extend(child_cast)
-            elif isinstance(child_cast, AstNode):
-                program_body.append(child_cast)
-
+        program_body = self.generate_cast_body(node.children[1:-1])
+      
         self.variable_context.pop_context()
 
         return Module(
@@ -231,7 +219,7 @@ class TS2CAST(object):
         #     (function_result) - Optional
         #       (identifier)
         #  (body_node) ...
-
+     
         # Create a new variable context
         self.variable_context.push_context()
 
@@ -316,6 +304,19 @@ class TS2CAST(object):
         # Pop variable context off of stack before leaving this scope
         self.variable_context.pop_context()
 
+        
+        # If this is a class function, we need to associate the function def with the class
+        # We should also return None here so we don't duplicate the function def
+        if self.variable_context.is_class_function(name.name):
+            self.variable_context.copy_class_function(name.name,
+            FunctionDef(
+            name=name,
+            func_args=func_args,
+            body=body,
+            source_refs=[self.node_helper.get_source_ref(node)],
+        ))
+            return None
+        
         return FunctionDef(
             name=name,
             func_args=func_args,
@@ -1020,20 +1021,17 @@ class TS2CAST(object):
         # If we tell the variable context we are in a record definition, it will append the type name as a prefix to all defined variables.
         self.variable_context.enter_record_definition(record_name)
 
-        # Note:
+        # Note: In derived type declarations, functions are only declared. The actual definition will be in the outer module.
         funcs = []
-        derived_type_procedures_node = get_first_child_by_type(
+        if derived_type_procedures_node := get_first_child_by_type(
             node, "derived_type_procedures"
-        )
-        if derived_type_procedures_node:
+        ):
             for procedure_node in get_children_by_types(
                 derived_type_procedures_node, ["procedure_statement"]
             ):
-                funcs.append(
-                    self.visit_name(
-                        get_first_child_by_type(procedure_node, "method_name")
-                    )
-                )
+                function_name = self.node_helper.get_identifier(get_first_child_by_type(procedure_node, "method_name", recurse=True))
+                funcs.append(self.variable_context.register_module_function(function_name))
+               
 
         # A derived type can only have variable declarations in its body.
         fields = []
@@ -1261,12 +1259,14 @@ class TS2CAST(object):
 
     def generate_cast_body(self, body_nodes: List):
         body = []
+     
         for node in body_nodes:
             cast = self.visit(node)
+        
             if isinstance(cast, AstNode):
                 body.append(cast)
             elif isinstance(cast, List):
-                body.extend(cast)
+                body.extend([element for element in cast if element is not None])
 
         # Gromet doesn't support empty bodies, so we should create a no_op instead
         if len(body) == 0:
@@ -1274,3 +1274,4 @@ class TS2CAST(object):
 
         # TODO: How to add more support for source references
         return body
+
