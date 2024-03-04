@@ -131,6 +131,21 @@ class MML_System(BaseModel):
     mml: str
     system: System
 
+
+class Equation_Extraction_System(BaseModel):
+    """
+    Pydantic BaseModel representing a system with equation extraction.
+
+    Attributes:
+        pdf_local_path (str): the local path to the PDF file
+        save_folder (str): the folder path where images will be saved
+        gpt_key (str): your OpenAI API key
+    """
+
+    pdf_local_path: str
+    save_folder: str
+    gpt_key: str
+
 async def system_to_enriched_system(system: System) -> System:
     """Takes a System as input and enriches it with comments by running the tree-sitter comment extractor."""
 

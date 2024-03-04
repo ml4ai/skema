@@ -12,6 +12,8 @@ import org.ml4ai.skema.text_reading.data.CosmosJsonDataLoader
 import org.ml4ai.skema.text_reading.grounding.Grounder
 import org.ml4ai.skema.text_reading.scenario_context.ContextEngine
 import org.ml4ai.skema.text_reading.scenario_context.openai.DecoderContextEngine
+
+import scala.util.{Success, Try}
 //import org.ml4ai.skema.text_reading.scenario_context.openai.ContextEngine
 import org.ml4ai.skema.text_reading.scenario_context.{HeuristicContextEngine, CosmosOrderer}
 import org.ml4ai.skema.text_reading.serializer.SkemaJSONSerializer
@@ -58,14 +60,17 @@ class CosmosTextReadingPipeline(contextWindowSize: Int, contextEngineType:String
     val locations = textsAndLocations.map(_.split(jsonSeparator).takeRight(2).mkString(jsonSeparator)) //location = pageNum::blockIdx
 
     // extract mentions form each text block
-    val mentions = for (tf <- textsAndFilenames) yield {
-      val Array(rawText, filename) = tf.split(jsonSeparator)
-      // Extract mentions and apply grounding
+    val mentions =
+      (for (tf <- textsAndFilenames) yield Try {
+        val Array(rawText, filename) = tf.split(jsonSeparator)
+        // Extract mentions and apply grounding
 
-      val text = pdf2txt.process(rawText, maxLoops = 1)
-      this.extractMentions(text, Some(filename))._2
+        val text = pdf2txt.process(rawText, maxLoops = 1)
+        this.extractMentions(text, Some(filename))._2
 
-    }
+      }) collect {
+        case Success(ms) => ms
+      }
 
     // store location information from cosmos as an attachment for each mention
     val menWInd = mentions.zipWithIndex
