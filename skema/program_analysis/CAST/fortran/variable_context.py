@@ -28,7 +28,6 @@ class VariableContext(object):
         self.stop_condition_id = 0
         self.function_name_id = 0
 
-        # TODO Fill out logic and reevaluate ordering
         self.class_functions = {"_class": {"function": FunctionDef()}}
     
     def push_context(self):
