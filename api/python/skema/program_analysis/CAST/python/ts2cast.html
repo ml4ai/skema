@@ -111,6 +111,11 @@ class TS2CAST(object):
         # Additional variables used in generation
         self.var_count = 0
 
+        # A dictionary used to keep track of aliases that imports use
+        # (like import x as y, or from x import y as z)
+        # Used to resolve aliasing in imports
+        self.aliases = {}
+
         # Tree walking structures
         self.variable_context = VariableContext()
         self.node_helper = NodeHelper(self.source, self.source_file_name)
@@ -133,7 +138,19 @@ class TS2CAST(object):
 
     # TODO: node helper for ignoring comments
 
+    def check_alias(self, name):
+        &#34;&#34;&#34;Given a python string that represents a name,
+        this function checks to see if that name is an alias
+        for a different name, and returns it if it is indeed an alias.
+        Otherwise, the original name is returned.
+        &#34;&#34;&#34;
+        if name in self.aliases:
+            return self.aliases[name]
+        else:
+            return name
+
     def visit(self, node: Node):
+        # print(f&#34;===Visiting node[{node.type}]===&#34;)
         if node.type == &#34;module&#34;:
             return self.visit_module(node)
         elif node.type == &#34;parenthesized_expression&#34;:
@@ -154,6 +171,8 @@ class TS2CAST(object):
             return self.visit_comparison_op(node)
         elif node.type == &#34;assignment&#34;:
             return self.visit_assignment(node)
+        elif node.type == &#34;attribute&#34;:
+            return self.visit_attribute(node)
         elif node.type == &#34;identifier&#34;:
             return self.visit_identifier(node)
         elif node.type == &#34;unary_operator&#34;:
@@ -176,6 +195,14 @@ class TS2CAST(object):
             return self.visit_while(node)
         elif node.type == &#34;for_statement&#34;:
             return self.visit_for(node)
+        elif node.type == &#34;import_statement&#34;:
+            return self.visit_import(node)
+        elif node.type == &#34;import_from_statement&#34;:
+            return self.visit_import_from(node)
+        elif node.type == &#34;yield&#34;:
+            return self.visit_yield(node)
+        elif node.type == &#34;assert_statement&#34;:
+            return self.visit_assert(node)
         else:
             return self._visit_passthrough(node)
 
@@ -265,8 +292,10 @@ class TS2CAST(object):
 
     def visit_call(self, node: Node) -&gt; Call:
         ref = self.node_helper.get_source_ref(node)
-        func_identifier = get_first_child_by_type(node, &#34;identifier&#34;)
-        func_name = self.visit(func_identifier) #self.node_helper.get_identifier(func_identifier)
+
+        func_cast = self.visit(node.children[0])
+
+        func_name = get_func_name_node(func_cast)        
 
         arg_list = get_first_child_by_type(node, &#34;argument_list&#34;)
         args = get_non_control_children(arg_list)
@@ -279,7 +308,7 @@ class TS2CAST(object):
             elif isinstance(cast, AstNode):
                 func_args.append(cast)
 
-        if func_name.val.name == &#34;range&#34;:
+        if get_name_node(func_cast).name == &#34;range&#34;:
             start_step_value = CASTLiteralValue(
                 ScalarType.INTEGER, 
                 value=&#34;1&#34;,
@@ -296,7 +325,7 @@ class TS2CAST(object):
 
         # Function calls only want the &#39;Name&#39; part of the &#39;Var&#39; that the visit returns
         return Call(
-            func=func_name.val, 
+            func=func_name, 
             arguments=func_args, 
             source_refs=[ref]
         )
@@ -528,6 +557,69 @@ class TS2CAST(object):
                 source_code_data_type=[&#34;Python&#34;, PYTHON_VERSION, str(type((0)))],
                 source_refs=[literal_source_ref]
             )
+
+    def handle_dotted_name(self, import_stmt) -&gt; ModelImport:
+        ref = self.node_helper.get_source_ref(import_stmt)
+        name = self.node_helper.get_identifier(import_stmt)
+        self.visit(import_stmt)
+
+        return name
+
+    def handle_aliased_import(self, import_stmt) -&gt; ModelImport:
+        ref = self.node_helper.get_source_ref(import_stmt)
+        dot_name = get_children_by_types(import_stmt,[&#34;dotted_name&#34;])[0]
+        name = self.handle_dotted_name(dot_name) 
+        alias = get_children_by_types(import_stmt, [&#34;identifier&#34;])[0]
+        self.visit(alias)
+
+        return (name, self.node_helper.get_identifier(alias)) 
+
+    def visit_import(self, node: Node):
+        ref = self.node_helper.get_source_ref(node)
+        to_ret = []
+
+        names_list = get_children_by_types(node, [&#34;dotted_name&#34;, &#34;aliased_import&#34;])
+        for name in names_list:
+            if name.type == &#34;dotted_name&#34;:
+                resolved_name = self.handle_dotted_name(name)
+                to_ret.append(ModelImport(name=resolved_name, alias=None, symbol=None, all=False, source_refs=ref))
+            elif name.type == &#34;aliased_import&#34;:
+                resolved_name = self.handle_aliased_import(name)
+                self.aliases[resolved_name[1]] = resolved_name[0]
+                to_ret.append(ModelImport(name=resolved_name[0], alias=resolved_name[1], symbol=None, all=False, source_refs=ref))
+
+        return to_ret
+
+    def visit_import_from(self, node: Node):
+        ref = self.node_helper.get_source_ref(node)
+        to_ret = []
+
+        names_list = get_children_by_types(node, [&#34;dotted_name&#34;, &#34;aliased_import&#34;])
+        wild_card = get_children_by_types(node, [&#34;wildcard_import&#34;])
+        module_name = self.node_helper.get_identifier(names_list[0])
+
+        # if &#34;wildcard_import&#34; exists then it&#39;ll be in the list
+        if len(wild_card) == 1:
+            to_ret.append(ModelImport(name=module_name, alias=None, symbol=None, all=True, source_refs=ref))
+        else:
+            for name in names_list[1:]:
+                if name.type == &#34;dotted_name&#34;:
+                    resolved_name = self.handle_dotted_name(name) 
+                    to_ret.append(ModelImport(name=module_name, alias=None, symbol=resolved_name, all=False, source_refs=ref))
+                elif name.type == &#34;aliased_import&#34;:
+                    resolved_name = self.handle_aliased_import(name)
+                    self.aliases[resolved_name[1]] = resolved_name[0]
+                    to_ret.append(ModelImport(name=module_name, alias=resolved_name[1], symbol=resolved_name[0], all=False, source_refs=ref))
+            
+        return to_ret
+
+    def visit_attribute(self, node: Node):
+        ref = self.node_helper.get_source_ref(node)
+        obj,_,attr = node.children
+        obj_cast = self.visit(obj)
+        attr_cast = self.visit(attr)
+
+        return Attribute(value= get_name_node(obj_cast), attr=get_name_node(attr_cast), source_refs=ref)
 
     def handle_for_clause(self, node: Node):
         # Given the &#34;for x in seq&#34; clause of a list comprehension
@@ -913,7 +1005,9 @@ class TS2CAST(object):
 
     def visit_name(self, node):
         # First, we will check if this name is already defined, and if it is return the name node generated previously
-        identifier = self.node_helper.get_identifier(node)
+        # NOTE: the call to check_alias is a crucial change, to resolve aliasing
+        # need to make sure nothing breaks
+        identifier = self.check_alias(self.node_helper.get_identifier(node))
         if self.variable_context.is_variable(identifier):
             return self.variable_context.get_node(identifier)
 
@@ -938,17 +1032,52 @@ class TS2CAST(object):
 
         return self.variable_context.add_variable(func_name, &#34;function&#34;, None)
             
+    def visit_yield(self, node):
+        source_code_data_type = [&#34;Python&#34;, &#34;3.8&#34;, &#34;List&#34;]
+        ref = self.node_helper.get_source_ref(node)
+        return [
+            CASTLiteralValue(
+                StructureType.LIST,
+                &#34;YieldNotImplemented&#34;,
+                source_code_data_type,
+                ref
+            )   
+        ]
+
+    def visit_assert(self, node):
+        source_code_data_type = [&#34;Python&#34;, &#34;3.8&#34;, &#34;List&#34;]
+        ref = self.node_helper.get_source_ref(node)
+        return [
+            CASTLiteralValue(
+                StructureType.LIST,
+                &#34;AssertNotImplemented&#34;,
+                source_code_data_type,
+                ref
+            )   
+        ]
+
+
 def get_name_node(node):
     # Given a CAST node, if it&#39;s type Var, then we extract the name node out of it
     # If it&#39;s anything else, then the node just gets returned normally
     cur_node = node
     if isinstance(node, list):
         cur_node = node[0]
-
+    if isinstance(cur_node, Attribute):
+        return get_name_node(cur_node.attr)
     if isinstance(cur_node, Var):
         return cur_node.val
     else:
-        return node</code></pre>
+        return node
+
+def get_func_name_node(node):
+    # Given a CAST node, we attempt to extract the appropriate name element
+    # from it. 
+    cur_node = node
+    if isinstance(cur_node, Var):
+        return cur_node.val
+    else:
+        return cur_node </code></pre>
 </details>
 </section>
 <section>
@@ -958,6 +1087,25 @@ def get_name_node(node):
 <section>
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
+<dt id="skema.program_analysis.CAST.python.ts2cast.get_func_name_node"><code class="name flex">
+<span>def <span class="ident">get_func_name_node</span></span>(<span>node)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_func_name_node(node):
+    # Given a CAST node, we attempt to extract the appropriate name element
+    # from it. 
+    cur_node = node
+    if isinstance(cur_node, Var):
+        return cur_node.val
+    else:
+        return cur_node </code></pre>
+</details>
+</dd>
 <dt id="skema.program_analysis.CAST.python.ts2cast.get_name_node"><code class="name flex">
 <span>def <span class="ident">get_name_node</span></span>(<span>node)</span>
 </code></dt>
@@ -973,7 +1121,8 @@ def get_name_node(node):
     cur_node = node
     if isinstance(node, list):
         cur_node = node[0]
-
+    if isinstance(cur_node, Attribute):
+        return get_name_node(cur_node.attr)
     if isinstance(cur_node, Var):
         return cur_node.val
     else:
@@ -1024,6 +1173,11 @@ def get_name_node(node):
         # Additional variables used in generation
         self.var_count = 0
 
+        # A dictionary used to keep track of aliases that imports use
+        # (like import x as y, or from x import y as z)
+        # Used to resolve aliasing in imports
+        self.aliases = {}
+
         # Tree walking structures
         self.variable_context = VariableContext()
         self.node_helper = NodeHelper(self.source, self.source_file_name)
@@ -1046,7 +1200,19 @@ def get_name_node(node):
 
     # TODO: node helper for ignoring comments
 
+    def check_alias(self, name):
+        &#34;&#34;&#34;Given a python string that represents a name,
+        this function checks to see if that name is an alias
+        for a different name, and returns it if it is indeed an alias.
+        Otherwise, the original name is returned.
+        &#34;&#34;&#34;
+        if name in self.aliases:
+            return self.aliases[name]
+        else:
+            return name
+
     def visit(self, node: Node):
+        # print(f&#34;===Visiting node[{node.type}]===&#34;)
         if node.type == &#34;module&#34;:
             return self.visit_module(node)
         elif node.type == &#34;parenthesized_expression&#34;:
@@ -1067,6 +1233,8 @@ def get_name_node(node):
             return self.visit_comparison_op(node)
         elif node.type == &#34;assignment&#34;:
             return self.visit_assignment(node)
+        elif node.type == &#34;attribute&#34;:
+            return self.visit_attribute(node)
         elif node.type == &#34;identifier&#34;:
             return self.visit_identifier(node)
         elif node.type == &#34;unary_operator&#34;:
@@ -1089,6 +1257,14 @@ def get_name_node(node):
             return self.visit_while(node)
         elif node.type == &#34;for_statement&#34;:
             return self.visit_for(node)
+        elif node.type == &#34;import_statement&#34;:
+            return self.visit_import(node)
+        elif node.type == &#34;import_from_statement&#34;:
+            return self.visit_import_from(node)
+        elif node.type == &#34;yield&#34;:
+            return self.visit_yield(node)
+        elif node.type == &#34;assert_statement&#34;:
+            return self.visit_assert(node)
         else:
             return self._visit_passthrough(node)
 
@@ -1178,8 +1354,10 @@ def get_name_node(node):
 
     def visit_call(self, node: Node) -&gt; Call:
         ref = self.node_helper.get_source_ref(node)
-        func_identifier = get_first_child_by_type(node, &#34;identifier&#34;)
-        func_name = self.visit(func_identifier) #self.node_helper.get_identifier(func_identifier)
+
+        func_cast = self.visit(node.children[0])
+
+        func_name = get_func_name_node(func_cast)        
 
         arg_list = get_first_child_by_type(node, &#34;argument_list&#34;)
         args = get_non_control_children(arg_list)
@@ -1192,7 +1370,7 @@ def get_name_node(node):
             elif isinstance(cast, AstNode):
                 func_args.append(cast)
 
-        if func_name.val.name == &#34;range&#34;:
+        if get_name_node(func_cast).name == &#34;range&#34;:
             start_step_value = CASTLiteralValue(
                 ScalarType.INTEGER, 
                 value=&#34;1&#34;,
@@ -1209,7 +1387,7 @@ def get_name_node(node):
 
         # Function calls only want the &#39;Name&#39; part of the &#39;Var&#39; that the visit returns
         return Call(
-            func=func_name.val, 
+            func=func_name, 
             arguments=func_args, 
             source_refs=[ref]
         )
@@ -1441,6 +1619,69 @@ def get_name_node(node):
                 source_code_data_type=[&#34;Python&#34;, PYTHON_VERSION, str(type((0)))],
                 source_refs=[literal_source_ref]
             )
+
+    def handle_dotted_name(self, import_stmt) -&gt; ModelImport:
+        ref = self.node_helper.get_source_ref(import_stmt)
+        name = self.node_helper.get_identifier(import_stmt)
+        self.visit(import_stmt)
+
+        return name
+
+    def handle_aliased_import(self, import_stmt) -&gt; ModelImport:
+        ref = self.node_helper.get_source_ref(import_stmt)
+        dot_name = get_children_by_types(import_stmt,[&#34;dotted_name&#34;])[0]
+        name = self.handle_dotted_name(dot_name) 
+        alias = get_children_by_types(import_stmt, [&#34;identifier&#34;])[0]
+        self.visit(alias)
+
+        return (name, self.node_helper.get_identifier(alias)) 
+
+    def visit_import(self, node: Node):
+        ref = self.node_helper.get_source_ref(node)
+        to_ret = []
+
+        names_list = get_children_by_types(node, [&#34;dotted_name&#34;, &#34;aliased_import&#34;])
+        for name in names_list:
+            if name.type == &#34;dotted_name&#34;:
+                resolved_name = self.handle_dotted_name(name)
+                to_ret.append(ModelImport(name=resolved_name, alias=None, symbol=None, all=False, source_refs=ref))
+            elif name.type == &#34;aliased_import&#34;:
+                resolved_name = self.handle_aliased_import(name)
+                self.aliases[resolved_name[1]] = resolved_name[0]
+                to_ret.append(ModelImport(name=resolved_name[0], alias=resolved_name[1], symbol=None, all=False, source_refs=ref))
+
+        return to_ret
+
+    def visit_import_from(self, node: Node):
+        ref = self.node_helper.get_source_ref(node)
+        to_ret = []
+
+        names_list = get_children_by_types(node, [&#34;dotted_name&#34;, &#34;aliased_import&#34;])
+        wild_card = get_children_by_types(node, [&#34;wildcard_import&#34;])
+        module_name = self.node_helper.get_identifier(names_list[0])
+
+        # if &#34;wildcard_import&#34; exists then it&#39;ll be in the list
+        if len(wild_card) == 1:
+            to_ret.append(ModelImport(name=module_name, alias=None, symbol=None, all=True, source_refs=ref))
+        else:
+            for name in names_list[1:]:
+                if name.type == &#34;dotted_name&#34;:
+                    resolved_name = self.handle_dotted_name(name) 
+                    to_ret.append(ModelImport(name=module_name, alias=None, symbol=resolved_name, all=False, source_refs=ref))
+                elif name.type == &#34;aliased_import&#34;:
+                    resolved_name = self.handle_aliased_import(name)
+                    self.aliases[resolved_name[1]] = resolved_name[0]
+                    to_ret.append(ModelImport(name=module_name, alias=resolved_name[1], symbol=resolved_name[0], all=False, source_refs=ref))
+            
+        return to_ret
+
+    def visit_attribute(self, node: Node):
+        ref = self.node_helper.get_source_ref(node)
+        obj,_,attr = node.children
+        obj_cast = self.visit(obj)
+        attr_cast = self.visit(attr)
+
+        return Attribute(value= get_name_node(obj_cast), attr=get_name_node(attr_cast), source_refs=ref)
 
     def handle_for_clause(self, node: Node):
         # Given the &#34;for x in seq&#34; clause of a list comprehension
@@ -1826,7 +2067,9 @@ def get_name_node(node):
 
     def visit_name(self, node):
         # First, we will check if this name is already defined, and if it is return the name node generated previously
-        identifier = self.node_helper.get_identifier(node)
+        # NOTE: the call to check_alias is a crucial change, to resolve aliasing
+        # need to make sure nothing breaks
+        identifier = self.check_alias(self.node_helper.get_identifier(node))
         if self.variable_context.is_variable(identifier):
             return self.variable_context.get_node(identifier)
 
@@ -1849,10 +2092,58 @@ def get_name_node(node):
         if self.variable_context.is_variable(func_name):
             return self.variable_context.get_node(func_name)
 
-        return self.variable_context.add_variable(func_name, &#34;function&#34;, None)</code></pre>
+        return self.variable_context.add_variable(func_name, &#34;function&#34;, None)
+            
+    def visit_yield(self, node):
+        source_code_data_type = [&#34;Python&#34;, &#34;3.8&#34;, &#34;List&#34;]
+        ref = self.node_helper.get_source_ref(node)
+        return [
+            CASTLiteralValue(
+                StructureType.LIST,
+                &#34;YieldNotImplemented&#34;,
+                source_code_data_type,
+                ref
+            )   
+        ]
+
+    def visit_assert(self, node):
+        source_code_data_type = [&#34;Python&#34;, &#34;3.8&#34;, &#34;List&#34;]
+        ref = self.node_helper.get_source_ref(node)
+        return [
+            CASTLiteralValue(
+                StructureType.LIST,
+                &#34;AssertNotImplemented&#34;,
+                source_code_data_type,
+                ref
+            )   
+        ]</code></pre>
 </details>
 <h3>Methods</h3>
 <dl>
+<dt id="skema.program_analysis.CAST.python.ts2cast.TS2CAST.check_alias"><code class="name flex">
+<span>def <span class="ident">check_alias</span></span>(<span>self, name)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Given a python string that represents a name,
+this function checks to see if that name is an alias
+for a different name, and returns it if it is indeed an alias.
+Otherwise, the original name is returned.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def check_alias(self, name):
+    &#34;&#34;&#34;Given a python string that represents a name,
+    this function checks to see if that name is an alias
+    for a different name, and returns it if it is indeed an alias.
+    Otherwise, the original name is returned.
+    &#34;&#34;&#34;
+    if name in self.aliases:
+        return self.aliases[name]
+    else:
+        return name</code></pre>
+</details>
+</dd>
 <dt id="skema.program_analysis.CAST.python.ts2cast.TS2CAST.construct_loop_construct"><code class="name flex">
 <span>def <span class="ident">construct_loop_construct</span></span>(<span>self, node: tree_sitter.Node)</span>
 </code></dt>
@@ -1898,6 +2189,42 @@ def get_name_node(node):
         return self.variable_context.get_node(func_name)
 
     return self.variable_context.add_variable(func_name, &#34;function&#34;, None)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST.python.ts2cast.TS2CAST.handle_aliased_import"><code class="name flex">
+<span>def <span class="ident">handle_aliased_import</span></span>(<span>self, import_stmt) ‑> <a title="skema.program_analysis.CAST2FN.model.cast.model_import.ModelImport" href="../../CAST2FN/model/cast/model_import.html#skema.program_analysis.CAST2FN.model.cast.model_import.ModelImport">ModelImport</a></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def handle_aliased_import(self, import_stmt) -&gt; ModelImport:
+    ref = self.node_helper.get_source_ref(import_stmt)
+    dot_name = get_children_by_types(import_stmt,[&#34;dotted_name&#34;])[0]
+    name = self.handle_dotted_name(dot_name) 
+    alias = get_children_by_types(import_stmt, [&#34;identifier&#34;])[0]
+    self.visit(alias)
+
+    return (name, self.node_helper.get_identifier(alias)) </code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST.python.ts2cast.TS2CAST.handle_dotted_name"><code class="name flex">
+<span>def <span class="ident">handle_dotted_name</span></span>(<span>self, import_stmt) ‑> <a title="skema.program_analysis.CAST2FN.model.cast.model_import.ModelImport" href="../../CAST2FN/model/cast/model_import.html#skema.program_analysis.CAST2FN.model.cast.model_import.ModelImport">ModelImport</a></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def handle_dotted_name(self, import_stmt) -&gt; ModelImport:
+    ref = self.node_helper.get_source_ref(import_stmt)
+    name = self.node_helper.get_identifier(import_stmt)
+    self.visit(import_stmt)
+
+    return name</code></pre>
 </details>
 </dd>
 <dt id="skema.program_analysis.CAST.python.ts2cast.TS2CAST.handle_for_clause"><code class="name flex">
@@ -2024,6 +2351,7 @@ def get_name_node(node):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def visit(self, node: Node):
+    # print(f&#34;===Visiting node[{node.type}]===&#34;)
     if node.type == &#34;module&#34;:
         return self.visit_module(node)
     elif node.type == &#34;parenthesized_expression&#34;:
@@ -2044,6 +2372,8 @@ def get_name_node(node):
         return self.visit_comparison_op(node)
     elif node.type == &#34;assignment&#34;:
         return self.visit_assignment(node)
+    elif node.type == &#34;attribute&#34;:
+        return self.visit_attribute(node)
     elif node.type == &#34;identifier&#34;:
         return self.visit_identifier(node)
     elif node.type == &#34;unary_operator&#34;:
@@ -2066,8 +2396,38 @@ def get_name_node(node):
         return self.visit_while(node)
     elif node.type == &#34;for_statement&#34;:
         return self.visit_for(node)
+    elif node.type == &#34;import_statement&#34;:
+        return self.visit_import(node)
+    elif node.type == &#34;import_from_statement&#34;:
+        return self.visit_import_from(node)
+    elif node.type == &#34;yield&#34;:
+        return self.visit_yield(node)
+    elif node.type == &#34;assert_statement&#34;:
+        return self.visit_assert(node)
     else:
         return self._visit_passthrough(node)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_assert"><code class="name flex">
+<span>def <span class="ident">visit_assert</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def visit_assert(self, node):
+    source_code_data_type = [&#34;Python&#34;, &#34;3.8&#34;, &#34;List&#34;]
+    ref = self.node_helper.get_source_ref(node)
+    return [
+        CASTLiteralValue(
+            StructureType.LIST,
+            &#34;AssertNotImplemented&#34;,
+            source_code_data_type,
+            ref
+        )   
+    ]</code></pre>
 </details>
 </dd>
 <dt id="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_assignment"><code class="name flex">
@@ -2093,6 +2453,24 @@ def get_name_node(node):
         right=right_cast,
         source_refs=[ref]
     )</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_attribute"><code class="name flex">
+<span>def <span class="ident">visit_attribute</span></span>(<span>self, node: tree_sitter.Node)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def visit_attribute(self, node: Node):
+    ref = self.node_helper.get_source_ref(node)
+    obj,_,attr = node.children
+    obj_cast = self.visit(obj)
+    attr_cast = self.visit(attr)
+
+    return Attribute(value= get_name_node(obj_cast), attr=get_name_node(attr_cast), source_refs=ref)</code></pre>
 </details>
 </dd>
 <dt id="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_binary_op"><code class="name flex">
@@ -2137,8 +2515,10 @@ where left and right can either be operators or literals</p></div>
 </summary>
 <pre><code class="python">def visit_call(self, node: Node) -&gt; Call:
     ref = self.node_helper.get_source_ref(node)
-    func_identifier = get_first_child_by_type(node, &#34;identifier&#34;)
-    func_name = self.visit(func_identifier) #self.node_helper.get_identifier(func_identifier)
+
+    func_cast = self.visit(node.children[0])
+
+    func_name = get_func_name_node(func_cast)        
 
     arg_list = get_first_child_by_type(node, &#34;argument_list&#34;)
     args = get_non_control_children(arg_list)
@@ -2151,7 +2531,7 @@ where left and right can either be operators or literals</p></div>
         elif isinstance(cast, AstNode):
             func_args.append(cast)
 
-    if func_name.val.name == &#34;range&#34;:
+    if get_name_node(func_cast).name == &#34;range&#34;:
         start_step_value = CASTLiteralValue(
             ScalarType.INTEGER, 
             value=&#34;1&#34;,
@@ -2168,7 +2548,7 @@ where left and right can either be operators or literals</p></div>
 
     # Function calls only want the &#39;Name&#39; part of the &#39;Var&#39; that the visit returns
     return Call(
-        func=func_name.val, 
+        func=func_name, 
         arguments=func_args, 
         source_refs=[ref]
     )</code></pre>
@@ -2568,6 +2948,65 @@ where left and right can either be operators or literals</p></div>
     )</code></pre>
 </details>
 </dd>
+<dt id="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_import"><code class="name flex">
+<span>def <span class="ident">visit_import</span></span>(<span>self, node: tree_sitter.Node)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def visit_import(self, node: Node):
+    ref = self.node_helper.get_source_ref(node)
+    to_ret = []
+
+    names_list = get_children_by_types(node, [&#34;dotted_name&#34;, &#34;aliased_import&#34;])
+    for name in names_list:
+        if name.type == &#34;dotted_name&#34;:
+            resolved_name = self.handle_dotted_name(name)
+            to_ret.append(ModelImport(name=resolved_name, alias=None, symbol=None, all=False, source_refs=ref))
+        elif name.type == &#34;aliased_import&#34;:
+            resolved_name = self.handle_aliased_import(name)
+            self.aliases[resolved_name[1]] = resolved_name[0]
+            to_ret.append(ModelImport(name=resolved_name[0], alias=resolved_name[1], symbol=None, all=False, source_refs=ref))
+
+    return to_ret</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_import_from"><code class="name flex">
+<span>def <span class="ident">visit_import_from</span></span>(<span>self, node: tree_sitter.Node)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def visit_import_from(self, node: Node):
+    ref = self.node_helper.get_source_ref(node)
+    to_ret = []
+
+    names_list = get_children_by_types(node, [&#34;dotted_name&#34;, &#34;aliased_import&#34;])
+    wild_card = get_children_by_types(node, [&#34;wildcard_import&#34;])
+    module_name = self.node_helper.get_identifier(names_list[0])
+
+    # if &#34;wildcard_import&#34; exists then it&#39;ll be in the list
+    if len(wild_card) == 1:
+        to_ret.append(ModelImport(name=module_name, alias=None, symbol=None, all=True, source_refs=ref))
+    else:
+        for name in names_list[1:]:
+            if name.type == &#34;dotted_name&#34;:
+                resolved_name = self.handle_dotted_name(name) 
+                to_ret.append(ModelImport(name=module_name, alias=None, symbol=resolved_name, all=False, source_refs=ref))
+            elif name.type == &#34;aliased_import&#34;:
+                resolved_name = self.handle_aliased_import(name)
+                self.aliases[resolved_name[1]] = resolved_name[0]
+                to_ret.append(ModelImport(name=module_name, alias=resolved_name[1], symbol=resolved_name[0], all=False, source_refs=ref))
+        
+    return to_ret</code></pre>
+</details>
+</dd>
 <dt id="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_lambda"><code class="name flex">
 <span>def <span class="ident">visit_lambda</span></span>(<span>self, node: tree_sitter.Node) ‑> <a title="skema.program_analysis.CAST2FN.model.cast.call.Call" href="../../CAST2FN/model/cast/call.html#skema.program_analysis.CAST2FN.model.cast.call.Call">Call</a></span>
 </code></dt>
@@ -2791,7 +3230,9 @@ where left and right can either be operators or literals</p></div>
 </summary>
 <pre><code class="python">def visit_name(self, node):
     # First, we will check if this name is already defined, and if it is return the name node generated previously
-    identifier = self.node_helper.get_identifier(node)
+    # NOTE: the call to check_alias is a crucial change, to resolve aliasing
+    # need to make sure nothing breaks
+    identifier = self.check_alias(self.node_helper.get_identifier(node))
     if self.variable_context.is_variable(identifier):
         return self.variable_context.get_node(identifier)
 
@@ -2933,6 +3374,28 @@ where operand is some kind of expression</p></div>
     )</code></pre>
 </details>
 </dd>
+<dt id="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_yield"><code class="name flex">
+<span>def <span class="ident">visit_yield</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def visit_yield(self, node):
+    source_code_data_type = [&#34;Python&#34;, &#34;3.8&#34;, &#34;List&#34;]
+    ref = self.node_helper.get_source_ref(node)
+    return [
+        CASTLiteralValue(
+            StructureType.LIST,
+            &#34;YieldNotImplemented&#34;,
+            source_code_data_type,
+            ref
+        )   
+    ]</code></pre>
+</details>
+</dd>
 </dl>
 </dd>
 </dl>
@@ -2951,6 +3414,7 @@ where operand is some kind of expression</p></div>
 </li>
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
+<li><code><a title="skema.program_analysis.CAST.python.ts2cast.get_func_name_node" href="#skema.program_analysis.CAST.python.ts2cast.get_func_name_node">get_func_name_node</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.python.ts2cast.get_name_node" href="#skema.program_analysis.CAST.python.ts2cast.get_name_node">get_name_node</a></code></li>
 </ul>
 </li>
@@ -2959,14 +3423,19 @@ where operand is some kind of expression</p></div>
 <li>
 <h4><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST">TS2CAST</a></code></h4>
 <ul class="">
+<li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.check_alias" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.check_alias">check_alias</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.construct_loop_construct" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.construct_loop_construct">construct_loop_construct</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.generate_cast" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.generate_cast">generate_cast</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.get_gromet_function_node" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.get_gromet_function_node">get_gromet_function_node</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.handle_aliased_import" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.handle_aliased_import">handle_aliased_import</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.handle_dotted_name" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.handle_dotted_name">handle_dotted_name</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.handle_for_clause" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.handle_for_clause">handle_for_clause</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.handle_if_clause" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.handle_if_clause">handle_if_clause</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.run" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.run">run</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit">visit</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_assert" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_assert">visit_assert</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_assignment" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_assignment">visit_assignment</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_attribute" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_attribute">visit_attribute</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_binary_op" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_binary_op">visit_binary_op</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_call" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_call">visit_call</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_comparison_op" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_comparison_op">visit_comparison_op</a></code></li>
@@ -2976,6 +3445,8 @@ where operand is some kind of expression</p></div>
 <li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_function_def" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_function_def">visit_function_def</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_identifier" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_identifier">visit_identifier</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_if_statement" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_if_statement">visit_if_statement</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_import" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_import">visit_import</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_import_from" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_import_from">visit_import_from</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_lambda" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_lambda">visit_lambda</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_list_comprehension" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_list_comprehension">visit_list_comprehension</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_literal" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_literal">visit_literal</a></code></li>
@@ -2986,6 +3457,7 @@ where operand is some kind of expression</p></div>
 <li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_return" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_return">visit_return</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_unary_op" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_unary_op">visit_unary_op</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_while" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_while">visit_while</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_yield" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_yield">visit_yield</a></code></li>
 </ul>
 </li>
 </ul>
