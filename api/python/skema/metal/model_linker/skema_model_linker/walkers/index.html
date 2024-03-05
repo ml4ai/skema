@@ -31,19 +31,25 @@
 from .json import JsonNode, JsonDictWalker
 from .petrinet import PetriNetWalker
 from .regnet import RegNetWalker
+from .generalized_amr import GeneralizedAMRWalker
 
-__all__ =[
+__all__ = [
     &#34;ModelWalker&#34;,
     &#34;JsonNode&#34;,
     &#34;JsonDictWalker&#34;,
     &#34;PetriNetWalker&#34;,
     &#34;RegNetWalker&#34;,
+    &#34;GeneralizedAMRWalker&#34;,
 ]</code></pre>
 </details>
 </section>
 <section>
 <h2 class="section-title" id="header-submodules">Sub-modules</h2>
 <dl>
+<dt><code class="name"><a title="skema.metal.model_linker.skema_model_linker.walkers.generalized_amr" href="generalized_amr.html">skema.metal.model_linker.skema_model_linker.walkers.generalized_amr</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
 <dt><code class="name"><a title="skema.metal.model_linker.skema_model_linker.walkers.json" href="json.html">skema.metal.model_linker.skema_model_linker.walkers.json</a></code></dt>
 <dd>
 <div class="desc"></div>
@@ -69,6 +75,36 @@ __all__ =[
 <section>
 <h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
+<dt id="skema.metal.model_linker.skema_model_linker.walkers.GeneralizedAMRWalker"><code class="flex name class">
+<span>class <span class="ident">GeneralizedAMRWalker</span></span>
+<span>(</span><span>data: Dict[str, Any])</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Defines the interface to walk through a __model to attach text extractions</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class GeneralizedAMRWalker(JsonDictWalker):
+
+    def _filter(self, obj_name: Optional[str], obj: Any, index: Optional[int]) -&gt; bool:
+        return obj_name in {&#34;states&#34;, &#34;parameters&#34;}</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="skema.metal.model_linker.skema_model_linker.walkers.json.JsonDictWalker" href="json.html#skema.metal.model_linker.skema_model_linker.walkers.json.JsonDictWalker">JsonDictWalker</a></li>
+<li><a title="skema.metal.model_linker.skema_model_linker.walkers.model_walker.ModelWalker" href="model_walker.html#skema.metal.model_linker.skema_model_linker.walkers.model_walker.ModelWalker">ModelWalker</a></li>
+<li>abc.ABC</li>
+</ul>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="skema.metal.model_linker.skema_model_linker.walkers.json.JsonDictWalker" href="json.html#skema.metal.model_linker.skema_model_linker.walkers.json.JsonDictWalker">JsonDictWalker</a></b></code>:
+<ul class="hlist">
+<li><code><a title="skema.metal.model_linker.skema_model_linker.walkers.json.JsonDictWalker.walk" href="json.html#skema.metal.model_linker.skema_model_linker.walkers.json.JsonDictWalker.walk">walk</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
 <dt id="skema.metal.model_linker.skema_model_linker.walkers.JsonDictWalker"><code class="flex name class">
 <span>class <span class="ident">JsonDictWalker</span></span>
 <span>(</span><span>data: Dict[str, Any])</span>
@@ -103,15 +139,15 @@ __all__ =[
         if allowed and callback:
             callback(obj_name, obj, index)
 
-        for prop, val in obj.items():
-            if isinstance(val, list):
-                for ix, elem in enumerate(val):
-                    if type(elem) in (list, dict):
-                        ret.extend(self.__step(prop, elem, ix, callback, **kwargs))
-            elif isinstance(val, dict):
+        if isinstance(obj, list):
+            for ix, elem in enumerate(obj):
+                if type(elem) in (list, dict):
+                    ret.extend(self.__step(obj_name, elem, ix, callback, **kwargs))
+        elif isinstance(obj, dict):
+            for prop, val in obj.items():
                 ret.extend(self.__step(prop, val, None, callback, **kwargs))
 
-        if allowed:
+        if allowed and not isinstance(obj, list):
             ret.append(JsonNode(obj_name, obj, index))
 
         return ret
@@ -127,6 +163,7 @@ __all__ =[
 </ul>
 <h3>Subclasses</h3>
 <ul class="hlist">
+<li><a title="skema.metal.model_linker.skema_model_linker.walkers.generalized_amr.GeneralizedAMRWalker" href="generalized_amr.html#skema.metal.model_linker.skema_model_linker.walkers.generalized_amr.GeneralizedAMRWalker">GeneralizedAMRWalker</a></li>
 <li><a title="skema.metal.model_linker.skema_model_linker.walkers.petrinet.PetriNetWalker" href="petrinet.html#skema.metal.model_linker.skema_model_linker.walkers.petrinet.PetriNetWalker">PetriNetWalker</a></li>
 <li><a title="skema.metal.model_linker.skema_model_linker.walkers.regnet.RegNetWalker" href="regnet.html#skema.metal.model_linker.skema_model_linker.walkers.regnet.RegNetWalker">RegNetWalker</a></li>
 </ul>
@@ -304,6 +341,7 @@ def walk(self, callback=None, *args, **kwargs):
 </li>
 <li><h3><a href="#header-submodules">Sub-modules</a></h3>
 <ul>
+<li><code><a title="skema.metal.model_linker.skema_model_linker.walkers.generalized_amr" href="generalized_amr.html">skema.metal.model_linker.skema_model_linker.walkers.generalized_amr</a></code></li>
 <li><code><a title="skema.metal.model_linker.skema_model_linker.walkers.json" href="json.html">skema.metal.model_linker.skema_model_linker.walkers.json</a></code></li>
 <li><code><a title="skema.metal.model_linker.skema_model_linker.walkers.model_walker" href="model_walker.html">skema.metal.model_linker.skema_model_linker.walkers.model_walker</a></code></li>
 <li><code><a title="skema.metal.model_linker.skema_model_linker.walkers.petrinet" href="petrinet.html">skema.metal.model_linker.skema_model_linker.walkers.petrinet</a></code></li>
@@ -312,6 +350,9 @@ def walk(self, callback=None, *args, **kwargs):
 </li>
 <li><h3><a href="#header-classes">Classes</a></h3>
 <ul>
+<li>
+<h4><code><a title="skema.metal.model_linker.skema_model_linker.walkers.GeneralizedAMRWalker" href="#skema.metal.model_linker.skema_model_linker.walkers.GeneralizedAMRWalker">GeneralizedAMRWalker</a></code></h4>
+</li>
 <li>
 <h4><code><a title="skema.metal.model_linker.skema_model_linker.walkers.JsonDictWalker" href="#skema.metal.model_linker.skema_model_linker.walkers.JsonDictWalker">JsonDictWalker</a></code></h4>
 <ul class="">

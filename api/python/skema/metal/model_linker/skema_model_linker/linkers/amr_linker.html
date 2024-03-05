@@ -62,19 +62,22 @@ class Linker(ABC):
 
     def _align_texts(self, sources: List[str], targets: List[str], threshold: float) -&gt; List[Tuple[str, str]]:
 
-        with torch.no_grad():
-            s_embs = self._model.encode(sources)
-            t_embs = self._model.encode(targets)
+        if len(sources) &gt; 0 and len(targets) &gt; 0:
+            with torch.no_grad():
+                s_embs = self._model.encode(sources)
+                t_embs = self._model.encode(targets)
 
-        similarities = util.pytorch_cos_sim(s_embs, t_embs)
+            similarities = util.pytorch_cos_sim(s_embs, t_embs)
 
-        indices = (similarities &gt;= threshold).nonzero()
+            indices = (similarities &gt;= threshold).nonzero()
 
-        ret = list()
-        for ix in indices:
-            ret.append((sources[ix[0]], targets[ix[1]]))
+            ret = list()
+            for ix in indices:
+                ret.append((sources[ix[0]], targets[ix[1]]))
 
-        return ret
+            return ret
+        else:
+            return []
 
     def _generate_linking_targets(self, extractions: Iterable[Attribute]) -&gt; Dict[str, List[AnchoredEntity]]:
         &#34;&#34;&#34; Will generate candidate texts to link to model elements &#34;&#34;&#34;
@@ -264,6 +267,7 @@ inheritance.</p></div>
 </ul>
 <h3>Subclasses</h3>
 <ul class="hlist">
+<li><a title="skema.metal.model_linker.skema_model_linker.linkers.generalizer_amr_linker.GeneralizedAMRLinker" href="generalizer_amr_linker.html#skema.metal.model_linker.skema_model_linker.linkers.generalizer_amr_linker.GeneralizedAMRLinker">GeneralizedAMRLinker</a></li>
 <li><a title="skema.metal.model_linker.skema_model_linker.linkers.petrinet.PetriNetLinker" href="petrinet.html#skema.metal.model_linker.skema_model_linker.linkers.petrinet.PetriNetLinker">PetriNetLinker</a></li>
 <li><a title="skema.metal.model_linker.skema_model_linker.linkers.regnet.RegNetLinker" href="regnet.html#skema.metal.model_linker.skema_model_linker.linkers.regnet.RegNetLinker">RegNetLinker</a></li>
 </ul>
@@ -393,19 +397,22 @@ inheritance.</p></div>
 
     def _align_texts(self, sources: List[str], targets: List[str], threshold: float) -&gt; List[Tuple[str, str]]:
 
-        with torch.no_grad():
-            s_embs = self._model.encode(sources)
-            t_embs = self._model.encode(targets)
+        if len(sources) &gt; 0 and len(targets) &gt; 0:
+            with torch.no_grad():
+                s_embs = self._model.encode(sources)
+                t_embs = self._model.encode(targets)
 
-        similarities = util.pytorch_cos_sim(s_embs, t_embs)
+            similarities = util.pytorch_cos_sim(s_embs, t_embs)
 
-        indices = (similarities &gt;= threshold).nonzero()
+            indices = (similarities &gt;= threshold).nonzero()
 
-        ret = list()
-        for ix in indices:
-            ret.append((sources[ix[0]], targets[ix[1]]))
+            ret = list()
+            for ix in indices:
+                ret.append((sources[ix[0]], targets[ix[1]]))
 
-        return ret
+            return ret
+        else:
+            return []
 
     def _generate_linking_targets(self, extractions: Iterable[Attribute]) -&gt; Dict[str, List[AnchoredEntity]]:
         &#34;&#34;&#34; Will generate candidate texts to link to model elements &#34;&#34;&#34;
