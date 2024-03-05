@@ -33,19 +33,22 @@ class Linker(ABC):
 
     def _align_texts(self, sources: List[str], targets: List[str], threshold: float) -> List[Tuple[str, str]]:
 
-        with torch.no_grad():
-            s_embs = self._model.encode(sources)
-            t_embs = self._model.encode(targets)
+        if len(sources) > 0 and len(targets) > 0:
+            with torch.no_grad():
+                s_embs = self._model.encode(sources)
+                t_embs = self._model.encode(targets)
 
-        similarities = util.pytorch_cos_sim(s_embs, t_embs)
+            similarities = util.pytorch_cos_sim(s_embs, t_embs)
 
-        indices = (similarities >= threshold).nonzero()
+            indices = (similarities >= threshold).nonzero()
 
-        ret = list()
-        for ix in indices:
-            ret.append((sources[ix[0]], targets[ix[1]]))
+            ret = list()
+            for ix in indices:
+                ret.append((sources[ix[0]], targets[ix[1]]))
 
-        return ret
+            return ret
+        else:
+            return []
 
     def _generate_linking_targets(self, extractions: Iterable[Attribute]) -> Dict[str, List[AnchoredEntity]]:
         """ Will generate candidate texts to link to model elements """

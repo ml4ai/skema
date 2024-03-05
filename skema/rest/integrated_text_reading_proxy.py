@@ -501,7 +501,6 @@ async def integrated_pdf_extractions(
         for amr in amrs:
             try:
                 aligned_amr = metal_proxy.link_amr(
-                    amr_type="petrinet",                # Resolve in runtime
                     amr_file=amr,
                     text_extractions_file=extractions_ufile)
                 aligned_amrs.append(aligned_amr)
