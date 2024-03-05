@@ -1,14 +1,13 @@
-import json
 import itertools as it
+import json
 
 from askem_extractions.data_model import AttributeCollection
 from fastapi import UploadFile, File, APIRouter, FastAPI
-from pydantic import Json
 
-
-from skema.metal.model_linker.skema_model_linker.linkers import PetriNetLinker, RegNetLinker
 from skema.metal.model_linker.skema_model_linker.link_amr import replace_xml_codepoints
-from skema.rest.schema import TextReadingAnnotationsOutput, TextReadingEvaluationResults, AMRLinkingEvaluationResults
+from skema.metal.model_linker.skema_model_linker.linkers import PetriNetLinker, RegNetLinker
+from skema.metal.model_linker.skema_model_linker.linkers.generalizer_amr_linker import GeneralizedAMRLinker
+from skema.rest.schema import AMRLinkingEvaluationResults
 from skema.rest.utils import compute_amr_linking_evaluation
 
 router = APIRouter()
@@ -17,8 +16,7 @@ router = APIRouter()
 @router.post(
     "/link_amr",
 )
-def link_amr(amr_type: str,
-             similarity_model: str = "sentence-transformers/all-MiniLM-L6-v2",
+def link_amr(similarity_model: str = "sentence-transformers/all-MiniLM-L6-v2",
              similarity_threshold: float = 0.5,
              amr_file: UploadFile = File(...),
              text_extractions_file: UploadFile = File(...)):
@@ -26,16 +24,13 @@ def link_amr(amr_type: str,
 
         ### Python example
         ```
-        params = {
-          "amr_type": "petrinet"
-        }
 
         files = {
           "amr_file": ("amr.json", open("amr.json"), "application/json"),
           "text_extractions_file": ("extractions.json", open("extractions.json"), "application/json")
         }
 
-        response = requests.post(f"{ENDPOINT}/metal/link_amr", params=params, files=files)
+        response = requests.post(f"{ENDPOINT}/metal/link_amr", files=files)
         if response.status_code == 200:
             enriched_amr = response.json()
         ```
@@ -59,13 +54,21 @@ def link_amr(amr_type: str,
         extractions = AttributeCollection.from_json(raw_extractions)
     # text_extractions = TextReadingAnnotationsOutput(**json.load(text_extractions_file.file))
 
-
+    # Get the AMR type from the header of the json
+    if 'schema_name' in amr:
+        amr_type = amr['schema_name'].lower()
+    elif 'header' in amr and 'schema_name' in amr['header']:
+        amr_type = amr['header']['schema_name'].lower()
+    else:
+        raise Exception("Schema name missing in AMR")
 
     # Link the AMR
     if amr_type == "petrinet":
         Linker = PetriNetLinker
     elif amr_type == "regnet":
         Linker = RegNetLinker
+    elif amr_type == "generalized amr":
+        Linker = GeneralizedAMRLinker
     else:
         raise NotImplementedError(f"{amr_type} AMR currently not supported")
 
