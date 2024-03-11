@@ -2,7 +2,7 @@
 """
 Response models for API
 """
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 
 from askem_extractions.data_model import AttributeCollection
 from pydantic import BaseModel, Field
@@ -255,4 +255,10 @@ class TextReadingAnnotationsOutput(BaseModel):
         None, name="generalized_errors",
         description="Any pipeline-wide errors, not specific to a particular input",
         examples=[[TextReadingError(pipeline="MIT", message="API quota exceeded")]],
+    )
+
+    aligned_amrs: List[Dict[str, Any]] = Field(
+        description="An aligned list of AMRs to the text extractions. This field will be populated only if it was"
+                    " provided as part of the input",
+        default_factory=lambda: []
     )
