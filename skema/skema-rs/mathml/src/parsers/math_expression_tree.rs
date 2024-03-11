@@ -3,7 +3,7 @@
 use crate::ast::VectorNotation;
 use crate::{
     ast::{
-        operator::{Derivative, DerivativeNotation, Gradient, Hat, Int, Operator, Summation},
+        operator::{Derivative, DerivativeNotation, Gradient, Hat, Int, Operator, Logarithm, Summation},
         Math, MathExpression, Mi, Mrow,
     },
     parsers::interpreted_mathml::interpreted_math,
@@ -266,6 +266,7 @@ fn is_unary_operator(op: &Operator) -> bool {
         Operator::Sqrt
             | Operator::Factorial
             | Operator::Exp
+            | Operator::Logarithm(_)
             | Operator::Power
             | Operator::Gradient(_)
             | Operator::Summation(_)
@@ -900,6 +901,13 @@ impl MathExpressionTree {
                     Operator::Min => {
                         expression.push_str(&format!("\\min {}", rest[0].to_latex()));
                     }
+                    Operator::Logarithm(x) => {
+                        if x.is_natural_log == true {
+                            expression.push_str(&format!("\\ln {}", rest[0].to_latex()));
+                        } else {
+                            expression.push_str(&format!("\\log {}", rest[0].to_latex()));
+                        }
+                    }
                     Operator::Comma => {
                         process_atoms_cons_parentheses(&mut expression, &rest[0]);
                         expression.push(',');
@@ -969,6 +977,13 @@ impl MathExpression {
                         element.flatten(tokens);
                     }
                 }
+                tokens.push(MathExpression::Mo(Operator::Rparen));
+            }
+            // Handles `Summation` operator with MathExpression
+            MathExpression::SummationMath(x) => {
+                tokens.push(MathExpression::Mo(Operator::Lparen));
+                x.op.flatten(tokens);
+                x.func.flatten(tokens);
                 tokens.push(MathExpression::Mo(Operator::Rparen));
             }
             MathExpression::Differential(x) => {
@@ -1052,16 +1067,32 @@ impl MathExpression {
                 superscript.flatten(tokens);
                 tokens.push(MathExpression::Mo(Operator::Rparen));
             }
-            MathExpression::Minimize(_op, vec) => {
+            MathExpression::Minimize(op, vec) => {
                 tokens.push(MathExpression::Mo(Operator::Lparen));
-                tokens.push(MathExpression::Mo(Operator::Min));
-                //row.flatten(tokens);
-                tokens.push(MathExpression::Mo(Operator::Lparen));
+                //tokens.push(MathExpression::Mo(Operator::Min));
+                op.flatten(tokens);
+                //tokens.push(MathExpression::Mo(Operator::Lparen));
                 for v in vec {
                     tokens.push(v.clone());
+                    //tokens.push(' ');
+                    //tokens.push(v.clone());
                 }
+                //tokens.push(MathExpression::Mo(Operator::Rparen));
                 tokens.push(MathExpression::Mo(Operator::Rparen));
-                tokens.push(MathExpression::Mo(Operator::Rparen));
+
+                /*if let Some(func_of_vec) = &x.func_of {
+                    if !func_of_vec.is_empty() && !func_of_vec[0].content.to_string().is_empty()
+                    {
+                        expression.push('(');
+                        for (index, func_ci) in func_of_vec.iter().enumerate() {
+                            process_math_expression(&func_ci.content, expression);
+                            if index < func_of_vec.len() - 1 {
+                                expression.push(',');
+                            }
+                        }
+                        expression.push(')');
+                    }
+                }*/
             }
             MathExpression::Absolute(_operator, components) => {
                 tokens.push(MathExpression::Mo(Operator::Lparen));
@@ -1097,8 +1128,9 @@ impl MathExpression {
                     tokens.push(MathExpression::Mo(Operator::Rparen));
                 }
             }
-            // Handles `Summation` operator with MathExpression
-            MathExpression::SummationMath(x) => {
+
+            // Handles `exp` operator with MathExpression
+            MathExpression::ExpMath(x) => {
                 tokens.push(MathExpression::Mo(Operator::Lparen));
                 x.op.flatten(tokens);
                 x.func.flatten(tokens);
@@ -1139,6 +1171,10 @@ impl Lexer {
                         } else {
                             acc.push(&MathExpression::Mo(Operator::Multiply));
                         }
+                        acc.push(x);
+                    }
+                    // Handle other types of operators.
+                    MathExpression::Mo(Operator::Min) => {
                         acc.push(x);
                     }
                     // Handle other types of operators.
@@ -1200,6 +1236,7 @@ impl Lexer {
 fn expr(input: Vec<MathExpression>) -> MathExpressionTree {
     let mut lexer = Lexer::new(input);
     insert_multiple_between_paren(&mut lexer);
+    collapse_commas_within_paren(&mut lexer);
     let mut result: MathExpressionTree = expr_bp(&mut lexer, 0);
     let mut math_vec: Vec<MathExpressionTree> = vec![];
     while lexer.next() != Token::Eof {
@@ -1245,7 +1282,6 @@ fn insert_multiple_between_paren(lexer: &mut Lexer) {
 
     while let Some(token) = iter.next() {
         new_tokens.push(token.clone());
-
         if let Some(next_token) = iter.peek() {
             if let Token::Op(Operator::Lparen) = token {
                 if let Token::Op(Operator::Rparen) = **next_token {
@@ -1256,6 +1292,70 @@ fn insert_multiple_between_paren(lexer: &mut Lexer) {
     }
     lexer.tokens = new_tokens;
 }
+
+fn collapse_commas_within_paren(lexer: &mut Lexer) {
+    let mut new_tokens = Vec::new();
+    let mut inside_paren = false;
+    let mut iter = lexer.tokens.iter().peekable();
+
+    while let Some(token) = iter.next() {
+        match token {
+            Token::Op(Operator::Lparen) => {
+                inside_paren = true;
+                new_tokens.push(token.clone());
+            },
+            Token::Op(Operator::Rparen) => {
+                inside_paren = false;
+                new_tokens.push(token.clone());
+            },
+            Token::Op(Operator::Comma) => {
+                // Skip the comma if we're inside parentheses
+                // Also, ensure the next token is added immediately after the last added token
+                if let Some(next_token) = iter.peek() {
+                    if let Token::Atom(_) = **next_token {
+                        // Skip adding the comma and directly add the next token
+                        new_tokens.push(next_token.clone().clone());
+                        iter.next(); // Consume the next token
+                    }
+                }
+            },
+            _ => {
+                // For any other token, just add it to the new list
+                new_tokens.push(token.clone());
+            }
+        }
+    }
+    println!("new_tokens:{:?}", new_tokens);
+    lexer.tokens = new_tokens;
+}
+
+/*fn collapse_commas_within_paren(lexer: &mut Lexer) {
+    let mut inside_paren = false;
+    let mut index_to_remove = Vec::new();
+    let mut iter = lexer.tokens.iter().peekable();
+
+    while let Some(token) = iter.next() {
+        match token {
+            Token::Op(Operator::Lparen) => {
+                inside_paren = true;
+            },
+            Token::Op(Operator::Rparen) => {
+                inside_paren = false;
+            },
+            Token::Op(Operator::Comma) => {
+
+            },
+            _ => {}
+        }
+    }
+
+    // Remove commas from the end to the start to avoid index shifting
+    index_to_remove.reverse();
+    for index in index_to_remove {
+        lexer.tokens.remove(index);
+    }
+}*/
+
 
 /// The Pratt parsing algorithm for constructing an S-expression representing an equation.
 fn expr_bp(lexer: &mut Lexer, min_bp: u8) -> MathExpressionTree {
@@ -1323,6 +1423,7 @@ fn prefix_binding_power(op: &Operator) -> ((), u8) {
         Operator::Summation(Summation { .. }) => ((), 25),
         Operator::Hat(Hat { .. }) => ((), 25),
         Operator::Int(Int { .. }) => ((), 25),
+        Operator::Logarithm(Logarithm { .. }) => ((), 25),
         _ => panic!("Bad operator: {:?}", op),
     }
 }
@@ -3517,5 +3618,134 @@ fn test_clm4_5__8_2() {
     println!("exp={:?}", exp);
     let s_exp = exp.to_string();
     assert_eq!(s_exp, "(= A_{n} (- (Min (, A_{c} (, A_{j} A_{p}))) R_{d}))");
+    //assert_eq!(s_exp, "(= A_{n} (- (Min A_{c} A_{j} A_{p}) R_{d}))");
     assert_eq!(exp.to_latex(), "A_{n}=(\\min A_{c},(A_{j},A_{p}))-R_{d}");
 }
+
+#[test]
+fn test_clm4_5__8_12_3() {
+    let input = "<math>
+  <msub>
+    <mi>f</mi>
+    <mi>L</mi>
+  </msub>
+  <mo>(</mo>
+  <msub>
+    <mi>T</mi>
+    <mi>v</mi>
+  </msub>
+  <mo>)</mo>
+  <mo>=</mo>
+  <mn>1</mn>
+  <mo>+</mo>
+  <mi>exp</mi>
+  <mo>[</mo>
+  <msub>
+    <mi>s</mi>
+    <mn>3</mn>
+  </msub>
+  <mo>(</mo>
+  <msub>
+    <mi>s</mi>
+    <mn>4</mn>
+  </msub>
+  <mo>&#x2212;</mo>
+  <msub>
+    <mi>T</mi>
+    <mi>v</mi>
+  </msub>
+  <mo>)</mo>
+  <mo>]</mo>
+    </math>";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", exp);
+    let s_exp = exp.to_string();
+    assert_eq!(s_exp, "(= f_{L} (+ 1 (exp (* s_{3} (- s_{4} T_{v})))))");
+    assert_eq!(exp.to_latex(), "f_{L}(T_{v})=1+\\mathrm{exp}{s_{3}*(s_{4}-T_{v})}");
+}
+
+#[test]
+fn test_log() {
+    let input = "<math>
+  <mrow><mi>log</mi><mi>x</mi></mrow>
+    </math>";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", exp);
+    let s_exp = exp.to_string();
+    assert_eq!(s_exp, "(Log x)");
+    assert_eq!(exp.to_latex(), "\\log x");
+}
+
+#[test]
+fn test_ln() {
+    let input = "<math>
+  <mrow><mi>ln</mi><mi>x</mi></mrow>
+    </math>";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", exp);
+    let s_exp = exp.to_string();
+    assert_eq!(s_exp, "(Ln x)");
+    assert_eq!(exp.to_latex(), "\\ln x");
+}
+
+#[test]
+fn test_minimize() {
+    let input = "<math>
+  <mi>min</mi>
+  <mo>&#x2061;</mo>
+  <mo>(</mo>
+  <msub>
+    <mi>A</mi>
+    <mi>c</mi>
+  </msub>
+  <mo>,</mo>
+  <msub>
+    <mi>A</mi>
+    <mi>j</mi>
+  </msub>
+  <mo>,</mo>
+  <msub>
+    <mi>A</mi>
+    <mi>p</mi>
+  </msub>
+  <mo>)</mo>
+  <mo>.</mo>
+    </math>";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", exp);
+    let s_exp = exp.to_string();
+    assert_eq!(s_exp, "(= A_{n} (- (Min (, A_{c} (, A_{j} A_{p}))) R_{d}))");
+    //assert_eq!(s_exp, "(= A_{n} (- (Min A_{c} A_{j} A_{p}) R_{d}))");
+    assert_eq!(exp.to_latex(), "A_{n}=(\\min A_{c},(A_{j},A_{p}))-R_{d}");
+}
+
+/*#[test]
+fn test_mtable() {
+    let input = "<math>
+  <mtable>
+  <mtr>
+    <mtd>
+     <mrow>
+       <mi>E</mi>
+       <mo>=</mo>
+       <mrow>
+        <mi>m</mi>
+        <msup>
+         <mi>c</mi>
+         <mn>2</mn>
+        </msup>
+       </mrow>
+     </mrow>
+    </mtd>
+<mtd>
+      <mtext>Einstein </mtext>
+    </mtd>
+  </mtr>
+</mtable>
+    </math>";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", exp);
+    let s_exp = exp.to_string();
+    assert_eq!(s_exp, "(= A_{n} (- (Min (, A_{c} (, A_{j} A_{p}))) R_{d}))");
+    assert_eq!(exp.to_latex(), "A_{n}=(\\min A_{c},(A_{j},A_{p}))-R_{d}");
+}*/

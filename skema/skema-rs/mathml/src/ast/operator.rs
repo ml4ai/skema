@@ -36,6 +36,13 @@ pub enum DerivativeNotation {
     Lagrange,
 }
 
+#[derive(
+Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, JsonSchema,
+)]
+pub struct Logarithm {
+    pub is_natural_log: bool,
+}
+
 /// Summation operator has the option of having lower bound and upper bound components
 #[derive(
     Debug,
@@ -143,9 +150,9 @@ pub enum Operator {
     Subtract,
     /// Square root operator
     Sqrt,
-    /// Left parenthesis
+    /// Left parenthesis; only for internal use (Pratt parsing)
     Lparen,
-    /// Right parenthesis
+    /// Right parenthesis; only for internal use (Pratt parsing)
     Rparen,
     /// Composition operator
     Compose,
@@ -203,7 +210,10 @@ pub enum Operator {
     Laplacian,
     /// Closed surface integral operator --need to include explit dS integration variable when translating to latex
     SurfaceInt,
+    /// only for internal use
     Comma,
+    /// Logarithm operator
+    Logarithm(Logarithm),
     /// Minimum operator
     Min,
     // Catchall for operators we haven't explicitly defined as enum variants yet.
@@ -288,6 +298,13 @@ impl fmt::Display for Operator {
             }
             Operator::Min => write!(f, "Min"),
             Operator::Comma => write!(f, ","),
+            Operator::Logarithm(Logarithm{is_natural_log}) => {
+                if *is_natural_log == true{
+                    write!(f, "Ln")
+                } else {
+                    write!(f, "Log")
+                }
+            }
         }
     }
 }

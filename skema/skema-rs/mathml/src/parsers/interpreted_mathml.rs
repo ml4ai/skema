@@ -6,9 +6,9 @@
 
 use crate::{
     ast::{
-        operator::{Derivative, DerivativeNotation, Gradient, Hat, Int, Operator, Summation},
-        Ci, Differential, HatComp, Integral, LaplacianComp, Math, MathExpression, Mi, Mrow,
-        SummationMath, Type, VectorNotation,
+        operator::{Derivative, DerivativeNotation, Gradient, Hat, Int, Operator,Logarithm, Summation},
+        Ci, Differential, HatComp, Integral, LaplacianComp, Math, MathExpression, Mi, Mrow, Mtr, Mtd,
+        SummationMath, ExpMath, Type, VectorNotation,
     },
     parsers::generic_mathml::{
         add, attribute, cross, divide, dot, elem_many0, equals, etag, lparen, mean, mi, mn, msub,
@@ -1480,9 +1480,97 @@ pub fn minimum_with_content(input: Span) -> IResult<(MathExpression, Vec<MathExp
         vec_exp.push(MathExpression::Mo(Operator::Comma));
     }
     let Some(_) = vec_exp.pop() else { todo!() };
+    println!("{:?}",vec_exp);
 
     Ok((s, (MathExpression::Mo(op), vec_exp)))
 }
+
+/// Handles summation as operator
+pub fn exponential(input: Span) -> IResult<(Operator, Mrow)> {
+    let (s, _exp) = ws(
+        terminated(delimited(stag!("mi"),tag("exp"), etag!("mi")),delimited(stag!("mo"),lparen, etag!("mo"))
+        ))(input)?;
+    let operator = Operator::Exp;
+    let (s, row) = ws(many_till(math_expression, delimited(stag!("mo"),rparen, etag!("mo"))))(s)?;
+    let mut expression: Vec<MathExpression> = Vec::new();
+    expression.push(MathExpression::Mrow(Mrow::new(row.0)));
+    let comps = Mrow(expression);
+
+    Ok((s, (operator, comps)))
+}
+
+/// Logarithm operator: e.g. log
+pub fn logarithm(input: Span) -> IResult<Operator> {
+    let (s, _exp) = ws(
+        delimited(stag!("mi"),tag("log"), etag!("mi")
+        ))(input)?;
+    let operator = Operator::Logarithm(Logarithm::new(false));
+
+    Ok((s, operator))
+}
+
+/// Logarithm operator: e.g. log
+pub fn natural_log(input: Span) -> IResult<Operator> {
+    let (s, _exp) = ws(
+        delimited(stag!("mi"),tag("ln"), etag!("mi")
+        ))(input)?;
+    let operator = Operator::Logarithm(Logarithm::new(true));
+
+    Ok((s, operator))
+}
+
+/// Elements in Rows in table
+/*pub fn mtd(input: Span) -> IResult<Mtd> {
+    println!("<");
+    let (s, elements) = ws(delimited(
+        stag!("mtd"),
+        many0(math_expression),
+        etag!("mtd"),
+    ))(input)?;
+    println!("<<");
+    Ok((s, Mtd::new(elements)))
+}*/
+
+/// Elements in Rows in table
+/*pub fn mtd_no_vector(input: Span) -> IResult<Mtd> {
+    println!("<");
+    let mut vec_exp: Vec<MathExpression> = Vec::new();
+    let (s, elements) = ws(delimited(
+        stag!("mtd"),
+        math_expression,
+        etag!("mtd"),
+    ))(input)?;
+    vec_exp.push(elements);
+    println!("<<");
+    Ok((s, Mtd::new(vec_exp)))
+}*/
+
+/// Rows in table
+/*pub fn mtr(input: Span) -> IResult<Mtr> {
+    println!(".");
+    let (s, elements) = ws(delimited(
+        stag!("mtr"),
+        many0(alt((mtd_no_vector,mtd))),
+        etag!("mtr"),
+    ))(input)?;
+    println!("..");
+    let row = Mtr(elements);
+    Ok((s, row))
+}*/
+
+/// Mtable
+/*pub fn mtable(input: Span) -> IResult<MathExpression> {
+    println!("-");
+    let (s, mtr) = ws(delimited(
+        stag!("mtable"),
+        many0(mtr),
+        etag!("mtable"),
+    ))(input)?;
+    println!("--");
+    Ok((s, MathExpression::Mtable(mtr)))
+    let row = Mtr(elements);
+}*/
+
 
 /// Parser for math expressions. This varies from the one in the generic_mathml module, since it
 /// assumes that expressions such as S(t) are actually univariate functions.
@@ -1512,6 +1600,8 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                 },
             ),
             vector_mover,
+            map(logarithm, MathExpression::Mo),
+            map(natural_log, MathExpression::Mo),
         )),
         alt((
             map(gradient_with_closed_paren, |row| {
@@ -1538,6 +1628,7 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
             }),
             map(downarrow_operator_with_bounds, MathExpression::Ci),
             map(downarrow_operator_no_bounds, MathExpression::Ci),
+            //mtable,
         )),
         map(
             first_order_partial_derivative_partial_func,
@@ -1589,6 +1680,18 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                             lower_bound,
                             upper_bound,
                         }))),
+                        func: Box::new(MathExpression::Mrow(comp)),
+                    })
+                },
+            ),
+            map(
+                exponential,
+                |(
+                     op,
+                     comp,
+                 )| {
+                    MathExpression::ExpMath(ExpMath {
+                        op: Box::new(MathExpression::Mo(op)),
                         func: Box::new(MathExpression::Mrow(comp)),
                     })
                 },

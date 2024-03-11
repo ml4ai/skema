@@ -4,7 +4,7 @@ use crate::ast::{
     MathExpression::{
         Mfrac, Mn, Mo, MoLine, Mover, Mspace, Msqrt, Mstyle, Msub, Msubsup, Msup, Mtext, Munder,
     },
-    Mi, Mrow,
+    Mi, Mrow, Mtr,
 };
 
 use nom::{

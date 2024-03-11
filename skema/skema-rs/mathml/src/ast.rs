@@ -80,6 +80,16 @@ pub struct SummationMath {
     pub func: Box<MathExpression>,
 }
 
+/// Represents expoenential operator with terms that are in the exponential
+/// E.g. exp( x(y-z) )
+#[derive(
+Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, JsonSchema,
+)]
+pub struct ExpMath {
+    pub op: Box<MathExpression>,
+    pub func: Box<MathExpression>,
+}
+
 /// Integral operation represents integral over math expressions
 #[derive(
     Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, JsonSchema,
@@ -109,6 +119,46 @@ pub struct LaplacianComp {
     pub op: Box<MathExpression>,
     pub comp: Ci,
 }
+
+/// Handles elements in row in table or matrix (`Mtr`) for `Mtable`
+#[derive(
+Debug,
+Ord,
+PartialOrd,
+PartialEq,
+Eq,
+Clone,
+Hash,
+new,
+Deserialize,
+Serialize,
+ToSchema,
+JsonSchema,
+)]
+pub struct Mtd(
+    /// Entry in table or matrix
+    pub Vec<MathExpression>
+);
+
+/// Handles table or matrix (`Mtr`) for `Mtable`
+#[derive(
+Debug,
+Ord,
+PartialOrd,
+PartialEq,
+Eq,
+Clone,
+Hash,
+new,
+Deserialize,
+Serialize,
+ToSchema,
+JsonSchema,
+)]
+pub struct Mtr(
+    /// Entry in table or matrix
+    Vec<Mtd>
+);
 
 /// Handles ↓  such that {comp}↓_{sub}^{sup} can parse
 #[derive(
@@ -193,6 +243,8 @@ pub enum MathExpression {
     /// ↓ as an operator e.g. I↓ indicates downward diffuse radiative fluxes per unit indcident flux
     DownArrow(DownArrow),
     Minimize(Box<MathExpression>, Vec<MathExpression>),
+    ExpMath(ExpMath),
+    Mtable(Vec<Mtr>),
     #[default]
     None,
 }
@@ -239,6 +291,10 @@ impl fmt::Display for MathExpression {
                 write!(f, "{op}")?;
                 write!(f, "{func}")
             }
+            MathExpression::ExpMath(ExpMath { op, func }) => {
+                write!(f, "{op}")?;
+                write!(f, "{func}")
+            }
             MathExpression::HatComp(HatComp { op, comp }) => {
                 write!(f, "{op}")?;
                 write!(f, "{comp}")
@@ -271,6 +327,13 @@ impl fmt::Display for MathExpression {
                 }
                 Ok(())
             }
+            /*MathExpression::Mtable(Mtr(mtd)) => {
+                for elements in mtd {
+                    write!(f, "{:?}", elements)?;
+                }
+                Ok(())
+            }*/
+
             expression => write!(f, "{expression:?}"),
         }
     }
