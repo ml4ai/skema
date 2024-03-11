@@ -261,7 +261,7 @@ class TS2CAST(object):
         ret_val = node.children[1]
         ret_cast = self.visit(ret_val)
 
-        return ModelReturn(value=ret_cast, source_refs=[ref])
+        return ModelReturn(value=get_operand_node(ret_cast), source_refs=[ref])
 
     def visit_call(self, node: Node) -> Call:
         ref = self.node_helper.get_source_ref(node)
@@ -434,8 +434,8 @@ class TS2CAST(object):
         op = get_op(self.node_helper.get_operator(node.children[1]))
         left, _, right = node.children
 
-        left_cast = get_name_node(self.visit(left))
-        right_cast = get_name_node(self.visit(right))
+        left_cast = get_operand_node(self.visit(left))
+        right_cast = get_operand_node(self.visit(right))
 
         return Operator(
             op=op, 
@@ -1078,7 +1078,7 @@ def get_name_node(node):
     if isinstance(cur_node, Var):
         return cur_node.val
     else:
-        return node
+        return cur_node
 
 def get_func_name_node(node):
     # Given a CAST node, we attempt to extract the appropriate name element
@@ -1088,3 +1088,13 @@ def get_func_name_node(node):
         return cur_node.val
     else:
         return cur_node 
+
+def get_operand_node(node):
+    # Given a CAST/list node, we extract the appropriate operand for the operator from it
+    cur_node = node
+    if isinstance(node, list):
+        cur_node = node[0]
+    if isinstance(cur_node, Var):
+        return cur_node.val
+    else:
+        return cur_node
