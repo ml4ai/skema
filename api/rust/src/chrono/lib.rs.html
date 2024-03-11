@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/chrono-0.4.34/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="chrono" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/chrono-0.4.35/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="chrono" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
     <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
@@ -628,6 +628,129 @@
 <a href="#627" id="627">627</a>
 <a href="#628" id="628">628</a>
 <a href="#629" id="629">629</a>
+<a href="#630" id="630">630</a>
+<a href="#631" id="631">631</a>
+<a href="#632" id="632">632</a>
+<a href="#633" id="633">633</a>
+<a href="#634" id="634">634</a>
+<a href="#635" id="635">635</a>
+<a href="#636" id="636">636</a>
+<a href="#637" id="637">637</a>
+<a href="#638" id="638">638</a>
+<a href="#639" id="639">639</a>
+<a href="#640" id="640">640</a>
+<a href="#641" id="641">641</a>
+<a href="#642" id="642">642</a>
+<a href="#643" id="643">643</a>
+<a href="#644" id="644">644</a>
+<a href="#645" id="645">645</a>
+<a href="#646" id="646">646</a>
+<a href="#647" id="647">647</a>
+<a href="#648" id="648">648</a>
+<a href="#649" id="649">649</a>
+<a href="#650" id="650">650</a>
+<a href="#651" id="651">651</a>
+<a href="#652" id="652">652</a>
+<a href="#653" id="653">653</a>
+<a href="#654" id="654">654</a>
+<a href="#655" id="655">655</a>
+<a href="#656" id="656">656</a>
+<a href="#657" id="657">657</a>
+<a href="#658" id="658">658</a>
+<a href="#659" id="659">659</a>
+<a href="#660" id="660">660</a>
+<a href="#661" id="661">661</a>
+<a href="#662" id="662">662</a>
+<a href="#663" id="663">663</a>
+<a href="#664" id="664">664</a>
+<a href="#665" id="665">665</a>
+<a href="#666" id="666">666</a>
+<a href="#667" id="667">667</a>
+<a href="#668" id="668">668</a>
+<a href="#669" id="669">669</a>
+<a href="#670" id="670">670</a>
+<a href="#671" id="671">671</a>
+<a href="#672" id="672">672</a>
+<a href="#673" id="673">673</a>
+<a href="#674" id="674">674</a>
+<a href="#675" id="675">675</a>
+<a href="#676" id="676">676</a>
+<a href="#677" id="677">677</a>
+<a href="#678" id="678">678</a>
+<a href="#679" id="679">679</a>
+<a href="#680" id="680">680</a>
+<a href="#681" id="681">681</a>
+<a href="#682" id="682">682</a>
+<a href="#683" id="683">683</a>
+<a href="#684" id="684">684</a>
+<a href="#685" id="685">685</a>
+<a href="#686" id="686">686</a>
+<a href="#687" id="687">687</a>
+<a href="#688" id="688">688</a>
+<a href="#689" id="689">689</a>
+<a href="#690" id="690">690</a>
+<a href="#691" id="691">691</a>
+<a href="#692" id="692">692</a>
+<a href="#693" id="693">693</a>
+<a href="#694" id="694">694</a>
+<a href="#695" id="695">695</a>
+<a href="#696" id="696">696</a>
+<a href="#697" id="697">697</a>
+<a href="#698" id="698">698</a>
+<a href="#699" id="699">699</a>
+<a href="#700" id="700">700</a>
+<a href="#701" id="701">701</a>
+<a href="#702" id="702">702</a>
+<a href="#703" id="703">703</a>
+<a href="#704" id="704">704</a>
+<a href="#705" id="705">705</a>
+<a href="#706" id="706">706</a>
+<a href="#707" id="707">707</a>
+<a href="#708" id="708">708</a>
+<a href="#709" id="709">709</a>
+<a href="#710" id="710">710</a>
+<a href="#711" id="711">711</a>
+<a href="#712" id="712">712</a>
+<a href="#713" id="713">713</a>
+<a href="#714" id="714">714</a>
+<a href="#715" id="715">715</a>
+<a href="#716" id="716">716</a>
+<a href="#717" id="717">717</a>
+<a href="#718" id="718">718</a>
+<a href="#719" id="719">719</a>
+<a href="#720" id="720">720</a>
+<a href="#721" id="721">721</a>
+<a href="#722" id="722">722</a>
+<a href="#723" id="723">723</a>
+<a href="#724" id="724">724</a>
+<a href="#725" id="725">725</a>
+<a href="#726" id="726">726</a>
+<a href="#727" id="727">727</a>
+<a href="#728" id="728">728</a>
+<a href="#729" id="729">729</a>
+<a href="#730" id="730">730</a>
+<a href="#731" id="731">731</a>
+<a href="#732" id="732">732</a>
+<a href="#733" id="733">733</a>
+<a href="#734" id="734">734</a>
+<a href="#735" id="735">735</a>
+<a href="#736" id="736">736</a>
+<a href="#737" id="737">737</a>
+<a href="#738" id="738">738</a>
+<a href="#739" id="739">739</a>
+<a href="#740" id="740">740</a>
+<a href="#741" id="741">741</a>
+<a href="#742" id="742">742</a>
+<a href="#743" id="743">743</a>
+<a href="#744" id="744">744</a>
+<a href="#745" id="745">745</a>
+<a href="#746" id="746">746</a>
+<a href="#747" id="747">747</a>
+<a href="#748" id="748">748</a>
+<a href="#749" id="749">749</a>
+<a href="#750" id="750">750</a>
+<a href="#751" id="751">751</a>
+<a href="#752" id="752">752</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! # Chrono: Date and Time for Rust
 //!
 
@@ -654,30 +777,35 @@
 //!
 //! Default features:
 //!
-//! - `alloc`: Enable features that depend on allocation (primarily string formatting)
+//! - `alloc`: Enable features that depend on allocation (primarily string formatting).
 //! - `std`: Enables functionality that depends on the standard library. This
 //!   is a superset of `alloc` and adds interoperation with standard library types
 //!   and traits.
-//! - `clock`: Enables reading the system time (`now`) that depends on the standard library for
-//! UNIX-like operating systems and the Windows API (`winapi`) for Windows.
+//! - `clock`: Enables reading the local timezone (`Local`). This is a superset of `now`.
+//! - `now`: Enables reading the system time (`now`).
 //! - `wasmbind`: Interface with the JS Date API for the `wasm32` target.
 //!
 //! Optional features:
 //!
-//! - [`serde`][]: Enable serialization/deserialization via serde.
-//! - `rkyv`: Enable serialization/deserialization via rkyv.
-//! - `arbitrary`: construct arbitrary instances of a type with the Arbitrary crate.
+//! - `serde`: Enable serialization/deserialization via [serde].
+//! - `rkyv`: Deprecated, use the `rkyv-*` features.
+//! - `rkyv-16`: Enable serialization/deserialization via [rkyv], using 16-bit integers for integral `*size` types.
+//! - `rkyv-32`: Enable serialization/deserialization via [rkyv], using 32-bit integers for integral `*size` types.
+//! - `rkyv-64`: Enable serialization/deserialization via [rkyv], using 64-bit integers for integral `*size` types.
+//! - `rkyv-validation`: Enable rkyv validation support using `bytecheck`.
+//! - `rustc-serialize`: Enable serialization/deserialization via rustc-serialize (deprecated).
+//! - `arbitrary`: Construct arbitrary instances of a type with the Arbitrary crate.
 //! - `unstable-locales`: Enable localization. This adds various methods with a
 //!   `_localized` suffix. The implementation and API may change or even be
 //!   removed in a patch release. Feedback welcome.
-//! - `oldtime`: this feature no langer has a function, but once offered compatibility with the
-//!   `time` 0.1 crate.
+//! - `oldtime`: This feature no longer has any effect; it used to offer compatibility with the `time` 0.1 crate.
 //!
-//! [`serde`]: https://github.com/serde-rs/serde
-//! [wasm-bindgen]: https://github.com/rustwasm/wasm-bindgen
+//! Note: The `rkyv{,-16,-32,-64}` features are mutually exclusive.
 //!
-//! See the [cargo docs][] for examples of specifying features.
+//! See the [cargo docs] for examples of specifying features.
 //!
+//! [serde]: https://github.com/serde-rs/serde
+//! [rkyv]: https://github.com/rkyv/rkyv
 //! [cargo docs]: https://doc.rust-lang.org/cargo/reference/specifying-dependencies.html#choosing-features
 //!
 //! ## Overview
@@ -737,7 +865,7 @@
 #![cfg_attr(feature = <span class="string">"now"</span>, doc = <span class="string">"```rust"</span>)]
 </span><span class="doccomment">//! use chrono::prelude::*;
 //!
-//! let utc: DateTime&lt;Utc&gt; = Utc::now();       // e.g. `2014-11-28T12:45:59.324310806Z`
+//! let utc: DateTime&lt;Utc&gt; = Utc::now(); // e.g. `2014-11-28T12:45:59.324310806Z`
 //! # let _ = utc;
 //! ```
 //!
@@ -755,34 +883,74 @@
 //!
 </span><span class="attr">#![cfg_attr(not(feature = <span class="string">"now"</span>), doc = <span class="string">"```ignore"</span>)]
 #![cfg_attr(feature = <span class="string">"now"</span>, doc = <span class="string">"```rust"</span>)]
-</span><span class="doccomment">//! use chrono::prelude::*;
-//! use chrono::offset::LocalResult;
+</span><span class="doccomment">//! use chrono::offset::LocalResult;
+//! use chrono::prelude::*;
 //!
 //! # fn doctest() -&gt; Option&lt;()&gt; {
 //!
 //! let dt = Utc.with_ymd_and_hms(2014, 7, 8, 9, 10, 11).unwrap(); // `2014-07-08T09:10:11Z`
-//! assert_eq!(dt, NaiveDate::from_ymd_opt(2014, 7, 8)?.and_hms_opt(9, 10, 11)?.and_local_timezone(Utc).unwrap());
+//! assert_eq!(
+//!     dt,
+//!     NaiveDate::from_ymd_opt(2014, 7, 8)?
+//!         .and_hms_opt(9, 10, 11)?
+//!         .and_local_timezone(Utc)
+//!         .unwrap()
+//! );
 //!
 //! // July 8 is 188th day of the year 2014 (`o` for "ordinal")
 //! assert_eq!(dt, NaiveDate::from_yo_opt(2014, 189)?.and_hms_opt(9, 10, 11)?.and_utc());
 //! // July 8 is Tuesday in ISO week 28 of the year 2014.
-//! assert_eq!(dt, NaiveDate::from_isoywd_opt(2014, 28, Weekday::Tue)?.and_hms_opt(9, 10, 11)?.and_utc());
+//! assert_eq!(
+//!     dt,
+//!     NaiveDate::from_isoywd_opt(2014, 28, Weekday::Tue)?.and_hms_opt(9, 10, 11)?.and_utc()
+//! );
 //!
-//! let dt = NaiveDate::from_ymd_opt(2014, 7, 8)?.and_hms_milli_opt(9, 10, 11, 12)?.and_local_timezone(Utc).unwrap(); // `2014-07-08T09:10:11.012Z`
-//! assert_eq!(dt, NaiveDate::from_ymd_opt(2014, 7, 8)?.and_hms_micro_opt(9, 10, 11, 12_000)?.and_local_timezone(Utc).unwrap());
-//! assert_eq!(dt, NaiveDate::from_ymd_opt(2014, 7, 8)?.and_hms_nano_opt(9, 10, 11, 12_000_000)?.and_local_timezone(Utc).unwrap());
+//! let dt = NaiveDate::from_ymd_opt(2014, 7, 8)?
+//!     .and_hms_milli_opt(9, 10, 11, 12)?
+//!     .and_local_timezone(Utc)
+//!     .unwrap(); // `2014-07-08T09:10:11.012Z`
+//! assert_eq!(
+//!     dt,
+//!     NaiveDate::from_ymd_opt(2014, 7, 8)?
+//!         .and_hms_micro_opt(9, 10, 11, 12_000)?
+//!         .and_local_timezone(Utc)
+//!         .unwrap()
+//! );
+//! assert_eq!(
+//!     dt,
+//!     NaiveDate::from_ymd_opt(2014, 7, 8)?
+//!         .and_hms_nano_opt(9, 10, 11, 12_000_000)?
+//!         .and_local_timezone(Utc)
+//!         .unwrap()
+//! );
 //!
 //! // dynamic verification
-//! assert_eq!(Utc.with_ymd_and_hms(2014, 7, 8, 21, 15, 33),
-//!            LocalResult::Single(NaiveDate::from_ymd_opt(2014, 7, 8)?.and_hms_opt(21, 15, 33)?.and_utc()));
+//! assert_eq!(
+//!     Utc.with_ymd_and_hms(2014, 7, 8, 21, 15, 33),
+//!     LocalResult::Single(
+//!         NaiveDate::from_ymd_opt(2014, 7, 8)?.and_hms_opt(21, 15, 33)?.and_utc()
+//!     )
+//! );
 //! assert_eq!(Utc.with_ymd_and_hms(2014, 7, 8, 80, 15, 33), LocalResult::None);
 //! assert_eq!(Utc.with_ymd_and_hms(2014, 7, 38, 21, 15, 33), LocalResult::None);
 //!
 //! # #[cfg(feature = "clock")] {
 //! // other time zone objects can be used to construct a local datetime.
 //! // obviously, `local_dt` is normally different from `dt`, but `fixed_dt` should be identical.
-//! let local_dt = Local.from_local_datetime(&amp;NaiveDate::from_ymd_opt(2014, 7, 8).unwrap().and_hms_milli_opt(9, 10, 11, 12).unwrap()).unwrap();
-//! let fixed_dt = FixedOffset::east_opt(9 * 3600).unwrap().from_local_datetime(&amp;NaiveDate::from_ymd_opt(2014, 7, 8).unwrap().and_hms_milli_opt(18, 10, 11, 12).unwrap()).unwrap();
+//! let local_dt = Local
+//!     .from_local_datetime(
+//!         &amp;NaiveDate::from_ymd_opt(2014, 7, 8).unwrap().and_hms_milli_opt(9, 10, 11, 12).unwrap(),
+//!     )
+//!     .unwrap();
+//! let fixed_dt = FixedOffset::east_opt(9 * 3600)
+//!     .unwrap()
+//!     .from_local_datetime(
+//!         &amp;NaiveDate::from_ymd_opt(2014, 7, 8)
+//!             .unwrap()
+//!             .and_hms_milli_opt(18, 10, 11, 12)
+//!             .unwrap(),
+//!     )
+//!     .unwrap();
 //! assert_eq!(dt, fixed_dt);
 //! # let _ = local_dt;
 //! # }
@@ -802,7 +970,15 @@
 //! use chrono::TimeDelta;
 //!
 //! // assume this returned `2014-11-28T21:45:59.324310806+09:00`:
-//! let dt = FixedOffset::east_opt(9*3600).unwrap().from_local_datetime(&amp;NaiveDate::from_ymd_opt(2014, 11, 28).unwrap().and_hms_nano_opt(21, 45, 59, 324310806).unwrap()).unwrap();
+//! let dt = FixedOffset::east_opt(9 * 3600)
+//!     .unwrap()
+//!     .from_local_datetime(
+//!         &amp;NaiveDate::from_ymd_opt(2014, 11, 28)
+//!             .unwrap()
+//!             .and_hms_nano_opt(21, 45, 59, 324310806)
+//!             .unwrap(),
+//!     )
+//!     .unwrap();
 //!
 //! // property accessors
 //! assert_eq!((dt.year(), dt.month(), dt.day()), (2014, 11, 28));
@@ -816,7 +992,15 @@
 //! // time zone accessor and manipulation
 //! assert_eq!(dt.offset().fix().local_minus_utc(), 9 * 3600);
 //! assert_eq!(dt.timezone(), FixedOffset::east_opt(9 * 3600).unwrap());
-//! assert_eq!(dt.with_timezone(&amp;Utc), NaiveDate::from_ymd_opt(2014, 11, 28).unwrap().and_hms_nano_opt(12, 45, 59, 324310806).unwrap().and_local_timezone(Utc).unwrap());
+//! assert_eq!(
+//!     dt.with_timezone(&amp;Utc),
+//!     NaiveDate::from_ymd_opt(2014, 11, 28)
+//!         .unwrap()
+//!         .and_hms_nano_opt(12, 45, 59, 324310806)
+//!         .unwrap()
+//!         .and_local_timezone(Utc)
+//!         .unwrap()
+//! );
 //!
 //! // a sample of property manipulations (validates dynamically)
 //! assert_eq!(dt.with_day(29).unwrap().weekday(), Weekday::Sat); // 2014-11-29 is Saturday
@@ -826,11 +1010,11 @@
 //! // arithmetic operations
 //! let dt1 = Utc.with_ymd_and_hms(2014, 11, 14, 8, 9, 10).unwrap();
 //! let dt2 = Utc.with_ymd_and_hms(2014, 11, 14, 10, 9, 8).unwrap();
-//! assert_eq!(dt1.signed_duration_since(dt2), TimeDelta::seconds(-2 * 3600 + 2));
-//! assert_eq!(dt2.signed_duration_since(dt1), TimeDelta::seconds(2 * 3600 - 2));
-//! assert_eq!(Utc.with_ymd_and_hms(1970, 1, 1, 0, 0, 0).unwrap() + TimeDelta::seconds(1_000_000_000),
+//! assert_eq!(dt1.signed_duration_since(dt2), TimeDelta::try_seconds(-2 * 3600 + 2).unwrap());
+//! assert_eq!(dt2.signed_duration_since(dt1), TimeDelta::try_seconds(2 * 3600 - 2).unwrap());
+//! assert_eq!(Utc.with_ymd_and_hms(1970, 1, 1, 0, 0, 0).unwrap() + TimeDelta::try_seconds(1_000_000_000).unwrap(),
 //!            Utc.with_ymd_and_hms(2001, 9, 9, 1, 46, 40).unwrap());
-//! assert_eq!(Utc.with_ymd_and_hms(1970, 1, 1, 0, 0, 0).unwrap() - TimeDelta::seconds(1_000_000_000),
+//! assert_eq!(Utc.with_ymd_and_hms(1970, 1, 1, 0, 0, 0).unwrap() - TimeDelta::try_seconds(1_000_000_000).unwrap(),
 //!            Utc.with_ymd_and_hms(1938, 4, 24, 22, 13, 20).unwrap());
 //! ```
 //!
@@ -866,7 +1050,10 @@
 //! let dt = Utc.with_ymd_and_hms(2014, 11, 28, 12, 0, 9).unwrap();
 //! assert_eq!(dt.format("%Y-%m-%d %H:%M:%S").to_string(), "2014-11-28 12:00:09");
 //! assert_eq!(dt.format("%a %b %e %T %Y").to_string(), "Fri Nov 28 12:00:09 2014");
-//! assert_eq!(dt.format_localized("%A %e %B %Y, %T", Locale::fr_BE).to_string(), "vendredi 28 novembre 2014, 12:00:09");
+//! assert_eq!(
+//!     dt.format_localized("%A %e %B %Y, %T", Locale::fr_BE).to_string(),
+//!     "vendredi 28 novembre 2014, 12:00:09"
+//! );
 //!
 //! assert_eq!(dt.format("%a %b %e %T %Y").to_string(), dt.format("%c").to_string());
 //! assert_eq!(dt.to_string(), "2014-11-28 12:00:09 UTC");
@@ -875,7 +1062,12 @@
 //! assert_eq!(format!("{:?}", dt), "2014-11-28T12:00:09Z");
 //!
 //! // Note that milli/nanoseconds are only printed if they are non-zero
-//! let dt_nano = NaiveDate::from_ymd_opt(2014, 11, 28).unwrap().and_hms_nano_opt(12, 0, 9, 1).unwrap().and_local_timezone(Utc).unwrap();
+//! let dt_nano = NaiveDate::from_ymd_opt(2014, 11, 28)
+//!     .unwrap()
+//!     .and_hms_nano_opt(12, 0, 9, 1)
+//!     .unwrap()
+//!     .and_local_timezone(Utc)
+//!     .unwrap();
 //! assert_eq!(format!("{:?}", dt_nano), "2014-11-28T12:00:09.000000001Z");
 //! # }
 //! # #[cfg(not(all(feature = "unstable-locales", feature = "alloc")))]
@@ -910,7 +1102,7 @@
 //! use chrono::prelude::*;
 //!
 //! let dt = Utc.with_ymd_and_hms(2014, 11, 28, 12, 0, 9).unwrap();
-//! let fixed_dt = dt.with_timezone(&amp;FixedOffset::east_opt(9*3600).unwrap());
+//! let fixed_dt = dt.with_timezone(&amp;FixedOffset::east_opt(9 * 3600).unwrap());
 //!
 //! // method 1
 //! assert_eq!("2014-11-28T12:00:09Z".parse::&lt;DateTime&lt;Utc&gt;&gt;(), Ok(dt.clone()));
@@ -918,10 +1110,14 @@
 //! assert_eq!("2014-11-28T21:00:09+09:00".parse::&lt;DateTime&lt;FixedOffset&gt;&gt;(), Ok(fixed_dt.clone()));
 //!
 //! // method 2
-//! assert_eq!(DateTime::parse_from_str("2014-11-28 21:00:09 +09:00", "%Y-%m-%d %H:%M:%S %z"),
-//!            Ok(fixed_dt.clone()));
-//! assert_eq!(DateTime::parse_from_rfc2822("Fri, 28 Nov 2014 21:00:09 +0900"),
-//!            Ok(fixed_dt.clone()));
+//! assert_eq!(
+//!     DateTime::parse_from_str("2014-11-28 21:00:09 +09:00", "%Y-%m-%d %H:%M:%S %z"),
+//!     Ok(fixed_dt.clone())
+//! );
+//! assert_eq!(
+//!     DateTime::parse_from_rfc2822("Fri, 28 Nov 2014 21:00:09 +0900"),
+//!     Ok(fixed_dt.clone())
+//! );
 //! assert_eq!(DateTime::parse_from_rfc3339("2014-11-28T21:00:09+09:00"), Ok(fixed_dt.clone()));
 //!
 //! // oops, the year is missing!
@@ -1182,7 +1378,33 @@
 /// [2]: https://serde.rs/field-attrs.html#with
 </span><span class="attr">#[cfg(feature = <span class="string">"serde"</span>)]
 </span><span class="kw">pub mod </span>serde {
+    <span class="kw">use </span>core::fmt;
+    <span class="kw">use </span>serde::de;
+
     <span class="kw">pub use </span><span class="kw">super</span>::datetime::serde::<span class="kw-2">*</span>;
+
+    <span class="doccomment">/// Create a custom `de::Error` with `SerdeError::InvalidTimestamp`.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>invalid_ts&lt;E, T&gt;(value: T) -&gt; E
+    <span class="kw">where
+        </span>E: de::Error,
+        T: fmt::Display,
+    {
+        E::custom(SerdeError::InvalidTimestamp(value))
+    }
+
+    <span class="kw">enum </span>SerdeError&lt;T: fmt::Display&gt; {
+        InvalidTimestamp(T),
+    }
+
+    <span class="kw">impl</span>&lt;T: fmt::Display&gt; fmt::Display <span class="kw">for </span>SerdeError&lt;T&gt; {
+        <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+            <span class="kw">match </span><span class="self">self </span>{
+                SerdeError::InvalidTimestamp(ts) =&gt; {
+                    <span class="macro">write!</span>(f, <span class="string">"value is not a legal timestamp: {}"</span>, ts)
+                }
+            }
+        }
+    }
 }
 
 <span class="doccomment">/// Zero-copy serialization/deserialization with rkyv.
@@ -1256,5 +1478,29 @@
             <span class="prelude-val">None </span>=&gt; <span class="macro">panic!</span>(<span class="macro-nonterminal">$m</span>),
         }
     };
+}
+
+<span class="attr">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="attr">#[cfg(feature = <span class="string">"clock"</span>)]
+    </span><span class="kw">use crate</span>::{DateTime, FixedOffset, Local, NaiveDate, NaiveDateTime, NaiveTime, Utc};
+
+    <span class="attr">#[test]
+    #[allow(deprecated)]
+    #[cfg(feature = <span class="string">"clock"</span>)]
+    </span><span class="kw">fn </span>test_type_sizes() {
+        <span class="kw">use </span>core::mem::size_of;
+        <span class="macro">assert_eq!</span>(size_of::&lt;NaiveDate&gt;(), <span class="number">4</span>);
+        <span class="macro">assert_eq!</span>(size_of::&lt;<span class="prelude-ty">Option</span>&lt;NaiveDate&gt;&gt;(), <span class="number">4</span>);
+        <span class="macro">assert_eq!</span>(size_of::&lt;NaiveTime&gt;(), <span class="number">8</span>);
+        <span class="macro">assert_eq!</span>(size_of::&lt;<span class="prelude-ty">Option</span>&lt;NaiveTime&gt;&gt;(), <span class="number">12</span>);
+        <span class="macro">assert_eq!</span>(size_of::&lt;NaiveDateTime&gt;(), <span class="number">12</span>);
+        <span class="macro">assert_eq!</span>(size_of::&lt;<span class="prelude-ty">Option</span>&lt;NaiveDateTime&gt;&gt;(), <span class="number">12</span>);
+
+        <span class="macro">assert_eq!</span>(size_of::&lt;DateTime&lt;Utc&gt;&gt;(), <span class="number">12</span>);
+        <span class="macro">assert_eq!</span>(size_of::&lt;DateTime&lt;FixedOffset&gt;&gt;(), <span class="number">16</span>);
+        <span class="macro">assert_eq!</span>(size_of::&lt;DateTime&lt;Local&gt;&gt;(), <span class="number">16</span>);
+        <span class="macro">assert_eq!</span>(size_of::&lt;<span class="prelude-ty">Option</span>&lt;DateTime&lt;FixedOffset&gt;&gt;&gt;(), <span class="number">16</span>);
+    }
 }
 </code></pre></div></section></main></body></html>
