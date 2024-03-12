@@ -592,6 +592,11 @@ class TS2CAST(object):
 
         return Attribute(value= get_name_node(obj_cast), attr=get_name_node(attr_cast), source_refs=ref)
 
+    def visit_subscript(self, node: Node):
+        ref = self.node_helper.get_source_ref(node)
+        val = node.children[0]
+        subscripts = node.children
+
     def handle_for_clause(self, node: Node):
         # Given the "for x in seq" clause of a list comprehension
         # we translate it to a CAST for loop, leaving the actual
