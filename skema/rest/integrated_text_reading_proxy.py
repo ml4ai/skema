@@ -15,6 +15,7 @@ import httpx
 from askem_extractions.data_model import AttributeCollection
 from askem_extractions.importers import import_arizona
 from fastapi import APIRouter, Depends, FastAPI, UploadFile, Response, status
+from langchain.tools.e2b_data_analysis.tool import UploadedFile
 
 from skema.rest.proxies import SKEMA_TR_ADDRESS, MIT_TR_ADDRESS, OPENAI_KEY, COSMOS_ADDRESS
 from skema.rest.schema import (
@@ -23,7 +24,7 @@ from skema.rest.schema import (
     TextReadingDocumentResults,
     TextReadingError, MiraGroundingInputs, MiraGroundingOutputItem, TextReadingEvaluationResults,
 )
-from skema.rest import utils
+from skema.rest import utils, metal_proxy
 
 router = APIRouter()
 
@@ -448,6 +449,7 @@ async def integrated_text_extractions(
 async def integrated_pdf_extractions(
         response: Response,
         pdfs: List[UploadFile],
+        amrs: List[UploadFile] = [],
         annotate_skema: bool = True,
         annotate_mit: bool = True
 ) -> TextReadingAnnotationsOutput:
@@ -481,7 +483,7 @@ async def integrated_pdf_extractions(
     plain_texts = ['\n'.join(block['content'] for block in c) for c in cosmos_data]
 
     # Run the text extractors
-    return integrated_extractions(
+    extractions = integrated_extractions(
         response,
         annotate_pdfs_with_skema,
         cosmos_data,
@@ -489,6 +491,29 @@ async def integrated_pdf_extractions(
         annotate_skema,
         annotate_mit
     )
+
+    # Do the alignment
+    aligned_amrs = list()
+    if len(amrs) > 0:
+        # Build an UploadFile instance from the extractions
+        json_extractions = extractions.model_dump_json()
+        extractions_ufile = UploadFile(file=io.BytesIO(json_extractions.encode('utf-8')))
+        for amr in amrs:
+            try:
+                aligned_amr = metal_proxy.link_amr(
+                    amr_file=amr,
+                    text_extractions_file=extractions_ufile)
+                aligned_amrs.append(aligned_amr)
+            except Exception as e:
+                error = TextReadingError(pipeline="AMR Linker", message=f"Error annotating {amr.filename}: {e}")
+                if extractions.generalized_errors is None:
+                    extractions.generalized_errors = [error]
+                else:
+                    extractions.generalized_errors.append(error)
+
+    extractions.aligned_amrs = aligned_amrs
+
+    return extractions
 
 
 # These are some direct proxies to the SKEMA and MIT APIs
