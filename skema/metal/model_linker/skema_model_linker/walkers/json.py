@@ -33,15 +33,15 @@ class JsonDictWalker(ModelWalker):
         if allowed and callback:
             callback(obj_name, obj, index)
 
-        for prop, val in obj.items():
-            if isinstance(val, list):
-                for ix, elem in enumerate(val):
-                    if type(elem) in (list, dict):
-                        ret.extend(self.__step(prop, elem, ix, callback, **kwargs))
-            elif isinstance(val, dict):
+        if isinstance(obj, list):
+            for ix, elem in enumerate(obj):
+                if type(elem) in (list, dict):
+                    ret.extend(self.__step(obj_name, elem, ix, callback, **kwargs))
+        elif isinstance(obj, dict):
+            for prop, val in obj.items():
                 ret.extend(self.__step(prop, val, None, callback, **kwargs))
 
-        if allowed:
+        if allowed and not isinstance(obj, list):
             ret.append(JsonNode(obj_name, obj, index))
 
         return ret
