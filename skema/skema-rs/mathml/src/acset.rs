@@ -890,8 +890,8 @@ impl From<Vec<FirstOrderODE>> for RegNet {
             }
             // This adds the intial values from the state variables into the parameters vec
             let parameters = Parameter {
-                id: state.clone(),
-                name: Some(state.clone()),
+                id: r_state.initial.clone().unwrap(),
+                name: r_state.initial.clone(),
                 description: Some(format!(
                     "The total {} population at timestep 0",
                     state.clone()
