@@ -170,6 +170,8 @@ class TS2CAST(object):
             return self.visit_import(node)
         elif node.type == "import_from_statement":
             return self.visit_import_from(node)
+        elif node.type == "class_definition":
+            return self.visit_class_definition(node)
         elif node.type == "yield":
             return self.visit_yield(node)
         elif node.type == "assert_statement":
@@ -259,7 +261,7 @@ class TS2CAST(object):
         ret_val = node.children[1]
         ret_cast = self.visit(ret_val)
 
-        return ModelReturn(value=ret_cast, source_refs=[ref])
+        return ModelReturn(value=get_operand_node(ret_cast), source_refs=[ref])
 
     def visit_call(self, node: Node) -> Call:
         ref = self.node_helper.get_source_ref(node)
@@ -432,8 +434,8 @@ class TS2CAST(object):
         op = get_op(self.node_helper.get_operator(node.children[1]))
         left, _, right = node.children
 
-        left_cast = get_name_node(self.visit(left))
-        right_cast = get_name_node(self.visit(right))
+        left_cast = get_operand_node(self.visit(left))
+        right_cast = get_operand_node(self.visit(right))
 
         return Operator(
             op=op, 
@@ -973,6 +975,43 @@ class TS2CAST(object):
             source_refs = ref
         )
 
+    def retrieve_init_func(self, functions: List[FunctionDef]):
+        # Given a list of CAST function defs, we
+        # attempt to retrieve the CAST function that corresponds to
+        # "__init__"
+        for func in functions:
+            if func.name.name == "__init__":
+                return func
+        return None
+
+    def retrieve_class_attrs(self, init_func: FunctionDef):
+        attrs = []
+        for stmt in init_func.body:
+            if isinstance(stmt, Assignment):
+                if isinstance(stmt.left, Attribute):
+                    if stmt.left.value.name == "self":
+                        attrs.append(stmt.left.attr)
+
+        return attrs
+
+    def visit_class_definition(self, node):
+        class_name_node = get_first_child_by_type(node, "identifier")
+        class_cast = self.visit(class_name_node)
+    
+        function_defs = get_children_by_types(get_children_by_types(node, "block")[0], "function_definition")
+        func_defs_cast = []
+        for func in function_defs:
+            func_cast = self.visit(func)
+            if isinstance(func_cast, List):
+                func_defs_cast.extend(func_cast)
+            else:
+                func_defs_cast.append(func_cast)
+
+        init_func = self.retrieve_init_func(func_defs_cast)        
+        attributes = self.retrieve_class_attrs(init_func)
+
+        return RecordDef(name=get_name_node(class_cast).name, bases=[], funcs=func_defs_cast, fields=attributes)
+
 
     def visit_name(self, node):
         # First, we will check if this name is already defined, and if it is return the name node generated previously
@@ -1039,7 +1078,7 @@ def get_name_node(node):
     if isinstance(cur_node, Var):
         return cur_node.val
     else:
-        return node
+        return cur_node
 
 def get_func_name_node(node):
     # Given a CAST node, we attempt to extract the appropriate name element
@@ -1049,3 +1088,13 @@ def get_func_name_node(node):
         return cur_node.val
     else:
         return cur_node 
+
+def get_operand_node(node):
+    # Given a CAST/list node, we extract the appropriate operand for the operator from it
+    cur_node = node
+    if isinstance(node, list):
+        cur_node = node[0]
+    if isinstance(cur_node, Var):
+        return cur_node.val
+    else:
+        return cur_node

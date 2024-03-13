@@ -266,10 +266,10 @@ def test_fun4():
 
     func_def_body = func_def_node.body[2]
     assert isinstance(func_def_body, ModelReturn)
-    assert isinstance(func_def_body.value, Var)
+    assert isinstance(func_def_body.value, Name)
 
-    assert func_def_body.value.val.name == "z"
-    assert func_def_body.value.val.id == 4
+    assert func_def_body.value.name == "z"
+    assert func_def_body.value.id == 4
 
     #######################################################
     func_asg_node = fun_cast.nodes[0].body[1]
