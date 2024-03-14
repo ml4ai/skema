@@ -829,9 +829,9 @@
                 <span class="kw">let </span>tgt_idx = table_counts.variable_count;
                 <span class="kw">let </span><span class="kw-2">mut </span>derivative_str = String::new();
                 <span class="kw">if </span><span class="kw-2">*</span>notation == DerivativeNotation::LeibnizTotal {
-                    derivative_str.push_str(<span class="kw-2">&amp;*</span><span class="macro">format!</span>(<span class="string">"D({},{})"</span>, order, bound_var));
+                    derivative_str.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"D({},{})"</span>, order, bound_var));
                 } <span class="kw">else if </span><span class="kw-2">*</span>notation == DerivativeNotation::LeibnizPartialStandard {
-                    derivative_str.push_str(<span class="kw-2">&amp;*</span><span class="macro">format!</span>(<span class="string">"PD({},{})"</span>, order, bound_var));
+                    derivative_str.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"PD({},{})"</span>, order, bound_var));
                 }
                 <span class="kw">let </span>unary = UnaryOperator {
                     src: to_decapodes_serialization(<span class="kw-2">&amp;</span>rest[<span class="number">0</span>], tables, table_counts),

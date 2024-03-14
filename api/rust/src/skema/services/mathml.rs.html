@@ -308,7 +308,7 @@
     parsers::first_order_ode::{first_order_ode, FirstOrderODE},
 };
 <span class="kw">use </span>petgraph::dot::{Config, Dot};
-<span class="kw">use </span>serde_json::from_str;
+
 <span class="kw">use </span>utoipa;
 
 <span class="doccomment">/// Parse MathML and return a DOT representation of the abstract syntax tree (AST)
@@ -445,7 +445,7 @@ request_body = Vec&lt;String&gt;,
 responses(
 (
 status = <span class="number">200</span>,
-body = Vec&lt;String&gt;
+body = Vec&lt;MathExpressionTree&gt;
 )
 )
 )]
