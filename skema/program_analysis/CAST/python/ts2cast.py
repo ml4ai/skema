@@ -605,15 +605,16 @@ class TS2CAST(object):
         for subscript in subscript_list:
             cast = self.visit(subscript)
             if isinstance(cast, list):
-                subscript_casts.extend(cast)
+                for elem in cast:
+                    subscript_casts.append(get_func_name_node(cast))
             else:
-                subscript_casts.append(cast)
+                subscript_casts.append(get_func_name_node(cast))
 
         get_func = self.get_gromet_function_node("_get")
         
         get_call = Call(
             func = get_func,
-            arguments = [name_cast] + subscript_casts,
+            arguments = [get_func_name_node(name_cast)] + subscript_casts,
             source_refs=ref
         )
 
@@ -639,7 +640,7 @@ class TS2CAST(object):
         else:
             step = CASTLiteralValue(
                 value_type=ScalarType.INTEGER,
-                value=1,
+                value="1",
                 source_code_data_type=["Python", "3.8", "Float"],
                 source_refs=ref,
             )
