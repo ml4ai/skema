@@ -45,7 +45,9 @@ IMPORT_PATTERN = re.compile(r&#39;^\s*(from\s+[^\s]+\s+import\s+[^\s,]+(?:\s*,\s
 def identify_source_type(source: str):
     if not source:
         return &#34;Unknown&#34;
-    if &#34;github&#34; in source:
+    elif source == &#34;https://github.com/python/cpython&#34;:
+        return &#34;Compiled&#34;
+    elif &#34;github&#34; in source:
         return &#34;Repository&#34;
     elif source.startswith(&#34;http&#34;):
         return &#34;Url&#34;
@@ -81,6 +83,10 @@ def module_locate(module_name: str) -&gt; str:
     :param module_name: The name of the module or submodule as a string.
     :return: The module&#39;s file path, GitHub URL, or tarball URL.
     &#34;&#34;&#34;
+
+    # Check if module is compiled into Python
+    if module_name in sys.builtin_module_names:
+        return &#34;https://github.com/python/cpython&#34;
 
     # Attempt to find the module in the local environment
     try:
@@ -183,7 +189,9 @@ print(module_locate(&#34;from matplotlib import pyplot as plt&#34;))
 <pre><code class="python">def identify_source_type(source: str):
     if not source:
         return &#34;Unknown&#34;
-    if &#34;github&#34; in source:
+    elif source == &#34;https://github.com/python/cpython&#34;:
+        return &#34;Compiled&#34;
+    elif &#34;github&#34; in source:
         return &#34;Repository&#34;
     elif source.startswith(&#34;http&#34;):
         return &#34;Url&#34;
@@ -214,6 +222,10 @@ For PyPI modules, it also attempts to return the tarball URL for the current ver
     :param module_name: The name of the module or submodule as a string.
     :return: The module&#39;s file path, GitHub URL, or tarball URL.
     &#34;&#34;&#34;
+
+    # Check if module is compiled into Python
+    if module_name in sys.builtin_module_names:
+        return &#34;https://github.com/python/cpython&#34;
 
     # Attempt to find the module in the local environment
     try:
