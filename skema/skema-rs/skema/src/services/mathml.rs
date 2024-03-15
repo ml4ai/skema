@@ -14,7 +14,7 @@ use mathml::{
     parsers::first_order_ode::{first_order_ode, FirstOrderODE},
 };
 use petgraph::dot::{Config, Dot};
-use serde_json::from_str;
+
 use utoipa;
 
 /// Parse MathML and return a DOT representation of the abstract syntax tree (AST)
@@ -151,7 +151,7 @@ request_body = Vec<String>,
 responses(
 (
 status = 200,
-body = Vec<String>
+body = Vec<MathExpressionTree>
 )
 )
 )]
