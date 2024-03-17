@@ -37,7 +37,7 @@ pub enum DerivativeNotation {
 }
 
 #[derive(
-Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, JsonSchema,
+    Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, JsonSchema,
 )]
 pub struct Logarithm {
     pub is_natural_log: bool,
@@ -298,8 +298,8 @@ impl fmt::Display for Operator {
             }
             Operator::Min => write!(f, "Min"),
             Operator::Comma => write!(f, ","),
-            Operator::Logarithm(Logarithm{is_natural_log}) => {
-                if *is_natural_log == true{
+            Operator::Logarithm(Logarithm { is_natural_log }) => {
+                if *is_natural_log == true {
                     write!(f, "Ln")
                 } else {
                     write!(f, "Log")

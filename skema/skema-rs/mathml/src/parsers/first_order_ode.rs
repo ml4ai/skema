@@ -1,4 +1,4 @@
-use crate::ast::operator::Operator::{Add, Divide, Multiply, Subtract, Power};
+use crate::ast::operator::Operator::{Add, Divide, Multiply, Power, Subtract};
 use crate::parsers::math_expression_tree::MathExpressionTree::Atom;
 use crate::parsers::math_expression_tree::MathExpressionTree::Cons;
 use crate::{
@@ -290,7 +290,7 @@ pub fn get_term_power(sys_states: Vec<String>, eq: Vec<MathExpressionTree>) -> P
     let mut exp_states = Vec::<String>::new();
     let mut polarity = true;
     let mut power = 0;
-    // assume power arguments are only length 2. 
+    // assume power arguments are only length 2.
     power = eq[1].to_string().parse::<i32>().unwrap();
 
     // this walks the tree and composes a vector of all variable and polarity changes
@@ -350,7 +350,7 @@ pub fn get_term_power(sys_states: Vec<String>, eq: Vec<MathExpressionTree>) -> P
                 } else {
                     variables.push(x.to_string());
                 }
-            },
+            }
         }
     }
 
@@ -859,7 +859,7 @@ pub fn get_terms_mult(sys_states: Vec<String>, eq: Vec<MathExpressionTree>) -> P
         if let Cons(x1, y1) = arg {
             if *x1 != Power && *x1 != Divide && !(*x1 == Subtract && y1.len() == 1) {
                 distribution = true;
-            } 
+            }
         }
     }
 

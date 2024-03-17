@@ -83,7 +83,7 @@ pub struct SummationMath {
 /// Represents expoenential operator with terms that are in the exponential
 /// E.g. exp( x(y-z) )
 #[derive(
-Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, JsonSchema,
+    Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, JsonSchema,
 )]
 pub struct ExpMath {
     pub op: Box<MathExpression>,
@@ -122,42 +122,42 @@ pub struct LaplacianComp {
 
 /// Handles elements in row in table or matrix (`Mtr`) for `Mtable`
 #[derive(
-Debug,
-Ord,
-PartialOrd,
-PartialEq,
-Eq,
-Clone,
-Hash,
-new,
-Deserialize,
-Serialize,
-ToSchema,
-JsonSchema,
+    Debug,
+    Ord,
+    PartialOrd,
+    PartialEq,
+    Eq,
+    Clone,
+    Hash,
+    new,
+    Deserialize,
+    Serialize,
+    ToSchema,
+    JsonSchema,
 )]
 pub struct Mtd(
     /// Entry in table or matrix
-    pub Vec<MathExpression>
+    pub Vec<MathExpression>,
 );
 
 /// Handles table or matrix (`Mtr`) for `Mtable`
 #[derive(
-Debug,
-Ord,
-PartialOrd,
-PartialEq,
-Eq,
-Clone,
-Hash,
-new,
-Deserialize,
-Serialize,
-ToSchema,
-JsonSchema,
+    Debug,
+    Ord,
+    PartialOrd,
+    PartialEq,
+    Eq,
+    Clone,
+    Hash,
+    new,
+    Deserialize,
+    Serialize,
+    ToSchema,
+    JsonSchema,
 )]
 pub struct Mtr(
     /// Entry in table or matrix
-    Vec<Mtd>
+    Vec<Mtd>,
 );
 
 /// Handles ↓  such that {comp}↓_{sub}^{sup} can parse
@@ -333,7 +333,6 @@ impl fmt::Display for MathExpression {
                 }
                 Ok(())
             }*/
-
             expression => write!(f, "{expression:?}"),
         }
     }

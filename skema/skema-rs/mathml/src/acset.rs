@@ -912,7 +912,7 @@ impl From<Vec<FirstOrderODE>> for PetriNet {
         }
 
         // now we construct transitions from unpaired terms, assuming them to be sources and sinks
-        // This should also support sources and sinks that are state dependent. 
+        // This should also support sources and sinks that are state dependent.
         if !terms.is_empty() {
             for (i, term) in terms.iter().enumerate() {
                 if term.polarity {
@@ -928,7 +928,7 @@ impl From<Vec<FirstOrderODE>> for PetriNet {
                         }
                     }
 
-                    // I think if the expression equals the dynamic state both in the input and output get 
+                    // I think if the expression equals the dynamic state both in the input and output get
                     if exp_eq_dyn {
                         input.push(term.dyn_state.clone());
                         output.push(term.dyn_state.clone());

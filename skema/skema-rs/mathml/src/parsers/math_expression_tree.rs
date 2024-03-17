@@ -3,7 +3,9 @@
 use crate::ast::VectorNotation;
 use crate::{
     ast::{
-        operator::{Derivative, DerivativeNotation, Gradient, Hat, Int, Operator, Logarithm, Summation},
+        operator::{
+            Derivative, DerivativeNotation, Gradient, Hat, Int, Logarithm, Operator, Summation,
+        },
         Math, MathExpression, Mi, Mrow,
     },
     parsers::interpreted_mathml::interpreted_math,
@@ -899,7 +901,37 @@ impl MathExpressionTree {
                         expression.push_str(&format!("\\oiint_S {}", rest[0].to_latex()));
                     }
                     Operator::Min => {
-                        expression.push_str(&format!("\\min {}", rest[0].to_latex()));
+                        expression.push_str("\\min \\{ ");
+                        for (index, r) in rest.iter().enumerate() {
+                            expression.push_str(&r.to_latex().to_string());
+                            expression.push(',');
+                        }
+                        // remove last redundant comma
+                        let Some(_) = expression.pop() else { todo!() };
+                        expression.push_str("\\}");
+                    }
+                    Operator::Multiply => {
+                        for (index, r) in rest.iter().enumerate() {
+                            if let MathExpressionTree::Cons(op, _) = r {
+                                if is_unary_operator(op) {
+                                    expression.push_str(&r.to_latex().to_string());
+                                } else if let Operator::Multiply = op {
+                                    expression.push_str(&r.to_latex().to_string());
+                                } else if let Operator::Divide = op {
+                                    expression.push_str(&r.to_latex().to_string());
+                                } else if let Operator::Dot = op {
+                                    expression.push_str(&r.to_latex().to_string());
+                                } else {
+                                    expression.push_str(&format!("({})", r.to_latex()));
+                                }
+                            } else {
+                                expression.push_str(&r.to_latex().to_string());
+                            }
+                            // Add "*" if it's not the last element
+                            if index < rest.len() - 1 {
+                                expression.push('*');
+                            }
+                        }
                     }
                     Operator::Logarithm(x) => {
                         if x.is_natural_log == true {
@@ -1069,30 +1101,10 @@ impl MathExpression {
             }
             MathExpression::Minimize(op, vec) => {
                 tokens.push(MathExpression::Mo(Operator::Lparen));
-                //tokens.push(MathExpression::Mo(Operator::Min));
-                op.flatten(tokens);
-                //tokens.push(MathExpression::Mo(Operator::Lparen));
                 for v in vec {
                     tokens.push(v.clone());
-                    //tokens.push(' ');
-                    //tokens.push(v.clone());
                 }
-                //tokens.push(MathExpression::Mo(Operator::Rparen));
                 tokens.push(MathExpression::Mo(Operator::Rparen));
-
-                /*if let Some(func_of_vec) = &x.func_of {
-                    if !func_of_vec.is_empty() && !func_of_vec[0].content.to_string().is_empty()
-                    {
-                        expression.push('(');
-                        for (index, func_ci) in func_of_vec.iter().enumerate() {
-                            process_math_expression(&func_ci.content, expression);
-                            if index < func_of_vec.len() - 1 {
-                                expression.push(',');
-                            }
-                        }
-                        expression.push(')');
-                    }
-                }*/
             }
             MathExpression::Absolute(_operator, components) => {
                 tokens.push(MathExpression::Mo(Operator::Lparen));
@@ -1232,12 +1244,70 @@ impl Lexer {
     }
 }
 
+/// Following Justin's `flatten_mults` for flattening Operator::Min
+fn flatten_min_op(mut expr: MathExpressionTree) -> MathExpressionTree {
+    match expr {
+        MathExpressionTree::Cons(ref x, ref mut y) => match x {
+            Operator::Min => {
+                match y[1].clone() {
+                    MathExpressionTree::Cons(x1, y1) => match x1 {
+                        Operator::Min => {
+                            let temp1 = flatten_min_op(y1[0].clone());
+                            let temp2 = flatten_min_op(y1[1].clone());
+                            y.remove(1);
+                            y.append(&mut [temp1, temp2].to_vec())
+                        }
+                        _ => {
+                            let temp1 = y[1].clone();
+                            y.remove(1);
+                            y.append(&mut [temp1].to_vec())
+                        }
+                    },
+                    MathExpressionTree::Atom(_x1) => {}
+                }
+                match y[0].clone() {
+                    MathExpressionTree::Cons(x0, y0) => match x0 {
+                        Operator::Min => {
+                            let temp1 = flatten_min_op(y0[0].clone());
+                            //let temp2 = flatten_min_op(y0[1].clone());
+                            y.remove(0);
+                            y.append(&mut [temp1].to_vec());
+                        }
+                        _ => {
+                            let temp1 = y[0].clone();
+                            y.remove(0);
+                            y.append(&mut [temp1].to_vec())
+                        }
+                    },
+                    MathExpressionTree::Atom(_x0) => {}
+                }
+            }
+            _ => {
+                if y.len() > 1 {
+                    let temp1 = flatten_min_op(y[1].clone());
+                    let temp0 = flatten_min_op(y[0].clone());
+                    y.remove(1);
+                    y.remove(0);
+                    y.append(&mut [temp0, temp1].to_vec())
+                } else {
+                    let temp0 = flatten_min_op(y[0].clone());
+                    y.remove(0);
+                    y.append(&mut [temp0].to_vec())
+                }
+            }
+        },
+        MathExpressionTree::Atom(ref _x) => {}
+    }
+    expr
+}
+
 /// Construct a MathExpressionTree from a vector of MathExpression structs.
 fn expr(input: Vec<MathExpression>) -> MathExpressionTree {
     let mut lexer = Lexer::new(input);
     insert_multiple_between_paren(&mut lexer);
     collapse_commas_within_paren(&mut lexer);
     let mut result: MathExpressionTree = expr_bp(&mut lexer, 0);
+    let mut result = flatten_min_op(result.clone());
     let mut math_vec: Vec<MathExpressionTree> = vec![];
     while lexer.next() != Token::Eof {
         let math_result = expr_bp(&mut lexer, 0);
@@ -1303,11 +1373,11 @@ fn collapse_commas_within_paren(lexer: &mut Lexer) {
             Token::Op(Operator::Lparen) => {
                 inside_paren = true;
                 new_tokens.push(token.clone());
-            },
+            }
             Token::Op(Operator::Rparen) => {
                 inside_paren = false;
                 new_tokens.push(token.clone());
-            },
+            }
             Token::Op(Operator::Comma) => {
                 // Skip the comma if we're inside parentheses
                 // Also, ensure the next token is added immediately after the last added token
@@ -1318,14 +1388,13 @@ fn collapse_commas_within_paren(lexer: &mut Lexer) {
                         iter.next(); // Consume the next token
                     }
                 }
-            },
+            }
             _ => {
                 // For any other token, just add it to the new list
                 new_tokens.push(token.clone());
             }
         }
     }
-    println!("new_tokens:{:?}", new_tokens);
     lexer.tokens = new_tokens;
 }
 
@@ -1355,7 +1424,6 @@ fn collapse_commas_within_paren(lexer: &mut Lexer) {
         lexer.tokens.remove(index);
     }
 }*/
-
 
 /// The Pratt parsing algorithm for constructing an S-expression representing an equation.
 fn expr_bp(lexer: &mut Lexer, min_bp: u8) -> MathExpressionTree {
@@ -1451,6 +1519,7 @@ fn infix_binding_power(op: &Operator) -> Option<(u8, u8)> {
         Operator::Dot => (18, 17),
         Operator::Cross => (18, 17),
         Operator::Comma => (14, 13),
+        Operator::Min => (14, 13),
         Operator::Other(op) => panic!("Unhandled operator: {}!", op),
         _ => return None,
     };
@@ -3582,6 +3651,59 @@ fn test_new_equation1() {
 }
 
 #[test]
+fn test_minimize() {
+    let input = "<math>
+  <mi>min</mi>
+  <mo>&#x2061;</mo>
+  <mo>(</mo>
+  <msub>
+    <mi>A</mi>
+    <mi>c</mi>
+  </msub>
+  <mo>,</mo>
+  <msub>
+    <mi>A</mi>
+    <mi>j</mi>
+  </msub>
+  <mo>,</mo>
+  <msub>
+    <mi>A</mi>
+    <mi>p</mi>
+  </msub>
+  <mo>)</mo>
+  <mo>.</mo>
+    </math>";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", exp);
+    let s_exp = exp.to_string();
+    assert_eq!(s_exp, "(Min A_{j} A_{p} A_{c})");
+    //assert_eq!(s_exp, "(= A_{n} (- (Min A_{c} A_{j} A_{p}) R_{d}))");
+    assert_eq!(exp.to_latex(), "\\min \\{ A_{j},A_{p},A_{c}\\}");
+}
+
+#[test]
+fn test_minimize_mi() {
+    let input = "<math>
+  <mi>min</mi>
+  <mo>&#x2061;</mo>
+  <mo>(</mo>
+    <mi>A</mi>
+  <mo>,</mo>
+    <mi>B</mi>
+  <mo>,</mo>
+    <mi>C</mi>
+  <mo>)</mo>
+  <mo>.</mo>
+    </math>";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", exp);
+    let s_exp = exp.to_string();
+    assert_eq!(s_exp, "(Min B C A)");
+    //assert_eq!(s_exp, "(= A_{n} (- (Min A_{c} A_{j} A_{p}) R_{d}))");
+    assert_eq!(exp.to_latex(), "\\min \\{ B,C,A\\}");
+}
+
+#[test]
 fn test_clm4_5__8_2() {
     let input = "<math>
   <msub>
@@ -3617,9 +3739,11 @@ fn test_clm4_5__8_2() {
     let exp = input.parse::<MathExpressionTree>().unwrap();
     println!("exp={:?}", exp);
     let s_exp = exp.to_string();
-    assert_eq!(s_exp, "(= A_{n} (- (Min (, A_{c} (, A_{j} A_{p}))) R_{d}))");
-    //assert_eq!(s_exp, "(= A_{n} (- (Min A_{c} A_{j} A_{p}) R_{d}))");
-    assert_eq!(exp.to_latex(), "A_{n}=(\\min A_{c},(A_{j},A_{p}))-R_{d}");
+    assert_eq!(s_exp, "(= A_{n} (- (Min A_{j} A_{p} A_{c}) R_{d}))");
+    assert_eq!(
+        exp.to_latex(),
+        "A_{n}=(\\min \\{ A_{j},A_{p},A_{c}\\})-R_{d}"
+    );
 }
 
 #[test]
@@ -3661,7 +3785,10 @@ fn test_clm4_5__8_12_3() {
     println!("exp={:?}", exp);
     let s_exp = exp.to_string();
     assert_eq!(s_exp, "(= f_{L} (+ 1 (exp (* s_{3} (- s_{4} T_{v})))))");
-    assert_eq!(exp.to_latex(), "f_{L}(T_{v})=1+\\mathrm{exp}{s_{3}*(s_{4}-T_{v})}");
+    assert_eq!(
+        exp.to_latex(),
+        "f_{L}(T_{v})=1+\\mathrm{exp}{s_{3}*(s_{4}-T_{v})}"
+    );
 }
 
 #[test]
@@ -3686,37 +3813,6 @@ fn test_ln() {
     let s_exp = exp.to_string();
     assert_eq!(s_exp, "(Ln x)");
     assert_eq!(exp.to_latex(), "\\ln x");
-}
-
-#[test]
-fn test_minimize() {
-    let input = "<math>
-  <mi>min</mi>
-  <mo>&#x2061;</mo>
-  <mo>(</mo>
-  <msub>
-    <mi>A</mi>
-    <mi>c</mi>
-  </msub>
-  <mo>,</mo>
-  <msub>
-    <mi>A</mi>
-    <mi>j</mi>
-  </msub>
-  <mo>,</mo>
-  <msub>
-    <mi>A</mi>
-    <mi>p</mi>
-  </msub>
-  <mo>)</mo>
-  <mo>.</mo>
-    </math>";
-    let exp = input.parse::<MathExpressionTree>().unwrap();
-    println!("exp={:?}", exp);
-    let s_exp = exp.to_string();
-    assert_eq!(s_exp, "(= A_{n} (- (Min (, A_{c} (, A_{j} A_{p}))) R_{d}))");
-    //assert_eq!(s_exp, "(= A_{n} (- (Min A_{c} A_{j} A_{p}) R_{d}))");
-    assert_eq!(exp.to_latex(), "A_{n}=(\\min A_{c},(A_{j},A_{p}))-R_{d}");
 }
 
 /*#[test]

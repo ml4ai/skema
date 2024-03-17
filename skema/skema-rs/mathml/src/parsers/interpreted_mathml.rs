@@ -6,9 +6,11 @@
 
 use crate::{
     ast::{
-        operator::{Derivative, DerivativeNotation, Gradient, Hat, Int, Operator,Logarithm, Summation},
-        Ci, Differential, HatComp, Integral, LaplacianComp, Math, MathExpression, Mi, Mrow, Mtr, Mtd,
-        SummationMath, ExpMath, Type, VectorNotation,
+        operator::{
+            Derivative, DerivativeNotation, Gradient, Hat, Int, Logarithm, Operator, Summation,
+        },
+        Ci, Differential, ExpMath, HatComp, Integral, LaplacianComp, Math, MathExpression, Mi,
+        Mrow, Mtd, Mtr, SummationMath, Type, VectorNotation,
     },
     parsers::generic_mathml::{
         add, attribute, cross, divide, dot, elem_many0, equals, etag, lparen, mean, mi, mn, msub,
@@ -1447,7 +1449,7 @@ pub fn laplacian_operation(input: Span) -> IResult<(MathExpression, Ci)> {
     Ok((s, (op, comp)))
 }
 
-pub fn minimum_with_content(input: Span) -> IResult<(MathExpression, Vec<MathExpression>)> {
+pub fn minimum_with_content_msub(input: Span) -> IResult<(MathExpression, Vec<MathExpression>)> {
     let (s, _x) = ws(pair(
         delimited(stag!("mi"), ws(tag("min")), etag!("mi")),
         alt((
@@ -1476,22 +1478,62 @@ pub fn minimum_with_content(input: Span) -> IResult<(MathExpression, Vec<MathExp
     let mut vec_exp: Vec<MathExpression> = Vec::new();
     for bvar in bound_vars {
         let b = MathExpression::Ci(Ci::new(Some(Type::Real), Box::new(bvar), None, None));
+        vec_exp.push(MathExpression::Mo(Operator::Min));
         vec_exp.push(b.clone());
-        vec_exp.push(MathExpression::Mo(Operator::Comma));
     }
-    let Some(_) = vec_exp.pop() else { todo!() };
-    println!("{:?}",vec_exp);
+    //let Some(_) = vec_exp.pop() else { todo!() };
+
+    Ok((s, (MathExpression::Mo(op), vec_exp)))
+}
+
+pub fn minimum_with_content_mi(input: Span) -> IResult<(MathExpression, Vec<MathExpression>)> {
+    let (s, _x) = ws(pair(
+        delimited(stag!("mi"), ws(tag("min")), etag!("mi")),
+        alt((
+            delimited(
+                stag!("mo"),
+                //ws(tag("&#x2061;")),
+                ws(tag("\u{2061}")),
+                etag!("mo"),
+            ),
+            tag(""),
+        )),
+    ))(input)?;
+    let op = Operator::Min;
+
+    let mo_lparen = delimited(stag!("mo"), lparen, etag!("mo"));
+    let mo_rparen = delimited(stag!("mo"), rparen, etag!("mo"));
+    let mo_mrow_lparen = delimited(tag("<mrow><mo>"), lparen, tag("</mo>"));
+    let mo_mrow_rparen = delimited(tag("<mo>"), rparen, tag("</mo></mrow>"));
+    let mo_comma = delimited(stag!("mo"), ws(tag(",")), etag!("mo"));
+    let (s, bound_vars) = delimited(
+        alt((mo_lparen, mo_mrow_lparen)),
+        separated_list1(mo_comma, mi),
+        alt((mo_mrow_rparen, mo_rparen)),
+    )(s)?;
+
+    let mut vec_exp: Vec<MathExpression> = Vec::new();
+    for bvar in bound_vars {
+        let b = MathExpression::Ci(Ci::new(Some(Type::Real), Box::new(MathExpression::Mi(bvar)), None, None));
+        vec_exp.push(MathExpression::Mo(Operator::Min));
+        vec_exp.push(b.clone());
+    }
+    //let Some(_) = vec_exp.pop() else { todo!() };
 
     Ok((s, (MathExpression::Mo(op), vec_exp)))
 }
 
 /// Handles summation as operator
 pub fn exponential(input: Span) -> IResult<(Operator, Mrow)> {
-    let (s, _exp) = ws(
-        terminated(delimited(stag!("mi"),tag("exp"), etag!("mi")),delimited(stag!("mo"),lparen, etag!("mo"))
-        ))(input)?;
+    let (s, _exp) = ws(terminated(
+        delimited(stag!("mi"), tag("exp"), etag!("mi")),
+        delimited(stag!("mo"), lparen, etag!("mo")),
+    ))(input)?;
     let operator = Operator::Exp;
-    let (s, row) = ws(many_till(math_expression, delimited(stag!("mo"),rparen, etag!("mo"))))(s)?;
+    let (s, row) = ws(many_till(
+        math_expression,
+        delimited(stag!("mo"), rparen, etag!("mo")),
+    ))(s)?;
     let mut expression: Vec<MathExpression> = Vec::new();
     expression.push(MathExpression::Mrow(Mrow::new(row.0)));
     let comps = Mrow(expression);
@@ -1501,9 +1543,7 @@ pub fn exponential(input: Span) -> IResult<(Operator, Mrow)> {
 
 /// Logarithm operator: e.g. log
 pub fn logarithm(input: Span) -> IResult<Operator> {
-    let (s, _exp) = ws(
-        delimited(stag!("mi"),tag("log"), etag!("mi")
-        ))(input)?;
+    let (s, _exp) = ws(delimited(stag!("mi"), tag("log"), etag!("mi")))(input)?;
     let operator = Operator::Logarithm(Logarithm::new(false));
 
     Ok((s, operator))
@@ -1511,9 +1551,7 @@ pub fn logarithm(input: Span) -> IResult<Operator> {
 
 /// Logarithm operator: e.g. log
 pub fn natural_log(input: Span) -> IResult<Operator> {
-    let (s, _exp) = ws(
-        delimited(stag!("mi"),tag("ln"), etag!("mi")
-        ))(input)?;
+    let (s, _exp) = ws(delimited(stag!("mi"), tag("ln"), etag!("mi")))(input)?;
     let operator = Operator::Logarithm(Logarithm::new(true));
 
     Ok((s, operator))
@@ -1571,7 +1609,6 @@ pub fn natural_log(input: Span) -> IResult<Operator> {
     let row = Mtr(elements);
 }*/
 
-
 /// Parser for math expressions. This varies from the one in the generic_mathml module, since it
 /// assumes that expressions such as S(t) are actually univariate functions.
 pub fn math_expression(input: Span) -> IResult<MathExpression> {
@@ -1609,7 +1646,10 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
             }),
             map(gradient_with_subscript, MathExpression::Mo),
             map(div, MathExpression::Mo),
-            map(minimum_with_content, |(op, vec_exp)| {
+            map(minimum_with_content_msub, |(op, vec_exp)| {
+                MathExpression::Minimize(Box::new(op), vec_exp)
+            }),
+            map(minimum_with_content_mi, |(op, vec_exp)| {
                 MathExpression::Minimize(Box::new(op), vec_exp)
             }),
             map(laplacian_operation, |(op, comp)| {
@@ -1684,18 +1724,12 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                     })
                 },
             ),
-            map(
-                exponential,
-                |(
-                     op,
-                     comp,
-                 )| {
-                    MathExpression::ExpMath(ExpMath {
-                        op: Box::new(MathExpression::Mo(op)),
-                        func: Box::new(MathExpression::Mrow(comp)),
-                    })
-                },
-            ),
+            map(exponential, |(op, comp)| {
+                MathExpression::ExpMath(ExpMath {
+                    op: Box::new(MathExpression::Mo(op)),
+                    func: Box::new(MathExpression::Mrow(comp)),
+                })
+            }),
             map(
                 munder_summation,
                 |(
