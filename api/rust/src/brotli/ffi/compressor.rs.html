@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/brotli-3.4.0/src/ffi/compressor.rs`."><title>compressor.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="brotli" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/brotli-3.5.0/src/ffi/compressor.rs`."><title>compressor.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="brotli" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
     <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
@@ -392,397 +392,471 @@
 <a href="#391" id="391">391</a>
 <a href="#392" id="392">392</a>
 <a href="#393" id="393">393</a>
-</pre></div><pre class="rust"><code><span class="attr">#![cfg(not(feature=<span class="string">"safe"</span>))]
+<a href="#394" id="394">394</a>
+<a href="#395" id="395">395</a>
+<a href="#396" id="396">396</a>
+<a href="#397" id="397">397</a>
+<a href="#398" id="398">398</a>
+<a href="#399" id="399">399</a>
+<a href="#400" id="400">400</a>
+<a href="#401" id="401">401</a>
+<a href="#402" id="402">402</a>
+<a href="#403" id="403">403</a>
+<a href="#404" id="404">404</a>
+<a href="#405" id="405">405</a>
+<a href="#406" id="406">406</a>
+<a href="#407" id="407">407</a>
+<a href="#408" id="408">408</a>
+<a href="#409" id="409">409</a>
+<a href="#410" id="410">410</a>
+<a href="#411" id="411">411</a>
+<a href="#412" id="412">412</a>
+<a href="#413" id="413">413</a>
+<a href="#414" id="414">414</a>
+<a href="#415" id="415">415</a>
+<a href="#416" id="416">416</a>
+<a href="#417" id="417">417</a>
+<a href="#418" id="418">418</a>
+<a href="#419" id="419">419</a>
+<a href="#420" id="420">420</a>
+<a href="#421" id="421">421</a>
+<a href="#422" id="422">422</a>
+<a href="#423" id="423">423</a>
+<a href="#424" id="424">424</a>
+<a href="#425" id="425">425</a>
+<a href="#426" id="426">426</a>
+<a href="#427" id="427">427</a>
+<a href="#428" id="428">428</a>
+<a href="#429" id="429">429</a>
+<a href="#430" id="430">430</a>
+</pre></div><pre class="rust"><code><span class="attr">#![cfg(not(feature = <span class="string">"safe"</span>))]
 
-#[cfg(feature=<span class="string">"std"</span>)]
-</span><span class="kw">use </span>std::{panic,thread, io};
-<span class="attr">#[cfg(feature=<span class="string">"std"</span>)]
+#[cfg(feature = <span class="string">"std"</span>)]
 </span><span class="kw">use </span>std::io::Write;
+<span class="attr">#[cfg(feature = <span class="string">"std"</span>)]
+</span><span class="kw">use </span>std::{io, panic, thread};
 
-<span class="kw">use </span>core;
+<span class="kw">use </span><span class="kw">super</span>::alloc_util::BrotliSubclassableAllocator;
 <span class="kw">use </span>brotli_decompressor::ffi::alloc_util;
 <span class="kw">use </span>brotli_decompressor::ffi::alloc_util::SubclassableAllocator;
 <span class="kw">use </span>brotli_decompressor::ffi::interface::{
-  brotli_alloc_func,
-  brotli_free_func,
-  CAllocator,
-  c_void,
+    brotli_alloc_func, brotli_free_func, c_void, CAllocator,
 };
-<span class="kw">use </span>brotli_decompressor::ffi::{
-  slice_from_raw_parts_or_nil,
-  slice_from_raw_parts_or_nil_mut,
-};
-<span class="kw">use </span>::enc::encode::BrotliEncoderStateStruct;
-<span class="kw">use </span><span class="kw">super</span>::alloc_util::BrotliSubclassableAllocator;
+<span class="kw">use </span>brotli_decompressor::ffi::{slice_from_raw_parts_or_nil, slice_from_raw_parts_or_nil_mut};
+<span class="kw">use </span>core;
+<span class="kw">use </span>enc::encode::BrotliEncoderStateStruct;
 
 <span class="attr">#[repr(C)]
 </span><span class="kw">pub enum </span>BrotliEncoderOperation {
-  BROTLI_OPERATION_PROCESS = <span class="number">0</span>,
-  BROTLI_OPERATION_FLUSH = <span class="number">1</span>,
-  BROTLI_OPERATION_FINISH = <span class="number">2</span>,
-  BROTLI_OPERATION_EMIT_METADATA = <span class="number">3</span>,
+    BROTLI_OPERATION_PROCESS = <span class="number">0</span>,
+    BROTLI_OPERATION_FLUSH = <span class="number">1</span>,
+    BROTLI_OPERATION_FINISH = <span class="number">2</span>,
+    BROTLI_OPERATION_EMIT_METADATA = <span class="number">3</span>,
 }
 
 <span class="attr">#[repr(C)]
 </span><span class="kw">pub enum </span>BrotliEncoderMode {
-  BROTLI_MODE_GENERIC = <span class="number">0</span>,
-  BROTLI_MODE_TEXT = <span class="number">1</span>,
-  BROTLI_MODE_FONT = <span class="number">2</span>,
-  BROTLI_MODE_FORCE_LSB_PRIOR = <span class="number">3</span>,
-  BROTLI_MODE_FORCE_MSB_PRIOR = <span class="number">4</span>,
-  BROTLI_MODE_FORCE_UTF8_PRIOR = <span class="number">5</span>,
-  BROTLI_MODE_FORCE_SIGNED_PRIOR = <span class="number">6</span>,
+    BROTLI_MODE_GENERIC = <span class="number">0</span>,
+    BROTLI_MODE_TEXT = <span class="number">1</span>,
+    BROTLI_MODE_FONT = <span class="number">2</span>,
+    BROTLI_MODE_FORCE_LSB_PRIOR = <span class="number">3</span>,
+    BROTLI_MODE_FORCE_MSB_PRIOR = <span class="number">4</span>,
+    BROTLI_MODE_FORCE_UTF8_PRIOR = <span class="number">5</span>,
+    BROTLI_MODE_FORCE_SIGNED_PRIOR = <span class="number">6</span>,
 }
 
 <span class="attr">#[repr(C)]
 </span><span class="kw">pub struct </span>BrotliEncoderState {
-  <span class="kw">pub </span>custom_allocator: CAllocator,
-  <span class="kw">pub </span>compressor: BrotliEncoderStateStruct&lt;BrotliSubclassableAllocator&gt;,
+    <span class="kw">pub </span>custom_allocator: CAllocator,
+    <span class="kw">pub </span>compressor: BrotliEncoderStateStruct&lt;BrotliSubclassableAllocator&gt;,
 }
 
-<span class="attr">#[cfg(not(feature=<span class="string">"std"</span>))]
-</span><span class="kw">fn </span>brotli_new_compressor_without_custom_alloc(_to_box: BrotliEncoderState) -&gt; <span class="kw-2">*mut </span>BrotliEncoderState{
+<span class="attr">#[cfg(not(feature = <span class="string">"std"</span>))]
+</span><span class="kw">fn </span>brotli_new_compressor_without_custom_alloc(
+    _to_box: BrotliEncoderState,
+) -&gt; <span class="kw-2">*mut </span>BrotliEncoderState {
     <span class="macro">panic!</span>(<span class="string">"Must supply allocators if calling divans when compiled without features=std"</span>);
 }
 
-<span class="attr">#[cfg(feature=<span class="string">"std"</span>)]
-</span><span class="kw">fn </span>brotli_new_compressor_without_custom_alloc(to_box: BrotliEncoderState) -&gt; <span class="kw-2">*mut </span>BrotliEncoderState{
-    alloc_util::Box::&lt;BrotliEncoderState&gt;::into_raw(
-        alloc_util::Box::&lt;BrotliEncoderState&gt;::new(to_box))
+<span class="attr">#[cfg(feature = <span class="string">"std"</span>)]
+</span><span class="kw">fn </span>brotli_new_compressor_without_custom_alloc(
+    to_box: BrotliEncoderState,
+) -&gt; <span class="kw-2">*mut </span>BrotliEncoderState {
+    alloc_util::Box::&lt;BrotliEncoderState&gt;::into_raw(alloc_util::Box::&lt;BrotliEncoderState&gt;::new(
+        to_box,
+    ))
 }
-<span class="attr">#[cfg(feature=<span class="string">"std"</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"std"</span>)]
 </span><span class="kw">unsafe fn </span>free_compressor_no_custom_alloc(state_ptr: <span class="kw-2">*mut </span>BrotliEncoderState) {
     <span class="kw">let </span>_state = alloc_util::Box::from_raw(state_ptr);
 }
 
-<span class="attr">#[cfg(not(feature=<span class="string">"std"</span>))]
+<span class="attr">#[cfg(not(feature = <span class="string">"std"</span>))]
 </span><span class="kw">unsafe fn </span>free_compressor_no_custom_alloc(_state_ptr: <span class="kw-2">*mut </span>BrotliEncoderState) {
     <span class="macro">unreachable!</span>();
 }
 
-
-
-
 <span class="attr">#[no_mangle]
-</span><span class="kw">pub unsafe extern fn </span>BrotliEncoderCreateInstance(
+</span><span class="kw">pub unsafe extern </span><span class="string">"C" </span><span class="kw">fn </span>BrotliEncoderCreateInstance(
     alloc_func: brotli_alloc_func,
     free_func: brotli_free_func,
     opaque: <span class="kw-2">*mut </span>c_void,
 ) -&gt; <span class="kw-2">*mut </span>BrotliEncoderState {
-  <span class="kw">match </span>catch_panic_cstate(|| {
-    <span class="kw">let </span>allocators = CAllocator {
-      alloc_func:alloc_func,
-      free_func:free_func,
-      opaque:opaque,
-    };
-    <span class="kw">let </span>to_box = BrotliEncoderState {
-      custom_allocator: allocators.clone(),
-      compressor: ::enc::encode::BrotliEncoderCreateInstance(
-        BrotliSubclassableAllocator::new(
-          SubclassableAllocator::new(allocators.clone())),
-      ),
-    };
-    <span class="kw">if let </span><span class="prelude-val">Some</span>(alloc) = alloc_func {
-      <span class="kw">if </span>free_func.is_none() {
-          <span class="macro">panic!</span>(<span class="string">"either both alloc and free must exist or neither"</span>);
-      }
-     <span class="kw">let </span>ptr = alloc(allocators.opaque, core::mem::size_of::&lt;BrotliEncoderState&gt;());
-      <span class="kw">let </span>brotli_decoder_state_ptr = core::mem::transmute::&lt;<span class="kw-2">*mut </span>c_void, <span class="kw-2">*mut </span>BrotliEncoderState&gt;(ptr);
-      core::ptr::write(brotli_decoder_state_ptr, to_box);
-      brotli_decoder_state_ptr
+    catch_panic_cstate(|| {
+        <span class="kw">let </span>allocators = CAllocator {
+            alloc_func,
+            free_func,
+            opaque,
+        };
+        <span class="kw">let </span>to_box = BrotliEncoderState {
+            custom_allocator: allocators.clone(),
+            compressor: ::enc::encode::BrotliEncoderCreateInstance(
+                BrotliSubclassableAllocator::new(SubclassableAllocator::new(allocators.clone())),
+            ),
+        };
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(alloc) = alloc_func {
+            <span class="kw">if </span>free_func.is_none() {
+                <span class="macro">panic!</span>(<span class="string">"either both alloc and free must exist or neither"</span>);
+            }
+            <span class="kw">let </span>ptr = alloc(
+                allocators.opaque,
+                core::mem::size_of::&lt;BrotliEncoderState&gt;(),
+            );
+            <span class="kw">let </span>brotli_decoder_state_ptr =
+                core::mem::transmute::&lt;<span class="kw-2">*mut </span>c_void, <span class="kw-2">*mut </span>BrotliEncoderState&gt;(ptr);
+            core::ptr::write(brotli_decoder_state_ptr, to_box);
+            brotli_decoder_state_ptr
+        } <span class="kw">else </span>{
+            brotli_new_compressor_without_custom_alloc(to_box)
+        }
+    })
+    .unwrap_or_else(|err| {
+        error_print(err);
+        core::ptr::null_mut()
+    })
+}
+
+<span class="attr">#[no_mangle]
+</span><span class="kw">pub unsafe extern </span><span class="string">"C" </span><span class="kw">fn </span>BrotliEncoderSetParameter(
+    state_ptr: <span class="kw-2">*mut </span>BrotliEncoderState,
+    param: ::enc::encode::BrotliEncoderParameter,
+    value: u32,
+) -&gt; i32 {
+    ::enc::encode::BrotliEncoderSetParameter(<span class="kw-2">&amp;mut </span>(<span class="kw-2">*</span>state_ptr).compressor, param, value)
+}
+
+<span class="attr">#[no_mangle]
+</span><span class="kw">pub unsafe extern </span><span class="string">"C" </span><span class="kw">fn </span>BrotliEncoderDestroyInstance(state_ptr: <span class="kw-2">*mut </span>BrotliEncoderState) {
+    <span class="kw">if </span>state_ptr.is_null() {
+        <span class="kw">return</span>;
+    }
+    ::enc::encode::BrotliEncoderDestroyInstance(<span class="kw-2">&amp;mut </span>(<span class="kw-2">*</span>state_ptr).compressor);
+    <span class="kw">if </span>(<span class="kw-2">*</span>state_ptr).custom_allocator.alloc_func.is_some() {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(free_fn) = (<span class="kw-2">*</span>state_ptr).custom_allocator.free_func {
+            <span class="kw">let </span>_to_free = core::ptr::read(state_ptr);
+            <span class="kw">let </span>ptr = core::mem::transmute::&lt;<span class="kw-2">*mut </span>BrotliEncoderState, <span class="kw-2">*mut </span>c_void&gt;(state_ptr);
+            free_fn((<span class="kw-2">*</span>state_ptr).custom_allocator.opaque, ptr);
+        }
     } <span class="kw">else </span>{
-      brotli_new_compressor_without_custom_alloc(to_box)
+        free_compressor_no_custom_alloc(state_ptr);
     }
-  }) {
-    <span class="prelude-val">Ok</span>(ret) =&gt; ret,
-    <span class="prelude-val">Err</span>(err) =&gt; {
-      error_print(err);
-      core::ptr::null_mut()
-    }
-  }
+}
+<span class="attr">#[no_mangle]
+</span><span class="kw">pub unsafe extern </span><span class="string">"C" </span><span class="kw">fn </span>BrotliEncoderIsFinished(state_ptr: <span class="kw-2">*mut </span>BrotliEncoderState) -&gt; i32 {
+    ::enc::encode::BrotliEncoderIsFinished(<span class="kw-2">&amp;mut </span>(<span class="kw-2">*</span>state_ptr).compressor)
 }
 
 <span class="attr">#[no_mangle]
-</span><span class="kw">pub unsafe extern fn </span>BrotliEncoderSetParameter(
-  state_ptr: <span class="kw-2">*mut </span>BrotliEncoderState,
-  param: ::enc::encode::BrotliEncoderParameter,
-  value: u32,
-) -&gt; i32 {
-  ::enc::encode::BrotliEncoderSetParameter(<span class="kw-2">&amp;mut </span>(<span class="kw-2">*</span>state_ptr).compressor, param, value)
+</span><span class="kw">pub unsafe extern </span><span class="string">"C" </span><span class="kw">fn </span>BrotliEncoderHasMoreOutput(state_ptr: <span class="kw-2">*mut </span>BrotliEncoderState) -&gt; i32 {
+    ::enc::encode::BrotliEncoderHasMoreOutput(<span class="kw-2">&amp;mut </span>(<span class="kw-2">*</span>state_ptr).compressor)
 }
 
 <span class="attr">#[no_mangle]
-</span><span class="kw">pub unsafe extern fn </span>BrotliEncoderDestroyInstance(state_ptr: <span class="kw-2">*mut </span>BrotliEncoderState) {
-  <span class="kw">if </span>state_ptr.is_null() {
-    <span class="kw">return</span>;
-  }
-  ::enc::encode::BrotliEncoderDestroyInstance(<span class="kw-2">&amp;mut </span>(<span class="kw-2">*</span>state_ptr).compressor);
-  <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw">_</span>) = (<span class="kw-2">*</span>state_ptr).custom_allocator.alloc_func {
-    <span class="kw">if let </span><span class="prelude-val">Some</span>(free_fn) = (<span class="kw-2">*</span>state_ptr).custom_allocator.free_func {
-      <span class="kw">let </span>_to_free = core::ptr::read(state_ptr);
-      <span class="kw">let </span>ptr = core::mem::transmute::&lt;<span class="kw-2">*mut </span>BrotliEncoderState, <span class="kw-2">*mut </span>c_void&gt;(state_ptr);
-      free_fn((<span class="kw-2">*</span>state_ptr).custom_allocator.opaque, ptr);
-    }
-  } <span class="kw">else </span>{
-    free_compressor_no_custom_alloc(state_ptr);
-  }
-}
-<span class="attr">#[no_mangle]
-</span><span class="kw">pub unsafe extern fn </span>BrotliEncoderIsFinished(
-  state_ptr: <span class="kw-2">*mut </span>BrotliEncoderState,
-) -&gt; i32 {
-  ::enc::encode::BrotliEncoderIsFinished(<span class="kw-2">&amp;mut </span>(<span class="kw-2">*</span>state_ptr).compressor)
-}
-
-<span class="attr">#[no_mangle]
-</span><span class="kw">pub unsafe extern fn </span>BrotliEncoderHasMoreOutput(
-  state_ptr: <span class="kw-2">*mut </span>BrotliEncoderState,
-) -&gt; i32 {
-  ::enc::encode::BrotliEncoderHasMoreOutput(<span class="kw-2">&amp;mut </span>(<span class="kw-2">*</span>state_ptr).compressor)
-}
-
-<span class="attr">#[no_mangle]
-</span><span class="kw">pub unsafe extern fn </span>BrotliEncoderSetCustomDictionary(
-  state_ptr: <span class="kw-2">*mut </span>BrotliEncoderState,
-  size: usize,
-  dict: <span class="kw-2">*const </span>u8,
+</span><span class="kw">pub unsafe extern </span><span class="string">"C" </span><span class="kw">fn </span>BrotliEncoderSetCustomDictionary(
+    state_ptr: <span class="kw-2">*mut </span>BrotliEncoderState,
+    size: usize,
+    dict: <span class="kw-2">*const </span>u8,
 ) {
-  <span class="kw">if let </span><span class="prelude-val">Err</span>(panic_err) = catch_panic(|| {
-      <span class="kw">let </span>dict_slice = slice_from_raw_parts_or_nil(dict, size);
-      ::enc::encode::BrotliEncoderSetCustomDictionary(<span class="kw-2">&amp;mut </span>(<span class="kw-2">*</span>state_ptr).compressor, size, dict_slice);
-      <span class="number">0
-  </span>}) {
-      error_print(panic_err);
-  }
+    <span class="kw">if let </span><span class="prelude-val">Err</span>(panic_err) = catch_panic(|| {
+        <span class="kw">let </span>dict_slice = slice_from_raw_parts_or_nil(dict, size);
+        ::enc::encode::BrotliEncoderSetCustomDictionary(
+            <span class="kw-2">&amp;mut </span>(<span class="kw-2">*</span>state_ptr).compressor,
+            size,
+            dict_slice,
+        );
+        <span class="number">0
+    </span>}) {
+        error_print(panic_err);
+    }
 }
 
 <span class="attr">#[no_mangle]
-</span><span class="kw">pub unsafe extern fn </span>BrotliEncoderTakeOutput(
-  state_ptr: <span class="kw-2">*mut </span>BrotliEncoderState,
-  size: <span class="kw-2">*mut </span>usize,
+</span><span class="kw">pub unsafe extern </span><span class="string">"C" </span><span class="kw">fn </span>BrotliEncoderTakeOutput(
+    state_ptr: <span class="kw-2">*mut </span>BrotliEncoderState,
+    size: <span class="kw-2">*mut </span>usize,
 ) -&gt; <span class="kw-2">*const </span>u8 {
-  ::enc::encode::BrotliEncoderTakeOutput(<span class="kw-2">&amp;mut </span>(<span class="kw-2">*</span>state_ptr).compressor, <span class="kw-2">&amp;mut *</span>size).as_ptr()
+    ::enc::encode::BrotliEncoderTakeOutput(<span class="kw-2">&amp;mut </span>(<span class="kw-2">*</span>state_ptr).compressor, <span class="kw-2">&amp;mut *</span>size).as_ptr()
 }
 <span class="attr">#[no_mangle]
-</span><span class="kw">pub extern fn </span>BrotliEncoderVersion() -&gt; u32 {
-  ::enc::encode::BrotliEncoderVersion()
+</span><span class="kw">pub extern </span><span class="string">"C" </span><span class="kw">fn </span>BrotliEncoderVersion() -&gt; u32 {
+    ::enc::encode::BrotliEncoderVersion()
 }
 <span class="attr">#[no_mangle]
-</span><span class="kw">pub extern fn </span>BrotliEncoderMaxCompressedSize(input_size: usize) -&gt; usize {
-  ::enc::encode::BrotliEncoderMaxCompressedSize(input_size)
+</span><span class="kw">pub extern </span><span class="string">"C" </span><span class="kw">fn </span>BrotliEncoderMaxCompressedSize(input_size: usize) -&gt; usize {
+    ::enc::encode::BrotliEncoderMaxCompressedSize(input_size)
 }
 <span class="attr">#[no_mangle]
-</span><span class="kw">pub unsafe extern fn </span>BrotliEncoderCompress(
-  quality: i32,
-  lgwin: i32,
-  mode: BrotliEncoderMode,
-  input_size: usize,
-  input_buffer: <span class="kw-2">*const </span>u8,
-  encoded_size: <span class="kw-2">*mut </span>usize,
-  encoded_buffer: <span class="kw-2">*mut </span>u8) -&gt; i32 {
-  <span class="kw">match </span>catch_panic(|| {
-    <span class="kw">let </span>input_buf = slice_from_raw_parts_or_nil(input_buffer, input_size);
-    <span class="kw">let </span>encoded_buf = slice_from_raw_parts_or_nil_mut(encoded_buffer, <span class="kw-2">*</span>encoded_size);
-    <span class="kw">let </span>allocators = CAllocator {
-        alloc_func:<span class="prelude-val">None</span>,
-        free_func:<span class="prelude-val">None</span>,
-        opaque:core::ptr::null_mut(),
-    };
-    <span class="kw">let </span>translated_mode = <span class="kw">match </span>mode {
-      BrotliEncoderMode::BROTLI_MODE_GENERIC =&gt;
-        ::enc::backward_references::BrotliEncoderMode::BROTLI_MODE_GENERIC,
-      BrotliEncoderMode::BROTLI_MODE_TEXT =&gt;
-        ::enc::backward_references::BrotliEncoderMode::BROTLI_MODE_TEXT,
-      BrotliEncoderMode::BROTLI_MODE_FONT =&gt;
-        ::enc::backward_references::BrotliEncoderMode::BROTLI_MODE_FONT,
-      BrotliEncoderMode::BROTLI_MODE_FORCE_LSB_PRIOR =&gt;
-        ::enc::backward_references::BrotliEncoderMode::BROTLI_FORCE_LSB_PRIOR,
-      BrotliEncoderMode::BROTLI_MODE_FORCE_MSB_PRIOR =&gt;
-        ::enc::backward_references::BrotliEncoderMode::BROTLI_FORCE_MSB_PRIOR,
-      BrotliEncoderMode::BROTLI_MODE_FORCE_UTF8_PRIOR =&gt;
-        ::enc::backward_references::BrotliEncoderMode::BROTLI_FORCE_UTF8_PRIOR,
-      BrotliEncoderMode::BROTLI_MODE_FORCE_SIGNED_PRIOR =&gt;
-        ::enc::backward_references::BrotliEncoderMode::BROTLI_FORCE_SIGNED_PRIOR,
-    };
-    <span class="kw">let </span><span class="kw-2">mut </span>m8 = BrotliSubclassableAllocator::new(
-      SubclassableAllocator::new(allocators.clone()));
-    <span class="kw">let </span>empty_m8 = BrotliSubclassableAllocator::new(
-      SubclassableAllocator::new(allocators.clone()));
-  
-    ::enc::encode::BrotliEncoderCompress(
-      empty_m8,
-      <span class="kw-2">&amp;mut </span>m8,
-      quality,
-      lgwin,
-      translated_mode,
-      input_size,
-      input_buf,
-      <span class="kw-2">&amp;mut *</span>encoded_size,
-      encoded_buf,
-      <span class="kw-2">&amp;mut </span>|_a,_b,_c,_d|(),
-      )
-
-  }) {
-    <span class="prelude-val">Ok</span>(ret) =&gt; ret,
-    <span class="prelude-val">Err</span>(panic_err) =&gt; {
-      error_print(panic_err);
-      <span class="number">0
-    </span>},
-  }
-}
-
-<span class="attr">#[no_mangle]
-</span><span class="kw">pub unsafe extern fn </span>BrotliEncoderCompressStreaming(
-  state_ptr: <span class="kw-2">*mut </span>BrotliEncoderState,
-  op: BrotliEncoderOperation,
-  available_in: <span class="kw-2">*mut </span>usize,
-  <span class="kw-2">mut </span>input_buf: <span class="kw-2">*const </span>u8,
-  available_out: <span class="kw-2">*mut </span>usize,
-  <span class="kw-2">mut </span>output_buf: <span class="kw-2">*mut </span>u8,
+</span><span class="kw">pub unsafe extern </span><span class="string">"C" </span><span class="kw">fn </span>BrotliEncoderCompress(
+    quality: i32,
+    lgwin: i32,
+    mode: BrotliEncoderMode,
+    input_size: usize,
+    input_buffer: <span class="kw-2">*const </span>u8,
+    encoded_size: <span class="kw-2">*mut </span>usize,
+    encoded_buffer: <span class="kw-2">*mut </span>u8,
 ) -&gt; i32 {
-  BrotliEncoderCompressStream(state_ptr,
-                              op,
-                              available_in,
-                              <span class="kw-2">&amp;mut </span>input_buf,
-                              available_out,
-                              <span class="kw-2">&amp;mut </span>output_buf,
-                              core::ptr::null_mut())
-                              
+    catch_panic(|| {
+        <span class="kw">let </span>input_buf = slice_from_raw_parts_or_nil(input_buffer, input_size);
+        <span class="kw">let </span>encoded_buf = slice_from_raw_parts_or_nil_mut(encoded_buffer, <span class="kw-2">*</span>encoded_size);
+        <span class="kw">let </span>allocators = CAllocator {
+            alloc_func: <span class="prelude-val">None</span>,
+            free_func: <span class="prelude-val">None</span>,
+            opaque: core::ptr::null_mut(),
+        };
+        <span class="kw">let </span>translated_mode = <span class="kw">match </span>mode {
+            BrotliEncoderMode::BROTLI_MODE_GENERIC =&gt; {
+                ::enc::backward_references::BrotliEncoderMode::BROTLI_MODE_GENERIC
+            }
+            BrotliEncoderMode::BROTLI_MODE_TEXT =&gt; {
+                ::enc::backward_references::BrotliEncoderMode::BROTLI_MODE_TEXT
+            }
+            BrotliEncoderMode::BROTLI_MODE_FONT =&gt; {
+                ::enc::backward_references::BrotliEncoderMode::BROTLI_MODE_FONT
+            }
+            BrotliEncoderMode::BROTLI_MODE_FORCE_LSB_PRIOR =&gt; {
+                ::enc::backward_references::BrotliEncoderMode::BROTLI_FORCE_LSB_PRIOR
+            }
+            BrotliEncoderMode::BROTLI_MODE_FORCE_MSB_PRIOR =&gt; {
+                ::enc::backward_references::BrotliEncoderMode::BROTLI_FORCE_MSB_PRIOR
+            }
+            BrotliEncoderMode::BROTLI_MODE_FORCE_UTF8_PRIOR =&gt; {
+                ::enc::backward_references::BrotliEncoderMode::BROTLI_FORCE_UTF8_PRIOR
+            }
+            BrotliEncoderMode::BROTLI_MODE_FORCE_SIGNED_PRIOR =&gt; {
+                ::enc::backward_references::BrotliEncoderMode::BROTLI_FORCE_SIGNED_PRIOR
+            }
+        };
+        <span class="kw">let </span><span class="kw-2">mut </span>m8 =
+            BrotliSubclassableAllocator::new(SubclassableAllocator::new(allocators.clone()));
+        <span class="kw">let </span>empty_m8 =
+            BrotliSubclassableAllocator::new(SubclassableAllocator::new(allocators.clone()));
+
+        ::enc::encode::BrotliEncoderCompress(
+            empty_m8,
+            <span class="kw-2">&amp;mut </span>m8,
+            quality,
+            lgwin,
+            translated_mode,
+            input_size,
+            input_buf,
+            <span class="kw-2">&amp;mut *</span>encoded_size,
+            encoded_buf,
+            <span class="kw-2">&amp;mut </span>|_a, _b, _c, _d| (),
+        )
+    })
+    .unwrap_or_else(|panic_err| {
+        error_print(panic_err);
+        <span class="number">0
+    </span>})
 }
 
 <span class="attr">#[no_mangle]
-</span><span class="kw">pub unsafe extern fn </span>BrotliEncoderCompressStream(
-  state_ptr: <span class="kw-2">*mut </span>BrotliEncoderState,
-  op: BrotliEncoderOperation,
-  available_in: <span class="kw-2">*mut </span>usize,
-  input_buf_ptr: <span class="kw-2">*mut*const </span>u8,
-  available_out: <span class="kw-2">*mut </span>usize,
-  output_buf_ptr: <span class="kw-2">*mut*mut </span>u8,
-  total_out: <span class="kw-2">*mut </span>usize) -&gt; i32 {
-  <span class="kw">match </span>catch_panic(|| {
-    <span class="kw">let </span><span class="kw-2">mut </span>input_offset = <span class="number">0usize</span>;
-    <span class="kw">let </span><span class="kw-2">mut </span>output_offset = <span class="number">0usize</span>;
-    <span class="kw">let </span>result;
-    <span class="kw">let </span>translated_op = <span class="kw">match </span>op {
-      BrotliEncoderOperation::BROTLI_OPERATION_PROCESS =&gt;
-        ::enc::encode::BrotliEncoderOperation::BROTLI_OPERATION_PROCESS,
-      BrotliEncoderOperation::BROTLI_OPERATION_FLUSH =&gt;
-        ::enc::encode::BrotliEncoderOperation::BROTLI_OPERATION_FLUSH,
-      BrotliEncoderOperation::BROTLI_OPERATION_FINISH =&gt;
-        ::enc::encode::BrotliEncoderOperation::BROTLI_OPERATION_FINISH,
-      BrotliEncoderOperation::BROTLI_OPERATION_EMIT_METADATA =&gt;
-        ::enc::encode::BrotliEncoderOperation::BROTLI_OPERATION_EMIT_METADATA,
-    };
-    {
-      <span class="kw">let </span>(input_buf, input_any):(<span class="kw-2">&amp;</span>[u8],bool) = <span class="kw">if </span><span class="kw-2">*</span>available_in != <span class="number">0 </span>{
-        (slice_from_raw_parts_or_nil(<span class="kw-2">*</span>input_buf_ptr, <span class="kw-2">*</span>available_in), <span class="bool-val">true</span>)
-      } <span class="kw">else </span>{
-        (<span class="kw-2">&amp;</span>[], <span class="bool-val">false</span>)
-      };
-      <span class="kw">let </span>(output_buf, output_any):(<span class="kw-2">&amp;mut</span>[u8],bool) = <span class="kw">if </span><span class="kw-2">*</span>available_out != <span class="number">0 </span>{
-        (slice_from_raw_parts_or_nil_mut(<span class="kw-2">*</span>output_buf_ptr, <span class="kw-2">*</span>available_out), <span class="bool-val">true</span>)
-      } <span class="kw">else </span>{
-        (<span class="kw-2">&amp;mut </span>[], <span class="bool-val">false</span>)
-      };
-      <span class="kw">let </span><span class="kw-2">mut </span>to = <span class="prelude-val">Some</span>(<span class="number">0usize</span>);
-      result = ::enc::encode::BrotliEncoderCompressStream(
-        <span class="kw-2">&amp;mut </span>(<span class="kw-2">*</span>state_ptr).compressor,
-        translated_op,
-        <span class="kw-2">&amp;mut *</span>available_in,
-        input_buf,
-        <span class="kw-2">&amp;mut </span>input_offset,
-        <span class="kw-2">&amp;mut *</span>available_out,
-        output_buf,
-        <span class="kw-2">&amp;mut </span>output_offset,
-        <span class="kw-2">&amp;mut </span>to,
-        <span class="kw-2">&amp;mut </span>|_a,_b,_c,_d|(),
-      );
-      <span class="kw">if </span>!total_out.is_null() {
-        <span class="kw-2">*</span>total_out = to.unwrap_or(<span class="number">0</span>);
-      }
-      <span class="kw">if </span>input_any {
-        <span class="kw-2">*</span>input_buf_ptr = (<span class="kw-2">*</span>input_buf_ptr).offset(input_offset <span class="kw">as </span>isize);
-      }
-      <span class="kw">if </span>output_any {
-        <span class="kw-2">*</span>output_buf_ptr = (<span class="kw-2">*</span>output_buf_ptr).offset(output_offset <span class="kw">as </span>isize);
-      }
-    }
-    result
-  }) {
-    <span class="prelude-val">Ok</span>(ret) =&gt; ret,
-    <span class="prelude-val">Err</span>(panic_err) =&gt; {
-      error_print(panic_err);
-      <span class="number">0
-    </span>},
-  }
+</span><span class="kw">pub unsafe extern </span><span class="string">"C" </span><span class="kw">fn </span>BrotliEncoderCompressStreaming(
+    state_ptr: <span class="kw-2">*mut </span>BrotliEncoderState,
+    op: BrotliEncoderOperation,
+    available_in: <span class="kw-2">*mut </span>usize,
+    <span class="kw-2">mut </span>input_buf: <span class="kw-2">*const </span>u8,
+    available_out: <span class="kw-2">*mut </span>usize,
+    <span class="kw-2">mut </span>output_buf: <span class="kw-2">*mut </span>u8,
+) -&gt; i32 {
+    BrotliEncoderCompressStream(
+        state_ptr,
+        op,
+        available_in,
+        <span class="kw-2">&amp;mut </span>input_buf,
+        available_out,
+        <span class="kw-2">&amp;mut </span>output_buf,
+        core::ptr::null_mut(),
+    )
 }
 
+<span class="attr">#[no_mangle]
+</span><span class="kw">pub unsafe extern </span><span class="string">"C" </span><span class="kw">fn </span>BrotliEncoderCompressStream(
+    state_ptr: <span class="kw-2">*mut </span>BrotliEncoderState,
+    op: BrotliEncoderOperation,
+    available_in: <span class="kw-2">*mut </span>usize,
+    input_buf_ptr: <span class="kw-2">*mut *const </span>u8,
+    available_out: <span class="kw-2">*mut </span>usize,
+    output_buf_ptr: <span class="kw-2">*mut *mut </span>u8,
+    total_out: <span class="kw-2">*mut </span>usize,
+) -&gt; i32 {
+    catch_panic(|| {
+        <span class="kw">let </span><span class="kw-2">mut </span>input_offset = <span class="number">0usize</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>output_offset = <span class="number">0usize</span>;
+        <span class="kw">let </span>result;
+        <span class="kw">let </span>translated_op = <span class="kw">match </span>op {
+            BrotliEncoderOperation::BROTLI_OPERATION_PROCESS =&gt; {
+                ::enc::encode::BrotliEncoderOperation::BROTLI_OPERATION_PROCESS
+            }
+            BrotliEncoderOperation::BROTLI_OPERATION_FLUSH =&gt; {
+                ::enc::encode::BrotliEncoderOperation::BROTLI_OPERATION_FLUSH
+            }
+            BrotliEncoderOperation::BROTLI_OPERATION_FINISH =&gt; {
+                ::enc::encode::BrotliEncoderOperation::BROTLI_OPERATION_FINISH
+            }
+            BrotliEncoderOperation::BROTLI_OPERATION_EMIT_METADATA =&gt; {
+                ::enc::encode::BrotliEncoderOperation::BROTLI_OPERATION_EMIT_METADATA
+            }
+        };
+        {
+            <span class="kw">let </span>(input_buf, input_any): (<span class="kw-2">&amp;</span>[u8], bool) = <span class="kw">if </span><span class="kw-2">*</span>available_in != <span class="number">0 </span>{
+                (
+                    slice_from_raw_parts_or_nil(<span class="kw-2">*</span>input_buf_ptr, <span class="kw-2">*</span>available_in),
+                    <span class="bool-val">true</span>,
+                )
+            } <span class="kw">else </span>{
+                (<span class="kw-2">&amp;</span>[], <span class="bool-val">false</span>)
+            };
+            <span class="kw">let </span>(output_buf, output_any): (<span class="kw-2">&amp;mut </span>[u8], bool) = <span class="kw">if </span><span class="kw-2">*</span>available_out != <span class="number">0 </span>{
+                (
+                    slice_from_raw_parts_or_nil_mut(<span class="kw-2">*</span>output_buf_ptr, <span class="kw-2">*</span>available_out),
+                    <span class="bool-val">true</span>,
+                )
+            } <span class="kw">else </span>{
+                (<span class="kw-2">&amp;mut </span>[], <span class="bool-val">false</span>)
+            };
+            <span class="kw">let </span><span class="kw-2">mut </span>to = <span class="prelude-val">Some</span>(<span class="number">0</span>);
+            result = ::enc::encode::BrotliEncoderCompressStream(
+                <span class="kw-2">&amp;mut </span>(<span class="kw-2">*</span>state_ptr).compressor,
+                translated_op,
+                <span class="kw-2">&amp;mut *</span>available_in,
+                input_buf,
+                <span class="kw-2">&amp;mut </span>input_offset,
+                <span class="kw-2">&amp;mut *</span>available_out,
+                output_buf,
+                <span class="kw-2">&amp;mut </span>output_offset,
+                <span class="kw-2">&amp;mut </span>to,
+                <span class="kw-2">&amp;mut </span>|_a, _b, _c, _d| (),
+            );
+            <span class="kw">if </span>!total_out.is_null() {
+                <span class="kw-2">*</span>total_out = to.unwrap_or(<span class="number">0</span>);
+            }
+            <span class="kw">if </span>input_any {
+                <span class="kw-2">*</span>input_buf_ptr = (<span class="kw-2">*</span>input_buf_ptr).add(input_offset);
+            }
+            <span class="kw">if </span>output_any {
+                <span class="kw-2">*</span>output_buf_ptr = (<span class="kw-2">*</span>output_buf_ptr).add(output_offset);
+            }
+        }
+        result
+    })
+    .unwrap_or_else(|panic_err| {
+        error_print(panic_err);
+        <span class="number">0
+    </span>})
+}
 
 <span class="attr">#[no_mangle]
-</span><span class="kw">pub unsafe extern fn </span>BrotliEncoderMallocU8(state_ptr: <span class="kw-2">*mut </span>BrotliEncoderState, size: usize) -&gt; <span class="kw-2">*mut </span>u8 {
+</span><span class="kw">pub unsafe extern </span><span class="string">"C" </span><span class="kw">fn </span>BrotliEncoderMallocU8(
+    state_ptr: <span class="kw-2">*mut </span>BrotliEncoderState,
+    size: usize,
+) -&gt; <span class="kw-2">*mut </span>u8 {
     <span class="kw">if let </span><span class="prelude-val">Some</span>(alloc_fn) = (<span class="kw-2">*</span>state_ptr).custom_allocator.alloc_func {
-        <span class="kw">return </span>core::mem::transmute::&lt;<span class="kw-2">*mut </span>c_void, <span class="kw-2">*mut </span>u8&gt;(alloc_fn((<span class="kw-2">*</span>state_ptr).custom_allocator.opaque, size));
+        core::mem::transmute::&lt;<span class="kw-2">*mut </span>c_void, <span class="kw-2">*mut </span>u8&gt;(alloc_fn(
+            (<span class="kw-2">*</span>state_ptr).custom_allocator.opaque,
+            size,
+        ))
     } <span class="kw">else </span>{
-        <span class="kw">return </span>alloc_util::alloc_stdlib(size);
+        alloc_util::alloc_stdlib(size)
     }
 }
 
 <span class="attr">#[no_mangle]
-</span><span class="kw">pub unsafe extern fn </span>BrotliEncoderFreeU8(state_ptr: <span class="kw-2">*mut </span>BrotliEncoderState, data: <span class="kw-2">*mut </span>u8, size: usize) {
+</span><span class="kw">pub unsafe extern </span><span class="string">"C" </span><span class="kw">fn </span>BrotliEncoderFreeU8(
+    state_ptr: <span class="kw-2">*mut </span>BrotliEncoderState,
+    data: <span class="kw-2">*mut </span>u8,
+    size: usize,
+) {
     <span class="kw">if let </span><span class="prelude-val">Some</span>(free_fn) = (<span class="kw-2">*</span>state_ptr).custom_allocator.free_func {
-        free_fn((<span class="kw-2">*</span>state_ptr).custom_allocator.opaque, core::mem::transmute::&lt;<span class="kw-2">*mut </span>u8, <span class="kw-2">*mut </span>c_void&gt;(data));
+        free_fn(
+            (<span class="kw-2">*</span>state_ptr).custom_allocator.opaque,
+            core::mem::transmute::&lt;<span class="kw-2">*mut </span>u8, <span class="kw-2">*mut </span>c_void&gt;(data),
+        );
     } <span class="kw">else </span>{
         alloc_util::free_stdlib(data, size);
     }
 }
 
 <span class="attr">#[no_mangle]
-</span><span class="kw">pub unsafe extern fn </span>BrotliEncoderMallocUsize(state_ptr: <span class="kw-2">*mut </span>BrotliEncoderState, size: usize) -&gt; <span class="kw-2">*mut </span>usize {
+</span><span class="kw">pub unsafe extern </span><span class="string">"C" </span><span class="kw">fn </span>BrotliEncoderMallocUsize(
+    state_ptr: <span class="kw-2">*mut </span>BrotliEncoderState,
+    size: usize,
+) -&gt; <span class="kw-2">*mut </span>usize {
     <span class="kw">if let </span><span class="prelude-val">Some</span>(alloc_fn) = (<span class="kw-2">*</span>state_ptr).custom_allocator.alloc_func {
-        <span class="kw">return </span>core::mem::transmute::&lt;<span class="kw-2">*mut </span>c_void, <span class="kw-2">*mut </span>usize&gt;(alloc_fn((<span class="kw-2">*</span>state_ptr).custom_allocator.opaque,
-                                                                         size * core::mem::size_of::&lt;usize&gt;()));
+        core::mem::transmute::&lt;<span class="kw-2">*mut </span>c_void, <span class="kw-2">*mut </span>usize&gt;(alloc_fn(
+            (<span class="kw-2">*</span>state_ptr).custom_allocator.opaque,
+            size * core::mem::size_of::&lt;usize&gt;(),
+        ))
     } <span class="kw">else </span>{
-        <span class="kw">return </span>alloc_util::alloc_stdlib(size);
+        alloc_util::alloc_stdlib(size)
     }
 }
 <span class="attr">#[no_mangle]
-</span><span class="kw">pub unsafe extern fn </span>BrotliEncoderFreeUsize(state_ptr: <span class="kw-2">*mut </span>BrotliEncoderState, data: <span class="kw-2">*mut </span>usize, size: usize) {
+</span><span class="kw">pub unsafe extern </span><span class="string">"C" </span><span class="kw">fn </span>BrotliEncoderFreeUsize(
+    state_ptr: <span class="kw-2">*mut </span>BrotliEncoderState,
+    data: <span class="kw-2">*mut </span>usize,
+    size: usize,
+) {
     <span class="kw">if let </span><span class="prelude-val">Some</span>(free_fn) = (<span class="kw-2">*</span>state_ptr).custom_allocator.free_func {
-        free_fn((<span class="kw-2">*</span>state_ptr).custom_allocator.opaque, core::mem::transmute::&lt;<span class="kw-2">*mut </span>usize, <span class="kw-2">*mut </span>c_void&gt;(data));
+        free_fn(
+            (<span class="kw-2">*</span>state_ptr).custom_allocator.opaque,
+            core::mem::transmute::&lt;<span class="kw-2">*mut </span>usize, <span class="kw-2">*mut </span>c_void&gt;(data),
+        );
     } <span class="kw">else </span>{
         alloc_util::free_stdlib(data, size);
     }
 }
 
-
-
-<span class="attr">#[cfg(all(feature=<span class="string">"std"</span>, not(feature=<span class="string">"pass-through-ffi-panics"</span>)))]
-</span><span class="kw">pub fn </span>catch_panic&lt;F:FnOnce()-&gt;i32+panic::UnwindSafe&gt;(f: F) -&gt; thread::Result&lt;i32&gt; {
+<span class="attr">#[cfg(all(feature = <span class="string">"std"</span>, not(feature = <span class="string">"pass-through-ffi-panics"</span>)))]
+</span><span class="kw">pub fn </span>catch_panic&lt;F: FnOnce() -&gt; i32 + panic::UnwindSafe&gt;(f: F) -&gt; thread::Result&lt;i32&gt; {
     panic::catch_unwind(f)
 }
 
-<span class="attr">#[cfg(all(feature=<span class="string">"std"</span>, not(feature=<span class="string">"pass-through-ffi-panics"</span>)))]
-</span><span class="kw">fn </span>catch_panic_cstate&lt;F:FnOnce()-&gt;<span class="kw-2">*mut </span>BrotliEncoderState+panic::UnwindSafe&gt;(f: F) -&gt; thread::Result&lt;<span class="kw-2">*mut </span>BrotliEncoderState&gt; {
+<span class="attr">#[cfg(all(feature = <span class="string">"std"</span>, not(feature = <span class="string">"pass-through-ffi-panics"</span>)))]
+</span><span class="kw">fn </span>catch_panic_cstate&lt;F: FnOnce() -&gt; <span class="kw-2">*mut </span>BrotliEncoderState + panic::UnwindSafe&gt;(
+    f: F,
+) -&gt; thread::Result&lt;<span class="kw-2">*mut </span>BrotliEncoderState&gt; {
     panic::catch_unwind(f)
 }
 
-<span class="attr">#[cfg(all(feature=<span class="string">"std"</span>, not(feature=<span class="string">"pass-through-ffi-panics"</span>)))]
-</span><span class="kw">fn </span>error_print&lt;<span class="prelude-val">Err</span>:core::fmt::Debug&gt;(err: <span class="prelude-val">Err</span>) {
+<span class="attr">#[cfg(all(feature = <span class="string">"std"</span>, not(feature = <span class="string">"pass-through-ffi-panics"</span>)))]
+</span><span class="kw">fn </span>error_print&lt;<span class="prelude-val">Err</span>: core::fmt::Debug&gt;(err: <span class="prelude-val">Err</span>) {
     <span class="kw">let </span>_ign = <span class="macro">writeln!</span>(<span class="kw-2">&amp;mut </span>io::stderr(), <span class="string">"Internal Error {:?}"</span>, err);
 }
 
 <span class="comment">// can't catch panics in a reliable way without std:: configure with panic=abort. These shouldn't happen
-</span><span class="attr">#[cfg(any(not(feature=<span class="string">"std"</span>), feature=<span class="string">"pass-through-ffi-panics"</span>))]
-</span><span class="kw">pub fn </span>catch_panic&lt;F:FnOnce()-&gt;i32&gt;(f: F) -&gt; <span class="prelude-ty">Result</span>&lt;i32, ()&gt; {
+</span><span class="attr">#[cfg(any(not(feature = <span class="string">"std"</span>), feature = <span class="string">"pass-through-ffi-panics"</span>))]
+</span><span class="kw">pub fn </span>catch_panic&lt;F: FnOnce() -&gt; i32&gt;(f: F) -&gt; <span class="prelude-ty">Result</span>&lt;i32, ()&gt; {
     <span class="prelude-val">Ok</span>(f())
 }
 
-<span class="attr">#[cfg(any(not(feature=<span class="string">"std"</span>), feature=<span class="string">"pass-through-ffi-panics"</span>))]
-</span><span class="kw">fn </span>catch_panic_cstate&lt;F:FnOnce()-&gt;<span class="kw-2">*mut </span>BrotliEncoderState&gt;(f: F) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw-2">*mut </span>BrotliEncoderState, ()&gt; {
+<span class="attr">#[cfg(any(not(feature = <span class="string">"std"</span>), feature = <span class="string">"pass-through-ffi-panics"</span>))]
+</span><span class="kw">fn </span>catch_panic_cstate&lt;F: FnOnce() -&gt; <span class="kw-2">*mut </span>BrotliEncoderState&gt;(
+    f: F,
+) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw-2">*mut </span>BrotliEncoderState, ()&gt; {
     <span class="prelude-val">Ok</span>(f())
 }
 
-<span class="attr">#[cfg(any(not(feature=<span class="string">"std"</span>), feature=<span class="string">"pass-through-ffi-panics"</span>))]
-</span><span class="kw">fn </span>error_print&lt;<span class="prelude-val">Err</span>&gt;(_err: <span class="prelude-val">Err</span>) {
-}
+<span class="attr">#[cfg(any(not(feature = <span class="string">"std"</span>), feature = <span class="string">"pass-through-ffi-panics"</span>))]
+</span><span class="kw">fn </span>error_print&lt;<span class="prelude-val">Err</span>&gt;(_err: <span class="prelude-val">Err</span>) {}
 </code></pre></div></section></main></body></html>

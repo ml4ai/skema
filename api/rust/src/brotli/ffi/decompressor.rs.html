@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/brotli-3.4.0/src/ffi/decompressor.rs`."><title>decompressor.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="brotli" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/brotli-3.5.0/src/ffi/decompressor.rs`."><title>decompressor.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="brotli" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
     <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
@@ -157,83 +157,111 @@
 <a href="#156" id="156">156</a>
 <a href="#157" id="157">157</a>
 <a href="#158" id="158">158</a>
+<a href="#159" id="159">159</a>
+<a href="#160" id="160">160</a>
+<a href="#161" id="161">161</a>
+<a href="#162" id="162">162</a>
+<a href="#163" id="163">163</a>
+<a href="#164" id="164">164</a>
+<a href="#165" id="165">165</a>
+<a href="#166" id="166">166</a>
+<a href="#167" id="167">167</a>
+<a href="#168" id="168">168</a>
+<a href="#169" id="169">169</a>
+<a href="#170" id="170">170</a>
+<a href="#171" id="171">171</a>
+<a href="#172" id="172">172</a>
+<a href="#173" id="173">173</a>
+<a href="#174" id="174">174</a>
+<a href="#175" id="175">175</a>
+<a href="#176" id="176">176</a>
+<a href="#177" id="177">177</a>
+<a href="#178" id="178">178</a>
+<a href="#179" id="179">179</a>
+<a href="#180" id="180">180</a>
+<a href="#181" id="181">181</a>
+<a href="#182" id="182">182</a>
+<a href="#183" id="183">183</a>
+<a href="#184" id="184">184</a>
 </pre></div><pre class="rust"><code><span class="kw">pub use </span>brotli_decompressor::ffi;
+<span class="kw">pub use </span>brotli_decompressor::ffi::interface::{brotli_alloc_func, brotli_free_func, c_void};
 <span class="kw">pub use </span>brotli_decompressor::{BrotliDecoderReturnInfo, HuffmanCode};
-<span class="kw">pub use </span>brotli_decompressor::ffi::interface::{
-  brotli_alloc_func,
-  brotli_free_func,
-  c_void,
-};
 
-<span class="kw">pub unsafe extern fn </span>CBrotliDecoderCreateInstance(
+<span class="kw">pub unsafe extern </span><span class="string">"C" </span><span class="kw">fn </span>CBrotliDecoderCreateInstance(
     alloc_func: brotli_alloc_func,
     free_func: brotli_free_func,
     opaque: <span class="kw-2">*mut </span>c_void,
 ) -&gt; <span class="kw-2">*mut </span>ffi::BrotliDecoderState {
-   ffi::BrotliDecoderCreateInstance(alloc_func, free_func, opaque)
+    ffi::BrotliDecoderCreateInstance(alloc_func, free_func, opaque)
 }
 
-<span class="kw">pub unsafe extern fn </span>CBrotliDecoderSetParameter(state_ptr: <span class="kw-2">*mut </span>ffi::BrotliDecoderState,
-                                       selector: ffi::interface::BrotliDecoderParameter,
-                                       value: u32) {
-    ffi::BrotliDecoderSetParameter(state_ptr,  selector, value)
-} 
-     
-<span class="attr">#[cfg(feature=<span class="string">"std"</span>)] </span><span class="comment">// this requires a default allocator
-</span><span class="kw">pub unsafe extern fn </span>CBrotliDecoderDecompress(
-  encoded_size: usize,
-  encoded_buffer: <span class="kw-2">*const </span>u8,
-  decoded_size: <span class="kw-2">*mut </span>usize,
-  decoded_buffer: <span class="kw-2">*mut </span>u8) -&gt; ffi::interface::BrotliDecoderResult {
+<span class="kw">pub unsafe extern </span><span class="string">"C" </span><span class="kw">fn </span>CBrotliDecoderSetParameter(
+    state_ptr: <span class="kw-2">*mut </span>ffi::BrotliDecoderState,
+    selector: ffi::interface::BrotliDecoderParameter,
+    value: u32,
+) {
+    ffi::BrotliDecoderSetParameter(state_ptr, selector, value)
+}
+
+<span class="attr">#[cfg(feature = <span class="string">"std"</span>)] </span><span class="comment">// this requires a default allocator
+</span><span class="kw">pub unsafe extern </span><span class="string">"C" </span><span class="kw">fn </span>CBrotliDecoderDecompress(
+    encoded_size: usize,
+    encoded_buffer: <span class="kw-2">*const </span>u8,
+    decoded_size: <span class="kw-2">*mut </span>usize,
+    decoded_buffer: <span class="kw-2">*mut </span>u8,
+) -&gt; ffi::interface::BrotliDecoderResult {
     ffi::BrotliDecoderDecompress(encoded_size, encoded_buffer, decoded_size, decoded_buffer)
 }
 
-<span class="kw">pub unsafe extern fn </span>CBrotliDecoderDecompressStream(
+<span class="kw">pub unsafe extern </span><span class="string">"C" </span><span class="kw">fn </span>CBrotliDecoderDecompressStream(
     state_ptr: <span class="kw-2">*mut </span>ffi::BrotliDecoderState,
     available_in: <span class="kw-2">*mut </span>usize,
-    input_buf_ptr: <span class="kw-2">*mut*const </span>u8,
+    input_buf_ptr: <span class="kw-2">*mut *const </span>u8,
     available_out: <span class="kw-2">*mut </span>usize,
-    output_buf_ptr: <span class="kw-2">*mut*mut </span>u8,
+    output_buf_ptr: <span class="kw-2">*mut *mut </span>u8,
     total_out: <span class="kw-2">*mut </span>usize,
 ) -&gt; ffi::interface::BrotliDecoderResult {
-ffi::BrotliDecoderDecompressStream(
-  state_ptr,
-  available_in,
-  input_buf_ptr,
-  available_out,
-  output_buf_ptr,
-  total_out)
+    ffi::BrotliDecoderDecompressStream(
+        state_ptr,
+        available_in,
+        input_buf_ptr,
+        available_out,
+        output_buf_ptr,
+        total_out,
+    )
 }
 
-<span class="kw">pub unsafe extern fn </span>CBrotliDecoderDecompressStreaming(
+<span class="kw">pub unsafe extern </span><span class="string">"C" </span><span class="kw">fn </span>CBrotliDecoderDecompressStreaming(
     state_ptr: <span class="kw-2">*mut </span>ffi::BrotliDecoderState,
     available_in: <span class="kw-2">*mut </span>usize,
     input_buf_ptr: <span class="kw-2">*const </span>u8,
     available_out: <span class="kw-2">*mut </span>usize,
     output_buf_ptr: <span class="kw-2">*mut </span>u8,
 ) -&gt; ffi::interface::BrotliDecoderResult {
-ffi::BrotliDecoderDecompressStreaming(
-  state_ptr,
-  available_in,
-  input_buf_ptr,
-  available_out,
-  output_buf_ptr)
+    ffi::BrotliDecoderDecompressStreaming(
+        state_ptr,
+        available_in,
+        input_buf_ptr,
+        available_out,
+        output_buf_ptr,
+    )
 }
 
-<span class="kw">pub unsafe extern fn </span>CBrotliDecoderDecompressWithReturnInfo(
+<span class="kw">pub unsafe extern </span><span class="string">"C" </span><span class="kw">fn </span>CBrotliDecoderDecompressWithReturnInfo(
     available_in: usize,
     input_buf_ptr: <span class="kw-2">*const </span>u8,
     available_out_and_scratch: usize,
     output_buf_and_scratch: <span class="kw-2">*mut </span>u8,
 ) -&gt; BrotliDecoderReturnInfo {
-ffi::BrotliDecoderDecompressWithReturnInfo(
-  available_in,
-  input_buf_ptr,
-  available_out_and_scratch,
-  output_buf_and_scratch)
+    ffi::BrotliDecoderDecompressWithReturnInfo(
+        available_in,
+        input_buf_ptr,
+        available_out_and_scratch,
+        output_buf_and_scratch,
+    )
 }
 
-<span class="kw">pub unsafe extern fn </span>CBrotliDecoderDecompressPrealloc(
+<span class="kw">pub unsafe extern </span><span class="string">"C" </span><span class="kw">fn </span>CBrotliDecoderDecompressPrealloc(
     available_in: usize,
     input_buf_ptr: <span class="kw-2">*const </span>u8,
     available_out: usize,
@@ -245,74 +273,98 @@ ffi::BrotliDecoderDecompressWithReturnInfo(
     available_hc: usize,
     hc_ptr: <span class="kw-2">*mut </span>HuffmanCode,
 ) -&gt; BrotliDecoderReturnInfo {
-ffi::BrotliDecoderDecompressPrealloc(
-  available_in,
-  input_buf_ptr,
-  available_out,
-  output_buf_ptr,
-  available_u8,
-  u8_ptr,
-  available_u32,
-  u32_ptr,
-  available_hc,
-  hc_ptr)
+    ffi::BrotliDecoderDecompressPrealloc(
+        available_in,
+        input_buf_ptr,
+        available_out,
+        output_buf_ptr,
+        available_u8,
+        u8_ptr,
+        available_u32,
+        u32_ptr,
+        available_hc,
+        hc_ptr,
+    )
 }
 
-<span class="kw">pub unsafe extern fn </span>CBrotliDecoderMallocU8(state_ptr: <span class="kw-2">*mut </span>ffi::BrotliDecoderState, size: usize) -&gt; <span class="kw-2">*mut </span>u8 {
-  ffi::BrotliDecoderMallocU8(state_ptr, size)
+<span class="kw">pub unsafe extern </span><span class="string">"C" </span><span class="kw">fn </span>CBrotliDecoderMallocU8(
+    state_ptr: <span class="kw-2">*mut </span>ffi::BrotliDecoderState,
+    size: usize,
+) -&gt; <span class="kw-2">*mut </span>u8 {
+    ffi::BrotliDecoderMallocU8(state_ptr, size)
 }
 
-<span class="kw">pub unsafe extern fn </span>CBrotliDecoderFreeU8(state_ptr: <span class="kw-2">*mut </span>ffi::BrotliDecoderState, data: <span class="kw-2">*mut </span>u8, size: usize) {
-  ffi::BrotliDecoderFreeU8(state_ptr, data, size)
+<span class="kw">pub unsafe extern </span><span class="string">"C" </span><span class="kw">fn </span>CBrotliDecoderFreeU8(
+    state_ptr: <span class="kw-2">*mut </span>ffi::BrotliDecoderState,
+    data: <span class="kw-2">*mut </span>u8,
+    size: usize,
+) {
+    ffi::BrotliDecoderFreeU8(state_ptr, data, size)
 }
 
-<span class="kw">pub unsafe extern fn </span>CBrotliDecoderMallocUsize(state_ptr: <span class="kw-2">*mut </span>ffi::BrotliDecoderState, size: usize) -&gt; <span class="kw-2">*mut </span>usize {
-  ffi::BrotliDecoderMallocUsize(state_ptr, size)
+<span class="kw">pub unsafe extern </span><span class="string">"C" </span><span class="kw">fn </span>CBrotliDecoderMallocUsize(
+    state_ptr: <span class="kw-2">*mut </span>ffi::BrotliDecoderState,
+    size: usize,
+) -&gt; <span class="kw-2">*mut </span>usize {
+    ffi::BrotliDecoderMallocUsize(state_ptr, size)
 }
 
-<span class="kw">pub unsafe extern fn </span>CBrotliDecoderFreeUsize(state_ptr: <span class="kw-2">*mut </span>ffi::BrotliDecoderState, data: <span class="kw-2">*mut </span>usize, size: usize) {
-  ffi::BrotliDecoderFreeUsize(state_ptr, data, size)
+<span class="kw">pub unsafe extern </span><span class="string">"C" </span><span class="kw">fn </span>CBrotliDecoderFreeUsize(
+    state_ptr: <span class="kw-2">*mut </span>ffi::BrotliDecoderState,
+    data: <span class="kw-2">*mut </span>usize,
+    size: usize,
+) {
+    ffi::BrotliDecoderFreeUsize(state_ptr, data, size)
 }
 
-<span class="kw">pub unsafe extern fn </span>CBrotliDecoderDestroyInstance(state_ptr: <span class="kw-2">*mut </span>ffi::BrotliDecoderState) {
-  ffi::BrotliDecoderDestroyInstance(state_ptr)
+<span class="kw">pub unsafe extern </span><span class="string">"C" </span><span class="kw">fn </span>CBrotliDecoderDestroyInstance(state_ptr: <span class="kw-2">*mut </span>ffi::BrotliDecoderState) {
+    ffi::BrotliDecoderDestroyInstance(state_ptr)
 }
 
-<span class="kw">pub extern fn </span>CBrotliDecoderVersion() -&gt; u32 {
-  ffi::BrotliDecoderVersion()
+<span class="kw">pub extern </span><span class="string">"C" </span><span class="kw">fn </span>CBrotliDecoderVersion() -&gt; u32 {
+    ffi::BrotliDecoderVersion()
+}
+
+<span class="attr">#[no_mangle]
+</span><span class="kw">pub extern </span><span class="string">"C" </span><span class="kw">fn </span>CBrotliDecoderErrorString(c: ffi::BrotliDecoderErrorCode) -&gt; <span class="kw-2">*const </span>u8 {
+    ffi::BrotliDecoderErrorString(c)
 }
 
 <span class="attr">#[no_mangle]
-</span><span class="kw">pub extern fn </span>CBrotliDecoderErrorString(c: ffi::BrotliDecoderErrorCode) -&gt; <span class="kw-2">*const </span>u8 {
-  ffi::BrotliDecoderErrorString(c)
+</span><span class="kw">pub unsafe extern </span><span class="string">"C" </span><span class="kw">fn </span>CBrotliDecoderHasMoreOutput(
+    state_ptr: <span class="kw-2">*const </span>ffi::BrotliDecoderState,
+) -&gt; i32 {
+    ffi::BrotliDecoderHasMoreOutput(state_ptr)
 }
 
 <span class="attr">#[no_mangle]
-</span><span class="kw">pub unsafe extern fn </span>CBrotliDecoderHasMoreOutput(state_ptr: <span class="kw-2">*const </span>ffi::BrotliDecoderState) -&gt; i32 {
-  ffi::BrotliDecoderHasMoreOutput(state_ptr)
+</span><span class="kw">pub unsafe extern </span><span class="string">"C" </span><span class="kw">fn </span>CBrotliDecoderTakeOutput(
+    state_ptr: <span class="kw-2">*mut </span>ffi::BrotliDecoderState,
+    size: <span class="kw-2">*mut </span>usize,
+) -&gt; <span class="kw-2">*const </span>u8 {
+    ffi::BrotliDecoderTakeOutput(state_ptr, size)
 }
 
 <span class="attr">#[no_mangle]
-</span><span class="kw">pub unsafe extern fn </span>CBrotliDecoderTakeOutput(state_ptr: <span class="kw-2">*mut </span>ffi::BrotliDecoderState, size: <span class="kw-2">*mut </span>usize) -&gt; <span class="kw-2">*const </span>u8 {
-  ffi::BrotliDecoderTakeOutput(state_ptr, size)
-}
-
-
-
-<span class="attr">#[no_mangle]
-</span><span class="kw">pub unsafe extern fn </span>CBrotliDecoderIsUsed(state_ptr: <span class="kw-2">*const </span>ffi::BrotliDecoderState) -&gt; i32 {
-  ffi::BrotliDecoderIsUsed(state_ptr)
+</span><span class="kw">pub unsafe extern </span><span class="string">"C" </span><span class="kw">fn </span>CBrotliDecoderIsUsed(state_ptr: <span class="kw-2">*const </span>ffi::BrotliDecoderState) -&gt; i32 {
+    ffi::BrotliDecoderIsUsed(state_ptr)
 }
 <span class="attr">#[no_mangle]
-</span><span class="kw">pub unsafe extern fn </span>CBrotliDecoderIsFinished(state_ptr: <span class="kw-2">*const </span>ffi::BrotliDecoderState) -&gt; i32 {
-  ffi::BrotliDecoderIsFinished(state_ptr)
+</span><span class="kw">pub unsafe extern </span><span class="string">"C" </span><span class="kw">fn </span>CBrotliDecoderIsFinished(
+    state_ptr: <span class="kw-2">*const </span>ffi::BrotliDecoderState,
+) -&gt; i32 {
+    ffi::BrotliDecoderIsFinished(state_ptr)
 }
 <span class="attr">#[no_mangle]
-</span><span class="kw">pub unsafe extern fn </span>CBrotliDecoderGetErrorCode(state_ptr: <span class="kw-2">*const </span>ffi::BrotliDecoderState) -&gt; ffi::BrotliDecoderErrorCode {
-  ffi::BrotliDecoderGetErrorCode(state_ptr)
+</span><span class="kw">pub unsafe extern </span><span class="string">"C" </span><span class="kw">fn </span>CBrotliDecoderGetErrorCode(
+    state_ptr: <span class="kw-2">*const </span>ffi::BrotliDecoderState,
+) -&gt; ffi::BrotliDecoderErrorCode {
+    ffi::BrotliDecoderGetErrorCode(state_ptr)
 }
 <span class="attr">#[no_mangle]
-</span><span class="kw">pub unsafe extern fn </span>CBrotliDecoderGetErrorString(state_ptr: <span class="kw-2">*const </span>ffi::BrotliDecoderState) -&gt; <span class="kw-2">*const </span>u8 {
-  ffi::BrotliDecoderGetErrorString(state_ptr)
+</span><span class="kw">pub unsafe extern </span><span class="string">"C" </span><span class="kw">fn </span>CBrotliDecoderGetErrorString(
+    state_ptr: <span class="kw-2">*const </span>ffi::BrotliDecoderState,
+) -&gt; <span class="kw-2">*const </span>u8 {
+    ffi::BrotliDecoderGetErrorString(state_ptr)
 }
 </code></pre></div></section></main></body></html>
