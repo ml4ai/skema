@@ -202,7 +202,7 @@ pub struct Initial {
 }
 
 impl Default for Initial {
-    fn default() -> Self { Initial { target: "temp".to_string(), expression: "0".to_string(), expression_mathml: "<math><\\math>".to_string() } }
+    fn default() -> Self { Initial { target: "temp".to_string(), expression: "0".to_string(), expression_mathml: "<math></math>".to_string() } }
 }
 
 #[derive(
@@ -471,6 +471,7 @@ impl From<Vec<FirstOrderODE>> for PetriNet {
                 name: ode.lhs_var.to_string().clone(),
                 ..Default::default()
             };
+            let a = "\\";
             let initials = Initial {
                 target: ode.lhs_var.to_string().clone(),
                 ..Default::default()
