@@ -202,7 +202,7 @@ pub struct Initial {
 }
 
 impl Default for Initial {
-    fn default() -> Self { Initial { target: "temp".to_string(), expression: "0".to_string(), expression_mathml: "<math><\\math>".to_string() } }
+    fn default() -> Self { Initial { target: "temp".to_string(), expression: "0".to_string(), expression_mathml: "<math></math>".to_string() } }
 }
 
 #[derive(
