@@ -41,6 +41,7 @@ pub enum DerivativeNotation {
 )]
 pub struct Logarithm {
     pub is_natural_log: bool,
+    pub base: Option<Box<MathExpression>>,
 }
 
 /// Summation operator has the option of having lower bound and upper bound components
@@ -298,13 +299,23 @@ impl fmt::Display for Operator {
             }
             Operator::Min => write!(f, "Min"),
             Operator::Comma => write!(f, ","),
-            Operator::Logarithm(Logarithm { is_natural_log }) => {
-                if *is_natural_log == true {
+            Operator::Logarithm(Logarithm {
+                is_natural_log,
+                base,
+            }) => match (is_natural_log, base) {
+                (true, None) => {
                     write!(f, "Ln")
-                } else {
+                }
+                (false, None) => {
                     write!(f, "Log")
                 }
-            }
+                (false, Some(x)) => {
+                    write!(f, "Log_{{{x}}}")
+                }
+                (true, Some(x)) => {
+                    write!(f, "")
+                }
+            },
         }
     }
 }

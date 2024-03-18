@@ -241,6 +241,26 @@ pub fn superscript(input: Span) -> IResult<MathExpression> {
     )))
 }
 
+/// Parse content identifier for Msup
+pub fn log_base(input: Span) -> IResult<Operator> {
+    println!("-");
+    let (s, _exp) = ws(delimited(
+        pair(stag!("msub"), stag!("mi")),
+        tag("log"),
+        etag!("mi"),
+    ))(input)?;
+    println!("--");
+    println!("{s:?}");
+    let (s, base) = ws(terminated(math_expression, etag!("msub")))(s)?;
+    println!("---");
+    println!("{:?}", base);
+    //let (s, _exp) = ws(delimited(stag!("mi"), tag("log"), etag!("mi")))(input)?;
+    //let operator = Operator::Logarithm(Logarithm::new(false, None));
+    let operator = Operator::Logarithm(Logarithm::new(false, Some(Box::new(base))));
+    println!("{:?}", operator);
+    return Ok((s, operator));
+}
+
 /// Parse vector notation for Mover
 pub fn vector_mover(input: Span) -> IResult<MathExpression> {
     let (s, (x, _vec)) = ws(delimited(
@@ -1052,6 +1072,51 @@ pub fn newtonian_derivative(input: Span) -> IResult<(Derivative, Ci)> {
     ))
 }
 
+/// Parse a first-order ordinary derivative with log.
+/// E.g. d/dt ln(dM)= 0
+pub fn first_order_derivative_with_log(input: Span) -> IResult<(Derivative, MathExpression)> {
+    let (s, _) = tuple((stag!("mfrac"), d))(input)?;
+    println!("|");
+    let (s, with_respect_to) = delimited(
+        tuple((stag!("mrow"), d)),
+        mi,
+        pair(etag!("mrow"), etag!("mfrac")),
+    )(s)?;
+    let mut expression: Vec<MathExpression> = Vec::new();
+    let (s, ln) = ws(natural_log)(s)?;
+    let op = MathExpression::Mo(ln);
+    expression.push(op);
+    let (s, (_, mi)) = ws(delimited(
+        pair(tuple((stag!("mo"), lparen, etag!("mo"))), stag!("mrow")),
+        pair(d, mi),
+        pair(etag!("mrow"), tuple((stag!("mo"), rparen, etag!("mo")))),
+    ))(s)?;
+    let d_mi = format!("d{}", MathExpression::Mi(mi));
+    expression.push(MathExpression::Mi(Mi::new(d_mi)));
+
+    println!("||||-");
+    let row = MathExpression::Mrow(Mrow::new(expression));
+    println!("|||||--");
+
+    Ok((
+        s,
+        (
+            Derivative::new(
+                1,
+                1,
+                Ci::new(
+                    Some(Type::Real),
+                    Box::new(MathExpression::Mi(with_respect_to)),
+                    None,
+                    None,
+                ),
+                DerivativeNotation::LeibnizTotal,
+            ),
+            row,
+        ),
+    ))
+}
+
 // We reimplement the mfrac and mrow parsers in this file (instead of importing them from
 // the generic_mathml module) to work with the specialized version of the math_expression parser
 // (also in this file).
@@ -1514,7 +1579,12 @@ pub fn minimum_with_content_mi(input: Span) -> IResult<(MathExpression, Vec<Math
 
     let mut vec_exp: Vec<MathExpression> = Vec::new();
     for bvar in bound_vars {
-        let b = MathExpression::Ci(Ci::new(Some(Type::Real), Box::new(MathExpression::Mi(bvar)), None, None));
+        let b = MathExpression::Ci(Ci::new(
+            Some(Type::Real),
+            Box::new(MathExpression::Mi(bvar)),
+            None,
+            None,
+        ));
         vec_exp.push(MathExpression::Mo(Operator::Min));
         vec_exp.push(b.clone());
     }
@@ -1544,15 +1614,21 @@ pub fn exponential(input: Span) -> IResult<(Operator, Mrow)> {
 /// Logarithm operator: e.g. log
 pub fn logarithm(input: Span) -> IResult<Operator> {
     let (s, _exp) = ws(delimited(stag!("mi"), tag("log"), etag!("mi")))(input)?;
-    let operator = Operator::Logarithm(Logarithm::new(false));
+    let operator = Operator::Logarithm(Logarithm::new(false, None));
 
     Ok((s, operator))
 }
 
 /// Logarithm operator: e.g. log
 pub fn natural_log(input: Span) -> IResult<Operator> {
-    let (s, _exp) = ws(delimited(stag!("mi"), tag("ln"), etag!("mi")))(input)?;
-    let operator = Operator::Logarithm(Logarithm::new(true));
+    let (s, _exp) = ws(alt((
+        terminated(
+            delimited(stag!("mi"), tag("ln"), etag!("mi")),
+            tuple((stag!("mo"), tag("\u{2061}"), etag!("mo"))),
+        ),
+        delimited(stag!("mi"), tag("ln"), etag!("mi")),
+    )))(input)?;
+    let operator = Operator::Logarithm(Logarithm::new(true, None));
 
     Ok((s, operator))
 }
@@ -1637,6 +1713,7 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                 },
             ),
             vector_mover,
+            map(log_base, MathExpression::Mo),
             map(logarithm, MathExpression::Mo),
             map(natural_log, MathExpression::Mo),
         )),
@@ -1801,6 +1878,28 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                             func_of,
                             notation: vector_notation,
                         })),
+                    })
+                },
+            ),
+            map(
+                first_order_derivative_with_log,
+                |(
+                    Derivative {
+                        order,
+                        var_index,
+                        bound_var,
+                        notation,
+                    },
+                    row,
+                )| {
+                    MathExpression::Differential(Differential {
+                        diff: Box::new(MathExpression::Mo(Operator::Derivative(Derivative {
+                            order,
+                            var_index,
+                            bound_var,
+                            notation,
+                        }))),
+                        func: Box::new(row),
                     })
                 },
             ),

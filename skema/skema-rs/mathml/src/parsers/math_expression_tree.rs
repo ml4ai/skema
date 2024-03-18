@@ -933,13 +933,21 @@ impl MathExpressionTree {
                             }
                         }
                     }
-                    Operator::Logarithm(x) => {
-                        if x.is_natural_log == true {
+                    Operator::Logarithm(x) => match (&x.is_natural_log, &x.base) {
+                        (true, None) => {
                             expression.push_str(&format!("\\ln {}", rest[0].to_latex()));
-                        } else {
+                        }
+                        (false, None) => {
                             expression.push_str(&format!("\\log {}", rest[0].to_latex()));
                         }
-                    }
+                        (false, Some(b)) => {
+                            expression.push_str("\\log_{");
+                            expression.push_str(&format!("{}", b));
+                            expression.push('}');
+                            expression.push_str(&format!("{}", rest[0].to_latex()));
+                        }
+                        (&true, &Some(_)) => todo!(),
+                    },
                     Operator::Comma => {
                         process_atoms_cons_parentheses(&mut expression, &rest[0]);
                         expression.push(',');
@@ -3813,6 +3821,36 @@ fn test_ln() {
     let s_exp = exp.to_string();
     assert_eq!(s_exp, "(Ln x)");
     assert_eq!(exp.to_latex(), "\\ln x");
+}
+
+#[test]
+fn test_log_10base() {
+    let input = "<math>
+    <msub><mi>log</mi><mn>10</mn></msub><mi>x</mi>
+    </math>";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", exp);
+    let s_exp = exp.to_string();
+    assert_eq!(s_exp, "(Log_{10} x)");
+    assert_eq!(exp.to_latex(), "\\log_{10}x");
+}
+
+#[test]
+fn test_conservatiob_of_mass_5() {
+    let input = "<math>
+    <mfrac><mi>d</mi><mrow><mi>d</mi><mi>t</mi></mrow></mfrac>
+    <mi>ln</mi><mo>&#x2061;</mo>
+    <mo>(</mo>
+    <mrow><mi>d</mi><mi>M</mi></mrow>
+    <mo>)</mo>
+    <mo>=</mo>
+    <mn>0</mn>
+    </math>";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", exp);
+    let s_exp = exp.to_string();
+    assert_eq!(s_exp, "(= (D(1, t) (Ln dM)) 0)");
+    assert_eq!(exp.to_latex(), "\\frac{d \\ln dM}{dt}=0");
 }
 
 /*#[test]
