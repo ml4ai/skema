@@ -5,6 +5,7 @@ Response models for API
 from typing import List, Optional, Dict, Any
 
 from askem_extractions.data_model import AttributeCollection
+from fastapi import UploadFile
 from pydantic import BaseModel, Field
 
 # see https://github.com/pydantic/pydantic/issues/5821#issuecomment-1559196859
@@ -167,6 +168,10 @@ class TextReadingInputDocuments(BaseModel):
         title="texts",
         description="List of input plain texts to be annotated by the text reading pipelines",
         examples=[["x = 0", "y = 1", "I: Infected population"]],
+    )
+    amrs: List[str] = Field(
+        description="List of optional AMR files to align with the extractions",
+        examples=[[]]
     )
 
 
