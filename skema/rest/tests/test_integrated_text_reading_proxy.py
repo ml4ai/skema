@@ -23,7 +23,8 @@ def test_text_integrated_extractions():
             "x = 0",
             "y = 1",
             "I: Infected population"
-        ]
+        ],
+        "amrs": []
     }
 
     response = client.post(f"/integrated-text-extractions", params=params, json=payload)
