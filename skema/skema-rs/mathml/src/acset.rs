@@ -202,7 +202,7 @@ pub struct Initial {
 }
 
 impl Default for Initial {
-    fn default() -> Self { Initial { target: "temp".to_string(), expression: "0".to_string(), expression_mathml: "<math><\\math>".to_string() } }
+    fn default() -> Self { Initial { target: "temp".to_string(), expression: "0".to_string(), expression_mathml: "<math></math>".to_string() } }
 }
 
 #[derive(
@@ -223,12 +223,12 @@ pub struct RegTransition {
     /// Note: source is a required field in the schema, but we make it optional since we want to
     /// reuse this schema for partial extractions as well.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub source: Option<Vec<String>>,
+    pub source: Option<String>,
 
     /// Note: target is a required field in the schema, but we make it optional since we want to
     /// reuse this schema for partial extractions as well.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub target: Option<Vec<String>>,
+    pub target: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sign: Option<bool>,
@@ -890,8 +890,8 @@ impl From<Vec<FirstOrderODE>> for RegNet {
             }
             // This adds the intial values from the state variables into the parameters vec
             let parameters = Parameter {
-                id: state.clone(),
-                name: Some(state.clone()),
+                id: r_state.initial.clone().unwrap(),
+                name: r_state.initial.clone(),
                 description: Some(format!(
                     "The total {} population at timestep 0",
                     state.clone()
@@ -929,7 +929,9 @@ impl From<Vec<FirstOrderODE>> for RegNet {
             unpaired_terms.remove(*i);
         }
 
-        for (i, t) in transition_pair.iter().enumerate() {
+        let mut trans_num = 0;
+
+        for (_i, t) in transition_pair.iter().enumerate() {
             if t.0.exp_states.len() == 1 {
                 // construct transtions for simple transtions
                 let prop = Properties {
@@ -938,15 +940,27 @@ impl From<Vec<FirstOrderODE>> for RegNet {
                     rate_constant: None,
                 };
                 let trans = RegTransition {
-                    id: format!("t{}", i.clone()),
-                    source: Some([t.1.dyn_state.clone()].to_vec()),
-                    target: Some([t.0.dyn_state.clone()].to_vec()),
+                    id: format!("t{}", trans_num.clone()),
+                    source: Some(t.1.dyn_state.clone()),
+                    target: Some(t.0.dyn_state.clone()),
                     sign: Some(true),
                     grounding: None,
                     properties: Some(prop.clone()),
                 };
+                trans_num = trans_num + 1;
+                transitions_vec.insert(trans.clone());
+                let trans = RegTransition {
+                    id: format!("t{}", trans_num.clone()),
+                    source: Some(t.0.dyn_state.clone()),
+                    target: Some(t.1.dyn_state.clone()),
+                    sign: Some(false),
+                    grounding: None,
+                    properties: Some(prop.clone()),
+                };
+                trans_num = trans_num + 1;
                 transitions_vec.insert(trans.clone());
             } else {
+
                 // construct transitions for complicated transitions
                 // mainly need to construct the output specially,
                 // run by clay
@@ -963,22 +977,25 @@ impl From<Vec<FirstOrderODE>> for RegNet {
                     name: t.0.parameters[0].clone(),
                     rate_constant: None,
                 };
-                let trans = RegTransition {
-                    id: format!("t{}", i.clone()),
-                    source: Some(t.1.exp_states.clone()),
-                    target: Some(output.clone()),
-                    sign: Some(true),
-                    grounding: None,
-                    properties: Some(prop.clone()),
-                };
-                transitions_vec.insert(trans.clone());
+                for (j, _out) in output.iter().enumerate() {
+                    let trans = RegTransition {
+                        id: format!("t{}", trans_num.clone()),
+                        source: Some(t.1.exp_states[j].clone()),
+                        target: Some(output[j].clone()),
+                        sign: Some(true),
+                        grounding: None,
+                        properties: Some(prop.clone()),
+                    };
+                    transitions_vec.insert(trans.clone());
+                    trans_num = trans_num + 1;
+                }
             }
         }
 
         for (i, term) in unpaired_terms.iter().enumerate() {
             println!("Term: {:?}", term.clone());
             if term.exp_states.len() > 1 {
-                let mut output = [term.dyn_state.clone()].to_vec();
+                let mut output = term.dyn_state.clone();
                 let mut input = term.exp_states.clone();
 
                 let param_len = term.parameters.len();
@@ -991,28 +1008,28 @@ impl From<Vec<FirstOrderODE>> for RegNet {
 
                 input.sort();
                 input.dedup();
-                output.sort();
-                output.dedup();
 
                 if input.clone().len() > 1 {
                     let old_input = input.clone();
                     input = [].to_vec();
                     for term in old_input.clone().iter() {
-                        if *term != output[0] {
+                        if *term != output {
                             input.push(term.clone());
                         }
                     }
                 }
-
-                let trans = RegTransition {
-                    id: format!("s{}", i.clone()),
-                    source: Some(input.clone()),
-                    target: Some(output.clone()),
-                    sign: Some(true),
-                    grounding: None,
-                    properties: Some(prop.clone()),
-                };
-                transitions_vec.insert(trans.clone());
+                for (j, _trm) in input.iter().enumerate() {
+                    let trans = RegTransition {
+                        id: format!("s{}", trans_num.clone()),
+                        source: Some(input[j].clone()),
+                        target: Some(output.clone()),
+                        sign: Some(term.polarity),
+                        grounding: None,
+                        properties: Some(prop.clone()),
+                    };
+                    transitions_vec.insert(trans.clone());
+                    trans_num = trans_num + 1;
+                }
             }
         }
 

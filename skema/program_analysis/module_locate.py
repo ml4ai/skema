@@ -16,7 +16,9 @@ IMPORT_PATTERN = re.compile(r'^\s*(from\s+[^\s]+\s+import\s+[^\s,]+(?:\s*,\s*[^\
 def identify_source_type(source: str):
     if not source:
         return "Unknown"
-    if "github" in source:
+    elif source == "https://github.com/python/cpython":
+        return "Compiled"
+    elif "github" in source:
         return "Repository"
     elif source.startswith("http"):
         return "Url"
@@ -52,6 +54,10 @@ def module_locate(module_name: str) -> str:
     :param module_name: The name of the module or submodule as a string.
     :return: The module's file path, GitHub URL, or tarball URL.
     """
+
+    # Check if module is compiled into Python
+    if module_name in sys.builtin_module_names:
+        return "https://github.com/python/cpython"
 
     # Attempt to find the module in the local environment
     try:
