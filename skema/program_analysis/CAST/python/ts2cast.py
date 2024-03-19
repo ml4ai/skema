@@ -624,7 +624,6 @@ class TS2CAST(object):
         ref = self.node_helper.get_source_ref(node)
         indices = get_non_control_children(node)
         index_cast = []
-        func_len = self.get_gromet_function_node("len")
 
         for index in indices:
             cast = self.visit(index)
