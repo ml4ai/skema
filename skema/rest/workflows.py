@@ -87,7 +87,7 @@ async def equation_to_amrs(data: schema.EquationsToAMRs, client: httpx.AsyncClie
             res_new = await client.put(f"{SKEMA_RS_ADDESS}/mathml/g-amr", json=eqns)
             if res_new.status_code != 200:
                 return JSONResponse(
-                    status_code=402,
+                    status_code=422,
                     content={
                         "error": f"Attempted creation of {data.model} AMR, which failed. Then tried creation of Generalized AMR, which also failed with the following error {res_new.text}. Please check equations, seen as pMathML below.",
                         "payload": eqns,
@@ -126,7 +126,7 @@ async def equation_to_amrs(data: schema.EquationsToAMRs, client: httpx.AsyncClie
             )
     else:
         return JSONResponse(
-            status_code=401,
+            status_code=422,
             content={
                 "error": f"{data.model} is not a supported model type",
                 "payload": eqns,
