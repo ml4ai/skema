@@ -716,22 +716,6 @@ def healthcheck() -> int:
     return status_code
 
 
-@router.get("/eval", response_model=TextReadingEvaluationResults, status_code=200, deprecated=True)
-def quantitative_eval() -> TextReadingEvaluationResults:
-    """ Compares the SIDARTHE paper extractions against ground truth extractions. This path stays for compatibility
-    with the dashboard, but will be removed in the near future as the dashboard is updated to run dynamically the POST
-    path"""
-
-    # Read ground truth annotations
-    with (Path(__file__).parents[0] / "data" / "sidarthe_annotations.json").open() as f:
-        gt_data = json.load(f)
-
-    # Read the SKEMA extractions
-    extractions = AttributeCollection.from_json(Path(__file__).parents[0] / "data" / "extractions_sidarthe_skema.json")
-
-    return utils.compute_text_reading_evaluation(gt_data, extractions)
-
-
 @router.post("/eval", response_model=TextReadingEvaluationResults, status_code=200)
 def quantitative_eval(extractions_file: UploadFile,
                       gt_annotations: UploadFile, json_text: UploadFile) -> TextReadingEvaluationResults:
