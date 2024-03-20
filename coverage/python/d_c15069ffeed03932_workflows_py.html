@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="d_7f155e5a1b03c261___init___py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.4.4">coverage.py v7.4.4</a>,
-            created at 2024-03-20 18:26 +0000
+            created at 2024-03-20 19:01 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"/>
@@ -169,7 +169,7 @@
     <p class="mis show_mis"><span class="n"><a id="t87" href="#t87">87</a></span><span class="t">            <span class="nam">res_new</span> <span class="op">=</span> <span class="key">await</span> <span class="nam">client</span><span class="op">.</span><span class="nam">put</span><span class="op">(</span><span class="str">f"{SKEMA_RS_ADDESS}/mathml/g-amr"</span><span class="op">,</span> <span class="nam">json</span><span class="op">=</span><span class="nam">eqns</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t88" href="#t88">88</a></span><span class="t">            <span class="key">if</span> <span class="nam">res_new</span><span class="op">.</span><span class="nam">status_code</span> <span class="op">!=</span> <span class="num">200</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t89" href="#t89">89</a></span><span class="t">                <span class="key">return</span> <span class="nam">JSONResponse</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t90" href="#t90">90</a></span><span class="t">                    <span class="nam">status_code</span><span class="op">=</span><span class="num">402</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t90" href="#t90">90</a></span><span class="t">                    <span class="nam">status_code</span><span class="op">=</span><span class="num">422</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t91" href="#t91">91</a></span><span class="t">                    <span class="nam">content</span><span class="op">=</span><span class="op">{</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t92" href="#t92">92</a></span><span class="t">                        <span class="str">"error"</span><span class="op">:</span> <span class="str">f"Attempted creation of {data.model} AMR, which failed. Then tried creation of Generalized AMR, which also failed with the following error {res_new.text}. Please check equations, seen as pMathML below."</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t93" href="#t93">93</a></span><span class="t">                        <span class="str">"payload"</span><span class="op">:</span> <span class="nam">eqns</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
@@ -208,7 +208,7 @@
     <p class="pln"><span class="n"><a id="t126" href="#t126">126</a></span><span class="t">            <span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t127" href="#t127">127</a></span><span class="t">    <span class="key">else</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t128" href="#t128">128</a></span><span class="t">        <span class="key">return</span> <span class="nam">JSONResponse</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t129" href="#t129">129</a></span><span class="t">            <span class="nam">status_code</span><span class="op">=</span><span class="num">401</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t129" href="#t129">129</a></span><span class="t">            <span class="nam">status_code</span><span class="op">=</span><span class="num">422</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t130" href="#t130">130</a></span><span class="t">            <span class="nam">content</span><span class="op">=</span><span class="op">{</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t131" href="#t131">131</a></span><span class="t">                <span class="str">"error"</span><span class="op">:</span> <span class="str">f"{data.model} is not a supported model type"</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t132" href="#t132">132</a></span><span class="t">                <span class="str">"payload"</span><span class="op">:</span> <span class="nam">eqns</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
@@ -988,7 +988,7 @@
             <a id="nextFileLink" class="nav" href="d_7f155e5a1b03c261___init___py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.4.4">coverage.py v7.4.4</a>,
-            created at 2024-03-20 18:26 +0000
+            created at 2024-03-20 19:01 +0000
         </p>
     </div>
 </footer>
