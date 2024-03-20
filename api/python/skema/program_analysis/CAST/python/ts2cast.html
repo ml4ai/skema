@@ -189,6 +189,10 @@ class TS2CAST(object):
             return self.visit_dict_comprehension(node)
         elif node.type == &#34;lambda&#34;:
             return self.visit_lambda(node)
+        elif node.type == &#34;subscript&#34;:
+            return self.visit_subscript(node)
+        elif node.type == &#34;slice&#34;:
+            return self.visit_slice(node)
         elif node.type == &#34;pair&#34;:
             return self.visit_pair(node)
         elif node.type == &#34;while_statement&#34;:
@@ -622,6 +626,61 @@ class TS2CAST(object):
         attr_cast = self.visit(attr)
 
         return Attribute(value= get_name_node(obj_cast), attr=get_name_node(attr_cast), source_refs=ref)
+
+    def visit_subscript(self, node: Node):
+        ref = self.node_helper.get_source_ref(node)
+        values = get_non_control_children(node)
+        name_cast = self.visit(values[0])
+        subscript_list = values[1:]
+        subscript_casts = []
+        for subscript in subscript_list:
+            cast = self.visit(subscript)
+            if isinstance(cast, list):
+                for elem in cast:
+                    subscript_casts.append(get_func_name_node(cast))
+            else:
+                subscript_casts.append(get_func_name_node(cast))
+
+        get_func = self.get_gromet_function_node(&#34;_get&#34;)
+        
+        get_call = Call(
+            func = get_func,
+            arguments = [get_func_name_node(name_cast)] + subscript_casts,
+            source_refs=ref
+        )
+
+        return get_call
+
+    def visit_slice(self, node: Node):
+        ref = self.node_helper.get_source_ref(node)
+        indices = get_non_control_children(node)
+        index_cast = []
+
+        for index in indices:
+            cast = self.visit(index)
+            if isinstance(cast ,list):
+                index_cast.extend(cast)
+            else:
+                index_cast.append(cast)
+
+        start = index_cast[0]
+        end = index_cast[1]
+        if len(index_cast) == 3:
+            step = index_cast[2]
+        else:
+            step = CASTLiteralValue(
+                value_type=ScalarType.INTEGER,
+                value=&#34;1&#34;,
+                source_code_data_type=[&#34;Python&#34;, &#34;3.8&#34;, &#34;Float&#34;],
+                source_refs=ref,
+            )
+
+        return CASTLiteralValue(value_type=StructureType.LIST, 
+            value=[start,end,step], 
+            source_code_data_type=[&#34;Python&#34;, &#34;3.8&#34;, &#34;List&#34;],
+            source_refs=ref
+        )
+
 
     def handle_for_clause(self, node: Node):
         # Given the &#34;for x in seq&#34; clause of a list comprehension
@@ -1320,6 +1379,10 @@ def get_operand_node(node):
             return self.visit_dict_comprehension(node)
         elif node.type == &#34;lambda&#34;:
             return self.visit_lambda(node)
+        elif node.type == &#34;subscript&#34;:
+            return self.visit_subscript(node)
+        elif node.type == &#34;slice&#34;:
+            return self.visit_slice(node)
         elif node.type == &#34;pair&#34;:
             return self.visit_pair(node)
         elif node.type == &#34;while_statement&#34;:
@@ -1753,6 +1816,61 @@ def get_operand_node(node):
         attr_cast = self.visit(attr)
 
         return Attribute(value= get_name_node(obj_cast), attr=get_name_node(attr_cast), source_refs=ref)
+
+    def visit_subscript(self, node: Node):
+        ref = self.node_helper.get_source_ref(node)
+        values = get_non_control_children(node)
+        name_cast = self.visit(values[0])
+        subscript_list = values[1:]
+        subscript_casts = []
+        for subscript in subscript_list:
+            cast = self.visit(subscript)
+            if isinstance(cast, list):
+                for elem in cast:
+                    subscript_casts.append(get_func_name_node(cast))
+            else:
+                subscript_casts.append(get_func_name_node(cast))
+
+        get_func = self.get_gromet_function_node(&#34;_get&#34;)
+        
+        get_call = Call(
+            func = get_func,
+            arguments = [get_func_name_node(name_cast)] + subscript_casts,
+            source_refs=ref
+        )
+
+        return get_call
+
+    def visit_slice(self, node: Node):
+        ref = self.node_helper.get_source_ref(node)
+        indices = get_non_control_children(node)
+        index_cast = []
+
+        for index in indices:
+            cast = self.visit(index)
+            if isinstance(cast ,list):
+                index_cast.extend(cast)
+            else:
+                index_cast.append(cast)
+
+        start = index_cast[0]
+        end = index_cast[1]
+        if len(index_cast) == 3:
+            step = index_cast[2]
+        else:
+            step = CASTLiteralValue(
+                value_type=ScalarType.INTEGER,
+                value=&#34;1&#34;,
+                source_code_data_type=[&#34;Python&#34;, &#34;3.8&#34;, &#34;Float&#34;],
+                source_refs=ref,
+            )
+
+        return CASTLiteralValue(value_type=StructureType.LIST, 
+            value=[start,end,step], 
+            source_code_data_type=[&#34;Python&#34;, &#34;3.8&#34;, &#34;List&#34;],
+            source_refs=ref
+        )
+
 
     def handle_for_clause(self, node: Node):
         # Given the &#34;for x in seq&#34; clause of a list comprehension
@@ -2537,6 +2655,10 @@ Otherwise, the original name is returned.</p></div>
         return self.visit_dict_comprehension(node)
     elif node.type == &#34;lambda&#34;:
         return self.visit_lambda(node)
+    elif node.type == &#34;subscript&#34;:
+        return self.visit_subscript(node)
+    elif node.type == &#34;slice&#34;:
+        return self.visit_slice(node)
     elif node.type == &#34;pair&#34;:
         return self.visit_pair(node)
     elif node.type == &#34;while_statement&#34;:
@@ -3472,6 +3594,80 @@ where left and right can either be operators or literals</p></div>
     return ModelReturn(value=get_operand_node(ret_cast), source_refs=[ref])</code></pre>
 </details>
 </dd>
+<dt id="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_slice"><code class="name flex">
+<span>def <span class="ident">visit_slice</span></span>(<span>self, node: tree_sitter.Node)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def visit_slice(self, node: Node):
+    ref = self.node_helper.get_source_ref(node)
+    indices = get_non_control_children(node)
+    index_cast = []
+
+    for index in indices:
+        cast = self.visit(index)
+        if isinstance(cast ,list):
+            index_cast.extend(cast)
+        else:
+            index_cast.append(cast)
+
+    start = index_cast[0]
+    end = index_cast[1]
+    if len(index_cast) == 3:
+        step = index_cast[2]
+    else:
+        step = CASTLiteralValue(
+            value_type=ScalarType.INTEGER,
+            value=&#34;1&#34;,
+            source_code_data_type=[&#34;Python&#34;, &#34;3.8&#34;, &#34;Float&#34;],
+            source_refs=ref,
+        )
+
+    return CASTLiteralValue(value_type=StructureType.LIST, 
+        value=[start,end,step], 
+        source_code_data_type=[&#34;Python&#34;, &#34;3.8&#34;, &#34;List&#34;],
+        source_refs=ref
+    )</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_subscript"><code class="name flex">
+<span>def <span class="ident">visit_subscript</span></span>(<span>self, node: tree_sitter.Node)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def visit_subscript(self, node: Node):
+    ref = self.node_helper.get_source_ref(node)
+    values = get_non_control_children(node)
+    name_cast = self.visit(values[0])
+    subscript_list = values[1:]
+    subscript_casts = []
+    for subscript in subscript_list:
+        cast = self.visit(subscript)
+        if isinstance(cast, list):
+            for elem in cast:
+                subscript_casts.append(get_func_name_node(cast))
+        else:
+            subscript_casts.append(get_func_name_node(cast))
+
+    get_func = self.get_gromet_function_node(&#34;_get&#34;)
+    
+    get_call = Call(
+        func = get_func,
+        arguments = [get_func_name_node(name_cast)] + subscript_casts,
+        source_refs=ref
+    )
+
+    return get_call</code></pre>
+</details>
+</dd>
 <dt id="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_unary_op"><code class="name flex">
 <span>def <span class="ident">visit_unary_op</span></span>(<span>self, node: tree_sitter.Node) ‑> <a title="skema.program_analysis.CAST2FN.model.cast.operator.Operator" href="../../CAST2FN/model/cast/operator.html#skema.program_analysis.CAST2FN.model.cast.operator.Operator">Operator</a></span>
 </code></dt>
@@ -3636,6 +3832,8 @@ where operand is some kind of expression</p></div>
 <li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_pair" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_pair">visit_pair</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_pattern" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_pattern">visit_pattern</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_return" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_return">visit_return</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_slice" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_slice">visit_slice</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_subscript" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_subscript">visit_subscript</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_unary_op" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_unary_op">visit_unary_op</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_while" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_while">visit_while</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_yield" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_yield">visit_yield</a></code></li>
