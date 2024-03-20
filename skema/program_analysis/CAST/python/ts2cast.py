@@ -160,6 +160,10 @@ class TS2CAST(object):
             return self.visit_dict_comprehension(node)
         elif node.type == "lambda":
             return self.visit_lambda(node)
+        elif node.type == "subscript":
+            return self.visit_subscript(node)
+        elif node.type == "slice":
+            return self.visit_slice(node)
         elif node.type == "pair":
             return self.visit_pair(node)
         elif node.type == "while_statement":
@@ -593,6 +597,61 @@ class TS2CAST(object):
         attr_cast = self.visit(attr)
 
         return Attribute(value= get_name_node(obj_cast), attr=get_name_node(attr_cast), source_refs=ref)
+
+    def visit_subscript(self, node: Node):
+        ref = self.node_helper.get_source_ref(node)
+        values = get_non_control_children(node)
+        name_cast = self.visit(values[0])
+        subscript_list = values[1:]
+        subscript_casts = []
+        for subscript in subscript_list:
+            cast = self.visit(subscript)
+            if isinstance(cast, list):
+                for elem in cast:
+                    subscript_casts.append(get_func_name_node(cast))
+            else:
+                subscript_casts.append(get_func_name_node(cast))
+
+        get_func = self.get_gromet_function_node("_get")
+        
+        get_call = Call(
+            func = get_func,
+            arguments = [get_func_name_node(name_cast)] + subscript_casts,
+            source_refs=ref
+        )
+
+        return get_call
+
+    def visit_slice(self, node: Node):
+        ref = self.node_helper.get_source_ref(node)
+        indices = get_non_control_children(node)
+        index_cast = []
+
+        for index in indices:
+            cast = self.visit(index)
+            if isinstance(cast ,list):
+                index_cast.extend(cast)
+            else:
+                index_cast.append(cast)
+
+        start = index_cast[0]
+        end = index_cast[1]
+        if len(index_cast) == 3:
+            step = index_cast[2]
+        else:
+            step = CASTLiteralValue(
+                value_type=ScalarType.INTEGER,
+                value="1",
+                source_code_data_type=["Python", "3.8", "Float"],
+                source_refs=ref,
+            )
+
+        return CASTLiteralValue(value_type=StructureType.LIST, 
+            value=[start,end,step], 
+            source_code_data_type=["Python", "3.8", "List"],
+            source_refs=ref
+        )
+
 
     def handle_for_clause(self, node: Node):
         # Given the "for x in seq" clause of a list comprehension
