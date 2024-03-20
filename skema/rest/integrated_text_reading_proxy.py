@@ -416,13 +416,13 @@ async def integrated_text_extractions(
     ### Python example
     ```
     params = {
-       "annotate_skema":True,
-       "annotate_mit": True
+        "annotate_skema": True,
+        "annotate_mit": True
+
     }
+    payload = {"texts": [file_text], "amrs": [amr_text]}
 
-    files = [("pdfs", ("paper.txt", open("paper.txt", "rb")))]
-
-    response = request.post(f"{URL}/text-reading/integrated-text-extractions", params=params, files=files)
+    response = requests.post(f"{URL}/text-reading/integrated-text-extractions", params=params, json=payload)
     if response.status_code == 200:
         data = response.json()
     ```
@@ -489,7 +489,7 @@ async def integrated_pdf_extractions(
        "annotate_mit": True
     }
 
-    files = [("pdfs", ("ijerp.pdf", open("ijerp.pdf", "rb")))]
+    files = [("pdfs", ("ijerp.pdf", open("ijerp.pdf", "rb"))), ("amrs", ("amr.json", open("amr.json", "rb")))]
 
     response = request.post(f"{URL}/text-reading/integrated-pdf-extractions", params=params, files=files)
     if response.status_code == 200:
