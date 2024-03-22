@@ -63,7 +63,7 @@ class VariableVersionPass:
         for id in var_ids:
             self.con_scope_to_highest_var_vers[con_scopestr][id] = 0
         # DEBUG printing
-        if self.pipeline_state.PRINT_DEBUGGING_INFO:
+        if True: #self.pipeline_state.PRINT_DEBUGGING_INFO:
             print(
                 f"initialized highest_vars_vers_dict {self.con_scope_to_highest_var_vers[con_scopestr]}"
             )
@@ -195,28 +195,29 @@ class VariableVersionPass:
         """
         # add vars to interface
         for id, var_name in vars.items():
-            highest_ver = self.get_highest_ver_in_con_scope(con_scopestr, id)
-            # if con_scopestr is a FunctionDef container, and highest_ver is VAR_INIT_VERSION
-            # we call fix_for_python_gcc_declaration_distinction
-            # this creates a dummy assignment to the variable in the FunctionDef container
-            # most likely, this is not the ideal long term solution
-            scopestr_is_func = self.pipeline_state.is_con_scopestr_func_def(
-                con_scopestr
-            )
-            local_var = (
-                scopestr_is_func
-                and self.pipeline_state.is_var_local_to_func(con_scopestr, id)
-            )
-            if local_var and highest_ver == VAR_INIT_VERSION:
-                self.fix_for_python_gcc_declaration_distinction(
-                    con_scopestr, id, var_name
+            if self.is_var_in_con_scope(con_scopestr, id):
+                highest_ver = self.get_highest_ver_in_con_scope(con_scopestr, id)
+                # if con_scopestr is a FunctionDef container, and highest_ver is VAR_INIT_VERSION
+                # we call fix_for_python_gcc_declaration_distinction
+                # this creates a dummy assignment to the variable in the FunctionDef container
+                # most likely, this is not the ideal long term solution
+                scopestr_is_func = self.pipeline_state.is_con_scopestr_func_def(
+                    con_scopestr
                 )
-                # update highest ver after the dummy assignment
-                highest_ver = self.get_highest_ver_in_con_scope(
-                    con_scopestr, id
+                local_var = (
+                    scopestr_is_func
+                    and self.pipeline_state.is_var_local_to_func(con_scopestr, id)
                 )
-            fullid = build_fullid(var_name, id, highest_ver, con_scopestr)
-            interface[id] = fullid
+                if local_var and highest_ver == VAR_INIT_VERSION:
+                    self.fix_for_python_gcc_declaration_distinction(
+                        con_scopestr, id, var_name
+                    )
+                    # update highest ver after the dummy assignment
+                    highest_ver = self.get_highest_ver_in_con_scope(
+                        con_scopestr, id
+                    )
+                fullid = build_fullid(var_name, id, highest_ver, con_scopestr)
+                interface[id] = fullid
 
     def populate_loop_interfaces(self, node: AnnCastLoop):
         # populate interfaces and increment versions in previous scope of modified variables
