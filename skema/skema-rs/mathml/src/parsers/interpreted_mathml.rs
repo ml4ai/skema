@@ -7,7 +7,8 @@
 use crate::{
     ast::{
         operator::{
-            Derivative, DerivativeNotation, Gradient, Hat, Int, Logarithm, Operator, Summation,
+            Derivative, DerivativeNotation, Gradient, Hat, Int, Logarithm, LogarithmNotation,
+            Operator, Summation,
         },
         Ci, Differential, ExpMath, HatComp, Integral, LaplacianComp, Math, MathExpression, Mi,
         Mrow, Mtd, Mtr, SummationMath, Type, VectorNotation,
@@ -250,7 +251,7 @@ pub fn log_base(input: Span) -> IResult<Operator> {
     ))(input)?;
     let (s, base) = ws(terminated(math_expression, etag!("msub")))(s)?;
 
-    let operator = Operator::Logarithm(Logarithm::new(false, Some(Box::new(base))));
+    let operator = Operator::Logarithm(Logarithm::new(LogarithmNotation::LogBase(Box::new(base))));
 
     Ok((s, operator))
 }
@@ -1606,7 +1607,7 @@ pub fn exponential(input: Span) -> IResult<(Operator, Mrow)> {
 /// Logarithm operator: e.g. log
 pub fn logarithm(input: Span) -> IResult<Operator> {
     let (s, _exp) = ws(delimited(stag!("mi"), tag("log"), etag!("mi")))(input)?;
-    let operator = Operator::Logarithm(Logarithm::new(false, None));
+    let operator = Operator::Logarithm(Logarithm::new(LogarithmNotation::Log));
 
     Ok((s, operator))
 }
@@ -1620,7 +1621,7 @@ pub fn natural_log(input: Span) -> IResult<Operator> {
         ),
         delimited(stag!("mi"), tag("ln"), etag!("mi")),
     )))(input)?;
-    let operator = Operator::Logarithm(Logarithm::new(true, None));
+    let operator = Operator::Logarithm(Logarithm::new(LogarithmNotation::Ln));
 
     Ok((s, operator))
 }
@@ -1908,7 +1909,7 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                         r#type,
                         content,
                         func_of,
-                        notation: vector_notation,
+                        notation: _vector_notation,
                     },
                 )| {
                     MathExpression::Differential(Differential {
@@ -1972,7 +1973,7 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                         r#type,
                         content,
                         func_of,
-                        notation: vector_notation,
+                        notation: _vector_notation,
                     },
                 )| {
                     MathExpression::Differential(Differential {

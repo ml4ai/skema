@@ -40,8 +40,22 @@ pub enum DerivativeNotation {
     Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, JsonSchema,
 )]
 pub struct Logarithm {
-    pub is_natural_log: bool,
-    pub base: Option<Box<MathExpression>>,
+    pub notation: LogarithmNotation,
+    //pub is_natural_log: bool,
+    //pub base: Option<Box<MathExpression>>,
+}
+
+/// Varying logarithm notation
+#[derive(
+    Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, JsonSchema,
+)]
+pub enum LogarithmNotation {
+    /// e.g. ln
+    Ln,
+    /// e.g log
+    Log,
+    /// e.g. log with base
+    LogBase(Box<MathExpression>),
 }
 
 /// Summation operator has the option of having lower bound and upper bound components
@@ -299,22 +313,10 @@ impl fmt::Display for Operator {
             }
             Operator::Min => write!(f, "Min"),
             Operator::Comma => write!(f, ","),
-            Operator::Logarithm(Logarithm {
-                is_natural_log,
-                base,
-            }) => match (is_natural_log, base) {
-                (true, None) => {
-                    write!(f, "Ln")
-                }
-                (false, None) => {
-                    write!(f, "Log")
-                }
-                (false, Some(x)) => {
-                    write!(f, "Log_{{{x}}}")
-                }
-                (true, Some(x)) => {
-                    write!(f, "")
-                }
+            Operator::Logarithm(Logarithm { notation }) => match notation {
+                LogarithmNotation::Ln => write!(f, "Ln"),
+                LogarithmNotation::Log => write!(f, "Log"),
+                LogarithmNotation::LogBase(x) => write!(f, "Log_{{{x}}}"),
             },
         }
     }

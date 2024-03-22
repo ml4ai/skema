@@ -4,7 +4,8 @@ use crate::ast::VectorNotation;
 use crate::{
     ast::{
         operator::{
-            Derivative, DerivativeNotation, Gradient, Hat, Int, Logarithm, Operator, Summation,
+            Derivative, DerivativeNotation, Gradient, Hat, Int, Logarithm, LogarithmNotation,
+            Operator, Summation,
         },
         Math, MathExpression, Mi, Mrow,
     },
@@ -933,20 +934,19 @@ impl MathExpressionTree {
                             }
                         }
                     }
-                    Operator::Logarithm(x) => match (&x.is_natural_log, &x.base) {
-                        (true, None) => {
+                    Operator::Logarithm(x) => match &x.notation {
+                        LogarithmNotation::Ln => {
                             expression.push_str(&format!("\\ln {}", rest[0].to_latex()));
                         }
-                        (false, None) => {
+                        LogarithmNotation::Log => {
                             expression.push_str(&format!("\\log {}", rest[0].to_latex()));
                         }
-                        (false, Some(b)) => {
+                        LogarithmNotation::LogBase(base) => {
                             expression.push_str("\\log_{");
-                            expression.push_str(&format!("{}", b));
+                            expression.push_str(&format!("{}", base));
                             expression.push('}');
-                            expression.push_str(&format!("{}", rest[0].to_latex()));
+                            expression.push_str(&rest[0].to_latex().to_string());
                         }
-                        (&true, &Some(_)) => todo!(),
                     },
                     Operator::Comma => {
                         process_atoms_cons_parentheses(&mut expression, &rest[0]);
@@ -1107,7 +1107,7 @@ impl MathExpression {
                 superscript.flatten(tokens);
                 tokens.push(MathExpression::Mo(Operator::Rparen));
             }
-            MathExpression::Minimize(op, vec) => {
+            MathExpression::Minimize(_, vec) => {
                 tokens.push(MathExpression::Mo(Operator::Lparen));
                 for v in vec {
                     tokens.push(v.clone());
@@ -1313,7 +1313,6 @@ fn flatten_min_op(mut expr: MathExpressionTree) -> MathExpressionTree {
 fn expr(input: Vec<MathExpression>) -> MathExpressionTree {
     let mut lexer = Lexer::new(input);
     insert_multiple_between_paren(&mut lexer);
-    collapse_commas_within_paren(&mut lexer);
     let mut result: MathExpressionTree = expr_bp(&mut lexer, 0);
     let mut result = flatten_min_op(result.clone());
     let mut math_vec: Vec<MathExpressionTree> = vec![];
@@ -1370,68 +1369,6 @@ fn insert_multiple_between_paren(lexer: &mut Lexer) {
     }
     lexer.tokens = new_tokens;
 }
-
-fn collapse_commas_within_paren(lexer: &mut Lexer) {
-    let mut new_tokens = Vec::new();
-    let mut inside_paren = false;
-    let mut iter = lexer.tokens.iter().peekable();
-
-    while let Some(token) = iter.next() {
-        match token {
-            Token::Op(Operator::Lparen) => {
-                inside_paren = true;
-                new_tokens.push(token.clone());
-            }
-            Token::Op(Operator::Rparen) => {
-                inside_paren = false;
-                new_tokens.push(token.clone());
-            }
-            Token::Op(Operator::Comma) => {
-                // Skip the comma if we're inside parentheses
-                // Also, ensure the next token is added immediately after the last added token
-                if let Some(next_token) = iter.peek() {
-                    if let Token::Atom(_) = **next_token {
-                        // Skip adding the comma and directly add the next token
-                        new_tokens.push(next_token.clone().clone());
-                        iter.next(); // Consume the next token
-                    }
-                }
-            }
-            _ => {
-                // For any other token, just add it to the new list
-                new_tokens.push(token.clone());
-            }
-        }
-    }
-    lexer.tokens = new_tokens;
-}
-
-/*fn collapse_commas_within_paren(lexer: &mut Lexer) {
-    let mut inside_paren = false;
-    let mut index_to_remove = Vec::new();
-    let mut iter = lexer.tokens.iter().peekable();
-
-    while let Some(token) = iter.next() {
-        match token {
-            Token::Op(Operator::Lparen) => {
-                inside_paren = true;
-            },
-            Token::Op(Operator::Rparen) => {
-                inside_paren = false;
-            },
-            Token::Op(Operator::Comma) => {
-
-            },
-            _ => {}
-        }
-    }
-
-    // Remove commas from the end to the start to avoid index shifting
-    index_to_remove.reverse();
-    for index in index_to_remove {
-        lexer.tokens.remove(index);
-    }
-}*/
 
 /// The Pratt parsing algorithm for constructing an S-expression representing an equation.
 fn expr_bp(lexer: &mut Lexer, min_bp: u8) -> MathExpressionTree {
@@ -3712,7 +3649,7 @@ fn test_minimize_mi() {
 }
 
 #[test]
-fn test_clm4_5__8_2() {
+fn test_clm4_5_8_2() {
     let input = "<math>
   <msub>
     <mi>A</mi>
@@ -3755,7 +3692,7 @@ fn test_clm4_5__8_2() {
 }
 
 #[test]
-fn test_clm4_5__8_12_3() {
+fn test_clm4_5_8_12_3() {
     let input = "<math>
   <msub>
     <mi>f</mi>
@@ -3836,7 +3773,7 @@ fn test_log_10base() {
 }
 
 #[test]
-fn test_conservatiob_of_mass_5() {
+fn test_conservation_of_mass_5() {
     let input = "<math>
     <mfrac><mi>d</mi><mrow><mi>d</mi><mi>t</mi></mrow></mfrac>
     <mi>ln</mi><mo>&#x2061;</mo>
@@ -3851,4 +3788,15 @@ fn test_conservatiob_of_mass_5() {
     let s_exp = exp.to_string();
     assert_eq!(s_exp, "(= (D(1, t) (Ln dM)) 0)");
     assert_eq!(exp.to_latex(), "\\frac{d \\ln dM}{dt}=0");
+}
+
+#[test]
+fn test_msup_with_perp() {
+    let input = "<math>
+    <msup><mi>u</mi><mrow><mi>&#x22A5;</mi></mrow></msup>
+    </math>";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    let s_exp = exp.to_string();
+    assert_eq!(s_exp, "(^ u ⊥)");
+    assert_eq!(exp.to_latex(), "u^{⊥}");
 }

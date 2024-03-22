@@ -68,11 +68,15 @@ async fn main() {
         let db_port = env::var("SKEMA_GRAPH_DB_PORT").unwrap_or("443".to_string());
 
         let schema_met = schema_for!(MathExpressionTree);
-        let data_met = serde_json::to_string_pretty(&schema_met).unwrap().to_string();
+        let data_met = serde_json::to_string_pretty(&schema_met)
+            .unwrap()
+            .to_string();
         fs::write("./met_schema.txt", data_met).expect("Unable to write file");
 
         let schema_gamr = schema_for!(GeneralizedAMR);
-        let data_gamr = serde_json::to_string_pretty(&schema_gamr).unwrap().to_string();
+        let data_gamr = serde_json::to_string_pretty(&schema_gamr)
+            .unwrap()
+            .to_string();
         fs::write("./gamr_schema.txt", data_gamr).expect("Unable to write file");
         /*
         let config = Config {

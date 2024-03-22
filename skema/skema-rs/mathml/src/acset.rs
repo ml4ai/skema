@@ -320,7 +320,13 @@ pub struct Initial {
 }
 
 impl Default for Initial {
-    fn default() -> Self { Initial { target: "temp".to_string(), expression: "0".to_string(), expression_mathml: "<math></math>".to_string() } }
+    fn default() -> Self {
+        Initial {
+            target: "temp".to_string(),
+            expression: "0".to_string(),
+            expression_mathml: "<math></math>".to_string(),
+        }
+    }
 }
 
 #[derive(
@@ -1176,7 +1182,6 @@ impl From<Vec<FirstOrderODE>> for RegNet {
                 trans_num = trans_num + 1;
                 transitions_vec.insert(trans.clone());
             } else {
-
                 // construct transitions for complicated transitions
                 // mainly need to construct the output specially,
                 // run by clay
