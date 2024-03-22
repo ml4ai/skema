@@ -963,6 +963,7 @@ pub fn get_terms_mult(sys_states: Vec<String>, eq: Vec<MathExpressionTree>) -> P
         let mut rhs_vec = Vec::<PnTerm>::new();
 
         for arg in arg_terms.iter() {
+            println!("arg_term: {:?}", arg.clone());
             if arg.0 == 0 {
                 lhs_vec.push(arg.1.clone());
             } else {

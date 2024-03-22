@@ -1094,9 +1094,7 @@ pub fn first_order_derivative_with_log(input: Span) -> IResult<(Derivative, Math
     let d_mi = format!("d{}", MathExpression::Mi(mi));
     expression.push(MathExpression::Mi(Mi::new(d_mi)));
 
-    println!("||||-");
     let row = MathExpression::Mrow(Mrow::new(expression));
-    println!("|||||--");
 
     Ok((
         s,

@@ -3852,34 +3852,3 @@ fn test_conservatiob_of_mass_5() {
     assert_eq!(s_exp, "(= (D(1, t) (Ln dM)) 0)");
     assert_eq!(exp.to_latex(), "\\frac{d \\ln dM}{dt}=0");
 }
-
-/*#[test]
-fn test_mtable() {
-    let input = "<math>
-  <mtable>
-  <mtr>
-    <mtd>
-     <mrow>
-       <mi>E</mi>
-       <mo>=</mo>
-       <mrow>
-        <mi>m</mi>
-        <msup>
-         <mi>c</mi>
-         <mn>2</mn>
-        </msup>
-       </mrow>
-     </mrow>
-    </mtd>
-<mtd>
-      <mtext>Einstein </mtext>
-    </mtd>
-  </mtr>
-</mtable>
-    </math>";
-    let exp = input.parse::<MathExpressionTree>().unwrap();
-    println!("exp={:?}", exp);
-    let s_exp = exp.to_string();
-    assert_eq!(s_exp, "(= A_{n} (- (Min (, A_{c} (, A_{j} A_{p}))) R_{d}))");
-    assert_eq!(exp.to_latex(), "A_{n}=(\\min A_{c},(A_{j},A_{p}))-R_{d}");
-}*/
