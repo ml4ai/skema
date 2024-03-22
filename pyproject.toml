@@ -16,7 +16,7 @@ dependencies=[
     "dill==0.3.7",
     "networkx==2.8.8",
     "PyYAML",
-    "tree-sitter",
+    "tree-sitter==0.20.4",
     "neo4j==5.14.1",
     "requests",
     "beautifulsoup4", # used to remove comments etc from pMML before sending to MORAE
@@ -43,7 +43,7 @@ dynamic = ["readme"]
 #   Pygraphviz is often tricky to install, so we reserve it for the dev extras
 #   list.
 # - six: Required by auto-generated Swagger models
-dev = ["pytest", "pytest-cov", "pytest-xdist", "pytest-asyncio", "black", "mypy", "coverage", "pygraphviz", "six"]
+dev = ["pytest", "pytest-cov", "pytest-xdist", "pytest-asyncio", "pytest-mock", "black", "mypy", "coverage", "pygraphviz", "six"]
 
 demo = ["notebook"]
 
