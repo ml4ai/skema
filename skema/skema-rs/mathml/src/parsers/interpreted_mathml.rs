@@ -243,22 +243,16 @@ pub fn superscript(input: Span) -> IResult<MathExpression> {
 
 /// Parse content identifier for Msup
 pub fn log_base(input: Span) -> IResult<Operator> {
-    println!("-");
     let (s, _exp) = ws(delimited(
         pair(stag!("msub"), stag!("mi")),
         tag("log"),
         etag!("mi"),
     ))(input)?;
-    println!("--");
-    println!("{s:?}");
     let (s, base) = ws(terminated(math_expression, etag!("msub")))(s)?;
-    println!("---");
-    println!("{:?}", base);
-    //let (s, _exp) = ws(delimited(stag!("mi"), tag("log"), etag!("mi")))(input)?;
-    //let operator = Operator::Logarithm(Logarithm::new(false, None));
+
     let operator = Operator::Logarithm(Logarithm::new(false, Some(Box::new(base))));
-    println!("{:?}", operator);
-    return Ok((s, operator));
+
+    Ok((s, operator))
 }
 
 /// Parse vector notation for Mover
@@ -280,7 +274,7 @@ pub fn vector_mover(input: Span) -> IResult<MathExpression> {
         None,
         Some(VectorNotation::Arrow),
     );
-    Ok((s, MathExpression::Ci(ci)));
+    Ok((s, MathExpression::Ci(ci)))
 }
 
 /// Parse Mover
