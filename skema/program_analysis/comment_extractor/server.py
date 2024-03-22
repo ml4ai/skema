@@ -30,13 +30,42 @@ router = APIRouter()
 
 @router.get("/comments-get-supported-languages", summary="Endpoint for checking which languages and comment types are supported by comment extractor.")
 async def comments_get_supported_languages() -> SupportedLanguageResponse:
-    """Endpoint for checking which type of comments are supported for each language."""
+    """Endpoint for checking which type of comments are supported for each language.
+    ### Python example
+
+    ```
+    import requests
+
+    response=requests.get("/comment_service/comments-get-supported-languages")
+    supported_languages = response.json()
+    """
     return SUPPORTED_LANGUAGES
 
 
-@router.get("/comments-get-supported-file-extensions", summary="Endpoint for checking which files extensions are currently supported by comment extractor.")
+@router.get("/comments-get-supported-file-extensions", summary="Endpoint for checking which files extensions are currently supported by comment extractor.", responses=
+            {
+                200: {
+        "content": {
+            "application/json":{
+                "example": [
+                    ".py",
+                    ".f",
+                    ".f90"
+                ]
+            }
+        }
+    }
+            })
 async def comments_get_supported_file_extensions() -> List[str]:
-    "Endpoint for checking which file extensions are supported for comment extraction."
+    """Endpoint for checking which file extensions are supported for comment extraction.
+    ### Python example
+
+    ```
+    import requests
+
+    response=requests.get("/comment_service/comments-get-supported-file_extensions")
+    supported_file_extensions = response.json()
+    """
     return SUPPORTED_FILE_EXTENSIONS
 
 
