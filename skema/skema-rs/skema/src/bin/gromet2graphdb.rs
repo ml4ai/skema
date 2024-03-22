@@ -23,6 +23,10 @@ struct Cli {
 async fn main() {
     // debug outputs
     let debug = true;
+    let push_graph = true;
+    let clear_graph = true;
+    //let json_output = true;
+    let csv_output = true;
     // take in gromet location and deserialize
 
     let args = Cli::parse();
@@ -41,7 +45,7 @@ async fn main() {
     }
 
     if debug {
-        fs::write("debug.txt", full_query.clone()).expect("Unable to write file");
+        fs::write("./output_queries/debug.txt", full_query.clone()).expect("Unable to write file");
     }
 
     let db_protocol = env::var("SKEMA_GRAPH_DB_PROTO").unwrap_or("bolt+s://".to_string());
@@ -55,6 +59,18 @@ async fn main() {
         db_port: db_port.parse::<u16>().unwrap(),
     };
 
-    run_queries(queries, config.clone()).await.unwrap(); // The properties need to have quotes!!
-                                                         // writing output to file, since too long for std out now.
+    if push_graph {
+        run_queries(queries, config.clone()).await.unwrap(); // The properties need to have quotes!!
+        if csv_output {
+            let csv_query = ["WITH \"MATCH path = (c)-[r]->(m) RETURN c,r,m\" AS query\n
+            CALL export_util.csv_query(query, \"/usr/lib/memgraph/query_modules/export.csv\", True)\n
+            YIELD file_path, data\n
+            RETURN file_path, data;".to_string()].to_vec();
+            run_queries(csv_query, config.clone()).await.unwrap();
+        }
+        if clear_graph {
+            let clear_query = ["MATCH (n) DETACH DELETE n".to_string()].to_vec();
+            run_queries(clear_query, config.clone()).await.unwrap();
+        }                                            
+    }
 }

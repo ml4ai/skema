@@ -67,21 +67,12 @@ async fn main() {
             env::var("SKEMA_GRAPH_DB_HOST").unwrap_or("graphdb-bolt.askem.lum.ai".to_string());
         let db_port = env::var("SKEMA_GRAPH_DB_PORT").unwrap_or("443".to_string());
 
-        let schema_met = schema_for!(MathExpressionTree);
-        let data_met = serde_json::to_string_pretty(&schema_met).unwrap().to_string();
-        fs::write("./met_schema.txt", data_met).expect("Unable to write file");
-
-        let schema_gamr = schema_for!(GeneralizedAMR);
-        let data_gamr = serde_json::to_string_pretty(&schema_gamr).unwrap().to_string();
-        fs::write("./gamr_schema.txt", data_gamr).expect("Unable to write file");
-        /*
+        
         let config = Config {
             db_protocol: db_protocol.clone(),
             db_host: db_host.clone(),
             db_port: db_port.parse::<u16>().unwrap(),
         };
-
-        let _response = module_query(config.clone()).await;
 
         let mut ids = Vec::<i64>::new();
         let graph = Arc::new(config.graphdb_connection().await);
@@ -94,9 +85,9 @@ async fn main() {
             ids.push(node.id());
         }
         println!("{:?}", ids.clone());
-        let math_content = module_id2mathml_MET_ast(ids[ids.len() - 1], config.clone()).await;
-        let pn_amr = PetriNet::from(math_content);
-        */
+        //let math_content = module_id2mathml_MET_ast(ids[ids.len() - 1], config.clone()).await;
+        //let pn_amr = PetriNet::from(math_content);
+        
         //println!("{:?}", math_content.clone());
         //println!("\nAMR from code: {:?}", PetriNet::from(math_content));
 
