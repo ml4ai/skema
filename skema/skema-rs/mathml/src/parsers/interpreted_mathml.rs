@@ -280,7 +280,7 @@ pub fn vector_mover(input: Span) -> IResult<MathExpression> {
         None,
         Some(VectorNotation::Arrow),
     );
-    return Ok((s, MathExpression::Ci(ci)));
+    Ok((s, MathExpression::Ci(ci)));
 }
 
 /// Parse Mover
