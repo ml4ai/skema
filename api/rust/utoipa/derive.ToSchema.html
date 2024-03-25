@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Generate reusable OpenAPI schema to be used together with `OpenApi`."><title>ToSchema in utoipa - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../" data-static-root-path="../static.files/" data-current-crate="utoipa" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="sidebar-items.js"></script><script defer src="../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc derive"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button></nav><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../utoipa/index.html">utoipa</a><span class="version">3.5.0</span></h2></div><div class="sidebar-elems"></div></nav><div class="sidebar-resizer"></div>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Generate reusable OpenAPI schema to be used together with `OpenApi`."><title>ToSchema in utoipa - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../" data-static-root-path="../static.files/" data-current-crate="utoipa" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.0 (aedd173a2 2024-03-17)" data-channel="1.77.0" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../static.files/storage-4c98445ec4002617.js"></script><script defer src="sidebar-items.js"></script><script defer src="../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc derive"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle" title="show sidebar"></button></nav><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../utoipa/index.html">utoipa</a><span class="version">3.5.0</span></h2></div><div class="sidebar-elems"></div></nav><div class="sidebar-resizer"></div>
     <main><div class="width-limiter"><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../utoipa/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="main-heading"><h1>Derive Macro <a href="index.html">utoipa</a>::<wbr><a class="derive" href="#">ToSchema</a><button id="copy-path" title="Copy item path to clipboard"><img src="../static.files/clipboard-7571035ce49a181d.svg" width="19" height="18" alt="Copy item path"></button></h1><span class="out-of-band"><a class="src" href="../src/utoipa_gen/lib.rs.html#49">source</a> · <button id="toggle-all-docs" title="collapse all docs">[<span>&#x2212;</span>]</button></span></div><pre class="rust item-decl"><code>#[derive(ToSchema)]
 {
     <span class="comment">// Attributes available to this derive:</span>
@@ -26,7 +26,7 @@ level doc comments will resolve to object descriptions.</p>
     <span class="doccomment">/// Name for your pet
     </span>name: String,
 }</code></pre></div>
-<h2 id="struct-optional-configuration-options-for-schema"><a href="#struct-optional-configuration-options-for-schema">Struct Optional Configuration Options for <code>#[schema(...)]</code></a></h2>
+<h2 id="struct-optional-configuration-options-for-schema"><a class="doc-anchor" href="#struct-optional-configuration-options-for-schema">§</a>Struct Optional Configuration Options for <code>#[schema(...)]</code></h2>
 <ul>
 <li><code>example = ...</code> Can be <em><code>json!(...)</code></em>. <em><code>json!(...)</code></em> should be something that
 <em><code>serde_json::json!</code></em> can parse as a <em><code>serde_json::Value</code></em>.</li>
@@ -46,7 +46,7 @@ OpenAPI spec as <em><code>path.to.Pet</code></em>.</li>
 not in the code. If you’d like to mark the fields as deprecated in the code as well use
 Rust’s own <code>#[deprecated]</code> attribute instead.</li>
 </ul>
-<h2 id="enum-optional-configuration-options-for-schema"><a href="#enum-optional-configuration-options-for-schema">Enum Optional Configuration Options for <code>#[schema(...)]</code></a></h2>
+<h2 id="enum-optional-configuration-options-for-schema"><a class="doc-anchor" href="#enum-optional-configuration-options-for-schema">§</a>Enum Optional Configuration Options for <code>#[schema(...)]</code></h2>
 <ul>
 <li><code>example = ...</code> Can be method reference or <em><code>json!(...)</code></em>.</li>
 <li><code>default = ...</code> Can be method reference or <em><code>json!(...)</code></em>.</li>
@@ -63,13 +63,13 @@ OpenAPI spec as <em><code>path.to.Pet</code></em>.</li>
 not in the code. If you’d like to mark the enum as deprecated in the code as well use
 Rust’s own <code>#[deprecated]</code> attribute instead.</li>
 </ul>
-<h2 id="enum-variant-optional-configuration-options-for-schema"><a href="#enum-variant-optional-configuration-options-for-schema">Enum Variant Optional Configuration Options for <code>#[schema(...)]</code></a></h2>
+<h2 id="enum-variant-optional-configuration-options-for-schema"><a class="doc-anchor" href="#enum-variant-optional-configuration-options-for-schema">§</a>Enum Variant Optional Configuration Options for <code>#[schema(...)]</code></h2>
 <p>Supports all variant specific configuration options e.g. if variant is <em><code>UnnamedStruct</code></em> then
 unnamed struct type configuration options are supported.</p>
 <p>In addition to the variant type specific configuration options enum variants support custom
 <em><code>rename</code></em> attribute. It behaves similarly to serde’s <em><code>rename</code></em> attribute. If both <em>serde</em>
 <em><code>rename</code></em> and <em>schema</em> <em><code>rename</code></em> are defined <strong>serde</strong> will take precedence.</p>
-<h2 id="unnamed-field-struct-optional-configuration-options-for-schema"><a href="#unnamed-field-struct-optional-configuration-options-for-schema">Unnamed Field Struct Optional Configuration Options for <code>#[schema(...)]</code></a></h2>
+<h2 id="unnamed-field-struct-optional-configuration-options-for-schema"><a class="doc-anchor" href="#unnamed-field-struct-optional-configuration-options-for-schema">§</a>Unnamed Field Struct Optional Configuration Options for <code>#[schema(...)]</code></h2>
 <ul>
 <li><code>example = ...</code> Can be method reference or <em><code>json!(...)</code></em>.</li>
 <li><code>default = ...</code> Can be method reference or <em><code>json!(...)</code></em>. If no value is specified, and the struct has
@@ -95,7 +95,7 @@ OpenAPI spec as <em><code>path.to.Pet</code></em>.</li>
 not in the code. If you’d like to mark the field as deprecated in the code as well use
 Rust’s own <code>#[deprecated]</code> attribute instead.</li>
 </ul>
-<h2 id="named-fields-optional-configuration-options-for-schema"><a href="#named-fields-optional-configuration-options-for-schema">Named Fields Optional Configuration Options for <code>#[schema(...)]</code></a></h2>
+<h2 id="named-fields-optional-configuration-options-for-schema"><a class="doc-anchor" href="#named-fields-optional-configuration-options-for-schema">§</a>Named Fields Optional Configuration Options for <code>#[schema(...)]</code></h2>
 <ul>
 <li><code>example = ...</code> Can be method reference or <em><code>json!(...)</code></em>.</li>
 <li><code>default = ...</code> Can be method reference or <em><code>json!(...)</code></em>.</li>
@@ -145,7 +145,7 @@ Supports formats <em><code>additional_properties</code></em> and <em><code>addit
 not in the code. If you’d like to mark the field as deprecated in the code as well use
 Rust’s own <code>#[deprecated]</code> attribute instead.</li>
 </ul>
-<h5 id="field-nullability-and-required-rules"><a href="#field-nullability-and-required-rules">Field nullability and required rules</a></h5>
+<h5 id="field-nullability-and-required-rules"><a class="doc-anchor" href="#field-nullability-and-required-rules">§</a>Field nullability and required rules</h5>
 <p>Field is considered <em><code>required</code></em> if</p>
 <ul>
 <li>it is not <code>Option</code> field</li>
@@ -155,7 +155,7 @@ Rust’s own <code>#[deprecated]</code> attribute instead.</li>
 attribute</li>
 </ul>
 <p>Field is considered <em><code>nullable</code></em> when field type is <em><code>Option</code></em>.</p>
-<h3 id="xml-attribute-configuration-options"><a href="#xml-attribute-configuration-options">Xml attribute Configuration Options</a></h3>
+<h3 id="xml-attribute-configuration-options"><a class="doc-anchor" href="#xml-attribute-configuration-options">§</a>Xml attribute Configuration Options</h3>
 <ul>
 <li><code>xml(name = &quot;...&quot;)</code> Will set name for property or type.</li>
 <li><code>xml(namespace = &quot;...&quot;)</code> Will set namespace for xml element which needs to be valid uri.</li>
@@ -165,7 +165,7 @@ attribute</li>
 <li><code>xml(wrapped(name = &quot;wrap_name&quot;))</code> Will override the wrapper elements name.</li>
 </ul>
 <p>See <a href="openapi/xml/struct.Xml.html"><code>Xml</code></a> for more details.</p>
-<h2 id="partial-serde-attributes-support"><a href="#partial-serde-attributes-support">Partial <code>#[serde(...)]</code> attributes support</a></h2>
+<h2 id="partial-serde-attributes-support"><a class="doc-anchor" href="#partial-serde-attributes-support">§</a>Partial <code>#[serde(...)]</code> attributes support</h2>
 <p>ToSchema derive has partial support for <a href="https://serde.rs/attributes.html">serde attributes</a>. These supported attributes will reflect to the
 generated OpenAPI doc. For example if <em><code>#[serde(skip)]</code></em> is defined the attribute will not show up in the OpenAPI spec at all since it will not never
 be serialized anyway. Similarly the <em><code>rename</code></em> and <em><code>rename_all</code></em> will reflect to the generated OpenAPI doc.</p>
@@ -234,7 +234,7 @@ as optional.</strong></em></p>
  </span><span class="kw">struct </span>MyValue {
      field: String
  }</code></pre></div>
-<h2 id="repr-attribute-support"><a href="#repr-attribute-support"><code>#[repr(...)]</code> attribute support</a></h2>
+<h2 id="repr-attribute-support"><a class="doc-anchor" href="#repr-attribute-support">§</a><code>#[repr(...)]</code> attribute support</h2>
 <p><a href="https://github.com/dtolnay/serde-repr">Serde repr</a> allows field-less enums be represented by
 their numeric value.</p>
 <ul>
@@ -276,11 +276,11 @@ OpenAPI spec as <em><code>path.to.Pet</code></em>.</li>
     </span>Unknown = <span class="number">0</span>,
     <span class="prelude-val">Ok </span>= <span class="number">1</span>,
  }</code></pre></div>
-<h2 id="generic-schemas-with-aliases"><a href="#generic-schemas-with-aliases">Generic schemas with aliases</a></h2>
+<h2 id="generic-schemas-with-aliases"><a class="doc-anchor" href="#generic-schemas-with-aliases">§</a>Generic schemas with aliases</h2>
 <p>Schemas can also be generic which allows reusing types. This enables certain behaviour patters
 where super type declares common code for type aliases.</p>
 <p>In this example we have common <code>Status</code> type which accepts one generic type. It is then defined
-with <code>#[aliases(...)]</code> that it is going to be used with <a href="std::string::String"><code>String</code></a> and <a href="https://doc.rust-lang.org/1.76.0/std/primitive.i32.html" title="primitive i32"><code>i32</code></a> values.
+with <code>#[aliases(...)]</code> that it is going to be used with <a href="std::string::String"><code>String</code></a> and <a href="https://doc.rust-lang.org/1.77.0/std/primitive.i32.html" title="primitive i32"><code>i32</code></a> values.
 The generic argument could also be another <a href="trait.ToSchema.html"><code>ToSchema</code></a> as well.</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="attr">#[derive(ToSchema)]
@@ -298,7 +298,7 @@ The generic argument could also be another <a href="trait.ToSchema.html"><code>T
 behind the scenes which then can be later referenced anywhere in code.</p>
 <p><strong>Note!</strong> You should never register generic type itself in <code>components(...)</code> so according above example <code>Status&lt;...&gt;</code> should not be registered
 because it will not render the type correctly and will cause an error in generated OpenAPI spec.</p>
-<h2 id="examples"><a href="#examples">Examples</a></h2>
+<h2 id="examples"><a class="doc-anchor" href="#examples">§</a>Examples</h2>
 <p><em><strong>Simple example of a Pet with descriptions and object level example.</strong></em></p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="doccomment">/// This is a pet.

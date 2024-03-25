@@ -72,7 +72,7 @@ var srcIndex = new Map(JSON.parse('[\
 ["httpdate",["",[],["date.rs","lib.rs"]]],\
 ["humantime",["",[],["date.rs","duration.rs","lib.rs","wrapper.rs"]]],\
 ["idna",["",[],["lib.rs","punycode.rs","uts46.rs"]]],\
-["indexmap",["",[["map",[["core",[],["entry.rs","raw.rs","raw_entry_v1.rs"]]],["core.rs","iter.rs","serde_seq.rs","slice.rs"]],["set",[],["iter.rs","slice.rs"]]],["arbitrary.rs","lib.rs","macros.rs","map.rs","mutable_keys.rs","serde.rs","set.rs","util.rs"]]],\
+["indexmap",["",[["map",[["core",[],["entry.rs","raw.rs","raw_entry_v1.rs"]]],["core.rs","iter.rs","mutable.rs","serde_seq.rs","slice.rs"]],["set",[],["iter.rs","mutable.rs","slice.rs"]]],["arbitrary.rs","lib.rs","macros.rs","map.rs","serde.rs","set.rs","util.rs"]]],\
 ["is_terminal",["",[],["lib.rs"]]],\
 ["itoa",["",[],["lib.rs","udiv128.rs"]]],\
 ["language_tags",["",[],["iana_registry.rs","lib.rs"]]],\

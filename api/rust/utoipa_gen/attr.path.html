@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Path attribute macro implements OpenAPI path for the decorated function."><title>path in utoipa_gen - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../" data-static-root-path="../static.files/" data-current-crate="utoipa_gen" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="sidebar-items.js"></script><script defer src="../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc attr"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button></nav><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../utoipa_gen/index.html">utoipa_gen</a><span class="version">3.5.0</span></h2></div><div class="sidebar-elems"></div></nav><div class="sidebar-resizer"></div>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Path attribute macro implements OpenAPI path for the decorated function."><title>path in utoipa_gen - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../" data-static-root-path="../static.files/" data-current-crate="utoipa_gen" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.0 (aedd173a2 2024-03-17)" data-channel="1.77.0" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../static.files/storage-4c98445ec4002617.js"></script><script defer src="sidebar-items.js"></script><script defer src="../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc attr"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle" title="show sidebar"></button></nav><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../utoipa_gen/index.html">utoipa_gen</a><span class="version">3.5.0</span></h2></div><div class="sidebar-elems"></div></nav><div class="sidebar-resizer"></div>
     <main><div class="width-limiter"><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../utoipa_gen/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="main-heading"><h1>Attribute Macro <a href="index.html">utoipa_gen</a>::<wbr><a class="attr" href="#">path</a><button id="copy-path" title="Copy item path to clipboard"><img src="../static.files/clipboard-7571035ce49a181d.svg" width="19" height="18" alt="Copy item path"></button></h1><span class="out-of-band"><a class="src" href="../src/utoipa_gen/lib.rs.html#641">source</a> · <button id="toggle-all-docs" title="collapse all docs">[<span>&#x2212;</span>]</button></span></div><pre class="rust item-decl"><code>#[path]</code></pre><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Path attribute macro implements OpenAPI path for the decorated function.</p>
 <p>This is a <code>#[derive]</code> implementation for <a href="trait.Path.html"><code>Path</code></a> trait. Macro accepts set of attributes that can
 be used to configure and override default values what are resolved automatically.</p>
@@ -16,7 +16,7 @@ used as <em><code>description</code></em>.</p>
 /// All lines of the doc comment will be included to operation description.
 </span><span class="attr">#[utoipa::path(get, path = <span class="string">"/operation"</span>)]
 </span><span class="kw">fn </span>operation() {}</code></pre></div>
-<h2 id="path-attributes"><a href="#path-attributes">Path Attributes</a></h2>
+<h2 id="path-attributes"><a class="doc-anchor" href="#path-attributes">§</a>Path Attributes</h2>
 <ul>
 <li>
 <p><code>operation</code> <em><strong>Must be first parameter!</strong></em> Accepted values are known http operations such as
@@ -55,7 +55,7 @@ the performed request.</p>
 <p><code>security(...)</code> List of <a href="openapi/security/struct.SecurityRequirement.html"><code>SecurityRequirement</code></a>s local to the path operation.</p>
 </li>
 </ul>
-<h2 id="request-body-attributes"><a href="#request-body-attributes">Request Body Attributes</a></h2>
+<h2 id="request-body-attributes"><a class="doc-anchor" href="#request-body-attributes">§</a>Request Body Attributes</h2>
 <p><strong>Simple format definition by <code>request_body = ...</code></strong></p>
 <ul>
 <li><em><code>request_body = Type</code></em>, <em><code>request_body = inline(Type)</code></em> or <em><code>request_body = ref(&quot;...&quot;)</code></em>.
@@ -101,7 +101,7 @@ This has same syntax as <em><code>examples(...)</code></em> in <a href="#respons
 <div class="example-wrap"><pre class="language-text"><code> request_body(content = String, description = &quot;Xml as string request&quot;, content_type = &quot;text/xml&quot;),
  request_body = Pet,
  request_body = Option&lt;[Pet]&gt;,
-</code></pre></div><h2 id="response-attributes"><a href="#response-attributes">Response Attributes</a></h2>
+</code></pre></div><h2 id="response-attributes"><a class="doc-anchor" href="#response-attributes">§</a>Response Attributes</h2>
 <ul>
 <li>
 <p><code>status = ...</code> Is either a valid http status code integer. E.g. <em><code>200</code></em> or a string value representing
@@ -197,7 +197,7 @@ the <em><code>value</code></em> attribute. Value must be literal string.</li>
        )
    )
 )
-</code></pre></div><h4 id="using-toresponse-for-reusable-responses"><a href="#using-toresponse-for-reusable-responses">Using <code>ToResponse</code> for reusable responses</a></h4>
+</code></pre></div><h4 id="using-toresponse-for-reusable-responses"><a class="doc-anchor" href="#using-toresponse-for-reusable-responses">§</a>Using <code>ToResponse</code> for reusable responses</h4>
 <p><em><strong><code>ReusableResponse</code> must be a type that implements <a href="trait.ToResponse.html"><code>ToResponse</code></a>.</strong></em></p>
 <div class="example-wrap"><pre class="language-text"><code>responses(
     (status = 200, response = ReusableResponse)
@@ -207,11 +207,11 @@ the <em><code>value</code></em> attribute. Value must be literal string.</li>
 <div class="example-wrap"><pre class="language-text"><code>responses(
     (status = 200, response = inline(ReusableResponse))
 )
-</code></pre></div><h3 id="responses-from-intoresponses"><a href="#responses-from-intoresponses">Responses from <code>IntoResponses</code></a></h3>
+</code></pre></div><h3 id="responses-from-intoresponses"><a class="doc-anchor" href="#responses-from-intoresponses">§</a>Responses from <code>IntoResponses</code></h3>
 <p><em><strong>Responses for a path can be specified with one or more types that implement
 <a href="trait.IntoResponses.html"><code>IntoResponses</code></a>.</strong></em></p>
 <div class="example-wrap"><pre class="language-text"><code>responses(MyResponse)
-</code></pre></div><h2 id="response-header-attributes"><a href="#response-header-attributes">Response Header Attributes</a></h2>
+</code></pre></div><h2 id="response-header-attributes"><a class="doc-anchor" href="#response-header-attributes">§</a>Response Header Attributes</h2>
 <ul>
 <li>
 <p><code>name</code> Name of the header. E.g. <em><code>x-csrf-token</code></em></p>
@@ -230,10 +230,10 @@ response header.</p>
 <p><strong>Header supported formats:</strong></p>
 <div class="example-wrap"><pre class="language-text"><code>(&quot;x-csrf-token&quot;),
 (&quot;x-csrf-token&quot; = String, description = &quot;New csrf token&quot;),
-</code></pre></div><h2 id="params-attributes"><a href="#params-attributes">Params Attributes</a></h2>
+</code></pre></div><h2 id="params-attributes"><a class="doc-anchor" href="#params-attributes">§</a>Params Attributes</h2>
 <p>The list of attributes inside the <code>params(...)</code> attribute can take two forms: <a href="#tuples">Tuples</a> or <a href="#intoparams-type">IntoParams
 Type</a>.</p>
-<h3 id="tuples"><a href="#tuples">Tuples</a></h3>
+<h3 id="tuples"><a class="doc-anchor" href="#tuples">§</a>Tuples</h3>
 <p>In the tuples format, parameters are specified using the following attributes inside a list of
 tuples separated by commas:</p>
 <ul>
@@ -273,7 +273,7 @@ with explicit <code>bool</code> value as <em><code>deprecated = bool</code></em>
 will override any example in underlying parameter type.</p>
 </li>
 </ul>
-<h6 id="parameter-type-attributes"><a href="#parameter-type-attributes">Parameter type attributes</a></h6>
+<h6 id="parameter-type-attributes"><a class="doc-anchor" href="#parameter-type-attributes">§</a>Parameter type attributes</h6>
 <p>These attributes supported when <em><code>parameter_type</code></em> is present. Either by manually providing one
 or otherwise resolved e.g from path macro argument when <em><code>actix_extras</code></em> crate feature is
 enabled.</p>
@@ -347,7 +347,7 @@ be non-negative integer.</p>
         min_items = 1
     )
 )
-</code></pre></div><h3 id="intoparams-type"><a href="#intoparams-type">IntoParams Type</a></h3>
+</code></pre></div><h3 id="intoparams-type"><a class="doc-anchor" href="#intoparams-type">§</a>IntoParams Type</h3>
 <p>In the IntoParams parameters format, the parameters are specified using an identifier for a type
 that implements <a href="trait.IntoParams.html"><code>IntoParams</code></a>. See <a href="trait.IntoParams.html"><code>IntoParams</code></a> for an
 example.</p>
@@ -360,7 +360,7 @@ representation</a> or other structs.</p>
     MyParameters2,
     (&quot;id&quot; = String, Path, deprecated, description = &quot;Pet database id&quot;),
 )
-</code></pre></div><h2 id="security-requirement-attributes"><a href="#security-requirement-attributes">Security Requirement Attributes</a></h2>
+</code></pre></div><h2 id="security-requirement-attributes"><a class="doc-anchor" href="#security-requirement-attributes">§</a>Security Requirement Attributes</h2>
 <ul>
 <li><code>name</code> Define the name for security requirement. This must match to name of existing
 <a href="openapi/security/enum.SecurityScheme.html"><code>SecuritySchema</code></a>.</li>
@@ -374,11 +374,11 @@ existing <a href="openapi/security/enum.SecurityScheme.html"><code>SecuritySchem
 </code></pre></div>
 <p>Leaving empty <em><code>()</code></em> creates an empty <a href="openapi/security/struct.SecurityRequirement.html"><code>SecurityRequirement</code></a> this is useful when
 security requirement is optional for operation.</p>
-<h2 id="actix_extras-feature-support-for-actix-web"><a href="#actix_extras-feature-support-for-actix-web">actix_extras feature support for actix-web</a></h2>
+<h2 id="actix_extras-feature-support-for-actix-web"><a class="doc-anchor" href="#actix_extras-feature-support-for-actix-web">§</a>actix_extras feature support for actix-web</h2>
 <p><strong>actix_extras</strong> feature gives <strong>utoipa</strong> ability to parse path operation information from <strong>actix-web</strong> types and macros.</p>
 <ol>
 <li>Ability to parse <code>path</code> from <strong>actix-web</strong> path attribute macros e.g. <em><code>#[get(...)]</code></em>.</li>
-<li>Ability to parse <a href="https://doc.rust-lang.org/1.76.0/core/primitive/index.html" title="mod core::primitive"><code>std::primitive</code></a>  or <a href="https://doc.rust-lang.org/1.76.0/alloc/string/struct.String.html" title="struct alloc::string::String"><code>String</code></a> or <a href="https://doc.rust-lang.org/1.76.0/std/primitive.tuple.html" title="primitive tuple"><code>tuple</code></a> typed <code>path</code> parameters from <strong>actix-web</strong> <em><code>web::Path&lt;...&gt;</code></em>.</li>
+<li>Ability to parse <a href="https://doc.rust-lang.org/1.77.0/core/primitive/index.html" title="mod core::primitive"><code>std::primitive</code></a>  or <a href="https://doc.rust-lang.org/1.77.0/alloc/string/struct.String.html" title="struct alloc::string::String"><code>String</code></a> or <a href="https://doc.rust-lang.org/1.77.0/std/primitive.tuple.html" title="primitive tuple"><code>tuple</code></a> typed <code>path</code> parameters from <strong>actix-web</strong> <em><code>web::Path&lt;...&gt;</code></em>.</li>
 <li>Ability to parse <code>path</code> and <code>query</code> parameters form <strong>actix-web</strong> <em><code>web::Path&lt;...&gt;</code></em>, <em><code>web::Query&lt;...&gt;</code></em> types
 with <a href="trait.IntoParams.html"><code>IntoParams</code></a> trait.</li>
 </ol>
@@ -418,16 +418,16 @@ resolved from path and the argument types of handler</p>
 </span><span class="kw">async fn </span>get_pet_by_id(id: web::Path&lt;i32&gt;) -&gt; <span class="kw">impl </span>Responder {
     HttpResponse::Ok().json(<span class="macro">json!</span>({ <span class="string">"pet"</span>: <span class="macro">format!</span>(<span class="string">"{:?}"</span>, <span class="kw-2">&amp;</span>id.into_inner()) }))
 }</code></pre></div>
-<h2 id="rocket_extras-feature-support-for-rocket"><a href="#rocket_extras-feature-support-for-rocket">rocket_extras feature support for rocket</a></h2>
+<h2 id="rocket_extras-feature-support-for-rocket"><a class="doc-anchor" href="#rocket_extras-feature-support-for-rocket">§</a>rocket_extras feature support for rocket</h2>
 <p><strong>rocket_extras</strong> feature enhances path operation parameter support. It gives <strong>utoipa</strong> ability to parse <code>path</code>, <code>path parameters</code>
 and <code>query parameters</code> based on arguments given to <strong>rocket</strong>  proc macros such as <em><strong><code>#[get(...)]</code></strong></em>.</p>
 <ol>
-<li>It is able to parse parameter types for <a href="https://doc.rust-lang.org/std/primitive/index.html">primitive types</a>, <a href="https://doc.rust-lang.org/1.76.0/alloc/string/struct.String.html" title="struct alloc::string::String"><code>String</code></a>, <a href="https://doc.rust-lang.org/1.76.0/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec"><code>Vec</code></a>, <a href="https://doc.rust-lang.org/1.76.0/core/option/enum.Option.html" title="enum core::option::Option"><code>Option</code></a> or <a href="https://doc.rust-lang.org/1.76.0/std/path/struct.PathBuf.html" title="struct std::path::PathBuf"><code>std::path::PathBuf</code></a>
+<li>It is able to parse parameter types for <a href="https://doc.rust-lang.org/std/primitive/index.html">primitive types</a>, <a href="https://doc.rust-lang.org/1.77.0/alloc/string/struct.String.html" title="struct alloc::string::String"><code>String</code></a>, <a href="https://doc.rust-lang.org/1.77.0/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec"><code>Vec</code></a>, <a href="https://doc.rust-lang.org/1.77.0/core/option/enum.Option.html" title="enum core::option::Option"><code>Option</code></a> or <a href="https://doc.rust-lang.org/1.77.0/std/path/struct.PathBuf.html" title="struct std::path::PathBuf"><code>std::path::PathBuf</code></a>
 type.</li>
 <li>It is able to determine <code>parameter_in</code> for <a href="trait.IntoParams.html"><code>IntoParams</code></a> trait used for <code>FromForm</code> type of query parameters.</li>
 </ol>
 <p>See the <strong>rocket_extras</strong> in action in examples <a href="https://github.com/juhaku/utoipa/tree/master/examples/rocket-todo">rocket-todo</a>.</p>
-<h2 id="axum_extras-feature-support-for-axum"><a href="#axum_extras-feature-support-for-axum">axum_extras feature support for axum</a></h2>
+<h2 id="axum_extras-feature-support-for-axum"><a class="doc-anchor" href="#axum_extras-feature-support-for-axum">§</a>axum_extras feature support for axum</h2>
 <p><strong>axum_extras</strong> feature enhances parameter support for path operation in following ways.</p>
 <ol>
 <li>It allows users to use tuple style path parameters e.g. <em><code>Path((id, name)): Path&lt;(i32, String)&gt;</code></em> and resolves
@@ -480,7 +480,7 @@ parameter names and types from it.</li>
 ) -&gt; Json&lt;Vec&lt;String&gt;&gt; {
     Json(<span class="macro">vec!</span>[])
 }</code></pre></div>
-<h2 id="examples"><a href="#examples">Examples</a></h2>
+<h2 id="examples"><a class="doc-anchor" href="#examples">§</a>Examples</h2>
 <p><em><strong>More complete example.</strong></em></p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="attr">#[utoipa::path(

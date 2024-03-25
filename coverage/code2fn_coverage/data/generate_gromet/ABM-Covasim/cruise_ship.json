@@ -24,11 +24,11 @@
 
                 ],
                 [
-                    {"gromet_type":"SourceCodeCollection","name":"","global_reference_id":"","files":[{"gromet_type":"CodeFileReference","uid":"dfd0b3f7-a426-9755-a5e7-9f3e5f64f4d4","name":"cruise_ship.py","path":""}],"is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2024-03-20 18:56:38.613319"}},
-                    {"gromet_type":"GrometCreation","gromet_version":"0.1.9","is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2024-03-20 18:56:38.613269"}}
+                    {"gromet_type":"SourceCodeCollection","name":"","global_reference_id":"","files":[{"gromet_type":"CodeFileReference","uid":"0e06b686-cabd-27da-4efd-9bdfbc1d469e","name":"cruise_ship.py","path":""}],"is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2024-03-25 15:30:38.226410"}},
+                    {"gromet_type":"GrometCreation","gromet_version":"0.1.9","is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2024-03-25 15:30:38.226358"}}
                 ],
                 [
-                    {"gromet_type":"SourceCodeReference","code_file_reference_uid":"dfd0b3f7-a426-9755-a5e7-9f3e5f64f4d4","line_begin":1,"line_end":7,"is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2024-03-20 18:56:38.613353"}}
+                    {"gromet_type":"SourceCodeReference","code_file_reference_uid":"0e06b686-cabd-27da-4efd-9bdfbc1d469e","line_begin":1,"line_end":7,"is_metadatum":true,"provenance":{"gromet_type":"Provenance","method":"skema_code2fn_program_analysis","timestamp":"2024-03-25 15:30:38.226449"}}
                 ]
             ],
             "gromet_type": "GrometFNModule",
@@ -39,6 +39,14 @@
         "cruise_ship.cruise_ship"
     ],
     "module_dependencies": [
+        {
+            "name": "model",
+            "source_reference": {
+                "type": "Local",
+                "value": "/tmp/tmpxmyyew4h/COmplexVID-19/model.py",
+                "gromet_type": "TypedValue"
+            }
+        },
         {
             "name": "covasim",
             "source_reference": {
@@ -52,14 +60,6 @@
             "source_reference": {
                 "type": "Url",
                 "value": "https://files.pythonhosted.org/packages/40/f1/083c2f2ee6066c39fbdc65d2b0b9669091244852edf8fc5b1399f051ca5b/parameters-0.2.1.tar.gz",
-                "gromet_type": "TypedValue"
-            }
-        },
-        {
-            "name": "model",
-            "source_reference": {
-                "type": "Local",
-                "value": "/tmp/tmphbpye1go/COmplexVID-19/model.py",
                 "gromet_type": "TypedValue"
             }
         }
