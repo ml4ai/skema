@@ -194,7 +194,7 @@ pub fn subtract(input: Span) -> IResult<Operator> {
 }
 
 pub fn multiply(input: Span) -> IResult<Operator> {
-    let (s, op) = value(Operator::Multiply, alt((ws(tag("*")), ws(tag("&#x2217;")))))(input)?;
+    let (s, op) = value(Operator::Multiply, alt((ws(tag("*")), ws(tag("&#x2217;")), ws(tag("∗")))))(input)?;
     Ok((s, op))
 }
 
