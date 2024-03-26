@@ -646,6 +646,13 @@
 <a href="#644" id="644">644</a>
 <a href="#645" id="645">645</a>
 <a href="#646" id="646">646</a>
+<a href="#647" id="647">647</a>
+<a href="#648" id="648">648</a>
+<a href="#649" id="649">649</a>
+<a href="#650" id="650">650</a>
+<a href="#651" id="651">651</a>
+<a href="#652" id="652">652</a>
+<a href="#653" id="653">653</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::ast::{
     operator::Operator,
     Math, MathExpression,
@@ -842,7 +849,10 @@
 }
 
 <span class="kw">pub fn </span>multiply(input: Span) -&gt; IResult&lt;Operator&gt; {
-    <span class="kw">let </span>(s, op) = value(Operator::Multiply, alt((ws(tag(<span class="string">"*"</span>)), ws(tag(<span class="string">"&amp;#x2217;"</span>)), ws(tag(<span class="string">"∗"</span>)))))(input)<span class="question-mark">?</span>;
+    <span class="kw">let </span>(s, op) = value(
+        Operator::Multiply,
+        alt((ws(tag(<span class="string">"*"</span>)), ws(tag(<span class="string">"&amp;#x2217;"</span>)), ws(tag(<span class="string">"∗"</span>)))),
+    )(input)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((s, op))
 }
 
@@ -884,8 +894,13 @@
     <span class="prelude-val">Ok</span>((s, op))
 }
 
-<span class="kw">pub fn </span>vector(input: Span) -&gt; IResult&lt;Operator&gt; {
-    <span class="kw">let </span>(s, op) = value(Operator::Vector, alt((ws(tag(<span class="string">"→"</span>)), ws(tag(<span class="string">"&amp;#x2192;"</span>)))))(input)<span class="question-mark">?</span>;
+<span class="kw">pub fn </span>minimum(input: Span) -&gt; IResult&lt;Operator&gt; {
+    <span class="kw">let </span>(s, _x) = ws(delimited(<span class="macro">stag!</span>(<span class="string">"mi"</span>), ws(tag(<span class="string">"min"</span>)), <span class="macro">etag!</span>(<span class="string">"mi"</span>)))(input)<span class="question-mark">?</span>;
+    <span class="kw">let </span>(s, _op) = ws(alt((
+        delimited(<span class="macro">stag!</span>(<span class="string">"mo"</span>), ws(tag(<span class="string">"\u{2061}"</span>)), <span class="macro">etag!</span>(<span class="string">"mo"</span>)),
+        tag(<span class="string">""</span>),
+    )))(s)<span class="question-mark">?</span>;
+    <span class="kw">let </span>op = Operator::Min;
     <span class="prelude-val">Ok</span>((s, op))
 }
 
@@ -907,7 +922,6 @@
         divide,
         dot,
         cross,
-        vector,
         operator_other,
     ))(input)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((s, op))

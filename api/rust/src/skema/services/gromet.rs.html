@@ -471,6 +471,12 @@
 <a href="#469" id="469">469</a>
 <a href="#470" id="470">470</a>
 <a href="#471" id="471">471</a>
+<a href="#472" id="472">472</a>
+<a href="#473" id="473">473</a>
+<a href="#474" id="474">474</a>
+<a href="#475" id="475">475</a>
+<a href="#476" id="476">476</a>
+<a href="#477" id="477">477</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! REST API endpoints related to CRUD operations and other queries on GroMEt objects.
 </span><span class="kw">use </span><span class="kw">crate</span>::config::Config;
 <span class="kw">use </span><span class="kw">crate</span>::database::{parse_gromet_queries, run_queries};
@@ -841,18 +847,21 @@
             </span>r#type: <span class="prelude-val">Some</span>(ast::Type::Real),
             content: Box::new(mathml::ast::MathExpression::Mi(lhs_mi1)),
             func_of: <span class="prelude-val">None</span>,
+            notation: <span class="prelude-val">None</span>,
         };
         <span class="kw">let </span>lhs_ci2 = mathml::ast::Ci {
             <span class="comment">// differentiation variable
             </span>r#type: <span class="prelude-val">Some</span>(ast::Type::Real),
             content: Box::new(mathml::ast::MathExpression::Mi(lhs_mi2)),
             func_of: <span class="prelude-val">None</span>,
+            notation: <span class="prelude-val">None</span>,
         };
         <span class="kw">let </span>lhs_ci3 = mathml::ast::Ci {
             <span class="comment">// state function
             </span>r#type: <span class="prelude-val">Some</span>(ast::Type::Function),
             content: Box::new(mathml::ast::MathExpression::Mi(lhs_mi3)),
             func_of: <span class="prelude-val">Some</span>([lhs_ci1].to_vec()),
+            notation: <span class="prelude-val">None</span>,
         };
         <span class="kw">let </span>lhs_deriv = mathml::ast::operator::Derivative {
             order: <span class="number">1</span>,
@@ -911,18 +920,21 @@
             </span>r#type: <span class="prelude-val">Some</span>(ast::Type::Real),
             content: Box::new(mathml::ast::MathExpression::Mi(lhs_mi1)),
             func_of: <span class="prelude-val">None</span>,
+            notation: <span class="prelude-val">None</span>,
         };
         <span class="kw">let </span>lhs_ci2 = mathml::ast::Ci {
             <span class="comment">// differentiation variable
             </span>r#type: <span class="prelude-val">Some</span>(ast::Type::Real),
             content: Box::new(mathml::ast::MathExpression::Mi(lhs_mi2)),
             func_of: <span class="prelude-val">None</span>,
+            notation: <span class="prelude-val">None</span>,
         };
         <span class="kw">let </span>lhs_ci3 = mathml::ast::Ci {
             <span class="comment">// state function
             </span>r#type: <span class="prelude-val">Some</span>(ast::Type::Function),
             content: Box::new(mathml::ast::MathExpression::Mi(lhs_mi3)),
             func_of: <span class="prelude-val">Some</span>([lhs_ci1].to_vec()),
+            notation: <span class="prelude-val">None</span>,
         };
         <span class="kw">let </span>lhs_deriv = mathml::ast::operator::Derivative {
             order: <span class="number">1</span>,

@@ -291,6 +291,38 @@
 <a href="#289" id="289">289</a>
 <a href="#290" id="290">290</a>
 <a href="#291" id="291">291</a>
+<a href="#292" id="292">292</a>
+<a href="#293" id="293">293</a>
+<a href="#294" id="294">294</a>
+<a href="#295" id="295">295</a>
+<a href="#296" id="296">296</a>
+<a href="#297" id="297">297</a>
+<a href="#298" id="298">298</a>
+<a href="#299" id="299">299</a>
+<a href="#300" id="300">300</a>
+<a href="#301" id="301">301</a>
+<a href="#302" id="302">302</a>
+<a href="#303" id="303">303</a>
+<a href="#304" id="304">304</a>
+<a href="#305" id="305">305</a>
+<a href="#306" id="306">306</a>
+<a href="#307" id="307">307</a>
+<a href="#308" id="308">308</a>
+<a href="#309" id="309">309</a>
+<a href="#310" id="310">310</a>
+<a href="#311" id="311">311</a>
+<a href="#312" id="312">312</a>
+<a href="#313" id="313">313</a>
+<a href="#314" id="314">314</a>
+<a href="#315" id="315">315</a>
+<a href="#316" id="316">316</a>
+<a href="#317" id="317">317</a>
+<a href="#318" id="318">318</a>
+<a href="#319" id="319">319</a>
+<a href="#320" id="320">320</a>
+<a href="#321" id="321">321</a>
+<a href="#322" id="322">322</a>
+<a href="#323" id="323">323</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::ast::Ci;
 <span class="kw">use </span><span class="kw">crate</span>::ast::MathExpression;
 <span class="kw">use </span>derive_new::new;
@@ -327,6 +359,28 @@
     </span>DNotation,
     <span class="doccomment">/// prime notation, e.g. f'
     </span>Lagrange,
+}
+
+<span class="attr">#[derive(
+    Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, JsonSchema,
+)]
+</span><span class="kw">pub struct </span>Logarithm {
+    <span class="kw">pub </span>notation: LogarithmNotation,
+    <span class="comment">//pub is_natural_log: bool,
+    //pub base: Option&lt;Box&lt;MathExpression&gt;&gt;,
+</span>}
+
+<span class="doccomment">/// Varying logarithm notation
+</span><span class="attr">#[derive(
+    Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, JsonSchema,
+)]
+</span><span class="kw">pub enum </span>LogarithmNotation {
+    <span class="doccomment">/// e.g. ln
+    </span>Ln,
+    <span class="doccomment">/// e.g log
+    </span>Log,
+    <span class="doccomment">/// e.g. log with base
+    </span>LogBase(Box&lt;MathExpression&gt;),
 }
 
 <span class="doccomment">/// Summation operator has the option of having lower bound and upper bound components
@@ -436,9 +490,9 @@
     </span>Subtract,
     <span class="doccomment">/// Square root operator
     </span>Sqrt,
-    <span class="doccomment">/// Left parenthesis
+    <span class="doccomment">/// Left parenthesis; only for internal use (Pratt parsing)
     </span>Lparen,
-    <span class="doccomment">/// Right parenthesis
+    <span class="doccomment">/// Right parenthesis; only for internal use (Pratt parsing)
     </span>Rparen,
     <span class="doccomment">/// Composition operator
     </span>Compose,
@@ -496,8 +550,12 @@
     </span>Laplacian,
     <span class="doccomment">/// Closed surface integral operator --need to include explit dS integration variable when translating to latex
     </span>SurfaceInt,
-    <span class="doccomment">/// Vector operator
-    </span>Vector,
+    <span class="doccomment">/// only for internal use
+    </span>Comma,
+    <span class="doccomment">/// Logarithm operator
+    </span>Logarithm(Logarithm),
+    <span class="doccomment">/// Minimum operator
+    </span>Min,
     <span class="comment">// Catchall for operators we haven't explicitly defined as enum variants yet.
     </span>Other(String),
 }
@@ -544,7 +602,6 @@
             Operator::Arccsc =&gt; <span class="macro">write!</span>(f, <span class="string">"Arccsc"</span>),
             Operator::Arccot =&gt; <span class="macro">write!</span>(f, <span class="string">"Arccot"</span>),
             Operator::Mean =&gt; <span class="macro">write!</span>(f, <span class="string">"Mean"</span>),
-            Operator::Vector =&gt; <span class="macro">write!</span>(f, <span class="string">"Vec"</span>),
             Operator::Gradient(Gradient { subscript }) =&gt; <span class="kw">match </span>subscript {
                 <span class="prelude-val">Some</span>(sub) =&gt; <span class="macro">write!</span>(f, <span class="string">"Grad_{sub}"</span>),
                 <span class="prelude-val">None </span>=&gt; <span class="macro">write!</span>(f, <span class="string">"Grad"</span>),
@@ -579,6 +636,13 @@
             Operator::SurfaceInt =&gt; {
                 <span class="macro">write!</span>(f, <span class="string">"SurfaceInt"</span>)
             }
+            Operator::Min =&gt; <span class="macro">write!</span>(f, <span class="string">"Min"</span>),
+            Operator::Comma =&gt; <span class="macro">write!</span>(f, <span class="string">","</span>),
+            Operator::Logarithm(Logarithm { notation }) =&gt; <span class="kw">match </span>notation {
+                LogarithmNotation::Ln =&gt; <span class="macro">write!</span>(f, <span class="string">"Ln"</span>),
+                LogarithmNotation::Log =&gt; <span class="macro">write!</span>(f, <span class="string">"Log"</span>),
+                LogarithmNotation::LogBase(x) =&gt; <span class="macro">write!</span>(f, <span class="string">"Log_{{{x}}}"</span>),
+            },
         }
     }
 }
