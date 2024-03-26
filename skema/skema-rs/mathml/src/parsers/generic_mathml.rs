@@ -4,7 +4,7 @@ use crate::ast::{
     MathExpression::{
         Mfrac, Mn, Mo, MoLine, Mover, Mspace, Msqrt, Mstyle, Msub, Msubsup, Msup, Mtext, Munder,
     },
-    Mi, Mrow, Mtr,
+    Mi, Mrow,
 };
 
 use nom::{
@@ -194,7 +194,10 @@ pub fn subtract(input: Span) -> IResult<Operator> {
 }
 
 pub fn multiply(input: Span) -> IResult<Operator> {
-    let (s, op) = value(Operator::Multiply, alt((ws(tag("*")), ws(tag("&#x2217;")), ws(tag("∗")))))(input)?;
+    let (s, op) = value(
+        Operator::Multiply,
+        alt((ws(tag("*")), ws(tag("&#x2217;")), ws(tag("∗")))),
+    )(input)?;
     Ok((s, op))
 }
 

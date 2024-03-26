@@ -3800,3 +3800,34 @@ fn test_msup_with_perp() {
     assert_eq!(s_exp, "(^ u ⊥)");
     assert_eq!(exp.to_latex(), "u^{⊥}");
 }
+
+#[test]
+fn test_msubsup_msub_content() {
+    let input = "<math>
+    <msubsup>
+    <mi>β</mi>
+    <mrow>
+      <mi>c</mi>
+      <mi>W</mi>
+    </mrow>
+    <mrow>
+      <mi>A</mi>
+      <mi>e</mi>
+      <mi>r</mi>
+      <mi>o</mi>
+    </mrow>
+    </msubsup>
+    <mo>+</mo>
+    <msub>
+    <mi>A</mi>
+    <mi>n</mi>
+    </msub>
+    </math>";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", exp);
+    let s_exp = exp.to_string();
+    let content = exp.to_cmml();
+    println!("content={:?}", content);
+    assert_eq!(s_exp, "(+ β_{cW}^{Aero} A_{n})");
+    assert_eq!(exp.to_latex(), "\\beta_{cW}^{Aero}+A_{n}");
+}

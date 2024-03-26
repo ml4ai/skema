@@ -11,7 +11,7 @@ use crate::{
             Operator, Summation,
         },
         Ci, Differential, ExpMath, HatComp, Integral, LaplacianComp, Math, MathExpression, Mi,
-        Mrow, Mtd, Mtr, SummationMath, Type, VectorNotation,
+        Mrow, SummationMath, Type, VectorNotation,
     },
     parsers::generic_mathml::{
         add, attribute, cross, divide, dot, elem_many0, equals, etag, lparen, mean, mi, mn, msub,
@@ -1626,57 +1626,19 @@ pub fn natural_log(input: Span) -> IResult<Operator> {
     Ok((s, operator))
 }
 
-/// Elements in Rows in table
-/*pub fn mtd(input: Span) -> IResult<Mtd> {
-    println!("<");
-    let (s, elements) = ws(delimited(
-        stag!("mtd"),
-        many0(math_expression),
-        etag!("mtd"),
-    ))(input)?;
-    println!("<<");
-    Ok((s, Mtd::new(elements)))
-}*/
+/// Msubsup to content indentifiers
+pub fn msubsubsup_to_content(input: Span) -> IResult<MathExpression> {
+    let (s, x) = ws(msubsup)(input)?;
+    let ci = Ci::new(Some(Type::Real), Box::new(x), None, None);
+    Ok((s, MathExpression::Ci(ci)))
+}
 
-/// Elements in Rows in table
-/*pub fn mtd_no_vector(input: Span) -> IResult<Mtd> {
-    println!("<");
-    let mut vec_exp: Vec<MathExpression> = Vec::new();
-    let (s, elements) = ws(delimited(
-        stag!("mtd"),
-        math_expression,
-        etag!("mtd"),
-    ))(input)?;
-    vec_exp.push(elements);
-    println!("<<");
-    Ok((s, Mtd::new(vec_exp)))
-}*/
-
-/// Rows in table
-/*pub fn mtr(input: Span) -> IResult<Mtr> {
-    println!(".");
-    let (s, elements) = ws(delimited(
-        stag!("mtr"),
-        many0(alt((mtd_no_vector,mtd))),
-        etag!("mtr"),
-    ))(input)?;
-    println!("..");
-    let row = Mtr(elements);
-    Ok((s, row))
-}*/
-
-/// Mtable
-/*pub fn mtable(input: Span) -> IResult<MathExpression> {
-    println!("-");
-    let (s, mtr) = ws(delimited(
-        stag!("mtable"),
-        many0(mtr),
-        etag!("mtable"),
-    ))(input)?;
-    println!("--");
-    Ok((s, MathExpression::Mtable(mtr)))
-    let row = Mtr(elements);
-}*/
+/// Msub to content indentifiers
+pub fn msub_to_content(input: Span) -> IResult<MathExpression> {
+    let (s, x) = ws(msub)(input)?;
+    let ci = Ci::new(Some(Type::Real), Box::new(x), None, None);
+    Ok((s, MathExpression::Ci(ci)))
+}
 
 /// Parser for math expressions. This varies from the one in the generic_mathml module, since it
 /// assumes that expressions such as S(t) are actually univariate functions.
@@ -2143,14 +2105,15 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
             map(operator, MathExpression::Mo),
             map(gradient, MathExpression::Mo),
             mn,
-            msub,
+            msub_to_content,
             superscript,
             mfrac,
             mtext,
             over_term,
         )),
         map(mrow, MathExpression::Mrow),
-        msubsup,
+        msubsubsup_to_content,
+        //msubsup,
     )))(input)
 }
 

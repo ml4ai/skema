@@ -120,46 +120,6 @@ pub struct LaplacianComp {
     pub comp: Ci,
 }
 
-/// Handles elements in row in table or matrix (`Mtr`) for `Mtable`
-#[derive(
-    Debug,
-    Ord,
-    PartialOrd,
-    PartialEq,
-    Eq,
-    Clone,
-    Hash,
-    new,
-    Deserialize,
-    Serialize,
-    ToSchema,
-    JsonSchema,
-)]
-pub struct Mtd(
-    /// Entry in table or matrix
-    pub Vec<MathExpression>,
-);
-
-/// Handles table or matrix (`Mtr`) for `Mtable`
-#[derive(
-    Debug,
-    Ord,
-    PartialOrd,
-    PartialEq,
-    Eq,
-    Clone,
-    Hash,
-    new,
-    Deserialize,
-    Serialize,
-    ToSchema,
-    JsonSchema,
-)]
-pub struct Mtr(
-    /// Entry in table or matrix
-    Vec<Mtd>,
-);
-
 /// Handles ↓  such that {comp}↓_{sub}^{sup} can parse
 #[derive(
     Debug,
@@ -244,7 +204,6 @@ pub enum MathExpression {
     DownArrow(DownArrow),
     Minimize(Box<MathExpression>, Vec<MathExpression>),
     ExpMath(ExpMath),
-    Mtable(Vec<Mtr>),
     #[default]
     None,
 }
@@ -327,12 +286,6 @@ impl fmt::Display for MathExpression {
                 }
                 Ok(())
             }
-            /*MathExpression::Mtable(Mtr(mtd)) => {
-                for elements in mtd {
-                    write!(f, "{:?}", elements)?;
-                }
-                Ok(())
-            }*/
             expression => write!(f, "{expression:?}"),
         }
     }
