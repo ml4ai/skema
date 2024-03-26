@@ -408,7 +408,7 @@ def integrated_extractions(
 )
 async def integrated_text_extractions(
         response: Response,
-        texts: TextReadingInputDocuments,
+        inputs: TextReadingInputDocuments,
         annotate_skema: bool = True,
         annotate_mit: bool = True,
 ) -> TextReadingAnnotationsOutput:
@@ -428,10 +428,12 @@ async def integrated_text_extractions(
     ```
     """
     # Get the input plain texts
-    texts = texts.texts
+    texts = inputs.texts
+
+    amrs = inputs.amrs
 
     # Run the text extractors
-    return integrated_extractions(
+    extractions = integrated_extractions(
         response,
         annotate_text_with_skema,
         texts,
@@ -439,6 +441,31 @@ async def integrated_text_extractions(
         annotate_skema,
         annotate_mit
     )
+
+    # Do the alignment
+    aligned_amrs = list()
+    if len(amrs) > 0:
+        # Build an UploadFile instance from the extractions
+        json_extractions = extractions.model_dump_json()
+        extractions_ufile = UploadFile(file=io.BytesIO(json_extractions.encode('utf-8')))
+        for amr in amrs:
+            # amr = json.loads(amr)
+            amr_ufile = UploadFile(file=io.BytesIO(amr.encode('utf-8')))
+            try:
+                aligned_amr = metal_proxy.link_amr(
+                    amr_file=amr_ufile,
+                    text_extractions_file=extractions_ufile)
+                aligned_amrs.append(aligned_amr)
+            except Exception as e:
+                error = TextReadingError(pipeline="AMR Linker", message=f"Error annotating {amr.filename}: {e}")
+                if extractions.generalized_errors is None:
+                    extractions.generalized_errors = [error]
+                else:
+                    extractions.generalized_errors.append(error)
+
+    extractions.aligned_amrs = aligned_amrs
+
+    return extractions
 
 
 @router.post(
