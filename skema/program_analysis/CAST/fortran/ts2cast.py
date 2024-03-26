@@ -277,13 +277,7 @@ class TS2CAST(object):
                 func_args.append(self.visit(parameter))
 
         # The first child of function will be the function statement, the rest will be body nodes
-        body = []
-        for body_node in node.children[1:]:
-            child_cast = self.visit(body_node)
-            if isinstance(child_cast, List):
-                body.extend(child_cast)
-            elif isinstance(child_cast, AstNode):
-                body.append(child_cast)
+        body = self.generate_cast_body(node.children[1:-1])
 
         # After creating the body, we can go back and update the var nodes we created for the arguments
         # We do this by looking for intent,in nodes
@@ -1274,4 +1268,3 @@ class TS2CAST(object):
 
         # TODO: How to add more support for source references
         return body
-
