@@ -3831,3 +3831,52 @@ fn test_msubsup_msub_content() {
     assert_eq!(s_exp, "(+ β_{cW}^{Aero} A_{n})");
     assert_eq!(exp.to_latex(), "\\beta_{cW}^{Aero}+A_{n}");
 }
+
+#[test]
+fn test_new_eval_test() {
+    let input = "<math>
+    <mfrac><mrow><mi>d</mi><msub><mi>s</mi><mrow><mi>c</mi></mrow></msub></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac>
+    <mo>=</mo>
+    <mi>α</mi>
+    <mo>∗</mo>
+    <msub><mi>r</mi><mrow><mi>c</mi></mrow></msub>
+    <mo>−</mo>
+    <msub><mi>s</mi><mrow><mi>c</mi></mrow></msub><mo>∗</mo>
+    <mo>(</mo>
+    <msubsup><mi>β</mi><mrow><mi>c</mi><mi>c</mi></mrow><mrow><mi>D</mi><mi>c</mi></mrow></msubsup>
+    <mo>∗</mo>
+    <msub><mi>i</mi><mrow><mi>c</mi></mrow></msub>
+    <mo>+</mo>
+    <msubsup>
+    <mi>β</mi>
+    <mrow><mi>c</mi><mi>c</mi></mrow>
+    <mrow><mi>A</mi><mi>e</mi><mi>r</mi><mi>o</mi></mrow>
+    </msubsup>
+    <mo>∗</mo>
+    <msub><mi>i</mi><mrow><mi>c</mi></mrow></msub>
+    <mo>+</mo>
+    <msubsup>
+    <mi>β</mi>
+    <mrow><mi>c</mi><mi>W</mi></mrow>
+    <mrow><mi>A</mi><mi>e</mi><mi>r</mi><mi>o</mi></mrow>
+    </msubsup>
+    <mo>∗</mo>
+    <msub><mi>i</mi><mrow><mi>W</mi></mrow></msub>
+    <mo>+</mo>
+    <msubsup><mi>β</mi><mrow><mi>c</mi><mi>W</mi></mrow><mrow><mi>D</mi><mi>c</mi></mrow></msubsup>
+    <mo>∗</mo>
+    <msub><mi>i</mi><mrow><mi>W</mi></mrow></msub>
+    <mo>+</mo>
+    <msubsup><mi>β</mi><mrow><mi>H</mi><mi>c</mi></mrow><mrow><mi>A</mi><mi>e</mi><mi>r</mi><mi>o</mi></mrow></msubsup>
+    <mo>∗</mo>
+    <msub><mi>i</mi><mrow><mi>H</mi></mrow></msub>
+    <mo>)</mo>
+    </math>";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", exp);
+    let s_exp = exp.to_string();
+    let content = exp.to_cmml();
+    println!("content={:?}", content);
+    assert_eq!(s_exp, "(= (D(1, t) s_{c}) (- (* α r_{c}) (* s_{c} (+ (+ (+ (+ (* β_{cc}^{Dc} i_{c}) (* β_{cc}^{Aero} i_{c})) (* β_{cW}^{Aero} i_{W})) (* β_{cW}^{Dc} i_{W})) (* β_{Hc}^{Aero} i_{H})))))");
+    assert_eq!(exp.to_latex(), "\\frac{d s_{c}}{dt}=\\alpha*r_{c}-s_{c}*(\\beta_{cc}^{Dc}*i_{c}+\\beta_{cc}^{Aero}*i_{c}+\\beta_{cW}^{Aero}*i_{W}+\\beta_{cW}^{Dc}*i_{W}+\\beta_{Hc}^{Aero}*i_{H})");
+}
