@@ -67,6 +67,7 @@ pub fn recognize_leibniz_differential_operator<'a>(
                     Some(Type::Real),
                     Box::new(MathExpression::Mi(Mi(denom_var.trim().to_string()))),
                     None,
+                    None,
                 ),
                 DerivativeNotation::LeibnizTotal,
             )),
@@ -80,6 +81,7 @@ pub fn recognize_leibniz_differential_operator<'a>(
                 Ci::new(
                     Some(Type::Real),
                     Box::new(MathExpression::Mi(Mi(denom_var.trim().to_string()))),
+                    None,
                     None,
                 ),
                 DerivativeNotation::LeibnizPartialStandard,

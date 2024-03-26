@@ -1,4 +1,4 @@
-use crate::ast::operator::Operator::{Add, Divide, Multiply, Subtract, Power};
+use crate::ast::operator::Operator::{Add, Divide, Multiply, Power, Subtract};
 use crate::parsers::math_expression_tree::MathExpressionTree::Atom;
 use crate::parsers::math_expression_tree::MathExpressionTree::Cons;
 use crate::{
@@ -10,8 +10,11 @@ use crate::{
         generic_mathml::{attribute, equals, etag, stag, ws, IResult, Span},
         interpreted_mathml::{
             ci_univariate_with_bounds, ci_univariate_without_bounds, ci_unknown_with_bounds,
-            ci_unknown_without_bounds, first_order_derivative_leibniz_notation, math_expression,
-            newtonian_derivative, operator, first_order_partial_derivative_leibniz_notation, first_order_partial_derivative_partial_func, first_order_dderivative_leibniz_notation
+            ci_unknown_without_bounds, first_order_dderivative_leibniz_notation,
+            first_order_derivative_leibniz_notation,
+            first_order_partial_derivative_leibniz_notation,
+            first_order_partial_derivative_partial_func, math_expression, newtonian_derivative,
+            operator,
         },
         math_expression_tree::MathExpressionTree,
     },
@@ -58,7 +61,10 @@ pub fn first_order_ode(input: Span) -> IResult<FirstOrderODE> {
     // Recognize LHS derivative
     let (s, (derivative, ci)) = alt((
         first_order_derivative_leibniz_notation,
-        newtonian_derivative, first_order_partial_derivative_leibniz_notation, first_order_partial_derivative_partial_func, first_order_dderivative_leibniz_notation
+        newtonian_derivative,
+        first_order_partial_derivative_leibniz_notation,
+        first_order_partial_derivative_partial_func,
+        first_order_dderivative_leibniz_notation,
     ))(s)?;
     //let ci = binding.content;
     //let parenthesized = ci.func_of.clone();
@@ -89,6 +95,7 @@ pub fn first_order_ode(input: Span) -> IResult<FirstOrderODE> {
                     r#type: Some(Type::Function),
                     content,
                     func_of,
+                    notation: None,
                 })
             },
         ),
@@ -98,6 +105,7 @@ pub fn first_order_ode(input: Span) -> IResult<FirstOrderODE> {
                 r#type: Some(Type::Function),
                 content,
                 func_of: None,
+                notation: None,
             })
         }),
         map(
@@ -109,6 +117,7 @@ pub fn first_order_ode(input: Span) -> IResult<FirstOrderODE> {
                     r#type: Some(Type::Function),
                     content,
                     func_of,
+                    notation: None,
                 })
             },
         ),
@@ -281,7 +290,7 @@ pub fn get_term_power(sys_states: Vec<String>, eq: Vec<MathExpressionTree>) -> P
     let mut exp_states = Vec::<String>::new();
     let mut polarity = true;
     let mut power = 0;
-    // assume power arguments are only length 2. 
+    // assume power arguments are only length 2.
     power = eq[1].to_string().parse::<i32>().unwrap();
 
     // this walks the tree and composes a vector of all variable and polarity changes
@@ -341,7 +350,7 @@ pub fn get_term_power(sys_states: Vec<String>, eq: Vec<MathExpressionTree>) -> P
                 } else {
                     variables.push(x.to_string());
                 }
-            },
+            }
         }
     }
 
@@ -850,7 +859,7 @@ pub fn get_terms_mult(sys_states: Vec<String>, eq: Vec<MathExpressionTree>) -> P
         if let Cons(x1, y1) = arg {
             if *x1 != Power && *x1 != Divide && !(*x1 == Subtract && y1.len() == 1) {
                 distribution = true;
-            } 
+            }
         }
     }
 
@@ -1186,7 +1195,9 @@ fn test_ci_univariate_func() {
                 Some(Type::Real),
                 Box::new(MathExpression::Mi(Mi("t".to_string()))),
                 None,
+                None,
             )]),
+            None,
         ),
     );
 }
@@ -1203,7 +1214,9 @@ fn test_ci_univariate_func2() {
                 Some(Type::Real),
                 Box::new(MathExpression::Mi(Mi("t".to_string()))),
                 None,
+                None,
             )]),
+            None,
         ),
     );
 }
@@ -1224,6 +1237,7 @@ fn test_first_order_derivative_leibniz_notation_with_implicit_time_dependence() 
                     Some(Type::Real),
                     Box::new(MathExpression::Mi(Mi("t".to_string()))),
                     None,
+                    None,
                 ),
                 DerivativeNotation::LeibnizTotal,
             ),
@@ -1235,7 +1249,9 @@ fn test_first_order_derivative_leibniz_notation_with_implicit_time_dependence() 
                     Some(Type::Real),
                     Box::new(MathExpression::Mi(Mi("".to_string()))),
                     None,
+                    None,
                 )]),
+                None,
             ),
         ),
     );
@@ -1257,6 +1273,7 @@ fn test_first_order_derivative_leibniz_notation_with_explicit_time_dependence() 
                     Some(Type::Real),
                     Box::new(MathExpression::Mi(Mi("t".to_string()))),
                     None,
+                    None,
                 ),
                 DerivativeNotation::LeibnizTotal,
             ),
@@ -1267,7 +1284,9 @@ fn test_first_order_derivative_leibniz_notation_with_explicit_time_dependence() 
                     Some(Type::Real),
                     Box::new(MathExpression::Mi(Mi("t".to_string()))),
                     None,
+                    None,
                 )]),
+                None,
             ),
         ),
     );
@@ -1340,6 +1359,7 @@ fn test_msub_derivative() {
                     Some(Type::Real),
                     Box::new(MathExpression::Mi(Mi("t".to_string()))),
                     None,
+                    None,
                 ),
                 DerivativeNotation::LeibnizTotal,
             ),
@@ -1353,7 +1373,9 @@ fn test_msub_derivative() {
                     Some(Type::Real),
                     Box::new(MathExpression::Mi(Mi("".to_string()))),
                     None,
+                    None,
                 )]),
+                None,
             ),
         ),
     );
