@@ -181,6 +181,7 @@ pub async fn get_gamr(payload: web::Json<Vec<String>>) -> HttpResponse {
         .iter()
         .map(|x| x.parse::<MathExpressionTree>().unwrap())
         .collect();
+    println!("_|_|_|_|_|_|_|_|_|_\nInitial Conversion to MET MET: {:?}\n_|_|_|_|_|_|_|_|_|_|_|_|_", met_vec.clone());
     HttpResponse::Ok().json(web::Json(GeneralizedAMR::from(met_vec)))
 }
 
