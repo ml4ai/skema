@@ -946,6 +946,18 @@ impl From<Vec<FirstOrderODE>> for PetriNet {
         parameter_vec.sort();
         parameter_vec.dedup();
 
+        // now to trim the numbers from the parameters field
+        let mut nums = Vec::<usize>::new();
+        for (k, param) in parameter_vec.iter().enumerate() {
+            if param.id.parse::<f32>().is_ok() {
+                nums.push(k);
+            }
+        }
+
+        for num in nums.iter().rev() {
+            parameter_vec.remove(num.clone());
+        }
+
         // construct the PetriNet
         let ode = Ode {
             rates: Some(rate_vec),
