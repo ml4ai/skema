@@ -846,18 +846,47 @@ impl From<Vec<FirstOrderODE>> for PetriNet {
                 transitions_vec.insert(transitions.clone());
 
                 let mut expression_string = "".to_string();
-
-                for param in t.0.parameters.clone().iter() {
-                    expression_string = format!("{}{}*", expression_string.clone(), param.clone());
-                }
-
-                let exp_len = t.0.exp_states.len();
-                for (i, exp) in t.0.exp_states.clone().iter().enumerate() {
-                    if i != exp_len - 1 {
+                // check for division
+                if t.0.expression.contains("divide") {
+                    // split on the divide, take the post div part, split on the apply
+                    // first entry on the apply split are div arguments
+                    let v: Vec<&str> = t.0.expression.split_terminator("<divide/>").collect();
+                    println!("v: {:?}", v.clone());
+                    let v2: Vec<&str> = v[1].split_terminator("</apply>").collect();
+                    println!("v2: {:?}", v2.clone());
+                    // now to split on the <ci></ci>
+                    let v3: Vec<&str> = v2[0].split_terminator("<ci>").collect();
+                    println!("v3: {:?}", v3.clone());
+                    let temp_str = format!("{}{}", v3[1], v3[2]);
+                    let v4: Vec<&str> = temp_str.split_terminator("</ci>").collect();
+                    println!("v4: {:?}", v4.clone());
+                    expression_string = format!("{}/{}", v4[0],v4[1]);
+                    for param in t.0.parameters.clone().iter() {
+                        if param != v4[0] && param != v4[1] {
+                            expression_string = format!("{}*{}", expression_string.clone(), param.clone());
+                        }
+                    }
+                    for (i, exp) in t.0.exp_states.clone().iter().enumerate() {
+                        if exp != v4[0] && exp != v4[1] {
+                            expression_string = format!("{}*{}", expression_string.clone(), exp.clone());
+                        }
+                    }
+                } else {
+                    for param in t.0.parameters.clone().iter() {
                         expression_string =
-                            format!("{}{}*", expression_string.clone(), exp.clone());
-                    } else {
-                        expression_string = format!("{}{}", expression_string.clone(), exp.clone());
+                            format!("{}{}*", expression_string.clone(), param.clone());
+                    }
+                    if !t.0.exp_states.is_empty() {
+                        let exp_len = t.0.exp_states.len() - 1;
+                        for (i, exp) in t.0.exp_states.clone().iter().enumerate() {
+                            if i != exp_len {
+                                expression_string =
+                                    format!("{}{}*", expression_string.clone(), exp.clone());
+                            } else {
+                                expression_string =
+                                    format!("{}{}", expression_string.clone(), exp.clone());
+                            }
+                        }
                     }
                 }
 
@@ -888,20 +917,48 @@ impl From<Vec<FirstOrderODE>> for PetriNet {
 
                 let mut expression_string = "".to_string();
 
-                for param in t.0.parameters.clone().iter() {
-                    expression_string = format!("{}{}*", expression_string.clone(), param.clone());
-                }
-
-                let exp_len = t.0.exp_states.len() - 1;
-                for (i, exp) in t.0.exp_states.clone().iter().enumerate() {
-                    if i != exp_len {
+                if t.0.expression.contains("divide") {
+                    // split on the divide, take the post div part, split on the apply
+                    // first entry on the apply split are div arguments
+                    let v: Vec<&str> = t.0.expression.split_terminator("<divide/>").collect();
+                    println!("v: {:?}", v.clone());
+                    let v2: Vec<&str> = v[1].split_terminator("</apply>").collect();
+                    println!("v2: {:?}", v2.clone());
+                    // now to split on the <ci></ci>
+                    let v3: Vec<&str> = v2[0].split_terminator("<ci>").collect();
+                    println!("v3: {:?}", v3.clone());
+                    let temp_str = format!("{}{}", v3[1], v3[2]);
+                    let v4: Vec<&str> = temp_str.split_terminator("</ci>").collect();
+                    println!("v4: {:?}", v4.clone());
+                    expression_string = format!("{}/{}", v4[0],v4[1]);
+                    for param in t.0.parameters.clone().iter() {
+                        if param != v4[0] && param != v4[1] {
+                            expression_string = format!("{}*{}", expression_string.clone(), param.clone());
+                        }
+                    }
+                    for (i, exp) in t.0.exp_states.clone().iter().enumerate() {
+                        if exp != v4[0] && exp != v4[1] {
+                            expression_string = format!("{}*{}", expression_string.clone(), exp.clone());
+                        }
+                    }
+                } else {
+                    for param in t.0.parameters.clone().iter() {
                         expression_string =
-                            format!("{}{}*", expression_string.clone(), exp.clone());
-                    } else {
-                        expression_string = format!("{}{}", expression_string.clone(), exp.clone());
+                            format!("{}{}*", expression_string.clone(), param.clone());
+                    }
+                    if !t.0.exp_states.is_empty() {
+                        let exp_len = t.0.exp_states.len() - 1;
+                        for (i, exp) in t.0.exp_states.clone().iter().enumerate() {
+                            if i != exp_len {
+                                expression_string =
+                                    format!("{}{}*", expression_string.clone(), exp.clone());
+                            } else {
+                                expression_string =
+                                    format!("{}{}", expression_string.clone(), exp.clone());
+                            }
+                        }
                     }
                 }
-
                 let rate = Rate {
                     target: transitions.id.clone(),
                     expression: expression_string.clone(), // the second term needs to be the product of the inputs
@@ -944,22 +1001,48 @@ impl From<Vec<FirstOrderODE>> for PetriNet {
 
                     let mut expression_string = "".to_string();
 
-                    if !term.exp_states.is_empty() {
-                        let exp_len = term.exp_states.len() - 1;
-                        for (i, exp) in term.exp_states.clone().iter().enumerate() {
-                            if i != exp_len {
-                                expression_string =
-                                    format!("{}{}*", expression_string.clone(), exp.clone());
-                            } else {
-                                expression_string =
-                                    format!("{}{}", expression_string.clone(), exp.clone());
+                    if term.expression.contains("divide") {
+                        // split on the divide, take the post div part, split on the apply
+                        // first entry on the apply split are div arguments
+                        let v: Vec<&str> = term.expression.split_terminator("<divide/>").collect();
+                        println!("v: {:?}", v.clone());
+                        let v2: Vec<&str> = v[1].split_terminator("</apply>").collect();
+                        println!("v2: {:?}", v2.clone());
+                        // now to split on the <ci></ci>
+                        let v3: Vec<&str> = v2[0].split_terminator("<ci>").collect();
+                        println!("v3: {:?}", v3.clone());
+                        let temp_str = format!("{}{}", v3[1], v3[2]);
+                        let v4: Vec<&str> = temp_str.split_terminator("</ci>").collect();
+                        println!("v4: {:?}", v4.clone());
+                        expression_string = format!("{}/{}", v4[0],v4[1]);
+                        for param in term.parameters.clone().iter() {
+                            if param != v4[0] && param != v4[1] {
+                                expression_string = format!("{}*{}", expression_string.clone(), param.clone());
                             }
                         }
-                    }
-
-                    for param in term.parameters.clone().iter() {
-                        expression_string =
-                            format!("{}{}", expression_string.clone(), param.clone());
+                        for (i, exp) in term.exp_states.clone().iter().enumerate() {
+                            if exp != v4[0] && exp != v4[1] {
+                                expression_string = format!("{}*{}", expression_string.clone(), exp.clone());
+                            }
+                        }
+                    } else {
+                        for param in term.parameters.clone().iter() {
+                            expression_string =
+                                format!("{}{}*", expression_string.clone(), param.clone());
+                        }
+                        if !term.exp_states.is_empty() {
+                            let exp_len = term.exp_states.len() - 1;
+                            for (i, exp) in term.exp_states.clone().iter().enumerate() {
+                                if i != exp_len {
+                                    expression_string =
+                                        format!("{}{}*", expression_string.clone(), exp.clone());
+                                } else {
+                                    expression_string =
+                                        format!("{}{}", expression_string.clone(), exp.clone());
+                                }
+                            }
+                        }
+    
                     }
 
                     let rate = Rate {
@@ -985,22 +1068,49 @@ impl From<Vec<FirstOrderODE>> for PetriNet {
 
                     let mut expression_string = "".to_string();
 
-                    if !term.exp_states.is_empty() {
-                        let exp_len = term.exp_states.len() - 1;
-                        for (i, exp) in term.exp_states.clone().iter().enumerate() {
-                            if i != exp_len {
-                                expression_string =
-                                    format!("{}{}*", expression_string.clone(), exp.clone());
-                            } else {
-                                expression_string =
-                                    format!("{}{}", expression_string.clone(), exp.clone());
+                    if term.expression.contains("divide") {
+                        // split on the divide, take the post div part, split on the apply
+                        // first entry on the apply split are div arguments
+                        let v: Vec<&str> = term.expression.split_terminator("<divide/>").collect();
+                        println!("v: {:?}", v.clone());
+                        let v2: Vec<&str> = v[1].split_terminator("</apply>").collect();
+                        println!("v2: {:?}", v2.clone());
+                        // now to split on the <ci></ci>
+                        let v3: Vec<&str> = v2[0].split_terminator("<ci>").collect();
+                        println!("v3: {:?}", v3.clone());
+                        let temp_str = format!("{}{}", v3[1], v3[2]);
+                        let v4: Vec<&str> = temp_str.split_terminator("</ci>").collect();
+                        println!("v4: {:?}", v4.clone());
+                        expression_string = format!("{}/{}", v4[0],v4[1]);
+                        for param in term.parameters.clone().iter() {
+                            if param != v4[0] && param != v4[1] {
+                                expression_string = format!("{}*{}", expression_string.clone(), param.clone());
                             }
                         }
-                    }
-
-                    for param in term.parameters.clone().iter() {
-                        expression_string =
-                            format!("{}{}", expression_string.clone(), param.clone());
+                        for (i, exp) in term.exp_states.clone().iter().enumerate() {
+                            if exp != v4[0] && exp != v4[1] {
+                                expression_string = format!("{}*{}", expression_string.clone(), exp.clone());
+                            }
+                        }
+                    } else {
+    
+                        for param in term.parameters.clone().iter() {
+                            expression_string =
+                                format!("{}{}*", expression_string.clone(), param.clone());
+                        }
+                        if !term.exp_states.is_empty() {
+                            let exp_len = term.exp_states.len() - 1;
+                            for (i, exp) in term.exp_states.clone().iter().enumerate() {
+                                if i != exp_len {
+                                    expression_string =
+                                        format!("{}{}*", expression_string.clone(), exp.clone());
+                                } else {
+                                    expression_string =
+                                        format!("{}{}", expression_string.clone(), exp.clone());
+                                }
+                            }
+                        }
+    
                     }
 
                     let rate = Rate {
