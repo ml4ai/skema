@@ -1033,8 +1033,6 @@ pub fn get_terms_mult(sys_states: Vec<String>, eq: Vec<MathExpressionTree>) -> P
         exp_states.sort();
         //exp_states.dedup();
 
-        println!("infix expressions: {:?}\n", MathExpressionTree::Cons(Multiply, eq.clone()).to_infix_expression());
-
         PnTerm {
             dyn_state: "temp".to_string(),
             exp_states,
@@ -1134,8 +1132,6 @@ pub fn get_term_mult(sys_states: Vec<String>, eq: Vec<MathExpressionTree>) -> Pn
     variables.dedup();
     exp_states.sort();
     //exp_states.dedup();
-
-    println!("infix expressions: {:?}\n", MathExpressionTree::Cons(Multiply, eq.clone()).to_infix_expression());
 
     PnTerm {
         dyn_state: "temp".to_string(),
