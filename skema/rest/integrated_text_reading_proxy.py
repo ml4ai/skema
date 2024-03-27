@@ -457,7 +457,7 @@ async def integrated_text_extractions(
                     text_extractions_file=extractions_ufile)
                 aligned_amrs.append(aligned_amr)
             except Exception as e:
-                error = TextReadingError(pipeline="AMR Linker", message=f"Error annotating {amr.filename}: {e}")
+                error = TextReadingError(pipeline="AMR Linker", message=f"Error annotating amr: {e}")
                 if extractions.generalized_errors is None:
                     extractions.generalized_errors = [error]
                 else:
