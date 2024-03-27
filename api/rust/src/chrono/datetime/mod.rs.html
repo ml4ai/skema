@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/chrono-0.4.35/src/datetime/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="chrono" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.0 (aedd173a2 2024-03-17)" data-channel="1.77.0" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/chrono-0.4.37/src/datetime/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="chrono" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.0 (aedd173a2 2024-03-17)" data-channel="1.77.0" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
             <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
     <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../chrono/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
@@ -2050,12 +2050,33 @@
 <a href="#2048" id="2048">2048</a>
 <a href="#2049" id="2049">2049</a>
 <a href="#2050" id="2050">2050</a>
+<a href="#2051" id="2051">2051</a>
+<a href="#2052" id="2052">2052</a>
+<a href="#2053" id="2053">2053</a>
+<a href="#2054" id="2054">2054</a>
+<a href="#2055" id="2055">2055</a>
+<a href="#2056" id="2056">2056</a>
+<a href="#2057" id="2057">2057</a>
+<a href="#2058" id="2058">2058</a>
+<a href="#2059" id="2059">2059</a>
+<a href="#2060" id="2060">2060</a>
+<a href="#2061" id="2061">2061</a>
+<a href="#2062" id="2062">2062</a>
+<a href="#2063" id="2063">2063</a>
+<a href="#2064" id="2064">2064</a>
+<a href="#2065" id="2065">2065</a>
+<a href="#2066" id="2066">2066</a>
+<a href="#2067" id="2067">2067</a>
+<a href="#2068" id="2068">2068</a>
+<a href="#2069" id="2069">2069</a>
+<a href="#2070" id="2070">2070</a>
+<a href="#2071" id="2071">2071</a>
 </pre></div><pre class="rust"><code><span class="comment">// This is a part of Chrono.
 // See README.md and LICENSE.txt for details.
 
 </span><span class="doccomment">//! ISO 8601 date and time with time zone.
 
-</span><span class="attr">#[cfg(all(not(feature = <span class="string">"std"</span>), feature = <span class="string">"alloc"</span>))]
+</span><span class="attr">#[cfg(all(feature = <span class="string">"alloc"</span>, not(feature = <span class="string">"std"</span>), not(test)))]
 </span><span class="kw">use </span>alloc::string::String;
 <span class="kw">use </span>core::borrow::Borrow;
 <span class="kw">use </span>core::cmp::Ordering;
@@ -2077,7 +2098,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::naive::{Days, IsoWeek, NaiveDate, NaiveDateTime, NaiveTime};
 <span class="attr">#[cfg(feature = <span class="string">"clock"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::offset::Local;
-<span class="kw">use </span><span class="kw">crate</span>::offset::{FixedOffset, Offset, TimeZone, Utc};
+<span class="kw">use </span><span class="kw">crate</span>::offset::{FixedOffset, LocalResult, Offset, TimeZone, Utc};
 <span class="attr">#[allow(deprecated)]
 </span><span class="kw">use </span><span class="kw">crate</span>::Date;
 <span class="kw">use crate</span>::{expect, try_opt};
@@ -2101,7 +2122,7 @@
 /// There are some constructors implemented here (the `from_*` methods), but
 /// the general-purpose constructors are all via the methods on the
 /// [`TimeZone`](./offset/trait.TimeZone.html) implementations.
-</span><span class="attr">#[derive(Clone)]
+</span><span class="attr">#[derive(Copy, Clone)]
 #[cfg_attr(
     any(feature = <span class="string">"rkyv"</span>, feature = <span class="string">"rkyv-16"</span>, feature = <span class="string">"rkyv-32"</span>, feature = <span class="string">"rkyv-64"</span>),
     derive(Archive, Deserialize, Serialize),
@@ -2131,9 +2152,9 @@
     ///
     /// # Example
     ///
-    </span><span class="attr">#[cfg_attr(not(feature = <span class="string">"clock"</span>), doc = <span class="string">"```ignore"</span>)]
-    #[cfg_attr(feature = <span class="string">"clock"</span>, doc = <span class="string">"```rust"</span>)]
-    </span><span class="doccomment">/// use chrono::{DateTime, Local};
+    /// ```
+    /// # #[cfg(feature = "clock")] {
+    /// use chrono::{DateTime, Local};
     ///
     /// let dt = Local::now();
     /// // Get components
@@ -2142,6 +2163,7 @@
     /// // Serialize, pass through FFI... and recreate the `DateTime`:
     /// let dt_new = DateTime::&lt;Local&gt;::from_naive_utc_and_offset(naive_utc, offset);
     /// assert_eq!(dt, dt_new);
+    /// # }
     /// ```
     </span><span class="attr">#[inline]
     #[must_use]
@@ -2225,8 +2247,7 @@
     </span><span class="attr">#[inline]
     #[must_use]
     </span><span class="kw">pub fn </span>date_naive(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; NaiveDate {
-        <span class="kw">let </span>local = <span class="self">self</span>.naive_local();
-        NaiveDate::from_ymd_opt(local.year(), local.month(), local.day()).unwrap()
+        <span class="self">self</span>.naive_local().date()
     }
 
     <span class="doccomment">/// Retrieves the time component.
@@ -2331,10 +2352,10 @@
     #[inline]
     #[must_use]
     </span><span class="kw">pub const fn </span>timestamp_nanos(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; i64 {
-        <span class="macro">expect!</span>(
+        expect(
             <span class="self">self</span>.timestamp_nanos_opt(),
-            <span class="string">"value can not be represented in a timestamp with nanosecond precision."
-        </span>)
+            <span class="string">"value can not be represented in a timestamp with nanosecond precision."</span>,
+        )
     }
 
     <span class="doccomment">/// Returns the number of non-leap-nanoseconds since January 1, 1970 UTC.
@@ -2705,13 +2726,12 @@
     /// # Examples
     ///
     /// ```rust
-    /// # use chrono::{FixedOffset, SecondsFormat, TimeZone, Utc, NaiveDate};
+    /// # use chrono::{FixedOffset, SecondsFormat, TimeZone, NaiveDate};
     /// let dt = NaiveDate::from_ymd_opt(2018, 1, 26)
     ///     .unwrap()
     ///     .and_hms_micro_opt(18, 30, 9, 453_829)
     ///     .unwrap()
-    ///     .and_local_timezone(Utc)
-    ///     .unwrap();
+    ///     .and_utc();
     /// assert_eq!(dt.to_rfc3339_opts(SecondsFormat::Millis, false), "2018-01-26T18:30:09.453+00:00");
     /// assert_eq!(dt.to_rfc3339_opts(SecondsFormat::Millis, true), "2018-01-26T18:30:09.453Z");
     /// assert_eq!(dt.to_rfc3339_opts(SecondsFormat::Secs, true), "2018-01-26T18:30:09Z");
@@ -2734,6 +2754,32 @@
         write_rfc3339(<span class="kw-2">&amp;mut </span>result, <span class="self">self</span>.naive_local(), <span class="self">self</span>.offset.fix(), secform, use_z)
             .expect(<span class="string">"writing rfc3339 datetime to string should never fail"</span>);
         result
+    }
+
+    <span class="doccomment">/// Set the time to a new fixed time on the existing date.
+    ///
+    /// # Errors
+    ///
+    /// Returns `LocalResult::None` if the datetime is at the edge of the representable range for a
+    /// `DateTime`, and `with_time` would push the value in UTC out of range.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # #[cfg(feature = "clock")] {
+    /// use chrono::{Local, NaiveTime};
+    ///
+    /// let noon = NaiveTime::from_hms_opt(12, 0, 0).unwrap();
+    /// let today_noon = Local::now().with_time(noon);
+    /// let today_midnight = Local::now().with_time(NaiveTime::MIN);
+    ///
+    /// assert_eq!(today_noon.single().unwrap().time(), noon);
+    /// assert_eq!(today_midnight.single().unwrap().time(), NaiveTime::MIN);
+    /// # }
+    /// ```
+    </span><span class="attr">#[must_use]
+    </span><span class="kw">pub fn </span>with_time(<span class="kw-2">&amp;</span><span class="self">self</span>, time: NaiveTime) -&gt; LocalResult&lt;<span class="self">Self</span>&gt; {
+        <span class="self">self</span>.timezone().from_local_datetime(<span class="kw-2">&amp;</span><span class="self">self</span>.overflowing_naive_local().date().and_time(time))
     }
 
     <span class="doccomment">/// The minimum possible `DateTime&lt;Utc&gt;`.
@@ -2884,7 +2930,7 @@
     </span><span class="kw">pub const fn </span>from_timestamp_nanos(nanos: i64) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>secs = nanos.div_euclid(<span class="number">1_000_000_000</span>);
         <span class="kw">let </span>nsecs = nanos.rem_euclid(<span class="number">1_000_000_000</span>) <span class="kw">as </span>u32;
-        <span class="macro">expect!</span>(<span class="self">Self</span>::from_timestamp(secs, nsecs), <span class="string">"timestamp in nanos is always in range"</span>)
+        expect(<span class="self">Self</span>::from_timestamp(secs, nsecs), <span class="string">"timestamp in nanos is always in range"</span>)
     }
 
     <span class="doccomment">/// The Unix Epoch, 1970-01-01 00:00:00 UTC.
@@ -3437,10 +3483,6 @@
         map_local(<span class="self">self</span>, |datetime| datetime.with_nanosecond(nano))
     }
 }
-
-<span class="comment">// we need them as automatic impls cannot handle associated types
-</span><span class="kw">impl</span>&lt;Tz: TimeZone&gt; Copy <span class="kw">for </span>DateTime&lt;Tz&gt; <span class="kw">where </span>&lt;Tz <span class="kw">as </span>TimeZone&gt;::Offset: Copy {}
-<span class="kw">unsafe impl</span>&lt;Tz: TimeZone&gt; Send <span class="kw">for </span>DateTime&lt;Tz&gt; <span class="kw">where </span>&lt;Tz <span class="kw">as </span>TimeZone&gt;::Offset: Send {}
 
 <span class="kw">impl</span>&lt;Tz: TimeZone, Tz2: TimeZone&gt; PartialEq&lt;DateTime&lt;Tz2&gt;&gt; <span class="kw">for </span>DateTime&lt;Tz&gt; {
     <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>DateTime&lt;Tz2&gt;) -&gt; bool {

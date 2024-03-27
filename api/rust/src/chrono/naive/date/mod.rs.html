@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/chrono-0.4.35/src/naive/date/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="chrono" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.0 (aedd173a2 2024-03-17)" data-channel="1.77.0" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/chrono-0.4.37/src/naive/date/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="chrono" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.0 (aedd173a2 2024-03-17)" data-channel="1.77.0" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
             <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
     <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../../chrono/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
@@ -2569,31 +2569,6 @@
 <a href="#2567" id="2567">2567</a>
 <a href="#2568" id="2568">2568</a>
 <a href="#2569" id="2569">2569</a>
-<a href="#2570" id="2570">2570</a>
-<a href="#2571" id="2571">2571</a>
-<a href="#2572" id="2572">2572</a>
-<a href="#2573" id="2573">2573</a>
-<a href="#2574" id="2574">2574</a>
-<a href="#2575" id="2575">2575</a>
-<a href="#2576" id="2576">2576</a>
-<a href="#2577" id="2577">2577</a>
-<a href="#2578" id="2578">2578</a>
-<a href="#2579" id="2579">2579</a>
-<a href="#2580" id="2580">2580</a>
-<a href="#2581" id="2581">2581</a>
-<a href="#2582" id="2582">2582</a>
-<a href="#2583" id="2583">2583</a>
-<a href="#2584" id="2584">2584</a>
-<a href="#2585" id="2585">2585</a>
-<a href="#2586" id="2586">2586</a>
-<a href="#2587" id="2587">2587</a>
-<a href="#2588" id="2588">2588</a>
-<a href="#2589" id="2589">2589</a>
-<a href="#2590" id="2590">2590</a>
-<a href="#2591" id="2591">2591</a>
-<a href="#2592" id="2592">2592</a>
-<a href="#2593" id="2593">2593</a>
-<a href="#2594" id="2594">2594</a>
 </pre></div><pre class="rust"><code><span class="comment">// This is a part of Chrono.
 // See README.md and LICENSE.txt for details.
 
@@ -2761,7 +2736,7 @@
     </span><span class="attr">#[deprecated(since = <span class="string">"0.4.23"</span>, note = <span class="string">"use `from_ymd_opt()` instead"</span>)]
     #[must_use]
     </span><span class="kw">pub const fn </span>from_ymd(year: i32, month: u32, day: u32) -&gt; NaiveDate {
-        <span class="macro">expect!</span>(NaiveDate::from_ymd_opt(year, month, day), <span class="string">"invalid or out-of-range date"</span>)
+        expect(NaiveDate::from_ymd_opt(year, month, day), <span class="string">"invalid or out-of-range date"</span>)
     }
 
     <span class="doccomment">/// Makes a new `NaiveDate` from the [calendar date](#calendar-date)
@@ -2809,7 +2784,7 @@
     </span><span class="attr">#[deprecated(since = <span class="string">"0.4.23"</span>, note = <span class="string">"use `from_yo_opt()` instead"</span>)]
     #[must_use]
     </span><span class="kw">pub const fn </span>from_yo(year: i32, ordinal: u32) -&gt; NaiveDate {
-        <span class="macro">expect!</span>(NaiveDate::from_yo_opt(year, ordinal), <span class="string">"invalid or out-of-range date"</span>)
+        expect(NaiveDate::from_yo_opt(year, ordinal), <span class="string">"invalid or out-of-range date"</span>)
     }
 
     <span class="doccomment">/// Makes a new `NaiveDate` from the [ordinal date](#ordinal-date)
@@ -2854,7 +2829,7 @@
     </span><span class="attr">#[deprecated(since = <span class="string">"0.4.23"</span>, note = <span class="string">"use `from_isoywd_opt()` instead"</span>)]
     #[must_use]
     </span><span class="kw">pub const fn </span>from_isoywd(year: i32, week: u32, weekday: Weekday) -&gt; NaiveDate {
-        <span class="macro">expect!</span>(NaiveDate::from_isoywd_opt(year, week, weekday), <span class="string">"invalid or out-of-range date"</span>)
+        expect(NaiveDate::from_isoywd_opt(year, week, weekday), <span class="string">"invalid or out-of-range date"</span>)
     }
 
     <span class="doccomment">/// Makes a new `NaiveDate` from the [ISO week date](#week-date)
@@ -2945,7 +2920,7 @@
     #[inline]
     #[must_use]
     </span><span class="kw">pub const fn </span>from_num_days_from_ce(days: i32) -&gt; NaiveDate {
-        <span class="macro">expect!</span>(NaiveDate::from_num_days_from_ce_opt(days), <span class="string">"out-of-range date"</span>)
+        expect(NaiveDate::from_num_days_from_ce_opt(days), <span class="string">"out-of-range date"</span>)
     }
 
     <span class="doccomment">/// Makes a new `NaiveDate` from a day's number in the proleptic Gregorian calendar, with
@@ -2998,7 +2973,7 @@
         weekday: Weekday,
         n: u8,
     ) -&gt; NaiveDate {
-        <span class="macro">expect!</span>(NaiveDate::from_weekday_of_month_opt(year, month, weekday, n), <span class="string">"out-of-range date"</span>)
+        expect(NaiveDate::from_weekday_of_month_opt(year, month, weekday, n), <span class="string">"out-of-range date"</span>)
     }
 
     <span class="doccomment">/// Makes a new `NaiveDate` by counting the number of occurrences of a particular day-of-week
@@ -3142,7 +3117,7 @@
             <span class="kw">return </span><span class="prelude-val">Some</span>(<span class="self">self</span>);
         }
 
-        <span class="kw">match </span>months.<span class="number">0 </span>&lt;= core::i32::MAX <span class="kw">as </span>u32 {
+        <span class="kw">match </span>months.<span class="number">0 </span>&lt;= i32::MAX <span class="kw">as </span>u32 {
             <span class="bool-val">true </span>=&gt; <span class="self">self</span>.diff_months(months.<span class="number">0 </span><span class="kw">as </span>i32),
             <span class="bool-val">false </span>=&gt; <span class="prelude-val">None</span>,
         }
@@ -3178,47 +3153,18 @@
             <span class="kw">return </span><span class="prelude-val">Some</span>(<span class="self">self</span>);
         }
 
-        <span class="comment">// Copy `i32::MAX` here so we don't have to do a complicated cast
-        </span><span class="kw">match </span>months.<span class="number">0 </span>&lt;= <span class="number">2_147_483_647 </span>{
+        <span class="kw">match </span>months.<span class="number">0 </span>&lt;= i32::MAX <span class="kw">as </span>u32 {
             <span class="bool-val">true </span>=&gt; <span class="self">self</span>.diff_months(-(months.<span class="number">0 </span><span class="kw">as </span>i32)),
             <span class="bool-val">false </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
     <span class="kw">const fn </span>diff_months(<span class="self">self</span>, months: i32) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
-        <span class="kw">let </span>(years, left) = ((months / <span class="number">12</span>), (months % <span class="number">12</span>));
-
-        <span class="comment">// Determine new year (without taking months into account for now
-
-        </span><span class="kw">let </span>year = <span class="kw">if </span>(years &gt; <span class="number">0 </span>&amp;&amp; years &gt; (MAX_YEAR - <span class="self">self</span>.year()))
-            || (years &lt; <span class="number">0 </span>&amp;&amp; years &lt; (MIN_YEAR - <span class="self">self</span>.year()))
-        {
-            <span class="kw">return </span><span class="prelude-val">None</span>;
-        } <span class="kw">else </span>{
-            <span class="self">self</span>.year() + years
-        };
-
-        <span class="comment">// Determine new month
-
-        </span><span class="kw">let </span>month = <span class="self">self</span>.month() <span class="kw">as </span>i32 + left;
-        <span class="kw">let </span>(year, month) = <span class="kw">if </span>month &lt;= <span class="number">0 </span>{
-            <span class="kw">if </span>year == MIN_YEAR {
-                <span class="kw">return </span><span class="prelude-val">None</span>;
-            }
-
-            (year - <span class="number">1</span>, month + <span class="number">12</span>)
-        } <span class="kw">else if </span>month &gt; <span class="number">12 </span>{
-            <span class="kw">if </span>year == MAX_YEAR {
-                <span class="kw">return </span><span class="prelude-val">None</span>;
-            }
-
-            (year + <span class="number">1</span>, month - <span class="number">12</span>)
-        } <span class="kw">else </span>{
-            (year, month)
-        };
+        <span class="kw">let </span>months = <span class="macro">try_opt!</span>((<span class="self">self</span>.year() * <span class="number">12 </span>+ <span class="self">self</span>.month() <span class="kw">as </span>i32 - <span class="number">1</span>).checked_add(months));
+        <span class="kw">let </span>year = months.div_euclid(<span class="number">12</span>);
+        <span class="kw">let </span>month = months.rem_euclid(<span class="number">12</span>) <span class="kw">as </span>u32 + <span class="number">1</span>;
 
         <span class="comment">// Clamp original day in case new month is shorter
-
         </span><span class="kw">let </span>flags = YearFlags::from_year(year);
         <span class="kw">let </span>feb_days = <span class="kw">if </span>flags.ndays() == <span class="number">366 </span>{ <span class="number">29 </span>} <span class="kw">else </span>{ <span class="number">28 </span>};
         <span class="kw">let </span>days = [<span class="number">31</span>, feb_days, <span class="number">31</span>, <span class="number">30</span>, <span class="number">31</span>, <span class="number">30</span>, <span class="number">31</span>, <span class="number">31</span>, <span class="number">30</span>, <span class="number">31</span>, <span class="number">30</span>, <span class="number">31</span>];
@@ -3228,7 +3174,7 @@
             day = day_max;
         };
 
-        NaiveDate::from_mdf(year, <span class="macro">try_opt!</span>(Mdf::new(month <span class="kw">as </span>u32, day, flags)))
+        NaiveDate::from_ymd_opt(year, month, day)
     }
 
     <span class="doccomment">/// Add a duration in [`Days`] to the date
@@ -3348,7 +3294,7 @@
     #[inline]
     #[must_use]
     </span><span class="kw">pub const fn </span>and_hms(<span class="kw-2">&amp;</span><span class="self">self</span>, hour: u32, min: u32, sec: u32) -&gt; NaiveDateTime {
-        <span class="macro">expect!</span>(<span class="self">self</span>.and_hms_opt(hour, min, sec), <span class="string">"invalid time"</span>)
+        expect(<span class="self">self</span>.and_hms_opt(hour, min, sec), <span class="string">"invalid time"</span>)
     }
 
     <span class="doccomment">/// Makes a new `NaiveDateTime` from the current date, hour, minute and second.
@@ -3390,7 +3336,7 @@
     #[inline]
     #[must_use]
     </span><span class="kw">pub const fn </span>and_hms_milli(<span class="kw-2">&amp;</span><span class="self">self</span>, hour: u32, min: u32, sec: u32, milli: u32) -&gt; NaiveDateTime {
-        <span class="macro">expect!</span>(<span class="self">self</span>.and_hms_milli_opt(hour, min, sec, milli), <span class="string">"invalid time"</span>)
+        expect(<span class="self">self</span>.and_hms_milli_opt(hour, min, sec, milli), <span class="string">"invalid time"</span>)
     }
 
     <span class="doccomment">/// Makes a new `NaiveDateTime` from the current date, hour, minute, second and millisecond.
@@ -3454,7 +3400,7 @@
     #[inline]
     #[must_use]
     </span><span class="kw">pub const fn </span>and_hms_micro(<span class="kw-2">&amp;</span><span class="self">self</span>, hour: u32, min: u32, sec: u32, micro: u32) -&gt; NaiveDateTime {
-        <span class="macro">expect!</span>(<span class="self">self</span>.and_hms_micro_opt(hour, min, sec, micro), <span class="string">"invalid time"</span>)
+        expect(<span class="self">self</span>.and_hms_micro_opt(hour, min, sec, micro), <span class="string">"invalid time"</span>)
     }
 
     <span class="doccomment">/// Makes a new `NaiveDateTime` from the current date, hour, minute, second and microsecond.
@@ -3504,7 +3450,7 @@
     #[inline]
     #[must_use]
     </span><span class="kw">pub const fn </span>and_hms_nano(<span class="kw-2">&amp;</span><span class="self">self</span>, hour: u32, min: u32, sec: u32, nano: u32) -&gt; NaiveDateTime {
-        <span class="macro">expect!</span>(<span class="self">self</span>.and_hms_nano_opt(hour, min, sec, nano), <span class="string">"invalid time"</span>)
+        expect(<span class="self">self</span>.and_hms_nano_opt(hour, min, sec, nano), <span class="string">"invalid time"</span>)
     }
 
     <span class="doccomment">/// Makes a new `NaiveDateTime` from the current date, hour, minute, second and nanosecond.
@@ -3571,7 +3517,7 @@
     #[inline]
     #[must_use]
     </span><span class="kw">pub const fn </span>succ(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; NaiveDate {
-        <span class="macro">expect!</span>(<span class="self">self</span>.succ_opt(), <span class="string">"out of bound"</span>)
+        expect(<span class="self">self</span>.succ_opt(), <span class="string">"out of bound"</span>)
     }
 
     <span class="doccomment">/// Makes a new `NaiveDate` for the next calendar date.
@@ -3610,7 +3556,7 @@
     #[inline]
     #[must_use]
     </span><span class="kw">pub const fn </span>pred(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; NaiveDate {
-        <span class="macro">expect!</span>(<span class="self">self</span>.pred_opt(), <span class="string">"out of bound"</span>)
+        expect(<span class="self">self</span>.pred_opt(), <span class="string">"out of bound"</span>)
     }
 
     <span class="doccomment">/// Makes a new `NaiveDate` for the previous calendar date.
@@ -3754,7 +3700,7 @@
         <span class="kw">let </span>days = (year1_div_400 <span class="kw">as </span>i64 - year2_div_400 <span class="kw">as </span>i64) * <span class="number">146_097 </span>+ (cycle1 - cycle2);
         <span class="comment">// The range of `TimeDelta` is ca. 585 million years, the range of `NaiveDate` ca. 525.000
         // years.
-        </span><span class="macro">expect!</span>(TimeDelta::try_days(days), <span class="string">"always in range"</span>)
+        </span>expect(TimeDelta::try_days(days), <span class="string">"always in range"</span>)
     }
 
     <span class="doccomment">/// Returns the number of whole years from the given `base` until `self`.
@@ -4033,10 +3979,14 @@
     <span class="doccomment">/// Create a new `NaiveDate` from a raw year-ordinal-flags `i32`.
     ///
     /// In a valid value an ordinal is never `0`, and neither are the year flags. This method
-    /// doesn't do any validation.
+    /// doesn't do any validation in release builds.
     </span><span class="attr">#[inline]
     </span><span class="kw">const fn </span>from_yof(yof: i32) -&gt; NaiveDate {
-        <span class="macro">debug_assert!</span>(yof != <span class="number">0</span>);
+        <span class="comment">// The following are the invariants our ordinal and flags should uphold for a valid
+        // `NaiveDate`.
+        </span><span class="macro">debug_assert!</span>(((yof &amp; OL_MASK) &gt;&gt; <span class="number">3</span>) &gt; <span class="number">1</span>);
+        <span class="macro">debug_assert!</span>(((yof &amp; OL_MASK) &gt;&gt; <span class="number">3</span>) &lt;= MAX_OL);
+        <span class="macro">debug_assert!</span>((yof &amp; <span class="number">0b111</span>) != <span class="number">000</span>);
         NaiveDate { yof: <span class="kw">unsafe </span>{ NonZeroI32::new_unchecked(yof) } }
     }
 

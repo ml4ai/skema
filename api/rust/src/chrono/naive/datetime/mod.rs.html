@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/chrono-0.4.35/src/naive/datetime/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="chrono" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.0 (aedd173a2 2024-03-17)" data-channel="1.77.0" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/chrono-0.4.37/src/naive/datetime/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="chrono" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.0 (aedd173a2 2024-03-17)" data-channel="1.77.0" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
             <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
     <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../../chrono/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
@@ -2282,13 +2282,6 @@
 <a href="#2280" id="2280">2280</a>
 <a href="#2281" id="2281">2281</a>
 <a href="#2282" id="2282">2282</a>
-<a href="#2283" id="2283">2283</a>
-<a href="#2284" id="2284">2284</a>
-<a href="#2285" id="2285">2285</a>
-<a href="#2286" id="2286">2286</a>
-<a href="#2287" id="2287">2287</a>
-<a href="#2288" id="2288">2288</a>
-<a href="#2289" id="2289">2289</a>
 </pre></div><pre class="rust"><code><span class="comment">// This is a part of Chrono.
 // See README.md and LICENSE.txt for details.
 
@@ -2312,7 +2305,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::offset::Utc;
 <span class="kw">use </span><span class="kw">crate</span>::time_delta::NANOS_PER_SEC;
 <span class="kw">use crate</span>::{
-    expect, try_opt, DateTime, Datelike, FixedOffset, LocalResult, Months, TimeDelta, TimeZone,
+    expect, try_opt, DateTime, Datelike, FixedOffset, MappedLocalTime, Months, TimeDelta, TimeZone,
     Timelike, Weekday,
 };
 <span class="attr">#[cfg(feature = <span class="string">"rustc-serialize"</span>)]
@@ -2414,7 +2407,7 @@
     #[must_use]
     </span><span class="kw">pub const fn </span>from_timestamp(secs: i64, nsecs: u32) -&gt; NaiveDateTime {
         <span class="kw">let </span>datetime =
-            <span class="macro">expect!</span>(DateTime::from_timestamp(secs, nsecs), <span class="string">"invalid or out-of-range datetime"</span>);
+            expect(DateTime::from_timestamp(secs, nsecs), <span class="string">"invalid or out-of-range datetime"</span>);
         datetime.naive_utc()
     }
 
@@ -2426,7 +2419,7 @@
     ///
     /// Returns `None` if the number of milliseconds would be out of range for a `NaiveDateTime`
     /// (more than ca. 262,000 years away from common era)
-    </span><span class="attr">#[deprecated(since = <span class="string">"0.4.34"</span>, note = <span class="string">"use `DateTime::from_timestamp_millis` instead"</span>)]
+    </span><span class="attr">#[deprecated(since = <span class="string">"0.4.35"</span>, note = <span class="string">"use `DateTime::from_timestamp_millis` instead"</span>)]
     #[inline]
     #[must_use]
     </span><span class="kw">pub const fn </span>from_timestamp_millis(millis: i64) -&gt; <span class="prelude-ty">Option</span>&lt;NaiveDateTime&gt; {
@@ -2441,7 +2434,7 @@
     ///
     /// Returns `None` if the number of microseconds would be out of range for a `NaiveDateTime`
     /// (more than ca. 262,000 years away from common era)
-    </span><span class="attr">#[deprecated(since = <span class="string">"0.4.34"</span>, note = <span class="string">"use `DateTime::from_timestamp_micros` instead"</span>)]
+    </span><span class="attr">#[deprecated(since = <span class="string">"0.4.35"</span>, note = <span class="string">"use `DateTime::from_timestamp_micros` instead"</span>)]
     #[inline]
     #[must_use]
     </span><span class="kw">pub const fn </span>from_timestamp_micros(micros: i64) -&gt; <span class="prelude-ty">Option</span>&lt;NaiveDateTime&gt; {
@@ -2458,7 +2451,7 @@
     ///
     /// Returns `None` if the number of nanoseconds would be out of range for a `NaiveDateTime`
     /// (more than ca. 262,000 years away from common era)
-    </span><span class="attr">#[deprecated(since = <span class="string">"0.4.34"</span>, note = <span class="string">"use `DateTime::from_timestamp_nanos` instead"</span>)]
+    </span><span class="attr">#[deprecated(since = <span class="string">"0.4.35"</span>, note = <span class="string">"use `DateTime::from_timestamp_nanos` instead"</span>)]
     #[inline]
     #[must_use]
     </span><span class="kw">pub const fn </span>from_timestamp_nanos(nanos: i64) -&gt; <span class="prelude-ty">Option</span>&lt;NaiveDateTime&gt; {
@@ -2481,7 +2474,7 @@
     /// Returns `None` if the number of seconds would be out of range for a `NaiveDateTime` (more
     /// than ca. 262,000 years away from common era), and panics on an invalid nanosecond
     /// (2 seconds or more).
-    </span><span class="attr">#[deprecated(since = <span class="string">"0.4.34"</span>, note = <span class="string">"use `DateTime::from_timestamp` instead"</span>)]
+    </span><span class="attr">#[deprecated(since = <span class="string">"0.4.35"</span>, note = <span class="string">"use `DateTime::from_timestamp` instead"</span>)]
     #[inline]
     #[must_use]
     </span><span class="kw">pub const fn </span>from_timestamp_opt(secs: i64, nsecs: u32) -&gt; <span class="prelude-ty">Option</span>&lt;NaiveDateTime&gt; {
@@ -2643,7 +2636,7 @@
     ///
     /// Note that this does *not* account for the timezone!
     /// The true "UNIX timestamp" would count seconds since the midnight *UTC* on the epoch.
-    </span><span class="attr">#[deprecated(since = <span class="string">"0.4.34"</span>, note = <span class="string">"use `.and_utc().timestamp()` instead"</span>)]
+    </span><span class="attr">#[deprecated(since = <span class="string">"0.4.35"</span>, note = <span class="string">"use `.and_utc().timestamp()` instead"</span>)]
     #[inline]
     #[must_use]
     </span><span class="kw">pub const fn </span>timestamp(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; i64 {
@@ -2654,7 +2647,7 @@
     ///
     /// Note that this does *not* account for the timezone!
     /// The true "UNIX timestamp" would count seconds since the midnight *UTC* on the epoch.
-    </span><span class="attr">#[deprecated(since = <span class="string">"0.4.34"</span>, note = <span class="string">"use `.and_utc().timestamp_millis()` instead"</span>)]
+    </span><span class="attr">#[deprecated(since = <span class="string">"0.4.35"</span>, note = <span class="string">"use `.and_utc().timestamp_millis()` instead"</span>)]
     #[inline]
     #[must_use]
     </span><span class="kw">pub const fn </span>timestamp_millis(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; i64 {
@@ -2665,7 +2658,7 @@
     ///
     /// Note that this does *not* account for the timezone!
     /// The true "UNIX timestamp" would count seconds since the midnight *UTC* on the epoch.
-    </span><span class="attr">#[deprecated(since = <span class="string">"0.4.34"</span>, note = <span class="string">"use `.and_utc().timestamp_micros()` instead"</span>)]
+    </span><span class="attr">#[deprecated(since = <span class="string">"0.4.35"</span>, note = <span class="string">"use `.and_utc().timestamp_micros()` instead"</span>)]
     #[inline]
     #[must_use]
     </span><span class="kw">pub const fn </span>timestamp_micros(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; i64 {
@@ -2704,7 +2697,7 @@
     ///
     /// The dates that can be represented as nanoseconds are between 1677-09-21T00:12:43.145224192
     /// and 2262-04-11T23:47:16.854775807.
-    </span><span class="attr">#[deprecated(since = <span class="string">"0.4.34"</span>, note = <span class="string">"use `.and_utc().timestamp_nanos_opt()` instead"</span>)]
+    </span><span class="attr">#[deprecated(since = <span class="string">"0.4.35"</span>, note = <span class="string">"use `.and_utc().timestamp_nanos_opt()` instead"</span>)]
     #[inline]
     #[must_use]
     </span><span class="kw">pub const fn </span>timestamp_nanos_opt(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;i64&gt; {
@@ -2715,7 +2708,7 @@
     ///
     /// The return value ranges from 0 to 999,
     /// or for [leap seconds](./struct.NaiveTime.html#leap-second-handling), to 1,999.
-    </span><span class="attr">#[deprecated(since = <span class="string">"0.4.34"</span>, note = <span class="string">"use `.and_utc().timestamp_subsec_millis()` instead"</span>)]
+    </span><span class="attr">#[deprecated(since = <span class="string">"0.4.35"</span>, note = <span class="string">"use `.and_utc().timestamp_subsec_millis()` instead"</span>)]
     #[inline]
     #[must_use]
     </span><span class="kw">pub const fn </span>timestamp_subsec_millis(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
@@ -2726,7 +2719,7 @@
     ///
     /// The return value ranges from 0 to 999,999,
     /// or for [leap seconds](./struct.NaiveTime.html#leap-second-handling), to 1,999,999.
-    </span><span class="attr">#[deprecated(since = <span class="string">"0.4.34"</span>, note = <span class="string">"use `.and_utc().timestamp_subsec_micros()` instead"</span>)]
+    </span><span class="attr">#[deprecated(since = <span class="string">"0.4.35"</span>, note = <span class="string">"use `.and_utc().timestamp_subsec_micros()` instead"</span>)]
     #[inline]
     #[must_use]
     </span><span class="kw">pub const fn </span>timestamp_subsec_micros(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
@@ -2737,6 +2730,7 @@
     ///
     /// The return value ranges from 0 to 999,999,999,
     /// or for [leap seconds](./struct.NaiveTime.html#leap-second-handling), to 1,999,999,999.
+    </span><span class="attr">#[deprecated(since = <span class="string">"0.4.36"</span>, note = <span class="string">"use `.and_utc().timestamp_subsec_nanos()` instead"</span>)]
     </span><span class="kw">pub const fn </span>timestamp_subsec_nanos(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
         <span class="self">self</span>.and_utc().timestamp_subsec_nanos()
     }
@@ -3108,12 +3102,12 @@
     /// ```
     </span><span class="attr">#[must_use]
     </span><span class="kw">pub const fn </span>signed_duration_since(<span class="self">self</span>, rhs: NaiveDateTime) -&gt; TimeDelta {
-        <span class="macro">expect!</span>(
+        expect(
             <span class="self">self</span>.date
                 .signed_duration_since(rhs.date)
                 .checked_add(<span class="kw-2">&amp;</span><span class="self">self</span>.time.signed_duration_since(rhs.time)),
-            <span class="string">"always in range"
-        </span>)
+            <span class="string">"always in range"</span>,
+        )
     }
 
     <span class="doccomment">/// Formats the combined date and time with the specified formatting items.
@@ -3193,16 +3187,8 @@
         <span class="self">self</span>.format_with_items(StrftimeItems::new(fmt))
     }
 
-    <span class="doccomment">/// Converts the `NaiveDateTime` into the timezone-aware `DateTime&lt;Tz&gt;`
-    /// with the provided timezone, if possible.
-    ///
-    /// This can fail in cases where the local time represented by the `NaiveDateTime`
-    /// is not a valid local timestamp in the target timezone due to an offset transition
-    /// for example if the target timezone had a change from +00:00 to +01:00
-    /// occuring at 2015-09-05 22:59:59, then a local time of 2015-09-05 23:56:04
-    /// could never occur. Similarly, if the offset transitioned in the opposite direction
-    /// then there would be two local times of 2015-09-05 23:56:04, one at +00:00 and one
-    /// at +01:00.
+    <span class="doccomment">/// Converts the `NaiveDateTime` into a timezone-aware `DateTime&lt;Tz&gt;` with the provided
+    /// time zone.
     ///
     /// # Example
     ///
@@ -3219,7 +3205,7 @@
     /// assert_eq!(dt.timezone(), tz);
     /// ```
     </span><span class="attr">#[must_use]
-    </span><span class="kw">pub fn </span>and_local_timezone&lt;Tz: TimeZone&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, tz: Tz) -&gt; LocalResult&lt;DateTime&lt;Tz&gt;&gt; {
+    </span><span class="kw">pub fn </span>and_local_timezone&lt;Tz: TimeZone&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, tz: Tz) -&gt; MappedLocalTime&lt;DateTime&lt;Tz&gt;&gt; {
         tz.from_local_datetime(<span class="self">self</span>)
     }
 
@@ -3246,7 +3232,7 @@
 
     <span class="doccomment">/// The Unix Epoch, 1970-01-01 00:00:00.
     </span><span class="kw">pub const </span>UNIX_EPOCH: <span class="self">Self </span>=
-        <span class="macro">expect!</span>(NaiveDate::from_ymd_opt(<span class="number">1970</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="string">""</span>).and_time(NaiveTime::MIN);
+        expect(NaiveDate::from_ymd_opt(<span class="number">1970</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="string">""</span>).and_time(NaiveTime::MIN);
 }
 
 <span class="kw">impl </span>From&lt;NaiveDate&gt; <span class="kw">for </span>NaiveDateTime {

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/chrono-0.4.35/src/datetime/serde.rs`."><title>serde.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="chrono" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.0 (aedd173a2 2024-03-17)" data-channel="1.77.0" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/chrono-0.4.37/src/datetime/serde.rs`."><title>serde.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="chrono" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.0 (aedd173a2 2024-03-17)" data-channel="1.77.0" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
             <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
     <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../chrono/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
@@ -1294,13 +1294,6 @@
 <a href="#1292" id="1292">1292</a>
 <a href="#1293" id="1293">1293</a>
 <a href="#1294" id="1294">1294</a>
-<a href="#1295" id="1295">1295</a>
-<a href="#1296" id="1296">1296</a>
-<a href="#1297" id="1297">1297</a>
-<a href="#1298" id="1298">1298</a>
-<a href="#1299" id="1299">1299</a>
-<a href="#1300" id="1300">1300</a>
-<a href="#1301" id="1301">1301</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>core::fmt;
 <span class="kw">use </span>serde::{de, ser};
 
@@ -1326,10 +1319,12 @@
 #[derive(Debug)]
 </span><span class="kw">pub struct </span>MilliSecondsTimestampVisitor;
 
-<span class="doccomment">/// Serialize into an ISO 8601 formatted string.
+<span class="doccomment">/// Serialize to an RFC 3339 formatted string
 ///
-/// See [the `serde` module](./serde/index.html) for alternate
-/// serializations.
+/// As an extension to RFC 3339 this can serialize `DateTime`s outside the range of 0-9999 years
+/// using an ISO 8601 syntax (which prepends an `-` or `+`).
+///
+/// See [the `serde` module](crate::serde) for alternate serializations.
 </span><span class="kw">impl</span>&lt;Tz: TimeZone&gt; ser::Serialize <span class="kw">for </span>DateTime&lt;Tz&gt; {
     <span class="kw">fn </span>serialize&lt;S&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
     <span class="kw">where
@@ -1357,7 +1352,7 @@
     <span class="kw">type </span>Value = DateTime&lt;FixedOffset&gt;;
 
     <span class="kw">fn </span>expecting(<span class="kw-2">&amp;</span><span class="self">self</span>, formatter: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
-        formatter.write_str(<span class="string">"a formatted date and time string or a unix timestamp"</span>)
+        formatter.write_str(<span class="string">"an RFC 3339 formatted date and time string"</span>)
     }
 
     <span class="kw">fn </span>visit_str&lt;E&gt;(<span class="self">self</span>, value: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Value, E&gt;
@@ -1368,13 +1363,12 @@
     }
 }
 
-<span class="doccomment">/// Deserialize a value that optionally includes a timezone offset in its
-/// string representation
+<span class="doccomment">/// Deserialize an RFC 3339 formatted string into a `DateTime&lt;FixedOffset&gt;`
 ///
-/// The value to be deserialized must be an rfc3339 string.
+/// As an extension to RFC 3339 this can deserialize to `DateTime`s outside the range of 0-9999
+/// years using an ISO 8601 syntax (which prepends an `-` or `+`).
 ///
-/// See [the `serde` module](./serde/index.html) for alternate
-/// deserialization formats.
+/// See [the `serde` module](crate::serde) for alternate deserialization formats.
 </span><span class="kw">impl</span>&lt;<span class="lifetime">'de</span>&gt; de::Deserialize&lt;<span class="lifetime">'de</span>&gt; <span class="kw">for </span>DateTime&lt;FixedOffset&gt; {
     <span class="kw">fn </span>deserialize&lt;D&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, D::Error&gt;
     <span class="kw">where
@@ -1384,12 +1378,14 @@
     }
 }
 
-<span class="doccomment">/// Deserialize into a UTC value
+<span class="doccomment">/// Deserialize an RFC 3339 formatted string into a `DateTime&lt;Utc&gt;`
 ///
-/// The value to be deserialized must be an rfc3339 string.
+/// If the value contains an offset from UTC that is not zero, the value will be converted to UTC.
 ///
-/// See [the `serde` module](./serde/index.html) for alternate
-/// deserialization formats.
+/// As an extension to RFC 3339 this can deserialize to `DateTime`s outside the range of 0-9999
+/// years using an ISO 8601 syntax (which prepends an `-` or `+`).
+///
+/// See [the `serde` module](crate::serde) for alternate deserialization formats.
 </span><span class="kw">impl</span>&lt;<span class="lifetime">'de</span>&gt; de::Deserialize&lt;<span class="lifetime">'de</span>&gt; <span class="kw">for </span>DateTime&lt;Utc&gt; {
     <span class="kw">fn </span>deserialize&lt;D&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, D::Error&gt;
     <span class="kw">where
@@ -1399,13 +1395,15 @@
     }
 }
 
-<span class="doccomment">/// Deserialize a value that includes no timezone in its string
-/// representation
+<span class="doccomment">/// Deserialize an RFC 3339 formatted string into a `DateTime&lt;Local&gt;`
 ///
-/// The value to be deserialized must be an rfc3339 string.
+/// The value will remain the same instant in UTC, but the offset will be recalculated to match
+/// that of the `Local` platform time zone.
 ///
-/// See [the `serde` module](./serde/index.html) for alternate
-/// serialization formats.
+/// As an extension to RFC 3339 this can deserialize to `DateTime`s outside the range of 0-9999
+/// years using an ISO 8601 syntax (which prepends an `-` or `+`).
+///
+/// See [the `serde` module](crate::serde) for alternate deserialization formats.
 </span><span class="attr">#[cfg(feature = <span class="string">"clock"</span>)]
 </span><span class="kw">impl</span>&lt;<span class="lifetime">'de</span>&gt; de::Deserialize&lt;<span class="lifetime">'de</span>&gt; <span class="kw">for </span>DateTime&lt;Local&gt; {
     <span class="kw">fn </span>deserialize&lt;D&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, D::Error&gt;
@@ -1436,8 +1434,7 @@
 ///     .unwrap()
 ///     .and_hms_nano_opt(02, 04, 59, 918355733)
 ///     .unwrap()
-///     .and_local_timezone(Utc)
-///     .unwrap();
+///     .and_utc();
 /// let my_s = S { time: time.clone() };
 ///
 /// let as_string = serde_json::to_string(&amp;my_s)?;
@@ -1484,8 +1481,7 @@
     ///         .unwrap()
     ///         .and_hms_nano_opt(02, 04, 59, 918355733)
     ///         .unwrap()
-    ///         .and_local_timezone(Utc)
-    ///         .unwrap(),
+    ///         .and_utc(),
     /// };
     /// let as_string = serde_json::to_string(&amp;my_s)?;
     /// assert_eq!(as_string, r#"{"time":1526522699918355733}"#);
@@ -1581,8 +1577,7 @@
 ///         .unwrap()
 ///         .and_hms_nano_opt(02, 04, 59, 918355733)
 ///         .unwrap()
-///         .and_local_timezone(Utc)
-///         .unwrap(),
+///         .and_utc(),
 /// );
 /// let my_s = S { time: time.clone() };
 ///
@@ -1630,8 +1625,7 @@
     ///             .unwrap()
     ///             .and_hms_nano_opt(02, 04, 59, 918355733)
     ///             .unwrap()
-    ///             .and_local_timezone(Utc)
-    ///             .unwrap(),
+    ///             .and_utc(),
     ///     ),
     /// };
     /// let as_string = serde_json::to_string(&amp;my_s)?;
@@ -1732,8 +1726,7 @@
 ///     .unwrap()
 ///     .and_hms_micro_opt(02, 04, 59, 918355)
 ///     .unwrap()
-///     .and_local_timezone(Utc)
-///     .unwrap();
+///     .and_utc();
 /// let my_s = S { time: time.clone() };
 ///
 /// let as_string = serde_json::to_string(&amp;my_s)?;
@@ -1772,8 +1765,7 @@
     ///         .unwrap()
     ///         .and_hms_micro_opt(02, 04, 59, 918355)
     ///         .unwrap()
-    ///         .and_local_timezone(Utc)
-    ///         .unwrap(),
+    ///         .and_utc(),
     /// };
     /// let as_string = serde_json::to_string(&amp;my_s)?;
     /// assert_eq!(as_string, r#"{"time":1526522699918355}"#);
@@ -1870,8 +1862,7 @@
 ///         .unwrap()
 ///         .and_hms_micro_opt(02, 04, 59, 918355)
 ///         .unwrap()
-///         .and_local_timezone(Utc)
-///         .unwrap(),
+///         .and_utc(),
 /// );
 /// let my_s = S { time: time.clone() };
 ///
@@ -1910,8 +1901,7 @@
     ///             .unwrap()
     ///             .and_hms_micro_opt(02, 04, 59, 918355)
     ///             .unwrap()
-    ///             .and_local_timezone(Utc)
-    ///             .unwrap(),
+    ///             .and_utc(),
     ///     ),
     /// };
     /// let as_string = serde_json::to_string(&amp;my_s)?;
@@ -2010,8 +2000,7 @@
 ///     .unwrap()
 ///     .and_hms_milli_opt(02, 04, 59, 918)
 ///     .unwrap()
-///     .and_local_timezone(Utc)
-///     .unwrap();
+///     .and_utc();
 /// let my_s = S { time: time.clone() };
 ///
 /// let as_string = serde_json::to_string(&amp;my_s)?;
@@ -2050,8 +2039,7 @@
     ///         .unwrap()
     ///         .and_hms_milli_opt(02, 04, 59, 918)
     ///         .unwrap()
-    ///         .and_local_timezone(Utc)
-    ///         .unwrap(),
+    ///         .and_utc(),
     /// };
     /// let as_string = serde_json::to_string(&amp;my_s)?;
     /// assert_eq!(as_string, r#"{"time":1526522699918}"#);
@@ -2141,8 +2129,7 @@
 ///         .unwrap()
 ///         .and_hms_milli_opt(02, 04, 59, 918)
 ///         .unwrap()
-///         .and_local_timezone(Utc)
-///         .unwrap(),
+///         .and_utc(),
 /// );
 /// let my_s = S { time: time.clone() };
 ///
@@ -2181,8 +2168,7 @@
     ///             .unwrap()
     ///             .and_hms_milli_opt(02, 04, 59, 918)
     ///             .unwrap()
-    ///             .and_local_timezone(Utc)
-    ///             .unwrap(),
+    ///             .and_utc(),
     ///     ),
     /// };
     /// let as_string = serde_json::to_string(&amp;my_s)?;
@@ -2554,7 +2540,7 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_serde_no_offset_debug() {
-        <span class="kw">use crate</span>::{LocalResult, NaiveDate, NaiveDateTime, Offset};
+        <span class="kw">use crate</span>::{MappedLocalTime, NaiveDate, NaiveDateTime, Offset};
         <span class="kw">use </span>core::fmt::Debug;
 
         <span class="attr">#[derive(Clone)]
@@ -2569,14 +2555,14 @@
             <span class="kw">fn </span>from_offset(_state: <span class="kw-2">&amp;</span>TestTimeZone) -&gt; TestTimeZone {
                 TestTimeZone
             }
-            <span class="kw">fn </span>offset_from_local_date(<span class="kw-2">&amp;</span><span class="self">self</span>, _local: <span class="kw-2">&amp;</span>NaiveDate) -&gt; LocalResult&lt;TestTimeZone&gt; {
-                LocalResult::Single(TestTimeZone)
+            <span class="kw">fn </span>offset_from_local_date(<span class="kw-2">&amp;</span><span class="self">self</span>, _local: <span class="kw-2">&amp;</span>NaiveDate) -&gt; MappedLocalTime&lt;TestTimeZone&gt; {
+                MappedLocalTime::Single(TestTimeZone)
             }
             <span class="kw">fn </span>offset_from_local_datetime(
                 <span class="kw-2">&amp;</span><span class="self">self</span>,
                 _local: <span class="kw-2">&amp;</span>NaiveDateTime,
-            ) -&gt; LocalResult&lt;TestTimeZone&gt; {
-                LocalResult::Single(TestTimeZone)
+            ) -&gt; MappedLocalTime&lt;TestTimeZone&gt; {
+                MappedLocalTime::Single(TestTimeZone)
             }
             <span class="kw">fn </span>offset_from_utc_date(<span class="kw-2">&amp;</span><span class="self">self</span>, _utc: <span class="kw-2">&amp;</span>NaiveDate) -&gt; TestTimeZone {
                 TestTimeZone
