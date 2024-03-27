@@ -317,6 +317,16 @@ class ToGrometPass:
     def symtab_records(self):
         return self.symbol_table["records"]
 
+    def offset_pif(self, var_name, func_name):
+        args = self.symbol_table["functions"][func_name][2]
+        idx = 1
+        for arg,_ in args:
+            if arg == var_name:
+                return idx
+            idx += 1
+
+        return 1
+
     def build_function_arguments_table(self, nodes):
         """Iterates through all the function definitions at the module
         level and creates a table that maps their function names to a map
@@ -2684,7 +2694,7 @@ class ToGrometPass:
             # is not inlined or part of an assignment we don't visit the
             # arguments as that's already been handled by the primitive handler
             # if not is_primitive(func_name, "CAST") or (from_assignment or is_inline(func_name)):
-            keyword_arg_len = len(self.symtab_functions()[func_name])
+            keyword_arg_len = len(self.symtab_functions()[func_name][2])
             visited_args = 0
             for arg in node.arguments:
                 self.visit(arg, parent_gromet_fn, node)
@@ -2766,9 +2776,10 @@ class ToGrometPass:
                             GrometWire(src=pif_idx, tgt=pof_idx),
                         )
                 elif isinstance(arg, AnnCastAssignment):
+                    pif_offset = self.offset_pif(arg.left.val.name, func_name)
                     parent_gromet_fn.wff = insert_gromet_object(
                         parent_gromet_fn.wff,
-                        GrometWire(src=pif_idx, tgt=len(parent_gromet_fn.pof))
+                        GrometWire(src=pif_idx - (visited_args - pif_offset), tgt=len(parent_gromet_fn.pof))
                     )
                     # if isinstance(arg.right)
             
@@ -2777,7 +2788,7 @@ class ToGrometPass:
             # otherwise if more keyword args exist than visited args
             # we need to add some ports
             if keyword_arg_len > visited_args:
-                for i in range(keyword_arg_len - visited_args - 1):
+                for i in range(keyword_arg_len - visited_args):
                     parent_gromet_fn.pif = insert_gromet_object(
                         parent_gromet_fn.pif, GrometPort(box=call_bf_idx)
                     )
@@ -3193,7 +3204,7 @@ class ToGrometPass:
                         ),
                     )
                 else:
-                    functions[node.name.name][2].append(arg.default_value.value)
+                    functions[node.name.name][2].append((arg.val.name, arg.default_value.value))
                     new_gromet.opi = insert_gromet_object(
                         new_gromet.opi,
                         GrometPort(

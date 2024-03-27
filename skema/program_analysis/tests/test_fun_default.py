@@ -26,6 +26,15 @@ r = foo(4)
 s = foo(3, 4)
 """
 
+def fun_default2():
+    return """
+def foo(x=1, y=2):
+    return x + y
+
+a = foo(10, y=20)
+b = foo(y=2, x=1)
+"""
+
 def generate_gromet(test_file_string):
     # use ast.Parse to get Python AST
     contents = ast.parse(test_file_string)
@@ -99,7 +108,7 @@ def test_fun_default1():
     assert base_fn.pof[7].name == "s"
 
     assert len(base_fn.wff) == 4
-    assert base_fn.wff[0].src == 3
+    assert base_fn.wff[0].src == 4
     assert base_fn.wff[0].tgt == 2
 
     assert base_fn.wff[1].src == 5
@@ -171,4 +180,157 @@ def test_fun_default1():
     assert assign_fn.wfopo[0].src == 1
     assert assign_fn.wfopo[0].tgt == 1
 
+def test_fun_default2():
+    exp_gromet = generate_gromet(fun_default2())
+    base_fn = exp_gromet.fn
+
+    assert len(base_fn.b) == 1
+    assert base_fn.b[0].function_type == FunctionType.MODULE
+
+    assert len(base_fn.bf) == 6
+    assert base_fn.bf[0].function_type == FunctionType.IMPORTED_METHOD and base_fn.bf[0].import_type == ImportType.OTHER 
+    assert base_fn.bf[0].body == 1 and base_fn.bf[0].name == "foo_id0"
+    assert base_fn.bf[1].function_type == FunctionType.LITERAL and base_fn.bf[1].value.value == 10
+    assert base_fn.bf[1].value.value_type == "Integer"
+    assert base_fn.bf[2].function_type == FunctionType.EXPRESSION and base_fn.bf[2].body == 2
+    assert base_fn.bf[3].function_type == FunctionType.IMPORTED_METHOD and base_fn.bf[3].import_type == ImportType.OTHER
+    assert base_fn.bf[3].body == 1 and base_fn.bf[3].name == "foo_id0"
+    assert base_fn.bf[4].function_type == FunctionType.EXPRESSION and base_fn.bf[4].body == 3
+    assert base_fn.bf[5].function_type == FunctionType.EXPRESSION and base_fn.bf[5].body == 4
+
+    assert len(base_fn.pif) == 4
+    assert base_fn.pif[0].box == 1
+    assert base_fn.pif[1].box == 1
+    assert base_fn.pif[2].box == 4
+    assert base_fn.pif[3].box == 4
+
+    assert len(base_fn.pof) == 6
+    assert base_fn.pof[0].box == 2
+
+    assert base_fn.pof[1].box == 3
+    assert base_fn.pof[1].name == "y"
+
+    assert base_fn.pof[2].box == 1
+    assert base_fn.pof[2].name == "a"
+
+    assert base_fn.pof[3].box == 5
+    assert base_fn.pof[3].name == "y"
+
+    assert base_fn.pof[4].box == 6
+    assert base_fn.pof[4].name == "x"
+    
+    assert base_fn.pof[5].box == 4
+    assert base_fn.pof[5].name == "b"
+
+    assert len(base_fn.wff) == 4
+    assert base_fn.wff[0].src == 1
+    assert base_fn.wff[0].tgt == 1
+
+    assert base_fn.wff[1].src == 2
+    assert base_fn.wff[1].tgt == 2
+
+    assert base_fn.wff[2].src == 4
+    assert base_fn.wff[2].tgt == 4
+
+    assert base_fn.wff[3].src == 3
+    assert base_fn.wff[3].tgt == 5
+    
+    ###############################
+    func_fn = exp_gromet.fn_array[0]
+    assert len(func_fn.b) == 1
+    assert func_fn.b[0].function_type == FunctionType.FUNCTION
+    assert func_fn.b[0].name == "foo_id0"
+
+    assert len(func_fn.opi) == 2
+    assert func_fn.opi[0].box == 1
+    assert func_fn.opi[0].name == "x"
+    assert func_fn.opi[0].default_value == 1
+
+    assert func_fn.opi[1].box == 1
+    assert func_fn.opi[1].name == "y"
+    assert func_fn.opi[1].default_value == 2
+
+    assert len(func_fn.opo) == 1
+    assert func_fn.opo[0].box == 1
+
+    assert len(func_fn.bf) == 1
+    assert func_fn.bf[0].function_type == FunctionType.LANGUAGE_PRIMITIVE
+    assert func_fn.bf[0].name == "ast.Add"
+
+    assert len(func_fn.pif) == 2
+    assert func_fn.pif[0].box == 1
+    assert func_fn.pif[1].box == 1
+
+    assert len(func_fn.pof) == 1
+    assert func_fn.pof[0].box == 1
+
+    assert len(func_fn.wfopi) == 2
+    assert func_fn.wfopi[0].src == 1
+    assert func_fn.wfopi[0].tgt == 1
+    assert func_fn.wfopi[1].src == 2
+    assert func_fn.wfopi[1].tgt == 2
+
+    assert len(func_fn.wfopo) == 1
+    assert func_fn.wfopo[0].src == 1
+    assert func_fn.wfopo[0].tgt == 1
+
+    ###############################
+    assign_fn = exp_gromet.fn_array[1]
+    assert len(assign_fn.opo) == 1
+    assert assign_fn.opo[0].box == 1
+
+    assert len(assign_fn.b) == 1
+    assert assign_fn.b[0].function_type == FunctionType.EXPRESSION
+
+    assert len(assign_fn.bf) == 1
+    assert assign_fn.bf[0].function_type == FunctionType.LITERAL
+    assert assign_fn.bf[0].value.value_type == "Integer"
+    assert assign_fn.bf[0].value.value == 20
+    
+    assert len(assign_fn.pof) == 1
+    assert assign_fn.pof[0].box == 1
+    
+    assert len(assign_fn.wfopo) == 1
+    assert assign_fn.wfopo[0].src == 1
+    assert assign_fn.wfopo[0].tgt == 1
+
+    ###############################
+    assign_fn = exp_gromet.fn_array[2]
+    assert len(assign_fn.opo) == 1
+    assert assign_fn.opo[0].box == 1
+
+    assert len(assign_fn.b) == 1
+    assert assign_fn.b[0].function_type == FunctionType.EXPRESSION
+
+    assert len(assign_fn.bf) == 1
+    assert assign_fn.bf[0].function_type == FunctionType.LITERAL
+    assert assign_fn.bf[0].value.value_type == "Integer"
+    assert assign_fn.bf[0].value.value == 2
+    
+    assert len(assign_fn.pof) == 1
+    assert assign_fn.pof[0].box == 1
+    
+    assert len(assign_fn.wfopo) == 1
+    assert assign_fn.wfopo[0].src == 1
+    assert assign_fn.wfopo[0].tgt == 1
+
+    ###############################
+    assign_fn = exp_gromet.fn_array[3]
+    assert len(assign_fn.opo) == 1
+    assert assign_fn.opo[0].box == 1
+
+    assert len(assign_fn.b) == 1
+    assert assign_fn.b[0].function_type == FunctionType.EXPRESSION
+
+    assert len(assign_fn.bf) == 1
+    assert assign_fn.bf[0].function_type == FunctionType.LITERAL
+    assert assign_fn.bf[0].value.value_type == "Integer"
+    assert assign_fn.bf[0].value.value == 1
+    
+    assert len(assign_fn.pof) == 1
+    assert assign_fn.pof[0].box == 1
+    
+    assert len(assign_fn.wfopo) == 1
+    assert assign_fn.wfopo[0].src == 1
+    assert assign_fn.wfopo[0].tgt == 1
 
