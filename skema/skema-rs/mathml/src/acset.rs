@@ -652,6 +652,18 @@ impl From<Vec<MathExpressionTree>> for GeneralizedAMR {
             parameter_vec.push(parameter.clone());
         }
 
+        // now to trim the numbers from the parameters field
+        let mut nums = Vec::<usize>::new();
+        for (k, param) in parameter_vec.iter().enumerate() {
+            if param.id.parse::<f32>().is_ok() {
+                nums.push(k);
+            }
+        }
+
+        for num in nums.iter().rev() {
+            parameter_vec.remove(num.clone());
+        }
+
         let header = Header {
             name: "Model".to_string(),
             schema: "G-AMR".to_string(),
@@ -1210,6 +1222,18 @@ impl From<Vec<FirstOrderODE>> for RegNet {
 
         parameter_vec.sort();
         parameter_vec.dedup();
+
+        // now to trim the numbers from the parameters field
+        let mut nums = Vec::<usize>::new();
+        for (k, param) in parameter_vec.iter().enumerate() {
+            if param.id.parse::<f32>().is_ok() {
+                nums.push(k);
+            }
+        }
+
+        for num in nums.iter().rev() {
+            parameter_vec.remove(num.clone());
+        }
 
         // ------------------------------------------
 
