@@ -746,7 +746,7 @@ impl From<Vec<FirstOrderODE>> for PetriNet {
         // first is we need to replace any terms with more than 2 exp_states with subterms, these are simply
         // terms that need to be distributed (ASSUMPTION, MOST A TRANSTION CAN HAVE IS 2 IN AND 2 OUT)
         // but first we need to inherit the dynamic state to each sub term
-        let mut composite_term_ind = Vec::<usize>::new();
+        /*let mut composite_term_ind = Vec::<usize>::new();
         let mut sub_terms = Vec::<PnTerm>::new();
         for (j, t) in terms.clone().iter().enumerate() {
             if t.exp_states.len() > 2 && t.sub_terms.is_some() {
@@ -763,7 +763,7 @@ impl From<Vec<FirstOrderODE>> for PetriNet {
             terms.remove(*i);
         }
         // replace with subterms
-        terms.append(&mut sub_terms);
+        terms.append(&mut sub_terms);*/
 
         // now for polarity pairs of terms we need to construct the transistions
         let mut paired_term_indices = Vec::<usize>::new();

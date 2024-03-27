@@ -1135,10 +1135,19 @@ pub fn flatten_mults(mut equation: MathExpressionTree) -> MathExpressionTree {
                 match y[1].clone() {
                     Cons(x1, y1) => match x1 {
                         Multiply => {
-                            let temp1 = flatten_mults(y1[0].clone());
-                            let temp2 = flatten_mults(y1[1].clone());
+                            let mut temp1 = flatten_mults(y1[0].clone());
+                            let mut temp2 = flatten_mults(y1[1].clone());
                             y.remove(1);
-                            y.append(&mut [temp1, temp2].to_vec())
+                            if let Cons(Multiply, ref mut y2) = temp1 {
+                                y.append(&mut y2.clone());
+                            } else {
+                                y.append(&mut [temp1].to_vec());
+                            }
+                            if let Cons(Multiply, ref mut y2) = temp2 {
+                                y.append(&mut y2.clone());
+                            } else {
+                                y.append(&mut [temp2].to_vec());
+                            }
                         }
                         _ => {
                             let temp1 = y[1].clone();
@@ -1151,10 +1160,19 @@ pub fn flatten_mults(mut equation: MathExpressionTree) -> MathExpressionTree {
                 match y[0].clone() {
                     Cons(x0, y0) => match x0 {
                         Multiply => {
-                            let temp1 = flatten_mults(y0[0].clone());
-                            let temp2 = flatten_mults(y0[1].clone());
+                            let mut temp1 = flatten_mults(y0[0].clone());
+                            let mut temp2 = flatten_mults(y0[1].clone());
                             y.remove(0);
-                            y.append(&mut [temp1, temp2].to_vec());
+                            if let Cons(Multiply, ref mut y2) = temp1 {
+                                y.append(&mut y2.clone());
+                            } else {
+                                y.append(&mut [temp1].to_vec());
+                            }
+                            if let Cons(Multiply, ref mut y2) = temp2 {
+                                y.append(&mut y2.clone());
+                            } else {
+                                y.append(&mut [temp2].to_vec());
+                            }
                         }
                         _ => {
                             let temp1 = y[0].clone();

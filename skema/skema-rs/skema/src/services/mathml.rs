@@ -272,6 +272,11 @@ pub async fn get_amr(payload: web::Json<AMRmathml>) -> HttpResponse {
             let mut flattened_asts = Vec::<FirstOrderODE>::new();
 
             for (_, mut eq) in mt_asts {
+                println!("pre-flattened RHS: {:?}", eq.rhs.to_string().clone());
+                eq.rhs = flatten_mults(eq.rhs.clone());
+                println!("once flattened RHS: {:?}", eq.rhs.to_string().clone());
+                eq.rhs = flatten_mults(eq.rhs.clone());
+                println!("twice flattened RHS: {:?}", eq.rhs.to_string().clone());
                 eq.rhs = flatten_mults(eq.rhs.clone());
                 flattened_asts.push(eq.clone());
             }
