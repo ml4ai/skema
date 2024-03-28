@@ -31,17 +31,35 @@ class EnrichmentReqest(BaseModel):
                 }
             }
         }]
-    ),
+    )
     source: str = Field(
         description="The raw source code to extract parameter values from",
         examples=["a=1\nb=a+1\nc=b-a"]
-    ),
+    )
     filename: str = Field(
         description="The filename of the file passed in the 'source' field",
         examples=["source.py"]
     )
 
-@router.post("/amr-enrichment", summary="Given an amr and source code, return an enriched amr with parameter values filled in.")
+@router.post("/amr-enrichment", summary="Given an amr and source code, return an enriched amr with parameter values filled in.", response_model=Dict, responses={
+    200: {
+        "content": {
+            "application/json":{
+                "example": {
+                    "semantics": {
+                        "ode":{
+                            "parameters":[
+                                {"name": "a", "value": 1},
+                                {"name": "b", "value": 2},
+                                {"name": "c", "value": 1}
+                            ]
+                        }
+                    }
+                }
+            }
+        }
+    }
+})
 def amr_enrichment(request: EnrichmentReqest):
     """
     Endpoint for enriching amr with parameter values.

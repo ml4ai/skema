@@ -297,6 +297,19 @@ def healthcheck() -> int:
     "/fn-supported-file-extensions",
     summary="Endpoint for checking which files extensions are currently supported by code2fn pipeline.",
     response_model=List[str],
+    responses={
+        200: {
+            "content": {
+                "application/json":{
+                    "example": [
+                        ".py",
+                        ".f",
+                        ".f90"
+                    ]
+                }
+            }
+        }
+    }
 )
 def fn_supported_file_extensions():
     """
@@ -319,6 +332,26 @@ def fn_supported_file_extensions():
         "Send a system of code and filepaths of interest,"
         " get a GroMEt FN Module collection back."
     ),
+    responses={
+        200: {
+            "content": {
+                "application/json":{
+                    "example": {
+                        "schema": "FN",
+                        "schema_version": "0.1.10",
+                        "name": "gromet_name",
+                        "modules": [],
+                        "module_index": [],
+                        "module_dependencies": [],
+                        "executables": [],
+                        "metadata_collection": [],
+                        "gromet_type": "GrometFNModuleCollection"
+
+                    }
+                }
+            }
+        }
+    }
 )
 async def fn_given_filepaths(system: System):
     """
@@ -355,6 +388,25 @@ async def fn_given_filepaths(system: System):
         "Send a zip file containing a code system,"
         " get a GroMEt FN Module collection back."
     ),
+    responses={
+        200: {
+            "content": {
+                "application/json":{
+                    "example": {
+                        "schema": "FN",
+                        "schema_version": "0.1.10",
+                        "name": "gromet_name",
+                        "modules": [],
+                        "module_index": [],
+                        "module_dependencies": [],
+                        "executables": [],
+                        "metadata_collection": [],
+                        "gromet_type": "GrometFNModuleCollection"
+                    }
+                }
+            }
+        }
+    }
 )
 async def fn_given_filepaths_zip(zip_file: UploadFile = File()):
     """
@@ -407,6 +459,41 @@ async def fn_given_filepaths_zip(zip_file: UploadFile = File()):
 @router.post(
     "/gromet-object-count",
     summary=("Endpoint for counting the number of boxes, wires, and ports in a Gromet object."),
+    responses={
+        200: {
+            "content": {
+                "application/json":{
+                    "example": {
+                        "b": 0,
+                        "bf": 0,
+                        "opi": 0,
+                        "opo": 0,
+                        "pil": 0,
+                        "pol": 0,
+                        "wlopi": 0,
+                        "wll": 0,
+                        "wlf": 0,
+                        "wlc": 0,
+                        "wlopo": 0,
+                        "pof": 0,
+                        "pif": 0,
+                        "wfopi": 0,
+                        "wfl": 0,
+                        "wff": 0,
+                        "wfc": 0,
+                        "wfopo": 0,
+                        "pic": 0,
+                        "poc": 0,
+                        "wcopi": 0,
+                        "wcl": 0,
+                        "wcf": 0,
+                        "wcc": 0,
+                        "wcopo": 0,
+                    }
+                }
+            }
+        }
+    }
 )
 async def gromet_object_count(gromet_object: Dict):
     """
