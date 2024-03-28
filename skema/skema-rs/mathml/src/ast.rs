@@ -48,6 +48,16 @@ pub struct Ci {
     pub r#type: Option<Type>,
     pub content: Box<MathExpression>,
     pub func_of: Option<Vec<Ci>>,
+    pub notation: Option<VectorNotation>,
+}
+
+/// Vector notation call for Ci being bold or an arrow
+#[derive(
+    Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, JsonSchema,
+)]
+pub enum VectorNotation {
+    Bold,
+    Arrow,
 }
 
 /// Represents the differentiation operator `diff` for functions or expresions `func`
@@ -66,6 +76,16 @@ pub struct Differential {
     Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, JsonSchema,
 )]
 pub struct SummationMath {
+    pub op: Box<MathExpression>,
+    pub func: Box<MathExpression>,
+}
+
+/// Represents expoenential operator with terms that are in the exponential
+/// E.g. exp( x(y-z) )
+#[derive(
+    Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, JsonSchema,
+)]
+pub struct ExpMath {
     pub op: Box<MathExpression>,
     pub func: Box<MathExpression>,
 }
@@ -182,6 +202,8 @@ pub enum MathExpression {
     SurfaceIntegral(Box<MathExpression>),
     /// ↓ as an operator e.g. I↓ indicates downward diffuse radiative fluxes per unit indcident flux
     DownArrow(DownArrow),
+    Minimize(Box<MathExpression>, Vec<MathExpression>),
+    ExpMath(ExpMath),
     #[default]
     None,
 }
@@ -194,6 +216,7 @@ impl fmt::Display for MathExpression {
                 r#type: _,
                 content,
                 func_of: _,
+                notation: _,
             }) => write!(f, "{}", content),
             MathExpression::Mn(number) => write!(f, "{}", number),
             MathExpression::Msup(base, superscript) => {
@@ -227,6 +250,10 @@ impl fmt::Display for MathExpression {
                 write!(f, "{op}")?;
                 write!(f, "{func}")
             }
+            MathExpression::ExpMath(ExpMath { op, func }) => {
+                write!(f, "{op}")?;
+                write!(f, "{func}")
+            }
             MathExpression::HatComp(HatComp { op, comp }) => {
                 write!(f, "{op}")?;
                 write!(f, "{comp}")
@@ -253,6 +280,12 @@ impl fmt::Display for MathExpression {
                 (None, Some(up)) => write!(f, "{comp}↓^{{{up}}}"),
                 (None, None) => write!(f, "{comp}↓"),
             },
+            MathExpression::Minimize(op, row) => {
+                for e in row {
+                    write!(f, "{}", e)?;
+                }
+                Ok(())
+            }
             expression => write!(f, "{expression:?}"),
         }
     }

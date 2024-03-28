@@ -368,18 +368,21 @@ pub async fn model2MET(
             r#type: Some(ast::Type::Real),
             content: Box::new(mathml::ast::MathExpression::Mi(lhs_mi1)),
             func_of: None,
+            notation: None,
         };
         let lhs_ci2 = mathml::ast::Ci {
             // differentiation variable
             r#type: Some(ast::Type::Real),
             content: Box::new(mathml::ast::MathExpression::Mi(lhs_mi2)),
             func_of: None,
+            notation: None,
         };
         let lhs_ci3 = mathml::ast::Ci {
             // state function
             r#type: Some(ast::Type::Function),
             content: Box::new(mathml::ast::MathExpression::Mi(lhs_mi3)),
             func_of: Some([lhs_ci1].to_vec()),
+            notation: None,
         };
         let lhs_deriv = mathml::ast::operator::Derivative {
             order: 1,
@@ -438,18 +441,21 @@ pub async fn model2GAMR(
             r#type: Some(ast::Type::Real),
             content: Box::new(mathml::ast::MathExpression::Mi(lhs_mi1)),
             func_of: None,
+            notation: None,
         };
         let lhs_ci2 = mathml::ast::Ci {
             // differentiation variable
             r#type: Some(ast::Type::Real),
             content: Box::new(mathml::ast::MathExpression::Mi(lhs_mi2)),
             func_of: None,
+            notation: None,
         };
         let lhs_ci3 = mathml::ast::Ci {
             // state function
             r#type: Some(ast::Type::Function),
             content: Box::new(mathml::ast::MathExpression::Mi(lhs_mi3)),
             func_of: Some([lhs_ci1].to_vec()),
+            notation: None,
         };
         let lhs_deriv = mathml::ast::operator::Derivative {
             order: 1,
