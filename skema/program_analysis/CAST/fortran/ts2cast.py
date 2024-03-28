@@ -540,8 +540,8 @@ class TS2CAST(object):
                     (...) ...
             (body) ...
         """
-
-        loop_control_node = get_first_child_by_type(node, "loop_contrel_expression")
+        
+        loop_control_node = get_first_child_by_type(node, "loop_control_expression")
         if not loop_control_node:
             return self._visit_while(node)
 
@@ -588,7 +588,7 @@ class TS2CAST(object):
                 ),
             )
         )
-
+     
         # (i, generated_iter_0, sc_0) = next(generated_iter_0)
         pre.append(
             Assignment(
@@ -612,7 +612,7 @@ class TS2CAST(object):
         expr = Operator(
             op="!=",  # TODO: Should this be == or !=
             operands=[
-                Var(stop_condition_name_node, "Boolean"),
+                stop_condition_name_node,
                 CASTLiteralValue("Boolean", True),
             ],
         )
@@ -1090,7 +1090,7 @@ class TS2CAST(object):
         # attr = self.node_helper.get_identifier(
         #    get_first_child_by_type(node, "type_member", recurse=True)
         # )
-        # print(self.node_helper.get_identifier(get_first_child_by_type(node, "type_member", recurse=True)))
+        #print(self.node_helper.get_identifier(get_first_child_by_type(node, "type_member", recurse=True)))
         attr = self.visit_name(get_first_child_by_type(node, "type_member"))
 
         return Attribute(
