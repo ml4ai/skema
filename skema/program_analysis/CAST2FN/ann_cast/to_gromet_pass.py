@@ -318,6 +318,11 @@ class ToGrometPass:
         return self.symbol_table["records"]
 
     def offset_pif(self, var_name, func_name):
+        """Allows us to determine how much to offset a variable's pif.
+        This is done by acquiring its 'index location' in the function definition
+        that is foo(x,y,z) has an offset of 2 for variable y, and an offset of 3 for variable z.
+        Used primarily with keyword argument wiring.
+        """
         args = self.symbol_table["functions"][func_name][2]
         idx = 1
         for arg,_ in args:
@@ -2776,6 +2781,10 @@ class ToGrometPass:
                             GrometWire(src=pif_idx, tgt=pof_idx),
                         )
                 elif isinstance(arg, AnnCastAssignment):
+                    # We do an offset computation here that allows us to appropriately
+                    # wire keyword arguments whenever they're assigned in a different
+                    # order than they show up
+                    # i.e. foo(y=1,x=2) when the definition is foo(x,y)
                     pif_offset = self.offset_pif(arg.left.val.name, func_name)
                     parent_gromet_fn.wff = insert_gromet_object(
                         parent_gromet_fn.wff,
