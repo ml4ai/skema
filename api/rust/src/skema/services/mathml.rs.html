@@ -293,6 +293,8 @@
 <a href="#291" id="291">291</a>
 <a href="#292" id="292">292</a>
 <a href="#293" id="293">293</a>
+<a href="#294" id="294">294</a>
+<a href="#295" id="295">295</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>actix_web::{post, put, web, HttpResponse};
 <span class="kw">use </span>mathml::parsers::decapodes_serialization::{
     to_wiring_diagram, DecapodesCollection, WiringDiagram,
@@ -567,7 +569,9 @@ body = Vec&lt;MathExpressionTree&gt;
             <span class="kw">let </span><span class="kw-2">mut </span>flattened_asts = Vec::&lt;FirstOrderODE&gt;::new();
 
             <span class="kw">for </span>(<span class="kw">_</span>, <span class="kw-2">mut </span>eq) <span class="kw">in </span>mt_asts {
+                <span class="macro">println!</span>(<span class="string">"pre-flattened RHS: {:?}"</span>, eq.rhs.to_string().clone());
                 eq.rhs = flatten_mults(eq.rhs.clone());
+                <span class="macro">println!</span>(<span class="string">"once flattened RHS: {:?}"</span>, eq.rhs.to_string().clone());
                 flattened_asts.push(eq.clone());
             }
             <span class="kw">let </span>model_type = payload.model.clone();

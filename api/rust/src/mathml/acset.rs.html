@@ -1260,42 +1260,6 @@
 <a href="#1258" id="1258">1258</a>
 <a href="#1259" id="1259">1259</a>
 <a href="#1260" id="1260">1260</a>
-<a href="#1261" id="1261">1261</a>
-<a href="#1262" id="1262">1262</a>
-<a href="#1263" id="1263">1263</a>
-<a href="#1264" id="1264">1264</a>
-<a href="#1265" id="1265">1265</a>
-<a href="#1266" id="1266">1266</a>
-<a href="#1267" id="1267">1267</a>
-<a href="#1268" id="1268">1268</a>
-<a href="#1269" id="1269">1269</a>
-<a href="#1270" id="1270">1270</a>
-<a href="#1271" id="1271">1271</a>
-<a href="#1272" id="1272">1272</a>
-<a href="#1273" id="1273">1273</a>
-<a href="#1274" id="1274">1274</a>
-<a href="#1275" id="1275">1275</a>
-<a href="#1276" id="1276">1276</a>
-<a href="#1277" id="1277">1277</a>
-<a href="#1278" id="1278">1278</a>
-<a href="#1279" id="1279">1279</a>
-<a href="#1280" id="1280">1280</a>
-<a href="#1281" id="1281">1281</a>
-<a href="#1282" id="1282">1282</a>
-<a href="#1283" id="1283">1283</a>
-<a href="#1284" id="1284">1284</a>
-<a href="#1285" id="1285">1285</a>
-<a href="#1286" id="1286">1286</a>
-<a href="#1287" id="1287">1287</a>
-<a href="#1288" id="1288">1288</a>
-<a href="#1289" id="1289">1289</a>
-<a href="#1290" id="1290">1290</a>
-<a href="#1291" id="1291">1291</a>
-<a href="#1292" id="1292">1292</a>
-<a href="#1293" id="1293">1293</a>
-<a href="#1294" id="1294">1294</a>
-<a href="#1295" id="1295">1295</a>
-<a href="#1296" id="1296">1296</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Structs to represent elements of ACSets (Annotated C-Sets, a concept from category theory).
 //! JSON-serialized ACSets are the form of model exchange between TA1 and TA2.
 </span><span class="kw">use </span><span class="kw">crate</span>::ast::operator::Operator;
@@ -1950,6 +1914,18 @@
             parameter_vec.push(parameter.clone());
         }
 
+        <span class="comment">// now to trim the numbers from the parameters field
+        </span><span class="kw">let </span><span class="kw-2">mut </span>nums = Vec::&lt;usize&gt;::new();
+        <span class="kw">for </span>(k, param) <span class="kw">in </span>parameter_vec.iter().enumerate() {
+            <span class="kw">if </span>param.id.parse::&lt;f32&gt;().is_ok() {
+                nums.push(k);
+            }
+        }
+
+        <span class="kw">for </span>num <span class="kw">in </span>nums.iter().rev() {
+            parameter_vec.remove(num.clone());
+        }
+
         <span class="kw">let </span>header = Header {
             name: <span class="string">"Model"</span>.to_string(),
             schema: <span class="string">"G-AMR"</span>.to_string(),
@@ -2044,26 +2020,26 @@
         <span class="comment">// first is we need to replace any terms with more than 2 exp_states with subterms, these are simply
         // terms that need to be distributed (ASSUMPTION, MOST A TRANSTION CAN HAVE IS 2 IN AND 2 OUT)
         // but first we need to inherit the dynamic state to each sub term
-        </span><span class="kw">let </span><span class="kw-2">mut </span>composite_term_ind = Vec::&lt;usize&gt;::new();
-        <span class="kw">let </span><span class="kw-2">mut </span>sub_terms = Vec::&lt;PnTerm&gt;::new();
-        <span class="kw">for </span>(j, t) <span class="kw">in </span>terms.clone().iter().enumerate() {
-            <span class="kw">if </span>t.exp_states.len() &gt; <span class="number">2 </span>&amp;&amp; t.sub_terms.is_some() {
-                <span class="kw">for </span>(i, _sub_t) <span class="kw">in </span>t.sub_terms.clone().unwrap().iter().enumerate() {
+        /*let mut composite_term_ind = Vec::&lt;usize&gt;::new();
+        let mut sub_terms = Vec::&lt;PnTerm&gt;::new();
+        for (j, t) in terms.clone().iter().enumerate() {
+            if t.exp_states.len() &gt; 2 &amp;&amp; t.sub_terms.is_some() {
+                for (i, _sub_t) in t.sub_terms.clone().unwrap().iter().enumerate() {
                     terms[j].sub_terms.as_mut().unwrap()[i].dyn_state = t.dyn_state.clone();
                     sub_terms.push(terms[j].sub_terms.as_mut().unwrap()[i].clone());
                 }
                 composite_term_ind.push(j);
             }
         }
-        <span class="comment">// delete composite terms we are replacing
-        </span>composite_term_ind.sort();
-        <span class="kw">for </span>i <span class="kw">in </span>composite_term_ind.iter().rev() {
-            terms.remove(<span class="kw-2">*</span>i);
+        // delete composite terms we are replacing
+        composite_term_ind.sort();
+        for i in composite_term_ind.iter().rev() {
+            terms.remove(*i);
         }
-        <span class="comment">// replace with subterms
-        </span>terms.append(<span class="kw-2">&amp;mut </span>sub_terms);
+        // replace with subterms
+        terms.append(&amp;mut sub_terms);*/
 
-        <span class="comment">// now for polarity pairs of terms we need to construct the transistions
+        // now for polarity pairs of terms we need to construct the transistions
         </span><span class="kw">let </span><span class="kw-2">mut </span>paired_term_indices = Vec::&lt;usize&gt;::new();
         <span class="kw">let </span><span class="kw-2">mut </span>transition_pair = Vec::&lt;(PnTerm, PnTerm)&gt;::new();
         <span class="kw">for </span>(i, term1) <span class="kw">in </span>terms.clone().iter().enumerate() {
@@ -2143,25 +2119,9 @@
                 };
                 transitions_vec.insert(transitions.clone());
 
-                <span class="kw">let </span><span class="kw-2">mut </span>expression_string = <span class="string">""</span>.to_string();
-
-                <span class="kw">for </span>param <span class="kw">in </span>t.<span class="number">0</span>.parameters.clone().iter() {
-                    expression_string = <span class="macro">format!</span>(<span class="string">"{}{}*"</span>, expression_string.clone(), param.clone());
-                }
-
-                <span class="kw">let </span>exp_len = t.<span class="number">0</span>.exp_states.len();
-                <span class="kw">for </span>(i, exp) <span class="kw">in </span>t.<span class="number">0</span>.exp_states.clone().iter().enumerate() {
-                    <span class="kw">if </span>i != exp_len - <span class="number">1 </span>{
-                        expression_string =
-                            <span class="macro">format!</span>(<span class="string">"{}{}*"</span>, expression_string.clone(), exp.clone());
-                    } <span class="kw">else </span>{
-                        expression_string = <span class="macro">format!</span>(<span class="string">"{}{}"</span>, expression_string.clone(), exp.clone());
-                    }
-                }
-
                 <span class="kw">let </span>rate = Rate {
                     target: transitions.id.clone(),
-                    expression: expression_string.clone(), <span class="comment">// the second term needs to be the product of the inputs
+                    expression: t.<span class="number">0</span>.expression_infix.clone()[<span class="number">1</span>..t.<span class="number">0</span>.expression_infix.clone().len()-<span class="number">1</span>].to_string(),<span class="comment">// the second 
                     </span>expression_mathml: <span class="prelude-val">Some</span>(t.<span class="number">0</span>.expression.clone()),
                 };
                 rate_vec.push(rate.clone());
@@ -2184,25 +2144,9 @@
                 };
                 transitions_vec.insert(transitions.clone());
 
-                <span class="kw">let </span><span class="kw-2">mut </span>expression_string = <span class="string">""</span>.to_string();
-
-                <span class="kw">for </span>param <span class="kw">in </span>t.<span class="number">0</span>.parameters.clone().iter() {
-                    expression_string = <span class="macro">format!</span>(<span class="string">"{}{}*"</span>, expression_string.clone(), param.clone());
-                }
-
-                <span class="kw">let </span>exp_len = t.<span class="number">0</span>.exp_states.len() - <span class="number">1</span>;
-                <span class="kw">for </span>(i, exp) <span class="kw">in </span>t.<span class="number">0</span>.exp_states.clone().iter().enumerate() {
-                    <span class="kw">if </span>i != exp_len {
-                        expression_string =
-                            <span class="macro">format!</span>(<span class="string">"{}{}*"</span>, expression_string.clone(), exp.clone());
-                    } <span class="kw">else </span>{
-                        expression_string = <span class="macro">format!</span>(<span class="string">"{}{}"</span>, expression_string.clone(), exp.clone());
-                    }
-                }
-
                 <span class="kw">let </span>rate = Rate {
                     target: transitions.id.clone(),
-                    expression: expression_string.clone(), <span class="comment">// the second term needs to be the product of the inputs
+                    expression: t.<span class="number">0</span>.expression_infix.clone()[<span class="number">1</span>..t.<span class="number">0</span>.expression_infix.clone().len()-<span class="number">1</span>].to_string(),<span class="comment">// the second 
                     </span>expression_mathml: <span class="prelude-val">Some</span>(t.<span class="number">0</span>.expression.clone()),
                 };
                 rate_vec.push(rate.clone());
@@ -2240,29 +2184,9 @@
                     };
                     transitions_vec.insert(transitions.clone());
 
-                    <span class="kw">let </span><span class="kw-2">mut </span>expression_string = <span class="string">""</span>.to_string();
-
-                    <span class="kw">if </span>!term.exp_states.is_empty() {
-                        <span class="kw">let </span>exp_len = term.exp_states.len() - <span class="number">1</span>;
-                        <span class="kw">for </span>(i, exp) <span class="kw">in </span>term.exp_states.clone().iter().enumerate() {
-                            <span class="kw">if </span>i != exp_len {
-                                expression_string =
-                                    <span class="macro">format!</span>(<span class="string">"{}{}*"</span>, expression_string.clone(), exp.clone());
-                            } <span class="kw">else </span>{
-                                expression_string =
-                                    <span class="macro">format!</span>(<span class="string">"{}{}"</span>, expression_string.clone(), exp.clone());
-                            }
-                        }
-                    }
-
-                    <span class="kw">for </span>param <span class="kw">in </span>term.parameters.clone().iter() {
-                        expression_string =
-                            <span class="macro">format!</span>(<span class="string">"{}{}"</span>, expression_string.clone(), param.clone());
-                    }
-
                     <span class="kw">let </span>rate = Rate {
                         target: transitions.id.clone(),
-                        expression: expression_string.clone(), <span class="comment">// the second term needs to be the product of the inputs
+                        expression: term.expression_infix.clone()[<span class="number">1</span>..term.expression_infix.clone().len()-<span class="number">1</span>].to_string(),<span class="comment">// the second term needs to be the product of the inputs
                         </span>expression_mathml: <span class="prelude-val">Some</span>(term.expression.clone()),
                     };
                     rate_vec.push(rate.clone());
@@ -2281,29 +2205,9 @@
                     };
                     transitions_vec.insert(transitions.clone());
 
-                    <span class="kw">let </span><span class="kw-2">mut </span>expression_string = <span class="string">""</span>.to_string();
-
-                    <span class="kw">if </span>!term.exp_states.is_empty() {
-                        <span class="kw">let </span>exp_len = term.exp_states.len() - <span class="number">1</span>;
-                        <span class="kw">for </span>(i, exp) <span class="kw">in </span>term.exp_states.clone().iter().enumerate() {
-                            <span class="kw">if </span>i != exp_len {
-                                expression_string =
-                                    <span class="macro">format!</span>(<span class="string">"{}{}*"</span>, expression_string.clone(), exp.clone());
-                            } <span class="kw">else </span>{
-                                expression_string =
-                                    <span class="macro">format!</span>(<span class="string">"{}{}"</span>, expression_string.clone(), exp.clone());
-                            }
-                        }
-                    }
-
-                    <span class="kw">for </span>param <span class="kw">in </span>term.parameters.clone().iter() {
-                        expression_string =
-                            <span class="macro">format!</span>(<span class="string">"{}{}"</span>, expression_string.clone(), param.clone());
-                    }
-
                     <span class="kw">let </span>rate = Rate {
                         target: transitions.id.clone(),
-                        expression: expression_string.clone(), <span class="comment">// the second term needs to be the product of the inputs
+                        expression: term.expression_infix.clone()[<span class="number">1</span>..term.expression_infix.clone().len()-<span class="number">1</span>].to_string(),<span class="comment">// the second 
                         </span>expression_mathml: <span class="prelude-val">Some</span>(term.expression.clone()),
                     };
                     rate_vec.push(rate.clone());
@@ -2315,6 +2219,18 @@
 
         </span>parameter_vec.sort();
         parameter_vec.dedup();
+
+        <span class="comment">// now to trim the numbers from the parameters field
+        </span><span class="kw">let </span><span class="kw-2">mut </span>nums = Vec::&lt;usize&gt;::new();
+        <span class="kw">for </span>(k, param) <span class="kw">in </span>parameter_vec.iter().enumerate() {
+            <span class="kw">if </span>param.id.parse::&lt;f32&gt;().is_ok() {
+                nums.push(k);
+            }
+        }
+
+        <span class="kw">for </span>num <span class="kw">in </span>nums.iter().rev() {
+            parameter_vec.remove(num.clone());
+        }
 
         <span class="comment">// construct the PetriNet
         </span><span class="kw">let </span>ode = Ode {
@@ -2568,6 +2484,18 @@
 
         parameter_vec.sort();
         parameter_vec.dedup();
+
+        <span class="comment">// now to trim the numbers from the parameters field
+        </span><span class="kw">let </span><span class="kw-2">mut </span>nums = Vec::&lt;usize&gt;::new();
+        <span class="kw">for </span>(k, param) <span class="kw">in </span>parameter_vec.iter().enumerate() {
+            <span class="kw">if </span>param.id.parse::&lt;f32&gt;().is_ok() {
+                nums.push(k);
+            }
+        }
+
+        <span class="kw">for </span>num <span class="kw">in </span>nums.iter().rev() {
+            parameter_vec.remove(num.clone());
+        }
 
         <span class="comment">// ------------------------------------------
 
