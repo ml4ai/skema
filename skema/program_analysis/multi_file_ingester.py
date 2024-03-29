@@ -5,7 +5,6 @@ import os.path
 import yaml
 from pathlib import Path
 from typing import List
-import traceback
 
 from skema.gromet import GROMET_VERSION
 from skema.gromet.fn import (
@@ -141,8 +140,6 @@ def process_file_system(
 
         except (Exception,SystemExit) as e:
             os.chdir(cur_dir)
-            print(e)
-            traceback.print_exc()
 
     def clean_dependencies(dependencies, system_name):
         # Step 1: Remove duplicates and perform initial filtering in one step.
