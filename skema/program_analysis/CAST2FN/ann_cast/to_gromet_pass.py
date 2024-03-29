@@ -348,7 +348,7 @@ class ToGrometPass:
                 self.function_arguments[node.name.name] = {}
                 for i, arg in enumerate(node.func_args, 1):
                     self.function_arguments[node.name.name][arg.val.name] = i
-                self.symbol_table["functions"][node.name.name] = (node.name.name, -1)
+                self.symbol_table["functions"][node.name.name] = (node.name.name, -1, [-1] * len(node.func_args))
 
     def wire_from_var_env(self, name, gromet_fn):
         var_environment = self.symtab_variables()
@@ -2699,11 +2699,15 @@ class ToGrometPass:
             # is not inlined or part of an assignment we don't visit the
             # arguments as that's already been handled by the primitive handler
             # if not is_primitive(func_name, "CAST") or (from_assignment or is_inline(func_name)):
+            print(func_name)
+            print(self.symtab_functions().keys())
             if func_name in self.symtab_functions().keys():
+                print(self.symtab_functions()[func_name])
                 keyword_arg_len = len(self.symtab_functions()[func_name][2])
             else:
                 keyword_arg_len = 0
             visited_args = 0
+            print(keyword_arg_len)
             for arg in node.arguments:
                 self.visit(arg, parent_gromet_fn, node)
                 visited_args += 1
@@ -2789,10 +2793,16 @@ class ToGrometPass:
                     # order than they show up
                     # i.e. foo(y=1,x=2) when the definition is foo(x,y)
                     pif_offset = self.offset_pif(arg.left.val.name, func_name)
-                    parent_gromet_fn.wff = insert_gromet_object(
-                        parent_gromet_fn.wff,
-                        GrometWire(src=pif_idx - (visited_args - pif_offset), tgt=len(parent_gromet_fn.pof))
-                    )
+                    if keyword_arg_len > 0:
+                        parent_gromet_fn.wff = insert_gromet_object(
+                            parent_gromet_fn.wff,
+                            GrometWire(src=pif_idx - (visited_args - pif_offset), tgt=len(parent_gromet_fn.pof))
+                        )
+                    else:
+                        parent_gromet_fn.wff = insert_gromet_object(
+                            parent_gromet_fn.wff,
+                            GrometWire(src=pif_idx, tgt=len(parent_gromet_fn.pof))
+                        )
                     # if isinstance(arg.right)
             
             # the number of visited args matches the number of keyword args
