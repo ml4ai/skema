@@ -60,17 +60,35 @@ class EnrichmentReqest(BaseModel):
                 }
             }
         }]
-    ),
+    )
     source: str = Field(
         description=&#34;The raw source code to extract parameter values from&#34;,
         examples=[&#34;a=1\nb=a+1\nc=b-a&#34;]
-    ),
+    )
     filename: str = Field(
         description=&#34;The filename of the file passed in the &#39;source&#39; field&#34;,
         examples=[&#34;source.py&#34;]
     )
 
-@router.post(&#34;/amr-enrichment&#34;, summary=&#34;Given an amr and source code, return an enriched amr with parameter values filled in.&#34;)
+@router.post(&#34;/amr-enrichment&#34;, summary=&#34;Given an amr and source code, return an enriched amr with parameter values filled in.&#34;, response_model=Dict, responses={
+    200: {
+        &#34;content&#34;: {
+            &#34;application/json&#34;:{
+                &#34;example&#34;: {
+                    &#34;semantics&#34;: {
+                        &#34;ode&#34;:{
+                            &#34;parameters&#34;:[
+                                {&#34;name&#34;: &#34;a&#34;, &#34;value&#34;: 1},
+                                {&#34;name&#34;: &#34;b&#34;, &#34;value&#34;: 2},
+                                {&#34;name&#34;: &#34;c&#34;, &#34;value&#34;: 1}
+                            ]
+                        }
+                    }
+                }
+            }
+        }
+    }
+})
 def amr_enrichment(request: EnrichmentReqest):
     &#34;&#34;&#34;
     Endpoint for enriching amr with parameter values.
@@ -151,7 +169,25 @@ enriched_amr = response.json()</p></div>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">@router.post(&#34;/amr-enrichment&#34;, summary=&#34;Given an amr and source code, return an enriched amr with parameter values filled in.&#34;)
+<pre><code class="python">@router.post(&#34;/amr-enrichment&#34;, summary=&#34;Given an amr and source code, return an enriched amr with parameter values filled in.&#34;, response_model=Dict, responses={
+    200: {
+        &#34;content&#34;: {
+            &#34;application/json&#34;:{
+                &#34;example&#34;: {
+                    &#34;semantics&#34;: {
+                        &#34;ode&#34;:{
+                            &#34;parameters&#34;:[
+                                {&#34;name&#34;: &#34;a&#34;, &#34;value&#34;: 1},
+                                {&#34;name&#34;: &#34;b&#34;, &#34;value&#34;: 2},
+                                {&#34;name&#34;: &#34;c&#34;, &#34;value&#34;: 1}
+                            ]
+                        }
+                    }
+                }
+            }
+        }
+    }
+})
 def amr_enrichment(request: EnrichmentReqest):
     &#34;&#34;&#34;
     Endpoint for enriching amr with parameter values.
@@ -261,11 +297,11 @@ validated to form a valid model.</p>
                 }
             }
         }]
-    ),
+    )
     source: str = Field(
         description=&#34;The raw source code to extract parameter values from&#34;,
         examples=[&#34;a=1\nb=a+1\nc=b-a&#34;]
-    ),
+    )
     filename: str = Field(
         description=&#34;The filename of the file passed in the &#39;source&#39; field&#34;,
         examples=[&#34;source.py&#34;]

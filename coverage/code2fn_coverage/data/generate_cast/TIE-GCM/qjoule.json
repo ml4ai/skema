@@ -19,7 +19,7 @@ Traceback (most recent call last):
     return self.visit_module(node)
   File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST/fortran/ts2cast.py", line 176, in visit_module
     program_body = self.generate_cast_body(node.children[1:-1])
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST/fortran/ts2cast.py", line 1264, in generate_cast_body
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST/fortran/ts2cast.py", line 1258, in generate_cast_body
     cast = self.visit(node)
   File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST/fortran/ts2cast.py", line 123, in visit
     return self.visit_internal_procedures(node)
@@ -29,6 +29,6 @@ Traceback (most recent call last):
     return [self.visit(procedure) for procedure in internal_procedures]
   File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST/fortran/ts2cast.py", line 125, in visit
     return self.visit_function_def(node)
-  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST/fortran/ts2cast.py", line 291, in visit_function_def
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/CAST/fortran/ts2cast.py", line 285, in visit_function_def
     func_args[i].type = self.variable_context.get_type(arg.val.name)
 AttributeError: 'NoneType' object has no attribute 'val'

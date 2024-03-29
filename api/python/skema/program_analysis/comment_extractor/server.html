@@ -59,13 +59,42 @@ router = APIRouter()
 
 @router.get(&#34;/comments-get-supported-languages&#34;, summary=&#34;Endpoint for checking which languages and comment types are supported by comment extractor.&#34;)
 async def comments_get_supported_languages() -&gt; SupportedLanguageResponse:
-    &#34;&#34;&#34;Endpoint for checking which type of comments are supported for each language.&#34;&#34;&#34;
+    &#34;&#34;&#34;Endpoint for checking which type of comments are supported for each language.
+    ### Python example
+
+    ```
+    import requests
+
+    response=requests.get(&#34;/comment_service/comments-get-supported-languages&#34;)
+    supported_languages = response.json()
+    &#34;&#34;&#34;
     return SUPPORTED_LANGUAGES
 
 
-@router.get(&#34;/comments-get-supported-file-extensions&#34;, summary=&#34;Endpoint for checking which files extensions are currently supported by comment extractor.&#34;)
+@router.get(&#34;/comments-get-supported-file-extensions&#34;, summary=&#34;Endpoint for checking which files extensions are currently supported by comment extractor.&#34;, responses=
+            {
+                200: {
+        &#34;content&#34;: {
+            &#34;application/json&#34;:{
+                &#34;example&#34;: [
+                    &#34;.py&#34;,
+                    &#34;.f&#34;,
+                    &#34;.f90&#34;
+                ]
+            }
+        }
+    }
+            })
 async def comments_get_supported_file_extensions() -&gt; List[str]:
-    &#34;Endpoint for checking which file extensions are supported for comment extraction.&#34;
+    &#34;&#34;&#34;Endpoint for checking which file extensions are supported for comment extraction.
+    ### Python example
+
+    ```
+    import requests
+
+    response=requests.get(&#34;/comment_service/comments-get-supported-file_extensions&#34;)
+    supported_file_extensions = response.json()
+    &#34;&#34;&#34;
     return SUPPORTED_FILE_EXTENSIONS
 
 
@@ -211,14 +240,40 @@ async def comments_extract_zip(
 <span>async def <span class="ident">comments_get_supported_file_extensions</span></span>(<span>) ‑> List[str]</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Endpoint for checking which file extensions are supported for comment extraction.</p></div>
+<div class="desc"><p>Endpoint for checking which file extensions are supported for comment extraction.</p>
+<h3 id="python-example">Python example</h3>
+<p>```
+import requests</p>
+<p>response=requests.get("/comment_service/comments-get-supported-file_extensions")
+supported_file_extensions = response.json()</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">@router.get(&#34;/comments-get-supported-file-extensions&#34;, summary=&#34;Endpoint for checking which files extensions are currently supported by comment extractor.&#34;)
+<pre><code class="python">@router.get(&#34;/comments-get-supported-file-extensions&#34;, summary=&#34;Endpoint for checking which files extensions are currently supported by comment extractor.&#34;, responses=
+            {
+                200: {
+        &#34;content&#34;: {
+            &#34;application/json&#34;:{
+                &#34;example&#34;: [
+                    &#34;.py&#34;,
+                    &#34;.f&#34;,
+                    &#34;.f90&#34;
+                ]
+            }
+        }
+    }
+            })
 async def comments_get_supported_file_extensions() -&gt; List[str]:
-    &#34;Endpoint for checking which file extensions are supported for comment extraction.&#34;
+    &#34;&#34;&#34;Endpoint for checking which file extensions are supported for comment extraction.
+    ### Python example
+
+    ```
+    import requests
+
+    response=requests.get(&#34;/comment_service/comments-get-supported-file_extensions&#34;)
+    supported_file_extensions = response.json()
+    &#34;&#34;&#34;
     return SUPPORTED_FILE_EXTENSIONS</code></pre>
 </details>
 </dd>
@@ -226,14 +281,27 @@ async def comments_get_supported_file_extensions() -&gt; List[str]:
 <span>async def <span class="ident">comments_get_supported_languages</span></span>(<span>) ‑> <a title="skema.program_analysis.comment_extractor.model.SupportedLanguageResponse" href="model.html#skema.program_analysis.comment_extractor.model.SupportedLanguageResponse">SupportedLanguageResponse</a></span>
 </code></dt>
 <dd>
-<div class="desc"><p>Endpoint for checking which type of comments are supported for each language.</p></div>
+<div class="desc"><p>Endpoint for checking which type of comments are supported for each language.</p>
+<h3 id="python-example">Python example</h3>
+<p>```
+import requests</p>
+<p>response=requests.get("/comment_service/comments-get-supported-languages")
+supported_languages = response.json()</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">@router.get(&#34;/comments-get-supported-languages&#34;, summary=&#34;Endpoint for checking which languages and comment types are supported by comment extractor.&#34;)
 async def comments_get_supported_languages() -&gt; SupportedLanguageResponse:
-    &#34;&#34;&#34;Endpoint for checking which type of comments are supported for each language.&#34;&#34;&#34;
+    &#34;&#34;&#34;Endpoint for checking which type of comments are supported for each language.
+    ### Python example
+
+    ```
+    import requests
+
+    response=requests.get(&#34;/comment_service/comments-get-supported-languages&#34;)
+    supported_languages = response.json()
+    &#34;&#34;&#34;
     return SUPPORTED_LANGUAGES</code></pre>
 </details>
 </dd>
