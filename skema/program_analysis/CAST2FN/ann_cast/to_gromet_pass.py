@@ -2699,15 +2699,12 @@ class ToGrometPass:
             # is not inlined or part of an assignment we don't visit the
             # arguments as that's already been handled by the primitive handler
             # if not is_primitive(func_name, "CAST") or (from_assignment or is_inline(func_name)):
-            print(func_name)
-            print(self.symtab_functions().keys())
             if func_name in self.symtab_functions().keys():
                 print(self.symtab_functions()[func_name])
                 keyword_arg_len = len(self.symtab_functions()[func_name][2])
             else:
                 keyword_arg_len = 0
             visited_args = 0
-            print(keyword_arg_len)
             for arg in node.arguments:
                 self.visit(arg, parent_gromet_fn, node)
                 visited_args += 1
