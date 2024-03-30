@@ -1,4 +1,4 @@
-use crate::ast::operator::Operator::{Add, Divide, Multiply, Subtract, Power};
+use crate::ast::operator::Operator::{Add, Divide, Multiply, Power, Subtract};
 use crate::parsers::math_expression_tree::MathExpressionTree::Atom;
 use crate::parsers::math_expression_tree::MathExpressionTree::Cons;
 use crate::{
@@ -10,8 +10,11 @@ use crate::{
         generic_mathml::{attribute, equals, etag, stag, ws, IResult, Span},
         interpreted_mathml::{
             ci_univariate_with_bounds, ci_univariate_without_bounds, ci_unknown_with_bounds,
-            ci_unknown_without_bounds, first_order_derivative_leibniz_notation, math_expression,
-            newtonian_derivative, operator, first_order_partial_derivative_leibniz_notation, first_order_partial_derivative_partial_func, first_order_dderivative_leibniz_notation
+            ci_unknown_without_bounds, first_order_dderivative_leibniz_notation,
+            first_order_derivative_leibniz_notation,
+            first_order_partial_derivative_leibniz_notation,
+            first_order_partial_derivative_partial_func, math_expression, newtonian_derivative,
+            operator,
         },
         math_expression_tree::MathExpressionTree,
     },
@@ -58,7 +61,10 @@ pub fn first_order_ode(input: Span) -> IResult<FirstOrderODE> {
     // Recognize LHS derivative
     let (s, (derivative, ci)) = alt((
         first_order_derivative_leibniz_notation,
-        newtonian_derivative, first_order_partial_derivative_leibniz_notation, first_order_partial_derivative_partial_func, first_order_dderivative_leibniz_notation
+        newtonian_derivative,
+        first_order_partial_derivative_leibniz_notation,
+        first_order_partial_derivative_partial_func,
+        first_order_dderivative_leibniz_notation,
     ))(s)?;
     //let ci = binding.content;
     //let parenthesized = ci.func_of.clone();
@@ -89,6 +95,7 @@ pub fn first_order_ode(input: Span) -> IResult<FirstOrderODE> {
                     r#type: Some(Type::Function),
                     content,
                     func_of,
+                    notation: None,
                 })
             },
         ),
@@ -98,6 +105,7 @@ pub fn first_order_ode(input: Span) -> IResult<FirstOrderODE> {
                 r#type: Some(Type::Function),
                 content,
                 func_of: None,
+                notation: None,
             })
         }),
         map(
@@ -109,6 +117,7 @@ pub fn first_order_ode(input: Span) -> IResult<FirstOrderODE> {
                     r#type: Some(Type::Function),
                     content,
                     func_of,
+                    notation: None,
                 })
             },
         ),
@@ -189,6 +198,7 @@ pub struct PnTerm {
     pub exp_states: Vec<String>,        // list of state variables in term
     pub polarity: bool,                 // polarity of term
     pub expression: String,             // content mathml for the expression
+    pub expression_infix: String,
     pub parameters: Vec<String>,        // list of parameters in term
     pub sub_terms: Option<Vec<PnTerm>>, // This is to handle when we need to distribute or not for terms.
     pub math_vec: Option<MathExpressionTree>, // This is to allows for easy distribution using our current frame work
@@ -254,6 +264,7 @@ pub fn get_terms(sys_states: Vec<String>, ode: FirstOrderODE) -> Vec<PnTerm> {
                     exp_states: [x.to_string().clone()].to_vec(),
                     polarity: true,
                     expression: "".to_string(),
+                    expression_infix: "".to_string(),
                     parameters: Vec::<String>::new(),
                     sub_terms: None,
                     math_vec: None,
@@ -265,6 +276,7 @@ pub fn get_terms(sys_states: Vec<String>, ode: FirstOrderODE) -> Vec<PnTerm> {
                     exp_states: Vec::<String>::new(),
                     polarity: true,
                     expression: "".to_string(),
+                    expression_infix: "".to_string(),
                     parameters: [x.to_string().clone()].to_vec(),
                     sub_terms: None,
                     math_vec: None,
@@ -281,7 +293,7 @@ pub fn get_term_power(sys_states: Vec<String>, eq: Vec<MathExpressionTree>) -> P
     let mut exp_states = Vec::<String>::new();
     let mut polarity = true;
     let mut power = 0;
-    // assume power arguments are only length 2. 
+    // assume power arguments are only length 2.
     power = eq[1].to_string().parse::<i32>().unwrap();
 
     // this walks the tree and composes a vector of all variable and polarity changes
@@ -341,7 +353,7 @@ pub fn get_term_power(sys_states: Vec<String>, eq: Vec<MathExpressionTree>) -> P
                 } else {
                     variables.push(x.to_string());
                 }
-            },
+            }
         }
     }
 
@@ -371,7 +383,8 @@ pub fn get_term_power(sys_states: Vec<String>, eq: Vec<MathExpressionTree>) -> P
         dyn_state: "temp".to_string(),
         exp_states,
         polarity,
-        expression: MathExpressionTree::Cons(Multiply, eq).to_cmml(),
+        expression: MathExpressionTree::Cons(Multiply, eq.clone()).to_cmml(),
+        expression_infix: MathExpressionTree::Cons(Multiply, eq).to_infix_expression(),
         parameters: variables,
         sub_terms: None,
         math_vec: None,
@@ -433,6 +446,7 @@ pub fn get_terms_add(sys_states: Vec<String>, eq: Vec<MathExpressionTree>) -> Ve
                         exp_states: [x.to_string().clone()].to_vec(),
                         polarity: true,
                         expression: MathExpressionTree::Cons(Add, [arg.clone()].to_vec()).to_cmml(),
+                        expression_infix: MathExpressionTree::Cons(Add, [arg.clone()].to_vec()).to_infix_expression(),
                         parameters: Vec::<String>::new(),
                         sub_terms: None,
                         math_vec: Some(arg.clone()),
@@ -444,6 +458,7 @@ pub fn get_terms_add(sys_states: Vec<String>, eq: Vec<MathExpressionTree>) -> Ve
                         exp_states: Vec::<String>::new(),
                         polarity: true,
                         expression: MathExpressionTree::Cons(Add, [arg.clone()].to_vec()).to_cmml(),
+                        expression_infix: MathExpressionTree::Cons(Add, [arg.clone()].to_vec()).to_infix_expression(),
                         parameters: [x.to_string().clone()].to_vec(),
                         sub_terms: None,
                         math_vec: Some(arg.clone()),
@@ -559,6 +574,7 @@ pub fn get_terms_sub(sys_states: Vec<String>, eq: Vec<MathExpressionTree>) -> Ve
                         polarity: false,
                         expression: MathExpressionTree::Cons(Subtract, [eq[0].clone()].to_vec())
                             .to_cmml(),
+                        expression_infix: MathExpressionTree::Cons(Subtract, [eq[0].clone()].to_vec()).to_infix_expression(),
                         parameters: Vec::<String>::new(),
                         sub_terms: None,
                         math_vec: Some(eq[0].clone()),
@@ -571,6 +587,7 @@ pub fn get_terms_sub(sys_states: Vec<String>, eq: Vec<MathExpressionTree>) -> Ve
                         polarity: false,
                         expression: MathExpressionTree::Cons(Subtract, [eq[0].clone()].to_vec())
                             .to_cmml(),
+                        expression_infix: MathExpressionTree::Cons(Subtract, [eq[0].clone()].to_vec()).to_infix_expression(),
                         parameters: [x1.to_string()].to_vec(),
                         sub_terms: None,
                         math_vec: Some(eq[0].clone()),
@@ -696,10 +713,12 @@ pub fn get_terms_sub(sys_states: Vec<String>, eq: Vec<MathExpressionTree>) -> Ve
                     let mut polarity = true;
                     let mut expression =
                         MathExpressionTree::Cons(Add, [arg.clone()].to_vec()).to_cmml();
+                    let mut expression_infix = MathExpressionTree::Cons(Add, [arg.clone()].to_vec()).to_infix_expression();
                     if i == 1 {
                         polarity = false;
                         expression =
-                            MathExpressionTree::Cons(Subtract, [arg.clone()].to_vec()).to_cmml()
+                            MathExpressionTree::Cons(Subtract, [arg.clone()].to_vec()).to_cmml();
+                        expression_infix = MathExpressionTree::Cons(Subtract, [arg.clone()].to_vec()).to_infix_expression()
                     }
                     for state in sys_states.iter() {
                         if x.to_string() == *state {
@@ -712,6 +731,7 @@ pub fn get_terms_sub(sys_states: Vec<String>, eq: Vec<MathExpressionTree>) -> Ve
                             exp_states: [x.to_string().clone()].to_vec(),
                             polarity,
                             expression,
+                            expression_infix,
                             parameters: Vec::<String>::new(),
                             sub_terms: None,
                             math_vec: Some(arg.clone()),
@@ -723,6 +743,7 @@ pub fn get_terms_sub(sys_states: Vec<String>, eq: Vec<MathExpressionTree>) -> Ve
                             exp_states: Vec::<String>::new(),
                             polarity,
                             expression,
+                            expression_infix,
                             parameters: [x.to_string().clone()].to_vec(),
                             sub_terms: None,
                             math_vec: Some(arg.clone()),
@@ -827,7 +848,8 @@ pub fn get_term_div(sys_states: Vec<String>, eq: Vec<MathExpressionTree>) -> PnT
         dyn_state: "temp".to_string(),
         exp_states,
         polarity,
-        expression: MathExpressionTree::Cons(Multiply, eq).to_cmml(),
+        expression: MathExpressionTree::Cons(Multiply, eq.clone()).to_cmml(),
+        expression_infix: MathExpressionTree::Cons(Multiply, eq).to_infix_expression(),
         parameters: variables,
         sub_terms: None,
         math_vec: None,
@@ -850,7 +872,7 @@ pub fn get_terms_mult(sys_states: Vec<String>, eq: Vec<MathExpressionTree>) -> P
         if let Cons(x1, y1) = arg {
             if *x1 != Power && *x1 != Divide && !(*x1 == Subtract && y1.len() == 1) {
                 distribution = true;
-            } 
+            }
         }
     }
 
@@ -927,6 +949,7 @@ pub fn get_terms_mult(sys_states: Vec<String>, eq: Vec<MathExpressionTree>) -> P
                             exp_states: [x.to_string().clone()].to_vec(),
                             polarity: true,
                             expression: "temp".to_string(),
+                            expression_infix: "temp".to_string(),
                             parameters: Vec::<String>::new(),
                             sub_terms: None,
                             math_vec: Some(arg.clone()),
@@ -938,6 +961,7 @@ pub fn get_terms_mult(sys_states: Vec<String>, eq: Vec<MathExpressionTree>) -> P
                             exp_states: Vec::<String>::new(),
                             polarity: true,
                             expression: "temp".to_string(),
+                            expression_infix: "temp".to_string(),
                             parameters: [x.to_string().clone()].to_vec(),
                             sub_terms: None,
                             math_vec: Some(arg.clone()),
@@ -954,6 +978,7 @@ pub fn get_terms_mult(sys_states: Vec<String>, eq: Vec<MathExpressionTree>) -> P
         let mut rhs_vec = Vec::<PnTerm>::new();
 
         for arg in arg_terms.iter() {
+            println!("arg_term: {:?}", arg.clone());
             if arg.0 == 0 {
                 lhs_vec.push(arg.1.clone());
             } else {
@@ -1012,7 +1037,8 @@ pub fn get_terms_mult(sys_states: Vec<String>, eq: Vec<MathExpressionTree>) -> P
             dyn_state: "temp".to_string(),
             exp_states,
             polarity,
-            expression: MathExpressionTree::Cons(Multiply, eq).to_cmml(),
+            expression: MathExpressionTree::Cons(Multiply, eq.clone()).to_cmml(),
+            expression_infix: MathExpressionTree::Cons(Multiply, eq).to_infix_expression(),
             parameters: variables,
             sub_terms: Some(terms),
             math_vec: None,
@@ -1111,7 +1137,8 @@ pub fn get_term_mult(sys_states: Vec<String>, eq: Vec<MathExpressionTree>) -> Pn
         dyn_state: "temp".to_string(),
         exp_states,
         polarity,
-        expression: MathExpressionTree::Cons(Multiply, eq).to_cmml(),
+        expression: MathExpressionTree::Cons(Multiply, eq.clone()).to_cmml(),
+        expression_infix: MathExpressionTree::Cons(Multiply, eq).to_infix_expression(),
         parameters: variables,
         sub_terms: None,
         math_vec: None,
@@ -1125,10 +1152,19 @@ pub fn flatten_mults(mut equation: MathExpressionTree) -> MathExpressionTree {
                 match y[1].clone() {
                     Cons(x1, y1) => match x1 {
                         Multiply => {
-                            let temp1 = flatten_mults(y1[0].clone());
-                            let temp2 = flatten_mults(y1[1].clone());
+                            let mut temp1 = flatten_mults(y1[0].clone());
+                            let mut temp2 = flatten_mults(y1[1].clone());
                             y.remove(1);
-                            y.append(&mut [temp1, temp2].to_vec())
+                            if let Cons(Multiply, ref mut y2) = temp1 {
+                                y.append(&mut y2.clone());
+                            } else {
+                                y.append(&mut [temp1].to_vec());
+                            }
+                            if let Cons(Multiply, ref mut y2) = temp2 {
+                                y.append(&mut y2.clone());
+                            } else {
+                                y.append(&mut [temp2].to_vec());
+                            }
                         }
                         _ => {
                             let temp1 = y[1].clone();
@@ -1141,10 +1177,19 @@ pub fn flatten_mults(mut equation: MathExpressionTree) -> MathExpressionTree {
                 match y[0].clone() {
                     Cons(x0, y0) => match x0 {
                         Multiply => {
-                            let temp1 = flatten_mults(y0[0].clone());
-                            let temp2 = flatten_mults(y0[1].clone());
+                            let mut temp1 = flatten_mults(y0[0].clone());
+                            let mut temp2 = flatten_mults(y0[1].clone());
                             y.remove(0);
-                            y.append(&mut [temp1, temp2].to_vec());
+                            if let Cons(Multiply, ref mut y2) = temp1 {
+                                y.append(&mut y2.clone());
+                            } else {
+                                y.append(&mut [temp1].to_vec());
+                            }
+                            if let Cons(Multiply, ref mut y2) = temp2 {
+                                y.append(&mut y2.clone());
+                            } else {
+                                y.append(&mut [temp2].to_vec());
+                            }
                         }
                         _ => {
                             let temp1 = y[0].clone();
@@ -1185,7 +1230,9 @@ fn test_ci_univariate_func() {
                 Some(Type::Real),
                 Box::new(MathExpression::Mi(Mi("t".to_string()))),
                 None,
+                None,
             )]),
+            None,
         ),
     );
 }
@@ -1202,7 +1249,9 @@ fn test_ci_univariate_func2() {
                 Some(Type::Real),
                 Box::new(MathExpression::Mi(Mi("t".to_string()))),
                 None,
+                None,
             )]),
+            None,
         ),
     );
 }
@@ -1223,6 +1272,7 @@ fn test_first_order_derivative_leibniz_notation_with_implicit_time_dependence() 
                     Some(Type::Real),
                     Box::new(MathExpression::Mi(Mi("t".to_string()))),
                     None,
+                    None,
                 ),
                 DerivativeNotation::LeibnizTotal,
             ),
@@ -1234,7 +1284,9 @@ fn test_first_order_derivative_leibniz_notation_with_implicit_time_dependence() 
                     Some(Type::Real),
                     Box::new(MathExpression::Mi(Mi("".to_string()))),
                     None,
+                    None,
                 )]),
+                None,
             ),
         ),
     );
@@ -1256,6 +1308,7 @@ fn test_first_order_derivative_leibniz_notation_with_explicit_time_dependence() 
                     Some(Type::Real),
                     Box::new(MathExpression::Mi(Mi("t".to_string()))),
                     None,
+                    None,
                 ),
                 DerivativeNotation::LeibnizTotal,
             ),
@@ -1266,7 +1319,9 @@ fn test_first_order_derivative_leibniz_notation_with_explicit_time_dependence() 
                     Some(Type::Real),
                     Box::new(MathExpression::Mi(Mi("t".to_string()))),
                     None,
+                    None,
                 )]),
+                None,
             ),
         ),
     );
@@ -1339,6 +1394,7 @@ fn test_msub_derivative() {
                     Some(Type::Real),
                     Box::new(MathExpression::Mi(Mi("t".to_string()))),
                     None,
+                    None,
                 ),
                 DerivativeNotation::LeibnizTotal,
             ),
@@ -1352,7 +1408,9 @@ fn test_msub_derivative() {
                     Some(Type::Real),
                     Box::new(MathExpression::Mi(Mi("".to_string()))),
                     None,
+                    None,
                 )]),
+                None,
             ),
         ),
     );

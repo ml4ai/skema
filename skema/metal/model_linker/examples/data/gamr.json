@@ -1,0 +1,770 @@
+{
+  "header": {
+    "name": "Model",
+    "schema": "G-AMR",
+    "schema_name": "Generalized AMR",
+    "description": "Generalized AMR model from...",
+    "model_version": "0.1"
+  },
+  "met": [
+    {
+      "Cons": [
+        "Equals",
+        [
+          {
+            "Cons": [
+              {
+                "Derivative": {
+                  "order": 1,
+                  "var_index": 1,
+                  "bound_var": {
+                    "type": "Real",
+                    "content": {
+                      "Mi": "t"
+                    },
+                    "func_of": null
+                  },
+                  "notation": "LeibnizTotal"
+                }
+              },
+              [
+                {
+                  "Atom": {
+                    "Ci": {
+                      "type": "Function",
+                      "content": {
+                        "Mi": "S"
+                      },
+                      "func_of": [
+                        {
+                          "type": "Real",
+                          "content": {
+                            "Mi": ""
+                          },
+                          "func_of": null
+                        }
+                      ]
+                    }
+                  }
+                }
+              ]
+            ]
+          },
+          {
+            "Cons": [
+              "Multiply",
+              [
+                {
+                  "Cons": [
+                    "Subtract",
+                    [
+                      {
+                        "Atom": {
+                          "Ci": {
+                            "type": "Real",
+                            "content": {
+                              "Mi": "β"
+                            },
+                            "func_of": [
+                              {
+                                "type": "Real",
+                                "content": {
+                                  "Mi": "t"
+                                },
+                                "func_of": null
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    ]
+                  ]
+                },
+                {
+                  "Cons": [
+                    "Divide",
+                    [
+                      {
+                        "Cons": [
+                          "Multiply",
+                          [
+                            {
+                              "Atom": {
+                                "Ci": {
+                                  "type": null,
+                                  "content": {
+                                    "Mi": "S"
+                                  },
+                                  "func_of": null
+                                }
+                              }
+                            },
+                            {
+                              "Atom": {
+                                "Ci": {
+                                  "type": null,
+                                  "content": {
+                                    "Mi": "I"
+                                  },
+                                  "func_of": null
+                                }
+                              }
+                            }
+                          ]
+                        ]
+                      },
+                      {
+                        "Atom": {
+                          "Ci": {
+                            "type": null,
+                            "content": {
+                              "Mi": "N"
+                            },
+                            "func_of": null
+                          }
+                        }
+                      }
+                    ]
+                  ]
+                }
+              ]
+            ]
+          }
+        ]
+      ]
+    },
+    {
+      "Cons": [
+        "Equals",
+        [
+          {
+            "Cons": [
+              {
+                "Derivative": {
+                  "order": 1,
+                  "var_index": 1,
+                  "bound_var": {
+                    "type": "Real",
+                    "content": {
+                      "Mi": "t"
+                    },
+                    "func_of": null
+                  },
+                  "notation": "LeibnizTotal"
+                }
+              },
+              [
+                {
+                  "Atom": {
+                    "Ci": {
+                      "type": "Function",
+                      "content": {
+                        "Mi": "E"
+                      },
+                      "func_of": [
+                        {
+                          "type": "Real",
+                          "content": {
+                            "Mi": ""
+                          },
+                          "func_of": null
+                        }
+                      ]
+                    }
+                  }
+                }
+              ]
+            ]
+          },
+          {
+            "Cons": [
+              "Subtract",
+              [
+                {
+                  "Cons": [
+                    "Multiply",
+                    [
+                      {
+                        "Atom": {
+                          "Ci": {
+                            "type": "Real",
+                            "content": {
+                              "Mi": "β"
+                            },
+                            "func_of": [
+                              {
+                                "type": "Real",
+                                "content": {
+                                  "Mi": "t"
+                                },
+                                "func_of": null
+                              }
+                            ]
+                          }
+                        }
+                      },
+                      {
+                        "Cons": [
+                          "Divide",
+                          [
+                            {
+                              "Cons": [
+                                "Multiply",
+                                [
+                                  {
+                                    "Atom": {
+                                      "Ci": {
+                                        "type": null,
+                                        "content": {
+                                          "Mi": "S"
+                                        },
+                                        "func_of": null
+                                      }
+                                    }
+                                  },
+                                  {
+                                    "Atom": {
+                                      "Ci": {
+                                        "type": null,
+                                        "content": {
+                                          "Mi": "I"
+                                        },
+                                        "func_of": null
+                                      }
+                                    }
+                                  }
+                                ]
+                              ]
+                            },
+                            {
+                              "Atom": {
+                                "Ci": {
+                                  "type": null,
+                                  "content": {
+                                    "Mi": "N"
+                                  },
+                                  "func_of": null
+                                }
+                              }
+                            }
+                          ]
+                        ]
+                      }
+                    ]
+                  ]
+                },
+                {
+                  "Cons": [
+                    "Multiply",
+                    [
+                      {
+                        "Atom": {
+                          "Ci": {
+                            "type": null,
+                            "content": {
+                              "Mi": "σ"
+                            },
+                            "func_of": null
+                          }
+                        }
+                      },
+                      {
+                        "Atom": {
+                          "Ci": {
+                            "type": null,
+                            "content": {
+                              "Mi": "E"
+                            },
+                            "func_of": null
+                          }
+                        }
+                      }
+                    ]
+                  ]
+                }
+              ]
+            ]
+          }
+        ]
+      ]
+    },
+    {
+      "Cons": [
+        "Equals",
+        [
+          {
+            "Cons": [
+              {
+                "Derivative": {
+                  "order": 1,
+                  "var_index": 1,
+                  "bound_var": {
+                    "type": "Real",
+                    "content": {
+                      "Mi": "t"
+                    },
+                    "func_of": null
+                  },
+                  "notation": "LeibnizTotal"
+                }
+              },
+              [
+                {
+                  "Atom": {
+                    "Ci": {
+                      "type": "Function",
+                      "content": {
+                        "Mi": "I"
+                      },
+                      "func_of": [
+                        {
+                          "type": "Real",
+                          "content": {
+                            "Mi": ""
+                          },
+                          "func_of": null
+                        }
+                      ]
+                    }
+                  }
+                }
+              ]
+            ]
+          },
+          {
+            "Cons": [
+              "Subtract",
+              [
+                {
+                  "Cons": [
+                    "Multiply",
+                    [
+                      {
+                        "Atom": {
+                          "Ci": {
+                            "type": null,
+                            "content": {
+                              "Mi": "σ"
+                            },
+                            "func_of": null
+                          }
+                        }
+                      },
+                      {
+                        "Atom": {
+                          "Ci": {
+                            "type": null,
+                            "content": {
+                              "Mi": "E"
+                            },
+                            "func_of": null
+                          }
+                        }
+                      }
+                    ]
+                  ]
+                },
+                {
+                  "Cons": [
+                    "Multiply",
+                    [
+                      {
+                        "Atom": {
+                          "Ci": {
+                            "type": null,
+                            "content": {
+                              "Mi": "γ"
+                            },
+                            "func_of": null
+                          }
+                        }
+                      },
+                      {
+                        "Atom": {
+                          "Ci": {
+                            "type": null,
+                            "content": {
+                              "Mi": "I"
+                            },
+                            "func_of": null
+                          }
+                        }
+                      }
+                    ]
+                  ]
+                }
+              ]
+            ]
+          }
+        ]
+      ]
+    },
+    {
+      "Cons": [
+        "Equals",
+        [
+          {
+            "Cons": [
+              {
+                "Derivative": {
+                  "order": 1,
+                  "var_index": 1,
+                  "bound_var": {
+                    "type": "Real",
+                    "content": {
+                      "Mi": "t"
+                    },
+                    "func_of": null
+                  },
+                  "notation": "LeibnizTotal"
+                }
+              },
+              [
+                {
+                  "Atom": {
+                    "Ci": {
+                      "type": "Function",
+                      "content": {
+                        "Mi": "R"
+                      },
+                      "func_of": [
+                        {
+                          "type": "Real",
+                          "content": {
+                            "Mi": ""
+                          },
+                          "func_of": null
+                        }
+                      ]
+                    }
+                  }
+                }
+              ]
+            ]
+          },
+          {
+            "Cons": [
+              "Multiply",
+              [
+                {
+                  "Cons": [
+                    "Multiply",
+                    [
+                      {
+                        "Cons": [
+                          "Subtract",
+                          [
+                            {
+                              "Atom": {
+                                "Mn": "1"
+                              }
+                            },
+                            {
+                              "Atom": {
+                                "Ci": {
+                                  "type": null,
+                                  "content": {
+                                    "Mi": "ρ"
+                                  },
+                                  "func_of": null
+                                }
+                              }
+                            }
+                          ]
+                        ]
+                      },
+                      {
+                        "Atom": {
+                          "Ci": {
+                            "type": null,
+                            "content": {
+                              "Mi": "γ"
+                            },
+                            "func_of": null
+                          }
+                        }
+                      }
+                    ]
+                  ]
+                },
+                {
+                  "Atom": {
+                    "Ci": {
+                      "type": null,
+                      "content": {
+                        "Mi": "I"
+                      },
+                      "func_of": null
+                    }
+                  }
+                }
+              ]
+            ]
+          }
+        ]
+      ]
+    },
+    {
+      "Cons": [
+        "Equals",
+        [
+          {
+            "Cons": [
+              {
+                "Derivative": {
+                  "order": 1,
+                  "var_index": 1,
+                  "bound_var": {
+                    "type": "Real",
+                    "content": {
+                      "Mi": "t"
+                    },
+                    "func_of": null
+                  },
+                  "notation": "LeibnizTotal"
+                }
+              },
+              [
+                {
+                  "Atom": {
+                    "Ci": {
+                      "type": "Function",
+                      "content": {
+                        "Mi": "H"
+                      },
+                      "func_of": [
+                        {
+                          "type": "Real",
+                          "content": {
+                            "Mi": ""
+                          },
+                          "func_of": null
+                        }
+                      ]
+                    }
+                  }
+                }
+              ]
+            ]
+          },
+          {
+            "Cons": [
+              "Subtract",
+              [
+                {
+                  "Cons": [
+                    "Multiply",
+                    [
+                      {
+                        "Cons": [
+                          "Multiply",
+                          [
+                            {
+                              "Atom": {
+                                "Ci": {
+                                  "type": null,
+                                  "content": {
+                                    "Mi": "ρ"
+                                  },
+                                  "func_of": null
+                                }
+                              }
+                            },
+                            {
+                              "Atom": {
+                                "Ci": {
+                                  "type": null,
+                                  "content": {
+                                    "Mi": "γ"
+                                  },
+                                  "func_of": null
+                                }
+                              }
+                            }
+                          ]
+                        ]
+                      },
+                      {
+                        "Atom": {
+                          "Ci": {
+                            "type": null,
+                            "content": {
+                              "Mi": "I"
+                            },
+                            "func_of": null
+                          }
+                        }
+                      }
+                    ]
+                  ]
+                },
+                {
+                  "Cons": [
+                    "Multiply",
+                    [
+                      {
+                        "Atom": {
+                          "Ci": {
+                            "type": null,
+                            "content": {
+                              "Mi": "λ"
+                            },
+                            "func_of": null
+                          }
+                        }
+                      },
+                      {
+                        "Atom": {
+                          "Ci": {
+                            "type": null,
+                            "content": {
+                              "Mi": "H"
+                            },
+                            "func_of": null
+                          }
+                        }
+                      }
+                    ]
+                  ]
+                }
+              ]
+            ]
+          }
+        ]
+      ]
+    },
+    {
+      "Cons": [
+        "Equals",
+        [
+          {
+            "Cons": [
+              {
+                "Derivative": {
+                  "order": 1,
+                  "var_index": 1,
+                  "bound_var": {
+                    "type": "Real",
+                    "content": {
+                      "Mi": "t"
+                    },
+                    "func_of": null
+                  },
+                  "notation": "LeibnizTotal"
+                }
+              },
+              [
+                {
+                  "Atom": {
+                    "Ci": {
+                      "type": "Function",
+                      "content": {
+                        "Mi": "D"
+                      },
+                      "func_of": [
+                        {
+                          "type": "Real",
+                          "content": {
+                            "Mi": ""
+                          },
+                          "func_of": null
+                        }
+                      ]
+                    }
+                  }
+                }
+              ]
+            ]
+          },
+          {
+            "Cons": [
+              "Multiply",
+              [
+                {
+                  "Atom": {
+                    "Ci": {
+                      "type": null,
+                      "content": {
+                        "Mi": "λ"
+                      },
+                      "func_of": null
+                    }
+                  }
+                },
+                {
+                  "Atom": {
+                    "Ci": {
+                      "type": null,
+                      "content": {
+                        "Mi": "H"
+                      },
+                      "func_of": null
+                    }
+                  }
+                }
+              ]
+            ]
+          }
+        ]
+      ]
+    }
+  ],
+  "semantics": {
+    "states": [
+      {
+        "id": "D",
+        "name": "D"
+      },
+      {
+        "id": "E",
+        "name": "E"
+      },
+      {
+        "id": "H",
+        "name": "H"
+      },
+      {
+        "id": "I",
+        "name": "I"
+      },
+      {
+        "id": "R",
+        "name": "R"
+      },
+      {
+        "id": "S",
+        "name": "S"
+      }
+    ],
+    "parameters": [
+      {
+        "id": "1",
+        "name": "1"
+      },
+      {
+        "id": "N",
+        "name": "N"
+      },
+      {
+        "id": "β",
+        "name": "β"
+      },
+      {
+        "id": "γ",
+        "name": "γ"
+      },
+      {
+        "id": "λ",
+        "name": "λ"
+      },
+      {
+        "id": "ρ",
+        "name": "ρ"
+      },
+      {
+        "id": "σ",
+        "name": "σ"
+      }
+    ]
+  }
+}

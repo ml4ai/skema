@@ -2,6 +2,7 @@ from typing import List, Dict, Set
 from skema.program_analysis.CAST2FN.model.cast import (
     Var,
     Name,
+    FunctionDef
 )
 
 class VariableContext(object):
@@ -27,6 +28,8 @@ class VariableContext(object):
         self.stop_condition_id = 0
         self.function_name_id = 0
 
+        self.class_functions = {"_class": {"function": FunctionDef()}}
+    
     def push_context(self):
         """Create a new variable context and add it to the stack"""
         
@@ -147,3 +150,33 @@ class VariableContext(object):
 
     def unset_internal(self):
         self.internal = False
+
+    def register_module_function(self, function: str):
+        # Fortran variables are case INSENSITIVE so we should lower it first
+        function = function.lower() 
+        function_def = FunctionDef(
+            name=Name(
+                name="",
+                id=-1,
+                source_refs=[]
+            ),
+            func_args=[],
+            body=[],
+            source_refs=[]
+        )
+        self.class_functions[function] = function_def
+
+        return function_def
+
+
+    def is_class_function(self, function: str):
+        function = function.lower() 
+        return function in self.class_functions
+
+    def copy_class_function(self, function: str, function_def: FunctionDef ):
+        function = function.lower() 
+        self.class_functions[function].name = function_def.name
+        self.class_functions[function].func_args = function_def.func_args
+        self.class_functions[function].body = function_def.body
+        self.class_functions[function].source_refs = function_def.source_refs
+

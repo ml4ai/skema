@@ -297,9 +297,9 @@ pub fn to_decapodes_serialization(
                 let tgt_idx = table_counts.variable_count;
                 let mut derivative_str = String::new();
                 if *notation == DerivativeNotation::LeibnizTotal {
-                    derivative_str.push_str(&*format!("D({},{})", order, bound_var));
+                    derivative_str.push_str(&format!("D({},{})", order, bound_var));
                 } else if *notation == DerivativeNotation::LeibnizPartialStandard {
-                    derivative_str.push_str(&*format!("PD({},{})", order, bound_var));
+                    derivative_str.push_str(&format!("PD({},{})", order, bound_var));
                 }
                 let unary = UnaryOperator {
                     src: to_decapodes_serialization(&rest[0], tables, table_counts),

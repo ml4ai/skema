@@ -1,13 +1,14 @@
 use clap::Parser;
 
 pub use mathml::mml2pn::{ACSet, Term};
+use mathml::parsers::math_expression_tree::MathExpressionTree;
 use std::fs;
 // new imports
-use mathml::acset::{GeneralizedAMR, PetriNet};
+use mathml::acset::GeneralizedAMR;
 use neo4rs::{query, Node};
 use schemars::schema_for;
 use skema::config::Config;
-use skema::model_extraction::module_id2mathml_MET_ast;
+
 use std::env;
 
 use std::sync::Arc;
@@ -66,9 +67,17 @@ async fn main() {
             env::var("SKEMA_GRAPH_DB_HOST").unwrap_or("graphdb-bolt.askem.lum.ai".to_string());
         let db_port = env::var("SKEMA_GRAPH_DB_PORT").unwrap_or("443".to_string());
 
-        let schema = schema_for!(GeneralizedAMR);
-        let data = format!("{}", serde_json::to_string_pretty(&schema).unwrap());
-        fs::write("./schema.txt", data).expect("Unable to write file");
+        let schema_met = schema_for!(MathExpressionTree);
+        let data_met = serde_json::to_string_pretty(&schema_met)
+            .unwrap()
+            .to_string();
+        fs::write("./met_schema.txt", data_met).expect("Unable to write file");
+
+        let schema_gamr = schema_for!(GeneralizedAMR);
+        let data_gamr = serde_json::to_string_pretty(&schema_gamr)
+            .unwrap()
+            .to_string();
+        fs::write("./gamr_schema.txt", data_gamr).expect("Unable to write file");
         /*
         let config = Config {
             db_protocol: db_protocol.clone(),

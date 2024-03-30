@@ -82,6 +82,11 @@ class TS2CAST(object):
         # Additional variables used in generation
         self.var_count = 0
 
+        # A dictionary used to keep track of aliases that imports use
+        # (like import x as y, or from x import y as z)
+        # Used to resolve aliasing in imports
+        self.aliases = {}
+
         # Tree walking structures
         self.variable_context = VariableContext()
         self.node_helper = NodeHelper(self.source, self.source_file_name)
@@ -104,7 +109,19 @@ class TS2CAST(object):
 
     # TODO: node helper for ignoring comments
 
+    def check_alias(self, name):
+        """Given a python string that represents a name,
+        this function checks to see if that name is an alias
+        for a different name, and returns it if it is indeed an alias.
+        Otherwise, the original name is returned.
+        """
+        if name in self.aliases:
+            return self.aliases[name]
+        else:
+            return name
+
     def visit(self, node: Node):
+        # print(f"===Visiting node[{node.type}]===")
         if node.type == "module":
             return self.visit_module(node)
         elif node.type == "parenthesized_expression":
@@ -125,6 +142,8 @@ class TS2CAST(object):
             return self.visit_comparison_op(node)
         elif node.type == "assignment":
             return self.visit_assignment(node)
+        elif node.type == "attribute":
+            return self.visit_attribute(node)
         elif node.type == "identifier":
             return self.visit_identifier(node)
         elif node.type == "unary_operator":
@@ -141,12 +160,26 @@ class TS2CAST(object):
             return self.visit_dict_comprehension(node)
         elif node.type == "lambda":
             return self.visit_lambda(node)
+        elif node.type == "subscript":
+            return self.visit_subscript(node)
+        elif node.type == "slice":
+            return self.visit_slice(node)
         elif node.type == "pair":
             return self.visit_pair(node)
         elif node.type == "while_statement":
             return self.visit_while(node)
         elif node.type == "for_statement":
             return self.visit_for(node)
+        elif node.type == "import_statement":
+            return self.visit_import(node)
+        elif node.type == "import_from_statement":
+            return self.visit_import_from(node)
+        elif node.type == "class_definition":
+            return self.visit_class_definition(node)
+        elif node.type == "yield":
+            return self.visit_yield(node)
+        elif node.type == "assert_statement":
+            return self.visit_assert(node)
         else:
             return self._visit_passthrough(node)
 
@@ -232,12 +265,14 @@ class TS2CAST(object):
         ret_val = node.children[1]
         ret_cast = self.visit(ret_val)
 
-        return ModelReturn(value=ret_cast, source_refs=[ref])
+        return ModelReturn(value=get_operand_node(ret_cast), source_refs=[ref])
 
     def visit_call(self, node: Node) -> Call:
         ref = self.node_helper.get_source_ref(node)
-        func_identifier = get_first_child_by_type(node, "identifier")
-        func_name = self.visit(func_identifier) #self.node_helper.get_identifier(func_identifier)
+
+        func_cast = self.visit(node.children[0])
+
+        func_name = get_func_name_node(func_cast)        
 
         arg_list = get_first_child_by_type(node, "argument_list")
         args = get_non_control_children(arg_list)
@@ -250,7 +285,7 @@ class TS2CAST(object):
             elif isinstance(cast, AstNode):
                 func_args.append(cast)
 
-        if func_name.val.name == "range":
+        if get_name_node(func_cast).name == "range":
             start_step_value = CASTLiteralValue(
                 ScalarType.INTEGER, 
                 value="1",
@@ -267,7 +302,7 @@ class TS2CAST(object):
 
         # Function calls only want the 'Name' part of the 'Var' that the visit returns
         return Call(
-            func=func_name.val, 
+            func=func_name, 
             arguments=func_args, 
             source_refs=[ref]
         )
@@ -403,8 +438,8 @@ class TS2CAST(object):
         op = get_op(self.node_helper.get_operator(node.children[1]))
         left, _, right = node.children
 
-        left_cast = get_name_node(self.visit(left))
-        right_cast = get_name_node(self.visit(right))
+        left_cast = get_operand_node(self.visit(left))
+        right_cast = get_operand_node(self.visit(right))
 
         return Operator(
             op=op, 
@@ -499,6 +534,124 @@ class TS2CAST(object):
                 source_code_data_type=["Python", PYTHON_VERSION, str(type((0)))],
                 source_refs=[literal_source_ref]
             )
+
+    def handle_dotted_name(self, import_stmt) -> ModelImport:
+        ref = self.node_helper.get_source_ref(import_stmt)
+        name = self.node_helper.get_identifier(import_stmt)
+        self.visit(import_stmt)
+
+        return name
+
+    def handle_aliased_import(self, import_stmt) -> ModelImport:
+        ref = self.node_helper.get_source_ref(import_stmt)
+        dot_name = get_children_by_types(import_stmt,["dotted_name"])[0]
+        name = self.handle_dotted_name(dot_name) 
+        alias = get_children_by_types(import_stmt, ["identifier"])[0]
+        self.visit(alias)
+
+        return (name, self.node_helper.get_identifier(alias)) 
+
+    def visit_import(self, node: Node):
+        ref = self.node_helper.get_source_ref(node)
+        to_ret = []
+
+        names_list = get_children_by_types(node, ["dotted_name", "aliased_import"])
+        for name in names_list:
+            if name.type == "dotted_name":
+                resolved_name = self.handle_dotted_name(name)
+                to_ret.append(ModelImport(name=resolved_name, alias=None, symbol=None, all=False, source_refs=ref))
+            elif name.type == "aliased_import":
+                resolved_name = self.handle_aliased_import(name)
+                self.aliases[resolved_name[1]] = resolved_name[0]
+                to_ret.append(ModelImport(name=resolved_name[0], alias=resolved_name[1], symbol=None, all=False, source_refs=ref))
+
+        return to_ret
+
+    def visit_import_from(self, node: Node):
+        ref = self.node_helper.get_source_ref(node)
+        to_ret = []
+
+        names_list = get_children_by_types(node, ["dotted_name", "aliased_import"])
+        wild_card = get_children_by_types(node, ["wildcard_import"])
+        module_name = self.node_helper.get_identifier(names_list[0])
+
+        # if "wildcard_import" exists then it'll be in the list
+        if len(wild_card) == 1:
+            to_ret.append(ModelImport(name=module_name, alias=None, symbol=None, all=True, source_refs=ref))
+        else:
+            for name in names_list[1:]:
+                if name.type == "dotted_name":
+                    resolved_name = self.handle_dotted_name(name) 
+                    to_ret.append(ModelImport(name=module_name, alias=None, symbol=resolved_name, all=False, source_refs=ref))
+                elif name.type == "aliased_import":
+                    resolved_name = self.handle_aliased_import(name)
+                    self.aliases[resolved_name[1]] = resolved_name[0]
+                    to_ret.append(ModelImport(name=module_name, alias=resolved_name[1], symbol=resolved_name[0], all=False, source_refs=ref))
+            
+        return to_ret
+
+    def visit_attribute(self, node: Node):
+        ref = self.node_helper.get_source_ref(node)
+        obj,_,attr = node.children
+        obj_cast = self.visit(obj)
+        attr_cast = self.visit(attr)
+
+        return Attribute(value= get_name_node(obj_cast), attr=get_name_node(attr_cast), source_refs=ref)
+
+    def visit_subscript(self, node: Node):
+        ref = self.node_helper.get_source_ref(node)
+        values = get_non_control_children(node)
+        name_cast = self.visit(values[0])
+        subscript_list = values[1:]
+        subscript_casts = []
+        for subscript in subscript_list:
+            cast = self.visit(subscript)
+            if isinstance(cast, list):
+                for elem in cast:
+                    subscript_casts.append(get_func_name_node(cast))
+            else:
+                subscript_casts.append(get_func_name_node(cast))
+
+        get_func = self.get_gromet_function_node("_get")
+        
+        get_call = Call(
+            func = get_func,
+            arguments = [get_func_name_node(name_cast)] + subscript_casts,
+            source_refs=ref
+        )
+
+        return get_call
+
+    def visit_slice(self, node: Node):
+        ref = self.node_helper.get_source_ref(node)
+        indices = get_non_control_children(node)
+        index_cast = []
+
+        for index in indices:
+            cast = self.visit(index)
+            if isinstance(cast ,list):
+                index_cast.extend(cast)
+            else:
+                index_cast.append(cast)
+
+        start = index_cast[0]
+        end = index_cast[1]
+        if len(index_cast) == 3:
+            step = index_cast[2]
+        else:
+            step = CASTLiteralValue(
+                value_type=ScalarType.INTEGER,
+                value="1",
+                source_code_data_type=["Python", "3.8", "Float"],
+                source_refs=ref,
+            )
+
+        return CASTLiteralValue(value_type=StructureType.LIST, 
+            value=[start,end,step], 
+            source_code_data_type=["Python", "3.8", "List"],
+            source_refs=ref
+        )
+
 
     def handle_for_clause(self, node: Node):
         # Given the "for x in seq" clause of a list comprehension
@@ -881,10 +1034,49 @@ class TS2CAST(object):
             source_refs = ref
         )
 
+    def retrieve_init_func(self, functions: List[FunctionDef]):
+        # Given a list of CAST function defs, we
+        # attempt to retrieve the CAST function that corresponds to
+        # "__init__"
+        for func in functions:
+            if func.name.name == "__init__":
+                return func
+        return None
+
+    def retrieve_class_attrs(self, init_func: FunctionDef):
+        attrs = []
+        for stmt in init_func.body:
+            if isinstance(stmt, Assignment):
+                if isinstance(stmt.left, Attribute):
+                    if stmt.left.value.name == "self":
+                        attrs.append(stmt.left.attr)
+
+        return attrs
+
+    def visit_class_definition(self, node):
+        class_name_node = get_first_child_by_type(node, "identifier")
+        class_cast = self.visit(class_name_node)
+    
+        function_defs = get_children_by_types(get_children_by_types(node, "block")[0], "function_definition")
+        func_defs_cast = []
+        for func in function_defs:
+            func_cast = self.visit(func)
+            if isinstance(func_cast, List):
+                func_defs_cast.extend(func_cast)
+            else:
+                func_defs_cast.append(func_cast)
+
+        init_func = self.retrieve_init_func(func_defs_cast)        
+        attributes = self.retrieve_class_attrs(init_func)
+
+        return RecordDef(name=get_name_node(class_cast).name, bases=[], funcs=func_defs_cast, fields=attributes)
+
 
     def visit_name(self, node):
         # First, we will check if this name is already defined, and if it is return the name node generated previously
-        identifier = self.node_helper.get_identifier(node)
+        # NOTE: the call to check_alias is a crucial change, to resolve aliasing
+        # need to make sure nothing breaks
+        identifier = self.check_alias(self.node_helper.get_identifier(node))
         if self.variable_context.is_variable(identifier):
             return self.variable_context.get_node(identifier)
 
@@ -909,14 +1101,59 @@ class TS2CAST(object):
 
         return self.variable_context.add_variable(func_name, "function", None)
             
+    def visit_yield(self, node):
+        source_code_data_type = ["Python", "3.8", "List"]
+        ref = self.node_helper.get_source_ref(node)
+        return [
+            CASTLiteralValue(
+                StructureType.LIST,
+                "YieldNotImplemented",
+                source_code_data_type,
+                ref
+            )   
+        ]
+
+    def visit_assert(self, node):
+        source_code_data_type = ["Python", "3.8", "List"]
+        ref = self.node_helper.get_source_ref(node)
+        return [
+            CASTLiteralValue(
+                StructureType.LIST,
+                "AssertNotImplemented",
+                source_code_data_type,
+                ref
+            )   
+        ]
+
+
 def get_name_node(node):
     # Given a CAST node, if it's type Var, then we extract the name node out of it
     # If it's anything else, then the node just gets returned normally
     cur_node = node
     if isinstance(node, list):
         cur_node = node[0]
-
+    if isinstance(cur_node, Attribute):
+        return get_name_node(cur_node.attr)
     if isinstance(cur_node, Var):
         return cur_node.val
     else:
-        return node
+        return cur_node
+
+def get_func_name_node(node):
+    # Given a CAST node, we attempt to extract the appropriate name element
+    # from it. 
+    cur_node = node
+    if isinstance(cur_node, Var):
+        return cur_node.val
+    else:
+        return cur_node 
+
+def get_operand_node(node):
+    # Given a CAST/list node, we extract the appropriate operand for the operator from it
+    cur_node = node
+    if isinstance(node, list):
+        cur_node = node[0]
+    if isinstance(cur_node, Var):
+        return cur_node.val
+    else:
+        return cur_node

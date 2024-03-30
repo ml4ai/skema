@@ -7,13 +7,14 @@ from skema.rest.metal_proxy import app
 from fastapi.testclient import TestClient
 
 client = TestClient(app)
+
+
 # def test_link_amr():
 #     """Test that we are able to link and AMR to text extractions correctly"""
-#     amr_path = Path(__file__).parents[0] / "data" / "metal" / "fixed_scenario1_amr_eq.json"
+#     amr_path = Path(__file__).parents[0] / "data" / "metal" / "SIDARTHE_AMR_uuids.json"
 #     extractions_path = Path(__file__).parents[0] / "data" / "metal" / "tr_document_results.json"
 #
 #     params = {
-#         "amr_type": "petrinet",
 #         "similarity_model": "sentence-transformers/all-MiniLM-L6-v2",
 #         "similarity_threshold": 0.5
 #     }
@@ -35,7 +36,6 @@ client = TestClient(app)
 #     assert num_linked_elements > 5, f"Only {num_linked_elements}, should be close to 17 with the testing configuration"
 
 
-
 def test_healthcheck():
     """Test case for /healthcheck endpoint."""
     response = client.get("/healthcheck")
@@ -44,5 +44,6 @@ def test_healthcheck():
         status.HTTP_500_INTERNAL_SERVER_ERROR
     }
 
-if __name__ == "__main__":
-    test_link_amr()
+
+# if __name__ == "__main__":
+#     test_link_amr()
