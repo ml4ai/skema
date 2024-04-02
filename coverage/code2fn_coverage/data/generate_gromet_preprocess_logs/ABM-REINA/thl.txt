@@ -1,21 +1,12 @@
-Missing Function body on 10'th bf in the 30'th fn_array
-Missing Function body on 5'th bf in the 74'th fn_array
-Missing Function body on 1'th bf in the 76'th fn_array
-Missing Function body on 1'th bf in the 81'th fn_array
-Missing Function body on 24'th bf in the 96'th fn_array
-Missing Function body on 31'th bf in the 96'th fn_array
-Missing Function body on 33'th bf in the 96'th fn_array
-Missing Function body on 40'th bf in the 96'th fn_array
-Missing Function body on 44'th bf in the 96'th fn_array
-Missing Function body on 49'th bf in the 96'th fn_array
-Missing Function body on 73'th bf in the 96'th fn_array
-Missing Function body on 84'th bf in the 96'th fn_array
-Missing Function body on 88'th bf in the 96'th fn_array
-Missing Function body on 92'th bf in the 96'th fn_array
-Missing Function body on 2'th bf in the 124'th fn_array
-Missing Function body on 1'th bf in the 132'th fn_array
-Missing Function body on 4'th bf in the 134'th fn_array
-Missing Function body on 21'th bf in the 134'th fn_array
-Missing Function body on 2'th bf in the 149'th fn_array
-Missing Function body on 2'th bf in the 157'th fn_array
-Missing Function body on 4'th bf in the 159'th fn_array
+Traceback (most recent call last):
+  File "skema/program_analysis/model_coverage_report/model_coverage_report.py", line 76, in generate_data_product
+    output = func_timeout(10, data_product_function, args=args, kwargs=kwargs)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/func_timeout/dafunc.py", line 108, in func_timeout
+    raise_exception(exception)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/func_timeout/py3_raise.py", line 7, in raise_exception
+    raise exception[0] from None
+  File "skema/program_analysis/model_coverage_report/model_coverage_report.py", line 137, in generate_gromet_preprocess_logs
+    logs = fn_preprocessor(gromet_collection)[1]
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/rest/utils.py", line 100, in fn_preprocessor
+    for (j, fn_ent) in enumerate(fn_data['modules'][0]['fn_array']):
+IndexError: list index out of range

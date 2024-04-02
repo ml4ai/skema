@@ -460,7 +460,7 @@ this.</p>
 <p>For each yielded item that has <code>None</code> provided for the <code>HeaderName</code>,
 then the associated header name is the same as that of the previously
 yielded item. The first yielded item will have <code>HeaderName</code> set.</p>
-<h5 id="examples-27"><a class="doc-anchor" href="#examples-27">§</a>Examples</h5>
+<h5 id="examples-28"><a class="doc-anchor" href="#examples-28">§</a>Examples</h5>
 <p>Basic usage.</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">let </span><span class="kw-2">mut </span>map = HeaderMap::new();
@@ -499,7 +499,7 @@ sufficient, and should not be overridden without very good reason.</div></detail
     &lt;<a class="struct" href="struct.HeaderName.html" title="struct http::header::HeaderName">HeaderName</a> as <a class="trait" href="https://doc.rust-lang.org/1.77.1/core/convert/trait.TryFrom.html" title="trait core::convert::TryFrom">TryFrom</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/1.77.1/std/primitive.reference.html">&amp;'a K</a>&gt;&gt;::<a class="associatedtype" href="https://doc.rust-lang.org/1.77.1/core/convert/trait.TryFrom.html#associatedtype.Error" title="type core::convert::TryFrom::Error">Error</a>: <a class="trait" href="https://doc.rust-lang.org/1.77.1/core/convert/trait.Into.html" title="trait core::convert::Into">Into</a>&lt;<a class="struct" href="../struct.Error.html" title="struct http::Error">Error</a>&gt;,
     T: <a class="trait" href="https://doc.rust-lang.org/1.77.1/core/convert/trait.TryFrom.html" title="trait core::convert::TryFrom">TryFrom</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/1.77.1/std/primitive.reference.html">&amp;'a V</a>&gt;,
     T::<a class="associatedtype" href="https://doc.rust-lang.org/1.77.1/core/convert/trait.TryFrom.html#associatedtype.Error" title="type core::convert::TryFrom::Error">Error</a>: <a class="trait" href="https://doc.rust-lang.org/1.77.1/core/convert/trait.Into.html" title="trait core::convert::Into">Into</a>&lt;<a class="struct" href="../struct.Error.html" title="struct http::Error">Error</a>&gt;,</div></h3></section></summary><div class="docblock"><p>Try to convert a <code>HashMap</code> into a <code>HeaderMap</code>.</p>
-<h4 id="examples-28"><a class="doc-anchor" href="#examples-28">§</a>Examples</h4>
+<h4 id="examples-27"><a class="doc-anchor" href="#examples-27">§</a>Examples</h4>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>std::collections::HashMap;
 <span class="kw">use </span>std::convert::TryInto;
 <span class="kw">use </span>http::HeaderMap;
