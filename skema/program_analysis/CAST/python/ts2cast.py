@@ -479,9 +479,6 @@ class TS2CAST(object):
             source_refs=[ref]
         )
 
-    def create_binary_compare_tree(self, node):
-        return None
-
     def visit_boolean_op(self, node: Node):
         ref = self.node_helper.get_source_ref(node)
         operands = get_non_control_children(node)
@@ -512,9 +509,6 @@ class TS2CAST(object):
         tree_root = test
         
         return tree_root
-        # op = self.create_binary_compare_tree(node)
-        
-        # return self.visit(op)
 
     def visit_pattern(self, node: Node):
         pattern_cast = []
