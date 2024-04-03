@@ -317,6 +317,21 @@ class ToGrometPass:
     def symtab_records(self):
         return self.symbol_table["records"]
 
+    def offset_pif(self, var_name, func_name):
+        """Allows us to determine how much to offset a variable's pif.
+        This is done by acquiring its 'index location' in the function definition
+        that is foo(x,y,z) has an offset of 2 for variable y, and an offset of 3 for variable z.
+        Used primarily with keyword argument wiring.
+        """
+        args = self.symbol_table["functions"][func_name][2]
+        idx = 1
+        for arg,_ in args:
+            if arg == var_name:
+                return idx
+            idx += 1
+
+        return 1
+
     def build_function_arguments_table(self, nodes):
         """Iterates through all the function definitions at the module
         level and creates a table that maps their function names to a map
@@ -333,7 +348,7 @@ class ToGrometPass:
                 self.function_arguments[node.name.name] = {}
                 for i, arg in enumerate(node.func_args, 1):
                     self.function_arguments[node.name.name][arg.val.name] = i
-                self.symbol_table["functions"][node.name.name] = (node.name.name, -1)
+                self.symbol_table["functions"][node.name.name] = (node.name.name, -1, [-1] * len(node.func_args))
 
     def wire_from_var_env(self, name, gromet_fn):
         var_environment = self.symtab_variables()
@@ -2684,8 +2699,15 @@ class ToGrometPass:
             # is not inlined or part of an assignment we don't visit the
             # arguments as that's already been handled by the primitive handler
             # if not is_primitive(func_name, "CAST") or (from_assignment or is_inline(func_name)):
+            if func_name in self.symtab_functions().keys():
+                print(self.symtab_functions()[func_name])
+                keyword_arg_len = len(self.symtab_functions()[func_name][2])
+            else:
+                keyword_arg_len = 0
+            visited_args = 0
             for arg in node.arguments:
                 self.visit(arg, parent_gromet_fn, node)
+                visited_args += 1
 
                 parent_gromet_fn.pif = insert_gromet_object(
                     parent_gromet_fn.pif, GrometPort(box=call_bf_idx)
@@ -2763,11 +2785,32 @@ class ToGrometPass:
                             GrometWire(src=pif_idx, tgt=pof_idx),
                         )
                 elif isinstance(arg, AnnCastAssignment):
-                    parent_gromet_fn.wff = insert_gromet_object(
-                        parent_gromet_fn.wff,
-                        GrometWire(src=pif_idx, tgt=len(parent_gromet_fn.pof))
-                    )
+                    # We do an offset computation here that allows us to appropriately
+                    # wire keyword arguments whenever they're assigned in a different
+                    # order than they show up
+                    # i.e. foo(y=1,x=2) when the definition is foo(x,y)
+                    pif_offset = self.offset_pif(arg.left.val.name, func_name)
+                    if keyword_arg_len > 0:
+                        parent_gromet_fn.wff = insert_gromet_object(
+                            parent_gromet_fn.wff,
+                            GrometWire(src=pif_idx - (visited_args - pif_offset), tgt=len(parent_gromet_fn.pof))
+                        )
+                    else:
+                        parent_gromet_fn.wff = insert_gromet_object(
+                            parent_gromet_fn.wff,
+                            GrometWire(src=pif_idx, tgt=len(parent_gromet_fn.pof))
+                        )
                     # if isinstance(arg.right)
+            
+            # the number of visited args matches the number of keyword args
+            # if we used them all
+            # otherwise if more keyword args exist than visited args
+            # we need to add some ports
+            if keyword_arg_len > visited_args:
+                for i in range(keyword_arg_len - visited_args):
+                    parent_gromet_fn.pif = insert_gromet_object(
+                        parent_gromet_fn.pif, GrometPort(box=call_bf_idx)
+                    )
 
         if from_call or from_operator or from_assignment or from_loop:
             # Operator and calls need a pof appended here because they dont
@@ -3095,8 +3138,9 @@ class ToGrometPass:
 
         # Update the functions symbol table with its index in the FN array
         # This is currently used for wiring function names as parameters to function calls
+        # Also used to keep track of default values in a function's arguments
         functions = self.symtab_functions()
-        functions[node.name.name] = (node.name.name, idx)
+        functions[node.name.name] = (node.name.name, idx, [])
 
         metadata = self.create_source_code_reference(ref)
 
@@ -3179,6 +3223,7 @@ class ToGrometPass:
                         ),
                     )
                 else:
+                    functions[node.name.name][2].append((arg.val.name, arg.default_value.value))
                     new_gromet.opi = insert_gromet_object(
                         new_gromet.opi,
                         GrometPort(

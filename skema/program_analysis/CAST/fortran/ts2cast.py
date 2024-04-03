@@ -277,13 +277,7 @@ class TS2CAST(object):
                 func_args.append(self.visit(parameter))
 
         # The first child of function will be the function statement, the rest will be body nodes
-        body = []
-        for body_node in node.children[1:]:
-            child_cast = self.visit(body_node)
-            if isinstance(child_cast, List):
-                body.extend(child_cast)
-            elif isinstance(child_cast, AstNode):
-                body.append(child_cast)
+        body = self.generate_cast_body(node.children[1:-1])
 
         # After creating the body, we can go back and update the var nodes we created for the arguments
         # We do this by looking for intent,in nodes
@@ -546,8 +540,8 @@ class TS2CAST(object):
                     (...) ...
             (body) ...
         """
-
-        loop_control_node = get_first_child_by_type(node, "loop_contrel_expression")
+        
+        loop_control_node = get_first_child_by_type(node, "loop_control_expression")
         if not loop_control_node:
             return self._visit_while(node)
 
@@ -594,7 +588,7 @@ class TS2CAST(object):
                 ),
             )
         )
-
+     
         # (i, generated_iter_0, sc_0) = next(generated_iter_0)
         pre.append(
             Assignment(
@@ -618,7 +612,7 @@ class TS2CAST(object):
         expr = Operator(
             op="!=",  # TODO: Should this be == or !=
             operands=[
-                Var(stop_condition_name_node, "Boolean"),
+                stop_condition_name_node,
                 CASTLiteralValue("Boolean", True),
             ],
         )
@@ -1096,7 +1090,7 @@ class TS2CAST(object):
         # attr = self.node_helper.get_identifier(
         #    get_first_child_by_type(node, "type_member", recurse=True)
         # )
-        # print(self.node_helper.get_identifier(get_first_child_by_type(node, "type_member", recurse=True)))
+        #print(self.node_helper.get_identifier(get_first_child_by_type(node, "type_member", recurse=True)))
         attr = self.visit_name(get_first_child_by_type(node, "type_member"))
 
         return Attribute(
@@ -1274,4 +1268,3 @@ class TS2CAST(object):
 
         # TODO: How to add more support for source references
         return body
-

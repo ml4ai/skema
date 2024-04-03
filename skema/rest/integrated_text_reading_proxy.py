@@ -416,13 +416,13 @@ async def integrated_text_extractions(
     ### Python example
     ```
     params = {
-       "annotate_skema":True,
-       "annotate_mit": True
+        "annotate_skema": True,
+        "annotate_mit": True
+
     }
+    payload = {"texts": [file_text], "amrs": [amr_text]}
 
-    files = [("pdfs", ("paper.txt", open("paper.txt", "rb")))]
-
-    response = request.post(f"{URL}/text-reading/integrated-text-extractions", params=params, files=files)
+    response = requests.post(f"{URL}/text-reading/integrated-text-extractions", params=params, json=payload)
     if response.status_code == 200:
         data = response.json()
     ```
@@ -457,7 +457,7 @@ async def integrated_text_extractions(
                     text_extractions_file=extractions_ufile)
                 aligned_amrs.append(aligned_amr)
             except Exception as e:
-                error = TextReadingError(pipeline="AMR Linker", message=f"Error annotating {amr.filename}: {e}")
+                error = TextReadingError(pipeline="AMR Linker", message=f"Error annotating amr: {e}")
                 if extractions.generalized_errors is None:
                     extractions.generalized_errors = [error]
                 else:
@@ -489,7 +489,7 @@ async def integrated_pdf_extractions(
        "annotate_mit": True
     }
 
-    files = [("pdfs", ("ijerp.pdf", open("ijerp.pdf", "rb")))]
+    files = [("pdfs", ("ijerp.pdf", open("ijerp.pdf", "rb"))), ("amrs", ("amr.json", open("amr.json", "rb")))]
 
     response = request.post(f"{URL}/text-reading/integrated-pdf-extractions", params=params, files=files)
     if response.status_code == 200:
@@ -714,22 +714,6 @@ def healthcheck() -> int:
         else status.HTTP_500_INTERNAL_SERVER_ERROR
     )
     return status_code
-
-
-@router.get("/eval", response_model=TextReadingEvaluationResults, status_code=200, deprecated=True)
-def quantitative_eval() -> TextReadingEvaluationResults:
-    """ Compares the SIDARTHE paper extractions against ground truth extractions. This path stays for compatibility
-    with the dashboard, but will be removed in the near future as the dashboard is updated to run dynamically the POST
-    path"""
-
-    # Read ground truth annotations
-    with (Path(__file__).parents[0] / "data" / "sidarthe_annotations.json").open() as f:
-        gt_data = json.load(f)
-
-    # Read the SKEMA extractions
-    extractions = AttributeCollection.from_json(Path(__file__).parents[0] / "data" / "extractions_sidarthe_skema.json")
-
-    return utils.compute_text_reading_evaluation(gt_data, extractions)
 
 
 @router.post("/eval", response_model=TextReadingEvaluationResults, status_code=200)
