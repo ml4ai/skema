@@ -16,13 +16,15 @@ CONTROL_CHARACTERS = [
     "*",
     "**",
     "/",
-    "!="
+    "!=",
     ">",
     "<",
     "<=",
     ">=",
     "in",
-    "not"
+    "not",
+    "and",
+    "or"
 ]
 
 # Whatever constructs we see in the left
@@ -114,6 +116,17 @@ def get_first_child_by_type(node: Node, type: str, recurse=False):
             out = get_first_child_by_type(child, type, True)
             if out:
                 return out
+    return None
+
+def get_first_child_from_types(node: Node, types: List):
+    """Takes in a node and a list of strings as inputs and returns 
+    the first child that matches any of the types in the list
+    Otherwise, return None
+    """
+    for child in node.children:
+        if child.type in types:
+            return child
+
     return None
 
 def get_children_by_types(node: Node, types: List):

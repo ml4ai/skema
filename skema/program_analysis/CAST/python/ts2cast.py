@@ -32,6 +32,7 @@ from skema.program_analysis.CAST2FN.model.cast import (
 from skema.program_analysis.CAST.python.node_helper import (
     NodeHelper,
     get_first_child_by_type,
+    get_first_child_from_types,
     get_children_by_types,
     get_first_child_index,
     get_last_child_index,
@@ -140,6 +141,8 @@ class TS2CAST(object):
             return self.visit_if_statement(node)
         elif node.type == "comparison_operator":
             return self.visit_comparison_op(node)
+        elif node.type == "boolean_operator":
+            return self.visit_boolean_op(node)
         elif node.type == "assignment":
             return self.visit_assignment(node)
         elif node.type == "attribute":
@@ -305,20 +308,53 @@ class TS2CAST(object):
 
     def visit_comparison_op(self, node: Node):
         ref = self.node_helper.get_source_ref(node)
-        op = get_op(self.node_helper.get_operator(node.children[1]))
-        left, _, right = node.children
+        operands = get_non_control_children(node)
+        ops = get_control_children(node)
 
-        left_cast = get_name_node(self.visit(left))
-        right_cast = get_name_node(self.visit(right))
-
-        return Operator(
-            op=op, 
-            operands=[left_cast, right_cast], 
-            source_refs=[ref]
+        source_code_data_type = ["Python", "3.8", str(type(True))]
+        true_val = CASTLiteralValue(
+            ScalarType.BOOLEAN,
+            "True",
+            source_code_data_type=source_code_data_type,
+            source_refs=ref,
+        )
+        false_val = CASTLiteralValue(
+            ScalarType.BOOLEAN,
+            "False",
+            source_code_data_type=source_code_data_type,
+            source_refs=ref,
         )
 
+        idx = len(operands) - 1
+        op_idx = len(ops) - 1
+        tree_root = None
+        while idx > 0:
+            op = get_op(self.node_helper.get_operator(ops[op_idx]))
+            l = get_name_node(self.visit(operands[idx - 1]))
+            r = get_name_node(self.visit(operands[idx]))
+            if op == "ast.And":
+                test = ModelIf(expr=l, body=[r], orelse=[false_val], source_refs=ref)
+            elif op == "ast.Or":
+                test = ModelIf(expr=l, body=[true_val], orelse=[r], source_refs=ref)
+            else:
+                test = Operator(source_language="Python", interpreter="Python",
+                                version=PYTHON_VERSION,
+                                op=op,
+                                operands=[l,r],
+                                source_refs=ref)
+            if tree_root == None:        
+                tree_root = test
+            else:
+                tree_root = ModelIf(expr=test,body=[tree_root],orelse=[false_val], source_refs=ref)
+
+            op_idx = op_idx - 1
+            idx = idx - 1
+
+        return tree_root
+
     def visit_if_statement(self, node: Node) -> ModelIf:
-        if_condition = self.visit(get_first_child_by_type(node, "comparison_operator"))
+        cond = get_first_child_from_types(node, ["comparison_operator", "boolean_operator", "parenthesized_expression"])
+        if_condition = self.visit(cond)
 
         # Get the body of the if true part
         if_true = get_children_by_types(node, ["block"])[0].children
@@ -442,6 +478,43 @@ class TS2CAST(object):
             operands=[left_cast, right_cast], 
             source_refs=[ref]
         )
+
+    def create_binary_compare_tree(self, node):
+        return None
+
+    def visit_boolean_op(self, node: Node):
+        ref = self.node_helper.get_source_ref(node)
+        operands = get_non_control_children(node)
+        ops =  get_control_children(node)
+        
+        source_code_data_type = ["Python", "3.8", str(type(True))]
+        true_val = CASTLiteralValue(
+            ScalarType.BOOLEAN,
+            "True",
+            source_code_data_type=source_code_data_type,
+            source_refs=ref,
+        )
+        false_val = CASTLiteralValue(
+            ScalarType.BOOLEAN,
+            "False",
+            source_code_data_type=source_code_data_type,
+            source_refs=ref,
+        )
+
+        tree_root = None
+        op = get_op(self.node_helper.get_operator(ops[0]))            
+        l = self.visit(operands[0])
+        r = self.visit(operands[1])
+        if op == "ast.And":
+            test = ModelIf(expr=l, body=[r], orelse=[false_val], source_refs=ref)
+        elif op == "ast.Or":
+            test = ModelIf(expr=l, body=[true_val], orelse=[r], source_refs=ref)
+        tree_root = test
+        
+        return tree_root
+        # op = self.create_binary_compare_tree(node)
+        
+        # return self.visit(op)
 
     def visit_pattern(self, node: Node):
         pattern_cast = []

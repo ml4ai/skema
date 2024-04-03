@@ -33,6 +33,8 @@ def get_op(operator):
         '>'  : 'ast.Gt',
         '>=' : 'ast.GtE',
         '%' : 'ast.Mod',
+        'and' : 'ast.And',
+        'or' : 'ast.Or'
         # ast.UAdd: 'ast.UAdd',
         # ast.USub: 'ast.USub',
         # ast.FloorDiv: 'ast.FloorDiv',

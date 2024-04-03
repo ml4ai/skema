@@ -60,7 +60,7 @@ def python_to_cast(
     rawjson=False,
     legacy=False,
     cast_obj=False,
-    tree_sitter=True
+    tree_sitter=False
 ) -> Optional[CAST]:
     """Create a CAST object from a Python file and serialize it to JSON.
 
