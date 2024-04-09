@@ -36,6 +36,28 @@ pub enum DerivativeNotation {
     Lagrange,
 }
 
+#[derive(
+    Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, JsonSchema,
+)]
+pub struct Logarithm {
+    pub notation: LogarithmNotation,
+    //pub is_natural_log: bool,
+    //pub base: Option<Box<MathExpression>>,
+}
+
+/// Varying logarithm notation
+#[derive(
+    Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new, Deserialize, Serialize, JsonSchema,
+)]
+pub enum LogarithmNotation {
+    /// e.g. ln
+    Ln,
+    /// e.g log
+    Log,
+    /// e.g. log with base
+    LogBase(Box<MathExpression>),
+}
+
 /// Summation operator has the option of having lower bound and upper bound components
 #[derive(
     Debug,
@@ -143,9 +165,9 @@ pub enum Operator {
     Subtract,
     /// Square root operator
     Sqrt,
-    /// Left parenthesis
+    /// Left parenthesis; only for internal use (Pratt parsing)
     Lparen,
-    /// Right parenthesis
+    /// Right parenthesis; only for internal use (Pratt parsing)
     Rparen,
     /// Composition operator
     Compose,
@@ -203,8 +225,12 @@ pub enum Operator {
     Laplacian,
     /// Closed surface integral operator --need to include explit dS integration variable when translating to latex
     SurfaceInt,
-    /// Vector operator
-    Vector,
+    /// only for internal use
+    Comma,
+    /// Logarithm operator
+    Logarithm(Logarithm),
+    /// Minimum operator
+    Min,
     // Catchall for operators we haven't explicitly defined as enum variants yet.
     Other(String),
 }
@@ -251,7 +277,6 @@ impl fmt::Display for Operator {
             Operator::Arccsc => write!(f, "Arccsc"),
             Operator::Arccot => write!(f, "Arccot"),
             Operator::Mean => write!(f, "Mean"),
-            Operator::Vector => write!(f, "Vec"),
             Operator::Gradient(Gradient { subscript }) => match subscript {
                 Some(sub) => write!(f, "Grad_{sub}"),
                 None => write!(f, "Grad"),
@@ -286,6 +311,13 @@ impl fmt::Display for Operator {
             Operator::SurfaceInt => {
                 write!(f, "SurfaceInt")
             }
+            Operator::Min => write!(f, "Min"),
+            Operator::Comma => write!(f, ","),
+            Operator::Logarithm(Logarithm { notation }) => match notation {
+                LogarithmNotation::Ln => write!(f, "Ln"),
+                LogarithmNotation::Log => write!(f, "Log"),
+                LogarithmNotation::LogBase(x) => write!(f, "Log_{{{x}}}"),
+            },
         }
     }
 }

@@ -1,8 +1,12 @@
 //! Pratt parsing module to construct S-expressions from presentation MathML.
 //! This is based on the nice tutorial at https://matklad.github.io/2020/04/13/simple-but-powerful-pratt-parsing.html
+use crate::ast::VectorNotation;
 use crate::{
     ast::{
-        operator::{Derivative, DerivativeNotation, Gradient, Hat, Int, Operator, Summation},
+        operator::{
+            Derivative, DerivativeNotation, Gradient, Hat, Int, Logarithm, LogarithmNotation,
+            Operator, Summation,
+        },
         Math, MathExpression, Mi, Mrow,
     },
     parsers::interpreted_mathml::interpreted_math,
@@ -265,6 +269,7 @@ fn is_unary_operator(op: &Operator) -> bool {
         Operator::Sqrt
             | Operator::Factorial
             | Operator::Exp
+            | Operator::Logarithm(_)
             | Operator::Power
             | Operator::Gradient(_)
             | Operator::Summation(_)
@@ -288,7 +293,6 @@ fn is_unary_operator(op: &Operator) -> bool {
             | Operator::Arccsc
             | Operator::Arccot
             | Operator::Mean
-            | Operator::Vector
     )
 }
 
@@ -340,17 +344,55 @@ fn process_math_expression(expr: &MathExpression, expression: &mut String) {
     match expr {
         // If it's a Ci variant, recursively process its content
         MathExpression::Ci(x) => {
-            process_math_expression(&x.content, expression);
-            if let Some(func_of_vec) = &x.func_of {
-                if !func_of_vec.is_empty() && !func_of_vec[0].content.to_string().is_empty() {
-                    expression.push('(');
-                    for (index, func_ci) in func_of_vec.iter().enumerate() {
-                        process_math_expression(&func_ci.content, expression);
-                        if index < func_of_vec.len() - 1 {
-                            expression.push(',');
+            if let Some(vec_comp) = &x.notation {
+                if VectorNotation::Arrow == *vec_comp {
+                    expression.push_str("\\vec{");
+                    process_math_expression(&x.content, expression);
+                    expression.push('}');
+                    if let Some(func_of_vec) = &x.func_of {
+                        if !func_of_vec.is_empty() && !func_of_vec[0].content.to_string().is_empty()
+                        {
+                            expression.push('(');
+                            for (index, func_ci) in func_of_vec.iter().enumerate() {
+                                process_math_expression(&func_ci.content, expression);
+                                if index < func_of_vec.len() - 1 {
+                                    expression.push(',');
+                                }
+                            }
+                            expression.push(')');
                         }
                     }
-                    expression.push(')');
+                } else if VectorNotation::Bold == *vec_comp {
+                    expression.push_str("\\bold{");
+                    process_math_expression(&x.content, expression);
+                    expression.push('}');
+                    if let Some(func_of_vec) = &x.func_of {
+                        if !func_of_vec.is_empty() && !func_of_vec[0].content.to_string().is_empty()
+                        {
+                            expression.push('(');
+                            for (index, func_ci) in func_of_vec.iter().enumerate() {
+                                process_math_expression(&func_ci.content, expression);
+                                if index < func_of_vec.len() - 1 {
+                                    expression.push(',');
+                                }
+                            }
+                            expression.push(')');
+                        }
+                    }
+                }
+            } else {
+                process_math_expression(&x.content, expression);
+                if let Some(func_of_vec) = &x.func_of {
+                    if !func_of_vec.is_empty() && !func_of_vec[0].content.to_string().is_empty() {
+                        expression.push('(');
+                        for (index, func_ci) in func_of_vec.iter().enumerate() {
+                            process_math_expression(&func_ci.content, expression);
+                            if index < func_of_vec.len() - 1 {
+                                expression.push(',');
+                            }
+                        }
+                        expression.push(')');
+                    }
                 }
             }
         }
@@ -516,8 +558,7 @@ impl MathExpressionTree {
                         if *notation == DerivativeNotation::LeibnizTotal {
                             content_mathml.push_str("<diff/>");
                             content_mathml.push_str(&format!("<bvar>{}</bar>", bound_var));
-                        } else if *notation == DerivativeNotation::LeibnizPartialStandard
-                        {
+                        } else if *notation == DerivativeNotation::LeibnizPartialStandard {
                             content_mathml.push_str("<partialdiff/>");
                             content_mathml.push_str(&format!("<bvar>{}</bar>", bound_var));
                         }
@@ -689,11 +730,6 @@ impl MathExpressionTree {
                             expression.push('}');
                         }
                     },
-                    Operator::Vector => {
-                        expression.push_str("\\vec{");
-                        process_expression_parentheses(&mut expression, &rest[0]);
-                        expression.push('}');
-                    }
                     Operator::Dot => {
                         process_atoms_cons_parentheses(&mut expression, &rest[0]);
                         expression.push_str(" \\cdot ");
@@ -865,6 +901,58 @@ impl MathExpressionTree {
                     Operator::SurfaceInt => {
                         expression.push_str(&format!("\\oiint_S {}", rest[0].to_latex()));
                     }
+                    Operator::Min => {
+                        expression.push_str("\\min \\{ ");
+                        for (index, r) in rest.iter().enumerate() {
+                            expression.push_str(&r.to_latex().to_string());
+                            expression.push(',');
+                        }
+                        // remove last redundant comma
+                        let Some(_) = expression.pop() else { todo!() };
+                        expression.push_str("\\}");
+                    }
+                    Operator::Multiply => {
+                        for (index, r) in rest.iter().enumerate() {
+                            if let MathExpressionTree::Cons(op, _) = r {
+                                if is_unary_operator(op) {
+                                    expression.push_str(&r.to_latex().to_string());
+                                } else if let Operator::Multiply = op {
+                                    expression.push_str(&r.to_latex().to_string());
+                                } else if let Operator::Divide = op {
+                                    expression.push_str(&r.to_latex().to_string());
+                                } else if let Operator::Dot = op {
+                                    expression.push_str(&r.to_latex().to_string());
+                                } else {
+                                    expression.push_str(&format!("({})", r.to_latex()));
+                                }
+                            } else {
+                                expression.push_str(&r.to_latex().to_string());
+                            }
+                            // Add "*" if it's not the last element
+                            if index < rest.len() - 1 {
+                                expression.push('*');
+                            }
+                        }
+                    }
+                    Operator::Logarithm(x) => match &x.notation {
+                        LogarithmNotation::Ln => {
+                            expression.push_str(&format!("\\ln {}", rest[0].to_latex()));
+                        }
+                        LogarithmNotation::Log => {
+                            expression.push_str(&format!("\\log {}", rest[0].to_latex()));
+                        }
+                        LogarithmNotation::LogBase(base) => {
+                            expression.push_str("\\log_{");
+                            expression.push_str(&format!("{}", base));
+                            expression.push('}');
+                            expression.push_str(&rest[0].to_latex().to_string());
+                        }
+                    },
+                    Operator::Comma => {
+                        process_atoms_cons_parentheses(&mut expression, &rest[0]);
+                        expression.push(',');
+                        process_atoms_cons_parentheses(&mut expression, &rest[1]);
+                    }
                     _ => {
                         expression = "".to_string();
                         return "Contain unsupported operators.".to_string();
@@ -929,6 +1017,13 @@ impl MathExpression {
                         element.flatten(tokens);
                     }
                 }
+                tokens.push(MathExpression::Mo(Operator::Rparen));
+            }
+            // Handles `Summation` operator with MathExpression
+            MathExpression::SummationMath(x) => {
+                tokens.push(MathExpression::Mo(Operator::Lparen));
+                x.op.flatten(tokens);
+                x.func.flatten(tokens);
                 tokens.push(MathExpression::Mo(Operator::Rparen));
             }
             MathExpression::Differential(x) => {
@@ -1012,6 +1107,13 @@ impl MathExpression {
                 superscript.flatten(tokens);
                 tokens.push(MathExpression::Mo(Operator::Rparen));
             }
+            MathExpression::Minimize(_, vec) => {
+                tokens.push(MathExpression::Mo(Operator::Lparen));
+                for v in vec {
+                    tokens.push(v.clone());
+                }
+                tokens.push(MathExpression::Mo(Operator::Rparen));
+            }
             MathExpression::Absolute(_operator, components) => {
                 tokens.push(MathExpression::Mo(Operator::Lparen));
                 tokens.push(MathExpression::Mo(Operator::Abs));
@@ -1044,15 +1146,11 @@ impl MathExpression {
                     tokens.push(MathExpression::Mo(Operator::Lparen));
                     base.flatten(tokens);
                     tokens.push(MathExpression::Mo(Operator::Rparen));
-                } else if MathExpression::Mo(Operator::Vector) == **over {
-                    tokens.push(MathExpression::Mo(Operator::Vector));
-                    tokens.push(MathExpression::Mo(Operator::Lparen));
-                    base.flatten(tokens);
-                    tokens.push(MathExpression::Mo(Operator::Rparen));
                 }
             }
-            // Handles `Summation` operator with MathExpression
-            MathExpression::SummationMath(x) => {
+
+            // Handles `exp` operator with MathExpression
+            MathExpression::ExpMath(x) => {
                 tokens.push(MathExpression::Mo(Operator::Lparen));
                 x.op.flatten(tokens);
                 x.func.flatten(tokens);
@@ -1093,6 +1191,10 @@ impl Lexer {
                         } else {
                             acc.push(&MathExpression::Mo(Operator::Multiply));
                         }
+                        acc.push(x);
+                    }
+                    // Handle other types of operators.
+                    MathExpression::Mo(Operator::Min) => {
                         acc.push(x);
                     }
                     // Handle other types of operators.
@@ -1150,11 +1252,69 @@ impl Lexer {
     }
 }
 
+/// Following Justin's `flatten_mults` for flattening Operator::Min
+fn flatten_min_op(mut expr: MathExpressionTree) -> MathExpressionTree {
+    match expr {
+        MathExpressionTree::Cons(ref x, ref mut y) => match x {
+            Operator::Min => {
+                match y[1].clone() {
+                    MathExpressionTree::Cons(x1, y1) => match x1 {
+                        Operator::Min => {
+                            let temp1 = flatten_min_op(y1[0].clone());
+                            let temp2 = flatten_min_op(y1[1].clone());
+                            y.remove(1);
+                            y.append(&mut [temp1, temp2].to_vec())
+                        }
+                        _ => {
+                            let temp1 = y[1].clone();
+                            y.remove(1);
+                            y.append(&mut [temp1].to_vec())
+                        }
+                    },
+                    MathExpressionTree::Atom(_x1) => {}
+                }
+                match y[0].clone() {
+                    MathExpressionTree::Cons(x0, y0) => match x0 {
+                        Operator::Min => {
+                            let temp1 = flatten_min_op(y0[0].clone());
+                            //let temp2 = flatten_min_op(y0[1].clone());
+                            y.remove(0);
+                            y.append(&mut [temp1].to_vec());
+                        }
+                        _ => {
+                            let temp1 = y[0].clone();
+                            y.remove(0);
+                            y.append(&mut [temp1].to_vec())
+                        }
+                    },
+                    MathExpressionTree::Atom(_x0) => {}
+                }
+            }
+            _ => {
+                if y.len() > 1 {
+                    let temp1 = flatten_min_op(y[1].clone());
+                    let temp0 = flatten_min_op(y[0].clone());
+                    y.remove(1);
+                    y.remove(0);
+                    y.append(&mut [temp0, temp1].to_vec())
+                } else {
+                    let temp0 = flatten_min_op(y[0].clone());
+                    y.remove(0);
+                    y.append(&mut [temp0].to_vec())
+                }
+            }
+        },
+        MathExpressionTree::Atom(ref _x) => {}
+    }
+    expr
+}
+
 /// Construct a MathExpressionTree from a vector of MathExpression structs.
 fn expr(input: Vec<MathExpression>) -> MathExpressionTree {
     let mut lexer = Lexer::new(input);
     insert_multiple_between_paren(&mut lexer);
     let mut result: MathExpressionTree = expr_bp(&mut lexer, 0);
+    let mut result = flatten_min_op(result.clone());
     let mut math_vec: Vec<MathExpressionTree> = vec![];
     while lexer.next() != Token::Eof {
         let math_result = expr_bp(&mut lexer, 0);
@@ -1199,7 +1359,6 @@ fn insert_multiple_between_paren(lexer: &mut Lexer) {
 
     while let Some(token) = iter.next() {
         new_tokens.push(token.clone());
-
         if let Some(next_token) = iter.peek() {
             if let Token::Op(Operator::Lparen) = token {
                 if let Token::Op(Operator::Rparen) = **next_token {
@@ -1266,8 +1425,6 @@ fn prefix_binding_power(op: &Operator) -> ((), u8) {
         Operator::Sin => ((), 21),
         Operator::Tan => ((), 21),
         Operator::Mean => ((), 25),
-        //Operator::Hat => ((), 25),
-        Operator::Vector => ((), 25),
         Operator::SurfaceInt => ((), 25),
         Operator::Gradient(Gradient { .. }) => ((), 25),
         Operator::Derivative(Derivative { .. }) => ((), 25),
@@ -1275,9 +1432,11 @@ fn prefix_binding_power(op: &Operator) -> ((), u8) {
         Operator::Laplacian => ((), 25),
         Operator::Abs => ((), 25),
         Operator::Sqrt => ((), 25),
+        Operator::Min => ((), 25),
         Operator::Summation(Summation { .. }) => ((), 25),
         Operator::Hat(Hat { .. }) => ((), 25),
         Operator::Int(Int { .. }) => ((), 25),
+        Operator::Logarithm(Logarithm { .. }) => ((), 25),
         _ => panic!("Bad operator: {:?}", op),
     }
 }
@@ -1304,7 +1463,8 @@ fn infix_binding_power(op: &Operator) -> Option<(u8, u8)> {
         Operator::Power => (16, 15),
         Operator::Dot => (18, 17),
         Operator::Cross => (18, 17),
-        //Operator::Comma => (18, 17),
+        Operator::Comma => (14, 13),
+        Operator::Min => (14, 13),
         Operator::Other(op) => panic!("Unhandled operator: {}!", op),
         _ => return None,
     };
@@ -1911,6 +2071,7 @@ fn test_equation_halfar_dome() {
         s_exp,
         "(= (PD(1, t) H) (Div (* (* (* Γ (^ H (+ n 2))) (^ (Abs (Grad H)) (- n 1))) (Grad H))))"
     );
+    assert_eq!(exp.to_latex(), "\\frac{\\partial H}{\\partial t}=\\nabla \\cdot {(\\Gamma*H^{n+2}*\\left|\\nabla{H}\\right|^{n-1}*\\nabla{H})}");
 }
 
 #[test]
@@ -3384,12 +3545,14 @@ fn test_conservation_of_momentum_fluid_equation_1() {
 
 #[test]
 fn test_vector_notation() {
-    let input = "<math>
+    let input = "
+    <math>
     <mover><mi>v</mi><mo>&#x2192;</mo></mover>
     </math>";
     let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", exp);
     let s_exp = exp.to_string();
-    assert_eq!(s_exp, "(Vec v)");
+    assert_eq!(s_exp, "v");
     assert_eq!(exp.to_latex(), "\\vec{v}");
 }
 
@@ -3411,10 +3574,10 @@ fn test_conservation_of_mass_equation_2() {
     </math>";
     let exp = input.parse::<MathExpressionTree>().unwrap();
     let s_exp = exp.to_string();
-    assert_eq!(s_exp, "(= (PD(1, t) ρ) (- (Div (* (Vec μ) ρ))))");
+    assert_eq!(s_exp, "(= (PD(1, t) ρ) (- (Div (* ρ μ))))");
     assert_eq!(
         exp.to_latex(),
-        "\\frac{\\partial \\rho}{\\partial t}=-\\nabla \\cdot {(\\vec{\\mu}*\\rho)}"
+        "\\frac{\\partial \\rho}{\\partial t}=-\\nabla \\cdot {(\\rho*\\vec{\\mu})}"
     );
 }
 
@@ -3430,4 +3593,290 @@ fn test_new_equation1() {
         exp.to_latex(),
         "p_{ij}=R(t_{j})*w*\\frac{t_{i}-t_{j}}{\\lambda(t_{i})}"
     );
+}
+
+#[test]
+fn test_minimize() {
+    let input = "<math>
+  <mi>min</mi>
+  <mo>&#x2061;</mo>
+  <mo>(</mo>
+  <msub>
+    <mi>A</mi>
+    <mi>c</mi>
+  </msub>
+  <mo>,</mo>
+  <msub>
+    <mi>A</mi>
+    <mi>j</mi>
+  </msub>
+  <mo>,</mo>
+  <msub>
+    <mi>A</mi>
+    <mi>p</mi>
+  </msub>
+  <mo>)</mo>
+  <mo>.</mo>
+    </math>";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", exp);
+    let s_exp = exp.to_string();
+    assert_eq!(s_exp, "(Min A_{j} A_{p} A_{c})");
+    //assert_eq!(s_exp, "(= A_{n} (- (Min A_{c} A_{j} A_{p}) R_{d}))");
+    assert_eq!(exp.to_latex(), "\\min \\{ A_{j},A_{p},A_{c}\\}");
+}
+
+#[test]
+fn test_minimize_mi() {
+    let input = "<math>
+  <mi>min</mi>
+  <mo>&#x2061;</mo>
+  <mo>(</mo>
+    <mi>A</mi>
+  <mo>,</mo>
+    <mi>B</mi>
+  <mo>,</mo>
+    <mi>C</mi>
+  <mo>)</mo>
+  <mo>.</mo>
+    </math>";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", exp);
+    let s_exp = exp.to_string();
+    assert_eq!(s_exp, "(Min B C A)");
+    //assert_eq!(s_exp, "(= A_{n} (- (Min A_{c} A_{j} A_{p}) R_{d}))");
+    assert_eq!(exp.to_latex(), "\\min \\{ B,C,A\\}");
+}
+
+#[test]
+fn test_clm4_5_8_2() {
+    let input = "<math>
+  <msub>
+    <mi>A</mi>
+    <mi>n</mi>
+  </msub>
+  <mo>=</mo>
+  <mi>min</mi>
+  <mo>&#x2061;</mo>
+  <mo>(</mo>
+  <msub>
+    <mi>A</mi>
+    <mi>c</mi>
+  </msub>
+  <mo>,</mo>
+  <msub>
+    <mi>A</mi>
+    <mi>j</mi>
+  </msub>
+  <mo>,</mo>
+  <msub>
+    <mi>A</mi>
+    <mi>p</mi>
+  </msub>
+  <mo>)</mo>
+  <mo>&#x2212;</mo>
+  <msub>
+    <mi>R</mi>
+    <mi>d</mi>
+  </msub>
+  <mo>.</mo>
+    </math>";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", exp);
+    let s_exp = exp.to_string();
+    assert_eq!(s_exp, "(= A_{n} (- (Min A_{j} A_{p} A_{c}) R_{d}))");
+    assert_eq!(
+        exp.to_latex(),
+        "A_{n}=(\\min \\{ A_{j},A_{p},A_{c}\\})-R_{d}"
+    );
+}
+
+#[test]
+fn test_clm4_5_8_12_3() {
+    let input = "<math>
+  <msub>
+    <mi>f</mi>
+    <mi>L</mi>
+  </msub>
+  <mo>(</mo>
+  <msub>
+    <mi>T</mi>
+    <mi>v</mi>
+  </msub>
+  <mo>)</mo>
+  <mo>=</mo>
+  <mn>1</mn>
+  <mo>+</mo>
+  <mi>exp</mi>
+  <mo>[</mo>
+  <msub>
+    <mi>s</mi>
+    <mn>3</mn>
+  </msub>
+  <mo>(</mo>
+  <msub>
+    <mi>s</mi>
+    <mn>4</mn>
+  </msub>
+  <mo>&#x2212;</mo>
+  <msub>
+    <mi>T</mi>
+    <mi>v</mi>
+  </msub>
+  <mo>)</mo>
+  <mo>]</mo>
+    </math>";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", exp);
+    let s_exp = exp.to_string();
+    assert_eq!(s_exp, "(= f_{L} (+ 1 (exp (* s_{3} (- s_{4} T_{v})))))");
+    assert_eq!(
+        exp.to_latex(),
+        "f_{L}(T_{v})=1+\\mathrm{exp}{s_{3}*(s_{4}-T_{v})}"
+    );
+}
+
+#[test]
+fn test_log() {
+    let input = "<math>
+  <mrow><mi>log</mi><mi>x</mi></mrow>
+    </math>";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", exp);
+    let s_exp = exp.to_string();
+    assert_eq!(s_exp, "(Log x)");
+    assert_eq!(exp.to_latex(), "\\log x");
+}
+
+#[test]
+fn test_ln() {
+    let input = "<math>
+  <mrow><mi>ln</mi><mi>x</mi></mrow>
+    </math>";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", exp);
+    let s_exp = exp.to_string();
+    assert_eq!(s_exp, "(Ln x)");
+    assert_eq!(exp.to_latex(), "\\ln x");
+}
+
+#[test]
+fn test_log_10base() {
+    let input = "<math>
+    <msub><mi>log</mi><mn>10</mn></msub><mi>x</mi>
+    </math>";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", exp);
+    let s_exp = exp.to_string();
+    assert_eq!(s_exp, "(Log_{10} x)");
+    assert_eq!(exp.to_latex(), "\\log_{10}x");
+}
+
+#[test]
+fn test_conservation_of_mass_5() {
+    let input = "<math>
+    <mfrac><mi>d</mi><mrow><mi>d</mi><mi>t</mi></mrow></mfrac>
+    <mi>ln</mi><mo>&#x2061;</mo>
+    <mo>(</mo>
+    <mrow><mi>d</mi><mi>M</mi></mrow>
+    <mo>)</mo>
+    <mo>=</mo>
+    <mn>0</mn>
+    </math>";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", exp);
+    let s_exp = exp.to_string();
+    assert_eq!(s_exp, "(= (D(1, t) (Ln dM)) 0)");
+    assert_eq!(exp.to_latex(), "\\frac{d \\ln dM}{dt}=0");
+}
+
+#[test]
+fn test_msup_with_perp() {
+    let input = "<math>
+    <msup><mi>u</mi><mrow><mi>&#x22A5;</mi></mrow></msup>
+    </math>";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    let s_exp = exp.to_string();
+    assert_eq!(s_exp, "(^ u ⊥)");
+    assert_eq!(exp.to_latex(), "u^{⊥}");
+}
+
+#[test]
+fn test_msubsup_msub_content() {
+    let input = "<math>
+    <msubsup>
+    <mi>β</mi>
+    <mrow>
+      <mi>c</mi>
+      <mi>W</mi>
+    </mrow>
+    <mrow>
+      <mi>A</mi>
+      <mi>e</mi>
+      <mi>r</mi>
+      <mi>o</mi>
+    </mrow>
+    </msubsup>
+    <mo>+</mo>
+    <msub>
+    <mi>A</mi>
+    <mi>n</mi>
+    </msub>
+    </math>";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", exp);
+    let s_exp = exp.to_string();
+    let content = exp.to_cmml();
+    println!("content={:?}", content);
+    assert_eq!(s_exp, "(+ β_{cW}^{Aero} A_{n})");
+    assert_eq!(exp.to_latex(), "\\beta_{cW}^{Aero}+A_{n}");
+}
+
+#[test]
+fn test_new_eval_test() {
+    let input = "<math>
+    <mfrac><mrow><mi>d</mi><msub><mi>s</mi><mrow><mi>c</mi></mrow></msub></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac>
+    <mo>=</mo>
+    <mi>α</mi>
+    <mo>∗</mo>
+    <msub><mi>r</mi><mrow><mi>c</mi></mrow></msub>
+    <mo>−</mo>
+    <msub><mi>s</mi><mrow><mi>c</mi></mrow></msub><mo>∗</mo>
+    <mo>(</mo>
+    <msubsup><mi>β</mi><mrow><mi>c</mi><mi>c</mi></mrow><mrow><mi>D</mi><mi>c</mi></mrow></msubsup>
+    <mo>∗</mo>
+    <msub><mi>i</mi><mrow><mi>c</mi></mrow></msub>
+    <mo>+</mo>
+    <msubsup>
+    <mi>β</mi>
+    <mrow><mi>c</mi><mi>c</mi></mrow>
+    <mrow><mi>A</mi><mi>e</mi><mi>r</mi><mi>o</mi></mrow>
+    </msubsup>
+    <mo>∗</mo>
+    <msub><mi>i</mi><mrow><mi>c</mi></mrow></msub>
+    <mo>+</mo>
+    <msubsup>
+    <mi>β</mi>
+    <mrow><mi>c</mi><mi>W</mi></mrow>
+    <mrow><mi>A</mi><mi>e</mi><mi>r</mi><mi>o</mi></mrow>
+    </msubsup>
+    <mo>∗</mo>
+    <msub><mi>i</mi><mrow><mi>W</mi></mrow></msub>
+    <mo>+</mo>
+    <msubsup><mi>β</mi><mrow><mi>c</mi><mi>W</mi></mrow><mrow><mi>D</mi><mi>c</mi></mrow></msubsup>
+    <mo>∗</mo>
+    <msub><mi>i</mi><mrow><mi>W</mi></mrow></msub>
+    <mo>+</mo>
+    <msubsup><mi>β</mi><mrow><mi>H</mi><mi>c</mi></mrow><mrow><mi>A</mi><mi>e</mi><mi>r</mi><mi>o</mi></mrow></msubsup>
+    <mo>∗</mo>
+    <msub><mi>i</mi><mrow><mi>H</mi></mrow></msub>
+    <mo>)</mo>
+    </math>";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", exp);
+    let s_exp = exp.to_string();
+    let content = exp.to_cmml();
+    println!("content={:?}", content);
+    assert_eq!(s_exp, "(= (D(1, t) s_{c}) (- (* α r_{c}) (* s_{c} (+ (+ (+ (+ (* β_{cc}^{Dc} i_{c}) (* β_{cc}^{Aero} i_{c})) (* β_{cW}^{Aero} i_{W})) (* β_{cW}^{Dc} i_{W})) (* β_{Hc}^{Aero} i_{H})))))");
+    assert_eq!(exp.to_latex(), "\\frac{d s_{c}}{dt}=\\alpha*r_{c}-s_{c}*(\\beta_{cc}^{Dc}*i_{c}+\\beta_{cc}^{Aero}*i_{c}+\\beta_{cW}^{Aero}*i_{W}+\\beta_{cW}^{Dc}*i_{W}+\\beta_{Hc}^{Aero}*i_{H})");
 }
