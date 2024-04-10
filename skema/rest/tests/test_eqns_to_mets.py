@@ -40,6 +40,7 @@ async def test_post_eqns_to_mets_mathml_latex():
                                 "type": None,
                                 "content": {"Mi": "E"},
                                 "func_of": None,
+                                "notation": None,
                             }
                         }
                     },
@@ -53,6 +54,7 @@ async def test_post_eqns_to_mets_mathml_latex():
                                             "type": None,
                                             "content": {"Mi": "m"},
                                             "func_of": None,
+                                            "notation": None,
                                         }
                                     }
                                 },
@@ -66,6 +68,7 @@ async def test_post_eqns_to_mets_mathml_latex():
                                                         "type": None,
                                                         "content": {"Mi": "c"},
                                                         "func_of": None,
+                                                        "notation": None,
                                                     }
                                                 }
                                             },
@@ -89,6 +92,7 @@ async def test_post_eqns_to_mets_mathml_latex():
                                 "type": None,
                                 "content": {"Mi": "c"},
                                 "func_of": None,
+                                "notation": None,
                             }
                         }
                     },
@@ -102,6 +106,7 @@ async def test_post_eqns_to_mets_mathml_latex():
                                             "type": None,
                                             "content": {"Mi": "a"},
                                             "func_of": None,
+                                            "notation": None,
                                         }
                                     }
                                 },
@@ -111,6 +116,7 @@ async def test_post_eqns_to_mets_mathml_latex():
                                             "type": None,
                                             "content": {"Mi": "b"},
                                             "func_of": None,
+                                            "notation": None,
                                         }
                                     }
                                 },
@@ -175,6 +181,7 @@ async def test_post_eqns_to_mets_latex_mathml():
                                 "type": None,
                                 "content": {"Mi": "E"},
                                 "func_of": None,
+                                "notation": None,
                             }
                         }
                     },
@@ -188,6 +195,7 @@ async def test_post_eqns_to_mets_latex_mathml():
                                             "type": None,
                                             "content": {"Mi": "m"},
                                             "func_of": None,
+                                            "notation": None,
                                         }
                                     }
                                 },
@@ -201,6 +209,7 @@ async def test_post_eqns_to_mets_latex_mathml():
                                                         "type": None,
                                                         "content": {"Mi": "c"},
                                                         "func_of": None,
+                                                        "notation": None,
                                                     }
                                                 }
                                             },
@@ -224,6 +233,7 @@ async def test_post_eqns_to_mets_latex_mathml():
                                 "type": None,
                                 "content": {"Mi": "c"},
                                 "func_of": None,
+                                "notation": None,
                             }
                         }
                     },
@@ -237,6 +247,7 @@ async def test_post_eqns_to_mets_latex_mathml():
                                             "type": None,
                                             "content": {"Mi": "a"},
                                             "func_of": None,
+                                            "notation": None,
                                         }
                                     }
                                 },
@@ -246,6 +257,7 @@ async def test_post_eqns_to_mets_latex_mathml():
                                             "type": None,
                                             "content": {"Mi": "b"},
                                             "func_of": None,
+                                            "notation": None,
                                         }
                                     }
                                 },
