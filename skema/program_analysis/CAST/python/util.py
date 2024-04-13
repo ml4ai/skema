@@ -34,22 +34,24 @@ def get_op(operator):
         '>=' : 'ast.GtE',
         '%' : 'ast.Mod',
         'and' : 'ast.And',
-        'or' : 'ast.Or'
+        'or' : 'ast.Or',
+        '**' : 'ast.Pow',
+        'is' : 'ast.Is',
+        'is not': 'ast.IsNot',
+        '>>' : 'ast.RShift',
+        '<<' : 'ast.LShift',
+        '|' : 'ast.BitOr',
+        '&' : 'ast.BitAnd',
+        '~' : 'ast.Invert',
+        '^' : 'ast.BitXor',
+        '//' : 'ast.FloorDiv'
         # ast.UAdd: 'ast.UAdd',
         # ast.USub: 'ast.USub',
-        # ast.FloorDiv: 'ast.FloorDiv',
-        # ast.Pow: 'ast.Pow',
-        # ast.LShift: 'ast.LShift',
-        # ast.RShift: 'ast.RShift',
-        # ast.BitOr: 'ast.BitOr',
-        # ast.BitAnd: 'ast.BitAnd',
-        # ast.BitXor: 'ast.BitXor',
         # ast.And: 'ast.And',
         # ast.Or: 'ast.Or',
         # ast.In: 'ast.In',
         # ast.NotIn: 'ast.NotIn',
         # ast.Not: 'ast.Not',
-        # ast.Invert: 'ast.Invert',
     }
     if operator in ops.keys():
         return ops[operator]

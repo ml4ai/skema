@@ -7,6 +7,7 @@ from skema.program_analysis.CAST2FN.model.cast import (
     Name,
     CASTLiteralValue,
     ModelIf,
+    ScalarType,
     Operator
 )
 
@@ -52,7 +53,7 @@ def test_cond_compound1():
     assert asg_node.left.val.id == 0
 
     assert isinstance(asg_node.right, CASTLiteralValue)
-    assert asg_node.right.value_type == "Integer"
+    assert asg_node.right.value_type == ScalarType.INTEGER
     assert asg_node.right.value == '3'
 
     cond_node = exp_cast.nodes[0].body[1]
@@ -68,7 +69,7 @@ def test_cond_compound1():
         assert expr.op == "ast.Lt"
         assert len(expr.operands) == 2
         assert isinstance(expr.operands[0], CASTLiteralValue)
-        assert expr.operands[0].value_type == "Integer"
+        assert expr.operands[0].value_type == ScalarType.INTEGER
         assert expr.operands[0].value == "1"
 
         assert isinstance(expr.operands[1], Name)
@@ -85,13 +86,13 @@ def test_cond_compound1():
         assert body.operands[0].id == 0
 
         assert isinstance(body.operands[1], CASTLiteralValue)
-        assert body.operands[1].value_type == "Integer"
+        assert body.operands[1].value_type == ScalarType.INTEGER
         assert body.operands[1].value == "10"
 
         assert len(if_node.orelse) == 1
         orelse = if_node.orelse[0]
         assert isinstance(orelse, CASTLiteralValue)
-        assert orelse.value_type == "Boolean"
+        assert orelse.value_type == ScalarType.BOOLEAN
         assert orelse.value == "False"
 
     check_inner_if(cond_expr)
@@ -104,7 +105,7 @@ def test_cond_compound1():
     assert cond_body[0].left.val.id == 0
 
     assert isinstance(cond_body[0].right, CASTLiteralValue)
-    assert cond_body[0].right.value_type == "Integer"
+    assert cond_body[0].right.value_type == ScalarType.INTEGER
     assert cond_body[0].right.value == '40'
 
     cond_else = cond_node.orelse
@@ -122,7 +123,7 @@ def test_cond_compound2():
     assert asg_node.left.val.id == 0
 
     assert isinstance(asg_node.right, CASTLiteralValue)
-    assert asg_node.right.value_type == "Integer"
+    assert asg_node.right.value_type == ScalarType.INTEGER
     assert asg_node.right.value == '3'
 
     cond_node = exp_cast.nodes[0].body[1]
@@ -142,7 +143,7 @@ def test_cond_compound2():
         assert expr.operands[0].id == 0
 
         assert isinstance(expr.operands[1], CASTLiteralValue)
-        assert expr.operands[1].value_type == "Integer"
+        assert expr.operands[1].value_type == ScalarType.INTEGER
         assert expr.operands[1].value == "10"
 
         assert len(if_node.body) == 1
@@ -151,17 +152,17 @@ def test_cond_compound2():
         assert body.op == "ast.Lt"
         assert len(body.operands) == 2
         assert isinstance(body.operands[0], CASTLiteralValue)
-        assert body.operands[0].value_type == "Integer"
+        assert body.operands[0].value_type == ScalarType.INTEGER
         assert body.operands[0].value == "10"
 
         assert isinstance(body.operands[1], CASTLiteralValue)
-        assert body.operands[1].value_type == "Integer"
+        assert body.operands[1].value_type == ScalarType.INTEGER
         assert body.operands[1].value == "20"
 
         assert len(if_node.orelse) == 1
         orelse = if_node.orelse[0]
         assert isinstance(orelse, CASTLiteralValue)
-        assert orelse.value_type == "Boolean"
+        assert orelse.value_type == ScalarType.BOOLEAN
         assert orelse.value == "False"
 
     def check_inner_if(if_node):
@@ -172,7 +173,7 @@ def test_cond_compound2():
         assert expr.op == "ast.Lt"
         assert len(expr.operands) == 2
         assert isinstance(expr.operands[0], CASTLiteralValue)
-        assert expr.operands[0].value_type == "Integer"
+        assert expr.operands[0].value_type == ScalarType.INTEGER
         assert expr.operands[0].value == "1"
 
         assert isinstance(expr.operands[1], Name)
@@ -187,7 +188,7 @@ def test_cond_compound2():
         assert len(if_node.orelse) == 1
         orelse = if_node.orelse[0]
         assert isinstance(orelse, CASTLiteralValue)
-        assert orelse.value_type == "Boolean"
+        assert orelse.value_type == ScalarType.BOOLEAN
         assert orelse.value == "False"
 
     check_inner_if(cond_expr)
@@ -200,7 +201,7 @@ def test_cond_compound2():
     assert cond_body[0].left.val.id == 0
 
     assert isinstance(cond_body[0].right, CASTLiteralValue)
-    assert cond_body[0].right.value_type == "Integer"
+    assert cond_body[0].right.value_type == ScalarType.INTEGER
     assert cond_body[0].right.value == '40'
 
     cond_else = cond_node.orelse
@@ -218,7 +219,7 @@ def test_cond_compound3():
     assert asg_node.left.val.id == 0
 
     assert isinstance(asg_node.right, CASTLiteralValue)
-    assert asg_node.right.value_type == "Integer"
+    assert asg_node.right.value_type == ScalarType.INTEGER
     assert asg_node.right.value == '3'
 
     cond_node = exp_cast.nodes[0].body[1]
@@ -235,7 +236,7 @@ def test_cond_compound3():
         assert len(expr.operands) == 2
 
         assert isinstance(expr.operands[0], CASTLiteralValue)
-        assert expr.operands[0].value_type == "Integer"
+        assert expr.operands[0].value_type == ScalarType.INTEGER
         assert expr.operands[0].value == "1"
 
         assert isinstance(expr.operands[1], Name)
@@ -245,7 +246,7 @@ def test_cond_compound3():
         assert len(if_node.body) == 1
         body = if_node.body[0]
         assert isinstance(body, CASTLiteralValue)
-        assert body.value_type == "Boolean"
+        assert body.value_type == ScalarType.BOOLEAN
         assert body.value == "True"
 
         assert len(if_node.orelse) == 1
@@ -259,7 +260,7 @@ def test_cond_compound3():
         assert orelse.operands[0].id == 0
 
         assert isinstance(orelse.operands[1], CASTLiteralValue)
-        assert orelse.operands[1].value_type == "Integer"
+        assert orelse.operands[1].value_type == ScalarType.INTEGER
         assert orelse.operands[1].value == "10"
 
     def check_inner_if(if_node):
@@ -279,13 +280,13 @@ def test_cond_compound3():
         assert body.operands[0].id == 0
 
         assert isinstance(body.operands[1], CASTLiteralValue)
-        assert body.operands[1].value_type == "Integer"
+        assert body.operands[1].value_type == ScalarType.INTEGER
         assert body.operands[1].value == "5"
 
         assert len(if_node.orelse) == 1
         orelse = if_node.orelse[0]
         assert isinstance(orelse, CASTLiteralValue)
-        assert orelse.value_type == "Boolean"
+        assert orelse.value_type == ScalarType.BOOLEAN
         assert orelse.value == "False"
 
     check_inner_if(cond_expr)
@@ -298,7 +299,7 @@ def test_cond_compound3():
     assert cond_body[0].left.val.id == 0
 
     assert isinstance(cond_body[0].right, CASTLiteralValue)
-    assert cond_body[0].right.value_type == "Integer"
+    assert cond_body[0].right.value_type == ScalarType.INTEGER
     assert cond_body[0].right.value == '40'
 
     cond_else = cond_node.orelse

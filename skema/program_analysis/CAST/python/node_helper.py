@@ -10,6 +10,10 @@ CONTROL_CHARACTERS = [
     "==",
     "(",
     ")",
+    "[",
+    "]",
+    "{",
+    "}",
     ":",
     "+",
     "-",
@@ -24,7 +28,10 @@ CONTROL_CHARACTERS = [
     "in",
     "not",
     "and",
-    "or"
+    "or",
+    "if",
+    "is",
+    "is not"
 ]
 
 # Whatever constructs we see in the left
@@ -34,7 +41,8 @@ FOR_LOOP_LEFT_TYPES = [
     "identifier",
     "tuple_pattern",
     "pattern_list",
-    "list_pattern"
+    "list_pattern",
+    "attribute"
 ]
 
 # Whatever constructs we see in the right
@@ -56,6 +64,32 @@ WHILE_COND_TYPES = [
     "comparison_operator",
     "binary_operator"
 ]
+
+LITERAL_TYPES = [
+    "integer"
+    "true",
+    "false",
+    "float",
+    "list",
+    "tuple",
+    "dictionary",
+    "string",
+    "ellipsis",
+    "none"
+]
+
+IF_COND_TYPES = [
+    "identifier", 
+    "comparison_operator", 
+    "boolean_operator", 
+    "parenthesized_expression",
+    "call",
+    "attribute",
+    "list_comprehension",
+    "dictionary_comprehension",
+    "not_operator"
+] + LITERAL_TYPES
+
 
 # Whatever constructs we see in the 
 # list/dict comprehensions
@@ -156,7 +190,7 @@ def get_control_children(node: Node):
 def get_non_control_children(node: Node):
     children = []
     for child in node.children:
-        if child.type not in CONTROL_CHARACTERS:
+        if child.type not in CONTROL_CHARACTERS + ["line_continuation"]:
             children.append(child)
 
     return children
