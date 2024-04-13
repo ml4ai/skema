@@ -71,6 +71,7 @@ pub async fn module_id2mathml_MET_ast(module_id: i64, config: Config) -> Vec<Fir
             r#type: Some(Function),
             content: Box::new(MathExpression::Mi(Mi("temp".to_string()))),
             func_of: None,
+            notation: None,
         };
         let operate = Operator::Subtract;
         let rhs_arg = MathExpressionTree::Atom(MathExpression::Mi(Mi("temp".to_string())));
@@ -245,6 +246,7 @@ fn tree_2_MET_ast(
                 r#type: Some(Function),
                 content: Box::new(MathExpression::Mi(Mi(deriv_name[1..2].to_string()))),
                 func_of: None,
+                notation: None,
             };
             lhs.push(deriv);
         } else {
@@ -253,6 +255,7 @@ fn tree_2_MET_ast(
                 r#type: Some(Function),
                 content: Box::new(MathExpression::Mi(Mi(deriv_name[0..1].to_string()))),
                 func_of: None,
+                notation: None,
             };
             lhs.push(deriv);
         }
@@ -308,6 +311,7 @@ pub fn get_args_MET(
                     r#type: Some(mathml::ast::Type::Real),
                     content: Box::new(arg2),
                     func_of: None,
+                    notation: None,
                 };
                 args.push(MathExpressionTree::Atom(MathExpression::Ci(ci_arg.clone())));
             } else {
@@ -317,6 +321,7 @@ pub fn get_args_MET(
                     r#type: Some(mathml::ast::Type::Real),
                     content: Box::new(arg2),
                     func_of: None,
+                    notation: None,
                 };
                 args.push(MathExpressionTree::Atom(MathExpression::Ci(ci_arg.clone())));
             }
