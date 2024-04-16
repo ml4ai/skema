@@ -212,7 +212,7 @@ pub fn get_terms(sys_states: Vec<String>, ode: FirstOrderODE) -> Vec<PnTerm> {
     let _parameters = Vec::<String>::new();
 
     let dyn_state = ode.lhs_var.to_string();
-
+    println!("top level get terms MET {:?}\n", ode.rhs.clone());
     match ode.rhs {
         Cons(ref x, ref y) => match &x {
             Multiply => {
@@ -289,6 +289,7 @@ pub fn get_terms(sys_states: Vec<String>, ode: FirstOrderODE) -> Vec<PnTerm> {
 }
 
 pub fn get_term_power(sys_states: Vec<String>, eq: Vec<MathExpressionTree>) -> PnTerm {
+    println!("get term power MET {:?}\n", eq.clone());
     let mut variables = Vec::<String>::new();
     let mut exp_states = Vec::<String>::new();
     let mut polarity = true;
@@ -394,6 +395,7 @@ pub fn get_term_power(sys_states: Vec<String>, eq: Vec<MathExpressionTree>) -> P
 // this takes in the arguments of a closer to root level add operator and returns the PnTerms for it's subgraphs
 // we do expect at most multiplication, subtraction, division, or addition
 pub fn get_terms_add(sys_states: Vec<String>, eq: Vec<MathExpressionTree>) -> Vec<PnTerm> {
+    println!("get terms add MET {:?}\n", eq.clone());
     let mut terms = Vec::<PnTerm>::new();
 
     /* found multiple terms */
@@ -474,6 +476,7 @@ pub fn get_terms_add(sys_states: Vec<String>, eq: Vec<MathExpressionTree>) -> Ve
 // this takes in the arguments of a closer to root level sub operator and returns the PnTerms for it's subgraphs
 // we do expect at most multiplication, subtraction, division, or addition
 pub fn get_terms_sub(sys_states: Vec<String>, eq: Vec<MathExpressionTree>) -> Vec<PnTerm> {
+    println!("get terms sub MET {:?}\n", eq.clone());
     let mut terms = Vec::<PnTerm>::new();
 
     /* found multiple terms */
@@ -760,6 +763,7 @@ pub fn get_terms_sub(sys_states: Vec<String>, eq: Vec<MathExpressionTree>) -> Ve
 // this takes in the arguments of a div operator and returns the PnTerm for it
 // we do expect at most multiplication, subtraction, or addition
 pub fn get_term_div(sys_states: Vec<String>, eq: Vec<MathExpressionTree>) -> PnTerm {
+    println!("get term div MET {:?}\n", eq.clone());
     let mut variables = Vec::<String>::new();
     let mut exp_states = Vec::<String>::new();
     let mut polarity = true;
@@ -860,6 +864,7 @@ pub fn get_term_div(sys_states: Vec<String>, eq: Vec<MathExpressionTree>) -> PnT
 // or if we need to distribute over the multiplication and thus get multiple terms out. We will collect
 // both here for now and leave the inference to the PN construction phase since only then can we infer
 pub fn get_terms_mult(sys_states: Vec<String>, eq: Vec<MathExpressionTree>) -> PnTerm {
+    println!("get terms mult MET {:?}\n", eq.clone());
     let mut variables = Vec::<String>::new();
     let mut exp_states = Vec::<String>::new();
     let mut polarity = true;
@@ -1049,6 +1054,7 @@ pub fn get_terms_mult(sys_states: Vec<String>, eq: Vec<MathExpressionTree>) -> P
 // this takes in the arguments of a multiply operator and returns the PnTerm for it
 // we do expect at most division, subtraction, or addition
 pub fn get_term_mult(sys_states: Vec<String>, eq: Vec<MathExpressionTree>) -> PnTerm {
+    println!("get term mult MET {:?}\n", eq.clone());
     let mut variables = Vec::<String>::new();
     let mut exp_states = Vec::<String>::new();
     let mut polarity = true;
@@ -1133,6 +1139,8 @@ pub fn get_term_mult(sys_states: Vec<String>, eq: Vec<MathExpressionTree>) -> Pn
     exp_states.sort();
     //exp_states.dedup();
 
+    println!("MET: {:?}", MathExpressionTree::Cons(Multiply, eq.clone()));
+
     PnTerm {
         dyn_state: "temp".to_string(),
         exp_states,
@@ -1146,6 +1154,7 @@ pub fn get_term_mult(sys_states: Vec<String>, eq: Vec<MathExpressionTree>) -> Pn
 }
 
 pub fn flatten_mults(mut equation: MathExpressionTree) -> MathExpressionTree {
+    println!("before flatten top MET {:?}\n", equation.clone());
     match equation {
         Cons(ref x, ref mut y) => match x {
             Multiply => {
@@ -1216,6 +1225,7 @@ pub fn flatten_mults(mut equation: MathExpressionTree) -> MathExpressionTree {
         },
         Atom(ref _x) => {}
     }
+    println!("after flatten MET {:?}\n", equation.clone());
     equation
 }
 #[test]

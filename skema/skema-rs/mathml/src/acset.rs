@@ -577,7 +577,7 @@ impl From<Vec<MathExpressionTree>> for GeneralizedAMR {
         let mut states_vec = BTreeSet::<State>::new();
         let mut parameter_vec = Vec::<Parameter>::new();
         let mut rhs_vec = Vec::<MathExpressionTree>::new();
-
+        println!("-------\ngamr begining MET: {:?}\n-|-|-|-|-|-|-|-", met_vec.clone());
         // construct state vector, under assumption that only differentialed LHS terms are states
         for equation in met_vec.iter() {
             match equation {
