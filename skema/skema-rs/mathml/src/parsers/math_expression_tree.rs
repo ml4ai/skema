@@ -76,7 +76,7 @@ impl fmt::Display for MathExpressionTree {
 #[allow(unreachable_patterns)] // Lambda in this twice?
 fn unicode_to_latex(input: &str) -> String {
     // Step 1: Handle English representations of Greek letters
-    let re_english_greek = Regex::new(r"Lambda|lambda|Alpha|alpha|Beta|beta|Gamma|gamma|Delta|delta|Epsilon|epsilon|Zeta|zeta|Eta|eta|Theta|theta|Iota|iota|Kappa|kappa|Lambda|lambda|Mu|mu|Nu|nu|Xi|xi|Omicron|omicron|Pi|pi|Rho|rho|Sigma|sigma|Tau|tau|Upsilon|upsilon|Phi|phi|Chi|chi|Psi|psi|Omega|omega").unwrap();
+    let re_english_greek = Regex::new(r"Lambda|lambda|Alpha|alpha|Beta|beta|Gamma|gamma|Delta|delta|Epsilon|epsilon|Zeta|zeta|Eta|eta|Theta|theta|Iota|iota|Kappa|kappa|Lambda|lambda|Mu|mu|Nu|nu|Xi|xi|Omicron|omicron|Pi|pi|Rho|rho|Sigma|sigma|Tau|tau|Upsilon|upsilon|Phi|phi|Chi|chi|Psi|psi|Omega|omega|hbar").unwrap();
     let replaced_english_greek =
         re_english_greek.replace_all(input, |caps: &regex::Captures| match &caps[0] {
             "Lambda" => "\\Lambda".to_string(),
@@ -129,6 +129,7 @@ fn unicode_to_latex(input: &str) -> String {
             "psi" => "\\psi".to_string(),
             "Omega" => "\\Omega".to_string(),
             "omega" => "\\omega".to_string(),
+            "hbar" => "\\hbar".to_string(),
             _ => caps[0].to_string(),
         });
 
@@ -186,6 +187,7 @@ fn unicode_to_latex(input: &str) -> String {
                 0x03C8 => "\\psi".to_string(),
                 0x03A9 => "\\Omega".to_string(),
                 0x03C9 => "\\omega".to_string(),
+                0x0127 => "\\hbar".to_string(),
                 _ => caps[0].to_string(),
             }
         });
@@ -201,7 +203,7 @@ fn unicode_to_latex(input: &str) -> String {
         });
 
     // Step 4: Handle Greek letter symbols
-    let re_greek_symbols = Regex::new(r"Λ|λ|Α|α|Β|β|Γ|γ|Δ|δ|Ε|ε|Ζ|ζ|Η|η|Θ|θ|Ι|ι|Κ|κ|Λ|λ|Μ|μ|Ν|ν|Ξ|ξ|Ο|ο|Π|π|Ρ|ρ|Σ|σ|ς|Τ|τ|Υ|υ|Φ|φ|Χ|χ|Ψ|ψ|Ω|ω").unwrap();
+    let re_greek_symbols = Regex::new(r"Λ|λ|Α|α|Β|β|Γ|γ|Δ|δ|Ε|ε|Ζ|ζ|Η|η|Θ|θ|Ι|ι|Κ|κ|Λ|λ|Μ|μ|Ν|ν|Ξ|ξ|Ο|ο|Π|π|Ρ|ρ|Σ|σ|ς|Τ|τ|Υ|υ|Φ|φ|Χ|χ|Ψ|ψ|Ω|ω|ħ").unwrap();
     let replaced_greek_symbols =
         re_greek_symbols.replace_all(&replaced_other_unicode, |caps: &regex::Captures| {
             match &caps[0] {
@@ -256,6 +258,7 @@ fn unicode_to_latex(input: &str) -> String {
                 "ψ" => "\\psi".to_string(),
                 "Ω" => "\\Omega".to_string(),
                 "ω" => "\\omega".to_string(),
+                "ħ" => "\\hbar".to_string(),
                 _ => caps[0].to_string(),
             }
         });
@@ -535,6 +538,10 @@ impl MathExpressionTree {
                     Operator::Subtract => content_mathml.push_str("<minus/>"),
                     Operator::Multiply => content_mathml.push_str("<times/>"),
                     Operator::Equals => content_mathml.push_str("<eq/>"),
+                    Operator::Geq => content_mathml.push_str("<geq/>"),
+                    Operator::Leq => content_mathml.push_str("<leq/>"),
+                    Operator::GreaterThan => content_mathml.push_str("<gt/>"),
+                    Operator::LessThan => content_mathml.push_str("<lt/>"),
                     Operator::Divide => content_mathml.push_str("<divide/>"),
                     Operator::Power => content_mathml.push_str("<power/>"),
                     Operator::Exp => content_mathml.push_str("<exp/>"),
@@ -679,6 +686,26 @@ impl MathExpressionTree {
                     Operator::Equals => {
                         expression.push_str(&rest[0].to_latex().to_string());
                         expression.push('=');
+                        expression.push_str(&rest[1].to_latex().to_string());
+                    }
+                    Operator::Geq => {
+                        expression.push_str(&rest[0].to_latex().to_string());
+                        expression.push_str("\\geq ");
+                        expression.push_str(&rest[1].to_latex().to_string());
+                    }
+                    Operator::Leq => {
+                        expression.push_str(&rest[0].to_latex().to_string());
+                        expression.push_str("\\leq ");
+                        expression.push_str(&rest[1].to_latex().to_string());
+                    }
+                    Operator::GreaterThan => {
+                        expression.push_str(&rest[0].to_latex().to_string());
+                        expression.push('>');
+                        expression.push_str(&rest[1].to_latex().to_string());
+                    }
+                    Operator::LessThan => {
+                        expression.push_str(&rest[0].to_latex().to_string());
+                        expression.push('<');
                         expression.push_str(&rest[1].to_latex().to_string());
                     }
                     Operator::Divide => {
@@ -1455,6 +1482,10 @@ fn postfix_binding_power(op: &Operator) -> Option<(u8, ())> {
 fn infix_binding_power(op: &Operator) -> Option<(u8, u8)> {
     let res = match op {
         Operator::Equals => (1, 2),
+        Operator::Geq => (1, 2),
+        Operator::Leq => (1, 2),
+        Operator::GreaterThan => (1, 2),
+        Operator::LessThan => (1, 2),
         Operator::Add => (3, 4),
         Operator::Subtract => (5, 6),
         Operator::Multiply => (7, 8),
@@ -2697,7 +2728,7 @@ fn test_change_in_variable() {
     let exp = input.parse::<MathExpressionTree>().unwrap();
     let s_exp = exp.to_string();
     println!("latex_exp = {:?}", exp.to_latex());
-    assert_eq!(s_exp, "Δt");
+    assert_eq!(s_exp, "Δ t");
 }
 #[test]
 fn test_heating_rate() {
@@ -2739,7 +2770,7 @@ fn test_heating_rate() {
     ";
     let exp = input.parse::<MathExpressionTree>().unwrap();
     let s_exp = exp.to_string();
-    assert_eq!(s_exp, "(= Q_{i} (/ (- T_{i} T_{i-1}) (* C_{p} Δt)))");
+    assert_eq!(s_exp, "(= Q_{i} (/ (- T_{i} T_{i-1}) (* C_{p} Δ t)))");
 }
 
 #[test]
@@ -2893,7 +2924,7 @@ fn test_temperature_evolution() {
     let s_exp = exp.to_string();
     assert_eq!(
         s_exp,
-        "(= (/ (/ Δs_{i} Δt) C_{p}) (/ (/ (- s_{i} s_{i-1}) Δt) C_{p}))"
+        "(= (/ (/ Δ s_{i} Δ t) C_{p}) (/ (/ (- s_{i} s_{i-1}) Δ t) C_{p}))"
     );
 }
 
@@ -3005,7 +3036,7 @@ fn test_dry_static_energy() {
     </math>";
     let exp = input.parse::<MathExpressionTree>().unwrap();
     let s_exp = exp.to_string();
-    assert_eq!(s_exp, "(= s_{i} (+ s_{i-1} (* Δt Q_{i})))");
+    assert_eq!(s_exp, "(= s_{i} (+ s_{i-1} (* Δ t Q_{i})))");
 }
 
 #[test]
@@ -3879,4 +3910,105 @@ fn test_new_eval_test() {
     println!("content={:?}", content);
     assert_eq!(s_exp, "(= (D(1, t) s_{c}) (- (* α r_{c}) (* s_{c} (+ (+ (+ (+ (* β_{cc}^{Dc} i_{c}) (* β_{cc}^{Aero} i_{c})) (* β_{cW}^{Aero} i_{W})) (* β_{cW}^{Dc} i_{W})) (* β_{Hc}^{Aero} i_{H})))))");
     assert_eq!(exp.to_latex(), "\\frac{d s_{c}}{dt}=\\alpha*r_{c}-s_{c}*(\\beta_{cc}^{Dc}*i_{c}+\\beta_{cc}^{Aero}*i_{c}+\\beta_{cW}^{Aero}*i_{W}+\\beta_{cW}^{Dc}*i_{W}+\\beta_{Hc}^{Aero}*i_{H})");
+}
+
+#[test]
+fn test_greater_than_or_equal_to() {
+    let input = "<math>
+    <mi>x</mi>
+    <mo>+</mo>
+    <mi>y</mi>
+    <mo>&#x2265;</mo>
+    <mn>5</mn>
+    </math>";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", exp);
+    let s_exp = exp.to_string();
+    let content = exp.to_cmml();
+    println!("content={:?}", content);
+    assert_eq!(s_exp, "(≥ (+ x y) 5)");
+    assert_eq!(exp.to_latex(), "x+y\\geq 5");
+}
+
+#[test]
+fn test_less_than_or_equal_to() {
+    let input = "<math>
+    <mrow>
+    <mi>x</mi>
+    <mo>+</mo>
+    <mi>y</mi>
+    <mo>&#x2264;</mo>
+    <mn>5</mn>
+    </mrow>
+    </math>";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", exp);
+    let s_exp = exp.to_string();
+    let content = exp.to_cmml();
+    println!("content={:?}", content);
+    assert_eq!(s_exp, "(≤ (+ x y) 5)");
+    assert_eq!(exp.to_latex(), "x+y\\leq 5");
+}
+
+#[test]
+fn test_less_than() {
+    let input = "<math>
+    <mrow>
+    <mi>x</mi>
+    <mo>+</mo>
+    <mi>y</mi>
+    <mo>&lt;</mo>
+    <mn>5</mn>
+    </mrow>
+    </math>";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", exp);
+    let s_exp = exp.to_string();
+    let content = exp.to_cmml();
+    println!("content={:?}", content);
+    assert_eq!(s_exp, "(< (+ x y) 5)");
+    assert_eq!(exp.to_latex(), "x+y<5");
+}
+
+#[test]
+fn test_greater_than() {
+    let input = "<math>
+    <mrow>
+    <mi>3</mi>
+    <mi>y</mi>
+    <mo>&gt;</mo>
+    <mn>5</mn>
+    </mrow>
+    </math>";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", exp);
+    let s_exp = exp.to_string();
+    let content = exp.to_cmml();
+    println!("content={:?}", content);
+    assert_eq!(s_exp, "(> (* 3 y) 5)");
+    assert_eq!(exp.to_latex(), "3*y>5");
+}
+
+#[test]
+fn test_heisenberg_uncertainty_principle() {
+    let input = "<math>
+    <mrow>
+      <mi>Δ</mi>
+    <mi>x</mi>
+      <mi>Δ</mi>
+    <mi>p</mi>
+    <mo>≥</mo>
+    <mfrac>
+      <mi>&#x0127;</mi>
+      <mn>2</mn>
+    </mfrac>
+  </mrow>
+    </math>";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", exp);
+    let s_exp = exp.to_string();
+    let content = exp.to_cmml();
+    println!("content={:?}", content);
+    assert_eq!(s_exp, "(≥ (* Δ x Δ p) (/ ħ 2))");
+    assert_eq!(exp.to_latex(), "\\Delta x*\\Delta p\\geq \\frac{\\hbar}{2}");
 }

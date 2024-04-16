@@ -859,7 +859,9 @@ impl From<Vec<FirstOrderODE>> for PetriNet {
 
                 let rate = Rate {
                     target: transitions.id.clone(),
-                    expression: t.0.expression_infix.clone()[1..t.0.expression_infix.clone().len()-1].to_string(),// the second 
+                    expression: t.0.expression_infix.clone()
+                        [1..t.0.expression_infix.clone().len() - 1]
+                        .to_string(), // the second
                     expression_mathml: Some(t.0.expression.clone()),
                 };
                 rate_vec.push(rate.clone());
@@ -884,7 +886,9 @@ impl From<Vec<FirstOrderODE>> for PetriNet {
 
                 let rate = Rate {
                     target: transitions.id.clone(),
-                    expression: t.0.expression_infix.clone()[1..t.0.expression_infix.clone().len()-1].to_string(),// the second 
+                    expression: t.0.expression_infix.clone()
+                        [1..t.0.expression_infix.clone().len() - 1]
+                        .to_string(), // the second
                     expression_mathml: Some(t.0.expression.clone()),
                 };
                 rate_vec.push(rate.clone());
@@ -924,7 +928,9 @@ impl From<Vec<FirstOrderODE>> for PetriNet {
 
                     let rate = Rate {
                         target: transitions.id.clone(),
-                        expression: term.expression_infix.clone()[1..term.expression_infix.clone().len()-1].to_string(),// the second term needs to be the product of the inputs
+                        expression: term.expression_infix.clone()
+                            [1..term.expression_infix.clone().len() - 1]
+                            .to_string(), // the second term needs to be the product of the inputs
                         expression_mathml: Some(term.expression.clone()),
                     };
                     rate_vec.push(rate.clone());
@@ -945,7 +951,9 @@ impl From<Vec<FirstOrderODE>> for PetriNet {
 
                     let rate = Rate {
                         target: transitions.id.clone(),
-                        expression: term.expression_infix.clone()[1..term.expression_infix.clone().len()-1].to_string(),// the second 
+                        expression: term.expression_infix.clone()
+                            [1..term.expression_infix.clone().len() - 1]
+                            .to_string(), // the second
                         expression_mathml: Some(term.expression.clone()),
                     };
                     rate_vec.push(rate.clone());

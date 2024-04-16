@@ -231,6 +231,14 @@ pub enum Operator {
     Logarithm(Logarithm),
     /// Minimum operator
     Min,
+    /// Greater than or equal to
+    Geq,
+    /// Less than or equal to
+    Leq,
+    /// Greater than
+    GreaterThan,
+    /// Less than
+    LessThan,
     // Catchall for operators we haven't explicitly defined as enum variants yet.
     Other(String),
 }
@@ -318,6 +326,10 @@ impl fmt::Display for Operator {
                 LogarithmNotation::Log => write!(f, "Log"),
                 LogarithmNotation::LogBase(x) => write!(f, "Log_{{{x}}}"),
             },
+            Operator::Geq => write!(f, "≥"),
+            Operator::Leq => write!(f, "≤"),
+            Operator::GreaterThan => write!(f, ">"),
+            Operator::LessThan => write!(f, "<"),
         }
     }
 }

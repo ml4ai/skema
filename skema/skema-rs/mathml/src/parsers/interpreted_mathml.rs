@@ -14,9 +14,9 @@ use crate::{
         Mrow, SummationMath, Type, VectorNotation,
     },
     parsers::generic_mathml::{
-        add, attribute, cross, divide, dot, elem_many0, equals, etag, lparen, mean, mi, mn, msub,
-        msubsup, mtext, multiply, rparen, stag, subtract, tag_parser, ws, xml_declaration, IResult,
-        ParseError, Span,
+        add, attribute, cross, divide, dot, elem_many0, equals, etag, geq, gt, leq, lparen, lt,
+        mean, mi, mn, msub, msubsup, mtext, multiply, rparen, stag, subtract, tag_parser, ws,
+        xml_declaration, IResult, ParseError, Span,
     },
 };
 
@@ -36,7 +36,8 @@ pub fn operator(input: Span) -> IResult<Operator> {
     let (s, op) = ws(delimited(
         stag!("mo"),
         alt((
-            add, subtract, multiply, divide, equals, lparen, rparen, mean, dot, cross,
+            add, subtract, multiply, divide, equals, lparen, rparen, mean, dot, cross, geq, leq,
+            lt, gt,
         )),
         etag!("mo"),
     ))(input)?;
@@ -1256,7 +1257,7 @@ pub fn change_in_variable(input: Span) -> IResult<Ci> {
         alt((tag("<mi>Δ</mi>"), tag("<mi>&#x0394;</mi>"))),
         math_expression,
     ))(input)?;
-    let temp_sum = format!("Δ{}", elements);
+    let temp_sum = format!("Δ {}", elements);
     let change_in_var = Ci::new(
         Some(Type::Real),
         Box::new(MathExpression::Mi(Mi(temp_sum.to_string()))),
@@ -1668,6 +1669,7 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                 },
             ),
             vector_mover,
+            map(change_in_variable, MathExpression::Ci),
             map(log_base, MathExpression::Mo),
             map(logarithm, MathExpression::Mo),
             map(natural_log, MathExpression::Mo),
@@ -1737,7 +1739,7 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
         alt((
             ws(absolute_with_msup),
             ws(paren_as_msup),
-            map(change_in_variable, MathExpression::Ci),
+            //map(change_in_variable, MathExpression::Ci),
             map(
                 munderover_summation,
                 |(

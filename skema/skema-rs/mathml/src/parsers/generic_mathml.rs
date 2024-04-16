@@ -209,6 +209,30 @@ pub fn divide(input: Span) -> IResult<Operator> {
     Ok((s, op))
 }
 
+/// Greater than or equal to operator
+pub fn geq(input: Span) -> IResult<Operator> {
+    let (s, op) = value(Operator::Geq, alt((ws(tag("≥")), ws(tag("&#x2265;")))))(input)?;
+    Ok((s, op))
+}
+
+/// Less than or equal to operator
+pub fn leq(input: Span) -> IResult<Operator> {
+    let (s, op) = value(Operator::Leq, alt((ws(tag("≤")), ws(tag("&#x2264;")))))(input)?;
+    Ok((s, op))
+}
+
+/// Less than operator
+pub fn lt(input: Span) -> IResult<Operator> {
+    let (s, op) = value(Operator::LessThan, ws(tag("&lt;")))(input)?;
+    Ok((s, op))
+}
+
+/// Greater than operator
+pub fn gt(input: Span) -> IResult<Operator> {
+    let (s, op) = value(Operator::GreaterThan, ws(tag("&gt;")))(input)?;
+    Ok((s, op))
+}
+
 pub fn equals(input: Span) -> IResult<Operator> {
     let (s, op) = value(Operator::Equals, ws(tag("=")))(input)?;
     Ok((s, op))
@@ -267,6 +291,10 @@ pub fn operator(input: Span) -> IResult<Operator> {
         divide,
         dot,
         cross,
+        geq,
+        leq,
+        gt,
+        lt,
         operator_other,
     ))(input)?;
     Ok((s, op))
@@ -599,9 +627,9 @@ fn test_mathml_parser() {
                     Box::new(Mo(Operator::Other("sup".to_string()))),
                     Box::new(MathExpression::Mrow(Mrow(vec![
                         Mn("0".to_string()),
-                        Mo(Operator::Other("≤".to_string())),
+                        Mo(Operator::Leq),
                         MathExpression::Mi(Mi("t".to_string())),
-                        Mo(Operator::Other("≤".to_string())),
+                        Mo(Operator::Leq),
                         Msub(
                             Box::new(MathExpression::Mi(Mi("T".to_string()))),
                             Box::new(Mn("0".to_string())),
@@ -638,7 +666,7 @@ fn test_mathml_parser() {
                         ),
                     ]))),
                 ),
-                Mo(Operator::Other("≤".to_string())),
+                Mo(Operator::Leq),
                 MathExpression::Mi(Mi("C".to_string())),
             ],
         },
