@@ -11,7 +11,8 @@ from skema.program_analysis.CAST2FN.model.cast import (
     CASTLiteralValue,
     ModelIf,
     Loop,
-    Operator
+    Operator,
+    ScalarType
 )
 
 def while1():
@@ -56,7 +57,7 @@ def test_while1():
     assert asg_node.left.val.name == "x"
 
     assert isinstance(asg_node.right, CASTLiteralValue)
-    assert asg_node.right.value_type == "Integer"
+    assert asg_node.right.value_type == ScalarType.INTEGER
     assert asg_node.right.value == '2'
 
     assert isinstance(loop_node, Loop)
@@ -70,7 +71,7 @@ def test_while1():
     assert loop_test.operands[0].name == "x"
 
     assert isinstance(loop_test.operands[1], CASTLiteralValue)
-    assert loop_test.operands[1].value_type == "Integer"
+    assert loop_test.operands[1].value_type == ScalarType.INTEGER
     assert loop_test.operands[1].value == "5"
 
     # Loop Body
@@ -99,7 +100,7 @@ def test_while2():
     assert asg_node.left.val.name == "x"
 
     assert isinstance(asg_node.right, CASTLiteralValue)
-    assert asg_node.right.value_type == "Integer"
+    assert asg_node.right.value_type == ScalarType.INTEGER
     assert asg_node.right.value == '2'
 
     assert isinstance(asg_node_2, Assignment)
@@ -108,7 +109,7 @@ def test_while2():
     assert asg_node_2.left.val.name == "y"
 
     assert isinstance(asg_node_2.right, CASTLiteralValue)
-    assert asg_node_2.right.value_type == "Integer"
+    assert asg_node_2.right.value_type == ScalarType.INTEGER
     assert asg_node_2.right.value == '3'
 
     assert isinstance(loop_node, Loop)
@@ -122,7 +123,7 @@ def test_while2():
     assert loop_test.operands[0].name == "x"
 
     assert isinstance(loop_test.operands[1], CASTLiteralValue)
-    assert loop_test.operands[1].value_type == "Integer"
+    assert loop_test.operands[1].value_type == ScalarType.INTEGER
     assert loop_test.operands[1].value == "5"
 
     # Loop Body

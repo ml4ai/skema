@@ -9,7 +9,8 @@ from skema.program_analysis.CAST2FN.model.cast import (
     Name,
     CASTLiteralValue,
     ModelIf,
-    Operator
+    Operator,
+    ScalarType
 )
 
 def cond_compound1():
@@ -43,7 +44,7 @@ def test_cond_compound1():
     assert asg_node.left.val.id == 0
 
     assert isinstance(asg_node.right, CASTLiteralValue)
-    assert asg_node.right.value_type == "Integer"
+    assert asg_node.right.value_type == ScalarType.INTEGER
     assert asg_node.right.value == '3'
 
     cond_node = exp_cast.nodes[0].body[1]
@@ -59,7 +60,7 @@ def test_cond_compound1():
     assert expr.op == ".gt."
     assert len(expr.operands) == 2
     assert isinstance(expr.operands[1], CASTLiteralValue)
-    assert expr.operands[1].value_type == "Integer"
+    assert expr.operands[1].value_type == ScalarType.INTEGER
     assert expr.operands[1].value == "1"
 
     assert isinstance(expr.operands[0], Name)
@@ -76,13 +77,13 @@ def test_cond_compound1():
     assert body.operands[0].id == 0
 
     assert isinstance(body.operands[1], CASTLiteralValue)
-    assert body.operands[1].value_type == "Integer"
+    assert body.operands[1].value_type == ScalarType.INTEGER
     assert body.operands[1].value == "10"
 
     assert len(if_node.orelse) == 1
     orelse = if_node.orelse[0]
     assert isinstance(orelse, CASTLiteralValue)
-    assert orelse.value_type == "Boolean"
+    assert orelse.value_type == ScalarType.BOOLEAN
     assert orelse.value == False
 
     cond_body = cond_node.body
@@ -93,7 +94,7 @@ def test_cond_compound1():
     assert cond_body[0].left.val.id == 0
 
     assert isinstance(cond_body[0].right, CASTLiteralValue)
-    assert cond_body[0].right.value_type == "Integer"
+    assert cond_body[0].right.value_type == ScalarType.INTEGER
     assert cond_body[0].right.value == '40'
 
     cond_else = cond_node.orelse
