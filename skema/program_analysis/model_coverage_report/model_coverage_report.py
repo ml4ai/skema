@@ -33,6 +33,7 @@ from skema.rest.proxies import SKEMA_GRAPH_DB_HOST, SKEMA_GRAPH_DB_PORT, SKEMA_G
 from skema.rest.utils import fn_preprocessor
 from skema.rest.workflows import code_snippets_to_pn_amr, llm_assisted_codebase_to_pn_amr
 from skema.utils.fold import del_nulls, dictionary_to_gromet_json
+from skema.utils.change_dir_back import change_dir_back
 from skema.skema_py.server import System
 
 # Constants for file paths
@@ -60,16 +61,8 @@ class Status(Enum):
 def valid_path(path: str) -> bool:
     return "include_" not in path
 
-def change_dir_back(func):
-    """Decorator to ensure the working directory is changed back after function call."""
-    def wrapper(*args, **kwargs):
-        try:
-            return func(*args, **kwargs)
-        finally:
-            os.chdir(THIS_PATH)
-    return wrapper
 
-@change_dir_back
+@change_dir_back(THIS_PATH)
 def generate_data_product(output_dir: str, model_name: str, file_name: str, data_product_function: Callable, args=(), kwargs=None) -> Tuple[str, Any, Status]:
     output_path = Path(output_dir) / "data" / data_product_function.__name__ / model_name / file_name
     output_path.parent.mkdir(parents=True, exist_ok=True)
