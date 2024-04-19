@@ -1,3 +1,6 @@
+import json
+import httpx
+import pytest
 import asyncio
 import requests
 from pathlib import Path
@@ -16,17 +19,12 @@ from skema.rest import schema
 from skema.rest.llm_proxy import Dynamics
 from skema.rest.proxies import SKEMA_RS_ADDESS
 from skema.skema_py import server as code2fn
-import json
-import httpx
-import pytest
+from skema.data.program_analysis import MODEL_ZIP_ROOT_PATH
 
-CHIME_SIR_URL = (
-    "https://artifacts.askem.lum.ai/askem/data/models/zip-archives/CHIME-SIR-model.zip"
-)
 
-SIDARTHE_URL = (
-    "https://artifacts.askem.lum.ai/askem/data/models/zip-archives/SIDARTHE.zip"
-)
+CHIME_SIR_PATH = MODEL_ZIP_ROOT_PATH.resolve() / "CHIME-SIR-model.zip"
+SIDARTHE_PATH = MODEL_ZIP_ROOT_PATH.resolve() / "SIDARTHE.zip"
+
 
 @pytest.mark.asyncio
 async def test_any_amr_chime_sir():
@@ -34,8 +32,8 @@ async def test_any_amr_chime_sir():
     Unit test for checking that Chime-SIR model produces any AMR. This test zip contains 4 versions of CHIME SIR.
     This will test if just the core dynamics works, the whole script, and also rewritten scripts work. 
     """
-    response = requests.get(CHIME_SIR_URL)
-    zip_bytes = BytesIO(response.content)
+
+    zip_bytes = BytesIO(CHIME_SIR_PATH.read_bytes())
 
     # NOTE: For CI we are unable to use the LLM assisted functions due to API keys
     # So, we will instead mock the output for those functions instead
@@ -136,8 +134,7 @@ async def test_any_amr_sidarthe():
     Unit test for checking that Chime-SIR model produces any AMR. This test zip contains 4 versions of CHIME SIR.
     This will test if just the core dynamics works, the whole script, and also rewritten scripts work. 
     """
-    response = requests.get(SIDARTHE_URL)
-    zip_bytes = BytesIO(response.content)
+    zip_bytes = BytesIO(SIDARTHE_PATH.read_bytes())
 
     # NOTE: For CI we are unable to use the LLM assisted functions due to API keys
     # So, we will instead mock the output for those functions instead

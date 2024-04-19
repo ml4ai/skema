@@ -30,6 +30,8 @@ from skema.program_analysis.matlab2cast import matlab_to_cast
 from skema.program_analysis.tree_sitter_parsers.util import extension_to_language
 from skema.rest.utils import fn_preprocessor
 from skema.utils.fold import del_nulls, dictionary_to_gromet_json
+from skema.data.program_analysis import MODEL_ZIP_ROOT_PATH
+
 
 THIS_PATH = Path(__file__).parent.resolve()
 MODEL_YAML_PATH = Path(__file__).parent / "models.yaml"
@@ -141,11 +143,14 @@ def process_single_model(html: HTML_Instance, output_dir: str, model_name: str):
     """Generate an HTML report for a single model"""
     html.add_model(model_name)
     
-    if model_name in MODEL_YAML:
-        model_url = MODEL_YAML[model_name]["zip_archive"]
-        response = requests.get(model_url)
-
-    zip = ZipFile(BytesIO(response.content))
+    
+   
+    if not model_name in MODEL_YAML:
+        return 
+    
+    model_path = MODEL_ZIP_ROOT_PATH.resolve() / MODEL_YAML[model_name]["zip_archive"]
+        
+    zip = ZipFile(BytesIO(model_path.read_bytes()))
     with TemporaryDirectory() as temp:
         # We need to write all the files to the temporary directory before processing
         # This is because some steps may require additional files, such as include directories in Fortran
