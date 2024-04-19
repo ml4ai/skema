@@ -1,0 +1,28 @@
+Traceback (most recent call last):
+  File "skema/program_analysis/model_coverage_report/model_coverage_report.py", line 69, in generate_data_product
+    output = func_timeout(10, data_product_function, args=args, kwargs=(kwargs or {}))
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/func_timeout/dafunc.py", line 108, in func_timeout
+    raise_exception(exception)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/func_timeout/py3_raise.py", line 7, in raise_exception
+    raise exception[0] from None
+  File "skema/program_analysis/model_coverage_report/model_coverage_report.py", line 146, in ingest_with_morae
+    return json.dumps(asyncio.run(morae_async()))
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/asyncio/runners.py", line 44, in run
+    return loop.run_until_complete(main)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/asyncio/base_events.py", line 616, in run_until_complete
+    return future.result()
+  File "skema/program_analysis/model_coverage_report/model_coverage_report.py", line 138, in morae_async
+    return await code_snippets_to_pn_amr(
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/rest/workflows.py", line 506, in code_snippets_to_pn_amr
+    gromet = await code2fn.fn_given_filepaths(system)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/skema_py/server.py", line 382, in fn_given_filepaths
+    return await system_to_gromet(system)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/skema_py/server.py", line 254, in system_to_gromet
+    system = await system_to_enriched_system(system)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/skema_py/server.py", line 166, in system_to_enriched_system
+    results = await asyncio.gather(*coroutines)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/comment_extractor/server.py", line 86, in comments_extract
+    return comment_service.extract_comments_single(request)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/program_analysis/comment_extractor/comment_extractor.py", line 187, in extract_comments_single
+    while index < len(captures):
+TypeError: '<' not supported between instances of 'NoneType' and 'int'

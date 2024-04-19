@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Coverage for skema/program_analysis/CAST/fortran/ts2cast.py: 62%</title>
+    <title>Coverage for skema/program_analysis/CAST/fortran/ts2cast.py: 65%</title>
     <link rel="icon" sizes="32x32" href="favicon_32.png">
     <link rel="stylesheet" href="style.css" type="text/css">
     <script type="text/javascript" src="coverage_html.js" defer></script>
@@ -12,7 +12,7 @@
     <div class="content">
         <h1>
             <span class="text">Coverage for </span><b>skema/program_analysis/CAST/fortran/ts2cast.py</b>:
-            <span class="pc_cov">62%</span>
+            <span class="pc_cov">65%</span>
         </h1>
         <aside id="help_panel_wrapper">
             <input id="help_panel_state" type="checkbox">
@@ -55,8 +55,8 @@
         </aside>
         <h2>
             <span class="text">457 statements &nbsp;</span>
-            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">283<span class="text"> run</span></button>
-            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">174<span class="text"> missing</span></button>
+            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">297<span class="text"> run</span></button>
+            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">160<span class="text"> missing</span></button>
             <button type="button" class="exc show_exc button_toggle_exc" value="exc" data-shortcut="x" title="Toggle lines excluded">0<span class="text"> excluded</span></button>
         </h2>
         <p class="text">
@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="d_e767eca9ae588329_util_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.4.4">coverage.py v7.4.4</a>,
-            created at 2024-04-11 19:29 +0000
+            created at 2024-04-19 18:53 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"/>
@@ -243,7 +243,7 @@
     <p class="run"><span class="n"><a id="t161" href="#t161">161</a></span><span class="t">        <span class="key">elif</span> <span class="nam">node</span><span class="op">.</span><span class="nam">type</span> <span class="key">in</span> <span class="op">[</span><span class="str">"if_statement"</span><span class="op">,</span> <span class="str">"else_if_clause"</span><span class="op">,</span> <span class="str">"else_clause"</span><span class="op">]</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t162" href="#t162">162</a></span><span class="t">            <span class="key">return</span> <span class="nam">self</span><span class="op">.</span><span class="nam">visit_if_statement</span><span class="op">(</span><span class="nam">node</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t163" href="#t163">163</a></span><span class="t">        <span class="key">elif</span> <span class="nam">node</span><span class="op">.</span><span class="nam">type</span> <span class="op">==</span> <span class="str">"logical_expression"</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t164" href="#t164">164</a></span><span class="t">            <span class="key">return</span> <span class="nam">self</span><span class="op">.</span><span class="nam">visit_logical_expression</span><span class="op">(</span><span class="nam">node</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t164" href="#t164">164</a></span><span class="t">            <span class="key">return</span> <span class="nam">self</span><span class="op">.</span><span class="nam">visit_logical_expression</span><span class="op">(</span><span class="nam">node</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t165" href="#t165">165</a></span><span class="t">        <span class="key">elif</span> <span class="nam">node</span><span class="op">.</span><span class="nam">type</span> <span class="op">==</span> <span class="str">"derived_type_definition"</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t166" href="#t166">166</a></span><span class="t">            <span class="key">return</span> <span class="nam">self</span><span class="op">.</span><span class="nam">visit_derived_type</span><span class="op">(</span><span class="nam">node</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t167" href="#t167">167</a></span><span class="t">        <span class="key">elif</span> <span class="nam">node</span><span class="op">.</span><span class="nam">type</span> <span class="op">==</span> <span class="str">"derived_type_member_expression"</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
@@ -788,33 +788,33 @@
     <p class="run"><span class="n"><a id="t706" href="#t706">706</a></span><span class="t">    <span class="key">def</span> <span class="nam">visit_logical_expression</span><span class="op">(</span><span class="nam">self</span><span class="op">,</span> <span class="nam">node</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t707" href="#t707">707</a></span><span class="t">        <span class="str">"""Visitior for logical expression (i.e. true and false) which is used in compound conditional"""</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t708" href="#t708">708</a></span><span class="t">        <span class="com"># If this is a .not. operator, we need to pass it on to the math_expression visitor</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t709" href="#t709">709</a></span><span class="t">        <span class="key">if</span> <span class="nam">len</span><span class="op">(</span><span class="nam">node</span><span class="op">.</span><span class="nam">children</span><span class="op">)</span> <span class="op">&lt;</span> <span class="num">3</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t709" href="#t709">709</a></span><span class="t">        <span class="key">if</span> <span class="nam">len</span><span class="op">(</span><span class="nam">node</span><span class="op">.</span><span class="nam">children</span><span class="op">)</span> <span class="op">&lt;</span> <span class="num">3</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t710" href="#t710">710</a></span><span class="t">            <span class="key">return</span> <span class="nam">self</span><span class="op">.</span><span class="nam">visit_math_expression</span><span class="op">(</span><span class="nam">node</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t711" href="#t711">711</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t712" href="#t712">712</a></span><span class="t">        <span class="nam">literal_value_false</span> <span class="op">=</span> <span class="nam">CASTLiteralValue</span><span class="op">(</span><span class="str">"Boolean"</span><span class="op">,</span> <span class="key">False</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t713" href="#t713">713</a></span><span class="t">        <span class="nam">literal_value_true</span> <span class="op">=</span> <span class="nam">CASTLiteralValue</span><span class="op">(</span><span class="str">"Boolean"</span><span class="op">,</span> <span class="key">True</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t712" href="#t712">712</a></span><span class="t">        <span class="nam">literal_value_false</span> <span class="op">=</span> <span class="nam">CASTLiteralValue</span><span class="op">(</span><span class="str">"Boolean"</span><span class="op">,</span> <span class="key">False</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t713" href="#t713">713</a></span><span class="t">        <span class="nam">literal_value_true</span> <span class="op">=</span> <span class="nam">CASTLiteralValue</span><span class="op">(</span><span class="str">"Boolean"</span><span class="op">,</span> <span class="key">True</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t714" href="#t714">714</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t715" href="#t715">715</a></span><span class="t">        <span class="com"># AND: Right side goes in body if, left side in condition</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t716" href="#t716">716</a></span><span class="t">        <span class="com"># OR: Right side goes in body else, left side in condition</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t717" href="#t717">717</a></span><span class="t">        <span class="nam">left</span><span class="op">,</span> <span class="nam">operator</span><span class="op">,</span> <span class="nam">right</span> <span class="op">=</span> <span class="nam">node</span><span class="op">.</span><span class="nam">children</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t717" href="#t717">717</a></span><span class="t">        <span class="nam">left</span><span class="op">,</span> <span class="nam">operator</span><span class="op">,</span> <span class="nam">right</span> <span class="op">=</span> <span class="nam">node</span><span class="op">.</span><span class="nam">children</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t718" href="#t718">718</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t719" href="#t719">719</a></span><span class="t">        <span class="com"># First we need to check if this is logical and or a logical or</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t720" href="#t720">720</a></span><span class="t">        <span class="com"># The tehcnical types for these are \.or\. and \.and\. so to simplify things we can use the in keyword</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t721" href="#t721">721</a></span><span class="t">        <span class="nam">is_or</span> <span class="op">=</span> <span class="str">"or"</span> <span class="key">in</span> <span class="nam">operator</span><span class="op">.</span><span class="nam">type</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t721" href="#t721">721</a></span><span class="t">        <span class="nam">is_or</span> <span class="op">=</span> <span class="str">"or"</span> <span class="key">in</span> <span class="nam">operator</span><span class="op">.</span><span class="nam">type</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t722" href="#t722">722</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t723" href="#t723">723</a></span><span class="t">        <span class="nam">top_if</span> <span class="op">=</span> <span class="nam">ModelIf</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t724" href="#t724">724</a></span><span class="t">        <span class="nam">top_if_expr</span> <span class="op">=</span> <span class="nam">self</span><span class="op">.</span><span class="nam">visit</span><span class="op">(</span><span class="nam">left</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t725" href="#t725">725</a></span><span class="t">        <span class="nam">top_if</span><span class="op">.</span><span class="nam">expr</span> <span class="op">=</span> <span class="nam">top_if_expr</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t723" href="#t723">723</a></span><span class="t">        <span class="nam">top_if</span> <span class="op">=</span> <span class="nam">ModelIf</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t724" href="#t724">724</a></span><span class="t">        <span class="nam">top_if_expr</span> <span class="op">=</span> <span class="nam">self</span><span class="op">.</span><span class="nam">visit</span><span class="op">(</span><span class="nam">left</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t725" href="#t725">725</a></span><span class="t">        <span class="nam">top_if</span><span class="op">.</span><span class="nam">expr</span> <span class="op">=</span> <span class="nam">top_if_expr</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t726" href="#t726">726</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t727" href="#t727">727</a></span><span class="t">        <span class="nam">bottom_if_expr</span> <span class="op">=</span> <span class="nam">self</span><span class="op">.</span><span class="nam">visit</span><span class="op">(</span><span class="nam">right</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t728" href="#t728">728</a></span><span class="t">        <span class="key">if</span> <span class="nam">is_or</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t727" href="#t727">727</a></span><span class="t">        <span class="nam">bottom_if_expr</span> <span class="op">=</span> <span class="nam">self</span><span class="op">.</span><span class="nam">visit</span><span class="op">(</span><span class="nam">right</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t728" href="#t728">728</a></span><span class="t">        <span class="key">if</span> <span class="nam">is_or</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t729" href="#t729">729</a></span><span class="t">            <span class="nam">top_if</span><span class="op">.</span><span class="nam">orelse</span> <span class="op">=</span> <span class="op">[</span><span class="nam">bottom_if_expr</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t730" href="#t730">730</a></span><span class="t">            <span class="nam">top_if</span><span class="op">.</span><span class="nam">body</span> <span class="op">=</span> <span class="op">[</span><span class="nam">literal_value_true</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t731" href="#t731">731</a></span><span class="t">        <span class="key">else</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t732" href="#t732">732</a></span><span class="t">            <span class="nam">top_if</span><span class="op">.</span><span class="nam">orelse</span> <span class="op">=</span> <span class="op">[</span><span class="nam">literal_value_false</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t733" href="#t733">733</a></span><span class="t">            <span class="nam">top_if</span><span class="op">.</span><span class="nam">body</span> <span class="op">=</span> <span class="op">[</span><span class="nam">bottom_if_expr</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t732" href="#t732">732</a></span><span class="t">            <span class="nam">top_if</span><span class="op">.</span><span class="nam">orelse</span> <span class="op">=</span> <span class="op">[</span><span class="nam">literal_value_false</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t733" href="#t733">733</a></span><span class="t">            <span class="nam">top_if</span><span class="op">.</span><span class="nam">body</span> <span class="op">=</span> <span class="op">[</span><span class="nam">bottom_if_expr</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t734" href="#t734">734</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t735" href="#t735">735</a></span><span class="t">        <span class="key">return</span> <span class="nam">top_if</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t735" href="#t735">735</a></span><span class="t">        <span class="key">return</span> <span class="nam">top_if</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t736" href="#t736">736</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t737" href="#t737">737</a></span><span class="t">    <span class="key">def</span> <span class="nam">visit_assignment_statement</span><span class="op">(</span><span class="nam">self</span><span class="op">,</span> <span class="nam">node</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t738" href="#t738">738</a></span><span class="t">        <span class="nam">left</span><span class="op">,</span> <span class="nam">_</span><span class="op">,</span> <span class="nam">right</span> <span class="op">=</span> <span class="nam">node</span><span class="op">.</span><span class="nam">children</span>&nbsp;</span><span class="r"></span></p>
@@ -1359,7 +1359,7 @@
             <a id="nextFileLink" class="nav" href="d_e767eca9ae588329_util_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.4.4">coverage.py v7.4.4</a>,
-            created at 2024-04-11 19:29 +0000
+            created at 2024-04-19 18:53 +0000
         </p>
     </div>
 </footer>

@@ -37,7 +37,8 @@ from skema.program_analysis.CAST2FN.model.cast import (
     Var,
     Name,
     Operator,
-    CASTLiteralValue
+    CASTLiteralValue,
+    ScalarType
 )
 
 def binop1():
@@ -103,11 +104,11 @@ def test_binop1():
 
     assert isinstance(binop_node.right.operands[0], CASTLiteralValue)
     assert binop_node.right.operands[0].value == &#39;2&#39;
-    assert binop_node.right.operands[0].value_type == &#39;Integer&#39;
+    assert binop_node.right.operands[0].value_type == ScalarType.INTEGER
 
     assert isinstance(binop_node.right.operands[1], CASTLiteralValue)
     assert binop_node.right.operands[1].value == &#39;3&#39;
-    assert binop_node.right.operands[1].value_type == &#39;Integer&#39;
+    assert binop_node.right.operands[1].value_type == ScalarType.INTEGER
 
 def test_binop2():
     exp_cast = generate_cast(binop2())
@@ -121,7 +122,7 @@ def test_binop2():
     assert binop_node.left.val.id == 0
 
     assert isinstance(binop_node.right, CASTLiteralValue)
-    assert binop_node.right.value_type == &#34;Integer&#34;
+    assert binop_node.right.value_type == ScalarType.INTEGER
     assert binop_node.right.value == &#39;2&#39;
     
     # ------
@@ -141,7 +142,7 @@ def test_binop2():
 
     assert isinstance(binop_node.right.operands[1], CASTLiteralValue)
     assert binop_node.right.operands[1].value == &#39;3&#39;
-    assert binop_node.right.operands[1].value_type == &#39;Integer&#39;
+    assert binop_node.right.operands[1].value_type == ScalarType.INTEGER
 
 def test_binop3():
     exp_cast = generate_cast(binop3())
@@ -155,7 +156,7 @@ def test_binop3():
     assert binop_node.left.val.id == 0
 
     assert isinstance(binop_node.right, CASTLiteralValue)
-    assert binop_node.right.value_type == &#34;Integer&#34;
+    assert binop_node.right.value_type == ScalarType.INTEGER
     assert binop_node.right.value == &#39;1&#39;
     
     # ------
@@ -167,7 +168,7 @@ def test_binop3():
     assert binop_node.left.val.id == 1
 
     assert isinstance(binop_node.right, CASTLiteralValue)
-    assert binop_node.right.value_type == &#34;Integer&#34;
+    assert binop_node.right.value_type == ScalarType.INTEGER
     assert binop_node.right.value == &#39;2&#39;
     
     # ------
@@ -227,7 +228,7 @@ def test_unary1():
 
     assert isinstance(unary_node.right.operands[0], CASTLiteralValue)
     assert unary_node.right.operands[0].value == &#39;1&#39;
-    assert unary_node.right.operands[0].value_type == &#39;Integer&#39;
+    assert unary_node.right.operands[0].value_type == ScalarType.INTEGER
 
 def test_unary2():
     exp_cast = generate_cast(unary2())
@@ -242,7 +243,7 @@ def test_unary2():
 
     assert isinstance(unary_node.right, CASTLiteralValue)
     assert unary_node.right.value == &#39;1&#39;
-    assert unary_node.right.value_type == &#39;Integer&#39;
+    assert unary_node.right.value_type == ScalarType.INTEGER
 
     unary_node = exp_cast.nodes[0].body[1]
 
@@ -363,11 +364,11 @@ end program binop3
 
     assert isinstance(binop_node.right.operands[0], CASTLiteralValue)
     assert binop_node.right.operands[0].value == &#39;2&#39;
-    assert binop_node.right.operands[0].value_type == &#39;Integer&#39;
+    assert binop_node.right.operands[0].value_type == ScalarType.INTEGER
 
     assert isinstance(binop_node.right.operands[1], CASTLiteralValue)
     assert binop_node.right.operands[1].value == &#39;3&#39;
-    assert binop_node.right.operands[1].value_type == &#39;Integer&#39;</code></pre>
+    assert binop_node.right.operands[1].value_type == ScalarType.INTEGER</code></pre>
 </details>
 </dd>
 <dt id="skema.program_analysis.CAST.fortran.tests.test_operation_cast_fortran.test_binop2"><code class="name flex">
@@ -391,7 +392,7 @@ end program binop3
     assert binop_node.left.val.id == 0
 
     assert isinstance(binop_node.right, CASTLiteralValue)
-    assert binop_node.right.value_type == &#34;Integer&#34;
+    assert binop_node.right.value_type == ScalarType.INTEGER
     assert binop_node.right.value == &#39;2&#39;
     
     # ------
@@ -411,7 +412,7 @@ end program binop3
 
     assert isinstance(binop_node.right.operands[1], CASTLiteralValue)
     assert binop_node.right.operands[1].value == &#39;3&#39;
-    assert binop_node.right.operands[1].value_type == &#39;Integer&#39;</code></pre>
+    assert binop_node.right.operands[1].value_type == ScalarType.INTEGER</code></pre>
 </details>
 </dd>
 <dt id="skema.program_analysis.CAST.fortran.tests.test_operation_cast_fortran.test_binop3"><code class="name flex">
@@ -435,7 +436,7 @@ end program binop3
     assert binop_node.left.val.id == 0
 
     assert isinstance(binop_node.right, CASTLiteralValue)
-    assert binop_node.right.value_type == &#34;Integer&#34;
+    assert binop_node.right.value_type == ScalarType.INTEGER
     assert binop_node.right.value == &#39;1&#39;
     
     # ------
@@ -447,7 +448,7 @@ end program binop3
     assert binop_node.left.val.id == 1
 
     assert isinstance(binop_node.right, CASTLiteralValue)
-    assert binop_node.right.value_type == &#34;Integer&#34;
+    assert binop_node.right.value_type == ScalarType.INTEGER
     assert binop_node.right.value == &#39;2&#39;
     
     # ------
@@ -517,7 +518,7 @@ end program binop3
 
     assert isinstance(unary_node.right.operands[0], CASTLiteralValue)
     assert unary_node.right.operands[0].value == &#39;1&#39;
-    assert unary_node.right.operands[0].value_type == &#39;Integer&#39;</code></pre>
+    assert unary_node.right.operands[0].value_type == ScalarType.INTEGER</code></pre>
 </details>
 </dd>
 <dt id="skema.program_analysis.CAST.fortran.tests.test_operation_cast_fortran.test_unary2"><code class="name flex">
@@ -542,7 +543,7 @@ end program binop3
 
     assert isinstance(unary_node.right, CASTLiteralValue)
     assert unary_node.right.value == &#39;1&#39;
-    assert unary_node.right.value_type == &#39;Integer&#39;
+    assert unary_node.right.value_type == ScalarType.INTEGER
 
     unary_node = exp_cast.nodes[0].body[1]
 

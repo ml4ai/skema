@@ -1,0 +1,36 @@
+Traceback (most recent call last):
+  File "skema/program_analysis/model_coverage_report/model_coverage_report.py", line 69, in generate_data_product
+    output = func_timeout(10, data_product_function, args=args, kwargs=(kwargs or {}))
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/func_timeout/dafunc.py", line 108, in func_timeout
+    raise_exception(exception)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/func_timeout/py3_raise.py", line 7, in raise_exception
+    raise exception[0] from None
+  File "skema/program_analysis/model_coverage_report/model_coverage_report.py", line 146, in ingest_with_morae
+    return json.dumps(asyncio.run(morae_async()))
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/asyncio/runners.py", line 44, in run
+    return loop.run_until_complete(main)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/asyncio/base_events.py", line 616, in run_until_complete
+    return future.result()
+  File "skema/program_analysis/model_coverage_report/model_coverage_report.py", line 138, in morae_async
+    return await code_snippets_to_pn_amr(
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema/rest/workflows.py", line 511, in code_snippets_to_pn_amr
+    res = await client.put(f"{SKEMA_RS_ADDESS}/models/PN", json=gromet)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/httpx/_client.py", line 1929, in put
+    return await self.request(
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/httpx/_client.py", line 1574, in request
+    return await self.send(request, auth=auth, follow_redirects=follow_redirects)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/httpx/_client.py", line 1661, in send
+    response = await self._send_handling_auth(
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/httpx/_client.py", line 1689, in _send_handling_auth
+    response = await self._send_handling_redirects(
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/httpx/_client.py", line 1726, in _send_handling_redirects
+    response = await self._send_single_request(request)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/httpx/_client.py", line 1763, in _send_single_request
+    response = await transport.handle_async_request(request)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/httpx/_transports/default.py", line 373, in handle_async_request
+    resp = await self._pool.handle_async_request(req)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/contextlib.py", line 131, in __exit__
+    self.gen.throw(type, value, traceback)
+  File "/opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/httpx/_transports/default.py", line 86, in map_httpcore_exceptions
+    raise mapped_exc(message) from exc
+httpx.ReadTimeout

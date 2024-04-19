@@ -28,94 +28,85 @@
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">import argparse
-import os
-import traceback  # Debugs
-import requests
-import yaml
 import json
+import httpx
+import os
+import requests
+import subprocess
+import asyncio
+import traceback
+import yaml
+
 from enum import Enum
-from typing import List, Dict, Tuple, Callable, Any
-from zipfile import ZipFile
 from io import BytesIO
-from tempfile import TemporaryDirectory
 from pathlib import Path
+from tempfile import TemporaryDirectory
+from typing import Any, Callable, Dict, List, Tuple
+from zipfile import ZipFile
 
 from func_timeout import func_timeout, FunctionTimedOut
-from tree_sitter import Language, Parser, Tree
+from tree_sitter import Language, Parser
 
-from skema.program_analysis.CAST2FN.cast import CAST
-from skema.program_analysis.run_ann_cast_pipeline import ann_cast_pipeline
-from skema.program_analysis.model_coverage_report.html_builder import HTML_Instance
-from skema.program_analysis.multi_file_ingester import process_file_system
-from skema.program_analysis.single_file_ingester import process_file
-from skema.program_analysis.snippet_ingester import process_snippet
-from skema.program_analysis.tree_sitter_parsers.build_parsers import (
-    INSTALLED_LANGUAGES_FILEPATH,
-    LANGUAGES_YAML_FILEPATH,
-)
-from skema.program_analysis.python2cast import python_to_cast
 from skema.program_analysis.fortran2cast import fortran_to_cast
 from skema.program_analysis.matlab2cast import matlab_to_cast
+from skema.program_analysis.model_coverage_report.html_builder import HTML_Instance
+from skema.program_analysis.multi_file_ingester import process_file_system
+from skema.program_analysis.python2cast import python_to_cast
+from skema.program_analysis.single_file_ingester import process_file
+from skema.program_analysis.tree_sitter_parsers.build_parsers import INSTALLED_LANGUAGES_FILEPATH
 from skema.program_analysis.tree_sitter_parsers.util import extension_to_language
 from skema.rest.utils import fn_preprocessor
+from skema.rest.workflows import code_snippets_to_pn_amr
 from skema.utils.fold import del_nulls, dictionary_to_gromet_json
+from skema.utils.change_dir_back import change_dir_back
+from skema.skema_py.server import System
 
+# Constants for file paths
 THIS_PATH = Path(__file__).parent.resolve()
-MODEL_YAML_PATH = Path(__file__).parent / &#34;models.yaml&#34;
+MODEL_YAML_PATH = THIS_PATH / &#34;models.yaml&#34;
 MODEL_YAML = yaml.safe_load(MODEL_YAML_PATH.read_text())
 
 class Status(Enum):
-    &#34;&#34;&#34;Status enum for the status of executing a step in the code2fn pipeline&#34;&#34;&#34;
-
     VALID = &#34;Valid&#34;
     TIMEOUT = &#34;Timeout&#34;
     EXCEPTION = &#34;Exception&#34;
 
     @staticmethod
-    def all_valid(status_list: List) -&gt; bool:
-        &#34;&#34;&#34;Check if all status in a List are Status.VALID&#34;&#34;&#34;
-        return all([status == Status.VALID for status in status_list])
+    def all_valid(status_list: List[Enum]) -&gt; bool:
+        return all(status == Status.VALID for status in status_list)
 
     @staticmethod
-    def get_overall_status(status_list: List) -&gt; str:
-        &#34;&#34;&#34;Return the final pipeline status given a List of status for each step in the pipeline&#34;&#34;&#34;
-        return (
-            Status.TIMEOUT
-            if Status.TIMEOUT in status_list
-            else Status.EXCEPTION
-            if Status.EXCEPTION in status_list
-            else Status.VALID
-        )
+    def get_overall_status(status_list: List[Enum]) -&gt; Enum:
+        if Status.TIMEOUT in status_list:
+            return Status.TIMEOUT
+        elif Status.EXCEPTION in status_list:
+            return Status.EXCEPTION
+        return Status.VALID
+
+def valid_path(path: str) -&gt; bool:
+    return &#34;include_&#34; not in path
 
 
-def generate_data_product(
-    output_dir: str, model_name: str, file_name: str, data_product_function: Callable, args=(), kwargs=None
-) -&gt; Tuple[str, Any]:
-    &#34;&#34;&#34;Wrapper function for generating data products, returns the status of processing.&#34;&#34;&#34;
-    (output, output_path, status) = (None, None, None)
-
-    output_path = Path(output_dir) / &#34;data&#34;/ data_product_function.__name__ / model_name / file_name
+@change_dir_back(THIS_PATH)
+def generate_data_product(output_dir: str, model_name: str, file_name: str, data_product_function: Callable, args=(), kwargs=None) -&gt; Tuple[str, Any, Status]:
+    output_path = Path(output_dir) / &#34;data&#34; / data_product_function.__name__ / model_name / file_name
     output_path.parent.mkdir(parents=True, exist_ok=True)
     relative_output_path = output_path.relative_to(output_dir)
 
-    # There is a possibility that the processing function fails after changing the working directory.
-    # So we should change it back before and after each itteraton.
-    os.chdir(THIS_PATH)
+    output = None
     try:
-        output = func_timeout(10, data_product_function, args=args, kwargs=kwargs)
-        if output == &#34;&#34;:
-            raise Exception(&#34;Data product is empty&#34;)
+        output = func_timeout(10, data_product_function, args=args, kwargs=(kwargs or {}))
+        if not output:
+            raise ValueError(&#34;Data product is empty&#34;)
         output_path.write_text(output)
         status = Status.VALID
     except FunctionTimedOut:
-        os.chdir(THIS_PATH)
         output_path.write_text(&#34;Processing exceeded timeout (10s)&#34;)
         status = Status.TIMEOUT
-    except (Exception, SystemExit) as e:
-        os.chdir(THIS_PATH)
+    except Exception as e:
         output_path.write_text(traceback.format_exc())
         status = Status.EXCEPTION
-    
+
     return output, relative_output_path, status
 
 
@@ -165,6 +156,23 @@ def generate_gromet_preprocess_logs(gromet_collection: Dict) -&gt; str:
     &#34;&#34;&#34;Generator function for Gromet preprocessing logs&#34;&#34;&#34;
     logs = fn_preprocessor(gromet_collection)[1]
     return &#34;\n&#34;.join(logs)
+
+def ingest_with_morae(filename: str, source: str):
+    &#34;&#34;&#34;Generator function for ingesting source file with MORAE
+       NOTE: This function uses the non-llm amr pipeline due to being run in CI.
+    &#34;&#34;&#34;
+    
+    async def morae_async():
+        async with httpx.AsyncClient() as client:
+            return await code_snippets_to_pn_amr(
+                system=System(
+                    files=[filename],
+                    blobs=[source]
+                ),
+                client=client  # Pass the instantiated client
+            )
+
+    return json.dumps(asyncio.run(morae_async()))
 
 def process_single_model(html: HTML_Instance, output_dir: str, model_name: str):
     &#34;&#34;&#34;Generate an HTML report for a single model&#34;&#34;&#34;
@@ -240,6 +248,11 @@ def process_single_model(html: HTML_Instance, output_dir: str, model_name: str):
             except:
                 gromet_error_count = 0 
 
+        
+            amr_output, amr_report_relative_path, amr_report_status = generate_data_product(
+                output_dir, model_name, f&#34;{filename}.json&#34;, ingest_with_morae, args=(file.filename, source), kwargs=None
+            )
+          
             # Check the status of each pipeline step
             final_status = Status.get_overall_status(
                 [cast_status, gromet_status]
@@ -253,6 +266,12 @@ def process_single_model(html: HTML_Instance, output_dir: str, model_name: str):
                 can_ingest = False
             total_lines += len(source.splitlines())
 
+            html.add_file_consumer(
+                model_name,
+                file.filename,
+                amr_report_status is Status.VALID,
+                amr_report_relative_path
+            )
             html.add_file_basic(
                 model_name,
                 file.filename,
@@ -265,6 +284,7 @@ def process_single_model(html: HTML_Instance, output_dir: str, model_name: str):
                 gromet_report_relative_path,
                 gromet_preprocess_relative_path
             )
+
 
         # If all files are valid in a system, attempt to ingest full system into single GrometFNModuleCollection
         if not Status.all_valid(file_status_list):
@@ -340,9 +360,6 @@ def main():
     elif args.mode == &#34;single&#34;:
         supported, total = process_single_model(html, output_dir, args.model_name)
         model_line_coverage[args.model_name] = (supported, total)
-
-    # DataTables have to be initialized after all models are generated
-    html.add_data_table_script()
     
     output_path = Path(output_dir) / &#34;report.html&#34;
     output_path.write_text(html.soup.prettify())
@@ -385,46 +402,6 @@ if __name__ == &#34;__main__&#34;:
         return &#34;\n&#34;.join([cast_obj.to_json_str() for cast_obj in cast])
     else:
         return cast.to_json_str()</code></pre>
-</details>
-</dd>
-<dt id="skema.program_analysis.model_coverage_report.model_coverage_report.generate_data_product"><code class="name flex">
-<span>def <span class="ident">generate_data_product</span></span>(<span>output_dir: str, model_name: str, file_name: str, data_product_function: Callable, args=(), kwargs=None) ‑> Tuple[str, Any]</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Wrapper function for generating data products, returns the status of processing.</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def generate_data_product(
-    output_dir: str, model_name: str, file_name: str, data_product_function: Callable, args=(), kwargs=None
-) -&gt; Tuple[str, Any]:
-    &#34;&#34;&#34;Wrapper function for generating data products, returns the status of processing.&#34;&#34;&#34;
-    (output, output_path, status) = (None, None, None)
-
-    output_path = Path(output_dir) / &#34;data&#34;/ data_product_function.__name__ / model_name / file_name
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    relative_output_path = output_path.relative_to(output_dir)
-
-    # There is a possibility that the processing function fails after changing the working directory.
-    # So we should change it back before and after each itteraton.
-    os.chdir(THIS_PATH)
-    try:
-        output = func_timeout(10, data_product_function, args=args, kwargs=kwargs)
-        if output == &#34;&#34;:
-            raise Exception(&#34;Data product is empty&#34;)
-        output_path.write_text(output)
-        status = Status.VALID
-    except FunctionTimedOut:
-        os.chdir(THIS_PATH)
-        output_path.write_text(&#34;Processing exceeded timeout (10s)&#34;)
-        status = Status.TIMEOUT
-    except (Exception, SystemExit) as e:
-        os.chdir(THIS_PATH)
-        output_path.write_text(traceback.format_exc())
-        status = Status.EXCEPTION
-    
-    return output, relative_output_path, status</code></pre>
 </details>
 </dd>
 <dt id="skema.program_analysis.model_coverage_report.model_coverage_report.generate_full_gromet"><code class="name flex">
@@ -506,6 +483,34 @@ if __name__ == &#34;__main__&#34;:
     return tree.root_node.sexp()</code></pre>
 </details>
 </dd>
+<dt id="skema.program_analysis.model_coverage_report.model_coverage_report.ingest_with_morae"><code class="name flex">
+<span>def <span class="ident">ingest_with_morae</span></span>(<span>filename: str, source: str)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Generator function for ingesting source file with MORAE
+NOTE: This function uses the non-llm amr pipeline due to being run in CI.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def ingest_with_morae(filename: str, source: str):
+    &#34;&#34;&#34;Generator function for ingesting source file with MORAE
+       NOTE: This function uses the non-llm amr pipeline due to being run in CI.
+    &#34;&#34;&#34;
+    
+    async def morae_async():
+        async with httpx.AsyncClient() as client:
+            return await code_snippets_to_pn_amr(
+                system=System(
+                    files=[filename],
+                    blobs=[source]
+                ),
+                client=client  # Pass the instantiated client
+            )
+
+    return json.dumps(asyncio.run(morae_async()))</code></pre>
+</details>
+</dd>
 <dt id="skema.program_analysis.model_coverage_report.model_coverage_report.main"><code class="name flex">
 <span>def <span class="ident">main</span></span>(<span>)</span>
 </code></dt>
@@ -545,9 +550,6 @@ if __name__ == &#34;__main__&#34;:
     elif args.mode == &#34;single&#34;:
         supported, total = process_single_model(html, output_dir, args.model_name)
         model_line_coverage[args.model_name] = (supported, total)
-
-    # DataTables have to be initialized after all models are generated
-    html.add_data_table_script()
     
     output_path = Path(output_dir) / &#34;report.html&#34;
     output_path.write_text(html.soup.prettify())
@@ -662,6 +664,11 @@ Also, output a dictionary containing line coverage information for all models in
             except:
                 gromet_error_count = 0 
 
+        
+            amr_output, amr_report_relative_path, amr_report_status = generate_data_product(
+                output_dir, model_name, f&#34;{filename}.json&#34;, ingest_with_morae, args=(file.filename, source), kwargs=None
+            )
+          
             # Check the status of each pipeline step
             final_status = Status.get_overall_status(
                 [cast_status, gromet_status]
@@ -675,6 +682,12 @@ Also, output a dictionary containing line coverage information for all models in
                 can_ingest = False
             total_lines += len(source.splitlines())
 
+            html.add_file_consumer(
+                model_name,
+                file.filename,
+                amr_report_status is Status.VALID,
+                amr_report_relative_path
+            )
             html.add_file_basic(
                 model_name,
                 file.filename,
@@ -687,6 +700,7 @@ Also, output a dictionary containing line coverage information for all models in
                 gromet_report_relative_path,
                 gromet_preprocess_relative_path
             )
+
 
         # If all files are valid in a system, attempt to ingest full system into single GrometFNModuleCollection
         if not Status.all_valid(file_status_list):
@@ -720,6 +734,19 @@ Also, output a dictionary containing line coverage information for all models in
         return (supported_lines, total_lines)</code></pre>
 </details>
 </dd>
+<dt id="skema.program_analysis.model_coverage_report.model_coverage_report.valid_path"><code class="name flex">
+<span>def <span class="ident">valid_path</span></span>(<span>path: str) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def valid_path(path: str) -&gt; bool:
+    return &#34;include_&#34; not in path</code></pre>
+</details>
+</dd>
 </dl>
 </section>
 <section>
@@ -730,33 +757,27 @@ Also, output a dictionary containing line coverage information for all models in
 <span>(</span><span>value, names=None, *, module=None, qualname=None, type=None, start=1)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Status enum for the status of executing a step in the code2fn pipeline</p></div>
+<div class="desc"><p>An enumeration.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class Status(Enum):
-    &#34;&#34;&#34;Status enum for the status of executing a step in the code2fn pipeline&#34;&#34;&#34;
-
     VALID = &#34;Valid&#34;
     TIMEOUT = &#34;Timeout&#34;
     EXCEPTION = &#34;Exception&#34;
 
     @staticmethod
-    def all_valid(status_list: List) -&gt; bool:
-        &#34;&#34;&#34;Check if all status in a List are Status.VALID&#34;&#34;&#34;
-        return all([status == Status.VALID for status in status_list])
+    def all_valid(status_list: List[Enum]) -&gt; bool:
+        return all(status == Status.VALID for status in status_list)
 
     @staticmethod
-    def get_overall_status(status_list: List) -&gt; str:
-        &#34;&#34;&#34;Return the final pipeline status given a List of status for each step in the pipeline&#34;&#34;&#34;
-        return (
-            Status.TIMEOUT
-            if Status.TIMEOUT in status_list
-            else Status.EXCEPTION
-            if Status.EXCEPTION in status_list
-            else Status.VALID
-        )</code></pre>
+    def get_overall_status(status_list: List[Enum]) -&gt; Enum:
+        if Status.TIMEOUT in status_list:
+            return Status.TIMEOUT
+        elif Status.EXCEPTION in status_list:
+            return Status.EXCEPTION
+        return Status.VALID</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -780,39 +801,35 @@ Also, output a dictionary containing line coverage information for all models in
 <h3>Static methods</h3>
 <dl>
 <dt id="skema.program_analysis.model_coverage_report.model_coverage_report.Status.all_valid"><code class="name flex">
-<span>def <span class="ident">all_valid</span></span>(<span>status_list: List[~T]) ‑> bool</span>
+<span>def <span class="ident">all_valid</span></span>(<span>status_list: List[enum.Enum]) ‑> bool</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Check if all status in a List are Status.VALID</p></div>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">@staticmethod
-def all_valid(status_list: List) -&gt; bool:
-    &#34;&#34;&#34;Check if all status in a List are Status.VALID&#34;&#34;&#34;
-    return all([status == Status.VALID for status in status_list])</code></pre>
+def all_valid(status_list: List[Enum]) -&gt; bool:
+    return all(status == Status.VALID for status in status_list)</code></pre>
 </details>
 </dd>
 <dt id="skema.program_analysis.model_coverage_report.model_coverage_report.Status.get_overall_status"><code class="name flex">
-<span>def <span class="ident">get_overall_status</span></span>(<span>status_list: List[~T]) ‑> str</span>
+<span>def <span class="ident">get_overall_status</span></span>(<span>status_list: List[enum.Enum]) ‑> enum.Enum</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Return the final pipeline status given a List of status for each step in the pipeline</p></div>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">@staticmethod
-def get_overall_status(status_list: List) -&gt; str:
-    &#34;&#34;&#34;Return the final pipeline status given a List of status for each step in the pipeline&#34;&#34;&#34;
-    return (
-        Status.TIMEOUT
-        if Status.TIMEOUT in status_list
-        else Status.EXCEPTION
-        if Status.EXCEPTION in status_list
-        else Status.VALID
-    )</code></pre>
+def get_overall_status(status_list: List[Enum]) -&gt; Enum:
+    if Status.TIMEOUT in status_list:
+        return Status.TIMEOUT
+    elif Status.EXCEPTION in status_list:
+        return Status.EXCEPTION
+    return Status.VALID</code></pre>
 </details>
 </dd>
 </dl>
@@ -834,15 +851,16 @@ def get_overall_status(status_list: List) -&gt; str:
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
 <li><code><a title="skema.program_analysis.model_coverage_report.model_coverage_report.generate_cast" href="#skema.program_analysis.model_coverage_report.model_coverage_report.generate_cast">generate_cast</a></code></li>
-<li><code><a title="skema.program_analysis.model_coverage_report.model_coverage_report.generate_data_product" href="#skema.program_analysis.model_coverage_report.model_coverage_report.generate_data_product">generate_data_product</a></code></li>
 <li><code><a title="skema.program_analysis.model_coverage_report.model_coverage_report.generate_full_gromet" href="#skema.program_analysis.model_coverage_report.model_coverage_report.generate_full_gromet">generate_full_gromet</a></code></li>
 <li><code><a title="skema.program_analysis.model_coverage_report.model_coverage_report.generate_gromet" href="#skema.program_analysis.model_coverage_report.model_coverage_report.generate_gromet">generate_gromet</a></code></li>
 <li><code><a title="skema.program_analysis.model_coverage_report.model_coverage_report.generate_gromet_preprocess_fn" href="#skema.program_analysis.model_coverage_report.model_coverage_report.generate_gromet_preprocess_fn">generate_gromet_preprocess_fn</a></code></li>
 <li><code><a title="skema.program_analysis.model_coverage_report.model_coverage_report.generate_gromet_preprocess_logs" href="#skema.program_analysis.model_coverage_report.model_coverage_report.generate_gromet_preprocess_logs">generate_gromet_preprocess_logs</a></code></li>
 <li><code><a title="skema.program_analysis.model_coverage_report.model_coverage_report.generate_parse_tree" href="#skema.program_analysis.model_coverage_report.model_coverage_report.generate_parse_tree">generate_parse_tree</a></code></li>
+<li><code><a title="skema.program_analysis.model_coverage_report.model_coverage_report.ingest_with_morae" href="#skema.program_analysis.model_coverage_report.model_coverage_report.ingest_with_morae">ingest_with_morae</a></code></li>
 <li><code><a title="skema.program_analysis.model_coverage_report.model_coverage_report.main" href="#skema.program_analysis.model_coverage_report.model_coverage_report.main">main</a></code></li>
 <li><code><a title="skema.program_analysis.model_coverage_report.model_coverage_report.process_all_models" href="#skema.program_analysis.model_coverage_report.model_coverage_report.process_all_models">process_all_models</a></code></li>
 <li><code><a title="skema.program_analysis.model_coverage_report.model_coverage_report.process_single_model" href="#skema.program_analysis.model_coverage_report.model_coverage_report.process_single_model">process_single_model</a></code></li>
+<li><code><a title="skema.program_analysis.model_coverage_report.model_coverage_report.valid_path" href="#skema.program_analysis.model_coverage_report.model_coverage_report.valid_path">valid_path</a></code></li>
 </ul>
 </li>
 <li><h3><a href="#header-classes">Classes</a></h3>

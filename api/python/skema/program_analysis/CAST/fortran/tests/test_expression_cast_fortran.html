@@ -36,7 +36,8 @@ from skema.program_analysis.CAST2FN.model.cast import (
     Assignment,
     Var,
     Name,
-    CASTLiteralValue
+    CASTLiteralValue, 
+    ScalarType
 )
 
 def exp0():
@@ -73,7 +74,7 @@ def test_exp0():
     assert asg_node.left.val.name == &#34;x&#34;
 
     assert isinstance(asg_node.right, CASTLiteralValue)
-    assert asg_node.right.value_type == &#34;Integer&#34;
+    assert asg_node.right.value_type == ScalarType.INTEGER
     assert asg_node.right.value == &#39;2&#39;
 
 
@@ -89,7 +90,7 @@ def test_exp1():
     assert asg_node.left.val.id == 0
 
     assert isinstance(asg_node.right, CASTLiteralValue)
-    assert asg_node.right.value_type == &#34;Integer&#34;
+    assert asg_node.right.value_type == ScalarType.INTEGER
     assert asg_node.right.value == &#39;2&#39;
     
     # ------
@@ -101,7 +102,7 @@ def test_exp1():
     assert asg_node.left.val.id == 1
 
     assert isinstance(asg_node.right, CASTLiteralValue)
-    assert asg_node.right.value_type == &#34;Integer&#34;
+    assert asg_node.right.value_type == ScalarType.INTEGER
     assert asg_node.right.value == &#39;3&#39;
 
 if __name__ == &#34;__main__&#34;: 
@@ -188,7 +189,7 @@ end program exp1
     assert asg_node.left.val.name == &#34;x&#34;
 
     assert isinstance(asg_node.right, CASTLiteralValue)
-    assert asg_node.right.value_type == &#34;Integer&#34;
+    assert asg_node.right.value_type == ScalarType.INTEGER
     assert asg_node.right.value == &#39;2&#39;</code></pre>
 </details>
 </dd>
@@ -213,7 +214,7 @@ end program exp1
     assert asg_node.left.val.id == 0
 
     assert isinstance(asg_node.right, CASTLiteralValue)
-    assert asg_node.right.value_type == &#34;Integer&#34;
+    assert asg_node.right.value_type == ScalarType.INTEGER
     assert asg_node.right.value == &#39;2&#39;
     
     # ------
@@ -225,7 +226,7 @@ end program exp1
     assert asg_node.left.val.id == 1
 
     assert isinstance(asg_node.right, CASTLiteralValue)
-    assert asg_node.right.value_type == &#34;Integer&#34;
+    assert asg_node.right.value_type == ScalarType.INTEGER
     assert asg_node.right.value == &#39;3&#39;</code></pre>
 </details>
 </dd>
