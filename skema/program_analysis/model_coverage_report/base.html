@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <title>Code Model Coverage Tracker</title>
     <style>
         body {
@@ -14,7 +14,7 @@
             padding: 10px;
             margin: 10px;
         }
-        .table-container {
+        .hidden {
             display: none;
         }
         table {
@@ -30,11 +30,51 @@
         }
     </style>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.datatables.net/v/dt/jqc-1.12.4/dt-1.13.6/b-2.4.2/sl-1.7.0/datatables.min.css"/>
+    <link href="https://cdn.datatables.net/v/dt/jqc-1.12.4/dt-1.13.6/b-2.4.2/sl-1.7.0/datatables.min.css" rel="stylesheet"/>
     <script src="https://cdn.datatables.net/v/dt/jqc-1.12.4/dt-1.13.6/b-2.4.2/sl-1.7.0/datatables.min.js"></script>
 </head>
 <body>
-    <h1>Code Model Coverage Tracker</h1>
-    <!-- Add more model containers and tables as needed -->
-</body>
-</html>
+<h1>Code Model Coverage Tracker</h1>
+<!-- Dropdown for Mode Selection -->
+<div>
+    <select id="modeSelect">
+        <option value="consumer">Consumer Mode</option>
+        <option value="developer">Developer Mode</option>
+    </select>
+</div>
+
+<!-- Developer Mode Container -->
+<div class="model-container developer-mode hidden" id="developer">
+</div>
+
+<!-- Consumer Mode Container -->
+<div class="model-container consumer-mode" id="consumer">
+    <p> <b> Note: AMR in this report is generated without the assistance of an LLM. Results may be less accurate. </b> </p>
+</div>
+
+<script>
+    $(document).ready(function () {
+        // Initialize DataTables
+        $('.data-table').DataTable();
+
+        // Function to toggle between Developer and Consumer modes
+        function toggleMode() {
+            var selectedMode = $('#modeSelect').val();
+            // Toggle visibility based on the selected mode
+            if(selectedMode === "developer") {
+                $('.developer-mode').removeClass('hidden');
+                $('.consumer-mode').addClass('hidden');
+            } else { // Assuming the other option is "consumer"
+                $('.consumer-mode').removeClass('hidden');
+                $('.developer-mode').addClass('hidden');
+            }
+        }
+
+        // Event listener for when the mode selection changes
+        $('#modeSelect').on('change', toggleMode);
+
+        // Call toggleMode on document ready to ensure the correct mode is displayed
+        toggleMode();
+    });
+</script>
+

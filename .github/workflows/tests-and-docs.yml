@@ -86,14 +86,12 @@ jobs:
 
         # Install askem
         pip install ".[all]"
-       
-        
+
     # Install tree-sitter parser (for Python component unit tests)
     - name: Install tree-sitter parsers
       working-directory: .
       run: python skema/program_analysis/tree_sitter_parsers/build_parsers.py --ci --all
       
-
     # docs (API)
     # generate python docs using pdoc
     - name: "Create documentation for Python components (API docs)"
