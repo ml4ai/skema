@@ -14,7 +14,7 @@ def retrieve_model(model_path=None) -> str:
         str: Path to the loaded model file.
     """
     cwd = Path(__file__).parents[0]
-    REPO_NAME = "vraymond/img2mml"
+    REPO_NAME = "vraymond6/img2mml"
     MODEL_NAME = "cnn_xfmer_arxiv_im2mml_with_fonts_boldface_best.pt"
     # If the model path is none or doesn't exist, the default model will be downloaded from server.
     if model_path is None or not os.path.exists(model_path):
