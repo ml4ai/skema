@@ -53,7 +53,7 @@ ENV PATH="/root/.cargo/bin:${PATH}"
 RUN pip install wheel
 RUN pip install six
 # Download ML model (~150MB)
-RUN pip install huggingface_hub & python scripts/retrieve_model_ci.py
+RUN pip install huggingface_hub && python scripts/retrieve_model_ci.py
 RUN tree /app
 #RUN pip install ".[all]"
 # exclude dependencies for docs
