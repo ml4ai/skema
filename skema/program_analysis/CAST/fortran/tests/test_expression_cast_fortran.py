@@ -7,7 +7,8 @@ from skema.program_analysis.CAST2FN.model.cast import (
     Assignment,
     Var,
     Name,
-    CASTLiteralValue
+    CASTLiteralValue, 
+    ScalarType
 )
 
 def exp0():
@@ -44,7 +45,7 @@ def test_exp0():
     assert asg_node.left.val.name == "x"
 
     assert isinstance(asg_node.right, CASTLiteralValue)
-    assert asg_node.right.value_type == "Integer"
+    assert asg_node.right.value_type == ScalarType.INTEGER
     assert asg_node.right.value == '2'
 
 
@@ -60,7 +61,7 @@ def test_exp1():
     assert asg_node.left.val.id == 0
 
     assert isinstance(asg_node.right, CASTLiteralValue)
-    assert asg_node.right.value_type == "Integer"
+    assert asg_node.right.value_type == ScalarType.INTEGER
     assert asg_node.right.value == '2'
     
     # ------
@@ -72,7 +73,7 @@ def test_exp1():
     assert asg_node.left.val.id == 1
 
     assert isinstance(asg_node.right, CASTLiteralValue)
-    assert asg_node.right.value_type == "Integer"
+    assert asg_node.right.value_type == ScalarType.INTEGER
     assert asg_node.right.value == '3'
 
 if __name__ == "__main__": 

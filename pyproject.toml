@@ -15,11 +15,11 @@ dependencies=[
     "numpy",
     "dill==0.3.7",
     "networkx==2.8.8",
-    "PyYAML",
+    "PyYAML==6.*",
     "tree-sitter==0.20.4",
     "neo4j==5.14.1",
     "requests",
-    "beautifulsoup4", # used to remove comments etc from pMML before sending to MORAE
+    "beautifulsoup4==4.12.*", # used to remove comments etc from pMML before sending to MORAE
     "typing_extensions", # see https://github.com/pydantic/pydantic/issues/5821#issuecomment-1559196859
     "fastapi~=0.100.0",
     "starlette",
@@ -27,7 +27,7 @@ dependencies=[
     "pydantic>=2.0.0",
     "uvicorn",
     "python-multipart",
-    "func_timeout"
+    "func_timeout==4.3.5"
 ]
 # The Python program analysis pipeline does not currently work with Python 3.9
 # or 3.10. This may change in the future.
@@ -111,7 +111,7 @@ all = ["skema[core]", "skema[dev]", "skema[doc]", "skema[demo]", "skema[annotati
 
 [tool.setuptools.package-data]
 # needed to ensure models are included in package/discoverable
-"*" = ["*.json", "vocab.txt", "*.pt", "*.png", "*.html", "*.yml", "*.yaml"]
+"*" = ["*.json", "*vocab.txt", "*.pt", "*.png", "*.html", "*.yml", "*.yaml"]
 
 [tool.setuptools.dynamic]
 readme = {file = ["README.md"], content-type = "text/markdown"}

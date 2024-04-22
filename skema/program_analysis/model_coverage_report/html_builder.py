@@ -1,3 +1,4 @@
+from copy import deepcopy
 from pathlib import Path
 
 from bs4 import BeautifulSoup
@@ -33,39 +34,74 @@ class HTML_Instance:
 
     def add_model(self, model_name: str):
         """Adds a new model to the HTML source"""
-        # Create the new model HTML structure
-        new_model_container = self.soup.new_tag(
-            "div", id=model_name, class_="model-container"
-        )
-        new_model_heading = self.soup.new_tag("h2")
-        new_model_heading.string = model_name
-        # Create basic model table
-        new_model_table_container_basic = self.soup.new_tag(
-            "div", id=f"{model_name}-basic", class_="table-container"
-        )
-
-        new_model_table_basic = self.soup.new_tag("table", id=f"table-{model_name}", **{"class":"searchable sortable data-table"})
-        new_model_thead = self.soup.new_tag("thead")
-
-        new_model_table_header_basic = self.soup.new_tag("tr")
-        self.add_table_header_field(new_model_table_header_basic, "File Name")
-        self.add_table_header_field(new_model_table_header_basic, "Num Lines")
-        self.add_table_header_field(new_model_table_header_basic, "Can Ingest")
-        self.add_table_header_field(new_model_table_header_basic, "Tree-Sitter Parse Tree")
-        self.add_table_header_field(new_model_table_header_basic, "CAST")
-        self.add_table_header_field(new_model_table_header_basic, "Gromet")
-        self.add_table_header_field(new_model_table_header_basic, "Gromet Errors")
-        self.add_table_header_field(new_model_table_header_basic, "Gromet Report")
-        self.add_table_header_field(new_model_table_header_basic, "Preprocessed Gromet")
         
-        # Append the elements to each other
-        new_model_container.extend([new_model_heading, new_model_table_container_basic])
-        new_model_table_container_basic.append(new_model_table_basic)
-        new_model_table_basic.append(new_model_thead)
-        new_model_thead.append(new_model_table_header_basic)
+        def add_model_developer(): 
+            # Create the new model HTML structure
+            new_model_container = self.soup.new_tag(
+                "div", id=f"top-{model_name}-basic", class_="model-container"
+            )
+            new_model_heading = self.soup.new_tag("h2")
+            new_model_heading.string = model_name
+            # Create basic model table
+            new_model_table_container_basic = self.soup.new_tag(
+                "div", id=f"{model_name}-basic", class_="table-container"
+            )
 
-        # Append to outer body
-        self.soup.body.append(new_model_container)
+            new_model_table_basic = self.soup.new_tag("table", id=f"table-{model_name}", **{"class":"searchable sortable data-table"})
+            new_model_thead = self.soup.new_tag("thead")
+
+            new_model_table_header_basic = self.soup.new_tag("tr")
+            self.add_table_header_field(new_model_table_header_basic, "File Name")
+            self.add_table_header_field(new_model_table_header_basic, "Num Lines")
+            self.add_table_header_field(new_model_table_header_basic, "Can Ingest")
+            self.add_table_header_field(new_model_table_header_basic, "Tree-Sitter Parse Tree")
+            self.add_table_header_field(new_model_table_header_basic, "CAST")
+            self.add_table_header_field(new_model_table_header_basic, "Gromet")
+            self.add_table_header_field(new_model_table_header_basic, "Gromet Errors")
+            self.add_table_header_field(new_model_table_header_basic, "Gromet Report")
+            self.add_table_header_field(new_model_table_header_basic, "Preprocessed Gromet")
+            
+            # Append the elements to each other
+            new_model_container.extend([new_model_heading, new_model_table_container_basic])
+            new_model_table_container_basic.append(new_model_table_basic)
+            new_model_table_basic.append(new_model_thead)
+            new_model_thead.append(new_model_table_header_basic)
+
+            # Append to developer 
+            target_div = self.soup.find('div', id='developer')
+            target_div.append(new_model_container)
+        
+        def add_model_consumer():
+            # Create the new model HTML structure
+            new_model_container = self.soup.new_tag(
+                "div", id=f"top-{model_name}-consumer", class_="model-container"
+            )
+            new_model_heading = self.soup.new_tag("h2")
+            new_model_heading.string = model_name
+
+            # Create basic model table
+            new_model_table_container_basic = self.soup.new_tag(
+                "div", id=f"{model_name}-consumer", class_="table-container"
+            )
+
+            new_model_table_basic = self.soup.new_tag("table", id=f"table-{model_name}", **{"class":"searchable sortable data-table"})
+            new_model_thead = self.soup.new_tag("thead")
+
+            new_model_table_header_basic = self.soup.new_tag("tr")
+            self.add_table_header_field(new_model_table_header_basic, "File Name")
+            self.add_table_header_field(new_model_table_header_basic, "Can Ingest")
+            self.add_table_header_field(new_model_table_header_basic, "AMR")
+            
+            # Append the elements to each other
+            new_model_container.extend([new_model_heading, new_model_table_container_basic])
+            new_model_table_container_basic.append(new_model_table_basic)
+            new_model_table_basic.append(new_model_thead)
+            new_model_thead.append(new_model_table_header_basic)
+            target_div = self.soup.find('div', id='consumer')
+            target_div.append(deepcopy(new_model_container))
+        
+        add_model_consumer()
+        add_model_developer()
 
     def add_model_header_data(
         self,
@@ -139,6 +175,25 @@ class HTML_Instance:
         
         model_table.append(new_row)
 
+    def add_file_consumer(  
+        self,
+        model: str,
+        file_name: str,
+        can_ingest: bool,
+        amr_path: Path,
+
+    ):
+        """Add a file entry to a model table"""
+        model_table = self.soup.select_one(f"#{model}-consumer table")
+        new_row = self.soup.new_tag("tr")
+
+        # Add row data fields
+        self.add_table_data_field(new_row, file_name)
+        self.add_table_data_field(new_row, "✓" if can_ingest else "✗")
+        self.add_table_data_field(new_row, str(amr_path), anchored=True, anchor_text="Open AMR")
+      
+        model_table.append(new_row)
+        
     def write_html(self):
         """Output html to a file."""
         output_path = Path(__file__).resolve().parent / "output.html"
