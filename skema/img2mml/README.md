@@ -12,24 +12,23 @@ service was developed by Deepsana Shahi, Adarsh Pyarelal and Liang Zhang.
 
 The model itself is not checked into the repository, but you can get it from
 here:
-https://artifacts.askem.lum.ai/skema/img2mml/models/cnn_xfmer_arxiv_im2mml_with_fonts_boldface_best.pt
+https://huggingface.co/lum-ai/img2mml/blob/main/cnn_xfmer_arxiv_im2mml_with_fonts_boldface_best.pt
 
 Place the model file in the `trained_models` directory.
 
-The curl command below should do the trick.
+The Python command below should do the trick.
 
 ```
-curl -L https://artifacts.askem.lum.ai/skema/img2mml/models/cnn_xfmer_arxiv_im2mml_with_fonts_boldface_best.pt > trained_models/cnn_xfmer_arxiv_im2mml_with_fonts_boldface_best.pt
+python ../../scripts/retrieve_model_ci.py
 ```
 
-If you have the checkpoint in the `trained_models` directory already and hope to update it, please run the above curl command that will replace the previous one.
+If you have the checkpoint in the `trained_models` directory already and hope to update it, please run the above Python command that will replace the previous one.
 
 To update the model name or path, please make the following modifications to support updating the img2mml service and the corresponding Docker operations:
 
 1. Modify the ENV variable of `SKEMA_IMG2MML_MODEL_PATH`.
 2. Update the path settings in the "retrieve latest model for img2mml component" section of `skema/.github/workflows/tests-and-docs.yml`.
-3. Adjust the curl command in the test_equation_reading section of `skema/.drone.yml` to download the checkpoint.
-4. Update the download checkpoint path in `skema/img2mml/README.md`.
+3. Update the download checkpoint path in `skema/img2mml/README.md`.
 
 These changes will ensure that the necessary files and paths are updated correctly.
 
