@@ -13,6 +13,7 @@ import json
 from PIL import Image
 from io import BytesIO
 
+from huggingface_hub import hf_hub_download
 
 def retrieve_model(model_path=None) -> str:
     """
@@ -25,7 +26,7 @@ def retrieve_model(model_path=None) -> str:
         str: Path to the loaded model file.
     """
     cwd = Path(__file__).parents[0]
-    MODEL_BASE_ADDRESS = "https://artifacts.askem.lum.ai/skema/img2mml/models"
+    REPO_NAME = "lum-ai/img2mml"
     MODEL_NAME = "cnn_xfmer_arxiv_im2mml_with_fonts_boldface_best.pt"
     # If the model path is none or doesn't exist, the default model will be downloaded from server.
     if model_path is None or not os.path.exists(model_path):
@@ -34,10 +35,9 @@ def retrieve_model(model_path=None) -> str:
         # Check if the model file already exists
         if not os.path.exists(model_path):
             # If the file doesn't exist, download it from the specified URL
-            url = f"{MODEL_BASE_ADDRESS}/{MODEL_NAME}"
-            print(f"Downloading the model checkpoint from {url}...")
-            urllib.request.urlretrieve(url, model_path)
-
+            print(f"Downloading the model checkpoint from HuggingFace...")
+            hf_hub_download(repo_id=REPO_NAME, filename=MODEL_NAME, local_dir=model_path.parent, local_dir_use_symlinks=False)
+        
     return str(model_path)
 
 
