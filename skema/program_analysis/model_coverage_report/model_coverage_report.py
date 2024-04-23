@@ -151,8 +151,6 @@ def process_single_model(html: HTML_Instance, output_dir: str, model_name: str):
     """Generate an HTML report for a single model"""
     html.add_model(model_name)
     
-    
-   
     if not model_name in MODEL_YAML:
         return 
     
@@ -302,7 +300,8 @@ def process_all_models(html: HTML_Instance, output_dir: str):
         try:
             supported, total = process_single_model(html, output_dir, model_name)
             model_line_coverage[model_name] = (supported, total)
-        except:
+        except Exception as e:
+            print(e)
             continue
     return model_line_coverage
 
