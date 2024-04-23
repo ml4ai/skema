@@ -52,7 +52,10 @@ object GrounderFactory {
             new PipelineGrounder(Seq(manualGrounder, grounder))
           else
             grounder
-      case "manual" => manualGrounder
+        case "manual" => manualGrounder
+        case "scala-grounders" => 
+          // new ScalaGroundersAdapter() // See `miraembeddings` above
+          ???
         case other =>
           throw new RuntimeException(s"$other - is not implemented as a grounding engine")
       }

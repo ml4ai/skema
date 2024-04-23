@@ -1,3 +1,5 @@
+package org.ml4ai.skema.grounding.scala_grounders
+
 import org.clulab.scala_grounders.grounding.GroundingConfig
 import org.ml4ai.skema.text_reading.grounding.Grounder
 import org.ml4ai.skema.text_reading.grounding.GroundingCandidate
@@ -31,8 +33,7 @@ class ScalaGroundersAdapter(groundingConcepts: Seq[GroundingConcept]) extends Gr
     texts.map { text =>
       grounder.ground(text, concepts, k)
         .map { result => 
-          println(result)
-          GroundingCandidate(fromDKGToConcept(result.dkg), result.score) 
+          GroundingCandidate(fromDKGToConcept(result.dkg), result.score, details = Some(result.groundingDetails.grounderName)) 
         }
         .force.toSeq
     }
@@ -98,6 +99,5 @@ object AdHocExample extends App {
   // println(sga.grounder.components.toList.toSeq.map(_.getName))
   // val result = sga.groundingCandidates(Seq("dog dog dog"), 10)
   val result = sga.groundingCandidates(Seq("dog"), 10)
-  // result.head.foreach(println)
-  // println(ConfigFactory.load())
+  result.head.foreach(println)
 } 
