@@ -9,6 +9,10 @@ import org.clulab.scala_grounders.grounding.SequentialGrounder
 import org.clulab.scala_grounders.model.DKG
 import org.clulab.scala_grounders.model.DKGSynonym
 import com.typesafe.config.ConfigFactory
+import org.clulab.scala_grounders.using
+import org.clulab.scala_grounders.model.DKG
+import scala.io.Source
+
 
 /**
   * This class adapts the data definitions from this project to work with scala-grounder's definition
@@ -31,7 +35,8 @@ class ScalaGroundersAdapter(groundingConcepts: Seq[GroundingConcept]) extends Gr
   def groundingCandidates(texts: Seq[String], k: Int): Seq[Seq[GroundingCandidate]] = {
     val concepts = groundingConcepts.map(fromConceptToDKG)
     texts.map { text =>
-      grounder.ground(text, concepts, k)
+      // TODO Maybe provide additional context (useful for NeuralGrounder)
+      grounder.ground(text, None, concepts, k)
         .map { result => 
           GroundingCandidate(fromDKGToConcept(result.dkg), result.score, details = Some(result.groundingDetails.grounderName)) 
         }
@@ -46,7 +51,7 @@ class ScalaGroundersAdapter(groundingConcepts: Seq[GroundingConcept]) extends Gr
     * @param concept
     * @return
     */
-  private def fromConceptToDKG(concept: GroundingConcept): DKG = {
+  def fromConceptToDKG(concept: GroundingConcept): DKG = {
     DKG(concept.id, concept.name, concept.description, concept.synonyms.map { synonyms => synonyms.map { s => DKGSynonym(s, None) } }.getOrElse(Seq.empty))
   }
 
@@ -57,47 +62,21 @@ class ScalaGroundersAdapter(groundingConcepts: Seq[GroundingConcept]) extends Gr
     * @param dkg
     * @return
     */
-  private def fromDKGToConcept(dkg: DKG): GroundingConcept = {
+  def fromDKGToConcept(dkg: DKG): GroundingConcept = {
     GroundingConcept(dkg.id, dkg.name, dkg.description, Option(dkg.synonyms.map(_.value)), None)
   }
 
 }
-
-object AdHocExample extends App {
-  val gcs = Seq(
-    GroundingConcept(
-      id          = "id1",
-      name        = "dog",
-      description = Some("this is a cute dog"),
-      synonyms    = None,
-      embedding   = None
-    ), 
-    GroundingConcept(
-      id          = "id2",
-      name        = "cat",
-      description = Some("this is a cute cat"),
-      synonyms    = None,
-      embedding   = None
-    ), 
-    GroundingConcept(
-      id          = "id3",
-      name        = "dog cat",
-      description = Some("here we have a dog and a cat"),
-      synonyms    = None,
-      embedding   = None
-    ), 
-    GroundingConcept(
-      id          = "id4",
-      name        = "cat",
-      description = Some("this is a cute cat"),
-      synonyms    = None,
-      embedding   = None
-    ), 
-  )
-
-  val sga = new ScalaGroundersAdapter(gcs)
-  // println(sga.grounder.components.toList.toSeq.map(_.getName))
-  // val result = sga.groundingCandidates(Seq("dog dog dog"), 10)
-  val result = sga.groundingCandidates(Seq("dog"), 10)
-  result.head.foreach(println)
-} 
+/**
+  * Provide altenatives way of creating a `ScalaGroundersAdapter`
+  */
+object ScalaGroundersAdapter {
+  def apply(groundingConcepts: Seq[GroundingConcept]): ScalaGroundersAdapter = new ScalaGroundersAdapter(groundingConcepts)
+  def fromDkgs(dkgs: Seq[DKG]): ScalaGroundersAdapter = new ScalaGroundersAdapter(dkgs.map(dkg => GroundingConcept(dkg.id, dkg.name, dkg.description, Option(dkg.synonyms.map(_.value)), None)))
+  def fromFile(groundingConceptsPath: String): ScalaGroundersAdapter = {
+    val concepts = using(Source.fromFile(groundingConceptsPath)) { it =>
+      ujson.read(it.mkString).arr.map(it => DKG.fromJson(it))
+    }
+    ScalaGroundersAdapter.fromDkgs(concepts)
+  }
+}
