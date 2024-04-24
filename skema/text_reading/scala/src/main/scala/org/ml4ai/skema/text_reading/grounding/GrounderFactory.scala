@@ -5,6 +5,9 @@ import org.clulab.processors.Processor
 import org.clulab.processors.fastnlp.FastNLPProcessor
 
 import scala.collection.JavaConverters._
+import scala.io.Source
+import org.ml4ai.skema.grounding.scala_grounders.ScalaGroundersAdapter
+
 
 object GrounderFactory {
 
@@ -54,8 +57,9 @@ object GrounderFactory {
             grounder
         case "manual" => manualGrounder
         case "scala-grounders" => 
-          // new ScalaGroundersAdapter() // See `miraembeddings` above
-          ???
+          val ontologyFilePath = domainConfig.getString("ontologyPath")
+          ScalaGroundersAdapter.fromFile(groundingConceptsPath=ontologyFilePath) // See `miraembeddings` above
+          // ???
         case other =>
           throw new RuntimeException(s"$other - is not implemented as a grounding engine")
       }
