@@ -239,6 +239,8 @@ pub enum Operator {
     GreaterThan,
     /// Less than
     LessThan,
+    /// Transpose, e.g. A^T where it is A transpose
+    Transpose,
     // Catchall for operators we haven't explicitly defined as enum variants yet.
     Other(String),
 }
@@ -330,6 +332,7 @@ impl fmt::Display for Operator {
             Operator::Leq => write!(f, "≤"),
             Operator::GreaterThan => write!(f, ">"),
             Operator::LessThan => write!(f, "<"),
+            Operator::Transpose => write!(f, "Transpose"),
         }
     }
 }

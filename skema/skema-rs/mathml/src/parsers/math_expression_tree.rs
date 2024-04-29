@@ -556,6 +556,7 @@ impl MathExpressionTree {
                     Operator::Div => content_mathml.push_str("<divergence/>"),
                     Operator::Cos => content_mathml.push_str("<cos/>"),
                     Operator::Sin => content_mathml.push_str("<sin/>"),
+                    Operator::Transpose => content_mathml.push_str("<transpose/>"),
                     Operator::Derivative(Derivative {
                         order,
                         var_index,
@@ -975,6 +976,9 @@ impl MathExpressionTree {
                             expression.push_str(&rest[0].to_latex().to_string());
                         }
                     },
+                    Operator::Transpose => {
+                        expression.push_str(&format!("{}^\\top", rest[0].to_latex()));
+                    }
                     Operator::Comma => {
                         process_atoms_cons_parentheses(&mut expression, &rest[0]);
                         expression.push(',');
@@ -1097,15 +1101,28 @@ impl MathExpression {
                 denominator.flatten(tokens);
                 tokens.push(MathExpression::Mo(Operator::Rparen));
             }
-            // Insert implicit `exponential` and `power` operators
+            // Insert implicit `exponential` and `power` operators, along with `transpose` operator
             MathExpression::Msup(base, superscript) => {
-                if let MathExpression::Ci(x) = &**base {
+                if let MathExpression::Ci(x) = &**superscript {
+                    if x.content == Box::new(MathExpression::Mi(Mi("ᵀ".to_string()))) {
+                        tokens.push(MathExpression::Mo(Operator::Transpose));
+                        base.flatten(tokens);
+                    } else {
+                        base.flatten(tokens);
+                        tokens.push(MathExpression::Mo(Operator::Power));
+                        tokens.push(MathExpression::Mo(Operator::Lparen));
+                        superscript.flatten(tokens);
+                        tokens.push(MathExpression::Mo(Operator::Rparen));
+                    }
+                } else if let MathExpression::Ci(x) = &**base {
                     if x.content == Box::new(MathExpression::Mi(Mi("e".to_string()))) {
                         tokens.push(MathExpression::Mo(Operator::Exp));
                         tokens.push(MathExpression::Mo(Operator::Lparen));
                         superscript.flatten(tokens);
                         tokens.push(MathExpression::Mo(Operator::Rparen));
                     } else {
+                        println!("?");
+                        println!("superscript={:?}", superscript);
                         tokens.push(MathExpression::Mo(Operator::Lparen));
                         base.flatten(tokens);
                         tokens.push(MathExpression::Mo(Operator::Rparen));
@@ -1123,6 +1140,7 @@ impl MathExpression {
                 }
             }
             MathExpression::AbsoluteSup(base, superscript) => {
+                println!("??");
                 tokens.push(MathExpression::Mo(Operator::Lparen));
                 tokens.push(MathExpression::Mo(Operator::Abs));
                 tokens.push(MathExpression::Mo(Operator::Lparen));
@@ -1451,6 +1469,7 @@ fn prefix_binding_power(op: &Operator) -> ((), u8) {
         Operator::Cos => ((), 21),
         Operator::Sin => ((), 21),
         Operator::Tan => ((), 21),
+        Operator::Transpose => ((), 21),
         Operator::Mean => ((), 25),
         Operator::SurfaceInt => ((), 25),
         Operator::Gradient(Gradient { .. }) => ((), 25),
@@ -2381,6 +2400,8 @@ fn test_equation_halfar_dome_8_2_to_latex() {
     let modified_input1 = &replace_unicode_with_symbols(input).to_string();
     let modified_input2 = &preprocess_mathml_for_to_latex(modified_input1).to_string();
     let exp = modified_input2.parse::<MathExpressionTree>().unwrap();
+    let s_exp = exp.to_string();
+    println!("s_exp={:?}", s_exp);
     let latex_exp = exp.to_latex();
     assert_eq!(latex_exp, "\\Gamma=\\frac{2}{n+2}*A*(\\rho*g)^{n}");
 }
@@ -4011,4 +4032,21 @@ fn test_heisenberg_uncertainty_principle() {
     println!("content={:?}", content);
     assert_eq!(s_exp, "(≥ (* Δ x Δ p) (/ ħ 2))");
     assert_eq!(exp.to_latex(), "\\Delta x*\\Delta p\\geq \\frac{\\hbar}{2}");
+}
+
+#[test]
+fn test_transpose() {
+    let input = "<math>
+    <msup>
+    <mi>A</mi>
+    <mi>&#x1D40;</mi>
+    </msup>
+    </math>";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", exp);
+    let s_exp = exp.to_string();
+    let content = exp.to_cmml();
+    println!("content={:?}", content);
+    assert_eq!(s_exp, "(Transpose A)");
+    assert_eq!(exp.to_latex(), "A^\\top");
 }

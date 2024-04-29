@@ -1223,6 +1223,7 @@ pub fn absolute_with_msup(input: Span) -> IResult<MathExpression> {
 
 ///Parenthesis with Msup value
 pub fn paren_as_msup(input: Span) -> IResult<MathExpression> {
+    println!("1");
     let (s, sup) = ws(map(
         ws(delimited(
             tag("<mo>(</mo>"),
@@ -1234,6 +1235,7 @@ pub fn paren_as_msup(input: Span) -> IResult<MathExpression> {
         )),
         |(x, y)| MathExpression::Msup(Box::new(MathExpression::Mrow(x)), Box::new(y)),
     ))(input)?;
+    println!("11");
     Ok((s, sup))
 }
 
@@ -1668,6 +1670,8 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                     })
                 },
             ),
+            ws(absolute_with_msup),
+            ws(paren_as_msup),
             vector_mover,
             map(change_in_variable, MathExpression::Ci),
             map(log_base, MathExpression::Mo),
@@ -1737,8 +1741,8 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
             },
         ),
         alt((
-            ws(absolute_with_msup),
-            ws(paren_as_msup),
+            //ws(absolute_with_msup),
+            //ws(paren_as_msup),
             //map(change_in_variable, MathExpression::Ci),
             map(
                 munderover_summation,
