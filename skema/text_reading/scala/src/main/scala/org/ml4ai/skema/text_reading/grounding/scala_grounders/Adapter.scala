@@ -31,9 +31,9 @@ import scala.io.Source
   *                             a concept that is outside this)
   */
 class ScalaGroundersAdapter(groundingConcepts: Seq[GroundingConcept]) extends Grounder {
-  lazy val grounder = SequentialGrounder()
+  lazy val concepts = groundingConcepts.map(fromConceptToDKG)
+  lazy val grounder = SequentialGrounder().mkFast(concepts)
   def groundingCandidates(texts: Seq[String], k: Int): Seq[Seq[GroundingCandidate]] = {
-    val concepts = groundingConcepts.map(fromConceptToDKG)
     texts.map { text =>
       // TODO Maybe provide additional context (useful for NeuralGrounder)
       grounder.ground(text, None, concepts, k)
