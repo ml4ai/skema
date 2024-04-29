@@ -80,7 +80,11 @@ jobs:
       with:
         node-version: 18
     - name: Setup NodeJS Dependencies
-      run: npm install express
+      run: | 
+        npm install express
+        npm install mathjax-node
+        npm install lodash
+        
     # Install dependencies
     - name: System-wide deps
       run: |
