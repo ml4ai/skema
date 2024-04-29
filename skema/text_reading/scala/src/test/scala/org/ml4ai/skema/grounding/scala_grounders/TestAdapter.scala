@@ -11,7 +11,7 @@ import org.ml4ai.skema.text_reading.grounding.GroundingConcept
 /**
   * 
   * Running command:
-  *   sbt "test:runMain org.ml4ai.skema.grounding.scala_grounders.TestAdapter"
+  *   sbt "testOnly org.ml4ai.skema.grounding.scala_grounders.TestAdapter"
   */
 class TestAdapter extends Test {
 
