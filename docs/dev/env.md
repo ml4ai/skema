@@ -9,7 +9,7 @@ conda activate skema
 # Install tree-sitter parsers
 python skema/program_analysis/tree_sitter_parsers/build_parsers.py --all
 # download the checkpoint for the img2mml service
-curl -L https://artifacts.askem.lum.ai/skema/img2mml/models/cnn_xfmer_arxiv_im2mml_with_fonts_boldface_best.pt > skema/img2mml/trained_models/cnn_xfmer_arxiv_im2mml_with_fonts_boldface_best.pt
+python scripts/retrieve_model.py
 # mathjax deps for img2mml
 (cd skema/img2mml/data_generation && npm install)
 ```

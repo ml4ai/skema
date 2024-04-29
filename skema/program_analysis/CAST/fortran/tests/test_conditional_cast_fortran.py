@@ -9,7 +9,8 @@ from skema.program_analysis.CAST2FN.model.cast import (
     Name,
     CASTLiteralValue,
     ModelIf,
-    Operator
+    Operator,
+    ScalarType
 )
 
 def cond1():
@@ -63,7 +64,7 @@ def test_cond1():
     assert asg_node.left.val.name == "x"
 
     assert isinstance(asg_node.right, CASTLiteralValue)
-    assert asg_node.right.value_type == "Integer"
+    assert asg_node.right.value_type == ScalarType.INTEGER
     assert asg_node.right.value == '2'
 
     assert isinstance(cond_node, ModelIf)
@@ -103,7 +104,7 @@ def test_cond2():
     assert asg_node.left.val.id == 0
 
     assert isinstance(asg_node.right, CASTLiteralValue)
-    assert asg_node.right.value_type == "Integer"
+    assert asg_node.right.value_type == ScalarType.INTEGER
     assert asg_node.right.value == '2'
     
     asg_node = exp_cast.nodes[0].body[1]
@@ -114,7 +115,7 @@ def test_cond2():
     assert asg_node.left.val.id == 1
 
     assert isinstance(asg_node.right, CASTLiteralValue)
-    assert asg_node.right.value_type == "Integer"
+    assert asg_node.right.value_type == ScalarType.INTEGER
     assert asg_node.right.value == '3'
 
     assert isinstance(cond_node, ModelIf)
@@ -127,7 +128,7 @@ def test_cond2():
     assert isinstance(cond_expr.operands[0], Name)
     assert cond_expr.operands[0].name == "x"
     assert isinstance(cond_expr.operands[1], CASTLiteralValue)
-    assert cond_expr.operands[1].value_type == "Integer"
+    assert cond_expr.operands[1].value_type == ScalarType.INTEGER
     assert cond_expr.operands[1].value == "5"
 
     assert len(cond_body) == 3

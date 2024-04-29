@@ -1,92 +1,85 @@
 import argparse
-import os
-import traceback  # Debugs
-import requests
-import yaml
 import json
+import httpx
+import os
+import requests
+import subprocess
+import asyncio
+import traceback
+import yaml
+
 from enum import Enum
-from typing import List, Dict, Tuple, Callable, Any
-from zipfile import ZipFile
 from io import BytesIO
-from tempfile import TemporaryDirectory
 from pathlib import Path
+from tempfile import TemporaryDirectory
+from typing import Any, Callable, Dict, List, Tuple
+from zipfile import ZipFile
 
 from func_timeout import func_timeout, FunctionTimedOut
-from tree_sitter import Language, Parser, Tree
+from tree_sitter import Language, Parser
 
-from skema.program_analysis.CAST2FN.cast import CAST
-from skema.program_analysis.run_ann_cast_pipeline import ann_cast_pipeline
-from skema.program_analysis.model_coverage_report.html_builder import HTML_Instance
-from skema.program_analysis.multi_file_ingester import process_file_system
-from skema.program_analysis.single_file_ingester import process_file
-from skema.program_analysis.snippet_ingester import process_snippet
-from skema.program_analysis.tree_sitter_parsers.build_parsers import (
-    INSTALLED_LANGUAGES_FILEPATH,
-    LANGUAGES_YAML_FILEPATH,
-)
-from skema.program_analysis.python2cast import python_to_cast
 from skema.program_analysis.fortran2cast import fortran_to_cast
 from skema.program_analysis.matlab2cast import matlab_to_cast
+from skema.program_analysis.model_coverage_report.html_builder import HTML_Instance
+from skema.program_analysis.multi_file_ingester import process_file_system
+from skema.program_analysis.python2cast import python_to_cast
+from skema.program_analysis.single_file_ingester import process_file
+from skema.program_analysis.tree_sitter_parsers.build_parsers import INSTALLED_LANGUAGES_FILEPATH
 from skema.program_analysis.tree_sitter_parsers.util import extension_to_language
 from skema.rest.utils import fn_preprocessor
+from skema.rest.workflows import code_snippets_to_pn_amr
 from skema.utils.fold import del_nulls, dictionary_to_gromet_json
+from skema.data.program_analysis import MODEL_ZIP_ROOT_PATH
+from skema.utils.change_dir_back import change_dir_back
+from skema.skema_py.server import System
 
+
+# Constants for file paths
 THIS_PATH = Path(__file__).parent.resolve()
-MODEL_YAML_PATH = Path(__file__).parent / "models.yaml"
+MODEL_YAML_PATH = THIS_PATH / "models.yaml"
 MODEL_YAML = yaml.safe_load(MODEL_YAML_PATH.read_text())
 
 class Status(Enum):
-    """Status enum for the status of executing a step in the code2fn pipeline"""
-
     VALID = "Valid"
     TIMEOUT = "Timeout"
     EXCEPTION = "Exception"
 
     @staticmethod
-    def all_valid(status_list: List) -> bool:
-        """Check if all status in a List are Status.VALID"""
-        return all([status == Status.VALID for status in status_list])
+    def all_valid(status_list: List[Enum]) -> bool:
+        return all(status == Status.VALID for status in status_list)
 
     @staticmethod
-    def get_overall_status(status_list: List) -> str:
-        """Return the final pipeline status given a List of status for each step in the pipeline"""
-        return (
-            Status.TIMEOUT
-            if Status.TIMEOUT in status_list
-            else Status.EXCEPTION
-            if Status.EXCEPTION in status_list
-            else Status.VALID
-        )
+    def get_overall_status(status_list: List[Enum]) -> Enum:
+        if Status.TIMEOUT in status_list:
+            return Status.TIMEOUT
+        elif Status.EXCEPTION in status_list:
+            return Status.EXCEPTION
+        return Status.VALID
+
+def valid_path(path: str) -> bool:
+    return "include_" not in path
 
 
-def generate_data_product(
-    output_dir: str, model_name: str, file_name: str, data_product_function: Callable, args=(), kwargs=None
-) -> Tuple[str, Any]:
-    """Wrapper function for generating data products, returns the status of processing."""
-    (output, output_path, status) = (None, None, None)
-
-    output_path = Path(output_dir) / "data"/ data_product_function.__name__ / model_name / file_name
+@change_dir_back(THIS_PATH)
+def generate_data_product(output_dir: str, model_name: str, file_name: str, data_product_function: Callable, args=(), kwargs=None) -> Tuple[str, Any, Status]:
+    output_path = Path(output_dir) / "data" / data_product_function.__name__ / model_name / file_name
     output_path.parent.mkdir(parents=True, exist_ok=True)
     relative_output_path = output_path.relative_to(output_dir)
 
-    # There is a possibility that the processing function fails after changing the working directory.
-    # So we should change it back before and after each itteraton.
-    os.chdir(THIS_PATH)
+    output = None
     try:
-        output = func_timeout(10, data_product_function, args=args, kwargs=kwargs)
-        if output == "":
-            raise Exception("Data product is empty")
+        output = func_timeout(10, data_product_function, args=args, kwargs=(kwargs or {}))
+        if not output:
+            raise ValueError("Data product is empty")
         output_path.write_text(output)
         status = Status.VALID
     except FunctionTimedOut:
-        os.chdir(THIS_PATH)
         output_path.write_text("Processing exceeded timeout (10s)")
         status = Status.TIMEOUT
-    except (Exception, SystemExit) as e:
-        os.chdir(THIS_PATH)
+    except Exception as e:
         output_path.write_text(traceback.format_exc())
         status = Status.EXCEPTION
-    
+
     return output, relative_output_path, status
 
 
@@ -137,15 +130,33 @@ def generate_gromet_preprocess_logs(gromet_collection: Dict) -> str:
     logs = fn_preprocessor(gromet_collection)[1]
     return "\n".join(logs)
 
+def ingest_with_morae(filename: str, source: str):
+    """Generator function for ingesting source file with MORAE
+       NOTE: This function uses the non-llm amr pipeline due to being run in CI.
+    """
+    
+    async def morae_async():
+        async with httpx.AsyncClient() as client:
+            return await code_snippets_to_pn_amr(
+                system=System(
+                    files=[filename],
+                    blobs=[source]
+                ),
+                client=client  # Pass the instantiated client
+            )
+
+    return json.dumps(asyncio.run(morae_async()))
+
 def process_single_model(html: HTML_Instance, output_dir: str, model_name: str):
     """Generate an HTML report for a single model"""
     html.add_model(model_name)
     
-    if model_name in MODEL_YAML:
-        model_url = MODEL_YAML[model_name]["zip_archive"]
-        response = requests.get(model_url)
-
-    zip = ZipFile(BytesIO(response.content))
+    if not model_name in MODEL_YAML:
+        return 
+    
+    model_path = MODEL_ZIP_ROOT_PATH.resolve() / MODEL_YAML[model_name]["zip_archive"]
+        
+    zip = ZipFile(BytesIO(model_path.read_bytes()))
     with TemporaryDirectory() as temp:
         # We need to write all the files to the temporary directory before processing
         # This is because some steps may require additional files, such as include directories in Fortran
@@ -211,6 +222,11 @@ def process_single_model(html: HTML_Instance, output_dir: str, model_name: str):
             except:
                 gromet_error_count = 0 
 
+        
+            amr_output, amr_report_relative_path, amr_report_status = generate_data_product(
+                output_dir, model_name, f"{filename}.json", ingest_with_morae, args=(file.filename, source), kwargs=None
+            )
+          
             # Check the status of each pipeline step
             final_status = Status.get_overall_status(
                 [cast_status, gromet_status]
@@ -224,6 +240,12 @@ def process_single_model(html: HTML_Instance, output_dir: str, model_name: str):
                 can_ingest = False
             total_lines += len(source.splitlines())
 
+            html.add_file_consumer(
+                model_name,
+                file.filename,
+                amr_report_status is Status.VALID,
+                amr_report_relative_path
+            )
             html.add_file_basic(
                 model_name,
                 file.filename,
@@ -236,6 +258,7 @@ def process_single_model(html: HTML_Instance, output_dir: str, model_name: str):
                 gromet_report_relative_path,
                 gromet_preprocess_relative_path
             )
+
 
         # If all files are valid in a system, attempt to ingest full system into single GrometFNModuleCollection
         if not Status.all_valid(file_status_list):
@@ -277,7 +300,8 @@ def process_all_models(html: HTML_Instance, output_dir: str):
         try:
             supported, total = process_single_model(html, output_dir, model_name)
             model_line_coverage[model_name] = (supported, total)
-        except:
+        except Exception as e:
+            print(e)
             continue
     return model_line_coverage
 
@@ -311,9 +335,6 @@ def main():
     elif args.mode == "single":
         supported, total = process_single_model(html, output_dir, args.model_name)
         model_line_coverage[args.model_name] = (supported, total)
-
-    # DataTables have to be initialized after all models are generated
-    html.add_data_table_script()
     
     output_path = Path(output_dir) / "report.html"
     output_path.write_text(html.soup.prettify())

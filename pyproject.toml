@@ -15,11 +15,11 @@ dependencies=[
     "numpy",
     "dill==0.3.7",
     "networkx==2.8.8",
-    "PyYAML",
+    "PyYAML==6.*",
     "tree-sitter==0.20.4",
     "neo4j==5.14.1",
     "requests",
-    "beautifulsoup4", # used to remove comments etc from pMML before sending to MORAE
+    "beautifulsoup4==4.12.*", # used to remove comments etc from pMML before sending to MORAE
     "typing_extensions", # see https://github.com/pydantic/pydantic/issues/5821#issuecomment-1559196859
     "fastapi~=0.100.0",
     "starlette",
@@ -27,7 +27,7 @@ dependencies=[
     "pydantic>=2.0.0",
     "uvicorn",
     "python-multipart",
-    "func_timeout"
+    "func_timeout==4.3.5"
 ]
 # The Python program analysis pipeline does not currently work with Python 3.9
 # or 3.10. This may change in the future.
@@ -57,7 +57,7 @@ isa = [
 ]
 
 # shared ML dependencies
-ml = ["torch==2.0.1", "torchvision==0.15.2", "beartype==0.15.0"]
+ml = ["torch==2.0.1", "torchvision==0.15.2", "beartype==0.15.0", "huggingface_hub"]
 
 # Im2MML dependencies. The img2mml service converts equation images to MathML.
 # See the skema/img2mml directory.
@@ -100,6 +100,7 @@ all = ["skema[core]", "skema[dev]", "skema[doc]", "skema[demo]", "skema[annotati
 "skema.rest" = "skema/rest"
 "skema.skema_py" = "skema/skema_py"
 "skema.utils" = "skema/utils"
+"skema.data" = "skema/data"
 
 # re-map skema/text_reading/python to skema.text_reading
 #"skema.text_reading" = "skema/text_reading/python"
@@ -110,7 +111,7 @@ all = ["skema[core]", "skema[dev]", "skema[doc]", "skema[demo]", "skema[annotati
 
 [tool.setuptools.package-data]
 # needed to ensure models are included in package/discoverable
-"*" = ["*.json", "vocab.txt", "*.pt", "*.png", "*.html", "*.yml", "*.yaml"]
+"*" = ["*.json", "*vocab.txt", "*.pt", "*.png", "*.html", "*.yml", "*.yaml", "*.zip"]
 
 [tool.setuptools.dynamic]
 readme = {file = ["README.md"], content-type = "text/markdown"}
