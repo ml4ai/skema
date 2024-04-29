@@ -37,7 +37,7 @@ libraryDependencies ++= {
     "com.lihaoyi"                %% "requests"                            % "0.1.8",
     "io.cequence"                %% "openai-scala-client"                 % "1.0.0.RC.1",
     "org.scalatest"               %% "scalatest"                            % "3.0.9" % Test,
-    "org.clulab"                 %% "scala-grounders"                     % "0.0.34-SNAPSHOT", // https://github.com/robertvacareanu/skema_scala
+    "org.clulab"                 %% "scala-grounders"                     % "0.0.35", 
   )
 }
 
