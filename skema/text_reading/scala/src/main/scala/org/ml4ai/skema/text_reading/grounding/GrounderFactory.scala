@@ -57,9 +57,9 @@ object GrounderFactory {
             grounder
         case "manual" => manualGrounder
         case "scala-grounders" => 
+          // Similar to `miraembeddings`
           val ontologyFilePath = domainConfig.getString("ontologyPath")
-          ScalaGroundersAdapter.fromFile(groundingConceptsPath=ontologyFilePath) // See `miraembeddings` above
-          // ???
+          ScalaGroundersAdapter.fromFile(groundingConceptsPath=ontologyFilePath)
         case other =>
           throw new RuntimeException(s"$other - is not implemented as a grounding engine")
       }
