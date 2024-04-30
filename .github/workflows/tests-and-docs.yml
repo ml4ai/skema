@@ -78,13 +78,7 @@ jobs:
     - name: Setup NodeJS
       uses: actions/setup-node@v4
       with:
-        node-version: 18
-    - name: Setup NodeJS Dependencies
-      run: | 
-        npm install express
-        npm install mathjax-node
-        npm install lodash
-        
+        node-version: 18        
     # Install dependencies
     - name: System-wide deps
       run: |
@@ -151,11 +145,15 @@ jobs:
         cargo build --release --bin skema_service
         ./target/release/skema_service &
         echo "results for ${SKEMA_RS_HOST}:${SKEMA_RS_PORT}/version: `curl -s ${SKEMA_RS_HOST}:${SKEMA_RS_PORT}/version`"
+    - name: Install MathJax service deps
+      working-directory: ./skema/img2mml/data_generation
+      run: |
+        npm install
     - name: "Launch Mathjax in background for testing"
       working-directory: ./skema/img2mml/data_generation
       run: |
         npm start &
-    # NOTE: moved to runbefore the Python unit tests, so we can use the model coverage report results in testing
+    # NOTE: moved to run before the Python unit tests, so we can use the model coverage report results in testing
     - name: "Code2fn model coverage reports"
       run: python skema/program_analysis/model_coverage_report/model_coverage_report.py $GITHUB_WORKSPACE/docs/coverage/code2fn_coverage/ all
 
