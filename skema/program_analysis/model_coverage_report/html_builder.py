@@ -21,6 +21,10 @@ class HTML_Instance:
     def add_table_data_field(self, table_row_tag, field_data: str, anchored=False, anchor_text=None):
         """Adds a new field to a table row"""
         field_tag = self.soup.new_tag("td")
+        if field_data == "✓":
+            field_tag["class"] = "green"
+        elif field_data == "✗":
+            field_tag["class"] = "red"
 
         if anchored:
             anchor_tag = self.soup.new_tag("a")
@@ -53,7 +57,7 @@ class HTML_Instance:
             new_model_table_header_basic = self.soup.new_tag("tr")
             self.add_table_header_field(new_model_table_header_basic, "File Name")
             self.add_table_header_field(new_model_table_header_basic, "Num Lines")
-            self.add_table_header_field(new_model_table_header_basic, "Can Ingest")
+            self.add_table_header_field(new_model_table_header_basic, "Can Produce Gromet")
             self.add_table_header_field(new_model_table_header_basic, "Tree-Sitter Parse Tree")
             self.add_table_header_field(new_model_table_header_basic, "CAST")
             self.add_table_header_field(new_model_table_header_basic, "Gromet")
@@ -89,7 +93,7 @@ class HTML_Instance:
 
             new_model_table_header_basic = self.soup.new_tag("tr")
             self.add_table_header_field(new_model_table_header_basic, "File Name")
-            self.add_table_header_field(new_model_table_header_basic, "Can Ingest")
+            self.add_table_header_field(new_model_table_header_basic, "Can Produce AMR")
             self.add_table_header_field(new_model_table_header_basic, "AMR")
             
             # Append the elements to each other
