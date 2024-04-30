@@ -9,7 +9,7 @@ import org.json4s.JsonDSL._
   * @param concept instance returned by a grounder implementations
   * @param score   of the grounding algorithm given to concept
   */
-case class GroundingCandidate(concept: GroundingConcept, score: Float) {
+case class GroundingCandidate(concept: GroundingConcept, score: Float, details: Option[String] = None) {
 
   def toJValue: JValue = {
     ("groundingConcept" -> concept.toJValue) ~
