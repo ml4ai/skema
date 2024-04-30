@@ -42,6 +42,7 @@ import json
 from PIL import Image
 from io import BytesIO
 
+from huggingface_hub import hf_hub_download
 
 def retrieve_model(model_path=None) -&gt; str:
     &#34;&#34;&#34;
@@ -54,7 +55,7 @@ def retrieve_model(model_path=None) -&gt; str:
         str: Path to the loaded model file.
     &#34;&#34;&#34;
     cwd = Path(__file__).parents[0]
-    MODEL_BASE_ADDRESS = &#34;https://artifacts.askem.lum.ai/skema/img2mml/models&#34;
+    REPO_NAME = &#34;lum-ai/img2mml&#34;
     MODEL_NAME = &#34;cnn_xfmer_arxiv_im2mml_with_fonts_boldface_best.pt&#34;
     # If the model path is none or doesn&#39;t exist, the default model will be downloaded from server.
     if model_path is None or not os.path.exists(model_path):
@@ -63,10 +64,9 @@ def retrieve_model(model_path=None) -&gt; str:
         # Check if the model file already exists
         if not os.path.exists(model_path):
             # If the file doesn&#39;t exist, download it from the specified URL
-            url = f&#34;{MODEL_BASE_ADDRESS}/{MODEL_NAME}&#34;
-            print(f&#34;Downloading the model checkpoint from {url}...&#34;)
-            urllib.request.urlretrieve(url, model_path)
-
+            print(f&#34;Downloading the model checkpoint from HuggingFace...&#34;)
+            hf_hub_download(repo_id=REPO_NAME, filename=MODEL_NAME, local_dir=model_path.parent, local_dir_use_symlinks=False)
+        
     return str(model_path)
 
 
@@ -695,7 +695,7 @@ if present.</p>
         str: Path to the loaded model file.
     &#34;&#34;&#34;
     cwd = Path(__file__).parents[0]
-    MODEL_BASE_ADDRESS = &#34;https://artifacts.askem.lum.ai/skema/img2mml/models&#34;
+    REPO_NAME = &#34;lum-ai/img2mml&#34;
     MODEL_NAME = &#34;cnn_xfmer_arxiv_im2mml_with_fonts_boldface_best.pt&#34;
     # If the model path is none or doesn&#39;t exist, the default model will be downloaded from server.
     if model_path is None or not os.path.exists(model_path):
@@ -704,10 +704,9 @@ if present.</p>
         # Check if the model file already exists
         if not os.path.exists(model_path):
             # If the file doesn&#39;t exist, download it from the specified URL
-            url = f&#34;{MODEL_BASE_ADDRESS}/{MODEL_NAME}&#34;
-            print(f&#34;Downloading the model checkpoint from {url}...&#34;)
-            urllib.request.urlretrieve(url, model_path)
-
+            print(f&#34;Downloading the model checkpoint from HuggingFace...&#34;)
+            hf_hub_download(repo_id=REPO_NAME, filename=MODEL_NAME, local_dir=model_path.parent, local_dir_use_symlinks=False)
+        
     return str(model_path)</code></pre>
 </details>
 </dd>

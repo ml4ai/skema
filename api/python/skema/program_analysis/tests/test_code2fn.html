@@ -36,8 +36,9 @@ from tempfile import TemporaryFile, TemporaryDirectory
 
 from skema.program_analysis.multi_file_ingester import process_file_system
 from skema.gromet.fn import GrometFNModuleCollection
+from skema.data.program_analysis import MODEL_ZIP_ROOT_PATH
 
-BUCKY_ZIP_URL = &#34;https://artifacts.askem.lum.ai/askem/data/models/zip-archives/Bucky.zip&#34;
+BUCKY_ZIP_URL = MODEL_ZIP_ROOT_PATH.resolve() / &#34;Bucky.zip&#34;
 
 def test_code2fn():
     &#34;&#34;&#34;This is simply a smokescreen test to see if the PA pipeline runs to
@@ -48,8 +49,7 @@ def test_code2fn():
     flag or postprocessing function to be able to compare two GroMEts modulo
     their random components.&#34;&#34;&#34;
 
-    response = requests.get(BUCKY_ZIP_URL)
-    zip = zipfile.ZipFile(io.BytesIO(response.content))
+    zip = zipfile.ZipFile(io.BytesIO(BUCKY_ZIP_URL.read_bytes()))
 
     with TemporaryDirectory() as temp:
         system_filepaths_path = Path(temp) / &#34;system_filepaths.txt&#34;
@@ -100,8 +100,7 @@ their random components.</p></div>
     flag or postprocessing function to be able to compare two GroMEts modulo
     their random components.&#34;&#34;&#34;
 
-    response = requests.get(BUCKY_ZIP_URL)
-    zip = zipfile.ZipFile(io.BytesIO(response.content))
+    zip = zipfile.ZipFile(io.BytesIO(BUCKY_ZIP_URL.read_bytes()))
 
     with TemporaryDirectory() as temp:
         system_filepaths_path = Path(temp) / &#34;system_filepaths.txt&#34;
