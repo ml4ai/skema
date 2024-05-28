@@ -47,6 +47,17 @@ def foo(x, a):
 x = foo(2, 1)
     """
 
+def fun5():
+    return """
+def foo():
+    x = 1
+    y = 2
+    z = 3
+    return x,y,z
+    
+a,b,c = foo()
+    """
+
 
 def generate_cast(test_file_string):
     # use Python to CAST

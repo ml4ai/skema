@@ -12,19 +12,28 @@ CONTROL_CHARACTERS = [
     "]",
     "(",
     ")",
+    "[",
+    "]",
+    "{",
+    "}",
     ":",
     "+",
     "-",
     "*",
     "**",
     "/",
-    "!="
+    "!=",
     ">",
     "<",
     "<=",
     ">=",
     "in",
-    "not"
+    "not",
+    "and",
+    "or",
+    "if",
+    "is",
+    "is not"
 ]
 
 # Whatever constructs we see in the left
@@ -34,7 +43,8 @@ FOR_LOOP_LEFT_TYPES = [
     "identifier",
     "tuple_pattern",
     "pattern_list",
-    "list_pattern"
+    "list_pattern",
+    "attribute"
 ]
 
 # Whatever constructs we see in the right
@@ -56,6 +66,32 @@ WHILE_COND_TYPES = [
     "comparison_operator",
     "binary_operator"
 ]
+
+LITERAL_TYPES = [
+    "integer"
+    "true",
+    "false",
+    "float",
+    "list",
+    "tuple",
+    "dictionary",
+    "string",
+    "ellipsis",
+    "none"
+]
+
+IF_COND_TYPES = [
+    "identifier", 
+    "comparison_operator", 
+    "boolean_operator", 
+    "parenthesized_expression",
+    "call",
+    "attribute",
+    "list_comprehension",
+    "dictionary_comprehension",
+    "not_operator"
+] + LITERAL_TYPES
+
 
 # Whatever constructs we see in the 
 # list/dict comprehensions
@@ -118,6 +154,17 @@ def get_first_child_by_type(node: Node, type: str, recurse=False):
                 return out
     return None
 
+def get_first_child_from_types(node: Node, types: List):
+    """Takes in a node and a list of strings as inputs and returns 
+    the first child that matches any of the types in the list
+    Otherwise, return None
+    """
+    for child in node.children:
+        if child.type in types:
+            return child
+
+    return None
+
 def get_children_by_types(node: Node, types: List):
     """Takes in a node and a list of types as inputs and returns all children matching those types. Otherwise, return an empty list"""
     return [child for child in node.children if child.type in types]
@@ -145,7 +192,7 @@ def get_control_children(node: Node):
 def get_non_control_children(node: Node):
     children = []
     for child in node.children:
-        if child.type not in CONTROL_CHARACTERS:
+        if child.type not in CONTROL_CHARACTERS + ["line_continuation"]:
             children.append(child)
 
     return children

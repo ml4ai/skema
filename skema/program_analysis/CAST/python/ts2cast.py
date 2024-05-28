@@ -7,31 +7,36 @@ from tree_sitter import Language, Parser, Node
 
 from skema.program_analysis.CAST2FN.cast import CAST
 from skema.program_analysis.CAST2FN.model.cast import (
-    Module,
-    SourceRef,
+    AstNode,
     Assignment,
+    Attribute,
+    Call,
+    FunctionDef,
     CASTLiteralValue,
-    Var,
-    VarType,
+    Loop,
+    ModelBreak,
+    ModelContinue,
+    ModelIf,
+    ModelReturn,
+    ModelImport,
+    Module,
     Name,
     Operator,
-    AstNode,
-    SourceCodeDataType,
-    ModelImport,
-    FunctionDef,
-    Loop,
-    Call,
-    ModelReturn,
-    ModelIf,
     RecordDef,
-    Attribute,
     ScalarType,
-    StructureType
+    StructureType,
+    SourceRef,
+    SourceCodeDataType,
+    VarType,
+    Var,
+    ValueConstructor,
+
 )
 
 from skema.program_analysis.CAST.python.node_helper import (
     NodeHelper,
     get_first_child_by_type,
+    get_first_child_from_types,
     get_children_by_types,
     get_first_child_index,
     get_last_child_index,
@@ -40,6 +45,8 @@ from skema.program_analysis.CAST.python.node_helper import (
     FOR_LOOP_LEFT_TYPES,
     FOR_LOOP_RIGHT_TYPES,
     WHILE_COND_TYPES,
+    IF_COND_TYPES,
+    LITERAL_TYPES,
     COMPREHENSION_OPERATORS
 )
 from skema.program_analysis.CAST.python.util import (
@@ -140,6 +147,8 @@ class TS2CAST(object):
             return self.visit_if_statement(node)
         elif node.type == "comparison_operator":
             return self.visit_comparison_op(node)
+        elif node.type == "boolean_operator":
+            return self.visit_boolean_op(node)
         elif node.type == "assignment":
             return self.visit_assignment(node)
         elif node.type == "attribute":
@@ -150,7 +159,7 @@ class TS2CAST(object):
             return self.visit_unary_op(node)
         elif node.type == "binary_operator":
             return self.visit_binary_op(node)
-        elif node.type in ["integer", "list"]:
+        elif node.type in ["float", "integer", "list", "none", "true", "false", "tuple", "dictionary", "string"]:
             return self.visit_literal(node)
         elif node.type in ["list_pattern", "pattern_list", "tuple_pattern"]:
             return self.visit_pattern(node)
@@ -180,6 +189,18 @@ class TS2CAST(object):
             return self.visit_yield(node)
         elif node.type == "assert_statement":
             return self.visit_assert(node)
+        elif node.type == "not_operator":
+            return self.visit_not_operator(node)
+        elif node.type == "try_statement":
+            return self.visit_try(node)
+        elif node.type == "continue_statement":
+            return self.visit_continue(node)
+        elif node.type == "break_statement":
+            return self.visit_break(node)
+        elif node.type == "with_statement":
+            return self.visit_with(node)
+        elif node.type == "raise_statement":
+            return self.visit_raise(node)
         else:
             return self._visit_passthrough(node)
 
@@ -219,7 +240,7 @@ class TS2CAST(object):
         return expr_body
 
     def visit_function_def(self, node: Node) -> FunctionDef:
-        ref = self.node_helper.get_source_ref(node)
+        ref = [self.node_helper.get_source_ref(node)]
 
         name_node = get_first_child_by_type(node, "identifier")
         name = self.visit(name_node)
@@ -257,18 +278,26 @@ class TS2CAST(object):
             name=name.val,
             func_args=func_params,
             body=func_body,
-            source_refs=[ref]
+            source_refs=ref
         )
 
     def visit_return(self, node: Node) -> ModelReturn:
-        ref = self.node_helper.get_source_ref(node)
-        ret_val = node.children[1]
-        ret_cast = self.visit(ret_val)
+        ref = [self.node_helper.get_source_ref(node)]
+        if len(node.children) > 1:
+            ret_val = node.children[1]
+            ret_cast = self.visit(ret_val)
+        else:
+            ret_cast = CASTLiteralValue(
+                value_type=None,
+                value=None,
+                source_code_data_type=["Python", PYTHON_VERSION, str(type(None))],
+                source_refs=ref
+            )
 
-        return ModelReturn(value=get_operand_node(ret_cast), source_refs=[ref])
+        return ModelReturn(value=get_operand_node(ret_cast), source_refs=ref)
 
     def visit_call(self, node: Node) -> Call:
-        ref = self.node_helper.get_source_ref(node)
+        ref = [self.node_helper.get_source_ref(node)]
 
         func_cast = self.visit(node.children[0])
 
@@ -290,7 +319,7 @@ class TS2CAST(object):
                 ScalarType.INTEGER, 
                 value="1",
                 source_code_data_type=["Python", PYTHON_VERSION, str(type(1))],
-                source_refs=[ref]
+                source_refs=ref
             )
             # Add a step value
             if len(func_args) == 2:
@@ -304,25 +333,58 @@ class TS2CAST(object):
         return Call(
             func=func_name, 
             arguments=func_args, 
-            source_refs=[ref]
+            source_refs=ref
         )
 
     def visit_comparison_op(self, node: Node):
-        ref = self.node_helper.get_source_ref(node)
-        op = get_op(self.node_helper.get_operator(node.children[1]))
-        left, _, right = node.children
+        ref = [self.node_helper.get_source_ref(node)]
+        operands = get_non_control_children(node)
+        ops = get_control_children(node)
 
-        left_cast = get_name_node(self.visit(left))
-        right_cast = get_name_node(self.visit(right))
-
-        return Operator(
-            op=op, 
-            operands=[left_cast, right_cast], 
-            source_refs=[ref]
+        source_code_data_type = ["Python", PYTHON_VERSION, str(type(True))]
+        true_val = CASTLiteralValue(
+            ScalarType.BOOLEAN,
+            "True",
+            source_code_data_type=source_code_data_type,
+            source_refs=ref,
+        )
+        false_val = CASTLiteralValue(
+            ScalarType.BOOLEAN,
+            "False",
+            source_code_data_type=source_code_data_type,
+            source_refs=ref,
         )
 
+        idx = len(operands) - 1
+        op_idx = len(ops) - 1
+        tree_root = None
+        while idx > 0:
+            op = get_op(self.node_helper.get_operator(ops[op_idx]))
+            l = get_name_node(self.visit(operands[idx - 1]))
+            r = get_name_node(self.visit(operands[idx]))
+            if op == "ast.And":
+                test = ModelIf(expr=l, body=[r], orelse=[false_val], source_refs=ref)
+            elif op == "ast.Or":
+                test = ModelIf(expr=l, body=[true_val], orelse=[r], source_refs=ref)
+            else:
+                test = Operator(source_language="Python", interpreter="Python",
+                                version=PYTHON_VERSION,
+                                op=op,
+                                operands=[l,r],
+                                source_refs=ref)
+            if tree_root == None:        
+                tree_root = test
+            else:
+                tree_root = ModelIf(expr=test,body=[tree_root],orelse=[false_val], source_refs=ref)
+
+            op_idx = op_idx - 1
+            idx = idx - 1
+
+        return tree_root
+
     def visit_if_statement(self, node: Node) -> ModelIf:
-        if_condition = self.visit(get_first_child_by_type(node, "comparison_operator"))
+        cond = get_first_child_from_types(node, IF_COND_TYPES)
+        if_condition = self.visit(cond)
 
         # Get the body of the if true part
         if_true = get_children_by_types(node, ["block"])[0].children
@@ -387,13 +449,24 @@ class TS2CAST(object):
         )
 
     def visit_assignment(self, node: Node) -> Assignment:
-        left, _, right = node.children
+        # x = y unpacks accordingly, but
+        # x \
+        # = y doesn't unpack accordingly because the line continuation introduces one too many elements
+        # we use *_ to unpack everything between the left and right elements of the assignment, which could be
+        # = or \ =
+        left, *_, right = node.children
         ref = self.node_helper.get_source_ref(node)
         
         # For the RHS of an assignment we want the Name CAST node
         # and not the entire Var CAST node if we're doing an
         # assignment like x = y
-        right_cast = get_name_node(self.visit(right))
+        # Except in the case of a Joined String, we need to do a special handling since that's
+        # treated a bit different due to the Concatenate call
+        right_res = self.visit(right)
+        if isinstance(right_res, Call) and isinstance(right_res.func, Name) and right_res.func.name == "Concatenate":
+            right_cast = self.visit(right)
+        else:
+            right_cast = get_name_node(self.visit(right))
         
         return Assignment(
             left=self.visit(left),
@@ -447,7 +520,39 @@ class TS2CAST(object):
             source_refs=[ref]
         )
 
+    def visit_boolean_op(self, node: Node):
+        ref = [self.node_helper.get_source_ref(node)]
+        operands = get_non_control_children(node)
+        ops =  get_control_children(node)
+        
+        source_code_data_type = ["Python", PYTHON_VERSION, str(type(True))]
+        true_val = CASTLiteralValue(
+            ScalarType.BOOLEAN,
+            "True",
+            source_code_data_type=source_code_data_type,
+            source_refs=ref,
+        )
+        false_val = CASTLiteralValue(
+            ScalarType.BOOLEAN,
+            "False",
+            source_code_data_type=source_code_data_type,
+            source_refs=ref,
+        )
+
+        tree_root = None
+        op = get_op(self.node_helper.get_operator(ops[0]))            
+        l = self.visit(operands[0])
+        r = self.visit(operands[1])
+        if op == "ast.And":
+            test = ModelIf(expr=l, body=[r], orelse=[false_val], source_refs=ref)
+        elif op == "ast.Or":
+            test = ModelIf(expr=l, body=[true_val], orelse=[r], source_refs=ref)
+        tree_root = test
+        
+        return tree_root
+
     def visit_pattern(self, node: Node):
+        ref = [self.node_helper.get_source_ref(node)]
         pattern_cast = []
         for elem in node.children:
             cast = self.visit(elem)
@@ -456,7 +561,7 @@ class TS2CAST(object):
             elif isinstance(cast, AstNode):
                 pattern_cast.append(cast)
 
-        return CASTLiteralValue(value_type=StructureType.TUPLE, value=pattern_cast) 
+        return CASTLiteralValue(value_type=StructureType.TUPLE, value=pattern_cast, source_refs=ref) 
 
     def visit_identifier(self, node: Node) -> Var:
         identifier = self.node_helper.get_identifier(node)
@@ -516,27 +621,117 @@ class TS2CAST(object):
             return CASTLiteralValue(
                 value_type=StructureType.LIST,
                 value = list_items,
-                source_code_data_type=["Python", PYTHON_VERSION, str(type([0]))],
+                source_code_data_type=["Python", PYTHON_VERSION, str(list)],
                 source_refs=[literal_source_ref]
             )
         elif literal_type == "tuple":
             tuple_items = []
             for elem in node.children:
-                cast = self.visit(cast)
+                cast = self.visit(elem)
                 if isinstance(cast, List):
                     tuple_items.extend(cast)
                 elif isinstance(cast, AstNode):
                     tuple_items.append(cast)
 
             return CASTLiteralValue(
-                value_type=StructureType.LIST,
+                value_type=StructureType.TUPLE,
                 value = tuple_items,
-                source_code_data_type=["Python", PYTHON_VERSION, str(type((0)))],
+                source_code_data_type=["Python", PYTHON_VERSION, str(tuple)],
+                source_refs=[literal_source_ref]
+            )
+        elif literal_type == "dictionary":
+            keys = []
+            values = []
+            for elem in get_non_control_children(node):
+                cast = self.visit(elem)
+                if isinstance(cast, tuple):
+                    keys.append(cast[0])
+                    values.append(cast[1])
+                else:
+                    keys.append(cast)
+                    values.append(cast)
+
+            k = [e.value if hasattr(e, "value") else e for e in keys]
+            v = [e.value if hasattr(e, "value") else e for e in values]
+            for key in k:
+                if isinstance(key, CASTLiteralValue) and key.value_type == StructureType.TUPLE:
+                    return [
+                        CASTLiteralValue(
+                            StructureType.MAP,
+                            "",
+                            source_code_data_type=["Python", PYTHON_VERSION, str(dict)],
+                            source_refs=[literal_source_ref]
+                        )
+                    ]
+
+            return CASTLiteralValue(
+                value_type=StructureType.MAP,
+                value = str(list(zip(k,v))),
+                source_code_data_type=["Python", PYTHON_VERSION, str(dict)],
+                source_refs=[literal_source_ref]
+            )
+
+        elif literal_type == "string":
+            string_pieces = get_children_by_types(node, ["string_content", "interpolation"])
+            if "interpolation" in [val.type for val in string_pieces]: # JoinedStr 
+                str_pieces = []
+                for piece in string_pieces:
+                    if piece.type == "string_content":
+                        str_pieces.append(
+                            CASTLiteralValue(
+                                StructureType.LIST, 
+                                self.node_helper.get_identifier(piece), 
+                                ["Python", PYTHON_VERSION, str(str)],
+                                source_refs=[literal_source_ref]
+                            )
+                        ) 
+                    elif piece.type == "interpolation":
+                        interpolation_vals = get_non_control_children(piece)[0]
+                        f_string_val = []
+                        if interpolation_vals.type == "expression_list":
+                            exp_list = get_non_control_children(interpolation_vals)
+                            for exp in exp_list:
+                                cast = self.visit(exp)
+                                if isinstance(cast, List):
+                                    f_string_val.extend(cast)
+                                else:
+                                    f_string_val.append(cast)
+                        else:
+                            f_string_val = [self.visit(piece)]
+                        str_pieces.extend(f_string_val)
+                        
+                concat_node = self.get_gromet_function_node("Concatenate")
+
+                return Call(
+                    func = concat_node,
+                    arguments = str_pieces, 
+                    source_refs = [literal_source_ref]
+                )
+            else:
+                string_value = "".join([self.node_helper.get_identifier(piece) for piece in string_pieces])
+            
+                return CASTLiteralValue(
+                    StructureType.LIST, 
+                    string_value, 
+                    source_code_data_type=["Python", PYTHON_VERSION, str(str)], 
+                    source_refs=[literal_source_ref]
+                )
+        elif literal_type == "ellipsis":
+            return CASTLiteralValue(
+                ScalarType.ELLIPSIS, 
+                "...", 
+                ["Python", PYTHON_VERSION, str(type(...))],
+                source_refs=[literal_source_ref]
+            )
+        elif literal_type == "none":
+            return CASTLiteralValue(
+                value_type=None,
+                value=None,
+                source_code_data_type=["Python", PYTHON_VERSION, str(type(None))],
                 source_refs=[literal_source_ref]
             )
 
     def handle_dotted_name(self, import_stmt) -> ModelImport:
-        ref = self.node_helper.get_source_ref(import_stmt)
         name = self.node_helper.get_identifier(import_stmt)
         self.visit(import_stmt)
 
@@ -552,7 +747,7 @@ class TS2CAST(object):
         return (name, self.node_helper.get_identifier(alias)) 
 
     def visit_import(self, node: Node):
-        ref = self.node_helper.get_source_ref(node)
+        ref = [self.node_helper.get_source_ref(node)]
         to_ret = []
 
         names_list = get_children_by_types(node, ["dotted_name", "aliased_import"])
@@ -568,7 +763,7 @@ class TS2CAST(object):
         return to_ret
 
     def visit_import_from(self, node: Node):
-        ref = self.node_helper.get_source_ref(node)
+        ref = [self.node_helper.get_source_ref(node)]
         to_ret = []
 
         names_list = get_children_by_types(node, ["dotted_name", "aliased_import"])
@@ -591,7 +786,7 @@ class TS2CAST(object):
         return to_ret
 
     def visit_attribute(self, node: Node):
-        ref = self.node_helper.get_source_ref(node)
+        ref = [self.node_helper.get_source_ref(node)]
         obj,_,attr = node.children
         obj_cast = self.visit(obj)
         attr_cast = self.visit(attr)
@@ -658,7 +853,7 @@ class TS2CAST(object):
         # we translate it to a CAST for loop, leaving the actual
         # computation of the body node for the main comprehension handler
         assert node.type == "for_in_clause"
-        ref = self.node_helper.get_source_ref(node)
+        ref = [self.node_helper.get_source_ref(node)]
 
         # NOTE: Assumes the left part with the variable is always the 2nd
         # element in the children and the right part with the actual
@@ -672,16 +867,19 @@ class TS2CAST(object):
         next_func = self.get_gromet_function_node("next")
         
         iter_call = Assignment(
-            left = Var(iterator_name, "Iterator"),
+            left = Var(iterator_name, "Iterator", source_refs=ref),
             right = Call(
                 iter_func,
-                arguments=[right]
-            )
+                arguments=[right],
+                source_refs=ref
+            ),
+            source_refs=ref
         )
 
         next_call = Call(
             next_func,
-            arguments=[Var(iterator_name, "Iterator")]
+            arguments=[Var(iterator_name, "Iterator", source_refs=ref)],
+            source_refs=ref
         )
 
         next_assign = Assignment(
@@ -689,13 +887,14 @@ class TS2CAST(object):
                 "Tuple",
                 [
                     left,
-                    Var(iterator_name, "Iterator"),
-                    Var(stop_cond_name, "Boolean"),
+                    Var(iterator_name, "Iterator", source_refs=ref),
+                    Var(stop_cond_name, "Boolean", source_refs=ref),
                 ],
                 source_code_data_type = ["Python",PYTHON_VERSION,"Tuple"],
                 source_refs=ref
             ),
-            right=next_call
+            right=next_call,
+            source_refs=ref
         )
 
         loop_pre = []
@@ -721,29 +920,26 @@ class TS2CAST(object):
 
         loop_body = [None, next_assign]
 
-        return Loop(pre=loop_pre, expr=loop_expr, body=loop_body, post=[])
+        return Loop(pre=loop_pre, expr=loop_expr, body=loop_body, post=[], source_refs=ref)
 
     def handle_if_clause(self, node: Node):
         assert node.type == "if_clause"
-        ref = self.node_helper.get_source_ref(node)
+        ref = [self.node_helper.get_source_ref(node)]
         conditional = get_children_by_types(node, WHILE_COND_TYPES)[0]
         cond_cast = self.visit(conditional)
         
         return ModelIf(expr=cond_cast,body=[],orelse=[],source_refs=ref)
 
-    def construct_loop_construct(self, node: Node):
-        return []
-
     def visit_list_comprehension(self, node: Node) -> Call:
-        ref = self.node_helper.get_source_ref(node)
+        ref = [self.node_helper.get_source_ref(node)]
 
         temp_list_name = self.variable_context.add_variable(
-            "list__temp_", "Unknown", [ref]
+            "list__temp_", "Unknown", [ref[0]]
         )
 
         temp_asg_cast = Assignment(
-            left=Var(val=temp_list_name), 
-            right=CASTLiteralValue(value=[], value_type=StructureType.LIST),
+            left=Var(val=temp_list_name, source_refs=ref), 
+            right=CASTLiteralValue(value=[], value_type=StructureType.LIST, source_refs=ref),
             source_refs = ref
         )
 
@@ -786,12 +982,12 @@ class TS2CAST(object):
                     prev_if = new_if
         
         if prev_if == []:
-            prev_loop.body[0] = Call(func=Attribute(temp_list_name, append_call), arguments=[computation_cast], source_refs=ref)
+            prev_loop.body[0] = Call(func=Attribute(temp_list_name, append_call, source_refs=ref), arguments=[computation_cast], source_refs=ref)
         else:
             prev_loop.body[0] = prev_if
-            prev_if.body = [Call(func=Attribute(temp_list_name, append_call), arguments=[computation_cast], source_refs=ref)]
+            prev_if.body = [Call(func=Attribute(temp_list_name, append_call, source_refs=ref), arguments=[computation_cast], source_refs=ref)]
 
-        return_cast = ModelReturn(temp_list_name)
+        return_cast = ModelReturn(temp_list_name, source_refs=ref)
 
         func_name = self.variable_context.generate_func("%comprehension_list")
         func_def_cast = FunctionDef(name=func_name, func_args=[], body=[temp_asg_cast,loop_start,return_cast], source_refs=ref)
@@ -807,10 +1003,10 @@ class TS2CAST(object):
         return key,value
 
     def visit_dict_comprehension(self, node: Node) -> Call:
-        ref = self.node_helper.get_source_ref(node)
+        ref = [self.node_helper.get_source_ref(node)]
 
         temp_dict_name = self.variable_context.add_variable(
-            "dict__temp_", "Unknown", [ref]
+            "dict__temp_", "Unknown", [ref[0]]
         )
 
         temp_asg_cast = Assignment(
@@ -857,13 +1053,18 @@ class TS2CAST(object):
                     prev_if.body = [new_if]
                     prev_if = new_if
         
+        def get_comp_cast_name(comp_cast):
+            if isinstance(comp_cast, Var):
+                return comp_cast.val
+            return comp_cast
+        
         if prev_if == []:
-            prev_loop.body[0] = Assignment(left=Var(val=temp_dict_name), right=Call(func=set_call, arguments=[temp_dict_name, computation_cast[0].val, computation_cast[1]], source_refs=ref), source_refs=ref)
+            prev_loop.body[0] = Assignment(left=Var(val=temp_dict_name, source_refs=ref), right=Call(func=set_call, arguments=[temp_dict_name, get_comp_cast_name(computation_cast[0]), computation_cast[1]], source_refs=ref), source_refs=ref)
         else:
             prev_loop.body[0] = prev_if
-            prev_loop = Assignment(left=Var(val=temp_dict_name), right=Call(func=set_call, arguments=[temp_dict_name, computation_cast[0].val, computation_cast[1]], source_refs=ref), source_refs=ref)
+            prev_loop = Assignment(left=Var(val=temp_dict_name, source_refs=ref), right=Call(func=set_call, arguments=[temp_dict_name, get_comp_cast_name(computation_cast[0]), computation_cast[1]], source_refs=ref), source_refs=ref)
 
-        return_cast = ModelReturn(temp_dict_name)
+        return_cast = ModelReturn(temp_dict_name, source_refs=ref)
 
         func_name = self.variable_context.generate_func("%comprehension_dict")
         func_def_cast = FunctionDef(name=func_name, func_args=[], body=[temp_asg_cast,loop_start,return_cast], source_refs=ref)
@@ -876,7 +1077,7 @@ class TS2CAST(object):
     def visit_lambda(self, node: Node) -> Call:
         # TODO: we have to determine how to grab the variables that are being
         # used in the lambda that aren't part of the lambda's arguments
-        ref=self.node_helper.get_source_ref(node)
+        ref=[self.node_helper.get_source_ref(node)]
         params = get_children_by_types(node, ["lambda_parameters"])[0] 
         body = get_children_by_types(node, COMPREHENSION_OPERATORS)[0]
 
@@ -892,7 +1093,7 @@ class TS2CAST(object):
         func_body = body_cast 
 
         func_name = self.variable_context.generate_func("%lambda")
-        func_def_cast = FunctionDef(name=func_name, func_args=parameters, body=[ModelReturn(value=func_body)], source_refs=ref)
+        func_def_cast = FunctionDef(name=func_name, func_args=parameters, body=[ModelReturn(value=func_body, source_refs=ref)], source_refs=ref)
 
         self.generated_fns.append(func_def_cast)
         
@@ -902,7 +1103,7 @@ class TS2CAST(object):
         return Call(func=func_name, arguments=args, source_refs=ref)
 
     def visit_while(self, node: Node) -> Loop:
-        ref = self.node_helper.get_source_ref(node)
+        ref = [self.node_helper.get_source_ref(node)]
         
         # Push a variable context since a loop 
         # can create variables that only it can see
@@ -928,11 +1129,11 @@ class TS2CAST(object):
             expr=loop_cond,
             body=loop_body,
             post=[],
-            source_refs = ref
+            source_refs=ref
         )
 
     def visit_for(self, node: Node) -> Loop:
-        ref = self.node_helper.get_source_ref(node)
+        ref = [self.node_helper.get_source_ref(node)]
 
         # Pre: left, right        
         loop_cond_left = get_children_by_types(node, FOR_LOOP_LEFT_TYPES)[0]
@@ -953,10 +1154,11 @@ class TS2CAST(object):
         loop_pre = []
         loop_pre.append(
             Assignment(
-                left = Var(iterator_name, "Iterator"),
+                left = Var(iterator_name, "Iterator", source_refs=ref),
                 right = Call(
                     iter_func,
-                    arguments=[loop_cond_right_cast]
+                    arguments=[loop_cond_right_cast],
+                    source_refs=ref
                 )
             )
         )
@@ -967,16 +1169,18 @@ class TS2CAST(object):
                     "Tuple",
                     [
                         loop_cond_left_cast,
-                        Var(iterator_name, "Iterator"),
-                        Var(stop_cond_name, "Boolean"),
+                        Var(iterator_name, "Iterator", source_refs=ref),
+                        Var(stop_cond_name, "Boolean", source_refs=ref),
                     ],
                     source_code_data_type = ["Python",PYTHON_VERSION,"Tuple"],
                     source_refs=ref
                 ),
                 right=Call(
                     next_func,
-                    arguments=[Var(iterator_name, "Iterator")],
+                    arguments=[Var(iterator_name, "Iterator", source_refs=ref)],
+                    source_refs=ref
                 ),
+                source_refs=ref
             )
         )
 
@@ -1014,13 +1218,15 @@ class TS2CAST(object):
                     "Tuple",
                     [
                         loop_cond_left_cast,
-                        Var(iterator_name, "Iterator"),
-                        Var(stop_cond_name, "Boolean"),
+                        Var(iterator_name, "Iterator", source_refs=ref),
+                        Var(stop_cond_name, "Boolean", source_refs=ref),
                     ],
+                    source_refs=ref
                 ),
                 right=Call(
                     next_func,
-                    arguments=[Var(iterator_name, "Iterator")],
+                    arguments=[Var(iterator_name, "Iterator", source_refs=ref)],
+                    source_refs=ref
                 ),
             )
         )
@@ -1045,15 +1251,17 @@ class TS2CAST(object):
 
     def retrieve_class_attrs(self, init_func: FunctionDef):
         attrs = []
-        for stmt in init_func.body:
-            if isinstance(stmt, Assignment):
-                if isinstance(stmt.left, Attribute):
-                    if stmt.left.value.name == "self":
-                        attrs.append(stmt.left.attr)
+        if init_func != None:
+            for stmt in init_func.body:
+                if isinstance(stmt, Assignment):
+                    if isinstance(stmt.left, Attribute):
+                        if stmt.left.value.name == "self":
+                            attrs.append(stmt.left.attr)
 
         return attrs
 
     def visit_class_definition(self, node):
+        ref = [self.node_helper.get_source_ref(node)]
         class_name_node = get_first_child_by_type(node, "identifier")
         class_cast = self.visit(class_name_node)
     
@@ -1069,7 +1277,46 @@ class TS2CAST(object):
         init_func = self.retrieve_init_func(func_defs_cast)        
         attributes = self.retrieve_class_attrs(init_func)
 
-        return RecordDef(name=get_name_node(class_cast).name, bases=[], funcs=func_defs_cast, fields=attributes)
+        return RecordDef(name=get_name_node(class_cast).name, bases=[], funcs=func_defs_cast, fields=attributes, source_refs=ref)
+
+    def visit_not_operator(self, node):
+        # Handles the case of 
+        # not X
+        # where X is some language idiom that returns a value that fits into 
+        # not
+        # Seen mainly in if statements
+
+        ref = [self.node_helper.get_source_ref(node)]
+        arg = get_non_control_children(node)[0]
+        arg_cast = self.visit(arg)
+        arg_list = arg_cast if isinstance(arg_cast, List) else [arg_cast]
+        
+        bool_func = self.get_gromet_function_node("bool")
+        args = [Operator(
+            source_language="Python",
+            interpreter="Python",
+            version=PYTHON_VERSION,
+            op = "ast.Not", 
+            operands=arg_list, 
+            source_refs=ref
+        )]
+
+        bool_call = Call(func=bool_func, arguments=args, source_refs=ref)        
+        true_val = CASTLiteralValue(
+            value_type=ScalarType.BOOLEAN,
+            value="True",
+            source_code_data_type=["Python", PYTHON_VERSION, str(type(True))],
+            source_refs=ref
+        )
+
+        return Operator(
+            source_language="Python",
+            interpreter="Python",
+            version=PYTHON_VERSION,
+            op = "ast.Eq", 
+            operands=[bool_call, true_val], 
+            source_refs=ref
+        )
 
 
     def visit_name(self, node):
@@ -1102,8 +1349,8 @@ class TS2CAST(object):
         return self.variable_context.add_variable(func_name, "function", None)
             
     def visit_yield(self, node):
-        source_code_data_type = ["Python", "3.8", "List"]
-        ref = self.node_helper.get_source_ref(node)
+        source_code_data_type = ["Python", PYTHON_VERSION, "List"]
+        ref = [self.node_helper.get_source_ref(node)]
         return [
             CASTLiteralValue(
                 StructureType.LIST,
@@ -1114,8 +1361,8 @@ class TS2CAST(object):
         ]
 
     def visit_assert(self, node):
-        source_code_data_type = ["Python", "3.8", "List"]
-        ref = self.node_helper.get_source_ref(node)
+        source_code_data_type = ["Python", PYTHON_VERSION, "List"]
+        ref = [self.node_helper.get_source_ref(node)]
         return [
             CASTLiteralValue(
                 StructureType.LIST,
@@ -1125,6 +1372,71 @@ class TS2CAST(object):
             )   
         ]
 
+    def visit_raise(self, node):
+        ref = [self.node_helper.get_source_ref(node)]
+        # exc_name = self.visit(node.children[0])
+        raise_call = self.get_gromet_function_node("raise")
+        return Call(
+            func=raise_call,
+            arguments=[],
+            source_refs=ref
+        )
+
+    def visit_delete(self, node):
+        # NOTE: I don't think tree-sitter Python supports this idiom, so it isn't
+        # being used anywhere
+        source_code_data_type = ["Python", PYTHON_VERSION, "List"]
+        ref = [self.node_helper.get_source_ref(node)]
+        return [
+            CASTLiteralValue(
+                StructureType.LIST,
+                "DeleteNotImplemented",
+                source_code_data_type,
+                ref
+            )   
+        ]
+
+    def visit_try(self, node):
+        body = []        
+        try_block = get_children_by_types(node, ["block"])[0]
+        for piece in try_block.children:
+            cast = self.visit(piece)
+            if isinstance(cast, List):
+                body.extend(cast)
+            else:
+                body.append(cast)
+
+        except_block = get_children_by_types(get_first_child_by_type(node, "except_clause"), ["block"])[0]
+        for piece in except_block.children:
+            cast = self.visit(piece)
+            if isinstance(cast, List):
+                body.extend(cast)
+            else:
+                body.append(cast)
+
+        finally_block = get_children_by_types(get_first_child_by_type(node, "finally_clause"), ["block"])[0]
+        for piece in finally_block.children:
+            cast = self.visit(piece)
+            if isinstance(cast, List):
+                body.extend(cast)
+            else:
+                body.append(cast)
+
+        return body
+
+    def visit_with(self, node):
+        ref = [self.node_helper.get_source_ref(node)]
+        variables = []
+        body = []
+        return variables + body
+
+    def visit_break(self, node):
+        ref = [self.node_helper.get_source_ref(node)]
+        return ModelBreak(source_refs=ref)
+
+    def visit_continue(self, node):
+        ref = [self.node_helper.get_source_ref(node)]
+        return ModelContinue(source_refs=ref)
 
 def get_name_node(node):
     # Given a CAST node, if it's type Var, then we extract the name node out of it
@@ -1136,6 +1448,8 @@ def get_name_node(node):
         return get_name_node(cur_node.attr)
     if isinstance(cur_node, Var):
         return cur_node.val
+    if isinstance(cur_node, Call):
+        return get_name_node(cur_node.func)
     else:
         return cur_node
 
